@@ -1,0 +1,90 @@
+FROM debian:bullseye-slim as base
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update 
+RUN apt-get install -y python3-pip git
+RUN apt-get install -y espeak
+RUN apt-get install -y cmake
+
+RUN git clone --depth 1 https://github.com/isletennos/MMVC_Trainer.git -b v1.3.1.0
+
+RUN pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
+
+RUN pip install Cython==0.29.32
+RUN pip install numpy==1.22.4 
+RUN pip install scipy==1.9.0
+RUN pip install librosa==0.9.2
+RUN pip install phonemizer==3.2.1
+RUN pip install Unidecode==1.3.4
+RUN pip install resampy==0.4.0
+
+RUN pip install tqdm==4.64.0
+RUN pip install retry==0.9.2
+RUN pip install psutil==5.9.1
+RUN pip install python-socketio==5.7.1
+RUN pip install eventlet==0.33.1
+
+RUN pip install pyopenjtalk==0.2.0
+RUN pip install tensorboard==2.10.0
+RUN pip install matplotlib==3.5.3
+
+WORKDIR /MMVC_Trainer/monotonic_align
+RUN cythonize -3 -i core.pyx \
+ && mv core.cpython-39-x86_64-linux-gnu.so monotonic_align/
+
+
+FROM debian:bullseye-slim
+RUN apt-get update \
+        && apt-get install -y python3-pip espeak\
+        && apt-get clean \
+        && rm -rf /var/lib/apt/lists/*
+
+COPY --from=base /usr/local/lib/python3.9/dist-packages /usr/local/lib/python3.9/dist-packages
+COPY --from=base /MMVC_Trainer /MMVC_Trainer
+
+COPY fine_model/G_180000.pth /MMVC_Trainer/fine_model/G_180000.pth
+COPY fine_model/D_180000.pth /MMVC_Trainer/fine_model/D_180000.pth
+
+WORKDIR /MMVC_Trainer
+ADD /setup.sh  /MMVC_Trainer/
+
+# ENTRYPOINT ["/bin/bash", "setup.sh"]
+# CMD [ "8", "false"]
+
+# FROM ubuntu:focal-20220531 as base
+
+# ARG DEBIAN_FRONTEND=noninteractive
+
+# RUN apt-get update && apt-get install -y libfreetype6-dev g++ cmake sox libsndfile1-dev ffmpeg flac python3-pip
+# RUN apt-get install -y git emacs mlocate curl wget unzip
+
+# RUN git clone https://github.com/isletennos/MMVC_Trainer.git
+
+# RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
+#     sh Miniconda3-latest-Linux-x86_64.sh -b -p /opt/miniconda3 && \
+#     rm -r Miniconda3-latest-Linux-x86_64.sh
+
+# ENV PATH /opt/miniconda3/bin:$PATH
+# RUN pip install --upgrade pip && \
+#      conda update conda  && \
+#      conda create -n mmvc -c defaults python=3.7 &&  \
+#      conda init && \
+#      echo "conda activate mmvc" >> ~/.bashrc 
+
+# SHELL ["conda", "run", "-n", "mmvc", "/bin/bash", "-c"]
+
+# ENV CONDA_DEFAULT_ENV mmvc && \
+#     PATH /opt/conda/envs/mmvc/bin:$PATH
+
+# RUN pip install pyopenjtalk
+# RUN pip install Cython==0.29.21 librosa==0.8.0 matplotlib==3.3.1 numpy phonemizer==2.2.1 scipy==1.5.2 tensorboard  Unidecode==1.1.1 retry tqdm resampy==0.2.2
+# RUN pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
+
+# RUN pip install  psutil
+
+# COPY fine_model/G_180000.pth /MMVC_Trainer/fine_model/G_180000.pth
+# COPY fine_model/D_180000.pth /MMVC_Trainer/fine_model/D_180000.pth
+
+# WORKDIR /MMVC_Trainer
+

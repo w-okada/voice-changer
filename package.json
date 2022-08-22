@@ -1,0 +1,21 @@
+{
+  "name": "voice-changer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:docker": "date +%Y%m%d%H%M%S > trainer/dummy && DOCKER_BUILDKIT=1 docker build --ssh default -f trainer/Dockerfile trainer/ -t mmvc_trainer_docker",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/w-okada/voice-changer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/w-okada/voice-changer/issues"
+  },
+  "homepage": "https://github.com/w-okada/voice-changer#readme"
+}
