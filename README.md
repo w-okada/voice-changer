@@ -1,3 +1,7 @@
+Voice Changer AI Trainer and Player Container
+----
+
+[MMVC](https://github.com/isletennos/MMVC_Trainer)のトレーニングと実行を簡単にするためのDockerコンテナです。
 
 # 使用方法
 ## 前提
@@ -31,11 +35,22 @@ Sun Sep 15 22:40:52 2019
 ```
 こんな感じの出力が出ればOKです。
 
-ボイスチェンジ時にはGPUは必須ではありません。あればより高速にぼいちぇんできるかもしれません。
+ボイスチェンジ時にはGPUは必須ではありません。あればより高速にボイスチェンジできるかもしれません。
 
 ## トレーニングデータの準備
+### Data作成（自分の声）
+
+[MMVC](https://github.com/isletennos/MMVC_Trainer)のドキュメントに従って、ITAコーパスなどの台本データ(textデータ)を入手し、でwavデータを作成してください。textデータとwavデータは、dataset/00_myvoiceフォルダの下においてください。
+
+wavデータの作成は、こちらの[voice-recorder](https://github.com/w-okada/voice-recorder)アプリケーションを使用しても作成できます。
+wavのサンプリングレートやファイル名など、MMVCに適したデータを作成するように作られているので、いくらか手間が省けるかと思います。
+
+### Data作成（なりたい声）
+[MMVC](https://github.com/isletennos/MMVC_Trainer)のドキュメントに従って、公式サポートされている声データ(.zip形式)を取得してください。データはzip形式のまま、datasetフォルダにおいてください。
+
 
 ### Datasetの中身
+上記Data作成を実施すると、次のようなフォルダ構成になると思います。ご確認ください。
 ```
 $ ls dataset -l
 合計 1656692
@@ -61,10 +76,16 @@ $ EXP_NAME=001_exp
 # テスト用フォルダ作成
 $ sh template.sh $EXP_NAME
 
-$ docker run -it --gpus all --shm-size=2g \
+
+docker run -v .:/go/src/app:ro [container id]
+USER_ID=$(id -u)
+GROUP_ID=$(id -g)
+$ USER_ID=$(id -u) docker run -it --gpus all --shm-size=2g \
   -v `pwd`/exp/${EXP_NAME}/dataset:/MMVC_Trainer/dataset \
   -v `pwd`/exp/${EXP_NAME}/logs:/MMVC_Trainer/logs \
   -v `pwd`/exp/${EXP_NAME}/filelists:/MMVC_Trainer/filelists \
+  -e LOCAL_UID=$(id -u $USER) \
+  -e LOCAL_GID=$(id -g $USER) \
   -p 6008:6006  mmvc_trainer_docker
 ```
 

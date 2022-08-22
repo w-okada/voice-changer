@@ -1,6 +1,5 @@
 #!/bin/bash
 
-## 005_expより複数話者対応。myvoiceのフォルダ階層を一つ深くする。
 EXP_NAME=$1
 
 echo $EXP_NAME

@@ -36,7 +36,7 @@ RUN cythonize -3 -i core.pyx \
 
 FROM debian:bullseye-slim
 RUN apt-get update \
-        && apt-get install -y python3-pip espeak\
+        && apt-get install -y python3-pip espeak gosu\
         && apt-get clean \
         && rm -rf /var/lib/apt/lists/*
 
@@ -46,11 +46,20 @@ COPY --from=base /MMVC_Trainer /MMVC_Trainer
 COPY fine_model/G_180000.pth /MMVC_Trainer/fine_model/G_180000.pth
 COPY fine_model/D_180000.pth /MMVC_Trainer/fine_model/D_180000.pth
 
+# RUN groupadd -g 61000 docker
+# RUN useradd -g 61000 -l -m -s /bin/false -u 61000 docker
+# USER docker
+
 WORKDIR /MMVC_Trainer
 ADD /setup.sh  /MMVC_Trainer/
+ADD /exec.sh  /MMVC_Trainer/
+RUN chmod 0777 . -R
+# RUN chmod 0777 exec.sh
+# RUN chmod 0666 train_ms.py
+RUN chmod 0777 /usr/local/lib/python3.9/dist-packages/pyopenjtalk
 
-# ENTRYPOINT ["/bin/bash", "setup.sh"]
-# CMD [ "8", "false"]
+ENTRYPOINT ["/bin/bash", "setup.sh"]
+CMD [ "-h"]
 
 # FROM ubuntu:focal-20220531 as base
 
