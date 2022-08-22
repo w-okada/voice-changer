@@ -14,5 +14,7 @@ useradd -u $USER_ID -o -m user
 groupmod -g $GROUP_ID user
 
 #su user
-echo "parameter: $@"
-exec /usr/sbin/gosu user /bin/bash exec.sh "$@"
+# echo "parameter: $@"
+# exec /usr/sbin/gosu user /bin/bash exec.sh "$@"
+/bin/bash
+

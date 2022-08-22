@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build:docker": "date +%Y%m%d%H%M%S > trainer/dummy && DOCKER_BUILDKIT=1 docker build --ssh default -f trainer/Dockerfile trainer/ -t mmvc_trainer_docker",
+    "build:docker": "date +%Y%m%d%H%M%S > trainer/dummy && DOCKER_BUILDKIT=1 docker build -f trainer/Dockerfile trainer/ -t voice-changer",
+    "push:docker": "bash script/001_pushDocker.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

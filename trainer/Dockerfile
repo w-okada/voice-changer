@@ -1,3 +1,4 @@
+FROM dannadori/voice-changer-internal:20220823_035121 as front
 FROM debian:bullseye-slim as base
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -36,64 +37,25 @@ RUN cythonize -3 -i core.pyx \
 
 FROM debian:bullseye-slim
 RUN apt-get update \
-        && apt-get install -y python3-pip espeak gosu\
+        && apt-get install -y python3-pip espeak gosu libsndfile1-dev\
         && apt-get clean \
         && rm -rf /var/lib/apt/lists/*
 
-COPY --from=base /usr/local/lib/python3.9/dist-packages /usr/local/lib/python3.9/dist-packages
-COPY --from=base /MMVC_Trainer /MMVC_Trainer
-
+### Copy local resource
 COPY fine_model/G_180000.pth /MMVC_Trainer/fine_model/G_180000.pth
 COPY fine_model/D_180000.pth /MMVC_Trainer/fine_model/D_180000.pth
 
-# RUN groupadd -g 61000 docker
-# RUN useradd -g 61000 -l -m -s /bin/false -u 61000 docker
-# USER docker
+### Copy from base
+COPY --from=base --chmod=777 /usr/local/lib/python3.9/dist-packages /usr/local/lib/python3.9/dist-packages
+COPY --from=base --chmod=777 /MMVC_Trainer /MMVC_Trainer
 
 WORKDIR /MMVC_Trainer
 ADD /setup.sh  /MMVC_Trainer/
 ADD /exec.sh  /MMVC_Trainer/
-RUN chmod 0777 . -R
-# RUN chmod 0777 exec.sh
-# RUN chmod 0666 train_ms.py
-RUN chmod 0777 /usr/local/lib/python3.9/dist-packages/pyopenjtalk
 
+### Copy from frontend
+COPY --from=front --chmod=777 /voice-changer-internal/frontend/dist /voice-changer-internal/frontend/dist
+COPY --from=front --chmod=777 /voice-changer-internal/voice-change-service /voice-changer-internal/voice-change-service
+RUN chmod 0777 /voice-changer-internal/voice-change-service 
 ENTRYPOINT ["/bin/bash", "setup.sh"]
 CMD [ "-h"]
-
-# FROM ubuntu:focal-20220531 as base
-
-# ARG DEBIAN_FRONTEND=noninteractive
-
-# RUN apt-get update && apt-get install -y libfreetype6-dev g++ cmake sox libsndfile1-dev ffmpeg flac python3-pip
-# RUN apt-get install -y git emacs mlocate curl wget unzip
-
-# RUN git clone https://github.com/isletennos/MMVC_Trainer.git
-
-# RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
-#     sh Miniconda3-latest-Linux-x86_64.sh -b -p /opt/miniconda3 && \
-#     rm -r Miniconda3-latest-Linux-x86_64.sh
-
-# ENV PATH /opt/miniconda3/bin:$PATH
-# RUN pip install --upgrade pip && \
-#      conda update conda  && \
-#      conda create -n mmvc -c defaults python=3.7 &&  \
-#      conda init && \
-#      echo "conda activate mmvc" >> ~/.bashrc 
-
-# SHELL ["conda", "run", "-n", "mmvc", "/bin/bash", "-c"]
-
-# ENV CONDA_DEFAULT_ENV mmvc && \
-#     PATH /opt/conda/envs/mmvc/bin:$PATH
-
-# RUN pip install pyopenjtalk
-# RUN pip install Cython==0.29.21 librosa==0.8.0 matplotlib==3.3.1 numpy phonemizer==2.2.1 scipy==1.5.2 tensorboard  Unidecode==1.1.1 retry tqdm resampy==0.2.2
-# RUN pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
-
-# RUN pip install  psutil
-
-# COPY fine_model/G_180000.pth /MMVC_Trainer/fine_model/G_180000.pth
-# COPY fine_model/D_180000.pth /MMVC_Trainer/fine_model/D_180000.pth
-
-# WORKDIR /MMVC_Trainer
-

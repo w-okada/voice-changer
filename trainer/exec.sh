@@ -41,7 +41,7 @@ config=
 model=
 
 # オプション解析
-while getopts tb:rvc:m:h OPT; do
+while getopts tb:rvm:c:h OPT; do
     case $OPT in
     t) 
         training_flag=true
@@ -106,17 +106,22 @@ if $training_flag; then
     fi
 fi
 
-# if $voice_change_flag; then
-#     if [[ -z "$config" ]]; then
-#         warn "コンフィグファイル(-c)を指定してください"
-#     fi
-#     if [[ -z "$model" ]]; then
-#         warn "モデルファイル(-m)を指定してください"
-#     fi
+if $voice_change_flag; then
+    if [[ -z "$config" ]]; then
+        warn "コンフィグファイル(-c)を指定してください"
+    fi
+    if [[ -z "$model" ]]; then
+        warn "モデルファイル(-m)を指定してください"
+    fi
 
-#     cp -r /resources/* .
-#     if [[ -e ./setting.json ]]; then
-#         cp ./setting.json ../frontend/dist/assets/setting.json
-#     fi
-#     python3 serverSIO.py 8080 $config $model
-# fi
+    cd /voice-changer-internal/voice-change-service
+
+    cp -r /resources/* .
+    if [[ -e ./setting.json ]]; then
+        cp ./setting.json ../frontend/dist/assets/setting.json
+    fi
+    echo "-----------!!"
+    echo $config $model
+    echo $model
+    python3 serverSIO.py 8080 $config $model
+fi
