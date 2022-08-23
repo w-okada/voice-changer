@@ -93,41 +93,41 @@ fi
 
 
 
-# if $training_flag; then
+if $training_flag; then
 
 
-#     python3 create_dataset_jtalk.py -f train_config -s 24000 -m dataset/multi_speaker_correspondence.txt
-#     # date_tag=`date +%Y%m%d%H%M%S`
-#     sed -ie 's/80000/8000/' train_ms.py
-#     sed -ie "s/\"batch_size\": 10/\"batch_size\": $batch_size/" configs/train_config.json
+    python3 create_dataset_jtalk.py -f train_config -s 24000 -m dataset/multi_speaker_correspondence.txt
+    # date_tag=`date +%Y%m%d%H%M%S`
+    sed -ie 's/80000/8000/' train_ms.py
+    sed -ie "s/\"batch_size\": 10/\"batch_size\": $batch_size/" configs/train_config.json
+    sed -ie "s/torch.cuda.device_count()/1/" train_ms.py
+    python3 -m tensorboard.main --logdir logs --port 6006 --host 0.0.0.0 &
 
-#     python3 -m tensorboard.main --logdir logs --port 6006 --host 0.0.0.0 &
+    if ${resume_flag}; then
+        echo "トレーニング再開。バッチサイズ: ${batch_size}。"
+        python3 train_ms.py -c configs/train_config.json -m vc
+    else
+        echo "トレーニング開始。バッチサイズ: ${batch_size}。"
+        python3 train_ms.py -c configs/train_config.json -m vc -fg fine_model/G_180000.pth -fd fine_model/D_180000.pth
+    fi
+fi
 
-#     if ${resume_flag}; then
-#         echo "トレーニング再開。バッチサイズ: ${batch_size}。"
-#         python3 train_ms.py -c configs/train_config.json -m vc
-#     else
-#         echo "トレーニング開始。バッチサイズ: ${batch_size}。"
-#         python3 train_ms.py -c configs/train_config.json -m vc -fg fine_model/G_180000.pth -fd fine_model/D_180000.pth
-#     fi
-# fi
+if $voice_change_flag; then
+    if [[ -z "$config" ]]; then
+        warn "コンフィグファイル(-c)を指定してください"
+    fi
+    if [[ -z "$model" ]]; then
+        warn "モデルファイル(-m)を指定してください"
+    fi
 
-# if $voice_change_flag; then
-#     if [[ -z "$config" ]]; then
-#         warn "コンフィグファイル(-c)を指定してください"
-#     fi
-#     if [[ -z "$model" ]]; then
-#         warn "モデルファイル(-m)を指定してください"
-#     fi
+    cd /voice-changer-internal/voice-change-service
 
-#     cd /voice-changer-internal/voice-change-service
-
-#     cp -r /resources/* .
-#     if [[ -e ./setting.json ]]; then
-#         cp ./setting.json ../frontend/dist/assets/setting.json
-#     fi
-#     echo "-----------!!"
-#     echo $config $model
-#     echo $model
-#     python3 serverSIO.py 8080 $config $model
-# fi
+    cp -r /resources/* .
+    if [[ -e ./setting.json ]]; then
+        cp ./setting.json ../frontend/dist/assets/setting.json
+    fi
+    echo "-----------!!"
+    echo $config $model
+    echo $model
+    python3 serverSIO.py 8080 $config $model
+fi

@@ -1,7 +1,20 @@
-Voice Changer AI Trainer and Player Container
+Voice Changer Trainer and Player Container
 ----
+AIを使ったリアルタイムボイスチェンジャー[MMVC](https://github.com/isletennos/MMVC_Trainer)のトレーニングと実行を簡単にするためのヘルパーDockerコンテナです。
+このコンテナを用いることで、以下のことを簡単に行うことができます。
 
-[MMVC](https://github.com/isletennos/MMVC_Trainer)のトレーニングと実行を簡単にするためのDockerコンテナです。
+- MMVCのモデルのトレーニング
+- MMVCモデルを用いたリアルタイム声質変換（ボイスチェンジャ）
+  - リアルタイム話者切り替え
+  - CPU/GPU切り替え
+  - リアルタイム/ニアリアルタイム声質変換
+
+使用方法等はwikiをご参照ください。
+
+
+# 前提
+本ヘルパーコンテナはDockerで動かすことを想定しています。
+Dockerを動かせる環境の用意は各自で行ってください。
 
 # 使用方法
 ## 前提
