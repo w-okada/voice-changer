@@ -3,7 +3,7 @@
 EXP_NAME=$1
 shift 
 
-docker run -it --gpus all --shm-size=64M \
+docker run -it --gpus all --shm-size=128M \
   -v `pwd`/exp/${EXP_NAME}/dataset:/MMVC_Trainer/dataset \
   -v `pwd`/exp/${EXP_NAME}/logs:/MMVC_Trainer/logs \
   -v `pwd`/exp/${EXP_NAME}/filelists:/MMVC_Trainer/filelists \
