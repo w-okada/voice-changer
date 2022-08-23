@@ -10,6 +10,4 @@ docker run -it --gpus all --shm-size=2g \
   -v `pwd`/vc_resources:/resources \
   -e LOCAL_UID=$(id -u $USER) \
   -e LOCAL_GID=$(id -g $USER) \
-  -p 6008:6006 -p 8081:8080 mmvc_trainer_docker "$@"
-
-
+  -p 6006:6006 -p 8080:8080 dannadori/voice-changer:20220823_085004 "$@"

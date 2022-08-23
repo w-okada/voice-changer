@@ -15,6 +15,6 @@ groupmod -g $GROUP_ID user
 
 #su user
 # echo "parameter: $@"
-# exec /usr/sbin/gosu user /bin/bash exec.sh "$@"
-/bin/bash
+exec /usr/sbin/gosu user /bin/bash exec.sh "$@"
+#/bin/bash
 

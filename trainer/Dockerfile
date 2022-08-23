@@ -48,6 +48,7 @@ COPY fine_model/D_180000.pth /MMVC_Trainer/fine_model/D_180000.pth
 ### Copy from base
 COPY --from=base --chmod=777 /usr/local/lib/python3.9/dist-packages /usr/local/lib/python3.9/dist-packages
 COPY --from=base --chmod=777 /MMVC_Trainer /MMVC_Trainer
+RUN chmod 0777 /MMVC_Trainer 
 
 WORKDIR /MMVC_Trainer
 ADD /setup.sh  /MMVC_Trainer/
