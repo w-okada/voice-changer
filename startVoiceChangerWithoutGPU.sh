@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker run -it --gpus all --shm-size=128M \
+docker run -it --shm-size=128M \
   -v `pwd`/vc_resources:/resources \
   -e LOCAL_UID=$(id -u $USER) \
   -e LOCAL_GID=$(id -g $USER) \
