@@ -1,0 +1,68 @@
+ずんだもん（人型）　モデルデータ利用規約
+
+３Ｄモデリング：絹井けい
+販売元：SSS　LLC.　(https://zunko.jp)※以下「当社」とします。
+
+・本モデルを利用、もしくは改変した時点で本規約に同意したものとします。
+・本ライセンスの内容は変更する場合があり、最新のものが適用されます。
+・本ライセンスは日本語のものが正本とされ、翻訳と差異がある場合は常に日本語のものが優先されます。
+・本モデルの二次創作物を利用することによって生じた何らかのトラブル・損失に対し、絹井けい、および当社は一切責任を負わないものとします。
+・本モデルを改変した二次創作物の著作権法上の全ての権利は当社に帰属するものとします。
+
+
+●利用規約●
+本モデルでは基礎条項に加え、個別条項を元に以下の行為を許可します。
+
+・二次的著作物の配布の許可
+・成人向け表現（性的表現）の許可
+・成人向け表現（暴力表現）の許可
+・本モデルでの利用を目的とした衣装等を配布・頒布・販売する場合に限り、本モデルが含む以下のデータを流用することを許可します。ただし改変が著しく少ない場合を除きます。
+ 1.本モデルを構成するボーン・ウェイト
+ 2.モデルの素体パーツ「ずんだもん（人型）」メッシュデータ
+・当モデルデータを営利目的で使用する場合、販売元であるSSS LLC.が運営する「東北ずん子」ウェブサイトにて記載されている「版権商用利用の手引き(https://zunko.jp/con_shoushi.html)」に従ってください。
+　ただし以下の場合、事前受諾は不要です。
+　1.印刷やディスクプレスなど、個人から依頼されたものを複製する場合
+　2.動画や写真への映り込みなど、本モデルがメインコンテンツと判断されない場合
+
+
+
+●お問合せ先●
+
+ホームページ：https://zunko.jp/
+版権商用利用の手引き：https://zunko.jp/con_shoushi.html
+
+
+
+EN:Zundamon (humanoid) Model Data Terms of Use
+
+3D modeling: Kei Kinui
+Distributed by: SSS LLC. (https://zunko.jp) hereinafter referred to as "the Company".
+
+*By using or modifying this model, you agree to be bound by these terms.
+*The content of this license is subject to change, and the latest version shall apply.
+*The Japanese version of this license shall be the original, and if there are any differences between the Japanese version and the translated version, the Japanese version shall always take precedence.
+*Kei Kinui and the Company shall not be held responsible for any problems or losses that may arise from the use of secondary works of this model.
+*All rights under copyright law for secondary works modified from this model shall belong to the Company.
+
+
+*Terms of Use*
+In addition to the basic terms, this model permits the following actions based on the individual terms.
+
+*Permission to distribute derivative works
+*Permission for adult expression (sexual expression)
+*Permission to use adult-oriented expressions (violent expressions)
+*Permission is granted to use the following data included in this model only for the purpose of distributing or selling costumes, etc. for use in this model. However, this excludes cases where the modifications are extremely small.
+ 1:The bones and weights that make up the model
+ 2:Mesh data of the model's body part "Zundamon (humanoid)
+*If you wish to use this model data for commercial purposes, please follow the "Guide to the Commercial Use of Copyrighted Material (https://zunko.jp/con_shoushi.html)" described on the "Tohoku Zunko" website operated by SSS LLC, the distributor.
+　However, prior consent is not required in the following cases
+　1:Reproduction of materials commissioned by individuals, such as printing or disc pressing.
+　2:When this model is not judged to be the main content, such as reflection in videos or photos.
+
+
+
+*contact us*
+
+HomePage(https://zunko.jp)
+
+Guide to the Commercial Use of Copyrighted Material(https://zunko.jp/con_shoushi.html)
