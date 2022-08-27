@@ -2,7 +2,7 @@
 
 # 参考:https://programwiz.org/2022/03/22/how-to-write-shell-script-for-option-parsing/
 
-DOCKER_IMAGE=dannadori/voice-changer:20220827_105904
+DOCKER_IMAGE=dannadori/voice-changer:20220827_112334
 TENSORBOARD_PORT=6006
 VOICE_CHANGER_PORT=8080
 
