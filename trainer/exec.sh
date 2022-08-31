@@ -76,20 +76,20 @@ done
 # ## コマンドライン引数から、オプション引数分を削除
 # # shift $((OPTIND - 1))
 
-# モード解析
-if $training_flag && $voice_change_flag; then
-    warn "-t（トレーニングモード） と -v（ボイチェンモード）は同時に指定できません。"
-    exit 1
-elif $training_flag; then
-    echo "■■■  ト レ ー ニ ン グ モ ー ド   ■■■"
-elif $voice_change_flag; then
-    echo "■■■  ボ イ チ ェ ン モ ー ド  ■■■"
-elif $escape_flag; then
-    /bin/bash
-else
-    warn "-t（トレーニングモード） と -v（ボイチェンモード）のいずれかを指定してください。"
-    exit 1
-fi
+# # モード解析
+# if $training_flag && $voice_change_flag; then
+#     warn "-t（トレーニングモード） と -v（ボイチェンモード）は同時に指定できません。"
+#     exit 1
+# elif $training_flag; then
+#     echo "■■■  ト レ ー ニ ン グ モ ー ド   ■■■"
+# elif $voice_change_flag; then
+#     echo "■■■  ボ イ チ ェ ン モ ー ド  ■■■"
+# elif $escape_flag; then
+#     /bin/bash
+# else
+#     warn "-t（トレーニングモード） と -v（ボイチェンモード）のいずれかを指定してください。"
+#     exit 1
+# fi
 
 
 
