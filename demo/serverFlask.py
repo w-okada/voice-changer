@@ -37,7 +37,7 @@ dictConfig({
     }
 })
 
-app = Flask(__name__, static_folder="/voice-changer-internal/frontend/dist", static_url_path='/')
+app = Flask(__name__, static_folder="../frontend/dist", static_url_path='/')
 CORS(app, resources={r"/*": {"origins": "*"}}) 
 
 class VoiceChanger():
