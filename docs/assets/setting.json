@@ -1,5 +1,6 @@
 {
     "app_title": "voice-changer",
+    "majar_mode": "docker",
     "voice_changer_server_url": "http://localhost:8080/test",
     "sample_rate": 48000,
     "buffer_size": 1024,
