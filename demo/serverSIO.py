@@ -17,7 +17,7 @@ from text.symbols import symbols
 
 
 
-class MyCustomNamespace(socketio.Namespace): # 名前空間を設定するクラス
+class MyCustomNamespace(socketio.Namespace): 
     def __init__(self, namespace, config, model):
         super().__init__(namespace)
         self.hps =utils.get_hparams_from_file(config)
@@ -36,7 +36,7 @@ class MyCustomNamespace(socketio.Namespace): # 名前空間を設定するクラ
         print('[{}] connet sid : {}'.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S') , sid))
         # print('[{}] connet env : {}'.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S') , environ))
 
-    def on_request_message(self, sid, msg): # 送信してきたクライアントだけにメッセージを送る関数
+    def on_request_message(self, sid, msg): 
         # print("MESSGaa", msg)
         gpu = int(msg[0])
         srcId = int(msg[1])
@@ -88,9 +88,9 @@ if __name__ == '__main__':
     print(f"start... PORT:{PORT}, CONFIG:{CONFIG}, MODEL:{MODEL}")    
     # sio = socketio.Server(cors_allowed_origins='http://localhost:8080') 
     sio = socketio.Server(cors_allowed_origins='*') 
-    sio.register_namespace(MyCustomNamespace('/test', CONFIG, MODEL)) # 名前空間を設定
+    sio.register_namespace(MyCustomNamespace('/test', CONFIG, MODEL)) 
     app = socketio.WSGIApp(sio,static_files={
         '': '../frontend/dist',
-    }) # wsgiサーバーミドルウェア生成
-    eventlet.wsgi.server(eventlet.listen(('0.0.0.0',int(PORT))), app) # wsgiサーバー起動
+    }) 
+    eventlet.wsgi.server(eventlet.listen(('0.0.0.0',int(PORT))), app) 
     
