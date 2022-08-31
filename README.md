@@ -10,3 +10,6 @@ AIを使ったリアルタイムボイスチェンジャー[MMVC](https://github
   - リアルタイム/ニアリアルタイム声質変換
 
 使用方法等は[wiki](https://github.com/w-okada/voice-changer/wiki)をご参照ください。
+
+# 簡易デモ
+ボイスチェンジャの簡易デモをコラボから利用することができます。[コラボのノート](https://github.com/w-okada/voice-changer/blob/dev/VoiceChangerDemo.ipynb)
