@@ -7,7 +7,7 @@
     "prefix_chunk_size": 24,
     "chunk_size": 24,
     "speaker_ids": [100, 107, 101, 102, 103],
-    "speaker_names": ["ずんだもん", "user", "そら", "めたん", "つぐみ"],
+    "speaker_names": ["ずんだもん", "user", "そら", "めたん", "つむぎ"],
     "src_id": 107,
     "dst_id": 100,
     "vf_enable": true,
