@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build:docker": "date +%Y%m%d%H%M%S > trainer/dummy && DOCKER_BUILDKIT=1 docker build -f trainer/Dockerfile trainer/ -t voice-changer",
-    "copy:frontend":"docker run -v `pwd`/docs:/docs --entrypoint /bin/bash -ti voice-changer -c \"cp -r /voice-changer-internal/frontend/dist/* /docs\"",
-    "copy:backend":"docker run -v `pwd`/demo:/demo --entrypoint /bin/bash -ti voice-changer -c \"cp -r /voice-changer-internal/voice-change-service/* /demo/\"",
+    "copy:frontend":"rm -rf docs/* && docker run -v `pwd`/docs:/docs --entrypoint /bin/bash -ti voice-changer -c \"cp -r /voice-changer-internal/frontend/dist/* /docs\"",
+    "copy:backend":"rm -rf demo/* && docker run -v `pwd`/demo:/demo --entrypoint /bin/bash -ti voice-changer -c \"cp -r /voice-changer-internal/voice-change-service/* /demo/\"",
     "create:demo":"run-p copy:frontend copy:backend",
     "push:docker": "bash script/001_pushDocker.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
