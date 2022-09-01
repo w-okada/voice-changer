@@ -15,6 +15,7 @@
     "gpu": 0,
     "available_gpus": [-1, 0, 1, 2, 3, 4],
     "avatar": {
+        "enable_avatar": true,
         "motion_capture_face": true,
         "motion_capture_upperbody": true,
         "lip_overwrite_with_voice": true,
