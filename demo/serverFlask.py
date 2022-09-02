@@ -1,4 +1,4 @@
-from flask import Flask, request, Markup, abort, jsonify
+from flask import Flask, request, Markup, abort, jsonify, send_from_directory
 from flask_cors import CORS
 import logging
 from logging.config import dictConfig
@@ -37,7 +37,18 @@ dictConfig({
     }
 })
 
-app = Flask(__name__, static_folder="../frontend/dist", static_url_path='/')
+
+#app = Flask(__name__, static_folder="../frontend/dist", static_url_path='/')
+
+app = Flask(__name__)
+@app.route("/<path:path>")
+def static_dir(path):
+    return send_from_directory("../frontend/dist", path)
+
+@app.route('/', methods=['GET'])
+def redirect_to_index():
+    return send_from_directory("../frontend/dist", 'index.html')
+
 CORS(app, resources={r"/*": {"origins": "*"}}) 
 
 class VoiceChanger():
