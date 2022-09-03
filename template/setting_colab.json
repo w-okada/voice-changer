@@ -32,6 +32,7 @@
         "visualizer_draw_skip_rate": 3,
         "cross_fade_lower_value": 0.1,
         "cross_fade_offset_rate": 0.3,
-        "cross_fade_end_rate": 0.6
+        "cross_fade_end_rate": 0.6,
+        "cross_fade_type": 2
     }
 }
