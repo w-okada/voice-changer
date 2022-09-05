@@ -27,5 +27,5 @@ MMVCトレーニング用の音声を簡単に録音できるアプリです。
 ## 簡易デモ
 ボイスチェンジャの簡易デモをコラボから利用することができます。[コラボのノート](https://github.com/w-okada/voice-changer/blob/dev/VoiceChangerDemo.ipynb)
 
+![image](https://user-images.githubusercontent.com/48346627/186162321-9e453c03-f027-4944-8ec9-69b6fad658f0.png)
 
-https://user-images.githubusercontent.com/48346627/186162321-9e453c03-f027-4944-8ec9-69b6fad658f0.png
