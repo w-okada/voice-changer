@@ -19,5 +19,8 @@
             "file": "./assets/text/wagahaiwa.txt",
             "file_hira": "./assets/text/wagahaiwa_hira.txt"
         }
-    ]
+    ],
+    "uploader":{
+        "uploader_url":""
+    }
 }
