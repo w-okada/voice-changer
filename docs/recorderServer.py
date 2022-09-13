@@ -35,24 +35,64 @@ def redirect_to_index():
 
 CORS(app, resources={r"/*": {"origins": "*"}}) 
 
+
+## !!!!!!!!!!! COLABのプロキシがRoot直下のパスしか通さない??? !!!!!!
+## !!!!!!!!!!! Bodyで参照、設定コマンドを代替する。 !!!!!!
 @app.route('/api', methods=['POST'])
 def api():
     try:
         print("POST REQUEST PROCESSING....\n")
+        command = request.json['command']
         print(request)
-        # filename = f"{prefix}{index:03}.zip"
-        filename = f"AAAAAAAAAAA.zip"
-        data_dir = os.path.join(DATA_ROOT)
-        os.makedirs(data_dir,exist_ok=True)
-        fullpath = os.path.join(data_dir, filename)
-        data = base64.b64decode(request.json['data'])
-        f = open(fullpath, 'wb')
-        f.write(data)
-        f.close()
-        data = {
-            "message":"OK_TEST"
-        }
-        return jsonify(data)
+
+        # GET VOICE
+        if command == "GET_VOICE":
+            title = request.json['title']
+            prefix = request.json['prefix']
+            index = request.json['index']
+
+            data_dir = os.path.join(DATA_ROOT, title)
+            os.makedirs(data_dir,exist_ok=True)
+
+            filename = f"{prefix}{index:03}.zip"
+            fullpath = os.path.join(data_dir, filename)
+
+            is_file = os.path.isfile(fullpath)
+            if is_file == False:
+                data = {
+                    "message":"NOT_FOUND",
+                }
+                return jsonify(data)
+
+            f = open(fullpath, 'rb')
+            data = f.read()
+            dataBase64 = base64.b64encode(data).decode('utf-8')
+            data = {
+                "message":"OK",
+                "data":dataBase64,
+            }
+            return jsonify(data)
+
+
+        # POST VOICE
+        if command == "POST_VOICE":
+            title = request.json['title']
+            prefix = request.json['prefix']
+            index = request.json['index']
+            data = base64.b64decode(request.json['data'])
+
+            data_dir = os.path.join(DATA_ROOT, title)
+            os.makedirs(data_dir,exist_ok=True)
+
+            filename = f"{prefix}{index:03}.zip"
+            fullpath = os.path.join(data_dir, filename)
+            f = open(fullpath, 'wb')
+            f.write(data)
+            f.close()
+            data = {
+                "message":"OK_TEST"
+            }
+            return jsonify(data)
     except Exception as e:
         print("REQUEST PROCESSING!!!! EXCEPTION!!!", e)
         print(traceback.format_exc())
