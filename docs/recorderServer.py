@@ -35,7 +35,7 @@ def redirect_to_index():
 
 CORS(app, resources={r"/*": {"origins": "*"}}) 
 
-@app.route('/api/voice', methods=['POST'])
+@app.route('/api', methods=['POST'])
 def api():
     try:
         print("POST REQUEST PROCESSING....\n")
