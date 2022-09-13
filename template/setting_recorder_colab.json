@@ -1,6 +1,6 @@
 {
     "app_title": "voice-recorder",
-    "storage_type":"local",
+    "storage_type":"server",
     "use_mel_spectrogram":true,
     "text": [
         {
