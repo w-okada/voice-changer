@@ -35,7 +35,7 @@ def redirect_to_index():
 CORS(app, resources={r"/*": {"origins": "*"}}) 
 
 @app.route('/test', methods=['POST'])
-def post_voice(title, prefix, index):
+def test():
     try:
         # filename = f"{prefix}{index:03}.zip"
         # data_dir = os.path.join(DATA_ROOT, title)
