@@ -4,6 +4,7 @@ import logging
 from logging.config import dictConfig
 import sys, os
 import base64
+import traceback
 
 DATA_ROOT = "./"
 dictConfig({
@@ -34,17 +35,20 @@ def redirect_to_index():
 
 CORS(app, resources={r"/*": {"origins": "*"}}) 
 
-@app.route('/test', methods=['POST'])
-def test():
+@app.route('/api/voice', methods=['POST'])
+def api():
     try:
+        print("POST REQUEST PROCESSING....\n")
+        print(request)
         # filename = f"{prefix}{index:03}.zip"
-        # data_dir = os.path.join(DATA_ROOT, title)
-        # os.makedirs(data_dir,exist_ok=True)
-        # fullpath = os.path.join(data_dir, filename)
-        # data = base64.b64decode(request.json['data'])
-        # f = open(fullpath, 'wb')
-        # f.write(data)
-        # f.close()
+        filename = f"AAAAAAAAAAA.zip"
+        data_dir = os.path.join(DATA_ROOT)
+        os.makedirs(data_dir,exist_ok=True)
+        fullpath = os.path.join(data_dir, filename)
+        data = base64.b64decode(request.json['data'])
+        f = open(fullpath, 'wb')
+        f.write(data)
+        f.close()
         data = {
             "message":"OK_TEST"
         }
