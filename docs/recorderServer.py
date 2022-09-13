@@ -24,7 +24,6 @@ dictConfig({
 
 
 app = Flask(__name__)
-app.debug = True
 @app.route("/<path:path>")
 def static_dir(path):
     return send_from_directory("../docs", path)
@@ -34,6 +33,26 @@ def redirect_to_index():
     return send_from_directory("../frontend/dist", 'index.html')
 
 CORS(app, resources={r"/*": {"origins": "*"}}) 
+
+@app.route('/test', methods=['POST'])
+def post_voice(title, prefix, index):
+    try:
+        # filename = f"{prefix}{index:03}.zip"
+        # data_dir = os.path.join(DATA_ROOT, title)
+        # os.makedirs(data_dir,exist_ok=True)
+        # fullpath = os.path.join(data_dir, filename)
+        # data = base64.b64decode(request.json['data'])
+        # f = open(fullpath, 'wb')
+        # f.write(data)
+        # f.close()
+        data = {
+            "message":"OK_TEST"
+        }
+        return jsonify(data)
+    except Exception as e:
+        print("REQUEST PROCESSING!!!! EXCEPTION!!!", e)
+        print(traceback.format_exc())
+        return str(e)
 
 @app.route('/api/voice/<string:title>/<string:prefix>/<int:index>', methods=['POST'])
 def post_voice(title, prefix, index):
@@ -54,7 +73,7 @@ def post_voice(title, prefix, index):
         print("REQUEST PROCESSING!!!! EXCEPTION!!!", e)
         print(traceback.format_exc())
         return str(e)
-        
+
 @app.route('/api/voice/<string:title>/<string:prefix>/<int:index>', methods=['GET'])
 def get_voice(title, prefix, index):
     filename = f"{prefix}{index:03}.zip"
@@ -78,12 +97,12 @@ def get_voice(title, prefix, index):
     return jsonify(data)
 
 
-@app.after_request
-def after_request(response):
-# response.headers.add('Access-Control-Allow-Origin', '*')
-  response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-  response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-  return response
+# @app.after_request
+# def after_request(response):
+# # response.headers.add('Access-Control-Allow-Origin', '*')
+#   response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+#   response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+#   return response
 
 
 if __name__ == '__main__':
