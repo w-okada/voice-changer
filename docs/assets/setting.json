@@ -1,5 +1,7 @@
 {
     "app_title": "voice-recorder",
+    "storage_type":"local",
+    "use_mel_spectrogram":false,
     "text": [
         {
             "title": "ITA-emotion",
@@ -19,8 +21,5 @@
             "file": "./assets/text/wagahaiwa.txt",
             "file_hira": "./assets/text/wagahaiwa_hira.txt"
         }
-    ],
-    "uploader":{
-        "uploader_url":""
-    }
+    ]
 }
