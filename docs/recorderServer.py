@@ -29,22 +29,32 @@ app.debug = True
 def static_dir(path):
     return send_from_directory("../docs", path)
 
+@app.route('/', methods=['GET'])
+def redirect_to_index():
+    return send_from_directory("../frontend/dist", 'index.html')
+
+CORS(app, resources={r"/*": {"origins": "*"}}) 
 
 @app.route('/api/voice/<string:title>/<string:prefix>/<int:index>', methods=['POST'])
 def post_voice(title, prefix, index):
-    filename = f"{prefix}{index:03}.zip"
-    data_dir = os.path.join(DATA_ROOT, title)
-    os.makedirs(data_dir,exist_ok=True)
-    fullpath = os.path.join(data_dir, filename)
-    data = base64.b64decode(request.json['data'])
-    f = open(fullpath, 'wb')
-    f.write(data)
-    f.close()
-    data = {
-        "message":"OK"
-    }
-    return jsonify(data)
-
+    try:
+        filename = f"{prefix}{index:03}.zip"
+        data_dir = os.path.join(DATA_ROOT, title)
+        os.makedirs(data_dir,exist_ok=True)
+        fullpath = os.path.join(data_dir, filename)
+        data = base64.b64decode(request.json['data'])
+        f = open(fullpath, 'wb')
+        f.write(data)
+        f.close()
+        data = {
+            "message":"OK"
+        }
+        return jsonify(data)
+    except Exception as e:
+        print("REQUEST PROCESSING!!!! EXCEPTION!!!", e)
+        print(traceback.format_exc())
+        return str(e)
+        
 @app.route('/api/voice/<string:title>/<string:prefix>/<int:index>', methods=['GET'])
 def get_voice(title, prefix, index):
     filename = f"{prefix}{index:03}.zip"
@@ -67,7 +77,6 @@ def get_voice(title, prefix, index):
     }
     return jsonify(data)
 
-CORS(app, resources={r"/*": {"origins": "*"}}) 
 
 @app.after_request
 def after_request(response):
