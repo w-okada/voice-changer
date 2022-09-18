@@ -15,8 +15,6 @@ from data_utils import TextAudioSpeakerLoader, TextAudioSpeakerCollate
 from models import SynthesizerTrn
 from text.symbols import symbols
 
-
-
 class MyCustomNamespace(socketio.Namespace): 
     def __init__(self, namespace, config, model):
         super().__init__(namespace)
@@ -91,6 +89,7 @@ if __name__ == '__main__':
     sio.register_namespace(MyCustomNamespace('/test', CONFIG, MODEL)) 
     app = socketio.WSGIApp(sio,static_files={
         '': '../frontend/dist',
+        '/': '../frontend/dist/index.html',
     }) 
     eventlet.wsgi.server(eventlet.listen(('0.0.0.0',int(PORT))), app) 
     
