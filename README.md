@@ -27,5 +27,9 @@ MMVCトレーニング用の音声を簡単に録音できるアプリです。
 ## 簡易デモ
 ボイスチェンジャの簡易デモをコラボから利用することができます。[コラボのノート](https://github.com/w-okada/voice-changer/blob/dev/VoiceChangerDemo.ipynb)
 
-![image](https://user-images.githubusercontent.com/48346627/186162321-9e453c03-f027-4944-8ec9-69b6fad658f0.png)
+[説明動画](https://twitter.com/DannadoriYellow/status/1564897136999022592)
 
+動画との差分
+
+- サーバの起動完了のメッセージは、「Debuggerほにゃらら」ではなく「Application startup complete.」です。
+- プロキシにアクセスする際に、index.htmlを追加する必要はありません。
