@@ -1,7 +1,7 @@
 {
     "app_title": "voice-changer",
     "majar_mode": "docker",
-    "voice_changer_server_url": "./test",
+    "voice_changer_server_url": "/test",
     "sample_rate": 48000,
     "buffer_size": 1024,
     "prefix_chunk_size": 24,
