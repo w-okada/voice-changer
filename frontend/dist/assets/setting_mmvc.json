@@ -1,0 +1,38 @@
+{
+    "app_title": "voice-changer",
+    "majar_mode": "docker",
+    "voice_changer_server_url": "/test",
+    "sample_rate": 48000,
+    "buffer_size": 1024,
+    "prefix_chunk_size": 24,
+    "chunk_size": 24,
+    "speaker_ids": [100, 107, 101, 102, 103],
+    "speaker_names": ["ずんだもん", "user", "そら", "めたん", "つむぎ"],
+    "src_id": 107,
+    "dst_id": 100,
+    "vf_enable": true,
+    "voice_changer_mode": "realtime",
+    "gpu": 0,
+    "available_gpus": [-1, 0, 1, 2, 3, 4],
+    "avatar": {
+        "enable_avatar": true,
+        "motion_capture_face": true,
+        "motion_capture_upperbody": true,
+        "lip_overwrite_with_voice": true,
+        "avatar_url": "./assets/vrm/zundamon/zundamon.vrm",
+        "backgournd_image_url": "./assets/images/bg_natural_sougen.jpg",
+        "background_color": "#0000dd",
+        "chroma_key": "#0000dd",
+        "avatar_canvas_size": [1280, 720],
+        "screen_canvas_size": [1280, 720]
+    },
+    "advance": {
+        "avatar_draw_skip_rate": 3,
+        "screen_draw_skip_rate": 3,
+        "visualizer_draw_skip_rate": 3,
+        "cross_fade_lower_value": 0.1,
+        "cross_fade_offset_rate": 0.3,
+        "cross_fade_end_rate": 0.6,
+        "cross_fade_type": 2
+    }
+}

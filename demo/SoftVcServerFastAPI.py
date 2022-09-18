@@ -30,10 +30,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/front", StaticFiles(directory="voice-changer/frontend/dist", html=True), name="static")
 
 if MODE == "colab":
     print("ENV: colab")
+    app.mount("/front", StaticFiles(directory="voice-changer/frontend/dist", html=True), name="static")
     
     hubert_model = torch.hub.load("bshall/hubert:main", "hubert_soft").cuda()
     acoustic_model = torch.hub.load("bshall/acoustic-model:main", "hubert_soft").cuda()
