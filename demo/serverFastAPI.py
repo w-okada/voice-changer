@@ -142,4 +142,4 @@ def post_test(voice:VoiceModel):
 
 if __name__ == '__main__':
     logger.info('START APP')
-    uvicorn.run(f"{os.path.basename(__file__)[:-3]}:app", host="0.0.0.0", port=int(PORT), reload=True)
+    uvicorn.run(f"{os.path.basename(__file__)[:-3]}:app", host="0.0.0.0", port=int(PORT), reload=True, log_level="info")
