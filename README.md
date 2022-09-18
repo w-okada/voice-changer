@@ -24,8 +24,8 @@ MMVCトレーニング用の音声を簡単に録音できるアプリです。
 
 ![image](https://user-images.githubusercontent.com/48346627/184543418-44abb74e-3137-4f9e-947d-32354249c552.png)
 
-## 簡易デモ
-ボイスチェンジャの簡易デモをコラボから利用することができます。[コラボのノート](https://github.com/w-okada/voice-changer/blob/dev/VoiceChangerDemo.ipynb)
+## 簡易デモ(MMVC)
+ボイスチェンジャ(MMVC)の簡易デモをコラボから利用することができます。[コラボのノート](https://github.com/w-okada/voice-changer/blob/dev/VoiceChangerDemo.ipynb)
 
 [説明動画](https://twitter.com/DannadoriYellow/status/1564897136999022592)
 
@@ -33,3 +33,10 @@ MMVCトレーニング用の音声を簡単に録音できるアプリです。
 
 - サーバの起動完了のメッセージは、「Debuggerほにゃらら」ではなく「Application startup complete.」です。
 - プロキシにアクセスする際に、index.htmlを追加する必要はありません。
+
+## 簡易デモ(soft-vc)
+ボイスチェンジャ(soft-vc)の簡易デモをコラボから利用することができます。[コラボのノート](https://github.com/w-okada/voice-changer/blob/master/SoftVcDemo.ipynb)
+
+[説明動画](https://twitter.com/DannadoriYellow/status/1564897136999022592)
+
+
