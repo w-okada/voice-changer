@@ -37,9 +37,6 @@ dictConfig({
     }
 })
 
-
-#app = Flask(__name__, static_folder="../frontend/dist", static_url_path='/')
-
 app = Flask(__name__)
 @app.route("/<path:path>")
 def static_dir(path):
