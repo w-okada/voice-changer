@@ -1,17 +1,17 @@
-from flask import Flask, request, Markup, abort, jsonify, send_from_directory
-from flask_cors import CORS
+import uvicorn
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+
 import logging
-from logging.config import dictConfig
-import sys
-import base64
+import os, sys, base64, traceback, struct
 
 import torch
 import numpy as np
 from scipy.io.wavfile import write, read
-from datetime import datetime
-
-import traceback
-import struct
 
 sys.path.append("mod")
 sys.path.append("mod/text")
@@ -21,32 +21,6 @@ from data_utils import TextAudioSpeakerLoader, TextAudioSpeakerCollate
 from models import SynthesizerTrn
 from text.symbols import symbols
 
-dictConfig({
-    'version': 1,
-    'formatters': {'default': {
-        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
-    }},
-    'handlers': {'wsgi': {
-        'class': 'logging.StreamHandler',
-        'stream': 'ext://flask.logging.wsgi_errors_stream',
-        'formatter': 'default'
-    }},
-    'root': {
-        'level': 'INFO',
-        'handlers': ['wsgi']
-    }
-})
-
-app = Flask(__name__)
-@app.route("/<path:path>")
-def static_dir(path):
-    return send_from_directory("../frontend/dist", path)
-
-@app.route('/', methods=['GET'])
-def redirect_to_index():
-    return send_from_directory("../frontend/dist", 'index.html')
-
-CORS(app, resources={r"/*": {"origins": "*"}}) 
 
 class VoiceChanger():
     def __init__(self, config, model):
@@ -96,49 +70,76 @@ class VoiceChanger():
         return audio1
 
 
+logger = logging.getLogger('uvicorn')  
 
-@app.route('/test', methods=['GET', 'POST'])
-def test():
+args = sys.argv
+PORT = args[1]
+CONFIG = args[2]
+MODEL  = args[3]
+logger.info('INITIALIZE MODEL')
+voiceChanger = VoiceChanger(CONFIG, MODEL)
+voiceChanger.on_request(0,0,0,0,0)
+
+
+
+app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.mount("/front", StaticFiles(directory="../frontend/dist", html=True), name="static")
+
+@app.get("/test")
+def get_test():
     try:
-        if request.method == 'GET':
-            return request.args.get('query', '')
-        elif request.method == 'POST':
-            print("POST REQUEST PROCESSING....")
-            gpu = int(request.json['gpu'])
-            srcId = int(request.json['srcId'])
-            dstId = int(request.json['dstId'])
-            timestamp = int(request.json['timestamp'])
-            buffer = request.json['buffer']
-            wav = base64.b64decode(buffer)
-            # print(wav)
-            # print(base64.b64encode(wav))
-            changedVoice = voiceChanger.on_request(gpu, srcId, dstId, timestamp, wav)
-            changedVoiceBase64 = base64.b64encode(changedVoice).decode('utf-8')
-            # print("changedVoice",changedVoice)
-            # print("CV64",changedVoiceBase64)
-            data = {
-                "gpu":gpu,
-                "srcId":srcId,
-                "dstId":dstId,
-                "timestamp":timestamp,
-                "changedVoiceBase64":changedVoiceBase64
-            }
-            return jsonify(data)
-        else:
-            return abort(400)
+        return request.args.get('query', '')
     except Exception as e:
         print("REQUEST PROCESSING!!!! EXCEPTION!!!", e)
         print(traceback.format_exc())
         return str(e)
 
+class VoiceModel(BaseModel):
+    gpu: int
+    srcId: int
+    dstId: int
+    timestamp: int
+    buffer: str
+
+@app.post("/test")
+def post_test(voice:VoiceModel):
+    global voiceChanger
+    try:
+        print("POST REQUEST PROCESSING....")
+        gpu = voice.gpu
+        srcId = voice.srcId
+        dstId = voice.dstId
+        timestamp = voice.timestamp
+        buffer = voice.buffer
+        wav = base64.b64decode(buffer)
+
+        changedVoice = voiceChanger.on_request(gpu, srcId, dstId, timestamp, wav)
+        changedVoiceBase64 = base64.b64encode(changedVoice).decode('utf-8')
+
+        data = {
+            "gpu":gpu,
+            "srcId":srcId,
+            "dstId":dstId,
+            "timestamp":timestamp,
+            "changedVoiceBase64":changedVoiceBase64
+        }
+
+        json_compatible_item_data = jsonable_encoder(data)
+        
+        return JSONResponse(content=json_compatible_item_data)
+    except Exception as e:
+        print("REQUEST PROCESSING!!!! EXCEPTION!!!", e)
+        print(traceback.format_exc())
+        return str(e)
 
 if __name__ == '__main__':
-    args = sys.argv
-    PORT = args[1]
-    CONFIG = args[2]
-    MODEL  = args[3]
-    app.logger.info('INITIALIZE MODEL')
-    voiceChanger = VoiceChanger(CONFIG, MODEL)
-    voiceChanger.on_request(0,0,0,0,0)
-    app.logger.info('START APP')
-    app.run(debug=True, host='0.0.0.0',port=PORT)
+    logger.info('START APP')
+    uvicorn.run(f"{os.path.basename(__file__)[:-3]}:app", host="0.0.0.0", port=int(PORT), reload=True)
