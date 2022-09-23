@@ -29,13 +29,13 @@ fi
 # 起動
 if [ "${TYPE}" = "SOFT_VC" ] ; then
   echo "SOFT_VCを起動します"
-  python3 SoftVcServerSIO.py 8080
+  python3 SoftVcServerSIO.py -p 8080 --https True --httpsSelfSigned True
 elif [ "${TYPE}" = "SOFT_VC_FAST_API" ] ; then
   echo "SOFT_VC_FAST_APIを起動します"
   python3 SoftVcServerFastAPI.py 8080 docker
 else
   echo "MMVCを起動します"
-  python3 serverSIO.py 8080 $CONFIG $MODEL
+  python3 serverSIO.py -p 8080 -c $CONFIG -m $MODEL --https True --httpsSelfSigned True
 fi
 
 
