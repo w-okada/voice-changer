@@ -1,4 +1,4 @@
-FROM dannadori/voice-changer-internal:20220923_142757 as front
+FROM dannadori/voice-changer-internal:20220923_153015 as front
 FROM debian:bullseye-slim as base
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -29,6 +29,8 @@ RUN pip install eventlet==0.33.1
 RUN pip install pyopenjtalk==0.2.0
 RUN pip install tensorboard==2.10.0
 RUN pip install matplotlib==3.5.3
+
+RUN pip install pyOpenSSL==22.0.0
 
 WORKDIR /MMVC_Trainer/monotonic_align
 RUN cythonize -3 -i core.pyx \
