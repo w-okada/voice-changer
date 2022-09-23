@@ -2,9 +2,9 @@
 
 # 参考:https://programwiz.org/2022/03/22/how-to-write-shell-script-for-option-parsing/
 
-DOCKER_IMAGE=dannadori/voice-changer:20220923_143426
+DOCKER_IMAGE=dannadori/voice-changer:20220923_173952
 TENSORBOARD_PORT=6006
-VOICE_CHANGER_PORT=8080
+# VOICE_CHANGER_PORT=8080
 
 set -eu
 
@@ -27,6 +27,7 @@ usage:
             -c: トレーニングで使用したConfigのファイル名です。(config)
             -m: トレーニング済みのモデルのファイル名です。(model)
             -g: GPU使用/不使用。デフォルトはonなのでGPUを使う場合は指定不要。(gpu)
+            -p: port番号
     For help
         $0 [-h]
             -h: show this help
@@ -47,11 +48,11 @@ voice_change_flag=false
 config=
 model=
 gpu=on
-
+port=8080
 escape_flag=false
 
 # オプション解析
-while getopts tn:b:rvc:m:g:hx OPT; do
+while getopts tn:b:rvc:m:g:p:hx OPT; do
     case $OPT in
     t) 
         training_flag=true
@@ -76,6 +77,9 @@ while getopts tn:b:rvc:m:g:hx OPT; do
         ;;
     g) 
         gpu="$OPTARG"
+        ;;
+    p) 
+        port="$OPTARG"
         ;;
     h | \?) 
         usage && exit 1
@@ -139,14 +143,14 @@ if $voice_change_flag; then
         -v `pwd`/vc_resources:/resources \
         -e LOCAL_UID=$(id -u $USER) \
         -e LOCAL_GID=$(id -g $USER) \
-        -p ${VOICE_CHANGER_PORT}:8080 $DOCKER_IMAGE -v -c ${config} -m ${model}
+        -p ${port}:8080 $DOCKER_IMAGE -v -c ${config} -m ${model}
     elif [ "${gpu}" = "off" ]; then
         echo "CPUのみで稼働します。GPUは使用できません。"
         docker run -it --shm-size=128M \
         -v `pwd`/vc_resources:/resources \
         -e LOCAL_UID=$(id -u $USER) \
         -e LOCAL_GID=$(id -g $USER) \
-        -p ${VOICE_CHANGER_PORT}:8080 $DOCKER_IMAGE -v -c ${config} -m ${model}
+        -p ${port}:8080 $DOCKER_IMAGE -v -c ${config} -m ${model}
     else
         echo ${gpu}
         warn "-g は onかoffで指定して下さい。"

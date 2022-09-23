@@ -129,5 +129,5 @@ if $voice_change_flag; then
     echo "-----------!!"
     echo $config $model
     echo $model
-    python3 serverSIO.py 8080 $config $model
+    python3 serverSIO.py -p 8080 -c $config -m $model --https True --httpsSelfSigned True
 fi
