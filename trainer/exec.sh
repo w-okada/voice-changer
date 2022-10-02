@@ -23,6 +23,8 @@ if [ "${MODE}" = "SOFT_VC" ] ; then
     cp -r /resources/* .
     if [[ -e ./setting.json ]]; then
         cp ./setting.json ../frontend/dist/assets/setting.json
+    else
+        cp ../frontend/dist/assets/setting_softvc.json ../frontend/dist/assets/setting.json
     fi
     if [ "${VERBOSE}" = "on" ]; then
         echo "SOFT_VCを起動します(verbose)"
@@ -37,6 +39,8 @@ elif [ "${MODE}" = "MMVC" ] ; then
     cp -r /resources/* .
     if [[ -e ./setting.json ]]; then
         cp ./setting.json ../frontend/dist/assets/setting.json
+    else
+        cp ../frontend/dist/assets/setting_mmvc.json ../frontend/dist/assets/setting.json
     fi
 
     if [ "${VERBOSE}" = "on" ]; then
