@@ -1,6 +1,6 @@
 import eventlet
 import socketio
-import sys, os, struct, argparse
+import sys, os, struct, argparse, logging
 from distutils.util import strtobool
 from datetime import datetime
 from OpenSSL import SSL, crypto
@@ -80,7 +80,7 @@ class MyCustomNamespace(socketio.Namespace):
 
 def setupArgParser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", type=int, required=True, help="port")
+    parser.add_argument("-p", type=int, default=8080, help="port")
     parser.add_argument("-c", type=str, required=True, help="path for the config.json")
     parser.add_argument("-m", type=str, required=True, help="path for the model file")
     parser.add_argument("--https", type=strtobool, default=False, help="use https")
@@ -112,13 +112,35 @@ def create_self_signed_cert(certfile, keyfile, certargs, cert_dir="."):
         open(K_F, "wb").write(crypto.dump_privatekey(crypto.FILETYPE_PEM, k))
 
 
+def printMessage(message, level=0):
+    if level == 0:
+        print(f"\033[17m{message}\033[0m")
+    elif level == 1:
+        print(f"\033[34m    {message}\033[0m")
+    elif level == 2:
+        print(f"\033[32m    {message}\033[0m")
+    else:
+        print(f"\033[47m    {message}\033[0m")
+
 if __name__ == '__main__':
     parser = setupArgParser()
     args = parser.parse_args()
     PORT = args.p
     CONFIG = args.c
     MODEL  = args.m
-    print(f"start... PORT:{PORT}, CONFIG:{CONFIG}, MODEL:{MODEL}")
+
+    printMessage(f"Start MMVC SocketIO Server", level=0)
+    printMessage(f"CONFIG:{CONFIG}, MODEL:{MODEL}", level=1)
+
+    if os.environ["EX_PORT"]:
+        EX_PORT = os.environ["EX_PORT"]
+        printMessage(f"External_Port:{EX_PORT} Internal_Port:{PORT}", level=1)
+    else:
+        printMessage(f"Internal_Port:{PORT}", level=1)
+
+    if os.environ["EX_IP"]:
+        EX_IP = os.environ["EX_IP"]
+        printMessage(f"External_IP:{EX_IP}", level=1)
 
     if args.https and args.httpsSelfSigned == 1:
         # HTTPS(おれおれ証明書生成) 
@@ -134,15 +156,32 @@ if __name__ == '__main__':
                              "Org. Unit": "F"}, cert_dir="./key")
         key_path = os.path.join("./key", keyname)
         cert_path = os.path.join("./key", certname)
-        print(f"protocol: HTTPS(self-signed), key:{key_path}, cert:{cert_path}")
+        printMessage(f"protocol: HTTPS(self-signed), key:{key_path}, cert:{cert_path}", level=1)
     elif args.https and args.httpsSelfSigned == 0:
         # HTTPS 
         key_path = args.httpsKey
         cert_path = args.httpsCert
-        print(f"protocol: HTTPS, key:{key_path}, cert:{cert_path}")
+        printMessage(f"protocol: HTTPS, key:{key_path}, cert:{cert_path}", level=1)
     else:
         # HTTP
-        print("protocol: HTTP")
+        printMessage(f"protocol: HTTP", level=1)
+
+    # アドレス表示
+    if args.https == 1:
+        printMessage(f"open https://<IP>:<PORT>/ with your browser.", level=0)
+    else:
+        printMessage(f"open http://<IP>:<PORT>/ with your browser.", level=0)
+        
+    if EX_PORT and EX_IP and args.https == 1:
+        printMessage(f"In many cases it is one of the following", level=1)
+        printMessage(f"https://localhost:{EX_PORT}/", level=1)
+        for ip in EX_IP.strip().split(" "):
+            printMessage(f"https://{ip}:{EX_PORT}/", level=1)
+    elif EX_PORT and EX_IP and args.https == 0:
+        printMessage(f"In many cases it is one of the following", level=1)
+        printMessage(f"http://localhost:{EX_PORT}/", level=1)
+        # for ip in EX_IP.strip().split(" "):
+        #     print(f"    http://{ip}:{EX_PORT}/")
 
 
     # SocketIOセットアップ
@@ -153,6 +192,13 @@ if __name__ == '__main__':
         '/': '../frontend/dist/index.html',
     }) 
 
+
+    ### log を設定すると通常出力されないログが取得できるようだ。（ログ出力抑制には役立たない?）
+    # logger = logging.getLogger("logger")
+    # logger.propagate=False
+    # handler = logging.FileHandler(filename="logger.log")
+    # logger.addHandler(handler)
+
     if args.https:
         # HTTPS サーバ起動
         sslWrapper = eventlet.wrap_ssl(
@@ -161,8 +207,12 @@ if __name__ == '__main__':
                 keyfile=key_path, 
                 # server_side=True
             )
+        ### log を設定すると通常出力されないログが取得できるようだ。（ログ出力抑制には役立たない?）
+        # eventlet.wsgi.server(sslWrapper, app, log=logger)     
         eventlet.wsgi.server(sslWrapper, app)     
     else:
         # HTTP サーバ起動
+        ### log を設定すると通常出力されないログが取得できるようだ。（ログ出力抑制には役立たない?）
+        # eventlet.wsgi.server(eventlet.listen(('0.0.0.0',int(PORT))), app, log=logger) 
         eventlet.wsgi.server(eventlet.listen(('0.0.0.0',int(PORT))), app) 
 

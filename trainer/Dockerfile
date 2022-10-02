@@ -1,4 +1,4 @@
-FROM dannadori/voice-changer-internal:20220923_153015 as front
+FROM dannadori/voice-changer-internal:20221002_193031 as front
 FROM debian:bullseye-slim as base
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -60,5 +60,13 @@ ADD /exec.sh  /MMVC_Trainer/
 COPY --from=front --chmod=777 /voice-changer-internal/frontend/dist /voice-changer-internal/frontend/dist
 COPY --from=front --chmod=777 /voice-changer-internal/voice-change-service /voice-changer-internal/voice-change-service
 RUN chmod 0777 /voice-changer-internal/voice-change-service 
+
+COPY --from=front /hubert /hubert
+COPY --from=front /acoustic-model /acoustic-model
+COPY --from=front /hifigan /hifigan
+
+COPY --from=front /models /models 
+
+
 ENTRYPOINT ["/bin/bash", "setup.sh"]
 CMD [ "-h"]

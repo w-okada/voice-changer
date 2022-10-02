@@ -8,13 +8,12 @@ set -eu
 USER_ID=${LOCAL_UID:-9001}
 GROUP_ID=${LOCAL_GID:-9001}
 
-echo ""
-echo "アプリケーション開始... （内部ユーザー [UID : $USER_ID, GID: $GROUP_ID]）"
+echo "exec with [UID : $USER_ID, GID: $GROUP_ID]"
 useradd -u $USER_ID -o -m user
 groupmod -g $GROUP_ID user
 
 #su user
-# echo "parameter: $@"
+#echo "parameter: $@"
 exec /usr/sbin/gosu user /bin/bash exec.sh "$@"
 #/bin/bash
 
