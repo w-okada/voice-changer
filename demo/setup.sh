@@ -1,16 +1,11 @@
 #!/bin/bash
+cp -r /resources/* .
 
 TYPE=$1
-CONFIG=$2
-MODEL=$3
+PARAMS=${@:2:($#-1)}
 
-echo type: $TYPE
-echo config: $CONFIG
-echo model: $MODEL
-
-
-
-cp -r /resources/* .
+echo $TYPE
+echo $PARAMS
 
 ## Config 設置
 if [[ -e ./setting.json ]]; then
@@ -26,17 +21,23 @@ else
   fi
 fi
 
+
 # 起動
 if [ "${TYPE}" = "SOFT_VC" ] ; then
   echo "SOFT_VCを起動します"
-  python3 SoftVcServerSIO.py -p 8080 --https True --httpsSelfSigned True
+  python3 SoftVcServerSIO.py $PARAMS 2>stderr.txt
+elif [ "${TYPE}" = "SOFT_VC_VERBOSE" ] ; then
+  echo "SOFT_VCを起動します(verbose)"
+  python3 SoftVcServerSIO.py $PARAMS 
 elif [ "${TYPE}" = "SOFT_VC_FAST_API" ] ; then
   echo "SOFT_VC_FAST_APIを起動します"
   python3 SoftVcServerFastAPI.py 8080 docker
-else
+elif [ "${TYPE}" = "MMVC" ] ; then
   echo "MMVCを起動します"
-  python3 serverSIO.py -p 8080 -c $CONFIG -m $MODEL --https True --httpsSelfSigned True
+  python3 serverSIO.py $PARAMS 2>stderr.txt
+elif [ "${TYPE}" = "MMVC_VERBOSE" ] ; then
+  echo "MMVCを起動します(verbose)"
+  python3 serverSIO.py $PARAMS
 fi
-
 
 
