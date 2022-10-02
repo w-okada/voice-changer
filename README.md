@@ -11,6 +11,10 @@ AIを使ったリアルタイムボイスチェンジャー[MMVC](https://github
   - CPU/GPU切り替え
   - リアルタイム/ニアリアルタイム声質変換
 
+ボイスチェンジャは、サーバ・クライアント構成で動いています。MMVCのサーバを別のPC上で動かすことで、ゲーム実況など他の不可の高い処理への影響を抑えながら動かすことができます。（MacのChromeからも利用できます！！）
+![image](https://user-images.githubusercontent.com/48346627/193464403-ca981f72-6186-4eda-b715-55abdf236b17.png)
+
+
 ## 使用方法
 
 使用方法等は[wiki](https://github.com/w-okada/voice-changer/wiki)をご参照ください。
