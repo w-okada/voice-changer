@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-DOCKER_IMAGE=dannadori/voice-changer:20221028_215409
+DOCKER_IMAGE=dannadori/voice-changer:20221028_220138
 #DOCKER_IMAGE=voice-changer
 
 
