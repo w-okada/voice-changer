@@ -1,4 +1,4 @@
-FROM dannadori/voice-changer-internal:20221002_193031 as front
+FROM dannadori/voice-changer-internal:20221028_190940 as front
 FROM debian:bullseye-slim as base
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -8,7 +8,7 @@ RUN apt-get install -y python3-pip git
 RUN apt-get install -y espeak
 RUN apt-get install -y cmake
 
-RUN git clone --depth 1 https://github.com/isletennos/MMVC_Trainer.git -b v1.3.1.0
+RUN git clone --depth 1 https://github.com/isletennos/MMVC_Trainer.git -b v1.3.1.3
 
 RUN pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
 
@@ -49,18 +49,22 @@ COPY fine_model/D_180000.pth /MMVC_Trainer/fine_model/D_180000.pth
 
 ### Copy from base
 COPY --from=base --chmod=777 /usr/local/lib/python3.9/dist-packages /usr/local/lib/python3.9/dist-packages
-COPY --from=base --chmod=777 /MMVC_Trainer /MMVC_Trainer
+
+### Copy from frontend
+##### MMVC Trainer
+COPY --from=front --chmod=777 /MMVC_Trainer /MMVC_Trainer
 RUN chmod 0777 /MMVC_Trainer 
 
 WORKDIR /MMVC_Trainer
 ADD /setup.sh  /MMVC_Trainer/
 ADD /exec.sh  /MMVC_Trainer/
 
-### Copy from frontend
+##### Voice changer Internal
 COPY --from=front --chmod=777 /voice-changer-internal/frontend/dist /voice-changer-internal/frontend/dist
 COPY --from=front --chmod=777 /voice-changer-internal/voice-change-service /voice-changer-internal/voice-change-service
 RUN chmod 0777 /voice-changer-internal/voice-change-service 
 
+##### Soft VC
 COPY --from=front /hubert /hubert
 COPY --from=front /acoustic-model /acoustic-model
 COPY --from=front /hifigan /hifigan

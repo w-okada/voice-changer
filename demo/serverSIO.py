@@ -9,12 +9,17 @@ import torch
 import numpy as np
 from scipy.io.wavfile import write
 
-sys.path.append("mod")
-sys.path.append("mod/text")
+sys.path.append("/MMVC_Trainer")
+sys.path.append("/MMVC_Trainer/text")
+
+
 import utils
+import commons 
 from data_utils import TextAudioSpeakerLoader, TextAudioSpeakerCollate
 from models import SynthesizerTrn
 from text.symbols import symbols
+from mel_processing import spectrogram_torch
+from text import text_to_sequence, cleaned_text_to_sequence
 
 class MyCustomNamespace(socketio.Namespace): 
     def __init__(self, namespace, config, model):
@@ -50,17 +55,49 @@ class MyCustomNamespace(socketio.Namespace):
 
         if gpu<0 or self.gpu_num==0 :
             with torch.no_grad():
-                dataset = TextAudioSpeakerLoader("dummy.txt", self.hps.data, no_use_textfile=True)
-                data = dataset.get_audio_text_speaker_pair([ unpackedData, srcId, "a"])
+                
+                text_norm = text_to_sequence("a", self.hps.data.text_cleaners)
+                text_norm = commons.intersperse(text_norm, 0)
+                text_norm = torch.LongTensor(text_norm)
+
+                audio = torch.FloatTensor(unpackedData.astype(np.float32))
+                audio_norm = audio /self.hps.data.max_wav_value
+                audio_norm = audio_norm.unsqueeze(0)
+
+
+                spec = spectrogram_torch(audio_norm, self.hps.data.filter_length,
+                        self.hps.data.sampling_rate, self.hps.data.hop_length, self.hps.data.win_length,
+                        center=False)
+                spec = torch.squeeze(spec, 0)
+                sid = torch.LongTensor([int(srcId)])
+                
+                data =  (text_norm, spec, audio_norm, sid)
+
                 data = TextAudioSpeakerCollate()([data])
                 x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [x.cpu() for x in data]
                 sid_tgt1 = torch.LongTensor([dstId]).cpu()
                 audio1 = (self.net_g.cpu().voice_conversion(spec, spec_lengths, sid_src=sid_src, sid_tgt=sid_tgt1)[0][0,0].data * self.hps.data.max_wav_value).cpu().float().numpy()
         else:
             with torch.no_grad():
-                dataset = TextAudioSpeakerLoader("dummy.txt", self.hps.data, no_use_textfile=True)
-                data = dataset.get_audio_text_speaker_pair([ unpackedData, srcId, "a"])
+
+                text_norm = text_to_sequence("a", self.hps.data.text_cleaners)
+                text_norm = commons.intersperse(text_norm, 0)
+                text_norm = torch.LongTensor(text_norm)
+
+                audio = torch.FloatTensor(unpackedData.astype(np.float32))
+                audio_norm = audio /self.hps.data.max_wav_value
+                audio_norm = audio_norm.unsqueeze(0)
+
+
+                spec = spectrogram_torch(audio_norm, self.hps.data.filter_length,
+                        self.hps.data.sampling_rate, self.hps.data.hop_length, self.hps.data.win_length,
+                        center=False)
+                spec = torch.squeeze(spec, 0)
+                sid = torch.LongTensor([int(srcId)])
+                
+                data =  (text_norm, spec, audio_norm, sid)
                 data = TextAudioSpeakerCollate()([data])
+
                 x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [x.cuda(gpu) for x in data]
                 sid_tgt1 = torch.LongTensor([dstId]).cuda(gpu)
                 audio1 = (self.net_g.cuda(gpu).voice_conversion(spec, spec_lengths, sid_src=sid_src, sid_tgt=sid_tgt1)[0][0,0].data * self.hps.data.max_wav_value).cpu().float().numpy()
