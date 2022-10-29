@@ -22,7 +22,12 @@ from mel_processing import spectrogram_torch
 from text import text_to_sequence, cleaned_text_to_sequence
 
 class MyCustomNamespace(socketio.Namespace): 
-    def __init__(self, namespace, config, model):
+    def __init__(self, namespace):
+        super().__init__(namespace)
+        self.gpu_num = torch.cuda.device_count()
+        print("GPU_NUM:",self.gpu_num)
+
+    def __init__old(self, namespace, config, model):
         super().__init__(namespace)
         self.hps =utils.get_hparams_from_file(config)
         self.net_g = SynthesizerTrn(
@@ -36,12 +41,37 @@ class MyCustomNamespace(socketio.Namespace):
         print("GPU_NUM:",self.gpu_num)
         utils.load_checkpoint( model, self.net_g, None)
 
+    def loadModel(self, config, model):
+        self.hps =utils.get_hparams_from_file(config)
+        print("before DELETE:", torch.cuda.memory_allocated())
+        if hasattr(self, 'net_g') == True:
+            print("DELETE MODEL:", torch.cuda.memory_allocated())
+            del self.net_g
+        print("before load", torch.cuda.memory_allocated())
+        self.net_g = SynthesizerTrn(
+                len(symbols),
+                self.hps.data.filter_length // 2 + 1,
+                self.hps.train.segment_size // self.hps.data.hop_length,
+                n_speakers=self.hps.data.n_speakers,
+                **self.hps.model)
+        self.net_g.eval()
+        utils.load_checkpoint( model, self.net_g, None)
+        print(torch.cuda.memory_allocated())
+        print("after load", torch.cuda.memory_allocated())
+
+
+
     def on_connect(self, sid, environ):
         print('[{}] connet sid : {}'.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S') , sid))
         # print('[{}] connet env : {}'.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S') , environ))
 
+    def on_load_model(self, sid, msg):
+        print("on_load_model")
+        print(msg)
+        pass
+
     def on_request_message(self, sid, msg): 
-        # print("MESSGaa", msg)
+        print("on_request_message", torch.cuda.memory_allocated())
         gpu = int(msg[0])
         srcId = int(msg[1])
         dstId = int(msg[2])
@@ -223,7 +253,17 @@ if __name__ == '__main__':
 
     # SocketIOセットアップ
     sio = socketio.Server(cors_allowed_origins='*') 
-    sio.register_namespace(MyCustomNamespace('/test', CONFIG, MODEL)) 
+    namespace = MyCustomNamespace('/test')
+    sio.register_namespace(namespace) 
+    print("loadmodel1:")
+    namespace.loadModel(CONFIG, MODEL)
+    print("loadmodel2:")
+    namespace.loadModel(CONFIG, MODEL)
+    print("loadmodel3:")
+    namespace.loadModel(CONFIG, MODEL)
+    print("loadmodel4:")
+    namespace.loadModel(CONFIG, MODEL)
+    print("loadmodel5:")
     app = socketio.WSGIApp(sio,static_files={
         '': '../frontend/dist',
         '/': '../frontend/dist/index.html',
