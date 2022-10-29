@@ -86,6 +86,7 @@ def setupArgParser():
     parser.add_argument("--httpsKey", type=str, default="ssl.key", help="path for the key of https")
     parser.add_argument("--httpsCert", type=str, default="ssl.cert", help="path for the cert of https")
     parser.add_argument("--httpsSelfSigned", type=strtobool, default=True, help="generate self-signed certificate")
+    parser.add_argument("--colab", type=strtobool, default=False, help="run on colab")
     return parser
 
 def printMessage(message, level=0):
@@ -136,7 +137,7 @@ if __name__ == thisFilename:
         return {"result": "Index"}
     
 
-    @app_fastapi.post("/api/uploadfile/model")
+    @app_fastapi.post("/upload_model_file")
     async def upload_file(configFile:UploadFile = File(...), modelFile: UploadFile = File(...)):
         if configFile and modelFile:
             for file in [modelFile, configFile]:
@@ -205,55 +206,56 @@ if __name__ == '__main__':
     printMessage(f"Start MMVC SocketIO Server", level=0)
     printMessage(f"CONFIG:{CONFIG}, MODEL:{MODEL}", level=1)
 
-    if os.environ["EX_PORT"]:
-        EX_PORT = os.environ["EX_PORT"]
-        printMessage(f"External_Port:{EX_PORT} Internal_Port:{PORT}", level=1)
-    else:
-        printMessage(f"Internal_Port:{PORT}", level=1)
+    if args.colab == False:
+      if os.getenv("EX_PORT"):
+          EX_PORT = os.environ["EX_PORT"]
+          printMessage(f"External_Port:{EX_PORT} Internal_Port:{PORT}", level=1)
+      else:
+          printMessage(f"Internal_Port:{PORT}", level=1)
 
-    if os.environ["EX_IP"]:
-        EX_IP = os.environ["EX_IP"]
-        printMessage(f"External_IP:{EX_IP}", level=1)
+      if os.getenv("EX_IP"):
+          EX_IP = os.environ["EX_IP"]
+          printMessage(f"External_IP:{EX_IP}", level=1)
 
-    # HTTPS key/cert作成
-    if args.https and args.httpsSelfSigned == 1:
-        # HTTPS(おれおれ証明書生成) 
-        os.makedirs("./key", exist_ok=True)
-        key_base_name = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        keyname = f"{key_base_name}.key"
-        certname = f"{key_base_name}.cert"
-        create_self_signed_cert(certname, keyname, certargs=
-                            {"Country": "JP",
-                                "State": "Tokyo",
-                                "City": "Chuo-ku",
-                                "Organization": "F",
-                                "Org. Unit": "F"}, cert_dir="./key")
-        key_path = os.path.join("./key", keyname)
-        cert_path = os.path.join("./key", certname)
-        printMessage(f"protocol: HTTPS(self-signed), key:{key_path}, cert:{cert_path}", level=1)
-    elif args.https and args.httpsSelfSigned == 0:
-        # HTTPS 
-        key_path = args.httpsKey
-        cert_path = args.httpsCert
-        printMessage(f"protocol: HTTPS, key:{key_path}, cert:{cert_path}", level=1)
-    else:
-        # HTTP
-        printMessage(f"protocol: HTTP", level=1)
+      # HTTPS key/cert作成
+      if args.https and args.httpsSelfSigned == 1:
+          # HTTPS(おれおれ証明書生成) 
+          os.makedirs("./key", exist_ok=True)
+          key_base_name = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+          keyname = f"{key_base_name}.key"
+          certname = f"{key_base_name}.cert"
+          create_self_signed_cert(certname, keyname, certargs=
+                              {"Country": "JP",
+                                  "State": "Tokyo",
+                                  "City": "Chuo-ku",
+                                  "Organization": "F",
+                                  "Org. Unit": "F"}, cert_dir="./key")
+          key_path = os.path.join("./key", keyname)
+          cert_path = os.path.join("./key", certname)
+          printMessage(f"protocol: HTTPS(self-signed), key:{key_path}, cert:{cert_path}", level=1)
+      elif args.https and args.httpsSelfSigned == 0:
+          # HTTPS 
+          key_path = args.httpsKey
+          cert_path = args.httpsCert
+          printMessage(f"protocol: HTTPS, key:{key_path}, cert:{cert_path}", level=1)
+      else:
+          # HTTP
+          printMessage(f"protocol: HTTP", level=1)
 
-    # アドレス表示
-    if args.https == 1:
-        printMessage(f"open https://<IP>:<PORT>/ with your browser.", level=0)
-    else:
-        printMessage(f"open http://<IP>:<PORT>/ with your browser.", level=0)
-        
-    if EX_PORT and EX_IP and args.https == 1:
-        printMessage(f"In many cases it is one of the following", level=1)
-        printMessage(f"https://localhost:{EX_PORT}/", level=1)
-        for ip in EX_IP.strip().split(" "):
-            printMessage(f"https://{ip}:{EX_PORT}/", level=1)
-    elif EX_PORT and EX_IP and args.https == 0:
-        printMessage(f"In many cases it is one of the following", level=1)
-        printMessage(f"http://localhost:{EX_PORT}/", level=1)
+      # アドレス表示
+      if args.https == 1:
+          printMessage(f"open https://<IP>:<PORT>/ with your browser.", level=0)
+      else:
+          printMessage(f"open http://<IP>:<PORT>/ with your browser.", level=0)
+      
+      if EX_PORT and EX_IP and args.https == 1:
+          printMessage(f"In many cases it is one of the following", level=1)
+          printMessage(f"https://localhost:{EX_PORT}/", level=1)
+          for ip in EX_IP.strip().split(" "):
+              printMessage(f"https://{ip}:{EX_PORT}/", level=1)
+      elif EX_PORT and EX_IP and args.https == 0:
+          printMessage(f"In many cases it is one of the following", level=1)
+          printMessage(f"http://localhost:{EX_PORT}/", level=1)
 
 
     # サーバ起動
@@ -277,4 +279,3 @@ if __name__ == '__main__':
             reload=True,
             log_level="critical"
         )
-
