@@ -151,7 +151,7 @@ if __name__ == thisFilename or args.colab == True:
     
 
     UPLOAD_DIR = "model_upload_dir"
-    os.makedirs(UPLOAD_DIR)
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
     # Can colab receive post request "ONLY" at root path?
     @app_fastapi.post("/upload_model_file")
     async def upload_file(configFile:UploadFile = File(...), modelFile: UploadFile = File(...)):
