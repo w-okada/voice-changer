@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from scipy.io.wavfile import write, read
@@ -101,21 +102,32 @@ def printMessage(message, level=0):
         print(f"\033[47m    {message}\033[0m")
 
 global app_socketio
+global app_fastapi
 
+parser = setupArgParser()
+args = parser.parse_args()
 
 printMessage(f"Phase name:{__name__}", level=2)
 thisFilename = os.path.basename(__file__)[:-3]
 
 
-if __name__ == thisFilename:
+if __name__ == thisFilename or args.colab == True:
     printMessage(f"PHASE3:{__name__}", level=2)
-    parser = setupArgParser()
-    args = parser.parse_args()
     PORT = args.p
     CONFIG = args.c
     MODEL  = args.m
 
     app_fastapi = FastAPI()
+    app_fastapi.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    app_fastapi.mount("/front", StaticFiles(directory="../frontend/dist", html=True), name="static")
+
     sio = socketio.AsyncServer(
         async_mode='asgi',
         cors_allowed_origins='*'
@@ -223,8 +235,6 @@ if __name__ == '__mp_main__':
 if __name__ == '__main__':
     printMessage(f"PHASE1:{__name__}", level=2)
 
-    parser = setupArgParser()
-    args = parser.parse_args()
     PORT = args.p
     CONFIG = args.c
     MODEL  = args.m
@@ -298,10 +308,20 @@ if __name__ == '__main__':
         )
     else:
         # HTTP サーバ起動
-        uvicorn.run(
-            f"{os.path.basename(__file__)[:-3]}:app_socketio", 
-            host="0.0.0.0", 
-            port=int(PORT), 
-            reload=True,
-            log_level="critical"
-        )
+        if args.colab == True:
+          uvicorn.run(
+              f"{os.path.basename(__file__)[:-3]}:app_fastapi", 
+              host="0.0.0.0", 
+              port=int(PORT), 
+              log_level="critical"
+              )
+        else:
+          uvicorn.run(
+              f"{os.path.basename(__file__)[:-3]}:app_socketio", 
+              host="0.0.0.0", 
+              port=int(PORT), 
+              reload=True,
+              log_level="critical"
+          )
+
+
