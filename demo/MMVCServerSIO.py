@@ -150,6 +150,8 @@ if __name__ == thisFilename or args.colab == True:
         return {"result": "Index"}
     
 
+    UPLOAD_DIR = "model_upload_dir"
+    os.makedirs(UPLOAD_DIR)
     # Can colab receive post request "ONLY" at root path?
     @app_fastapi.post("/upload_model_file")
     async def upload_file(configFile:UploadFile = File(...), modelFile: UploadFile = File(...)):
@@ -157,37 +159,51 @@ if __name__ == thisFilename or args.colab == True:
             for file in [modelFile, configFile]:
                 filename = file.filename
                 fileobj = file.file
-                upload_dir = open(os.path.join(".", filename),'wb+')
+                upload_dir = open(os.path.join(UPLOAD_DIR, filename),'wb+')
                 shutil.copyfileobj(fileobj, upload_dir)
                 upload_dir.close()
-            namespace.loadModel(configFile.filename, modelFile.filename)                
+            namespace.loadModel(os.path.join(UPLOAD_DIR, configFile.filename), os.path.join(UPLOAD_DIR, modelFile.filename))                
             return {"uploaded files": f"{configFile.filename}, {modelFile.filename} "}
         return {"Error": "uploaded file is not found."}
 
 
-    @app_fastapi.get("/resumable")
-    async def get_resumble():
-        print("GET REQUSET")
-        raise HTTPException(status_code=404, detail="Not found")
 
-        return 'OK'
-
-    @app_fastapi.post("/resumable")
-    async def post_resumble(
+    @app_fastapi.post("/upload_file")
+    async def post_upload_file(
         file:UploadFile = File(...), 
         filename: str = Form(...)
         ):
 
-        print("resumableFilename", filename)
         if file and filename:
-            filename = file.filename + "_" + filename
             fileobj = file.file
-            upload_dir = open(os.path.join(".", filename),'wb+')
+            upload_dir = open(os.path.join(UPLOAD_DIR, filename),'wb+')
             shutil.copyfileobj(fileobj, upload_dir)
             upload_dir.close()
             return {"uploaded files": f"{filename} "}
         return {"Error": "uploaded file is not found."}
-        return 'OK'
+
+    @app_fastapi.post("/load_model")
+    async def post_load_model(
+        modelFilename: str = Form(...),
+        modelFilenameChunkNum: int = Form(...),
+        configFilename: str = Form(...)
+        ):
+
+        target_file_name = modelFilename
+        with open(os.path.join(UPLOAD_DIR, target_file_name), "ab") as target_file:
+            for i in range(modelFilenameChunkNum):
+                filename = f"{modelFilename}_{i}"
+                chunk_file_path = os.path.join(UPLOAD_DIR,filename)
+                stored_chunk_file = open(chunk_file_path, 'rb')
+                target_file.write(stored_chunk_file.read())
+                stored_chunk_file.close()
+                os.unlink(chunk_file_path)
+        target_file.close()
+        print(f'File saved to: {target_file_name}')
+
+        print(f'Load: {configFilename}, {target_file_name}')
+        namespace.loadModel(os.path.join(UPLOAD_DIR, configFilename), os.path.join(UPLOAD_DIR, target_file_name))
+        return {"File saved to": f"{target_file_name}"}
 
 
     @app_fastapi.post("/test")
