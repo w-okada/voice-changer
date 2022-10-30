@@ -7,6 +7,7 @@ from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 from scipy.io.wavfile import write, read
@@ -137,6 +138,7 @@ if __name__ == thisFilename:
         return {"result": "Index"}
     
 
+    # Can colab receive post request "ONLY" at root path?
     @app_fastapi.post("/upload_model_file")
     async def upload_file(configFile:UploadFile = File(...), modelFile: UploadFile = File(...)):
         if configFile and modelFile:
@@ -150,6 +152,30 @@ if __name__ == thisFilename:
             return {"uploaded files": f"{configFile.filename}, {modelFile.filename} "}
         return {"Error": "uploaded file is not found."}
 
+
+    @app_fastapi.get("/resumable")
+    async def get_resumble():
+        print("GET REQUSET")
+        raise HTTPException(status_code=404, detail="Not found")
+
+        return 'OK'
+
+    @app_fastapi.post("/resumable")
+    async def post_resumble(
+        file:UploadFile = File(...), 
+        filename: str = Form(...)
+        ):
+
+        print("resumableFilename", filename)
+        if file and filename:
+            filename = file.filename + "_" + filename
+            fileobj = file.file
+            upload_dir = open(os.path.join(".", filename),'wb+')
+            shutil.copyfileobj(fileobj, upload_dir)
+            upload_dir.close()
+            return {"uploaded files": f"{filename} "}
+        return {"Error": "uploaded file is not found."}
+        return 'OK'
 
 
     @app_fastapi.post("/test")
