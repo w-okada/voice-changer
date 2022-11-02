@@ -22,7 +22,7 @@ import numpy as np
 
 from mods.ssl import create_self_signed_cert
 from mods.VoiceChanger import VoiceChanger
-from mods.Whisper import Whisper
+# from mods.Whisper import Whisper
 
 class UvicornSuppressFilter(logging.Filter):
     def filter(self, record):
@@ -54,22 +54,22 @@ class MyCustomNamespace(socketio.AsyncNamespace):
             self.voiceChanger.destroy()
         self.voiceChanger = VoiceChanger(config, model)
 
-    def loadWhisperModel(self, model):
-        self.whisper = Whisper()
-        self.whisper.loadModel("tiny")
-        print("load")
+    # def loadWhisperModel(self, model):
+    #     self.whisper = Whisper()
+    #     self.whisper.loadModel("tiny")
+    #     print("load")
 
     def changeVoice(self, gpu, srcId, dstId, timestamp, prefixChunkSize, unpackedData):
-        if hasattr(self, 'whisper') == True:
-            self.whisper.addData(unpackedData)
+        # if hasattr(self, 'whisper') == True:
+        #     self.whisper.addData(unpackedData)
 
         return self.voiceChanger.on_request(gpu, srcId, dstId, timestamp, prefixChunkSize, unpackedData)
 
-    def transcribe(self):
-        if hasattr(self, 'whisper') == True:
-            self.whisper.transcribe(0)
-        else:
-            print("whisper not found")
+    # def transcribe(self):
+    #     if hasattr(self, 'whisper') == True:
+    #         self.whisper.transcribe(0)
+    #     else:
+    #         print("whisper not found")
 
 
     def on_connect(self, sid, environ):
@@ -154,7 +154,7 @@ if __name__ == thisFilename or args.colab == True:
     sio.register_namespace(namespace) 
     if CONFIG and MODEL:
         namespace.loadModel(CONFIG, MODEL)
-    namespace.loadWhisperModel("base")
+    # namespace.loadWhisperModel("base")
     
     
     app_socketio = socketio.ASGIApp(
