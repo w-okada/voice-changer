@@ -24,30 +24,30 @@ class VoiceChanger():
         self.net_g.eval()
         self.gpu_num = torch.cuda.device_count()
         utils.load_checkpoint( model, self.net_g, None)
+
+        text_norm = text_to_sequence("a", self.hps.data.text_cleaners)
+        text_norm = commons.intersperse(text_norm, 0)
+        self.text_norm = torch.LongTensor(text_norm)
+        self.audio_buffer = torch.zeros(1, 0)
+        self.prev_audio = np.zeros(1)
+
         print(f"VoiceChanger Initialized (GPU_NUM:{self.gpu_num})")
 
     def destroy(self):
         del self.net_g
 
-    def on_request(self, gpu, srcId, dstId, timestamp, wav): 
-        # if wav==0:
-        #     samplerate, data=read("dummy.wav")
-        #     unpackedData = data
-        # else:
-        #     unpackedData = np.array(struct.unpack('<%sh'%(len(wav) // struct.calcsize('<h') ), wav))
-        #     write("logs/received_data.wav", 24000, unpackedData.astype(np.int16))
-
+    def on_request(self, gpu, srcId, dstId, timestamp, prefixChunkSize, wav): 
         unpackedData = wav
+        convertSize = unpackedData.shape[0] + (prefixChunkSize * 512)
 
         try:
-
-            text_norm = text_to_sequence("a", self.hps.data.text_cleaners)
-            text_norm = commons.intersperse(text_norm, 0)
-            text_norm = torch.LongTensor(text_norm)
 
             audio = torch.FloatTensor(unpackedData.astype(np.float32))
             audio_norm = audio /self.hps.data.max_wav_value
             audio_norm = audio_norm.unsqueeze(0)
+            self.audio_buffer = torch.cat([self.audio_buffer, audio_norm], axis=1)
+            audio_norm = self.audio_buffer[:,-convertSize:]
+            self.audio_buffer = audio_norm
 
             spec = spectrogram_torch(audio_norm, self.hps.data.filter_length,
                     self.hps.data.sampling_rate, self.hps.data.hop_length, self.hps.data.win_length,
@@ -55,7 +55,7 @@ class VoiceChanger():
             spec = torch.squeeze(spec, 0)
             sid = torch.LongTensor([int(srcId)])
             
-            data =  (text_norm, spec, audio_norm, sid)
+            data =  (self.text_norm , spec, audio_norm, sid)
             data = TextAudioSpeakerCollate()([data])
 
             if gpu<0 or self.gpu_num==0 :
@@ -68,6 +68,17 @@ class VoiceChanger():
                     x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [x.cuda(gpu) for x in data]
                     sid_tgt1 = torch.LongTensor([dstId]).cuda(gpu)
                     audio1 = (self.net_g.cuda(gpu).voice_conversion(spec, spec_lengths, sid_src=sid_src, sid_tgt=sid_tgt1)[0][0,0].data * self.hps.data.max_wav_value).cpu().float().numpy()
+
+            # if len(self.prev_audio) > unpackedData.shape[0]:
+            #     prevLastFragment = self.prev_audio[-unpackedData.shape[0]:]
+            #     curSecondLastFragment = audio1[-unpackedData.shape[0]*2:-unpackedData.shape[0]]
+            #     print("prev, cur", prevLastFragment.shape, curSecondLastFragment.shape)
+            # self.prev_audio = audio1
+            # print("self.prev_audio", self.prev_audio.shape)
+
+            audio1 = audio1[-unpackedData.shape[0]*2:]
+
+
         except Exception as e:
             print("VC PROCESSING!!!! EXCEPTION!!!", e)
             print(traceback.format_exc())

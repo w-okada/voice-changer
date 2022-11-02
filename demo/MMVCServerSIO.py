@@ -22,6 +22,7 @@ import numpy as np
 
 from mods.ssl import create_self_signed_cert
 from mods.VoiceChanger import VoiceChanger
+from mods.Whisper import Whisper
 
 class UvicornSuppressFilter(logging.Filter):
     def filter(self, record):
@@ -40,6 +41,7 @@ class VoiceModel(BaseModel):
     srcId: int
     dstId: int
     timestamp: int
+    prefixChunkSize: int
     buffer: str
 
 
@@ -52,8 +54,23 @@ class MyCustomNamespace(socketio.AsyncNamespace):
             self.voiceChanger.destroy()
         self.voiceChanger = VoiceChanger(config, model)
 
-    def changeVoice(self, gpu, srcId, dstId, timestamp, unpackedData):
-        return self.voiceChanger.on_request(gpu, srcId, dstId, timestamp, unpackedData)
+    def loadWhisperModel(self, model):
+        self.whisper = Whisper()
+        self.whisper.loadModel("tiny")
+        print("load")
+
+    def changeVoice(self, gpu, srcId, dstId, timestamp, prefixChunkSize, unpackedData):
+        if hasattr(self, 'whisper') == True:
+            self.whisper.addData(unpackedData)
+
+        return self.voiceChanger.on_request(gpu, srcId, dstId, timestamp, prefixChunkSize, unpackedData)
+
+    def transcribe(self):
+        if hasattr(self, 'whisper') == True:
+            self.whisper.transcribe(0)
+        else:
+            print("whisper not found")
+
 
     def on_connect(self, sid, environ):
         # print('[{}] connet sid : {}'.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S') , sid))
@@ -65,10 +82,11 @@ class MyCustomNamespace(socketio.AsyncNamespace):
         srcId = int(msg[1])
         dstId = int(msg[2])
         timestamp = int(msg[3])
-        data = msg[4]
+        prefixChunkSize = int(msg[4])
+        data = msg[5]
         # print(srcId, dstId, timestamp)
         unpackedData = np.array(struct.unpack('<%sh'%(len(data) // struct.calcsize('<h') ), data))
-        audio1 = self.changeVoice(gpu, srcId, dstId, timestamp, unpackedData)
+        audio1 = self.changeVoice(gpu, srcId, dstId, timestamp, prefixChunkSize, unpackedData)
 
         bin = struct.pack('<%sh'%len(audio1), *audio1)
 
@@ -136,6 +154,9 @@ if __name__ == thisFilename or args.colab == True:
     sio.register_namespace(namespace) 
     if CONFIG and MODEL:
         namespace.loadModel(CONFIG, MODEL)
+    namespace.loadWhisperModel("base")
+    
+    
     app_socketio = socketio.ASGIApp(
         sio, 
         other_asgi_app=app_fastapi,
@@ -165,7 +186,6 @@ if __name__ == thisFilename or args.colab == True:
             namespace.loadModel(os.path.join(UPLOAD_DIR, configFile.filename), os.path.join(UPLOAD_DIR, modelFile.filename))                
             return {"uploaded files": f"{configFile.filename}, {modelFile.filename} "}
         return {"Error": "uploaded file is not found."}
-
 
 
     @app_fastapi.post("/upload_file")
@@ -206,6 +226,16 @@ if __name__ == thisFilename or args.colab == True:
         return {"File saved to": f"{target_file_name}"}
 
 
+
+    @app_fastapi.get("/transcribe")
+    def get_transcribe():
+        try:
+            namespace.transcribe()
+        except Exception as e:
+            print("TRANSCRIBE PROCESSING!!!! EXCEPTION!!!", e)
+            print(traceback.format_exc())
+            return str(e) 
+
     @app_fastapi.post("/test")
     async def post_test(voice:VoiceModel):
         try:
@@ -214,6 +244,7 @@ if __name__ == thisFilename or args.colab == True:
             srcId = voice.srcId
             dstId = voice.dstId
             timestamp = voice.timestamp
+            prefixChunkSize = voice.prefixChunkSize
             buffer = voice.buffer
             wav = base64.b64decode(buffer)
 
@@ -224,7 +255,7 @@ if __name__ == thisFilename or args.colab == True:
                 unpackedData = np.array(struct.unpack('<%sh'%(len(wav) // struct.calcsize('<h') ), wav))
                 write("logs/received_data.wav", 24000, unpackedData.astype(np.int16))
 
-            changedVoice = namespace.changeVoice(gpu, srcId, dstId, timestamp, unpackedData)
+            changedVoice = namespace.changeVoice(gpu, srcId, dstId, timestamp, prefixChunkSize, unpackedData)
             changedVoiceBase64 = base64.b64encode(changedVoice).decode('utf-8')
 
             data = {
@@ -232,6 +263,7 @@ if __name__ == thisFilename or args.colab == True:
                 "srcId":srcId,
                 "dstId":dstId,
                 "timestamp":timestamp,
+                "prefixChunkSize":prefixChunkSize,
                 "changedVoiceBase64":changedVoiceBase64
             }
 
@@ -320,7 +352,7 @@ if __name__ == '__main__':
             reload=True, 
             ssl_keyfile = key_path,
             ssl_certfile = cert_path,
-            log_level="critical"            
+            log_level="critical"
         )
     else:
         # HTTP サーバ起動
