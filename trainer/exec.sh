@@ -19,11 +19,16 @@ echo "------"
 if  [ "${MODE}" = "MMVC" ] ; then
     cd /voice-changer-internal/voice-change-service
 
+    ls /resources/* >/dev/null 2>&1
 
-
-    if [ -d /resources ]; then
+    if [ $? -ne 0 ]; then
+        echo "デフォルトの設定を使用します。"
+    else
+        echo "指定された設定を使用します。"
         cp -r /resources/* .
     fi
+
+
 
     if [[ -e ./setting.json ]]; then
         cp ./setting.json ../frontend/dist/assets/setting.json
