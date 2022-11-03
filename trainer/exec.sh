@@ -2,6 +2,7 @@
 
 # 参考:https://programwiz.org/2022/03/22/how-to-write-shell-script-for-option-parsing/
 
+#set -eux
 set -eu
 
 MODE=$1
@@ -19,22 +20,16 @@ echo "------"
 if  [ "${MODE}" = "MMVC" ] ; then
     cd /voice-changer-internal/voice-change-service
 
-    ls /resources/* >/dev/null 2>&1
-
-    if [ $? -ne 0 ]; then
-        echo "デフォルトの設定を使用します。"
+    if [[ -e /resources/setting.json ]]; then
+        echo "指定された設定(setting.json)を使用します。"
+        cp /resources/setting.json ../frontend/dist/assets/setting.json
     else
-        echo "指定された設定を使用します。"
-        cp -r /resources/* .
-    fi
-
-
-
-    if [[ -e ./setting.json ]]; then
-        cp ./setting.json ../frontend/dist/assets/setting.json
-    else
+        echo "デフォルトの設定(setting.json)を使用します。"
         cp ../frontend/dist/assets/setting_mmvc.json ../frontend/dist/assets/setting.json
     fi
+
+    find /resources/ -type f -name "config.json" | xargs -I{} sh -c 'echo "config.jsonをコピーします。" && cp {} ./'
+    find /resources/ -type f -name "*.pth"       | xargs -I{} sh -c 'echo "`basename {}`をコピーします。" && cp {} ./'
 
     if [ "${VERBOSE}" = "on" ]; then
         echo "MMVCを起動します(verbose)"
@@ -43,6 +38,7 @@ if  [ "${MODE}" = "MMVC" ] ; then
         echo "MMVCを起動します"
         python3 MMVCServerSIO.py $PARAMS 2>stderr.txt
     fi
+    
 elif [ "${MODE}" = "MMVC_TRAIN" ] ; then
     python3 create_dataset_jtalk.py -f train_config -s 24000 -m dataset/multi_speaker_correspondence.txt
     # date_tag=`date +%Y%m%d%H%M%S`
