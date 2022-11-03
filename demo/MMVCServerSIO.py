@@ -62,8 +62,12 @@ class MyCustomNamespace(socketio.AsyncNamespace):
     def changeVoice(self, gpu, srcId, dstId, timestamp, prefixChunkSize, unpackedData):
         # if hasattr(self, 'whisper') == True:
         #     self.whisper.addData(unpackedData)
+        if hasattr(self, 'voiceChanger') == True:
+            return self.voiceChanger.on_request(gpu, srcId, dstId, timestamp, prefixChunkSize, unpackedData)
+        else:
+            print("Voice Change is not loaded. Did you load a correct model?")
+            return np.zeros(1).astype(np.int16)
 
-        return self.voiceChanger.on_request(gpu, srcId, dstId, timestamp, prefixChunkSize, unpackedData)
 
     # def transcribe(self):
     #     if hasattr(self, 'whisper') == True:
@@ -89,7 +93,6 @@ class MyCustomNamespace(socketio.AsyncNamespace):
         audio1 = self.changeVoice(gpu, srcId, dstId, timestamp, prefixChunkSize, unpackedData)
 
         bin = struct.pack('<%sh'%len(audio1), *audio1)
-
         await self.emit('response',[timestamp, bin])
 
     def on_disconnect(self, sid):
@@ -260,8 +263,8 @@ if __name__ == thisFilename or args.colab == True:
                 write("logs/received_data.wav", 24000, unpackedData.astype(np.int16))
 
             changedVoice = namespace.changeVoice(gpu, srcId, dstId, timestamp, prefixChunkSize, unpackedData)
-            changedVoiceBase64 = base64.b64encode(changedVoice).decode('utf-8')
 
+            changedVoiceBase64 = base64.b64encode(changedVoice).decode('utf-8')
             data = {
                 "gpu":gpu,
                 "srcId":srcId,
@@ -274,6 +277,7 @@ if __name__ == thisFilename or args.colab == True:
             json_compatible_item_data = jsonable_encoder(data)
             
             return JSONResponse(content=json_compatible_item_data)
+
         except Exception as e:
             print("REQUEST PROCESSING!!!! EXCEPTION!!!", e)
             print(traceback.format_exc())
