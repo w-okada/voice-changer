@@ -17,23 +17,7 @@ echo "------"
 
 
 # 起動
-if [ "${MODE}" = "SOFT_VC" ] ; then
-    cd /voice-changer-internal/voice-change-service
-
-    cp -r /resources/* .
-    if [[ -e ./setting.json ]]; then
-        cp ./setting.json ../frontend/dist/assets/setting.json
-    else
-        cp ../frontend/dist/assets/setting_softvc.json ../frontend/dist/assets/setting.json
-    fi
-    if [ "${VERBOSE}" = "on" ]; then
-        echo "SOFT_VCを起動します(verbose)"
-        python3 SoftVcServerSIO.py $PARAMS 
-    else
-        echo "SOFT_VCを起動します"
-        python3 SoftVcServerSIO.py $PARAMS 2>stderr.txt
-    fi
-elif [ "${MODE}" = "MMVC" ] ; then
+if  [ "${MODE}" = "MMVC" ] ; then
     cd /voice-changer-internal/voice-change-service
 
     cp -r /resources/* .
@@ -45,10 +29,10 @@ elif [ "${MODE}" = "MMVC" ] ; then
 
     if [ "${VERBOSE}" = "on" ]; then
         echo "MMVCを起動します(verbose)"
-        python3 serverSIO.py $PARAMS
+        python3 MMVCServerSIO.py $PARAMS
     else
         echo "MMVCを起動します"
-        python3 serverSIO.py $PARAMS 2>stderr.txt
+        python3 MMVCServerSIO.py $PARAMS $PARAMS 2>stderr.txt
     fi
 elif [ "${MODE}" = "MMVC_TRAIN" ] ; then
     python3 create_dataset_jtalk.py -f train_config -s 24000 -m dataset/multi_speaker_correspondence.txt

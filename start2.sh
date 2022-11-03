@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-DOCKER_IMAGE=dannadori/voice-changer:20221028_220714
+DOCKER_IMAGE=dannadori/voice-changer:20221103_180651
 #DOCKER_IMAGE=voice-changer
 
 
@@ -75,28 +75,11 @@ elif [ "${MODE}" = "MMVC" ]; then
         # -p ${EX_PORT}:8080 $DOCKER_IMAGE /bin/bash
 
     fi
-
-elif [ "${MODE}" = "SOFT_VC" ]; then
-    if [ "${USE_GPU}" = "on" ]; then
-        echo "Start Soft-vc"
-
-        docker run -it --gpus all --shm-size=128M \
-        -v `pwd`/vc_resources:/resources \
-        -e LOCAL_UID=$(id -u $USER) \
-        -e LOCAL_GID=$(id -g $USER) \
-        -e EX_IP="`hostname -I`" \
-        -e EX_PORT=${EX_PORT} \
-        -e VERBOSE=${VERBOSE} \
-        -p ${EX_PORT}:8080 $DOCKER_IMAGE "$@"
-    else
-        echo "Start Soft-vc withou GPU is not supported"
-    fi
-
 else
     echo "
 usage: 
     $0 <MODE> <params...>
-    MODE: select one of ['MMVC_TRAIN', 'MMVC', 'SOFT_VC']
+    MODE: select one of ['MMVC_TRAIN', 'MMVC']
 " >&2
 fi
 
