@@ -11,12 +11,12 @@ PARAMS=${@:2:($#-1)}
 ### DEFAULT VAR ###
 DEFAULT_EX_PORT=18888
 DEFAULT_USE_GPU=on # on|off
-DEFAULT_VERBOSE=off # on|off
+# DEFAULT_VERBOSE=off # on|off
 
 ### ENV VAR ###
 EX_PORT=${EX_PORT:-${DEFAULT_EX_PORT}}
 USE_GPU=${USE_GPU:-${DEFAULT_USE_GPU}}
-VERBOSE=${VERBOSE:-${DEFAULT_VERBOSE}}
+# VERBOSE=${VERBOSE:-${DEFAULT_VERBOSE}}
 
 #echo $EX_PORT $USE_GPU $VERBOSE
 
@@ -51,7 +51,7 @@ elif [ "${MODE}" = "MMVC" ]; then
         -e LOCAL_GID=$(id -g $USER) \
         -e EX_IP="`hostname -I`" \
         -e EX_PORT=${EX_PORT} \
-        -e VERBOSE=${VERBOSE} \
+        # -e VERBOSE=${VERBOSE} \
         -p ${EX_PORT}:8080 $DOCKER_IMAGE "$@"
     else
         echo "MMVCを起動します(only cpu)"
@@ -61,19 +61,8 @@ elif [ "${MODE}" = "MMVC" ]; then
         -e LOCAL_GID=$(id -g $USER) \
         -e EX_IP="`hostname -I`" \
         -e EX_PORT=${EX_PORT} \
-        -e VERBOSE=${VERBOSE} \
-        -p ${EX_PORT}:8080 $DOCKER_IMAGE "$@"
-
-        # docker run -it --shm-size=128M \
-        # -v `pwd`/vc_resources:/resources \
-        # -e LOCAL_UID=$(id -u $USER) \
-        # -e LOCAL_GID=$(id -g $USER) \
-        # -e EX_IP="`hostname -I`" \
-        # -e EX_PORT=${EX_PORT} \
         # -e VERBOSE=${VERBOSE} \
-        # --entrypoint="" \
-        # -p ${EX_PORT}:8080 $DOCKER_IMAGE /bin/bash
-
+        -p ${EX_PORT}:8080 $DOCKER_IMAGE "$@"
     fi
 else
     echo "
