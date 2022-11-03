@@ -4,8 +4,8 @@
     "voice_changer_server_url": "/test",
     "sample_rate": 48000,
     "buffer_size": 1024,
-    "prefix_chunk_size": 24,
-    "chunk_size": 24,
+    "prefix_chunk_size": 48,
+    "chunk_size": 48,
     "speakers": [
         {
             "id": 100,
