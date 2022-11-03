@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-DOCKER_IMAGE=dannadori/voice-changer:20221104_031752
+DOCKER_IMAGE=dannadori/voice-changer:20221104_040941
 #DOCKER_IMAGE=voice-changer
 
 
@@ -51,7 +51,6 @@ elif [ "${MODE}" = "MMVC" ]; then
         -e LOCAL_GID=$(id -g $USER) \
         -e EX_IP="`hostname -I`" \
         -e EX_PORT=${EX_PORT} \
-        # -e VERBOSE=${VERBOSE} \
         -p ${EX_PORT}:8080 $DOCKER_IMAGE "$@"
     else
         echo "MMVCを起動します(only cpu)"
@@ -61,7 +60,6 @@ elif [ "${MODE}" = "MMVC" ]; then
         -e LOCAL_GID=$(id -g $USER) \
         -e EX_IP="`hostname -I`" \
         -e EX_PORT=${EX_PORT} \
-        # -e VERBOSE=${VERBOSE} \
         -p ${EX_PORT}:8080 $DOCKER_IMAGE "$@"
     fi
 else
