@@ -12,7 +12,7 @@ PARAMS=${@:2:($#-1)}
 echo "------"
 echo "$MODE"
 echo "PARAMS: $PARAMS"
-echo "VERBOSE: $VERBOSE"
+# echo "VERBOSE: $VERBOSE"
 echo "------"
 
 
@@ -31,14 +31,16 @@ if  [ "${MODE}" = "MMVC" ] ; then
     find /resources/ -type f -name "config.json" | xargs -I{} sh -c 'echo "config.jsonをコピーします。" && cp {} ./'
     find /resources/ -type f -name "*.pth"       | xargs -I{} sh -c 'echo "`basename {}`をコピーします。" && cp {} ./'
 
-    if [ "${VERBOSE}" = "on" ]; then
-        echo "MMVCを起動します(verbose)"
-        python3 MMVCServerSIO.py $PARAMS
-    else
-        echo "MMVCを起動します"
-        python3 MMVCServerSIO.py $PARAMS 2>stderr.txt
-    fi
-    
+    # if [ "${VERBOSE}" = "on" ]; then
+    #     echo "MMVCを起動します(verbose)"
+    #     python3 MMVCServerSIO.py $PARAMS
+    # else
+    #     echo "MMVCを起動します"
+    #     python3 MMVCServerSIO.py $PARAMS 2>stderr.txt
+    # fi
+    echo "MMVCを起動します"
+    python3 MMVCServerSIO.py $PARAMS 2>stderr.txt
+
 elif [ "${MODE}" = "MMVC_TRAIN" ] ; then
     python3 create_dataset_jtalk.py -f train_config -s 24000 -m dataset/multi_speaker_correspondence.txt
     # date_tag=`date +%Y%m%d%H%M%S`
