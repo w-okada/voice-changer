@@ -25,11 +25,6 @@ AIを使ったリアルタイムボイスチェンジャー[MMVC](https://github
 
 ![image](https://user-images.githubusercontent.com/48346627/191024059-9c90dfbc-8098-4a81-a905-2a8aa51662ba.png)
 
-
-## 関連技術
-本レポジトリでは、関連するボイスチェンジャとして[soft-vc](https://github.com/bshall/soft-vc)に注目しています。soft-vcにもリアルタイムでボイスチェンジできるようにしています。下記の「Docker不要な実行方法」のセクションからご利用ください。
-
-
 # Docker不要な実行方法
 
 本コンテナの一部の機能は、Google ColabやGithub Pagesを利用することで、ローカルPCにDockerの環境を用意することなく利用可能になっています。
@@ -55,9 +50,9 @@ Github Pagesにおいてあります。下記リンクにアクセスするこ�
 
 
 ## 簡易デモ(MMVC)
-MMVCを用いたボイスチェンジャです。
-
-[コラボのノート](https://github.com/w-okada/voice-changer/blob/dev/VoiceChangerDemo.ipynb)
+Colabを用いてデモ版を動かすことができます。
+- [簡単バージョン](https://github.com/w-okada/voice-changer/blob/master/VoiceChangerDemo_Simple.ipynb): 事前設定なしでColabから実行できます。 
+- [詳細バージョン](https://github.com/w-okada/voice-changer/blob/master/VoiceChangerDemo.ipynb): Google Driveと連携してモデルを読み込むことができます。
 
 [説明動画](https://twitter.com/DannadoriYellow/status/1564897136999022592)
 
