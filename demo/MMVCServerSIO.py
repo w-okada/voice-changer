@@ -161,6 +161,10 @@ if __name__ == thisFilename or args.colab == True:
         sio, 
         other_asgi_app=app_fastapi,
         static_files={
+            '/assets/icons/github.svg': {
+                'filename':'../frontend/dist/assets/icons/github.svg',
+                'content_type':'image/svg+xml'
+                },
             '': '../frontend/dist',
             '/': '../frontend/dist/index.html',
         }
