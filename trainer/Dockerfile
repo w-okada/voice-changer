@@ -1,4 +1,4 @@
-FROM dannadori/voice-changer-internal:20221104_061809 as front
+FROM dannadori/voice-changer-internal:20221108_184110 as front
 FROM debian:bullseye-slim as base
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -60,7 +60,6 @@ COPY --from=base --chmod=777 /usr/local/lib/python3.9/dist-packages /usr/local/l
 COPY --from=front --chmod=777 /MMVC_Trainer /MMVC_Trainer
 RUN chmod 0777 /MMVC_Trainer 
 
-WORKDIR /MMVC_Trainer
 ADD /setup.sh  /MMVC_Trainer/
 ADD /exec.sh  /MMVC_Trainer/
 
@@ -68,6 +67,10 @@ ADD /exec.sh  /MMVC_Trainer/
 COPY --from=front --chmod=777 /voice-changer-internal/frontend/dist /voice-changer-internal/frontend/dist
 COPY --from=front --chmod=777 /voice-changer-internal/voice-change-service /voice-changer-internal/voice-change-service
 RUN chmod 0777 /voice-changer-internal/voice-change-service 
+
+
+## 歴史的な経緯でsetup.shをMMVC_Trainerに置いているのでそこを起動時のWORKDIRにしている。
+WORKDIR /MMVC_Trainer
 
 # ##### Soft VC
 # COPY --from=front /hubert /hubert
