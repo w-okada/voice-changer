@@ -2,6 +2,9 @@
     "app_title": "voice-recorder",
     "storage_type":"local",
     "use_mel_spectrogram":true,
+    "current_text":"ITA-emotion",
+    "current_text_index":0,
+    "sample_rate":48000,
     "text": [
         {
             "title": "ITA-emotion",

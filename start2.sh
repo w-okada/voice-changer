@@ -1,20 +1,21 @@
 #!/bin/bash
 set -eu
 
-DOCKER_IMAGE=dannadori/voice-changer:20221104_062009
-#DOCKER_IMAGE=voice-changer
-
+#DOCKER_IMAGE=dannadori/voice-changer:20221108_105937
+DOCKER_IMAGE=voice-changer
 
 MODE=$1
 PARAMS=${@:2:($#-1)}
 
 ### DEFAULT VAR ###
 DEFAULT_EX_PORT=18888
+DEFAULT_EX_TB_PORT=16006
 DEFAULT_USE_GPU=on # on|off
 # DEFAULT_VERBOSE=off # on|off
 
 ### ENV VAR ###
 EX_PORT=${EX_PORT:-${DEFAULT_EX_PORT}}
+EX_TB_PORT=${EX_TB_PORT:-${DEFAULT_EX_TB_PORT}}
 USE_GPU=${USE_GPU:-${DEFAULT_USE_GPU}}
 # VERBOSE=${VERBOSE:-${DEFAULT_VERBOSE}}
 
@@ -30,16 +31,16 @@ if [ "${MODE}" = "MMVC_TRAIN" ]; then
     echo "トレーニングを開始します"
 
     docker run -it --gpus all --shm-size=128M \
-        -v `pwd`/exp/${name}/dataset:/MMVC_Trainer/dataset \
-        -v `pwd`/exp/${name}/logs:/MMVC_Trainer/logs \
-        -v `pwd`/exp/${name}/filelists:/MMVC_Trainer/filelists \
-        -v `pwd`/vc_resources:/resources \
+        -v `pwd`/work_dir/logs:/MMVC_Trainer/logs \
+        -v `pwd`/work_dir/dataset:/MMVC_Trainer/dataset \
+        -v `pwd`/work_dir/info:/MMVC_Trainer/info \
         -e LOCAL_UID=$(id -u $USER) \
         -e LOCAL_GID=$(id -g $USER) \
+        -e EX_PORT=${EX_PORT} -e EX_TB_PORT=${EX_TB_PORT} \
         -e EX_IP="`hostname -I`" \
-        -e EX_PORT=${EX_PORT} \
-        -e VERBOSE=${VERBOSE} \        
-        -p ${EX_PORT}:6006 $DOCKER_IMAGE "$@"
+        -p ${EX_PORT}:8080 -p ${EX_TB_PORT}:6006 \
+        $DOCKER_IMAGE "$@"
+
 
 elif [ "${MODE}" = "MMVC" ]; then
     if [ "${USE_GPU}" = "on" ]; then

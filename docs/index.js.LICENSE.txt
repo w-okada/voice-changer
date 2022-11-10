@@ -6,12 +6,6 @@
 */
 
 /*!
- * Font Awesome Free 6.1.2 by @fontawesome - https://fontawesome.com
- * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
- * Copyright 2022 Fonticons, Inc.
- */
-
-/*!
  * The buffer module from node.js, for the browser.
  *
  * @author   Feross Aboukhadijeh <https://feross.org>
@@ -19,7 +13,7 @@
  */
 
 /*!
- * wavesurfer.js 6.2.0 (2022-05-16)
+ * wavesurfer.js 6.4.0 (2022-11-05)
  * https://wavesurfer-js.org
  * @license BSD-3-Clause
  */
