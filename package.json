@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build:docker": "date +%Y%m%d%H%M%S > trainer/dummy && DOCKER_BUILDKIT=1 docker build -f trainer/Dockerfile trainer/ -t voice-changer",
+    "build:docker": "date +%Y%m%d%H%M%S > docker/dummy && DOCKER_BUILDKIT=1 docker build -f docker/Dockerfile docker/ -t voice-changer",
     "copy:frontend":"docker run -v `pwd`/frontend/dist:/frontend/dist --entrypoint /bin/bash -ti voice-changer -c \"cp -r /voice-changer-internal/frontend/dist/* /frontend/dist\"",
     "copy:backend":"docker run -v `pwd`/demo:/demo --entrypoint /bin/bash -ti voice-changer -c \"cp -r /voice-changer-internal/voice-change-service/* /demo/\"",
     "create:demo":"run-p copy:frontend copy:backend",
