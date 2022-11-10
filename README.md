@@ -7,7 +7,7 @@ MMVCで必要となる一連の作業（トレーニング用の音声の録音�
 ![image](https://user-images.githubusercontent.com/48346627/201169523-836e0f9e-2aca-4023-887c-52ecc219bcca.png)
 
 
-基本的にはDockerを前提としたアプリケーションですが、Github PagesとGoogle Colaboratory上での実行も可能です。（Google Colaboratoryの制約により使用感が一部悪いです。）
+Dockerを前提としたアプリケーションですが、Github PagesとGoogle Colaboratory上での実行も可能です。（Google Colaboratoryの制約により使用感が一部悪いです。）
 ![image](https://user-images.githubusercontent.com/48346627/201169876-36c33af9-f2d4-4746-9ddb-21186b94f6fc.png)
 
 このアプリケーションを用いることで、以下のことを簡単に行うことができます。
