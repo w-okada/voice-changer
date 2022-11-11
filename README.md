@@ -66,6 +66,21 @@ Dockerでの使用を推奨します。一部ユーザ体験が劣化します�
 
 詳細な使用方法等は[wiki](https://github.com/w-okada/voice-changer/wiki)をご参照ください。
 
+# デモ動画
+## リアルタイム性
+
+GPUを使用すると100msec強の遅延で変換することが可能です。
+
+https://user-images.githubusercontent.com/48346627/199807082-9d2ca75b-3a05-463d-b32e-14e663603626.mp4
+
+
+CPUでも最近のであればそれなりの速度で変換可能。
+
+https://user-images.githubusercontent.com/48346627/199855821-596f0874-8f69-4354-b226-4a755e9763bc.mp4
+
+
+古いCPU( i7-4770)だと、1000msecくらいかかってしまう。
+
 # Misc
 ## 簡易デモ(soft-vc)
 soft-vcを用いたボイスチェンジャです。
