@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-DOCKER_IMAGE=dannadori/voice-changer:20221112_092328
+DOCKER_IMAGE=dannadori/voice-changer:20221112_102442
 # DOCKER_IMAGE=voice-changer
 
 if [ $# = 0 ]; then
@@ -44,7 +44,7 @@ if [ "${MODE}" = "TRAIN" ]; then
         -e EX_PORT=${EX_PORT} -e EX_TB_PORT=${EX_TB_PORT} \
         -e EX_IP="`hostname -I`" \
         -p ${EX_PORT}:8080 -p ${EX_TB_PORT}:6006 \
-        $DOCKER_IMAGE "$@"
+        $DOCKER_IMAGE -t TRAIN "$@"
 
 
 elif [ "${MODE}" = "MMVC" ]; then
@@ -66,7 +66,8 @@ elif [ "${MODE}" = "MMVC" ]; then
         -e LOCAL_GID=$(id -g $USER) \
         -e EX_IP="`hostname -I`" \
         -e EX_PORT=${EX_PORT} \
-        -p ${EX_PORT}:8080 $DOCKER_IMAGE "$@"
+        -p ${EX_PORT}:8080 \
+        $DOCKER_IMAGE  -t MMVC "$@"
     fi
 else
     echo "
