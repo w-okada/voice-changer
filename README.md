@@ -38,14 +38,14 @@ Github Pages上で実行できるため、Dockerの準備は不要です。
 
 録音したデータは、ブラウザ上に保存されます。外部に一切漏れることはありません。
 
-詳細な使用方法は[wiki](https://github.com/w-okada/voice-changer/wiki/500_%E3%83%AC%E3%82%B3%E3%83%BC%E3%83%80%E3%83%BC)をご覧ください。
+詳細な使用方法は[wiki](https://github.com/w-okada/voice-changer/wiki/020_%E9%9F%B3%E5%A3%B0%E9%8C%B2%E9%9F%B3)をご覧ください。
 
 
 ## トレーニング用アプリ
 MMVCのトレーニングを行うアプリです。
 Dockerでの実行を強く推奨します。
 
-詳細な使用方法等は[wiki](https://github.com/w-okada/voice-changer/wiki)をご参照ください。
+詳細な使用方法等は[wiki](https://github.com/w-okada/voice-changer/wiki/030_%E3%83%88%E3%83%AC%E3%83%BC%E3%83%8B%E3%83%B3%E3%82%B0)をご参照ください。
 
 Colaboratoryでの実行を行う場合は、次のノートから実行できます。
 - [Colab ノート](https://github.com/w-okada/voice-changer/blob/master/MMVCTrainerFrontendDemo.ipynb)
@@ -64,7 +64,7 @@ Dockerでの使用を推奨します。一部ユーザ体験が劣化します�
 - サーバの起動完了のメッセージは、「Debuggerほにゃらら」ではなく「Application startup complete.」です。
 - プロキシにアクセスする際に、index.htmlを追加する必要はありません。
 
-詳細な使用方法等は[wiki](https://github.com/w-okada/voice-changer/wiki)をご参照ください。
+詳細な使用方法等は[wiki](https://github.com/w-okada/voice-changer/wiki/040_%E3%83%9C%E3%82%A4%E3%82%B9%E3%83%81%E3%82%A7%E3%83%B3%E3%82%B8%E3%83%A3%E3%83%BC)をご参照ください。
 
 # デモ動画
 ## リアルタイム性
