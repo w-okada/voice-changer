@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-DOCKER_IMAGE=dannadori/voice-changer:20221112_102442
+DOCKER_IMAGE=dannadori/voice-changer:20221112_104247
 # DOCKER_IMAGE=voice-changer
 
 if [ $# = 0 ]; then
@@ -14,7 +14,6 @@ if [ $# = 0 ]; then
 fi
 
 MODE=$1
-PARAMS=${@:2:($#-1)}
 
 ### DEFAULT VAR ###
 DEFAULT_EX_PORT=18888
@@ -44,7 +43,7 @@ if [ "${MODE}" = "TRAIN" ]; then
         -e EX_PORT=${EX_PORT} -e EX_TB_PORT=${EX_TB_PORT} \
         -e EX_IP="`hostname -I`" \
         -p ${EX_PORT}:8080 -p ${EX_TB_PORT}:6006 \
-        $DOCKER_IMAGE -t TRAIN "$@"
+        $DOCKER_IMAGE TRAIN "$@"
 
 
 elif [ "${MODE}" = "MMVC" ]; then
@@ -58,7 +57,7 @@ elif [ "${MODE}" = "MMVC" ]; then
         -e EX_IP="`hostname -I`" \
         -e EX_PORT=${EX_PORT} \
         -p ${EX_PORT}:8080 \
-        $DOCKER_IMAGE -t MMVC "$@"
+        $DOCKER_IMAGE MMVC "$@"
     else
         echo "MMVCを起動します(only cpu)"
         docker run -it --shm-size=128M \
@@ -68,7 +67,7 @@ elif [ "${MODE}" = "MMVC" ]; then
         -e EX_IP="`hostname -I`" \
         -e EX_PORT=${EX_PORT} \
         -p ${EX_PORT}:8080 \
-        $DOCKER_IMAGE -t MMVC "$@"
+        $DOCKER_IMAGE MMVC "$@"
     fi
 else
     echo "
