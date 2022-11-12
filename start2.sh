@@ -43,7 +43,7 @@ if [ "${MODE}" = "TRAIN" ]; then
         -e EX_PORT=${EX_PORT} -e EX_TB_PORT=${EX_TB_PORT} \
         -e EX_IP="`hostname -I`" \
         -p ${EX_PORT}:8080 -p ${EX_TB_PORT}:6006 \
-        $DOCKER_IMAGE TRAIN "$@"
+        $DOCKER_IMAGE "$@"
 
 
 elif [ "${MODE}" = "MMVC" ]; then
@@ -57,7 +57,7 @@ elif [ "${MODE}" = "MMVC" ]; then
         -e EX_IP="`hostname -I`" \
         -e EX_PORT=${EX_PORT} \
         -p ${EX_PORT}:8080 \
-        $DOCKER_IMAGE MMVC "$@"
+        $DOCKER_IMAGE "$@"
     else
         echo "MMVCを起動します(only cpu)"
         docker run -it --shm-size=128M \
@@ -67,7 +67,7 @@ elif [ "${MODE}" = "MMVC" ]; then
         -e EX_IP="`hostname -I`" \
         -e EX_PORT=${EX_PORT} \
         -p ${EX_PORT}:8080 \
-        $DOCKER_IMAGE MMVC "$@"
+        $DOCKER_IMAGE "$@"
     fi
 else
     echo "
