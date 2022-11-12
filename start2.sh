@@ -57,7 +57,8 @@ elif [ "${MODE}" = "MMVC" ]; then
         -e LOCAL_GID=$(id -g $USER) \
         -e EX_IP="`hostname -I`" \
         -e EX_PORT=${EX_PORT} \
-        -p ${EX_PORT}:8080 $DOCKER_IMAGE "$@"
+        -p ${EX_PORT}:8080 \
+        $DOCKER_IMAGE -t MMVC "$@"
     else
         echo "MMVCを起動します(only cpu)"
         docker run -it --shm-size=128M \
@@ -67,7 +68,7 @@ elif [ "${MODE}" = "MMVC" ]; then
         -e EX_IP="`hostname -I`" \
         -e EX_PORT=${EX_PORT} \
         -p ${EX_PORT}:8080 \
-        $DOCKER_IMAGE  -t MMVC "$@"
+        $DOCKER_IMAGE -t MMVC "$@"
     fi
 else
     echo "
