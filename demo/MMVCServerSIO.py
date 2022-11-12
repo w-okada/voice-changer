@@ -188,6 +188,11 @@ if __name__ == thisFilename or args.colab == True:
     CONFIG = args.c
     MODEL = args.m
 
+    if os.getenv("EX_TB_PORT"):
+        EX_TB_PORT = os.environ["EX_TB_PORT"]
+        exApplitionInfo.external_tensorboard_port = int(EX_TB_PORT)
+
+
     app_fastapi = FastAPI()
     app_fastapi.router.route_class = ValidationErrorLoggingRoute
     app_fastapi.add_middleware(
@@ -397,6 +402,7 @@ if __name__ == thisFilename or args.colab == True:
 
     @app_fastapi.get("/get_ex_application_info")
     async def get_ex_application_info():
+        print(">>>>>>>>>>>>>>",exApplitionInfo)
         json_compatible_item_data = jsonable_encoder(exApplitionInfo)
         return JSONResponse(content=json_compatible_item_data)
 
@@ -429,7 +435,6 @@ if __name__ == '__main__':
 
         if os.getenv("EX_TB_PORT"):
             EX_TB_PORT = os.environ["EX_TB_PORT"]
-            exApplitionInfo.external_tensorboard_port = int(EX_TB_PORT)
             printMessage(f"External_TeonsorBord_Port:{EX_TB_PORT}", level=1)
 
         if os.getenv("EX_IP"):
