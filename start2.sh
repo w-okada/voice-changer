@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-DOCKER_IMAGE=dannadori/voice-changer:20221112_092328
+DOCKER_IMAGE=dannadori/voice-changer:20221112_121031
 # DOCKER_IMAGE=voice-changer
 
 if [ $# = 0 ]; then
@@ -14,7 +14,6 @@ if [ $# = 0 ]; then
 fi
 
 MODE=$1
-PARAMS=${@:2:($#-1)}
 
 ### DEFAULT VAR ###
 DEFAULT_EX_PORT=18888
@@ -57,7 +56,8 @@ elif [ "${MODE}" = "MMVC" ]; then
         -e LOCAL_GID=$(id -g $USER) \
         -e EX_IP="`hostname -I`" \
         -e EX_PORT=${EX_PORT} \
-        -p ${EX_PORT}:8080 $DOCKER_IMAGE "$@"
+        -p ${EX_PORT}:8080 \
+        $DOCKER_IMAGE "$@"
     else
         echo "MMVCを起動します(only cpu)"
         docker run -it --shm-size=128M \
@@ -66,7 +66,8 @@ elif [ "${MODE}" = "MMVC" ]; then
         -e LOCAL_GID=$(id -g $USER) \
         -e EX_IP="`hostname -I`" \
         -e EX_PORT=${EX_PORT} \
-        -p ${EX_PORT}:8080 $DOCKER_IMAGE "$@"
+        -p ${EX_PORT}:8080 \
+        $DOCKER_IMAGE "$@"
     fi
 else
     echo "

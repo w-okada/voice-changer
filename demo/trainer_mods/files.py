@@ -13,7 +13,12 @@ def get_file_list(top_dir):
 
 
 def get_dir_list(top_dir):
-    return os.listdir(top_dir)
+    dirlist = []
+    files = os.listdir(top_dir)
+    for filename in files:
+        if os.path.isdir(os.path.join(top_dir, filename)):
+            dirlist.append(filename)
+    return dirlist
 
 def get_file_list(top_dir):
     return glob.glob(top_dir)

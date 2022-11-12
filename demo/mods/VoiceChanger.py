@@ -1,7 +1,7 @@
 import torch
 from scipy.io.wavfile import write, read
 import numpy as np
-import struct, traceback
+import traceback
 
 import utils 
 import commons 
