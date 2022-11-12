@@ -402,7 +402,6 @@ if __name__ == thisFilename or args.colab == True:
 
     @app_fastapi.get("/get_ex_application_info")
     async def get_ex_application_info():
-        print(">>>>>>>>>>>>>>",exApplitionInfo)
         json_compatible_item_data = jsonable_encoder(exApplitionInfo)
         return JSONResponse(content=json_compatible_item_data)
 
