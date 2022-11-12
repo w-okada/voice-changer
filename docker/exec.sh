@@ -7,7 +7,8 @@ PARAMS=${@:2:($#-1)}
 
 
 echo "------"
-echo "$MODE"
+echo "$@"
+echo "TYPE: $MODE"
 echo "PARAMS: $PARAMS"
 # echo "VERBOSE: $VERBOSE"
 echo "------"
