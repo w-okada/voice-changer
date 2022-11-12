@@ -4,6 +4,15 @@ set -eu
 DOCKER_IMAGE=dannadori/voice-changer:20221112_092328
 # DOCKER_IMAGE=voice-changer
 
+if [ $# = 0 ]; then
+    echo "
+    usage:
+        $0 <MODE> <params...>
+        MODE: select one of ['TRAIN', 'MMVC']
+    " >&2
+    exit 1
+fi
+
 MODE=$1
 PARAMS=${@:2:($#-1)}
 
