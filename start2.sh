@@ -1,8 +1,8 @@
 #!/bin/bash
 set -eu
 
-#DOCKER_IMAGE=dannadori/voice-changer:20221108_105937
-DOCKER_IMAGE=voice-changer
+DOCKER_IMAGE=dannadori/voice-changer:20221112_092328
+# DOCKER_IMAGE=voice-changer
 
 MODE=$1
 PARAMS=${@:2:($#-1)}
@@ -21,13 +21,9 @@ USE_GPU=${USE_GPU:-${DEFAULT_USE_GPU}}
 
 #echo $EX_PORT $USE_GPU $VERBOSE
 
-### INTERNAL SETTING ###
-TENSORBOARD_PORT=6006
-SIO_PORT=8080
-
 
 ### 
-if [ "${MODE}" = "MMVC_TRAIN" ]; then
+if [ "${MODE}" = "TRAIN" ]; then
     echo "トレーニングを開始します"
 
     docker run -it --gpus all --shm-size=128M \
@@ -67,7 +63,7 @@ else
     echo "
 usage: 
     $0 <MODE> <params...>
-    MODE: select one of ['MMVC_TRAIN', 'MMVC']
+    MODE: select one of ['TRAIN', 'MMVC']
 " >&2
 fi
 

@@ -1,4 +1,5 @@
 import sys, os, struct, argparse, logging, shutil,  base64, traceback
+from dataclasses import dataclass
 sys.path.append("/MMVC_Trainer")
 sys.path.append("/MMVC_Trainer/text")
 
@@ -48,7 +49,12 @@ logger.addFilter(UvicornSuppressFilter())
 logger = logging.getLogger("multipart.multipart")
 logger.propagate = False
 
+@dataclass
+class ExApplicationInfo():
+    external_tensorboard_port:int
 
+
+exApplitionInfo = ExApplicationInfo(external_tensorboard_port=0)
 
 class VoiceModel(BaseModel):
     gpu: int
@@ -267,6 +273,7 @@ if __name__ == thisFilename or args.colab == True:
         shutil.unpack_archive(zipFilePath, "/MMVC_Trainer/dataset/textful/")
         return {"Zip file unpacked": f"{zipFilePath}"}
 
+    
 
     ############
     # Voice Changer
@@ -373,6 +380,11 @@ if __name__ == thisFilename or args.colab == True:
     async def get_tail_training_log(num:int):
         return mod_get_tail_training_log(num)
 
+    @app_fastapi.get("/get_ex_application_info")
+    async def get_ex_application_info():
+        json_compatible_item_data = jsonable_encoder(exApplitionInfo)
+        return JSONResponse(content=json_compatible_item_data)
+
 
 if __name__ == '__mp_main__':
     printMessage(f"PHASE2:{__name__}", level=2)
@@ -394,6 +406,11 @@ if __name__ == '__main__':
           printMessage(f"External_Port:{EX_PORT} Internal_Port:{PORT}", level=1)
       else:
           printMessage(f"Internal_Port:{PORT}", level=1)
+
+      if os.getenv("EX_TB_PORT"):
+          EX_TB_PORT = os.environ["EX_TB_PORT"]
+          exApplitionInfo = int(EX_TB_PORT)
+          printMessage(f"External_TeonsorBord_Port:{EX_PORT}", level=1)
 
       if os.getenv("EX_IP"):
           EX_IP = os.environ["EX_IP"]
