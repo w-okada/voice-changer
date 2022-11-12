@@ -21,9 +21,6 @@ if  [ "${MODE}" = "MMVC" ] ; then
     if [[ -e /resources/setting.json ]]; then
         echo "指定された設定(setting.json)を使用します。"
         cp /resources/setting.json ../frontend/dist/assets/setting.json
-    else
-        echo "デフォルトの設定(setting.json)を使用します。"
-        cp ../frontend/dist/assets/setting_mmvc.json ../frontend/dist/assets/setting.json
     fi
 
     find /resources/ -type f -name "config.json" | xargs -I{} sh -c 'echo "config.jsonをコピーします。" && cp {} ./'

@@ -405,10 +405,8 @@ if __name__ == thisFilename or args.colab == True:
         json_compatible_item_data = jsonable_encoder(exApplitionInfo)
         return JSONResponse(content=json_compatible_item_data)
 
-
 if __name__ == '__mp_main__':
     printMessage(f"PHASE2:{__name__}", level=2)
-
 
 if __name__ == '__main__':
     printMessage(f"PHASE1:{__name__}", level=2)
