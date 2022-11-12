@@ -429,8 +429,8 @@ if __name__ == '__main__':
 
         if os.getenv("EX_TB_PORT"):
             EX_TB_PORT = os.environ["EX_TB_PORT"]
-            exApplitionInfo = int(EX_TB_PORT)
-            printMessage(f"External_TeonsorBord_Port:{EX_PORT}", level=1)
+            exApplitionInfo.external_tensorboard_port = int(EX_TB_PORT)
+            printMessage(f"External_TeonsorBord_Port:{EX_TB_PORT}", level=1)
 
         if os.getenv("EX_IP"):
             EX_IP = os.environ["EX_IP"]

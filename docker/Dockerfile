@@ -1,4 +1,4 @@
-FROM dannadori/voice-changer-internal:20221112_105408 as front
+FROM dannadori/voice-changer-internal:20221112_111947 as front
 FROM debian:bullseye-slim as base
 
 ARG DEBIAN_FRONTEND=noninteractive

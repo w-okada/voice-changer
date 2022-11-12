@@ -39,8 +39,8 @@ python3 MMVCServerSIO.py "$@"
 ### 
 # 起動パラメータ
 # (1) トレーニングの場合
-# python3 MMVCServerSIO.py <type> 
-# 環境変数: 
+# python3 MMVCServerSIO.py -t <type> [--https on|off, --httpsKey <key>, --httpsCert <key>, --httpsSelfSigned on|off]
+# 環境変数: EX_PORT, EX_TB_PORT, EX_IP (EX_IPはEX_IP="`hostname -I`"で自動取得)
 # ※ Colabの場合：python3 MMVCServerSIO.py -t Train -p {PORT} --colab True
 # (2) VCの場合
 
