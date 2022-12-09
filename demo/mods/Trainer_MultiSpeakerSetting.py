@@ -2,7 +2,7 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 import os
 
-MULTI_SPEAKER_SETTING_PATH = "/MMVC_Trainer/dataset/multi_speaker_correspondence.txt"
+MULTI_SPEAKER_SETTING_PATH = "MMVC_Trainer/dataset/multi_speaker_correspondence.txt"
 def mod_get_multi_speaker_setting():
     data = {}
     if os.path.isfile(MULTI_SPEAKER_SETTING_PATH) == False:

@@ -3,7 +3,7 @@ from trainer_mods.files import get_file_list
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
-LOG_DIR = "/MMVC_Trainer/info"
+LOG_DIR = "MMVC_Trainer/info"
 train_proc = None
 
 SUCCESS = 0
@@ -13,7 +13,7 @@ def sync_exec(cmd:str, log_path:str):
     shortCmdStr = cmd[:20]
     try:
         with open(log_path, 'w') as log_file:
-            proc = subprocess.run(cmd, shell=True, text=True, stdout=log_file, stderr=log_file, cwd="/MMVC_Trainer")
+            proc = subprocess.run(cmd, shell=True, text=True, stdout=log_file, stderr=log_file, cwd="MMVC_Trainer")
             print(f"{shortCmdStr} returncode:{proc.returncode}")
             if proc.returncode != 0:
                 print(f"{shortCmdStr} exception:")
@@ -28,7 +28,7 @@ def sync_exec_with_stdout(cmd:str, log_path:str):
     try:
         with open(log_path, 'w') as log_file:
             proc = subprocess.run(cmd, shell=True, text=True, stdout=subprocess.PIPE,
-            stderr=log_file, cwd="/MMVC_Trainer")
+            stderr=log_file, cwd="MMVC_Trainer")
             print(f"STDOUT{shortCmdStr}",proc.stdout)
     except Exception as e:
         print(f"{shortCmdStr} exception:", str(e))
@@ -43,13 +43,13 @@ def create_dataset():
     return res
 
 def set_batch_size(batch:int):
-    cmd = "sed -i 's/\"batch_size\": [0-9]*/\"batch_size\": " + str(batch) + "/' /MMVC_Trainer/configs/baseconfig.json"
+    cmd = "sed -i 's/\"batch_size\": [0-9]*/\"batch_size\": " + str(batch) + "/' MMVC_Trainer/configs/baseconfig.json"
     log_file = os.path.join(LOG_DIR, "log_set_batch_size.txt")
     res = sync_exec(cmd, log_file)
     return res
 
 def set_dummy_device_count():
-    cmd = 'sed -ie "s/torch.cuda.device_count()/1/" /MMVC_Trainer/train_ms.py'
+    cmd = 'sed -ie "s/torch.cuda.device_count()/1/" MMVC_Trainer/train_ms.py'
     log_file = os.path.join(LOG_DIR, "log_set_dummy_device_count.txt")
     res = sync_exec(cmd, log_file)
     return res
@@ -73,7 +73,7 @@ def exec_training():
         with open(log_file, 'w') as log_file:
             cmd = 'python3 train_ms.py -c configs/train_config.json -m ./'
             print("exec:",cmd)
-            train_proc = subprocess.Popen("exec "+cmd, shell=True, text=True, stdout=log_file, stderr=log_file, cwd="/MMVC_Trainer")
+            train_proc = subprocess.Popen("exec "+cmd, shell=True, text=True, stdout=log_file, stderr=log_file, cwd="MMVC_Trainer")
             print("Training stated")
             print(f"returncode:{train_proc.returncode}")
     except Exception as e:
@@ -133,11 +133,11 @@ def mod_post_stop_training():
 def mod_get_related_files():
     files = get_file_list(os.path.join(LOG_DIR,"*"))
     files.extend([
-        "/MMVC_Trainer/dataset/multi_speaker_correspondence.txt",
-        "/MMVC_Trainer/train_ms.py",
+        "MMVC_Trainer/dataset/multi_speaker_correspondence.txt",
+        "MMVC_Trainer/train_ms.py",
     ])
     files.extend(
-        get_file_list("/MMVC_Trainer/configs/*")
+        get_file_list("MMVC_Trainer/configs/*")
     )
 
     res = []

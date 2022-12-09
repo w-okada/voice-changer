@@ -5,8 +5,8 @@ import os
 # CreateはFileUploaderで実装。
 
 def mod_get_speakers():
-    os.makedirs("/MMVC_Trainer/dataset/textful", exist_ok=True)
-    speakers = get_dir_list("/MMVC_Trainer/dataset/textful/")
+    os.makedirs("MMVC_Trainer/dataset/textful", exist_ok=True)
+    speakers = get_dir_list("MMVC_Trainer/dataset/textful/")
     
     data = {
         "speakers":sorted(speakers)

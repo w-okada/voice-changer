@@ -6,8 +6,8 @@ from distutils.util import strtobool
 import numpy as np
 from scipy.io.wavfile import write, read
 
-sys.path.append("/MMVC_Trainer")
-sys.path.append("/MMVC_Trainer/text")
+sys.path.append("MMVC_Trainer")
+sys.path.append("MMVC_Trainer/text")
 
 from fastapi.routing import APIRoute
 from fastapi import HTTPException, Request, Response, FastAPI, UploadFile, File, Form
@@ -244,7 +244,7 @@ if __name__ == thisFilename or args.colab == True:
     # ##########
     UPLOAD_DIR = "upload_dir"
     os.makedirs(UPLOAD_DIR, exist_ok=True)
-    MODEL_DIR = "/MMVC_Trainer/logs"
+    MODEL_DIR = "MMVC_Trainer/logs"
     os.makedirs(MODEL_DIR, exist_ok=True)
 
     @app_fastapi.post("/upload_file")
@@ -290,7 +290,7 @@ if __name__ == thisFilename or args.colab == True:
     ):
         zipFilePath = concat_file_chunks(
             UPLOAD_DIR, zipFilename, zipFileChunkNum, UPLOAD_DIR)
-        shutil.unpack_archive(zipFilePath, "/MMVC_Trainer/dataset/textful/")
+        shutil.unpack_archive(zipFilePath, "MMVC_Trainer/dataset/textful/")
         return {"Zip file unpacked": f"{zipFilePath}"}
 
     ############

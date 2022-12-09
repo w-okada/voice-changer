@@ -13,11 +13,9 @@ echo "PARAMS: $PARAMS"
 # echo "VERBOSE: $VERBOSE"
 echo "------"
 
-
+cd /voice-changer-internal/voice-change-service
 # 起動
 if  [ "${MODE}" = "MMVC" ] ; then
-    cd /voice-changer-internal/voice-change-service
-
     if [[ -e /resources/setting.json ]]; then
         echo "指定された設定(setting.json)を使用します。"
         cp /resources/setting.json ../frontend/dist/assets/setting.json
@@ -30,7 +28,6 @@ if  [ "${MODE}" = "MMVC" ] ; then
     python3 MMVCServerSIO.py -t MMVC $PARAMS #2>stderr.txt
 
 elif [ "${MODE}" = "TRAIN" ] ; then
-    cd /voice-changer-internal/voice-change-service
     python3 -m tensorboard.main --logdir /MMVC_Trainer/logs --port 6006 --host 0.0.0.0 &
     python3 MMVCServerSIO.py -t TRAIN $PARAMS
 fi
