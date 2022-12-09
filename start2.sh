@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-DOCKER_IMAGE=dannadori/voice-changer:20221209_134116
+DOCKER_IMAGE=dannadori/voice-changer:20221209_141321
 # DOCKER_IMAGE=voice-changer
 
 if [ $# = 0 ]; then
