@@ -4,11 +4,11 @@ from trainer_mods.files import get_file_list
 import os
 
 def mod_get_speaker_voices(speaker:str):
-        voices = get_file_list(f'/MMVC_Trainer/dataset/textful/{speaker}/wav/*.wav')
+        voices = get_file_list(f'MMVC_Trainer/dataset/textful/{speaker}/wav/*.wav')
 
-        texts = get_file_list(f'/MMVC_Trainer/dataset/textful/{speaker}/text/*.txt')
+        texts = get_file_list(f'MMVC_Trainer/dataset/textful/{speaker}/text/*.txt')
 
-        readable_texts = get_file_list(f'/MMVC_Trainer/dataset/textful/{speaker}/readable_text/*.txt')
+        readable_texts = get_file_list(f'MMVC_Trainer/dataset/textful/{speaker}/readable_text/*.txt')
 
         items = voices
         items.extend(texts)

@@ -3,9 +3,9 @@ from fastapi.encoders import jsonable_encoder
 import os,  base64
 
 def mod_get_speaker_voice(speaker:str, voice:str):
-        wav_file = f'/MMVC_Trainer/dataset/textful/{speaker}/wav/{voice}.wav'
-        text_file = f'/MMVC_Trainer/dataset/textful/{speaker}/text/{voice}.txt'
-        readable_text_file = f'/MMVC_Trainer/dataset/textful/{speaker}/readable_text/{voice}.txt'
+        wav_file = f'MMVC_Trainer/dataset/textful/{speaker}/wav/{voice}.wav'
+        text_file = f'MMVC_Trainer/dataset/textful/{speaker}/text/{voice}.txt'
+        readable_text_file = f'MMVC_Trainer/dataset/textful/{speaker}/readable_text/{voice}.txt'
 
         data = {}
         if os.path.exists(wav_file):

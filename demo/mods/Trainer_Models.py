@@ -5,8 +5,8 @@ from trainer_mods.files import get_file_list
 import os
 
 def mod_get_models():
-    gModels = get_file_list(f'/MMVC_Trainer/logs/G*.pth')
-    dModels = get_file_list(f'/MMVC_Trainer/logs/D*.pth')
+    gModels = get_file_list(f'MMVC_Trainer/logs/G*.pth')
+    dModels = get_file_list(f'MMVC_Trainer/logs/D*.pth')
     models = []
     models.extend(gModels)
     models.extend(dModels)

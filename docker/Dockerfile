@@ -1,4 +1,4 @@
-FROM dannadori/voice-changer-internal:20221114_095228 as front
+FROM dannadori/voice-changer-internal:20221209_141145 as front
 FROM debian:bullseye-slim as base
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -48,29 +48,33 @@ RUN apt-get update \
         && apt-get clean \
         && rm -rf /var/lib/apt/lists/*
 
-### Copy local resource
-COPY fine_model/G_180000.pth /MMVC_Trainer/fine_model/G_180000.pth
-COPY fine_model/D_180000.pth /MMVC_Trainer/fine_model/D_180000.pth
+# ### Copy local resource
+# COPY fine_model/G_180000.pth /MMVC_Trainer/fine_model/G_180000.pth
+# COPY fine_model/D_180000.pth /MMVC_Trainer/fine_model/D_180000.pth
 
 ### Copy from base
 COPY --from=base --chmod=777 /usr/local/lib/python3.9/dist-packages /usr/local/lib/python3.9/dist-packages
 
-### Copy from frontend
-##### MMVC Trainer
-COPY --from=front --chmod=777 /MMVC_Trainer /MMVC_Trainer
-RUN chmod 0777 /MMVC_Trainer 
+# ### Copy from frontend
+# ##### MMVC Trainer
+# COPY --from=front --chmod=777 /MMVC_Trainer /MMVC_Trainer
+# RUN chmod 0777 /MMVC_Trainer 
 
-ADD /setup.sh  /MMVC_Trainer/
-ADD /exec.sh  /MMVC_Trainer/
+# ADD /setup.sh  /MMVC_Trainer/
+# ADD /exec.sh  /MMVC_Trainer/
 
 ##### Voice changer Internal
 COPY --from=front --chmod=777 /voice-changer-internal/frontend/dist /voice-changer-internal/frontend/dist
 COPY --from=front --chmod=777 /voice-changer-internal/voice-change-service /voice-changer-internal/voice-change-service
 RUN chmod 0777 /voice-changer-internal/voice-change-service 
 
+ADD /setup.sh  /voice-changer-internal/voice-change-service/
+ADD /exec.sh  /voice-changer-internal/voice-change-service/
+COPY fine_model/G_180000.pth /voice-changer-internal/voice-change-service/MMVC_Trainer/fine_model/G_180000.pth
+COPY fine_model/D_180000.pth /voice-changer-internal/voice-change-service/MMVC_Trainer/fine_model/D_180000.pth
 
 ## 歴史的な経緯でsetup.shをMMVC_Trainerに置いているのでそこを起動時のWORKDIRにしている。
-WORKDIR /MMVC_Trainer
+WORKDIR /voice-changer-internal/voice-change-service
 
 # ##### Soft VC
 # COPY --from=front /hubert /hubert
