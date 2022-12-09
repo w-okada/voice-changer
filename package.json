@@ -8,7 +8,8 @@
     "build:docker_arm64": "date +%Y%m%d%H%M%S > docker/dummy && DOCKER_BUILDKIT=1 docker build -f docker/Dockerfile_arm64 docker/ -t voice-changer-arm64",
     "copy:frontend":"docker run -v `pwd`/frontend/dist:/frontend/dist --entrypoint /bin/bash -ti voice-changer -c \"cp -r /voice-changer-internal/frontend/dist/* /frontend/dist\"",
     "copy:backend":"docker run -v `pwd`/demo:/demo --entrypoint /bin/bash -ti voice-changer -c \"cp -r /voice-changer-internal/voice-change-service/* /demo/ && rm -rf /demo/MMVC_Trainer/.git && rm -rf /demo/MMVC_Trainer/.gitignore \"",
-    "create:demo":"run-p copy:frontend copy:backend",
+    "copy:demo_resources":"cp misc/core.cpython-39-darwin.so  demo/MMVC_Trainer/monotonic_align/monotonic_align/",
+    "create:demo":"run-p copy:frontend copy:backend copy:demo_resources",
     "push:docker": "bash script/001_pushDocker.sh",
     "push:docker_arm64": "bash script/002_pushDocker_arm64.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
