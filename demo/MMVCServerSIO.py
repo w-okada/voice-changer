@@ -476,12 +476,12 @@ if __name__ == '__main__':
             path = ""
         else:
             path = "trainer"
-        if EX_PORT and EX_IP and args.https == 1:
+        if "EX_PORT" in locals() and "EX_IP" in locals() and args.https == 1:
             printMessage(f"In many cases it is one of the following", level=1)
             printMessage(f"https://localhost:{EX_PORT}/{path}", level=1)
             for ip in EX_IP.strip().split(" "):
                 printMessage(f"https://{ip}:{EX_PORT}/{path}", level=1)
-        elif EX_PORT and EX_IP and args.https == 0:
+        elif "EX_PORT" in locals() and "EX_IP" in locals() and args.https == 0:
             printMessage(f"In many cases it is one of the following", level=1)
             printMessage(f"http://localhost:{EX_PORT}/{path}", level=1)
 
