@@ -1,5 +1,19 @@
 Voice Changer Trainer and Player
 ----
+# News
+2022/12/09: Anacondaに対応しました(β版)。以下の構成に対応します。
+
+| #   | os            | middle   |
+| --- | ------------- | -------- |
+| 1   | Windows       | Anaconda |
+| 2   | Windows(WSL2) | Docker   |
+| 3   | Windows(WSL2) | Anaconda |
+| 4   | Mac(Intel)    | Anaconda |
+| 5   | Mac(M1)       | Anaconda |
+| 6   | Linux         | Docker   |
+| 7   | Linux         | Anaconda |
+| 8   | Colab         | Notebook |
+
 # 概要
 AIを使ったリアルタイムボイスチェンジャー[MMVC](https://github.com/isletennos/MMVC_Trainer)のヘルパーアプリケーションです。
 
@@ -8,17 +22,17 @@ MMVCで必要となる一連の作業（トレーニング用の音声の録音�
 
 このアプリケーションを用いることで、以下のことを簡単に行うことができます。
 
-- MMVCトレーニング用の音声録音 (GithubPages (Docker不要))
-- MMVCのモデルのトレーニング (Dockerを強く推奨、Colabでも可)
-- MMVCモデルを用いたリアルタイムボイスチェンジャー（Docker推奨、Colabでも可）
+- MMVCトレーニング用の音声録音 (GithubPages (ローカル環境構築不要))
+- MMVCのモデルのトレーニング (Dockerを強く推奨、その他構成Colabでも可)
+- MMVCモデルを用いたリアルタイムボイスチェンジャー
   - リアルタイム話者切り替え
   - CPU/GPU切り替え
   - リアルタイム/ニアリアルタイム声質変換
 
 
-本アプリケーションのリアルタイムボイスチェンジャーは、サーバ・クライアント構成で動きます。MMVCのサーバを別のPC上で動かすことで、ゲーム実況など他の負荷の高い処理への影響を抑えながら動かすことができます。（MacのChromeからも利用できます！！）
-![image](https://user-images.githubusercontent.com/48346627/201170195-88114174-0237-4610-b828-4fe08fe212e9.png)
+本アプリケーションのリアルタイムボイスチェンジャーは、サーバ・クライアント構成で動きます。MMVCのサーバを別のPC上で動かすことで、ゲーム実況など他の負荷の高い処理への影響を抑えながら動かすことができます。
 
+![image](https://user-images.githubusercontent.com/48346627/206640768-53f6052d-0a96-403b-a06c-6714a0b7471d.png)
 
 # 使用方法
 
@@ -45,28 +59,19 @@ Colaboratoryで実行する場合は、Colabの制約により途中切断が発
 
 ## プレイヤー（ボイスチェンジャーアプリ）
 MMVCでボイチェンを行うためのアプリです。
-Dockerで起動する場合は
-Dockerでの使用を推奨します。一部ユーザ体験が劣化しますが、次のノートでColaboratoryでの実行も可能です。
+お手元のPCでの使用を推奨します。一部ユーザ体験が劣化しますが、次のノートでColaboratoryでの実行も可能です。
 - [超簡単バージョン](https://github.com/w-okada/voice-changer/blob/master/VoiceChangerDemo_Simple.ipynb): 事前設定なしでColabから実行できます。 
 - [普通バージョン](https://github.com/w-okada/voice-changer/blob/master/VoiceChangerDemo.ipynb): Google Driveと連携してモデルを読み込むことができます。
 
-[説明動画](https://twitter.com/DannadoriYellow/status/1564897136999022592)
-
-動画との差分
-
-- サーバの起動完了のメッセージは、「Debuggerほにゃらら」ではなく「Application startup complete.」です。
-- プロキシにアクセスする際に、index.htmlを追加する必要はありません。
-
-詳細な使用方法等は[wiki](https://github.com/w-okada/voice-changer/wiki/040_%E3%83%9C%E3%82%A4%E3%82%B9%E3%83%81%E3%82%A7%E3%83%B3%E3%82%B8%E3%83%A3%E3%83%BC)をご参照ください。
-
 # 説明動画
-|No|タイトル|リンク|
-|---|---|---|
-|01|ざっくり説明編| [youtube](https://www.youtube.com/watch?v=MOPqnDPqhAU)|
-|02|ユーザー音声の録音編|[youtube](https://www.youtube.com/watch?v=s_GirFEGvaA)|
-|03|トレーニング編| 作成中|
-|04a|Colabでボイチェン編| 作成中|
-|04b|PCでボイチェン編| 作成中|
+| No  | タイトル                           | リンク                                                 |
+| --- | ---------------------------------- | ------------------------------------------------------ |
+| 01  | ざっくり説明編                     | [youtube](https://www.youtube.com/watch?v=MOPqnDPqhAU) |
+| 02  | ユーザー音声の録音編               | [youtube](https://www.youtube.com/watch?v=s_GirFEGvaA) |
+| 03  | トレーニング編                     | 作成中                                                 |
+| 04a | Colabでボイチェン編                | [youtube](https://youtu.be/TogfMzXH1T0)                |
+| 04b | PCでボイチェン編                   | 作成中                                                 |
+| ex1 | 番外編：WSL2とDockerのインストール | [youtube](https://youtu.be/POo_Cg0eFMU)                |
 
 ## リアルタイム性
 
