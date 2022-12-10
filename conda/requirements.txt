@@ -4,6 +4,7 @@ librosa==0.9.2
 numpy==1.23.5
 phonemizer==3.2.1
 psutil==5.9.4
+pyopenjtalk==0.3.0
 pyOpenSSL==22.1.0
 python-multipart==0.0.5
 python-socketio==5.7.2
