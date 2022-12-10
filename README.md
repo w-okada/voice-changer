@@ -1,7 +1,7 @@
 Voice Changer Trainer and Player
 ----
 # News
-2022/12/09: Anacondaに対応しました(β版)。以下の構成に対応します。
+2022/12/09: Anacondaに対応しました(β版)。以下の構成に対応します。動作確認状況はWikiをご確認ください。
 
 | #   | os            | middle   |
 | --- | ------------- | -------- |

@@ -383,9 +383,9 @@ if __name__ == thisFilename or args.colab == True:
         return mod_post_pre_training(batch)
 
     @app_fastapi.post("/post_start_training")
-    async def post_start_training():
+    async def post_start_training(enable_finetuning: bool = Form(...),GModel: str = Form(...),DModel: str = Form(...)):
         print("POST START TRAINING..")
-        return mod_post_start_training()
+        return mod_post_start_training(enable_finetuning, GModel, DModel)
 
     @app_fastapi.post("/post_stop_training")
     async def post_stop_training():

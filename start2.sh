@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-DOCKER_IMAGE=dannadori/voice-changer:20221209_141321
+DOCKER_IMAGE=dannadori/voice-changer:20221211_050342
 # DOCKER_IMAGE=voice-changer
 
 if [ $# = 0 ]; then
@@ -34,7 +34,7 @@ USE_GPU=${USE_GPU:-${DEFAULT_USE_GPU}}
 if [ "${MODE}" = "TRAIN" ]; then
     echo "トレーニングを開始します"
 
-    docker run -it --gpus all --shm-size=128M \
+    docker run -it --rm --gpus all --shm-size=128M \
         -v `pwd`/work_dir/logs:/MMVC_Trainer/logs \
         -v `pwd`/work_dir/dataset:/MMVC_Trainer/dataset \
         -v `pwd`/work_dir/info:/MMVC_Trainer/info \
@@ -50,7 +50,7 @@ elif [ "${MODE}" = "MMVC" ]; then
     if [ "${USE_GPU}" = "on" ]; then
         echo "MMVCを起動します(with gpu)"
 
-        docker run -it --gpus all --shm-size=128M \
+        docker run -it --rm --gpus all --shm-size=128M \
         -v `pwd`/vc_resources:/resources \
         -e LOCAL_UID=$(id -u $USER) \
         -e LOCAL_GID=$(id -g $USER) \
@@ -60,7 +60,7 @@ elif [ "${MODE}" = "MMVC" ]; then
         $DOCKER_IMAGE "$@"
     else
         echo "MMVCを起動します(only cpu)"
-        docker run -it --shm-size=128M \
+        docker run -it --rm --shm-size=128M \
         -v `pwd`/vc_resources:/resources \
         -e LOCAL_UID=$(id -u $USER) \
         -e LOCAL_GID=$(id -g $USER) \

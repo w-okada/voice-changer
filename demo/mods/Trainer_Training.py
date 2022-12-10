@@ -3,17 +3,20 @@ from trainer_mods.files import get_file_list
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
-LOG_DIR = "MMVC_Trainer/info"
+LOG_DIR = "logs"
 train_proc = None
 
 SUCCESS = 0
 ERROR = -1
 ### Submodule for Pre train
-def sync_exec(cmd:str, log_path:str):
+def sync_exec(cmd:str, log_path:str, cwd=None):
     shortCmdStr = cmd[:20]
     try:
         with open(log_path, 'w') as log_file:
-            proc = subprocess.run(cmd, shell=True, text=True, stdout=log_file, stderr=log_file, cwd="MMVC_Trainer")
+            if cwd == None:
+                proc = subprocess.run(cmd, shell=True, text=True, stdout=log_file, stderr=log_file)
+            else:
+                proc = subprocess.run(cmd, shell=True, text=True, stdout=log_file, stderr=log_file, cwd=cwd)
             print(f"{shortCmdStr} returncode:{proc.returncode}")
             if proc.returncode != 0:
                 print(f"{shortCmdStr} exception:")
@@ -39,7 +42,7 @@ def sync_exec_with_stdout(cmd:str, log_path:str):
 def create_dataset():
     cmd = "python3 create_dataset_jtalk.py -f train_config -s 24000 -m dataset/multi_speaker_correspondence.txt"
     log_file = os.path.join(LOG_DIR, "log_create_dataset_jtalk.txt")
-    res = sync_exec(cmd, log_file)
+    res = sync_exec(cmd, log_file, "MMVC_Trainer")
     return res
 
 def set_batch_size(batch:int):
@@ -55,7 +58,7 @@ def set_dummy_device_count():
     return res
 
 ### Submodule for Train 
-def exec_training():
+def exec_training(enable_finetuning:bool, GModel:str, DModel:str):
     global train_proc
     log_file = os.path.join(LOG_DIR, "training.txt")
 
@@ -71,7 +74,12 @@ def exec_training():
 
     try:
         with open(log_file, 'w') as log_file:
-            cmd = 'python3 train_ms.py -c configs/train_config.json -m ./'
+            if enable_finetuning == True:
+                GModelPath = os.path.join("logs", GModel) # 実行時にcwdを指定しているのでフォルダはlogsでよい。
+                DModelPath = os.path.join("logs", DModel)
+                cmd = f'python3 train_ms.py -c configs/train_config.json -m ./ -fg {GModelPath} -fd {DModelPath}'
+            else:
+                cmd = 'python3 train_ms.py -c configs/train_config.json -m ./'
             print("exec:",cmd)
             train_proc = subprocess.Popen("exec "+cmd, shell=True, text=True, stdout=log_file, stderr=log_file, cwd="MMVC_Trainer")
             print("Training stated")
@@ -115,8 +123,9 @@ def mod_post_pre_training(batch:int):
     return {"result":"success", "detail": f"Preprocess succeeded. {res[1]}"}
 
 
-def mod_post_start_training():
-    res = exec_training()
+def mod_post_start_training(enable_finetuning:str, GModel:str, DModel:str):
+    print("START_TRAINING:::::::", enable_finetuning, GModel, DModel)
+    res = exec_training(enable_finetuning, GModel, DModel)
     if res[0] == ERROR:
         return {"result":"failed", "detail": f"Start training failed. {res[1]}"}
 
