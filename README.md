@@ -64,14 +64,16 @@ MMVCでボイチェンを行うためのアプリです。
 - [普通バージョン](https://github.com/w-okada/voice-changer/blob/master/VoiceChangerDemo.ipynb): Google Driveと連携してモデルを読み込むことができます。
 
 # 説明動画
-| No  | タイトル                           | リンク                                                 |
-| --- | ---------------------------------- | ------------------------------------------------------ |
-| 01  | ざっくり説明編                     | [youtube](https://www.youtube.com/watch?v=MOPqnDPqhAU) |
-| 02  | ユーザー音声の録音編               | [youtube](https://www.youtube.com/watch?v=s_GirFEGvaA) |
-| 03  | トレーニング編                     | 作成中                                                 |
-| 04a | Colabでボイチェン編                | [youtube](https://youtu.be/TogfMzXH1T0)                |
-| 04b | PCでボイチェン編                   | 作成中                                                 |
-| ex1 | 番外編：WSL2とDockerのインストール | [youtube](https://youtu.be/POo_Cg0eFMU)                |
+| No  | タイトル                             | リンク                                  |
+| --- | ------------------------------------ | --------------------------------------- |
+| 01  | ざっくり説明編                       | [youtube](https://youtu.be/MOPqnDPqhAU) |
+| 02  | ユーザー音声の録音編                 | [youtube](https://youtu.be/s_GirFEGvaA) |
+| 03  | トレーニング編                       | 作成中                                  |
+| 04a | Colabでボイチェン編                  | [youtube](https://youtu.be/TogfMzXH1T0) |
+| 04b | PCでボイチェン編                     | 欠番(ex1, ex2, 04aの内容と被るため)     |
+| ex1 | 番外編：WSL2とDockerのインストール   | [youtube](https://youtu.be/POo_Cg0eFMU) |
+| ex2 | 番外編：WSL2とAnacondaのインストール | [youtube](https://youtu.be/fba9Zhsukqw) |
+
 
 ## リアルタイム性
 
