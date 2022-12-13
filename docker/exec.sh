@@ -28,7 +28,7 @@ if  [ "${MODE}" = "MMVC" ] ; then
     python3 MMVCServerSIO.py -t MMVC $PARAMS #2>stderr.txt
 
 elif [ "${MODE}" = "TRAIN" ] ; then
-    python3 -m tensorboard.main --logdir /MMVC_Trainer/logs --port 6006 --host 0.0.0.0 &
+    python3 -m tensorboard.main --logdir MMVC_Trainer/logs --port 6006 --host 0.0.0.0 &
     python3 MMVCServerSIO.py -t TRAIN $PARAMS
 fi
 
