@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-DOCKER_IMAGE=dannadori/voice-changer:20221211_050342
+DOCKER_IMAGE=dannadori/voice-changer:20221213_220109
 # DOCKER_IMAGE=voice-changer
 
 if [ $# = 0 ]; then
@@ -37,7 +37,7 @@ if [ "${MODE}" = "TRAIN" ]; then
     docker run -it --rm --gpus all --shm-size=128M \
         -v `pwd`/work_dir/logs:/voice-changer-internal/voice-change-service/MMVC_Trainer/logs \
         -v `pwd`/work_dir/dataset:/voice-changer-internal/voice-change-service/MMVC_Trainer/dataset \
-        -v `pwd`/work_dir/info:/voice-changer-internal/voice-change-service/MMVC_Trainer/info \
+        -v `pwd`/work_dir/info:/voice-changer-internal/voice-change-service/info \
         -e LOCAL_UID=$(id -u $USER) \
         -e LOCAL_GID=$(id -g $USER) \
         -e EX_PORT=${EX_PORT} -e EX_TB_PORT=${EX_TB_PORT} \
