@@ -35,9 +35,9 @@ if [ "${MODE}" = "TRAIN" ]; then
     echo "トレーニングを開始します"
 
     docker run -it --rm --gpus all --shm-size=128M \
-        -v `pwd`/work_dir/logs:MMVC_Trainer/logs \
-        -v `pwd`/work_dir/dataset:MMVC_Trainer/dataset \
-        -v `pwd`/work_dir/info:MMVC_Trainer/info \
+        -v `pwd`/work_dir/logs:/voice-changer-internal/voice-change-service/MMVC_Trainer/logs \
+        -v `pwd`/work_dir/dataset:/voice-changer-internal/voice-change-service/MMVC_Trainer/dataset \
+        -v `pwd`/work_dir/info:/voice-changer-internal/voice-change-service/MMVC_Trainer/info \
         -e LOCAL_UID=$(id -u $USER) \
         -e LOCAL_GID=$(id -g $USER) \
         -e EX_PORT=${EX_PORT} -e EX_TB_PORT=${EX_TB_PORT} \
