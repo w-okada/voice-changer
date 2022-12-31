@@ -1,4 +1,4 @@
-import os
+import os,shutil
 
 from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
@@ -19,6 +19,8 @@ class MMVC_Rest_Fileuploader:
         self.router = APIRouter()
         self.router.add_api_route("/upload_file", self.post_upload_file, methods=["POST"])
         self.router.add_api_route("/load_model", self.post_load_model, methods=["POST"])
+        self.router.add_api_route("/load_model_for_train", self.post_load_model_for_train, methods=["POST"])
+        self.router.add_api_route("/extract_voices", self.post_load_model, methods=["POST"])
 
     def post_upload_file(self, file: UploadFile = File(...), filename: str = Form(...)):
         return upload_file(UPLOAD_DIR, file, filename)
@@ -37,4 +39,25 @@ class MMVC_Rest_Fileuploader:
         return {"load": f"{modelFilePath}, {configFilePath}"}
 
 
+    def post_load_model_for_train(
+        self,
+        modelGFilename: str = Form(...),
+        modelGFilenameChunkNum: int = Form(...),
+        modelDFilename: str = Form(...),
+        modelDFilenameChunkNum: int = Form(...),
+    ):
+        modelGFilePath = concat_file_chunks(
+            UPLOAD_DIR, modelGFilename, modelGFilenameChunkNum, MODEL_DIR)
+        modelDFilePath = concat_file_chunks(
+            UPLOAD_DIR,  modelDFilename, modelDFilenameChunkNum, MODEL_DIR)
+        return {"File saved": f"{modelGFilePath}, {modelDFilePath}"}
 
+    def post_load_model(
+        self,
+        zipFilename: str = Form(...),
+        zipFileChunkNum: int = Form(...),
+    ):
+        zipFilePath = concat_file_chunks(
+            UPLOAD_DIR, zipFilename, zipFileChunkNum, UPLOAD_DIR)
+        shutil.unpack_archive(zipFilePath, "MMVC_Trainer/dataset/textful/")
+        return {"Zip file unpacked": f"{zipFilePath}"}

@@ -129,56 +129,25 @@ if __name__ == thisFilename or args.colab == True:
     ############
     # File Uploder
     # ##########
-    UPLOAD_DIR = "upload_dir"
-    os.makedirs(UPLOAD_DIR, exist_ok=True)
-    MODEL_DIR = "MMVC_Trainer/logs"
-    os.makedirs(MODEL_DIR, exist_ok=True)
-
-    # @app_fastapi.post("/upload_file")
-    # async def post_upload_file(
-    #     file: UploadFile = File(...),
-    #     filename: str = Form(...)
+    # @app_fastapi.post("/load_model_for_train")
+    # async def post_load_model_for_train(
+    #     modelGFilename: str = Form(...),
+    #     modelGFilenameChunkNum: int = Form(...),
+    #     modelDFilename: str = Form(...),
+    #     modelDFilenameChunkNum: int = Form(...),
     # ):
-    #     return upload_file(UPLOAD_DIR, file, filename)
 
-    # @app_fastapi.post("/load_model")
+
+
+    # @app_fastapi.post("/extract_voices")
     # async def post_load_model(
-    #     modelFilename: str = Form(...),
-    #     modelFilenameChunkNum: int = Form(...),
-    #     configFilename: str = Form(...)
+    #     zipFilename: str = Form(...),
+    #     zipFileChunkNum: int = Form(...),
     # ):
-
-    #     modelFilePath = concat_file_chunks(
-    #         UPLOAD_DIR, modelFilename, modelFilenameChunkNum, UPLOAD_DIR)
-    #     print(f'File saved to: {modelFilePath}')
-    #     configFilePath = os.path.join(UPLOAD_DIR, configFilename)
-
-    #     voiceChangerManager.loadModel(configFilePath, modelFilePath)
-    #     return {"load": f"{modelFilePath}, {configFilePath}"}
-
-    @app_fastapi.post("/load_model_for_train")
-    async def post_load_model_for_train(
-        modelGFilename: str = Form(...),
-        modelGFilenameChunkNum: int = Form(...),
-        modelDFilename: str = Form(...),
-        modelDFilenameChunkNum: int = Form(...),
-    ):
-
-        modelGFilePath = concat_file_chunks(
-            UPLOAD_DIR, modelGFilename, modelGFilenameChunkNum, MODEL_DIR)
-        modelDFilePath = concat_file_chunks(
-            UPLOAD_DIR,  modelDFilename, modelDFilenameChunkNum, MODEL_DIR)
-        return {"File saved": f"{modelGFilePath}, {modelDFilePath}"}
-
-    @app_fastapi.post("/extract_voices")
-    async def post_load_model(
-        zipFilename: str = Form(...),
-        zipFileChunkNum: int = Form(...),
-    ):
-        zipFilePath = concat_file_chunks(
-            UPLOAD_DIR, zipFilename, zipFileChunkNum, UPLOAD_DIR)
-        shutil.unpack_archive(zipFilePath, "MMVC_Trainer/dataset/textful/")
-        return {"Zip file unpacked": f"{zipFilePath}"}
+    #     zipFilePath = concat_file_chunks(
+    #         UPLOAD_DIR, zipFilename, zipFileChunkNum, UPLOAD_DIR)
+    #     shutil.unpack_archive(zipFilePath, "MMVC_Trainer/dataset/textful/")
+    #     return {"Zip file unpacked": f"{zipFilePath}"}
 
     ############
     # Voice Changer
