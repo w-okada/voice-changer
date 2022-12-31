@@ -12,11 +12,11 @@ sys.path.append("MMVC_Trainer")
 sys.path.append("MMVC_Trainer/text")
 
 from fastapi.routing import APIRoute
-from fastapi import HTTPException, Request, Response, FastAPI, UploadFile, File, Form
-from fastapi.staticfiles import StaticFiles
+from fastapi import HTTPException,  FastAPI, UploadFile, File, Form
+
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
+
 import uvicorn
 import socketio
 from pydantic import BaseModel
@@ -40,10 +40,10 @@ from mods.VoiceChanger import VoiceChanger
 from mods.ssl import create_self_signed_cert
 
 from voice_changer.VoiceChangerManager import VoiceChangerManager
-from sio.MMVC_SocketIOServer import MMVC_SocketIOServer
-from restapi.MMVC_Rest_VoiceChanger import MMVC_Rest_VoiceChanger
-from restapi.MMVC_Rest_Hello import MMVC_Rest_Hello
+from sio.MMVC_SocketIOApp import MMVC_SocketIOApp
 
+
+from restapi.MMVC_Rest import MMVC_Rest
 from pydantic import BaseModel
 
 class VoiceModel(BaseModel):
@@ -106,20 +106,7 @@ printMessage(f"Phase name:{__name__}", level=2)
 thisFilename = os.path.basename(__file__)[:-3]
 
 
-class ValidationErrorLoggingRoute(APIRoute):
-    def get_route_handler(self) -> Callable:
-        original_route_handler = super().get_route_handler()
 
-        async def custom_route_handler(request: Request) -> Response:
-            try:
-                return await original_route_handler(request)
-            except Exception as exc:
-                print("Exception", request.url, str(exc))
-                body = await request.body()
-                detail = {"errors": exc.errors(), "body": body.decode()}
-                raise HTTPException(status_code=422, detail=detail)
-
-        return custom_route_handler
 
 
 if __name__ == thisFilename or args.colab == True:
@@ -133,49 +120,11 @@ if __name__ == thisFilename or args.colab == True:
         EX_TB_PORT = os.environ["EX_TB_PORT"]
         exApplitionInfo.external_tensorboard_port = int(EX_TB_PORT)
 
-
-    app_fastapi = FastAPI()
-    app_fastapi.router.route_class = ValidationErrorLoggingRoute
-    app_fastapi.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-
-    app_fastapi.mount(
-        "/front", StaticFiles(directory="../frontend/dist", html=True), name="static")
-
-    app_fastapi.mount(
-        "/trainer", StaticFiles(directory="../frontend/dist", html=True), name="static")
-
-    app_fastapi.mount(
-        "/recorder", StaticFiles(directory="../frontend/dist", html=True), name="static")
-
     voiceChangerManager = VoiceChangerManager.get_instance()    
     if CONFIG and MODEL:
         voiceChangerManager.loadModel(CONFIG, MODEL)
-    sio = MMVC_SocketIOServer.get_instance(voiceChangerManager)
-
-    restHello = MMVC_Rest_Hello()
-    app_fastapi.include_router(restHello.router)
-    restVoiceChanger = MMVC_Rest_VoiceChanger(voiceChangerManager)
-    app_fastapi.include_router(restVoiceChanger.router)
-
-
-    app_socketio = socketio.ASGIApp(
-        sio,
-        other_asgi_app=app_fastapi,
-        static_files={
-            '/assets/icons/github.svg': {
-                'filename': '../frontend/dist/assets/icons/github.svg',
-                'content_type': 'image/svg+xml'
-            },
-            '': '../frontend/dist',
-            '/': '../frontend/dist/index.html',
-        }
-    )
+    app_fastapi = MMVC_Rest.get_instance(voiceChangerManager)
+    app_socketio = MMVC_SocketIOApp.get_instance(app_fastapi, voiceChangerManager)
 
     ############
     # File Uploder
