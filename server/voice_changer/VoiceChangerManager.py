@@ -1,5 +1,5 @@
 import numpy as np
-from mods.VoiceChanger import VoiceChanger
+from voice_changer.VoiceChanger import VoiceChanger
 
 class VoiceChangerManager():
     @classmethod
