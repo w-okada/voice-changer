@@ -1,16 +1,4 @@
-import sys, os, struct, argparse, logging, shutil, base64, traceback
-# logging.getLogger('numba').setLevel(logging.WARNING)
-
-# class UvicornSuppressFilter(logging.Filter):
-#     def filter(self, record):
-#         return False
-
-# logger = logging.getLogger("uvicorn.error")
-# logger.addFilter(UvicornSuppressFilter())
-# # logger.propagate = False
-# logger = logging.getLogger("multipart.multipart")
-# logger.propagate = False
-
+import sys, os, struct, argparse, shutil, base64, traceback
 import misc.log_control
 
 from dataclasses import dataclass
@@ -51,8 +39,8 @@ from mods.VoiceChanger import VoiceChanger
 
 from mods.ssl import create_self_signed_cert
 
-from sio.MMVC_Namespace import MMVC_Namespace
 from voice_changer.VoiceChangerManager import VoiceChangerManager
+from sio.MMVC_SocketIOServer import MMVC_SocketIOServer
 @dataclass
 class ExApplicationInfo():
     external_tensorboard_port: int
@@ -158,13 +146,14 @@ if __name__ == thisFilename or args.colab == True:
     app_fastapi.mount(
         "/recorder", StaticFiles(directory="../frontend/dist", html=True), name="static")
 
-    sio = socketio.AsyncServer(
-        async_mode='asgi',
-        cors_allowed_origins='*'
-    )
+    # sio = socketio.AsyncServer(
+    #     async_mode='asgi',
+    #     cors_allowed_origins='*'
+    # )
     voiceChangerManager = VoiceChangerManager.get_instance()
-    namespace = MMVC_Namespace.get_instance(voiceChangerManager)
-    sio.register_namespace(namespace)
+    # namespace = MMVC_Namespace.get_instance(voiceChangerManager)
+    # sio.register_namespace(namespace)
+    sio = MMVC_SocketIOServer.get_instance(voiceChangerManager)
     if CONFIG and MODEL:
         voiceChangerManager.loadModel(CONFIG, MODEL)
     # namespace.loadWhisperModel("base")
