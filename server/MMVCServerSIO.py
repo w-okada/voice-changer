@@ -134,27 +134,27 @@ if __name__ == thisFilename or args.colab == True:
     MODEL_DIR = "MMVC_Trainer/logs"
     os.makedirs(MODEL_DIR, exist_ok=True)
 
-    @app_fastapi.post("/upload_file")
-    async def post_upload_file(
-        file: UploadFile = File(...),
-        filename: str = Form(...)
-    ):
-        return upload_file(UPLOAD_DIR, file, filename)
+    # @app_fastapi.post("/upload_file")
+    # async def post_upload_file(
+    #     file: UploadFile = File(...),
+    #     filename: str = Form(...)
+    # ):
+    #     return upload_file(UPLOAD_DIR, file, filename)
 
-    @app_fastapi.post("/load_model")
-    async def post_load_model(
-        modelFilename: str = Form(...),
-        modelFilenameChunkNum: int = Form(...),
-        configFilename: str = Form(...)
-    ):
+    # @app_fastapi.post("/load_model")
+    # async def post_load_model(
+    #     modelFilename: str = Form(...),
+    #     modelFilenameChunkNum: int = Form(...),
+    #     configFilename: str = Form(...)
+    # ):
 
-        modelFilePath = concat_file_chunks(
-            UPLOAD_DIR, modelFilename, modelFilenameChunkNum, UPLOAD_DIR)
-        print(f'File saved to: {modelFilePath}')
-        configFilePath = os.path.join(UPLOAD_DIR, configFilename)
+    #     modelFilePath = concat_file_chunks(
+    #         UPLOAD_DIR, modelFilename, modelFilenameChunkNum, UPLOAD_DIR)
+    #     print(f'File saved to: {modelFilePath}')
+    #     configFilePath = os.path.join(UPLOAD_DIR, configFilename)
 
-        voiceChangerManager.loadModel(configFilePath, modelFilePath)
-        return {"load": f"{modelFilePath}, {configFilePath}"}
+    #     voiceChangerManager.loadModel(configFilePath, modelFilePath)
+    #     return {"load": f"{modelFilePath}, {configFilePath}"}
 
     @app_fastapi.post("/load_model_for_train")
     async def post_load_model_for_train(
@@ -183,49 +183,6 @@ if __name__ == thisFilename or args.colab == True:
     ############
     # Voice Changer
     # ##########
-
-    @app_fastapi.post("/test2")
-    async def post_test2(voice: VoiceModel):
-        try:
-            # print("POST REQUEST PROCESSING....")
-            gpu = voice.gpu
-            srcId = voice.srcId
-            dstId = voice.dstId
-            timestamp = voice.timestamp
-            prefixChunkSize = voice.prefixChunkSize
-            buffer = voice.buffer
-            wav = base64.b64decode(buffer)
-
-            if wav == 0:
-                samplerate, data = read("dummy.wav")
-                unpackedData = data
-            else:
-                unpackedData = np.array(struct.unpack(
-                    '<%sh' % (len(wav) // struct.calcsize('<h')), wav))
-                # write("logs/received_data.wav", 24000,
-                #       unpackedData.astype(np.int16))
-
-            changedVoice = voiceChangerManager.changeVoice(
-                gpu, srcId, dstId, timestamp, prefixChunkSize, unpackedData)
-
-            changedVoiceBase64 = base64.b64encode(changedVoice).decode('utf-8')
-            data = {
-                "gpu": gpu,
-                "srcId": srcId,
-                "dstId": dstId,
-                "timestamp": timestamp,
-                "prefixChunkSize": prefixChunkSize,
-                "changedVoiceBase64": changedVoiceBase64
-            }
-
-            json_compatible_item_data = jsonable_encoder(data)
-
-            return JSONResponse(content=json_compatible_item_data)
-
-        except Exception as e:
-            print("REQUEST PROCESSING!!!! EXCEPTION!!!", e)
-            print(traceback.format_exc())
-            return str(e)
 
     # Trainer REST API ※ ColabがTop直下のパスにしかPOSTを投げれないようなので"REST風"
 
