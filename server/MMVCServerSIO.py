@@ -1,11 +1,11 @@
-import sys, os, struct, argparse, shutil, base64, traceback
+import sys, os, struct, argparse, shutil, traceback, base64, struct
+import numpy as np
 import misc.log_control
 
 from dataclasses import dataclass
 from datetime import datetime
 from distutils.util import strtobool
 
-import numpy as np
 from scipy.io.wavfile import write, read
 
 sys.path.append("MMVC_Trainer")
@@ -41,13 +41,10 @@ from mods.ssl import create_self_signed_cert
 
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 from sio.MMVC_SocketIOServer import MMVC_SocketIOServer
-@dataclass
-class ExApplicationInfo():
-    external_tensorboard_port: int
+from restapi.MMVC_Rest_VoiceChanger import MMVC_Rest_VoiceChanger
+from restapi.MMVC_Rest_Hello import MMVC_Rest_Hello
 
-
-exApplitionInfo = ExApplicationInfo(external_tensorboard_port=0)
-
+from pydantic import BaseModel
 
 class VoiceModel(BaseModel):
     gpu: int
@@ -56,6 +53,16 @@ class VoiceModel(BaseModel):
     timestamp: int
     prefixChunkSize: int
     buffer: str
+
+@dataclass
+class ExApplicationInfo():
+    external_tensorboard_port: int
+
+
+exApplitionInfo = ExApplicationInfo(external_tensorboard_port=0)
+
+
+
 
 def setupArgParser():
     parser = argparse.ArgumentParser()
@@ -146,17 +153,16 @@ if __name__ == thisFilename or args.colab == True:
     app_fastapi.mount(
         "/recorder", StaticFiles(directory="../frontend/dist", html=True), name="static")
 
-    # sio = socketio.AsyncServer(
-    #     async_mode='asgi',
-    #     cors_allowed_origins='*'
-    # )
-    voiceChangerManager = VoiceChangerManager.get_instance()
-    # namespace = MMVC_Namespace.get_instance(voiceChangerManager)
-    # sio.register_namespace(namespace)
-    sio = MMVC_SocketIOServer.get_instance(voiceChangerManager)
+    voiceChangerManager = VoiceChangerManager.get_instance()    
     if CONFIG and MODEL:
         voiceChangerManager.loadModel(CONFIG, MODEL)
-    # namespace.loadWhisperModel("base")
+    sio = MMVC_SocketIOServer.get_instance(voiceChangerManager)
+
+    restHello = MMVC_Rest_Hello()
+    app_fastapi.include_router(restHello.router)
+    restVoiceChanger = MMVC_Rest_VoiceChanger(voiceChangerManager)
+    app_fastapi.include_router(restVoiceChanger.router)
+
 
     app_socketio = socketio.ASGIApp(
         sio,
@@ -170,10 +176,6 @@ if __name__ == thisFilename or args.colab == True:
             '/': '../frontend/dist/index.html',
         }
     )
-
-    @app_fastapi.get("/api/hello")
-    async def index():
-        return {"result": "Index"}
 
     ############
     # File Uploder
@@ -233,8 +235,8 @@ if __name__ == thisFilename or args.colab == True:
     # Voice Changer
     # ##########
 
-    @app_fastapi.post("/test")
-    async def post_test(voice: VoiceModel):
+    @app_fastapi.post("/test2")
+    async def post_test2(voice: VoiceModel):
         try:
             # print("POST REQUEST PROCESSING....")
             gpu = voice.gpu
@@ -342,7 +344,7 @@ if __name__ == thisFilename or args.colab == True:
         return JSONResponse(content=json_compatible_item_data)
 
 if __name__ == '__mp_main__':
-    printMessage(f"PHASE2adasdfadfasd:{__name__}", level=2)
+    printMessage(f"PHASE2:{__name__}", level=2)
 
 if __name__ == '__main__':
     printMessage(f"PHASE1:{__name__}", level=2)

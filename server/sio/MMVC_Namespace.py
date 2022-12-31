@@ -4,7 +4,6 @@ import numpy as np
 import socketio
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 
-
 class MMVC_Namespace(socketio.AsyncNamespace):
     def __init__(self, namespace:str, voiceChangerManager:VoiceChangerManager):
         super().__init__(namespace)

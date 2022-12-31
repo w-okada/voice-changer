@@ -46,7 +46,6 @@ class VoiceChanger():
     def on_request(self, gpu, srcId, dstId, timestamp, prefixChunkSize, wav):
         unpackedData = wav
         convertSize = unpackedData.shape[0] + (prefixChunkSize * 512)
-
         try:
 
             audio = torch.FloatTensor(unpackedData.astype(np.float32))
