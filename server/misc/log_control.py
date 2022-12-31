@@ -1,6 +1,6 @@
 import logging
 
-logging.getLogger('numba').setLevel(logging.WARNING)
+# logging.getLogger('numba').setLevel(logging.WARNING)
 
 class UvicornSuppressFilter(logging.Filter):
     def filter(self, record):
