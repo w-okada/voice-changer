@@ -11,3 +11,5 @@ import logging
 # # logger.propagate = False
 # logger = logging.getLogger("multipart.multipart")
 # logger.propagate = False
+
+logging.getLogger('asyncio').setLevel(logging.WARNING)

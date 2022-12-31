@@ -183,7 +183,7 @@ if __name__ == '__main__':
             reload=True,
             ssl_keyfile=key_path,
             ssl_certfile=cert_path,
-            # log_level="critical"
+            log_level="warning"
         )
     else:
         # HTTP サーバ起動
@@ -192,7 +192,7 @@ if __name__ == '__main__':
                 f"{os.path.basename(__file__)[:-3]}:app_fastapi",
                 host="0.0.0.0",
                 port=int(PORT),
-                # log_level="critical"
+                log_level="warning"
             )
         else:
             uvicorn.run(
@@ -200,6 +200,6 @@ if __name__ == '__main__':
                 host="0.0.0.0",
                 port=int(PORT),
                 reload=True,
-                # log_level="critical"
+                log_level="warning"
             )
 
