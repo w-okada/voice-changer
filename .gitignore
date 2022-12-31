@@ -1,2 +1,7 @@
 dummy
 node_modules
+__pycache__
+
+server/upload_dir/
+server/MMVC_Trainer/
+server/key
