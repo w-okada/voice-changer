@@ -19,47 +19,17 @@ from fastapi.responses import JSONResponse
 
 import uvicorn
 import socketio
-from pydantic import BaseModel
 
 from typing import Callable
-
-from mods.Trainer_Speakers import mod_get_speakers
-from mods.Trainer_Training import mod_post_pre_training, mod_post_start_training, mod_post_stop_training, mod_get_related_files, mod_get_tail_training_log
-from mods.Trainer_Model import mod_get_model, mod_delete_model
-
-from mods.Trainer_Models import mod_get_models
-from mods.Trainer_MultiSpeakerSetting import mod_get_multi_speaker_setting, mod_post_multi_speaker_setting
-from mods.Trainer_Speaker_Voice import mod_get_speaker_voice
-from mods.Trainer_Speaker_Voices import mod_get_speaker_voices
-
-from mods.Trainer_Speaker import mod_delete_speaker
-from mods.FileUploader import upload_file, concat_file_chunks
-
 from mods.VoiceChanger import VoiceChanger
-
 from mods.ssl import create_self_signed_cert
-
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 from sio.MMVC_SocketIOApp import MMVC_SocketIOApp
 
-
 from restapi.MMVC_Rest import MMVC_Rest
-from pydantic import BaseModel
-
-class VoiceModel(BaseModel):
-    gpu: int
-    srcId: int
-    dstId: int
-    timestamp: int
-    prefixChunkSize: int
-    buffer: str
-
-@dataclass
-class ExApplicationInfo():
-    external_tensorboard_port: int
 
 
-exApplitionInfo = ExApplicationInfo(external_tensorboard_port=0)
+
 
 
 
@@ -105,10 +75,6 @@ args = parser.parse_args()
 printMessage(f"Phase name:{__name__}", level=2)
 thisFilename = os.path.basename(__file__)[:-3]
 
-
-
-
-
 if __name__ == thisFilename or args.colab == True:
     printMessage(f"PHASE3:{__name__}", level=2)
     TYPE = args.t
@@ -116,9 +82,9 @@ if __name__ == thisFilename or args.colab == True:
     CONFIG = args.c
     MODEL = args.m
 
-    if os.getenv("EX_TB_PORT"):
-        EX_TB_PORT = os.environ["EX_TB_PORT"]
-        exApplitionInfo.external_tensorboard_port = int(EX_TB_PORT)
+    # if os.getenv("EX_TB_PORT"):
+    #     EX_TB_PORT = os.environ["EX_TB_PORT"]
+    #     exApplitionInfo.external_tensorboard_port = int(EX_TB_PORT)
 
     voiceChangerManager = VoiceChangerManager.get_instance()    
     if CONFIG and MODEL:
@@ -126,97 +92,6 @@ if __name__ == thisFilename or args.colab == True:
     app_fastapi = MMVC_Rest.get_instance(voiceChangerManager)
     app_socketio = MMVC_SocketIOApp.get_instance(app_fastapi, voiceChangerManager)
 
-    ############
-    # File Uploder
-    # ##########
-    # @app_fastapi.post("/load_model_for_train")
-    # async def post_load_model_for_train(
-    #     modelGFilename: str = Form(...),
-    #     modelGFilenameChunkNum: int = Form(...),
-    #     modelDFilename: str = Form(...),
-    #     modelDFilenameChunkNum: int = Form(...),
-    # ):
-
-
-
-    # @app_fastapi.post("/extract_voices")
-    # async def post_load_model(
-    #     zipFilename: str = Form(...),
-    #     zipFileChunkNum: int = Form(...),
-    # ):
-    #     zipFilePath = concat_file_chunks(
-    #         UPLOAD_DIR, zipFilename, zipFileChunkNum, UPLOAD_DIR)
-    #     shutil.unpack_archive(zipFilePath, "MMVC_Trainer/dataset/textful/")
-    #     return {"Zip file unpacked": f"{zipFilePath}"}
-
-    ############
-    # Voice Changer
-    # ##########
-
-    # Trainer REST API ※ ColabがTop直下のパスにしかPOSTを投げれないようなので"REST風"
-
-    @app_fastapi.get("/get_speakers")
-    async def get_speakers():
-        return mod_get_speakers()
-
-    @app_fastapi.delete("/delete_speaker")
-    async def delete_speaker(speaker: str = Form(...)):
-        return mod_delete_speaker(speaker)
-
-    @app_fastapi.get("/get_speaker_voices")
-    async def get_speaker_voices(speaker: str):
-        return mod_get_speaker_voices(speaker)
-
-    @app_fastapi.get("/get_speaker_voice")
-    async def get_speaker_voices(speaker: str, voice: str):
-        return mod_get_speaker_voice(speaker, voice)
-
-    @app_fastapi.get("/get_multi_speaker_setting")
-    async def get_multi_speaker_setting():
-        return mod_get_multi_speaker_setting()
-
-    @app_fastapi.post("/post_multi_speaker_setting")
-    async def post_multi_speaker_setting(setting: str = Form(...)):
-        return mod_post_multi_speaker_setting(setting)
-
-    @app_fastapi.get("/get_models")
-    async def get_models():
-        return mod_get_models()
-
-    @app_fastapi.get("/get_model")
-    async def get_model(model: str):
-        return mod_get_model(model)
-
-    @app_fastapi.delete("/delete_model")
-    async def delete_model(model: str = Form(...)):
-        return mod_delete_model(model)
-
-    @app_fastapi.post("/post_pre_training")
-    async def post_pre_training(batch: int = Form(...)):
-        return mod_post_pre_training(batch)
-
-    @app_fastapi.post("/post_start_training")
-    async def post_start_training(enable_finetuning: bool = Form(...),GModel: str = Form(...),DModel: str = Form(...)):
-        print("POST START TRAINING..")
-        return mod_post_start_training(enable_finetuning, GModel, DModel)
-
-    @app_fastapi.post("/post_stop_training")
-    async def post_stop_training():
-        print("POST STOP TRAINING..")
-        return mod_post_stop_training()
-
-    @app_fastapi.get("/get_related_files")
-    async def get_related_files():
-        return mod_get_related_files()
-
-    @app_fastapi.get("/get_tail_training_log")
-    async def get_tail_training_log(num: int):
-        return mod_get_tail_training_log(num)
-
-    @app_fastapi.get("/get_ex_application_info")
-    async def get_ex_application_info():
-        json_compatible_item_data = jsonable_encoder(exApplitionInfo)
-        return JSONResponse(content=json_compatible_item_data)
 
 if __name__ == '__mp_main__':
     printMessage(f"PHASE2:{__name__}", level=2)

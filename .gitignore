@@ -5,3 +5,7 @@ __pycache__
 server/upload_dir/
 server/MMVC_Trainer/
 server/key
+server/info
+
+server/memo.txt
+

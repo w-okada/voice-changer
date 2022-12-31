@@ -5,7 +5,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from fastapi import HTTPException, FastAPI, UploadFile, File, Form
 
-from mods.FileUploader import upload_file, concat_file_chunks
+from restapi.mods.FileUploader import upload_file, concat_file_chunks
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 
 UPLOAD_DIR = "upload_dir"

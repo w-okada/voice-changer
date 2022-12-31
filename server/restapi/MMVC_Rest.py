@@ -8,6 +8,10 @@ from voice_changer.VoiceChangerManager import VoiceChangerManager
 from restapi.MMVC_Rest_Hello import MMVC_Rest_Hello
 from restapi.MMVC_Rest_VoiceChanger import MMVC_Rest_VoiceChanger
 from restapi.MMVC_Rest_Fileuploader import MMVC_Rest_Fileuploader
+from restapi.MMVC_Rest_Trainer import MMVC_Rest_Trainer
+
+
+
 class ValidationErrorLoggingRoute(APIRoute):
     def get_route_handler(self) -> Callable:
         original_route_handler = super().get_route_handler()
@@ -53,6 +57,8 @@ class MMVC_Rest:
             app_fastapi.include_router(restVoiceChanger.router)
             fileUploader = MMVC_Rest_Fileuploader(voiceChangerManager)
             app_fastapi.include_router(fileUploader.router)
+            trainer = MMVC_Rest_Trainer()
+            app_fastapi.include_router(trainer.router)
 
             cls._instance = app_fastapi
             return cls._instance
