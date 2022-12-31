@@ -1,6 +1,6 @@
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from trainer_mods.files import get_file_list
+from restapi.utils.files import get_file_list
 import os
 
 def mod_get_speaker_voices(speaker:str):

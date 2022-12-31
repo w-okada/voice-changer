@@ -1,6 +1,6 @@
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from trainer_mods.files import get_dir_list
+from restapi.utils.files import get_dir_list
 import os
 # CreateはFileUploaderで実装。
 
