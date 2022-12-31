@@ -1,5 +1,5 @@
 import shutil
-from mods.Trainer_MultiSpeakerSetting import MULTI_SPEAKER_SETTING_PATH
+from restapi.mods.Trainer_MultiSpeakerSetting import MULTI_SPEAKER_SETTING_PATH
 
 def mod_delete_speaker(speaker:str):
         shutil.rmtree(f"MMVC_Trainer/dataset/textful/{speaker}")

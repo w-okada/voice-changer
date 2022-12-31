@@ -5,16 +5,16 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 
-from mods.Trainer_Speakers import mod_get_speakers
-from mods.Trainer_Training import mod_post_pre_training, mod_post_start_training, mod_post_stop_training, mod_get_related_files, mod_get_tail_training_log
-from mods.Trainer_Model import mod_get_model, mod_delete_model
+from restapi.mods.Trainer_Speakers import mod_get_speakers
+from restapi.mods.Trainer_Training import mod_post_pre_training, mod_post_start_training, mod_post_stop_training, mod_get_related_files, mod_get_tail_training_log
+from restapi.mods.Trainer_Model import mod_get_model, mod_delete_model
 
-from mods.Trainer_Models import mod_get_models
-from mods.Trainer_MultiSpeakerSetting import mod_get_multi_speaker_setting, mod_post_multi_speaker_setting
-from mods.Trainer_Speaker_Voice import mod_get_speaker_voice
-from mods.Trainer_Speaker_Voices import mod_get_speaker_voices
+from restapi.mods.Trainer_Models import mod_get_models
+from restapi.mods.Trainer_MultiSpeakerSetting import mod_get_multi_speaker_setting, mod_post_multi_speaker_setting
+from restapi.mods.Trainer_Speaker_Voice import mod_get_speaker_voice
+from restapi.mods.Trainer_Speaker_Voices import mod_get_speaker_voices
 
-from mods.Trainer_Speaker import mod_delete_speaker
+from restapi.mods.Trainer_Speaker import mod_delete_speaker
 from dataclasses import dataclass
 
 INFO_DIR = "info"
