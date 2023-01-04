@@ -1,0 +1,50 @@
+{
+  "name": "@dannadori/voice-changer-client-js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "clean:worklet": "rimraf worklet/dist/*",
+    "webpack:worklet:dev": "webpack --config webpack.worklet.dev.js",
+    "webpack:worklet:prod": "webpack --config webpack.worklet.prod.js",
+    "build:worklet:dev": "npm-run-all clean:worklet webpack:worklet:dev",
+    "build:worklet:prod": "npm-run-all clean:worklet webpack:worklet:prod",
+    "clean": "rimraf dist/*",
+    "webpack:dev": "webpack --config webpack.dev.js",
+    "webpack:prod": "webpack --config webpack.prod.js",
+    "build:dev": "npm-run-all build:worklet:dev clean webpack:dev",
+    "build:prod": "npm-run-all build:worklet:prod clean webpack:prod",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/audioworklet": "^0.0.36",
+    "@types/node": "^18.11.17",
+    "eslint": "^8.30.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.31.11",
+    "eslint-webpack-plugin": "^3.2.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.8.1",
+    "raw-loader": "^4.0.2",
+    "rimraf": "^3.0.2",
+    "ts-loader": "^9.4.2",
+    "typescript": "^4.9.4",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.11.1"
+  },
+  "dependencies": {
+    "@types/readable-stream": "^2.3.15",
+    "amazon-chime-sdk-js": "^3.9.0",
+    "microphone-stream": "^6.0.1",
+    "readable-stream": "^4.3.0",
+    "socket.io-client": "^4.5.4"
+  }
+}

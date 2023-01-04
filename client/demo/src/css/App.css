@@ -1,0 +1,174 @@
+@import url("https://fonts.googleapis.com/css2?family=Chicle&family=Poppins:ital,wght@0,200;0,400;0,600;1,200;1,400;1,600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Yusei+Magic&display=swap");
+
+:root {
+    --text-color: #333;
+    --company-color1: rgba(64, 119, 187, 1);
+    --company-color2: rgba(29, 47, 78, 1);
+    --company-color3: rgba(255, 255, 255, 1);
+    --company-color1-alpha: rgba(64, 119, 187, 0.3);
+    --company-color2-alpha: rgba(29, 47, 78, 0.3);
+    --company-color3-alpha: rgba(255, 255, 255, 0.3);
+    --global-shadow-color: rgba(0, 0, 0, 0.4);
+
+    --sidebar-transition-time: 0.3s;
+    --sidebar-transition-time-quick: 0.1s;
+    --sidebar-transition-animation: ease-in-out;
+
+    --header-height: 1.5rem;
+    --right-sidebar-width: 320px;
+
+    --dialog-border-color: rgba(100, 100, 100, 1);
+    --dialog-shadow-color: rgba(0, 0, 0, 0.3);
+    --dialog-background-color: rgba(255, 255, 255, 1);
+    --dialog-primary-color: rgba(19, 70, 209, 1);
+    --dialog-active-color: rgba(40, 70, 209, 1);
+    --dialog-input-border-color: rgba(200, 200, 200, 1);
+    --dialog-submit-button-color: rgba(180, 190, 230, 1);
+    --dialog-cancel-button-color: rgba(235, 80, 80, 1);
+
+    --body-video-seeker-height: 3rem;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+html {
+    font-size: 16px;
+}
+body {
+    height: 100%;
+    width: 100%;
+    color: var(--text-color);
+    background: linear-gradient(45deg, var(--company-color1) 0, 5%, var(--company-color2) 5% 10%, var(--company-color3) 10% 80%, var(--company-color1) 80% 85%, var(--company-color2) 85% 100%);
+}
+#app {
+    height: 100%;
+    width: 100%;
+}
+
+.body {
+    height: 100%;
+    width: 100%;
+    margin: 1rem;
+    font-family: "Yusei Magic", sans-serif;
+    display: flex;
+    flex-direction: column;
+    font-size: 1rem;
+    overflow-y: scroll;
+}
+.body-row {
+}
+.split-4-6 {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 40%;
+    }
+    & > div:nth-child(2) {
+        left: 40%;
+        width: 60%;
+    }
+}
+.split-3-7 {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 30%;
+    }
+    & > div:nth-child(2) {
+        left: 30%;
+        width: 70%;
+    }
+}
+
+.split-3-3-4 {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 30%;
+    }
+    & > div:nth-child(2) {
+        left: 30%;
+        width: 30%;
+    }
+    & > div:nth-child(3) {
+        left: 60%;
+        width: 40%;
+    }
+}
+.split-3-1-2-4 {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 30%;
+    }
+    & > div:nth-child(2) {
+        left: 30%;
+        width: 10%;
+    }
+    & > div:nth-child(3) {
+        left: 40%;
+        width: 20%;
+    }
+    & > div:nth-child(4) {
+        left: 60%;
+        width: 40%;
+    }
+}
+.underline {
+    border-bottom: 3px solid #333;
+}
+.left-padding-1 {
+    padding-left: 1rem;
+}
+.left-padding-2 {
+    padding-left: 2rem;
+}
+.highlight {
+    background-color: rgba(200, 200, 255, 0.1);
+}
+
+.body-top-title {
+    font-size: 3rem;
+}
+.body-section-title {
+    font-size: 1.5rem;
+    color: rgb(51, 49, 49);
+}
+.body-item-title {
+    color: rgb(51, 99, 49);
+}
+.body-item-text {
+    color: rgb(30, 30, 30);
+}
+.body-button-container {
+    display: flex;
+    flex-direction: row;
+    .body-button {
+        user-select: none;
+        border: solid 1px #333;
+        border-radius: 2px;
+        padding: 2px;
+    }
+}
+.body-select-container {
+    .body-select {
+        color: rgb(30, 30, 30);
+    }
+}

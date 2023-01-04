@@ -9,3 +9,6 @@ server/info
 
 server/memo.txt
 
+client/lib/dist
+client/lib/worklet/dist
+client/demo/dist/

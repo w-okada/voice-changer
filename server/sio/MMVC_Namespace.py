@@ -25,14 +25,20 @@ class MMVC_Namespace(socketio.AsyncNamespace):
         srcId = int(msg[1])
         dstId = int(msg[2])
         timestamp = int(msg[3])
-        prefixChunkSize = int(msg[4])
-        data = msg[5]
-        # print(srcId, dstId, timestamp)
+        convertChunkNum = int(msg[4])
+        crossFadeLowerValue = msg[5]
+        crossFadeOffsetRate = msg[6]
+        crossFadeEndRate = msg[7]
+        data = msg[8]
+        # print(srcId, dstId, timestamp, convertChunkNum, crossFadeLowerValue, crossFadeOffsetRate, crossFadeEndRate)
         unpackedData = np.array(struct.unpack(
             '<%sh' % (len(data) // struct.calcsize('<h')), data))
+        # audio1 = self.voiceChangerManager.changeVoice(
+            # gpu, srcId, dstId, timestamp, prefixChunkSize, unpackedData)
         audio1 = self.voiceChangerManager.changeVoice(
-            gpu, srcId, dstId, timestamp, prefixChunkSize, unpackedData)
-
+            gpu, srcId, dstId, timestamp, convertChunkNum, crossFadeLowerValue, crossFadeOffsetRate, crossFadeEndRate, unpackedData)
+        
+        print("sio result:", len(audio1), audio1.shape)
         bin = struct.pack('<%sh' % len(audio1), *audio1)
         await self.emit('response', [timestamp, bin])
 

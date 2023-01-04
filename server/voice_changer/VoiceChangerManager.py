@@ -13,7 +13,14 @@ class VoiceChangerManager():
             self.voiceChanger.destroy()
         self.voiceChanger = VoiceChanger(config, model)
 
-    def changeVoice(self, gpu, srcId, dstId, timestamp, prefixChunkSize, unpackedData):
+    def changeVoice(self, gpu, srcId, dstId, timestamp, convertChunkNum, crossFadeLowerValue, crossFadeOffsetRate, crossFadeEndRate, unpackedData):
+        if hasattr(self, 'voiceChanger') == True:
+            return self.voiceChanger.on_request(gpu, srcId, dstId, timestamp, convertChunkNum, crossFadeLowerValue, crossFadeOffsetRate, crossFadeEndRate, unpackedData)
+        else:
+            print("Voice Change is not loaded. Did you load a correct model?")
+            return np.zeros(1).astype(np.int16)
+
+    def changeVoice_old(self, gpu, srcId, dstId, timestamp, prefixChunkSize, unpackedData):
         if hasattr(self, 'voiceChanger') == True:
             return self.voiceChanger.on_request(gpu, srcId, dstId, timestamp, prefixChunkSize, unpackedData)
         else:

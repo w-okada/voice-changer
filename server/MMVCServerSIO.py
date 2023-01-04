@@ -177,7 +177,7 @@ if __name__ == '__main__':
             reload=True,
             ssl_keyfile=key_path,
             ssl_certfile=cert_path,
-            log_level="warning"
+            # log_level="warning"
         )
     else:
         # HTTP サーバ起動
