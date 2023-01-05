@@ -187,8 +187,9 @@ export class AudioStreamer extends Duplex {
 
     private sendBuffer = async (newBuffer: Uint8Array) => {
         if (this.serverUrl.length == 0) {
-            console.error("no server url")
-            throw "no server url"
+            console.warn("no server url")
+            return
+            // throw "no server url"
         }
         const timestamp = Date.now()
         // console.log("REQUEST_MESSAGE:", [this.gpu, this.srcId, this.dstId, timestamp, newBuffer.buffer])

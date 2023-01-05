@@ -16,8 +16,7 @@ export type VoiceChangerRequestParamas = {
 }
 
 export type VoiceChangerOptions = {
-    audioInputDeviceId: string | null,
-    mediaStream: MediaStream | null,
+    audioInput: string | MediaStream | null,
     mmvcServerUrl: string,
     protocol: Protocol,
     sampleRate: SampleRate, // 48000Hz
@@ -77,8 +76,7 @@ export const DefaultVoiceChangerRequestParamas: VoiceChangerRequestParamas = {
 }
 
 export const DefaultVoiceChangerOptions: VoiceChangerOptions = {
-    audioInputDeviceId: null,
-    mediaStream: null,
+    audioInput: null,
     mmvcServerUrl: "https://192.168.0.3:18888/test",
     protocol: "sio",
     sampleRate: 48000,

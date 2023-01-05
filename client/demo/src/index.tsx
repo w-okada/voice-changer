@@ -2,16 +2,22 @@ import * as React from "react";
 import { createRoot } from "react-dom/client";
 import "./css/App.css"
 import { useEffect, useMemo, useRef, useState } from "react";
-import { VoiceChnagerClient } from "@dannadori/voice-changer-client-js"
+import { VoiceChnagerClient, createDummyMediaStream } from "@dannadori/voice-changer-client-js"
 import { useMicrophoneOptions } from "./options_microphone";
 const container = document.getElementById("app")!;
 const root = createRoot(container);
 
 const App = () => {
-    const { component: microphoneSettingComponent, options: microphoneOptions, params: microphoneParams, isStarted } = useMicrophoneOptions()
 
+
+    const audioContextRef = useRef<AudioContext>()
     const voiceChangerClientRef = useRef<VoiceChnagerClient | null>(null)
     const [clientInitialized, setClientInitialized] = useState<boolean>(false)
+    const [bufferingTime, setBufferingTime] = useState<number>(0)
+    const [responseTime, setResponseTime] = useState<number>(0)
+    const [volume, setVolume] = useState<number>(0)
+
+    const { component: microphoneSettingComponent, options: microphoneOptions, params: microphoneParams, isStarted } = useMicrophoneOptions(audioContextRef.current)
 
     const onClearSettingClicked = async () => {
         //@ts-ignore
@@ -25,16 +31,24 @@ const App = () => {
 
     useEffect(() => {
         const initialized = async () => {
-            const ctx = new AudioContext()
-            voiceChangerClientRef.current = new VoiceChnagerClient(ctx, true, {
-                notifySendBufferingTime: (val: number) => { console.log(`buf:${val}`) },
-                notifyResponseTime: (val: number) => { console.log(`res:${val}`) },
+            audioContextRef.current = new AudioContext()
+            voiceChangerClientRef.current = new VoiceChnagerClient(audioContextRef.current, true, {
+                notifySendBufferingTime: (val: number) => {
+                    setBufferingTime(val)
+                },
+                notifyResponseTime: (val: number) => {
+                    setResponseTime(val)
+                },
                 notifyException: (mes: string) => {
                     if (mes.length > 0) {
                         console.log(`error:${mes}`)
                     }
                 }
-            }, { notifyVolume: (vol: number) => { } })
+            }, {
+                notifyVolume: (vol: number) => {
+                    setVolume(vol)
+                }
+            })
             await voiceChangerClientRef.current.isInitialized()
             setClientInitialized(true)
 
@@ -46,10 +60,9 @@ const App = () => {
     }, [])
 
     useEffect(() => {
-        console.log("START!!!", isStarted)
         const start = async () => {
             if (!voiceChangerClientRef.current || !clientInitialized) {
-                console.log("client is not initialized")
+                // console.log("client is not initialized")
                 return
             }
             // if (!microphoneOptions.audioInputDeviceId || microphoneOptions.audioInputDeviceId.length == 0) {
@@ -62,7 +75,7 @@ const App = () => {
         }
         const stop = async () => {
             if (!voiceChangerClientRef.current || !clientInitialized) {
-                console.log("client is not initialized")
+                // console.log("client is not initialized")
                 return
             }
             voiceChangerClientRef.current.stop()
@@ -74,29 +87,29 @@ const App = () => {
         }
     }, [isStarted])
 
-    // useEffect(() => {
-    //     if (!voiceChangerClientRef.current || !clientInitialized) {
-    //         console.log("client is not initialized")
-    //         return
-    //     }
-    //     voiceChangerClientRef.current.setServerUrl(microphoneOptions.mmvcServerUrl, microphoneOptions.protocol, false)
-    // }, [microphoneOptions.mmvcServerUrl, microphoneOptions.protocol])
 
     useEffect(() => {
         const changeInput = async () => {
             if (!voiceChangerClientRef.current || !clientInitialized) {
-                console.log("client is not initialized")
+                // console.log("client is not initialized")
                 return
             }
-            await voiceChangerClientRef.current.setup(microphoneOptions.audioInputDeviceId!, microphoneOptions.bufferSize, microphoneOptions.forceVfDisable)
+            if (!microphoneOptions.audioInput || microphoneOptions.audioInput == "none") {
+                const ms = createDummyMediaStream(audioContextRef.current!)
+                await voiceChangerClientRef.current.setup(ms, microphoneOptions.bufferSize, microphoneOptions.forceVfDisable)
+
+            } else {
+                await voiceChangerClientRef.current.setup(microphoneOptions.audioInput, microphoneOptions.bufferSize, microphoneOptions.forceVfDisable)
+            }
+
         }
         changeInput()
-    }, [microphoneOptions.audioInputDeviceId!, microphoneOptions.bufferSize, microphoneOptions.forceVfDisable])
+    }, [microphoneOptions.audioInput, microphoneOptions.bufferSize, microphoneOptions.forceVfDisable])
 
 
     useEffect(() => {
         if (!voiceChangerClientRef.current || !clientInitialized) {
-            console.log("client is not initialized")
+            // console.log("client is not initialized")
             return
         }
         voiceChangerClientRef.current.setInputChunkNum(microphoneOptions.inputChunkNum)
@@ -104,7 +117,7 @@ const App = () => {
 
     useEffect(() => {
         if (!voiceChangerClientRef.current || !clientInitialized) {
-            console.log("client is not initialized")
+            // console.log("client is not initialized")
             return
         }
         voiceChangerClientRef.current.setVoiceChangerMode(microphoneOptions.voiceChangerMode)
@@ -131,7 +144,19 @@ const App = () => {
             </>
         )
     }, [])
-
+    const performanceRow = useMemo(() => {
+        return (
+            <>
+                <div className="body-row split-3-1-1-1-4 left-padding-1 highlight">
+                    <div className="body-item-title">monitor:</div>
+                    <div className="body-item-text">vol(db):{volume.toFixed(4)}</div>
+                    <div className="body-item-text">buf(ms):{bufferingTime}</div>
+                    <div className="body-item-text">res(ms):{responseTime}</div>
+                    <div className="body-item-text"></div>
+                </div>
+            </>
+        )
+    }, [volume, bufferingTime, responseTime])
     return (
         <div className="body">
             <div className="body-row">
@@ -140,6 +165,7 @@ const App = () => {
                 </div>
             </div>
             {clearRow}
+            {performanceRow}
             {microphoneSettingComponent}
             <div>
                 <audio id="audio-output"></audio>

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { CHROME_EXTENSION } from "./const";
-import { DefaultVoiceChangerRequestParamas, VoiceChangerOptions, VoiceChangerRequestParamas, DefaultVoiceChangerOptions, SampleRate, BufferSize, VoiceChangerMode, Protocol } from "@dannadori/voice-changer-client-js"
+import { DefaultVoiceChangerRequestParamas, VoiceChangerOptions, VoiceChangerRequestParamas, DefaultVoiceChangerOptions, SampleRate, BufferSize, VoiceChangerMode, Protocol, fileSelectorAsDataURL, createDummyMediaStream } from "@dannadori/voice-changer-client-js"
 
 
 const reloadDevices = async () => {
@@ -20,7 +20,15 @@ const reloadDevices = async () => {
         label: "none",
         toJSON: () => { }
     })
-    return audioInputs
+    audioInputs.push({
+        deviceId: "file",
+        groupId: "file",
+        kind: "audioinput",
+        label: "file",
+        toJSON: () => { }
+    })
+    const audioOutputs = mediaDeviceInfos.filter(x => { return x.kind == "audiooutput" })
+    return [audioInputs, audioOutputs]
 }
 
 
@@ -31,11 +39,23 @@ export type MicrophoneOptionsComponent = {
     isStarted: boolean
 }
 
-export const useMicrophoneOptions = (): MicrophoneOptionsComponent => {
+
+export const useMicrophoneOptions = (audioContext?: AudioContext): MicrophoneOptionsComponent => {
     // GUI Info
-    const [audioDeviceInfo, setAudioDeviceInfo] = useState<MediaDeviceInfo[]>([])
+    const [inputAudioDeviceInfo, setInputAudioDeviceInfo] = useState<MediaDeviceInfo[]>([])
+    const [outputAudioDeviceInfo, setOutputAudioDeviceInfo] = useState<MediaDeviceInfo[]>([])
     const [editSpeakerTargetId, setEditSpeakerTargetId] = useState<number>(0)
     const [editSpeakerTargetName, setEditSpeakerTargetName] = useState<string>("")
+    const [audioInput, setAudioInput] = useState<string>("none")
+    const audioOutputRef = React.useRef<string>("")
+    const [audioOutput, _setAudioOutput] = useState<string>("none")
+    const setAudioOutput = (id: string) => {
+        audioOutputRef.current = id
+        _setAudioOutput(audioOutputRef.current)
+        const audio = document.getElementById("audio-output") as HTMLAudioElement
+        //@ts-ignore
+        audio.setSinkId(audioOutputRef.current)
+    }
 
     // const [options, setOptions] = useState<MicrophoneOptionsState>(InitMicrophoneOptionsState)
     const [params, setParams] = useState<VoiceChangerRequestParamas>(DefaultVoiceChangerRequestParamas)
@@ -45,7 +65,8 @@ export const useMicrophoneOptions = (): MicrophoneOptionsComponent => {
     useEffect(() => {
         const initialize = async () => {
             const audioInfo = await reloadDevices()
-            setAudioDeviceInfo(audioInfo)
+            setInputAudioDeviceInfo(audioInfo[0])
+            setOutputAudioDeviceInfo(audioInfo[1])
 
             if (CHROME_EXTENSION) {
                 //@ts-ignore
@@ -78,7 +99,6 @@ export const useMicrophoneOptions = (): MicrophoneOptionsComponent => {
         }
         const startClassName = isStarted ? "body-button-active" : "body-button-stanby"
         const stopClassName = isStarted ? "body-button-stanby" : "body-button-active"
-        console.log("ClassName", startClassName, stopClassName)
 
         return (
             <div className="body-row split-3-3-4 left-padding-1">
@@ -95,9 +115,113 @@ export const useMicrophoneOptions = (): MicrophoneOptionsComponent => {
     }, [isStarted])
 
 
-    const setAudioInputDeviceId = async (deviceId: string) => {
-        setOptions({ ...options, audioInputDeviceId: deviceId })
-    }
+    const audioInputRow = useMemo(() => {
+        return (
+            <div className="body-row split-3-7 left-padding-1 highlight">
+                <div className="body-item-title">AudioInput</div>
+                <div className="body-select-container">
+                    <select className="body-select" value={audioInput} onChange={(e) => { setAudioInput(e.target.value) }}>
+                        {
+                            inputAudioDeviceInfo.map(x => {
+                                return <option key={x.deviceId} value={x.deviceId}>{x.label}</option>
+                            })
+                        }
+                    </select>
+                </div>
+            </div>
+        )
+    }, [inputAudioDeviceInfo, audioInput])
+
+    const audioMediaInputRow = useMemo(() => {
+        console.log("GEN:audioMediaInputRow1")
+        if (audioInput != "file") {
+            console.log("GEN:audioMediaInputRow2")
+            return <></>
+        }
+        console.log("GEN:audioMediaInputRow3")
+
+        const onFileLoadClicked = async () => {
+            const url = await fileSelectorAsDataURL("")
+            const audio = document.getElementById("body-audio-converted") as HTMLAudioElement
+            audio.src = url
+            // audio.volume = 0.0
+            // audio.onplay = () => {
+            //     //@ts-ignore
+            //     const ms = audio.captureStream()
+            //     setOptions({ ...options, audioInput: ms })
+            // }
+            await audio.play()
+            const src = audioContext!.createMediaElementSource(audio);
+            const dst = audioContext!.createMediaStreamDestination()
+            src.connect(dst)
+            setOptions({ ...options, audioInput: dst.stream })
+
+
+            const audio_org = document.getElementById("body-audio-original") as HTMLAudioElement
+            audio_org.src = url
+            audio_org.pause()
+
+            audio_org.onplay = () => {
+                console.log(audioOutputRef.current)
+                // @ts-ignore
+                audio_org.setSinkId(audioOutputRef.current)
+            }
+        }
+
+        return (
+            <div className="body-row split-3-3-4 left-padding-1 highlight">
+                <div className="body-item-title"></div>
+                <div className="body-item-text">
+                    <div>
+                        org:<audio id="body-audio-original" controls></audio>
+                    </div>
+                    <div>
+                        cnv:<audio id="body-audio-converted" controls></audio>
+                    </div>
+                </div>
+                <div className="body-button-container">
+                    <div className="body-button" onClick={onFileLoadClicked}>load</div>
+                </div>
+            </div>
+        )
+    }, [audioInput, audioOutput])
+    console.log("GEN:audioMediaInputRow3")
+    useEffect(() => {
+        if (!audioContext) {
+            return
+        }
+        if (audioInput == "none") {
+            const ms = createDummyMediaStream(audioContext)
+            setOptions({ ...options, audioInput: ms })
+        } else if (audioInput == "file") {
+            // const audio = document.getElementById("body-audio") as HTMLAudioElement
+            // //@ts-ignore
+            // const ms = audio.captureStream()
+            // setOptions({ ...options, audioInput: ms })
+        } else {
+            setOptions({ ...options, audioInput: audioInput })
+        }
+    }, [audioContext, audioInput])
+
+
+    const audioOutputRow = useMemo(() => {
+        return (
+            <div className="body-row split-3-7 left-padding-1 highlight">
+                <div className="body-item-title">AudioOutput</div>
+                <div className="body-select-container">
+                    <select className="body-select" value={audioOutput} onChange={(e) => { setAudioOutput(e.target.value) }}>
+                        {
+                            outputAudioDeviceInfo.map(x => {
+                                return <option key={x.deviceId} value={x.deviceId}>{x.label}</option>
+                            })
+                        }
+                    </select>
+                    <audio hidden id="body-output-audio"></audio>
+                </div>
+            </div>
+        )
+    }, [outputAudioDeviceInfo, audioOutput])
+
 
     const onSetServerClicked = async () => {
         const input = document.getElementById("mmvc-server-url") as HTMLInputElement
@@ -197,19 +321,9 @@ export const useMicrophoneOptions = (): MicrophoneOptionsComponent => {
                         </select>
                     </div>
                 </div>
-
-                <div className="body-row split-3-7 left-padding-1 highlight">
-                    <div className="body-item-title">Microphone</div>
-                    <div className="body-select-container">
-                        <select className="body-select" value={options.audioInputDeviceId || "none"} onChange={(e) => { setAudioInputDeviceId(e.target.value) }}>
-                            {
-                                audioDeviceInfo.map(x => {
-                                    return <option key={x.deviceId} value={x.deviceId}>{x.label}</option>
-                                })
-                            }
-                        </select>
-                    </div>
-                </div>
+                {audioInputRow}
+                {audioMediaInputRow}
+                {audioOutputRow}
 
                 <div className="body-row split-3-7 left-padding-1 highlight">
                     <div className="body-item-title">Sample Rate</div>
@@ -339,7 +453,7 @@ export const useMicrophoneOptions = (): MicrophoneOptionsComponent => {
                 </div>
             </>
         )
-    }, [audioDeviceInfo, editSpeakerTargetId, editSpeakerTargetName, startButtonRow, params, options])
+    }, [inputAudioDeviceInfo, outputAudioDeviceInfo, editSpeakerTargetId, editSpeakerTargetName, startButtonRow, audioInputRow, audioMediaInputRow, audioOutputRow, params, options])
 
     return {
         component: settings,

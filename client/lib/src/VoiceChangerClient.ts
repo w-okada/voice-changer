@@ -118,6 +118,7 @@ export class VoiceChnagerClient {
         // create mic stream
         if (this.micStream) {
             console.log("DESTROY!!!!!!!!!!!!!!!!!!!")
+            this.micStream.unpipe()
             // this.micStream.stop()
             this.micStream.destroy()
             this.micStream = null
@@ -139,9 +140,12 @@ export class VoiceChnagerClient {
             console.log("VF disabled")
             this.micStream.setStream(this.currentMediaStream) // input device -> mic stream
         }
-        this.micStream.pipe(this.audioStreamer!) // mic stream -> audio streamer
-
-
+        this.micStream.pipe(this.audioStreamer) // mic stream -> audio streamer
+        if (!this._isVoiceChanging) {
+            this.micStream.pauseRecording()
+        } else {
+            this.micStream.playRecording()
+        }
     }
     get stream(): MediaStream {
         return this.currentMediaStreamAudioDestinationNode.stream

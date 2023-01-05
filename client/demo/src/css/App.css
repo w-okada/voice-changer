@@ -131,6 +131,59 @@ body {
         width: 40%;
     }
 }
+.split-3-2-2-2-1{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 30%;
+    }
+    & > div:nth-child(2) {
+        left: 30%;
+        width: 20%;
+    }
+    & > div:nth-child(3) {
+        left: 50%;
+        width: 20%;
+    }
+    & > div:nth-child(4) {
+        left: 70%;
+        width: 20%;
+    }
+    & > div:nth-child(5) {
+        left: 90%;
+        width: 10%;
+    }
+}
+.split-3-1-1-1-4{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 30%;
+    }
+    & > div:nth-child(2) {
+        left: 30%;
+        width: 10%;
+    }
+    & > div:nth-child(3) {
+        left: 40%;
+        width: 10%;
+    }
+    & > div:nth-child(4) {
+        left: 50%;
+        width: 10%;
+    }
+    & > div:nth-child(5) {
+        left: 60%;
+        width: 40%;
+    }
+
+}
 .underline {
     border-bottom: 3px solid #333;
 }
@@ -165,12 +218,14 @@ body {
 .body-button-container {
     display: flex;
     flex-direction: row;
+    align-items: center;
     .body-button {
         user-select: none;
         border: solid 1px #333;
         border-radius: 2px;
         padding: 2px;
         cursor:pointer;
+        vertical-align:middle;
     }
     .body-button-active {
         user-select: none;
