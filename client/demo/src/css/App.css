@@ -157,6 +157,11 @@ body {
 .body-item-text {
     color: rgb(30, 30, 30);
 }
+
+.body-item-input {
+    width:90%;
+}
+
 .body-button-container {
     display: flex;
     flex-direction: row;
@@ -165,6 +170,22 @@ body {
         border: solid 1px #333;
         border-radius: 2px;
         padding: 2px;
+        cursor:pointer;
+    }
+    .body-button-active {
+        user-select: none;
+        border: solid 1px #333;
+        border-radius: 2px;
+        padding: 2px;
+        background:#ada;
+    }
+    .body-button-stanby {
+        user-select: none;
+        border: solid 1px #333;
+        border-radius: 2px;
+        padding: 2px;
+        background:#aba;
+        cursor:pointer;
     }
 }
 .body-select-container {

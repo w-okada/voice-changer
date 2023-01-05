@@ -1,9 +1,9 @@
-import { VoiceChangerWorkletNode } from "./VoiceChangerWorkletNode";
+import { VoiceChangerWorkletNode, VolumeListener } from "./VoiceChangerWorkletNode";
 // @ts-ignore
 import workerjs from "raw-loader!../worklet/dist/index.js";
 import { VoiceFocusDeviceTransformer, VoiceFocusTransformDevice } from "amazon-chime-sdk-js";
 import { createDummyMediaStream } from "./util";
-import { BufferSize, MajarModeTypes, VoiceChangerMode, VoiceChangerRequestParamas } from "./const";
+import { BufferSize, DefaultVoiceChangerOptions, DefaultVoiceChangerRequestParamas, Protocol, VoiceChangerMode, VoiceChangerRequestParamas } from "./const";
 import MicrophoneStream from "microphone-stream";
 import { AudioStreamer, Callbacks, AudioStreamerListeners } from "./AudioStreamer";
 
@@ -29,10 +29,11 @@ export class VoiceChnagerClient {
     private currentMediaStreamAudioDestinationNode!: MediaStreamAudioDestinationNode
 
     private promiseForInitialize: Promise<void>
+    private _isVoiceChanging = false
 
     private callbacks: Callbacks = {
         onVoiceReceived: (voiceChangerMode: VoiceChangerMode, data: ArrayBuffer): void => {
-            console.log(voiceChangerMode, data)
+            // console.log(voiceChangerMode, data)
             if (voiceChangerMode === "realtime") {
                 this.vcNode.postReceivedVoice(data)
                 return
@@ -59,19 +60,21 @@ export class VoiceChnagerClient {
         }
     }
 
-    constructor(ctx: AudioContext, vfEnable: boolean, audioStreamerListeners: AudioStreamerListeners) {
+    constructor(ctx: AudioContext, vfEnable: boolean, audioStreamerListeners: AudioStreamerListeners, volumeListener: VolumeListener) {
         this.ctx = ctx
         this.vfEnable = vfEnable
         this.promiseForInitialize = new Promise<void>(async (resolve) => {
             const scriptUrl = URL.createObjectURL(new Blob([workerjs], { type: "text/javascript" }));
             await this.ctx.audioWorklet.addModule(scriptUrl)
 
-            this.vcNode = new VoiceChangerWorkletNode(this.ctx); // vc node 
+            this.vcNode = new VoiceChangerWorkletNode(this.ctx, volumeListener); // vc node 
             this.currentMediaStreamAudioDestinationNode = this.ctx.createMediaStreamDestination() // output node
             this.vcNode.connect(this.currentMediaStreamAudioDestinationNode) // vc node -> output node
             // (vc nodeにはaudio streamerのcallbackでデータが投げ込まれる)
-            this.audioStreamer = new AudioStreamer("sio", this.callbacks, audioStreamerListeners, { objectMode: true, })
-
+            this.audioStreamer = new AudioStreamer(this.callbacks, audioStreamerListeners, { objectMode: true, })
+            this.audioStreamer.setRequestParams(DefaultVoiceChangerRequestParamas)
+            this.audioStreamer.setInputChunkNum(DefaultVoiceChangerOptions.inputChunkNum)
+            this.audioStreamer.setVoiceChangerMode(DefaultVoiceChangerOptions.voiceChangerMode)
 
             if (this.vfEnable) {
                 this.vf = await VoiceFocusDeviceTransformer.create({ variant: 'c20' })
@@ -113,12 +116,17 @@ export class VoiceChnagerClient {
         }
 
         // create mic stream
+        if (this.micStream) {
+            console.log("DESTROY!!!!!!!!!!!!!!!!!!!")
+            // this.micStream.stop()
+            this.micStream.destroy()
+            this.micStream = null
+        }
         this.micStream = new MicrophoneStream({
             objectMode: true,
             bufferSize: bufferSize,
             context: this.ctx
         })
-
         // connect nodes.
         if (this.currentDevice && forceVfDisable == false) {
             this.currentMediaStreamAudioSourceNode = this.ctx.createMediaStreamSource(this.currentMediaStream) // input node
@@ -128,6 +136,7 @@ export class VoiceChnagerClient {
             voiceFocusNode.end.connect(this.outputNodeFromVF!)
             this.micStream.setStream(this.outputNodeFromVF!.stream) // vf node -> mic stream
         } else {
+            console.log("VF disabled")
             this.micStream.setStream(this.currentMediaStream) // input device -> mic stream
         }
         this.micStream.pipe(this.audioStreamer!) // mic stream -> audio streamer
@@ -138,22 +147,35 @@ export class VoiceChnagerClient {
         return this.currentMediaStreamAudioDestinationNode.stream
     }
 
-
-
+    start = () => {
+        if (!this.micStream) { return }
+        this.micStream.playRecording()
+        this._isVoiceChanging = true
+    }
+    stop = () => {
+        if (!this.micStream) { return }
+        this.micStream.pauseRecording()
+        this._isVoiceChanging = false
+    }
+    get isVoiceChanging(): boolean {
+        return this._isVoiceChanging
+    }
     // Audio Streamer Settingg
-    setServerUrl = (serverUrl: string, mode: MajarModeTypes) => {
-        this.audioStreamer.setServerUrl(serverUrl, mode)
+    setServerUrl = (serverUrl: string, mode: Protocol, openTab: boolean = false) => {
+        this.audioStreamer.setServerUrl(serverUrl, mode, openTab)
     }
 
     setRequestParams = (val: VoiceChangerRequestParamas) => {
         this.audioStreamer.setRequestParams(val)
     }
 
-    setChunkNum = (num: number) => {
-        this.audioStreamer.setChunkNum(num)
+    setInputChunkNum = (num: number) => {
+        this.audioStreamer.setInputChunkNum(num)
     }
 
     setVoiceChangerMode = (val: VoiceChangerMode) => {
         this.audioStreamer.setVoiceChangerMode(val)
     }
+
+
 }

@@ -1,18 +1,17 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 import "./css/App.css"
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { VoiceChnagerClient } from "@dannadori/voice-changer-client-js"
 import { useMicrophoneOptions } from "./options_microphone";
 const container = document.getElementById("app")!;
 const root = createRoot(container);
 
 const App = () => {
-    const { component: microphoneSettingComponent, options: microphonOptions } = useMicrophoneOptions()
+    const { component: microphoneSettingComponent, options: microphoneOptions, params: microphoneParams, isStarted } = useMicrophoneOptions()
 
-    const voiceChnagerClientRef = useRef<VoiceChnagerClient | null>(null)
-
-    console.log(microphonOptions)
+    const voiceChangerClientRef = useRef<VoiceChnagerClient | null>(null)
+    const [clientInitialized, setClientInitialized] = useState<boolean>(false)
 
     const onClearSettingClicked = async () => {
         //@ts-ignore
@@ -23,32 +22,101 @@ const App = () => {
         location.reload()
     }
 
+
     useEffect(() => {
-        if (microphonOptions.audioInputDeviceId.length == 0) {
-            return
-        }
-        const setAudio = async () => {
+        const initialized = async () => {
             const ctx = new AudioContext()
-
-            if (voiceChnagerClientRef.current) {
-
-            }
-            voiceChnagerClientRef.current = new VoiceChnagerClient(ctx, true, {
+            voiceChangerClientRef.current = new VoiceChnagerClient(ctx, true, {
                 notifySendBufferingTime: (val: number) => { console.log(`buf:${val}`) },
                 notifyResponseTime: (val: number) => { console.log(`res:${val}`) },
-                notifyException: (mes: string) => { console.log(`error:${mes}`) }
-            })
-            await voiceChnagerClientRef.current.isInitialized()
-
-            voiceChnagerClientRef.current.setServerUrl("https://192.168.0.3:18888/test", "sio")
-            voiceChnagerClientRef.current.setup(microphonOptions.audioInputDeviceId, 1024)
+                notifyException: (mes: string) => {
+                    if (mes.length > 0) {
+                        console.log(`error:${mes}`)
+                    }
+                }
+            }, { notifyVolume: (vol: number) => { } })
+            await voiceChangerClientRef.current.isInitialized()
+            setClientInitialized(true)
 
             const audio = document.getElementById("audio-output") as HTMLAudioElement
-            audio.srcObject = voiceChnagerClientRef.current.stream
+            audio.srcObject = voiceChangerClientRef.current.stream
             audio.play()
         }
-        setAudio()
-    }, [microphonOptions.audioInputDeviceId])
+        initialized()
+    }, [])
+
+    useEffect(() => {
+        console.log("START!!!", isStarted)
+        const start = async () => {
+            if (!voiceChangerClientRef.current || !clientInitialized) {
+                console.log("client is not initialized")
+                return
+            }
+            // if (!microphoneOptions.audioInputDeviceId || microphoneOptions.audioInputDeviceId.length == 0) {
+            //     console.log("audioInputDeviceId is not initialized")
+            //     return
+            // }
+            // await voiceChangerClientRef.current.setup(microphoneOptions.audioInputDeviceId!, microphoneOptions.bufferSize)
+            voiceChangerClientRef.current.setServerUrl(microphoneOptions.mmvcServerUrl, microphoneOptions.protocol, true)
+            voiceChangerClientRef.current.start()
+        }
+        const stop = async () => {
+            if (!voiceChangerClientRef.current || !clientInitialized) {
+                console.log("client is not initialized")
+                return
+            }
+            voiceChangerClientRef.current.stop()
+        }
+        if (isStarted) {
+            start()
+        } else {
+            stop()
+        }
+    }, [isStarted])
+
+    // useEffect(() => {
+    //     if (!voiceChangerClientRef.current || !clientInitialized) {
+    //         console.log("client is not initialized")
+    //         return
+    //     }
+    //     voiceChangerClientRef.current.setServerUrl(microphoneOptions.mmvcServerUrl, microphoneOptions.protocol, false)
+    // }, [microphoneOptions.mmvcServerUrl, microphoneOptions.protocol])
+
+    useEffect(() => {
+        const changeInput = async () => {
+            if (!voiceChangerClientRef.current || !clientInitialized) {
+                console.log("client is not initialized")
+                return
+            }
+            await voiceChangerClientRef.current.setup(microphoneOptions.audioInputDeviceId!, microphoneOptions.bufferSize, microphoneOptions.forceVfDisable)
+        }
+        changeInput()
+    }, [microphoneOptions.audioInputDeviceId!, microphoneOptions.bufferSize, microphoneOptions.forceVfDisable])
+
+
+    useEffect(() => {
+        if (!voiceChangerClientRef.current || !clientInitialized) {
+            console.log("client is not initialized")
+            return
+        }
+        voiceChangerClientRef.current.setInputChunkNum(microphoneOptions.inputChunkNum)
+    }, [microphoneOptions.inputChunkNum])
+
+    useEffect(() => {
+        if (!voiceChangerClientRef.current || !clientInitialized) {
+            console.log("client is not initialized")
+            return
+        }
+        voiceChangerClientRef.current.setVoiceChangerMode(microphoneOptions.voiceChangerMode)
+    }, [microphoneOptions.voiceChangerMode])
+
+    useEffect(() => {
+        if (!voiceChangerClientRef.current || !clientInitialized) {
+            console.log("client is not initialized")
+            return
+        }
+        voiceChangerClientRef.current.setRequestParams(microphoneParams)
+    }, [microphoneParams])
 
     const clearRow = useMemo(() => {
         return (

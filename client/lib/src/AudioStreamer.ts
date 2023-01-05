@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import { DefaultEventsMap } from "@socket.io/component-emitter";
 import { Duplex, DuplexOptions } from "readable-stream";
-import { DefaultVoiceChangerRequestParamas, MajarModeTypes, VoiceChangerMode, VoiceChangerRequestParamas } from "./const";
+import { DefaultVoiceChangerRequestParamas, Protocol, VoiceChangerMode, VoiceChangerRequestParamas, VOICE_CHANGER_CLIENT_EXCEPTION } from "./const";
 
 export type Callbacks = {
     onVoiceReceived: (voiceChangerMode: VoiceChangerMode, data: ArrayBuffer) => void
@@ -9,17 +9,17 @@ export type Callbacks = {
 export type AudioStreamerListeners = {
     notifySendBufferingTime: (time: number) => void
     notifyResponseTime: (time: number) => void
-    notifyException: (message: string) => void
+    notifyException: (code: VOICE_CHANGER_CLIENT_EXCEPTION, message: string) => void
 }
 export class AudioStreamer extends Duplex {
     private callbacks: Callbacks
     private audioStreamerListeners: AudioStreamerListeners
-    private majarMode: MajarModeTypes
+    private protocol: Protocol = "sio"
     private serverUrl = ""
     private socket: Socket<DefaultEventsMap, DefaultEventsMap> | null = null
     private voiceChangerMode: VoiceChangerMode = "realtime"
     private requestParamas: VoiceChangerRequestParamas = DefaultVoiceChangerRequestParamas
-    private chunkNum = 8
+    private inputChunkNum = 10
     private requestChunks: ArrayBuffer[] = []
     private recordChunks: ArrayBuffer[] = []
     private isRecording = false
@@ -27,9 +27,8 @@ export class AudioStreamer extends Duplex {
     // performance monitor
     private bufferStart = 0;
 
-    constructor(majarMode: MajarModeTypes, callbacks: Callbacks, audioStreamerListeners: AudioStreamerListeners, options?: DuplexOptions) {
+    constructor(callbacks: Callbacks, audioStreamerListeners: AudioStreamerListeners, options?: DuplexOptions) {
         super(options);
-        this.majarMode = majarMode
         this.callbacks = callbacks
         this.audioStreamerListeners = audioStreamerListeners
     }
@@ -38,17 +37,19 @@ export class AudioStreamer extends Duplex {
         if (this.socket) {
             this.socket.close()
         }
-        if (this.majarMode === "sio") {
+        if (this.protocol === "sio") {
             this.socket = io(this.serverUrl);
+            this.socket.on('connect_error', (err) => {
+                this.audioStreamerListeners.notifyException(VOICE_CHANGER_CLIENT_EXCEPTION.ERR_SIO_CONNECT_FAILED, `[SIO] rconnection failed ${err}`)
+            })
             this.socket.on('connect', () => console.log(`[SIO] sonnect to ${this.serverUrl}`));
             this.socket.on('response', (response: any[]) => {
                 const cur = Date.now()
                 const responseTime = cur - response[0]
                 const result = response[1] as ArrayBuffer
                 if (result.byteLength < 128 * 2) {
-                    this.audioStreamerListeners.notifyException(`[SIO] recevied data is too short ${result.byteLength}`)
+                    this.audioStreamerListeners.notifyException(VOICE_CHANGER_CLIENT_EXCEPTION.ERR_SIO_INVALID_RESPONSE, `[SIO] recevied data is too short ${result.byteLength}`)
                 } else {
-                    this.audioStreamerListeners.notifyException(``)
                     this.callbacks.onVoiceReceived(this.voiceChangerMode, response[1])
                     this.audioStreamerListeners.notifyResponseTime(responseTime)
                 }
@@ -57,11 +58,13 @@ export class AudioStreamer extends Duplex {
     }
 
     // Option Change
-    setServerUrl = (serverUrl: string, mode: MajarModeTypes) => {
+    setServerUrl = (serverUrl: string, mode: Protocol, openTab: boolean = false) => {
         this.serverUrl = serverUrl
-        this.majarMode = mode
-        window.open(serverUrl, '_blank')
-        console.log(`[AudioStreamer] Server Setting:${this.serverUrl} ${this.majarMode}`)
+        this.protocol = mode
+        if (openTab) {
+            window.open(serverUrl, '_blank')
+        }
+        console.log(`[AudioStreamer] Server Setting:${this.serverUrl} ${this.protocol}`)
 
         this.createSocketIO()// mode check is done in the method.
     }
@@ -70,8 +73,8 @@ export class AudioStreamer extends Duplex {
         this.requestParamas = val
     }
 
-    setChunkNum = (num: number) => {
-        this.chunkNum = num
+    setInputChunkNum = (num: number) => {
+        this.inputChunkNum = num
     }
 
     setVoiceChangerMode = (val: VoiceChangerMode) => {
@@ -115,7 +118,7 @@ export class AudioStreamer extends Duplex {
         }
 
         //// リクエストバッファの中身が、リクエスト送信数と違う場合は処理終了。
-        if (this.requestChunks.length < this.chunkNum) {
+        if (this.requestChunks.length < this.inputChunkNum) {
             return
         }
 
@@ -131,7 +134,7 @@ export class AudioStreamer extends Duplex {
             return prev + cur.byteLength
         }, 0)
 
-        console.log("send buff length", newBuffer.length)
+        // console.log("send buff length", newBuffer.length)
 
         this.sendBuffer(newBuffer)
         this.requestChunks = []
@@ -189,14 +192,14 @@ export class AudioStreamer extends Duplex {
         }
         const timestamp = Date.now()
         // console.log("REQUEST_MESSAGE:", [this.gpu, this.srcId, this.dstId, timestamp, newBuffer.buffer])
-        console.log("SERVER_URL", this.serverUrl, this.majarMode)
+        // console.log("SERVER_URL", this.serverUrl, this.protocol)
         const convertChunkNum = this.voiceChangerMode === "realtime" ? this.requestParamas.convertChunkNum : 0
-        if (this.majarMode === "sio") {
+        if (this.protocol === "sio") {
             if (!this.socket) {
                 console.warn(`sio is not initialized`)
                 return
             }
-            console.log("emit!")
+            // console.log("emit!")
             this.socket.emit('request_message', [
                 this.requestParamas.gpu,
                 this.requestParamas.srcId,
@@ -221,9 +224,8 @@ export class AudioStreamer extends Duplex {
                 newBuffer.buffer)
 
             if (res.byteLength < 128 * 2) {
-                this.audioStreamerListeners.notifyException(`[REST] recevied data is too short ${res.byteLength}`)
+                this.audioStreamerListeners.notifyException(VOICE_CHANGER_CLIENT_EXCEPTION.ERR_REST_INVALID_RESPONSE, `[REST] recevied data is too short ${res.byteLength}`)
             } else {
-                this.audioStreamerListeners.notifyException(``)
                 this.callbacks.onVoiceReceived(this.voiceChangerMode, res)
                 this.audioStreamerListeners.notifyResponseTime(Date.now() - timestamp)
             }

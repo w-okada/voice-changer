@@ -19,7 +19,7 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
         // データは(int16)で受信
         const i16Data = new Int16Array(arrayBuffer)
         const f32Data = new Float32Array(i16Data.length)
-        console.log(`[worklet] f32DataLength${f32Data.length} i16DataLength${i16Data.length}`)
+        // console.log(`[worklet] f32DataLength${f32Data.length} i16DataLength${i16Data.length}`)
         i16Data.forEach((x, i) => {
             const float = (x >= 0x8000) ? -(0x10000 - x) / 0x8000 : x / 0x7FFF;
             f32Data[i] = float
