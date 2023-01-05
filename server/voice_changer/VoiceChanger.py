@@ -85,7 +85,8 @@ class VoiceChanger():
             print("Cur", self.cur_strength)
             
             # ひとつ前の結果とサイズが変わるため、記録は消去する。
-            delattr(self,"prev_audio1")
+            if hasattr(self, 'prev_audio1') == True:
+                delattr(self,"prev_audio1")
 
 
         try:

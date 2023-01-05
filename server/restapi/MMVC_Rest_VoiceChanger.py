@@ -14,7 +14,10 @@ class VoiceModel(BaseModel):
     srcId: int
     dstId: int
     timestamp: int
-    prefixChunkSize: int
+    convertChunkNum: int
+    crossFadeLowerValue: float
+    crossFadeOffsetRate:float
+    crossFadeEndRate:float
     buffer: str
 
 class MMVC_Rest_VoiceChanger:
@@ -31,7 +34,10 @@ class MMVC_Rest_VoiceChanger:
             srcId = voice.srcId
             dstId = voice.dstId
             timestamp = voice.timestamp
-            prefixChunkSize = voice.prefixChunkSize
+            convertChunkNum = voice.convertChunkNum
+            crossFadeLowerValue = voice.crossFadeLowerValue
+            crossFadeOffsetRate = voice.crossFadeOffsetRate
+            crossFadeEndRate = voice.crossFadeEndRate
             buffer = voice.buffer
             wav = base64.b64decode(buffer)
 
@@ -46,7 +52,7 @@ class MMVC_Rest_VoiceChanger:
 
             self.tlock.acquire()
             changedVoice = self.voiceChangerManager.changeVoice(
-                gpu, srcId, dstId, timestamp, prefixChunkSize, unpackedData)
+                gpu, srcId, dstId, timestamp, convertChunkNum, crossFadeLowerValue, crossFadeOffsetRate, crossFadeEndRate, unpackedData)
             self.tlock.release()
 
             changedVoiceBase64 = base64.b64encode(changedVoice).decode('utf-8')
@@ -55,7 +61,7 @@ class MMVC_Rest_VoiceChanger:
                 "srcId": srcId,
                 "dstId": dstId,
                 "timestamp": timestamp,
-                "prefixChunkSize": prefixChunkSize,
+                "convertChunkNum": voice.convertChunkNum,
                 "changedVoiceBase64": changedVoiceBase64
             }
 
