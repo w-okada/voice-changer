@@ -1,7 +1,0 @@
-00_myvoice|107
-01_target|108
-02_target|109
-03_target|0
-04_target|1
-05_target|2
-1205_zundamon|100

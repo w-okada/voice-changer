@@ -1,6 +1,6 @@
 {
   "name": "@dannadori/voice-changer-client-js",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "",
   "main": "dist/index.js",
   "directories": {
@@ -17,6 +17,7 @@
     "webpack:prod": "webpack --config webpack.prod.js",
     "build:dev": "npm-run-all build:worklet:dev clean webpack:dev",
     "build:prod": "npm-run-all build:worklet:prod clean webpack:prod",
+    "release": "npm version patch && npm publish --access=public",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

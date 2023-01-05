@@ -11,4 +11,4 @@ server/memo.txt
 
 client/lib/dist
 client/lib/worklet/dist
-client/demo/dist/
+# client/demo/dist/ # demo用に残す

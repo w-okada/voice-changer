@@ -41,5 +41,11 @@ module.exports = {
             template: path.resolve(__dirname, "public/index.html"),
             filename: "./index.html",
         }),
+        new CopyPlugin({
+            patterns: [{ from: "public/assets", to: "asset" }],
+        }),
+        new CopyPlugin({
+            patterns: [{ from: "public/favicon.ico", to: "favicon.ico" }],
+        }),
     ]
 };
