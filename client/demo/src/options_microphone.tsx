@@ -133,12 +133,9 @@ export const useMicrophoneOptions = (audioContext?: AudioContext): MicrophoneOpt
     }, [inputAudioDeviceInfo, audioInput])
 
     const audioMediaInputRow = useMemo(() => {
-        console.log("GEN:audioMediaInputRow1")
         if (audioInput != "file") {
-            console.log("GEN:audioMediaInputRow2")
             return <></>
         }
-        console.log("GEN:audioMediaInputRow3")
 
         const onFileLoadClicked = async () => {
             const url = await fileSelectorAsDataURL("")
@@ -185,7 +182,7 @@ export const useMicrophoneOptions = (audioContext?: AudioContext): MicrophoneOpt
             </div>
         )
     }, [audioInput, audioOutput])
-    console.log("GEN:audioMediaInputRow3")
+
     useEffect(() => {
         if (!audioContext) {
             return

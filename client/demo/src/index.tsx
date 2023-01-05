@@ -149,7 +149,7 @@ const App = () => {
             <>
                 <div className="body-row split-3-1-1-1-4 left-padding-1 highlight">
                     <div className="body-item-title">monitor:</div>
-                    <div className="body-item-text">vol(db):{volume.toFixed(4)}</div>
+                    <div className="body-item-text">vol(rms):{volume.toFixed(4)}</div>
                     <div className="body-item-text">buf(ms):{bufferingTime}</div>
                     <div className="body-item-text">res(ms):{responseTime}</div>
                     <div className="body-item-text"></div>

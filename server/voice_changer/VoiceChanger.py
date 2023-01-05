@@ -112,8 +112,25 @@ class VoiceChanger():
                     x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [
                         x.cpu() for x in data]
                     sid_tgt1 = torch.LongTensor([dstId]).cpu()
-                    audio1 = (self.net_g.cpu().voice_conversion(spec, spec_lengths, sid_src=sid_src, sid_tgt=sid_tgt1)[
-                              0][0, 0].data * self.hps.data.max_wav_value).cpu().float().numpy()
+                    audio1 = (self.net_g.cpu().voice_conversion(spec, spec_lengths, sid_src=sid_src, sid_tgt=sid_tgt1)[0][0, 0].data * self.hps.data.max_wav_value)
+
+                    if self.prev_strength.device != torch.device('cpu'):
+                        print(f"prev_strength move from {self.prev_strength.device} to cpu")
+                        self.prev_strength = self.prev_strength.cpu()
+                    if self.cur_strength.device != torch.device('cpu'):
+                        print(f"cur_strength move from {self.cur_strength.device} to cpu")
+                        self.cur_strength = self.cur_strength.cpu()
+
+                    if hasattr(self, 'prev_audio1') == True and self.prev_audio1.device == torch.device('cpu'):
+                        prev = self.prev_audio1[-1*unpackedData.shape[0]:]
+                        cur  = audio1[-2*unpackedData.shape[0]:-1*unpackedData.shape[0]]
+                        result = prev * self.prev_strength + cur * self.cur_strength
+                    else:
+                        cur = audio1[-2*unpackedData.shape[0]:-1*unpackedData.shape[0]]
+                        result = cur
+
+                    self.prev_audio1 = audio1
+                    result = result.cpu().float().numpy()
             # elif self.mps_enabled == True: # MPS doesnt support aten::weight_norm_interface, and PYTORCH_ENABLE_MPS_FALLBACK=1 cause a big dely.
             #         x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [
             #             x.to("mps") for x in data]
@@ -137,15 +154,15 @@ class VoiceChanger():
 
 
 
-                    if hasattr(self, 'prev_audio1') == True:
+                    if hasattr(self, 'prev_audio1') == True and self.prev_audio1.device == torch.device('cuda', gpu):
                         prev = self.prev_audio1[-1*unpackedData.shape[0]:]
                         cur  = audio1[-2*unpackedData.shape[0]:-1*unpackedData.shape[0]]
                         result = prev * self.prev_strength + cur * self.cur_strength
-                        # print("merging...", prev.shape, cur.shape)
+                        print("merging...", prev.shape, cur.shape)
                     else:
                         cur = audio1[-2*unpackedData.shape[0]:-1*unpackedData.shape[0]]
                         result = cur
-                        # print("no merging...", cur.shape)
+                        print("no merging...", cur.shape)
                     self.prev_audio1 = audio1
 
                     #print(result)                    

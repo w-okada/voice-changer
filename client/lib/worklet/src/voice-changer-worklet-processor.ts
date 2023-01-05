@@ -58,7 +58,7 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
         }
 
         if (this.playBuffer.length === 0) {
-            console.log("[worklet] no play buffer")
+            // console.log("[worklet] no play buffer")
             return true
         }
 
