@@ -38,7 +38,7 @@ class MMVC_Namespace(socketio.AsyncNamespace):
         audio1 = self.voiceChangerManager.changeVoice(
             gpu, srcId, dstId, timestamp, convertChunkNum, crossFadeLowerValue, crossFadeOffsetRate, crossFadeEndRate, unpackedData)
         
-        print("sio result:", len(audio1), audio1.shape)
+        # print("sio result:", len(audio1), audio1.shape)
         bin = struct.pack('<%sh' % len(audio1), *audio1)
         await self.emit('response', [timestamp, bin])
 

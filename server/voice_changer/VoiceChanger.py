@@ -79,10 +79,10 @@ class VoiceChanger():
 
             torch.set_printoptions(edgeitems=2100)
             print("Generated Strengths")
-            print(f"cross fade: start:{cf_offset} end:{cf_end} range:{cf_range}")
-            print(f"target_len:{unpackedData.shape[0]}, prev_len:{len(self.prev_strength)} cur_len:{len(self.cur_strength)}")
-            print("Prev", self.prev_strength)
-            print("Cur", self.cur_strength)
+            # print(f"cross fade: start:{cf_offset} end:{cf_end} range:{cf_range}")
+            # print(f"target_len:{unpackedData.shape[0]}, prev_len:{len(self.prev_strength)} cur_len:{len(self.cur_strength)}")
+            # print("Prev", self.prev_strength)
+            # print("Cur", self.cur_strength)
             
             # ひとつ前の結果とサイズが変わるため、記録は消去する。
             if hasattr(self, 'prev_audio1') == True:
@@ -159,11 +159,11 @@ class VoiceChanger():
                         prev = self.prev_audio1[-1*unpackedData.shape[0]:]
                         cur  = audio1[-2*unpackedData.shape[0]:-1*unpackedData.shape[0]]
                         result = prev * self.prev_strength + cur * self.cur_strength
-                        print("merging...", prev.shape, cur.shape)
+                        # print("merging...", prev.shape, cur.shape)
                     else:
                         cur = audio1[-2*unpackedData.shape[0]:-1*unpackedData.shape[0]]
                         result = cur
-                        print("no merging...", cur.shape)
+                        # print("no merging...", cur.shape)
                     self.prev_audio1 = audio1
 
                     #print(result)                    
@@ -175,7 +175,7 @@ class VoiceChanger():
             print(traceback.format_exc())
 
         result = result.astype(np.int16)
-        print("on_request result size:",result.shape)
+        # print("on_request result size:",result.shape)
         return result
 
 

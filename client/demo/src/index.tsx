@@ -125,7 +125,7 @@ const App = () => {
 
     useEffect(() => {
         if (!voiceChangerClientRef.current || !clientInitialized) {
-            console.log("client is not initialized")
+            // console.log("client is not initialized")
             return
         }
         voiceChangerClientRef.current.setRequestParams(microphoneParams)
