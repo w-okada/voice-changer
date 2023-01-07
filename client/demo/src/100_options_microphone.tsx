@@ -1,13 +1,11 @@
 import * as React from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AUDIO_ELEMENT_FOR_PLAY_RESULT, CHROME_EXTENSION } from "./const";
-import { DefaultVoiceChangerRequestParamas, VoiceChangerOptions, VoiceChangerRequestParamas, DefaultVoiceChangerOptions, VoiceChangerMode, } from "@dannadori/voice-changer-client-js"
 import { useServerSetting } from "./101_server_setting";
 import { useDeviceSetting } from "./102_device_setting";
 import { useConvertSetting } from "./104_convert_setting";
 import { useAdvancedSetting } from "./105_advanced_setting";
 import { useSpeakerSetting } from "./103_speaker_setting";
-import { VoiceChnagerClient } from "@dannadori/voice-changer-client-js";
 import { useClient } from "./hooks/useClient";
 import { useServerControl } from "./106_server_control";
 
@@ -15,16 +13,21 @@ import { useServerControl } from "./106_server_control";
 
 export const useMicrophoneOptions = () => {
     const [audioContext, setAudioContext] = useState<AudioContext | null>(null)
-    const serverSetting = useServerSetting()
+    const clientState = useClient({
+        audioContext: audioContext,
+        audioOutputElementId: AUDIO_ELEMENT_FOR_PLAY_RESULT
+    })
+
+    const serverSetting = useServerSetting({
+        uploadFile: clientState.uploadFile,
+        changeOnnxExcecutionProvider: clientState.changeOnnxExcecutionProvider
+    })
     const deviceSetting = useDeviceSetting(audioContext)
     const speakerSetting = useSpeakerSetting()
     const convertSetting = useConvertSetting()
     const advancedSetting = useAdvancedSetting()
 
-    const clientState = useClient({
-        audioContext: audioContext,
-        audioOutputElementId: AUDIO_ELEMENT_FOR_PLAY_RESULT
-    })
+
     const serverControl = useServerControl({
         convertStart: async () => { await clientState.start(serverSetting.mmvcServerUrl, serverSetting.protocol) },
         convertStop: async () => { clientState.stop() },
@@ -50,6 +53,7 @@ export const useMicrophoneOptions = () => {
         console.log("input Cahngaga!")
         clientState.changeInput(deviceSetting.audioInput, convertSetting.bufferSize, advancedSetting.vfForceDisabled)
     }, [clientState.clientInitialized, deviceSetting.audioInput, convertSetting.bufferSize, advancedSetting.vfForceDisabled])
+
 
 
     // // const [options, setOptions] = useState<MicrophoneOptionsState>(InitMicrophoneOptionsState)

@@ -38,7 +38,7 @@ export class AudioStreamer extends Duplex {
             this.socket.close()
         }
         if (this.protocol === "sio") {
-            this.socket = io(this.serverUrl);
+            this.socket = io(this.serverUrl + "/test");
             this.socket.on('connect_error', (err) => {
                 this.audioStreamerListeners.notifyException(VOICE_CHANGER_CLIENT_EXCEPTION.ERR_SIO_CONNECT_FAILED, `[SIO] rconnection failed ${err}`)
             })
@@ -186,11 +186,11 @@ export class AudioStreamer extends Duplex {
     }
 
     private sendBuffer = async (newBuffer: Uint8Array) => {
-        if (this.serverUrl.length == 0) {
-            console.warn("no server url")
-            return
-            // throw "no server url"
-        }
+        // if (this.serverUrl.length == 0) {
+        //     // console.warn("no server url")
+        //     // return
+        //     // throw "no server url"
+        // }
         const timestamp = Date.now()
         // console.log("REQUEST_MESSAGE:", [this.gpu, this.srcId, this.dstId, timestamp, newBuffer.buffer])
         // console.log("SERVER_URL", this.serverUrl, this.protocol)
@@ -213,7 +213,7 @@ export class AudioStreamer extends Duplex {
                 newBuffer.buffer]);
         } else {
             const res = await postVoice(
-                this.serverUrl,
+                this.serverUrl + "/test",
                 this.requestParamas.gpu,
                 this.requestParamas.srcId,
                 this.requestParamas.dstId,

@@ -1,4 +1,4 @@
-import { BufferSize, createDummyMediaStream, Protocol, VoiceChangerMode, VoiceChangerRequestParamas, VoiceChnagerClient } from "@dannadori/voice-changer-client-js"
+import { BufferSize, createDummyMediaStream, Protocol, VoiceChangerMode, VoiceChangerRequestParamas, VoiceChnagerClient, uploadLargeFile, concatUploadedFile, OnnxExecutionProvider, setOnnxExecutionProvider } from "@dannadori/voice-changer-client-js"
 import { useEffect, useMemo, useRef, useState } from "react"
 
 export type UseClientProps = {
@@ -17,6 +17,8 @@ export type ClientState = {
     changeInputChunkNum: (inputChunkNum: number) => void
     changeVoiceChangeMode: (voiceChangerMode: VoiceChangerMode) => void
     changeRequestParams: (params: VoiceChangerRequestParamas) => void
+    uploadFile: (baseUrl: string, file: File, onprogress: (progress: number, end: boolean) => void) => Promise<void>
+    changeOnnxExcecutionProvider: (baseUrl: string, provider: OnnxExecutionProvider) => Promise<void>
 }
 export const useClient = (props: UseClientProps): ClientState => {
 
@@ -130,8 +132,19 @@ export const useClient = (props: UseClientProps): ClientState => {
         }
     }, [])
 
+    const uploadFile = useMemo(() => {
+        return async (baseUrl: string, file: File, onprogress: (progress: number, end: boolean) => void) => {
+            const num = await uploadLargeFile(baseUrl, file, onprogress)
+            const res = await concatUploadedFile(baseUrl, file, num)
+            console.log("upload", num, res)
+        }
+    }, [])
 
-
+    const changeOnnxExcecutionProvider = useMemo(() => {
+        return async (baseUrl: string, provider: OnnxExecutionProvider) => {
+            setOnnxExecutionProvider(baseUrl, provider)
+        }
+    }, [])
 
     return {
         clientInitialized,
@@ -141,9 +154,11 @@ export const useClient = (props: UseClientProps): ClientState => {
 
         start,
         stop,
+        uploadFile,
         changeInput,
         changeInputChunkNum,
         changeVoiceChangeMode,
         changeRequestParams,
+        changeOnnxExcecutionProvider,
     }
 }

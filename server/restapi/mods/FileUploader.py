@@ -14,6 +14,8 @@ def upload_file(upload_dirname:str, file:UploadFile, filename: str):
 
 def concat_file_chunks(upload_dirname:str, filename:str, chunkNum:int, dest_dirname:str):
     target_file_name = os.path.join(dest_dirname, filename)
+    if os.path.exists(target_file_name):
+        os.unlink(target_file_name)
     with open(target_file_name, "ab") as target_file:
         for i in range(chunkNum):
             chunkName = f"{filename}_{i}"

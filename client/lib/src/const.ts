@@ -93,7 +93,7 @@ export const DefaultVoiceChangerRequestParamas: VoiceChangerRequestParamas = {
 
 export const DefaultVoiceChangerOptions: VoiceChangerOptions = {
     audioInput: null,
-    mmvcServerUrl: "https://192.168.0.3:18888/test",
+    mmvcServerUrl: "",
     protocol: "sio",
     sampleRate: 48000,
     bufferSize: 1024,

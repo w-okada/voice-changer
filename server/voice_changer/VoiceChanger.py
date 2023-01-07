@@ -1,8 +1,7 @@
 import torch
-import math
+import math, os, traceback
 from scipy.io.wavfile import write, read
 import numpy as np
-import traceback
 
 import utils
 import commons
@@ -15,30 +14,20 @@ from mel_processing import spectrogram_torch
 from text import text_to_sequence, cleaned_text_to_sequence
 import onnxruntime
 
-# providers = ['OpenVINOExecutionProvider',"CUDAExecutionProvider","DmlExecutionProvider", "CPUExecutionProvider"]
-providers = ['OpenVINOExecutionProvider',"CUDAExecutionProvider","DmlExecutionProvider"]
+providers = ['OpenVINOExecutionProvider',"CUDAExecutionProvider","DmlExecutionProvider","CPUExecutionProvider"]
 
 class VoiceChanger():
-    # def __init__(self, config, model, onnx_model=None, providers=["CPUExecutionProvider"]):
-    def __init__(self, config, model, onnx_model=None):
+    def __init__(self, config, model=None, onnx_model=None):
+        # 共通で使用する情報を収集
         self.hps = utils.get_hparams_from_file(config)
-        self.net_g = SynthesizerTrn(
-            len(symbols),
-            self.hps.data.filter_length // 2 + 1,
-            self.hps.train.segment_size // self.hps.data.hop_length,
-            n_speakers=self.hps.data.n_speakers,
-            **self.hps.model)
-        self.net_g.eval()
         self.gpu_num = torch.cuda.device_count()
-        utils.load_checkpoint(model, self.net_g, None)
 
         text_norm = text_to_sequence("a", self.hps.data.text_cleaners)
         text_norm = commons.intersperse(text_norm, 0)
         self.text_norm = torch.LongTensor(text_norm)
         self.audio_buffer = torch.zeros(1, 0)
         self.prev_audio = np.zeros(1)
-        self.mps_enabled = getattr(
-            torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
+        self.mps_enabled = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
 
         print(f"VoiceChanger Initialized (GPU_NUM:{self.gpu_num}, mps_enabled:{self.mps_enabled})")
 
@@ -46,6 +35,20 @@ class VoiceChanger():
         self.crossFadeEndRate = 0
         self.unpackedData_length = 0
 
+        # PyTorchモデル生成
+        if model != None:
+            self.net_g = SynthesizerTrn(
+                len(symbols),
+                self.hps.data.filter_length // 2 + 1,
+                self.hps.train.segment_size // self.hps.data.hop_length,
+                n_speakers=self.hps.data.n_speakers,
+                **self.hps.model)
+            self.net_g.eval()
+            utils.load_checkpoint(model, self.net_g, None)
+        else:
+            self.net_g = None
+
+        # ONNXモデル生成
         if onnx_model != None:
             ort_options = onnxruntime.SessionOptions()
             ort_options.intra_op_num_threads = 8
@@ -54,30 +57,47 @@ class VoiceChanger():
             # ort_options.inter_op_num_threads = 8
             self.onnx_session = onnxruntime.InferenceSession(
                 onnx_model,
-                # sess_options=ort_options,
-                providers=providers,
+                providers=providers
             )
-            print("ONNX_MDEOL!1", self.onnx_session.get_providers())
+            # print("ONNX_MDEOL!1", self.onnx_session.get_providers())
+            # self.onnx_session.set_providers(providers=["CPUExecutionProvider"])
+            # print("ONNX_MDEOL!1", self.onnx_session.get_providers())
+            # self.onnx_session.set_providers(providers=["DmlExecutionProvider"])
+            # print("ONNX_MDEOL!1", self.onnx_session.get_providers())
+        else:
+            self.onnx_session = None
 
+        # ファイル情報を記録
+        self.pyTorch_model_file = model
+        self.onnx_model_file = onnx_model
+        self.config_file = config
 
     def destroy(self):
         del self.net_g
         del self.onnx_session
 
+    def get_info(self):
+        print("ONNX_MODEL",self.onnx_model_file)
+        return {
+            "pyTorchModelFile":os.path.basename(self.pyTorch_model_file)if self.pyTorch_model_file!=None else "",
+            "onnxModelFile":os.path.basename(self.onnx_model_file)if self.onnx_model_file!=None else "",
+            "configFile":os.path.basename(self.config_file),
+            "providers":self.onnx_session.get_providers() if hasattr(self, "onnx_session") else ""
+        }
 
-
+    def set_onnx_provider(self, provider:str):
+        if hasattr(self, "onnx_session"):
+            self.onnx_session.set_providers(providers=[provider])
+            print("ONNX_MDEOL!1", self.onnx_session.get_providers())
+            return {"provider":self.onnx_session.get_providers()}
+        
 
     def on_request(self, gpu, srcId, dstId, timestamp, convertChunkNum, crossFadeLowerValue, crossFadeOffsetRate, crossFadeEndRate, unpackedData):
-        # convertSize = unpackedData.shape[0] + (convertChunkNum * 128) # 128sample/1chunk
         convertSize = convertChunkNum * 128 # 128sample/1chunk
-        # print("on_request", unpackedData.shape[0], convertChunkNum* 128 )
         if unpackedData.shape[0] * 2 > convertSize:
-            # print(f"Convert sample_num = {128 * convertChunkNum} (128 * {convertChunkNum}) is less than input sample_num x2 ({unpackedData.shape[0]}) x2. Chage to {unpackedData.shape[0] * 2} samples")
             convertSize = unpackedData.shape[0] * 2
 
         print("convert Size", convertChunkNum, convertSize)
-
-
 
         if self.crossFadeOffsetRate != crossFadeOffsetRate or self.crossFadeEndRate != crossFadeEndRate or self.unpackedData_length != unpackedData.shape[0]:
             self.crossFadeOffsetRate = crossFadeOffsetRate

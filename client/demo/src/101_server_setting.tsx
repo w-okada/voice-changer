@@ -1,6 +1,11 @@
-import { DefaultVoiceChangerOptions, OnnxExecutionProvider, Protocol, Framework, fileSelector } from "@dannadori/voice-changer-client-js"
-import React from "react"
+import { DefaultVoiceChangerOptions, OnnxExecutionProvider, Protocol, Framework, fileSelector, getInfo, loadModel } from "@dannadori/voice-changer-client-js"
+import React, { useEffect } from "react"
 import { useMemo, useState } from "react"
+
+export type UseServerSettingProps = {
+    uploadFile: (baseUrl: string, file: File, onprogress: (progress: number, end: boolean) => void) => Promise<void>
+    changeOnnxExcecutionProvider: (baseUrl: string, provider: OnnxExecutionProvider) => Promise<void>
+}
 
 export type ServerSettingState = {
     serverSetting: JSX.Element;
@@ -13,7 +18,7 @@ export type ServerSettingState = {
     protocol: Protocol;
 }
 
-export const useServerSetting = (): ServerSettingState => {
+export const useServerSetting = (props: UseServerSettingProps): ServerSettingState => {
     const [mmvcServerUrl, setMmvcServerUrl] = useState<string>(DefaultVoiceChangerOptions.mmvcServerUrl)
     const [pyTorchModel, setPyTorchModel] = useState<File | null>(null)
     const [configFile, setConfigFile] = useState<File | null>(null)
@@ -65,6 +70,36 @@ export const useServerSetting = (): ServerSettingState => {
             }
             setOnnxModel(file)
         }
+        const onModelUploadClicked = async () => {
+            if (!pyTorchModel && !onnxModel) {
+                alert("PyTorchモデルとONNXモデルのどちらか一つ以上指定する必要があります。")
+                return
+            }
+            if (!configFile) {
+                alert("Configファイルを指定する必要があります。")
+                return
+            }
+            if (pyTorchModel) {
+                await props.uploadFile(mmvcServerUrl, pyTorchModel, (progress: number, end: boolean) => {
+                    console.log(progress, end)
+                })
+            }
+            if (onnxModel) {
+                await props.uploadFile(mmvcServerUrl, onnxModel, (progress: number, end: boolean) => {
+                    console.log(progress, end)
+                })
+            }
+            await props.uploadFile(mmvcServerUrl, configFile, (progress: number, end: boolean) => {
+                console.log(progress, end)
+            })
+            const res = await getInfo(mmvcServerUrl)
+            console.log(res)
+
+            const res2 = await loadModel(mmvcServerUrl, configFile, pyTorchModel, onnxModel)
+            console.log(res2)
+
+        }
+
         return (
             <>
                 <div className="body-row split-3-3-4 left-padding-1 guided">
@@ -103,9 +138,17 @@ export const useServerSetting = (): ServerSettingState => {
                         <div className="body-button" onClick={onOnnxFileLoadClicked}>select</div>
                     </div>
                 </div>
+                <div className="body-row split-3-3-4 left-padding-1 guided">
+                    <div className="body-item-title left-padding-2"></div>
+                    <div className="body-item-text">
+                    </div>
+                    <div className="body-button-container">
+                        <div className="body-button" onClick={onModelUploadClicked}>upload</div>
+                    </div>
+                </div>
             </>
         )
-    }, [pyTorchModel, configFile, onnxModel])
+    }, [pyTorchModel, configFile, onnxModel, mmvcServerUrl, props.uploadFile])
 
     const protocolRow = useMemo(() => {
         const onProtocolChanged = async (val: Protocol) => {
@@ -158,6 +201,7 @@ export const useServerSetting = (): ServerSettingState => {
             return
         }
         const onOnnxExecutionProviderChanged = async (val: OnnxExecutionProvider) => {
+            await props.changeOnnxExcecutionProvider(mmvcServerUrl, val)
             setOnnxExecutionProvider(val)
         }
         return (
@@ -177,8 +221,7 @@ export const useServerSetting = (): ServerSettingState => {
                 </div>
             </div>
         )
-    }, [onnxExecutionProvider, framework])
-
+    }, [onnxExecutionProvider, framework, mmvcServerUrl])
 
     const serverSetting = useMemo(() => {
         return (
