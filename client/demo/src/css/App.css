@@ -43,7 +43,8 @@ body {
     height: 100%;
     width: 100%;
     color: var(--text-color);
-    background: linear-gradient(45deg, var(--company-color1) 0, 5%, var(--company-color2) 5% 10%, var(--company-color3) 10% 80%, var(--company-color1) 80% 85%, var(--company-color2) 85% 100%);
+    /* background: linear-gradient(45deg, var(--company-color1) 0, 5%, var(--company-color2) 5% 10%, var(--company-color3) 10% 80%, var(--company-color1) 80% 85%, var(--company-color2) 85% 100%); */
+    background: linear-gradient(45deg, var(--company-color1) 0, 1%, var(--company-color2) 1% 5%, var(--company-color3) 5% 80%, var(--company-color1) 80% 85%, var(--company-color2) 85% 100%);
 }
 #app {
     height: 100%;
@@ -194,7 +195,12 @@ body {
     padding-left: 2rem;
 }
 .highlight {
-    background-color: rgba(200, 200, 255, 0.1);
+    background-color: rgba(200, 200, 255, 0.3);
+}
+.guided{
+    /* background-color: rgba(9, 133, 67, 0.3); */
+    background-color: rgba(159, 165, 162, 0.1);
+    /* border-bottom: 1px solid rgba(9, 133, 67, 0.3); */
 }
 
 .body-top-title {
@@ -204,6 +210,12 @@ body {
     font-size: 1.5rem;
     color: rgb(51, 49, 49);
 }
+.body-sub-section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: rgb(3, 53, 12);
+}
+
 .body-item-title {
     color: rgb(51, 99, 49);
 }

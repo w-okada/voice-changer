@@ -8,10 +8,10 @@ class VoiceChangerManager():
             cls._instance = cls()
         return cls._instance
 
-    def loadModel(self, config, model):
+    def loadModel(self, config, model, onnx_model):
         if hasattr(self, 'voiceChanger') == True:
             self.voiceChanger.destroy()
-        self.voiceChanger = VoiceChanger(config, model)
+        self.voiceChanger = VoiceChanger(config, model, onnx_model)
 
     def changeVoice(self, gpu, srcId, dstId, timestamp, convertChunkNum, crossFadeLowerValue, crossFadeOffsetRate, crossFadeEndRate, unpackedData):
         if hasattr(self, 'voiceChanger') == True:

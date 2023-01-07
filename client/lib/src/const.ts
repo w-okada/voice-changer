@@ -13,6 +13,7 @@ export type VoiceChangerRequestParamas = {
     crossFadeLowerValue: number,
     crossFadeOffsetRate: number,
     crossFadeEndRate: number,
+
 }
 
 export type VoiceChangerOptions = {
@@ -25,6 +26,8 @@ export type VoiceChangerOptions = {
     speakers: Speaker[],
     forceVfDisable: boolean,
     voiceChangerMode: VoiceChangerMode,
+    OnnxExecutionProvider: OnnxExecutionProvider,
+    Framework: Framework
 }
 
 
@@ -63,10 +66,23 @@ export const BufferSize = {
 } as const
 export type BufferSize = typeof BufferSize[keyof typeof BufferSize]
 
+export const OnnxExecutionProvider = {
+    "CPUExecutionProvider": "CPUExecutionProvider",
+    "CUDAExecutionProvider": "CUDAExecutionProvider",
+    "DmlExecutionProvider": "DmlExecutionProvider",
+    "OpenVINOExecutionProvider": "OpenVINOExecutionProvider",
+} as const
+export type OnnxExecutionProvider = typeof OnnxExecutionProvider[keyof typeof OnnxExecutionProvider]
+
+export const Framework = {
+    "PyTorch": "PyTorch",
+    "ONNX": "ONNX",
+}
+export type Framework = typeof Framework[keyof typeof Framework]
 
 // Defaults
 export const DefaultVoiceChangerRequestParamas: VoiceChangerRequestParamas = {
-    convertChunkNum: 1, //（★１）
+    convertChunkNum: 32, //（★１）
     srcId: 107,
     dstId: 100,
     gpu: 0,
@@ -105,14 +121,18 @@ export const DefaultVoiceChangerOptions: VoiceChangerOptions = {
         }
     ],
     forceVfDisable: false,
-    voiceChangerMode: "realtime"
+    voiceChangerMode: "realtime",
+    Framework: "PyTorch",
+    OnnxExecutionProvider: "CPUExecutionProvider"
 }
+
 
 
 export const VOICE_CHANGER_CLIENT_EXCEPTION = {
     ERR_SIO_CONNECT_FAILED: "ERR_SIO_CONNECT_FAILED",
     ERR_SIO_INVALID_RESPONSE: "ERR_SIO_INVALID_RESPONSE",
-    ERR_REST_INVALID_RESPONSE: "ERR_REST_INVALID_RESPONSE"
+    ERR_REST_INVALID_RESPONSE: "ERR_REST_INVALID_RESPONSE",
+    ERR_MIC_STREAM_NOT_INITIALIZED: "ERR_MIC_STREAM_NOT_INITIALIZED"
 
 } as const
 export type VOICE_CHANGER_CLIENT_EXCEPTION = typeof VOICE_CHANGER_CLIENT_EXCEPTION[keyof typeof VOICE_CHANGER_CLIENT_EXCEPTION]

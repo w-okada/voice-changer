@@ -35,6 +35,7 @@ def setupArgParser():
     parser.add_argument("-p", type=int, default=8080, help="port")
     parser.add_argument("-c", type=str, help="path for the config.json")
     parser.add_argument("-m", type=str, help="path for the model file")
+    parser.add_argument("-o", type=str, help="path for the onnx model file")
     parser.add_argument("--https", type=strtobool,
                         default=False, help="use https")
     parser.add_argument("--httpsKey", type=str,
@@ -75,6 +76,7 @@ if __name__ == thisFilename or args.colab == True:
     PORT = args.p
     CONFIG = args.c
     MODEL = args.m
+    ONNX_MODEL = args.o if args.o != None else None
 
     # if os.getenv("EX_TB_PORT"):
     #     EX_TB_PORT = os.environ["EX_TB_PORT"]
@@ -82,7 +84,7 @@ if __name__ == thisFilename or args.colab == True:
 
     voiceChangerManager = VoiceChangerManager.get_instance()    
     if CONFIG and MODEL:
-        voiceChangerManager.loadModel(CONFIG, MODEL)
+        voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL)
     app_fastapi = MMVC_Rest.get_instance(voiceChangerManager)
     app_socketio = MMVC_SocketIOApp.get_instance(app_fastapi, voiceChangerManager)
 
@@ -96,13 +98,13 @@ if __name__ == '__main__':
     PORT = args.p
     CONFIG = args.c
     MODEL = args.m
-
+    ONNX_MODEL = args.o if args.o != None else None
     if TYPE != "MMVC" and TYPE != "TRAIN":
         print("Type(-t) should be MMVC or TRAIN")
         exit(1)
 
     printMessage(f"Start MMVC SocketIO Server", level=0)
-    printMessage(f"CONFIG:{CONFIG}, MODEL:{MODEL}", level=1)
+    printMessage(f"CONFIG:{CONFIG}, MODEL:{MODEL} ONNX_MODEL:{ONNX_MODEL}", level=1)
 
     if args.colab == False:
         if os.getenv("EX_PORT"):

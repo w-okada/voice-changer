@@ -3,7 +3,7 @@ import { VoiceChangerWorkletNode, VolumeListener } from "./VoiceChangerWorkletNo
 import workerjs from "raw-loader!../worklet/dist/index.js";
 import { VoiceFocusDeviceTransformer, VoiceFocusTransformDevice } from "amazon-chime-sdk-js";
 import { createDummyMediaStream } from "./util";
-import { BufferSize, DefaultVoiceChangerOptions, DefaultVoiceChangerRequestParamas, Protocol, VoiceChangerMode, VoiceChangerRequestParamas } from "./const";
+import { BufferSize, DefaultVoiceChangerOptions, DefaultVoiceChangerRequestParamas, Protocol, VoiceChangerMode, VoiceChangerRequestParamas, VOICE_CHANGER_CLIENT_EXCEPTION } from "./const";
 import MicrophoneStream from "microphone-stream";
 import { AudioStreamer, Callbacks, AudioStreamerListeners } from "./AudioStreamer";
 
@@ -152,7 +152,10 @@ export class VoiceChnagerClient {
     }
 
     start = () => {
-        if (!this.micStream) { return }
+        if (!this.micStream) {
+            throw `Exception:${VOICE_CHANGER_CLIENT_EXCEPTION.ERR_MIC_STREAM_NOT_INITIALIZED}`
+            return
+        }
         this.micStream.playRecording()
         this._isVoiceChanging = true
     }
