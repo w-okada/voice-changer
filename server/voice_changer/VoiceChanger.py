@@ -17,7 +17,7 @@ import onnxruntime
 providers = ['OpenVINOExecutionProvider',"CUDAExecutionProvider","DmlExecutionProvider","CPUExecutionProvider"]
 
 class VoiceChanger():
-    def __init__(self, config, model=None, onnx_model=None):
+    def __init__(self, config:str, model:str=None, onnx_model:str=None):
         # 共通で使用する情報を収集
         self.hps = utils.get_hparams_from_file(config)
         self.gpu_num = torch.cuda.device_count()
@@ -90,9 +90,12 @@ class VoiceChanger():
             self.onnx_session.set_providers(providers=[provider])
             print("ONNX_MDEOL: ", self.onnx_session.get_providers())
             return {"provider":self.onnx_session.get_providers()}
+        else:
+            return {"provider":""}
+
         
 
-    def _generate_strength(self, crossFadeOffsetRate, crossFadeEndRate, unpackedData):
+    def _generate_strength(self, crossFadeOffsetRate:float, crossFadeEndRate:float, unpackedData):
 
         if self.crossFadeOffsetRate != crossFadeOffsetRate or self.crossFadeEndRate != crossFadeEndRate or self.unpackedData_length != unpackedData.shape[0]:
             self.crossFadeOffsetRate = crossFadeOffsetRate
@@ -143,12 +146,12 @@ class VoiceChanger():
         return data
 
 
-    def on_request(self, gpu, srcId, dstId, timestamp, convertChunkNum, crossFadeLowerValue, crossFadeOffsetRate, crossFadeEndRate, unpackedData):
+    def on_request(self, gpu:int, srcId:int, dstId:int, timestamp:int, convertChunkNum:int, crossFadeLowerValue:float, crossFadeOffsetRate:float, crossFadeEndRate:float, unpackedData:any):
         convertSize = convertChunkNum * 128 # 128sample/1chunk
         if unpackedData.shape[0] * 2 > convertSize:
             convertSize = unpackedData.shape[0] * 2
 
-        print("convert Size", convertChunkNum, convertSize)
+        # print("convert Size", convertChunkNum, convertSize)
 
         self._generate_strength(crossFadeOffsetRate, crossFadeEndRate, unpackedData)
         data = self. _generate_input(unpackedData, convertSize, srcId)

@@ -28,7 +28,7 @@ class VoiceChangerManager():
             return {"error":"no voice changer"}
 
 
-    def changeVoice(self, gpu, srcId, dstId, timestamp, convertChunkNum, crossFadeLowerValue, crossFadeOffsetRate, crossFadeEndRate, unpackedData):
+    def changeVoice(self, gpu:int, srcId:int, dstId:int, timestamp:int, convertChunkNum:int, crossFadeLowerValue:float, crossFadeOffsetRate:float, crossFadeEndRate:float, unpackedData:any):
         if hasattr(self, 'voiceChanger') == True:
             return self.voiceChanger.on_request(gpu, srcId, dstId, timestamp, convertChunkNum, crossFadeLowerValue, crossFadeOffsetRate, crossFadeEndRate, unpackedData)
         else:
