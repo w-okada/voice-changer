@@ -1,5 +1,6 @@
 import base64, struct
 import numpy as np
+import traceback
 
 from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
@@ -10,14 +11,7 @@ from pydantic import BaseModel
 import threading
 
 class VoiceModel(BaseModel):
-    gpu: int
-    srcId: int
-    dstId: int
     timestamp: int
-    convertChunkNum: int
-    crossFadeLowerValue: float
-    crossFadeOffsetRate:float
-    crossFadeEndRate:float
     buffer: str
 
 class MMVC_Rest_VoiceChanger:
@@ -30,14 +24,7 @@ class MMVC_Rest_VoiceChanger:
 
     def test(self, voice: VoiceModel):
         try:
-            gpu = voice.gpu
-            srcId = voice.srcId
-            dstId = voice.dstId
             timestamp = voice.timestamp
-            convertChunkNum = voice.convertChunkNum
-            crossFadeLowerValue = voice.crossFadeLowerValue
-            crossFadeOffsetRate = voice.crossFadeOffsetRate
-            crossFadeEndRate = voice.crossFadeEndRate
             buffer = voice.buffer
             wav = base64.b64decode(buffer)
 
@@ -51,17 +38,12 @@ class MMVC_Rest_VoiceChanger:
                 #       unpackedData.astype(np.int16))
 
             self.tlock.acquire()
-            changedVoice = self.voiceChangerManager.changeVoice(
-                gpu, srcId, dstId, timestamp, convertChunkNum, crossFadeLowerValue, crossFadeOffsetRate, crossFadeEndRate, unpackedData)
+            changedVoice = self.voiceChangerManager.changeVoice( unpackedData)
             self.tlock.release()
 
             changedVoiceBase64 = base64.b64encode(changedVoice).decode('utf-8')
             data = {
-                "gpu": gpu,
-                "srcId": srcId,
-                "dstId": dstId,
                 "timestamp": timestamp,
-                "convertChunkNum": voice.convertChunkNum,
                 "changedVoiceBase64": changedVoiceBase64
             }
 
@@ -71,6 +53,7 @@ class MMVC_Rest_VoiceChanger:
         except Exception as e:
             print("REQUEST PROCESSING!!!! EXCEPTION!!!", e)
             print(traceback.format_exc())
+            self.tlock.release()
             return str(e)
 
 

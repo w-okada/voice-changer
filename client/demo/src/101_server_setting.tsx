@@ -5,6 +5,9 @@ import { ClientState } from "./hooks/useClient"
 
 export type UseServerSettingProps = {
     clientState: ClientState
+    loadModelFunc: (() => Promise<void>) | undefined
+    uploadProgress: number,
+    isUploading: boolean
 }
 
 export type ServerSettingState = {
@@ -16,6 +19,7 @@ export type ServerSettingState = {
     framework: string;
     onnxExecutionProvider: OnnxExecutionProvider;
     protocol: Protocol;
+
 }
 
 export const useServerSetting = (props: UseServerSettingProps): ServerSettingState => {
@@ -54,6 +58,9 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             }
             setPyTorchModel(file)
         }
+        const onPyTorchFileClearClicked = () => {
+            setPyTorchModel(null)
+        }
         const onConfigFileLoadClicked = async () => {
             const file = await fileSelector("")
             if (file.name.endsWith(".json") == false) {
@@ -61,6 +68,9 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 return
             }
             setConfigFile(file)
+        }
+        const onConfigFileClearClicked = () => {
+            setConfigFile(null)
         }
         const onOnnxFileLoadClicked = async () => {
             const file = await fileSelector("")
@@ -70,31 +80,14 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             }
             setOnnxModel(file)
         }
+        const onOnnxFileClearClicked = () => {
+            setOnnxModel(null)
+        }
         const onModelUploadClicked = async () => {
-            if (!pyTorchModel && !onnxModel) {
-                alert("PyTorchモデルとONNXモデルのどちらか一つ以上指定する必要があります。")
+            if (!props.loadModelFunc) {
                 return
             }
-            if (!configFile) {
-                alert("Configファイルを指定する必要があります。")
-                return
-            }
-            if (pyTorchModel) {
-                await props.clientState.uploadFile(pyTorchModel, (progress: number, end: boolean) => {
-                    console.log(progress, end)
-                })
-            }
-            if (onnxModel) {
-                await props.clientState.uploadFile(onnxModel, (progress: number, end: boolean) => {
-                    console.log(progress, end)
-                })
-            }
-            await props.clientState.uploadFile(configFile, (progress: number, end: boolean) => {
-                console.log(progress, end)
-            })
-
-            await props.clientState.loadModel(configFile, pyTorchModel, onnxModel)
-            console.log("loaded")
+            props.loadModelFunc()
         }
 
         return (
@@ -115,6 +108,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                     </div>
                     <div className="body-button-container">
                         <div className="body-button" onClick={onPyTorchFileLoadClicked}>select</div>
+                        <div className="body-button left-margin-1" onClick={onPyTorchFileClearClicked}>clear</div>
                     </div>
                 </div>
                 <div className="body-row split-3-3-4 left-padding-1 guided">
@@ -124,6 +118,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                     </div>
                     <div className="body-button-container">
                         <div className="body-button" onClick={onConfigFileLoadClicked}>select</div>
+                        <div className="body-button left-margin-1" onClick={onConfigFileClearClicked}>clear</div>
                     </div>
                 </div>
                 <div className="body-row split-3-3-4 left-padding-1 guided">
@@ -133,11 +128,13 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                     </div>
                     <div className="body-button-container">
                         <div className="body-button" onClick={onOnnxFileLoadClicked}>select</div>
+                        <div className="body-button left-margin-1" onClick={onOnnxFileClearClicked}>clear</div>
                     </div>
                 </div>
                 <div className="body-row split-3-3-4 left-padding-1 guided">
                     <div className="body-item-title left-padding-2"></div>
                     <div className="body-item-text">
+                        {props.isUploading ? `uploading.... ${props.uploadProgress}%` : ""}
                     </div>
                     <div className="body-button-container">
                         <div className="body-button" onClick={onModelUploadClicked}>upload</div>
@@ -145,7 +142,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 </div>
             </>
         )
-    }, [pyTorchModel, configFile, onnxModel, mmvcServerUrl])
+    }, [pyTorchModel, configFile, onnxModel, props.loadModelFunc, props.isUploading, props.uploadProgress])
 
     const protocolRow = useMemo(() => {
         const onProtocolChanged = async (val: Protocol) => {

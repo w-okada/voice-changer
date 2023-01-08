@@ -14,13 +14,19 @@ import { ServerSettingKey } from "@dannadori/voice-changer-client-js";
 
 export const useMicrophoneOptions = () => {
     const [audioContext, setAudioContext] = useState<AudioContext | null>(null)
+    const [loadModelFunc, setLoadModelFunc] = useState<() => Promise<void>>()
+    const [uploadProgress, setUploadProgress] = useState<number>(0)
+    const [isUploading, setIsUploading] = useState<boolean>(false)
     const clientState = useClient({
         audioContext: audioContext,
         audioOutputElementId: AUDIO_ELEMENT_FOR_PLAY_RESULT
     })
 
     const serverSetting = useServerSetting({
-        clientState
+        clientState,
+        loadModelFunc,
+        uploadProgress: uploadProgress,
+        isUploading: isUploading
     })
     const deviceSetting = useDeviceSetting(audioContext)
     const speakerSetting = useSpeakerSetting()
@@ -34,7 +40,8 @@ export const useMicrophoneOptions = () => {
         getInfo: clientState.getInfo,
         volume: clientState.volume,
         bufferingTime: clientState.bufferingTime,
-        responseTime: clientState.responseTime
+        responseTime: clientState.responseTime,
+
     })
 
     useEffect(() => {
@@ -51,70 +58,94 @@ export const useMicrophoneOptions = () => {
     // 101 ServerSetting
     //// サーバ変更
     useEffect(() => {
-        if (!clientState.clientInitialized) return
         clientState.setServerUrl(serverSetting.mmvcServerUrl)
-    }, [clientState.clientInitialized, serverSetting.mmvcServerUrl])
+    }, [serverSetting.mmvcServerUrl])
     //// プロトコル変更
     useEffect(() => {
-        if (!clientState.clientInitialized) return
         clientState.setProtocol(serverSetting.protocol)
-    }, [clientState.clientInitialized, serverSetting.protocol])
+    }, [serverSetting.protocol])
     //// フレームワーク変更
     useEffect(() => {
-        if (!clientState.clientInitialized) return
         clientState.updateSettings(ServerSettingKey.framework, serverSetting.framework)
-    }, [clientState.clientInitialized, serverSetting.framework])
+    }, [serverSetting.framework])
     //// OnnxExecutionProvider変更
     useEffect(() => {
-        if (!clientState.clientInitialized) return
         clientState.updateSettings(ServerSettingKey.onnxExecutionProvider, serverSetting.onnxExecutionProvider)
-    }, [clientState.clientInitialized, serverSetting.onnxExecutionProvider])
+    }, [serverSetting.onnxExecutionProvider])
 
     // 102 DeviceSetting
     //// 入力情報の設定
     useEffect(() => {
-        if (!clientState.clientInitialized) return
         clientState.changeInput(deviceSetting.audioInput, convertSetting.bufferSize, advancedSetting.vfForceDisabled)
-    }, [clientState.clientInitialized, deviceSetting.audioInput, convertSetting.bufferSize, advancedSetting.vfForceDisabled])
+    }, [deviceSetting.audioInput, convertSetting.bufferSize, advancedSetting.vfForceDisabled])
 
     // 103 SpeakerSetting
     // 音声変換元、変換先の設定
     useEffect(() => {
-        if (!clientState.clientInitialized) return
         clientState.updateSettings(ServerSettingKey.srcId, speakerSetting.srcId)
-    }, [clientState.clientInitialized, speakerSetting.srcId])
+    }, [speakerSetting.srcId])
     useEffect(() => {
-        if (!clientState.clientInitialized) return
         clientState.updateSettings(ServerSettingKey.dstId, speakerSetting.dstId)
-    }, [clientState.clientInitialized, speakerSetting.dstId])
+    }, [speakerSetting.dstId])
 
     // 104 ConvertSetting
     useEffect(() => {
-        if (!clientState.clientInitialized) return
         clientState.setInputChunkNum(convertSetting.inputChunkNum)
-    }, [clientState.clientInitialized, convertSetting.inputChunkNum])
+    }, [convertSetting.inputChunkNum])
     useEffect(() => {
-        if (!clientState.clientInitialized) return
         clientState.updateSettings(ServerSettingKey.convertChunkNum, convertSetting.convertChunkNum)
-    }, [clientState.clientInitialized, convertSetting.convertChunkNum])
+    }, [convertSetting.convertChunkNum])
     useEffect(() => {
-        if (!clientState.clientInitialized) return
         clientState.updateSettings(ServerSettingKey.gpu, convertSetting.gpu)
-    }, [clientState.clientInitialized, convertSetting.gpu])
+    }, [convertSetting.gpu])
     useEffect(() => {
-        if (!clientState.clientInitialized) return
         clientState.updateSettings(ServerSettingKey.crossFadeOffsetRate, convertSetting.crossFadeOffsetRate)
-    }, [clientState.clientInitialized, convertSetting.crossFadeOffsetRate])
+    }, [convertSetting.crossFadeOffsetRate])
     useEffect(() => {
-        if (!clientState.clientInitialized) return
         clientState.updateSettings(ServerSettingKey.crossFadeEndRate, convertSetting.crossFadeEndRate)
-    }, [clientState.clientInitialized, convertSetting.crossFadeEndRate])
+    }, [convertSetting.crossFadeEndRate])
 
     // 105 AdvancedSetting
     useEffect(() => {
-        if (!clientState.clientInitialized) return
         clientState.setVoiceChangerMode(advancedSetting.voiceChangerMode)
-    }, [clientState.clientInitialized, advancedSetting.voiceChangerMode])
+    }, [advancedSetting.voiceChangerMode])
+
+
+    // Model Load
+    useEffect(() => {
+        const loadModel = () => {
+            return async () => {
+                if (!serverSetting.pyTorchModel && !serverSetting.onnxModel) {
+                    alert("PyTorchモデルとONNXモデルのどちらか一つ以上指定する必要があります。")
+                    return
+                }
+                if (!serverSetting.configFile) {
+                    alert("Configファイルを指定する必要があります。")
+                    return
+                }
+                setUploadProgress(0)
+                setIsUploading(true)
+                const models = [serverSetting.pyTorchModel, serverSetting.onnxModel].filter(x => { return x != null }) as File[]
+                for (let i = 0; i < models.length; i++) {
+                    const progRate = 1 / models.length
+                    const progOffset = 100 * i * progRate
+                    await clientState.uploadFile(models[i], (progress: number, end: boolean) => {
+                        // console.log(progress * progRate + progOffset, end, progRate,)
+                        setUploadProgress(progress * progRate + progOffset)
+                    })
+                }
+
+                await clientState.uploadFile(serverSetting.configFile, (progress: number, end: boolean) => {
+                    console.log(progress, end)
+                })
+
+                await clientState.loadModel(serverSetting.configFile, serverSetting.pyTorchModel, serverSetting.onnxModel)
+                setUploadProgress(0)
+                setIsUploading(false)
+            }
+        }
+        setLoadModelFunc(loadModel)
+    }, [serverSetting.configFile, serverSetting.pyTorchModel, serverSetting.onnxModel])
 
 
     const voiceChangerSetting = useMemo(() => {

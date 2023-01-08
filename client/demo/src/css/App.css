@@ -194,6 +194,12 @@ body {
 .left-padding-2 {
     padding-left: 2rem;
 }
+.left-margin-1 {
+    margin-left: 1rem;
+}
+.left-margin-2 {
+    margin-left: 2rem;
+}
 .highlight {
     background-color: rgba(200, 200, 255, 0.3);
 }

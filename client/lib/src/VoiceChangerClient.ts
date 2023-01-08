@@ -122,9 +122,7 @@ export class VoiceChnagerClient {
 
         // create mic stream
         if (this.micStream) {
-            console.log("DESTROY!!!!!!!!!!!!!!!!!!!")
             this.micStream.unpipe()
-            // this.micStream.stop()
             this.micStream.destroy()
             this.micStream = null
         }
@@ -176,9 +174,8 @@ export class VoiceChnagerClient {
     setServerUrl = (serverUrl: string, openTab: boolean = false) => {
         const url = validateUrl(serverUrl)
         const pageUrl = `${location.protocol}//${location.host}`
-        console.log("SERVER CHECK", url, pageUrl)
 
-        if (url != pageUrl && location.protocol == "https:" && this.sslCertified.includes(url) == false) {
+        if (url != pageUrl && url.length != 0 && location.protocol == "https:" && this.sslCertified.includes(url) == false) {
             if (openTab) {
                 const value = window.confirm("MMVC Server is different from this page's origin. Open tab to open ssl connection. OK? (You can close the opened tab after ssl connection succeed.)");
                 if (value) {

@@ -59,7 +59,7 @@ export class ServerConfigurator {
         }
 
         const chunkNum = fileChunks.length
-        console.log("FILE_CHUNKS:", chunkNum, fileChunks)
+        // console.log("FILE_CHUNKS:", chunkNum, fileChunks)
 
 
         while (true) {
@@ -77,8 +77,8 @@ export class ServerConfigurator {
                         method: 'POST',
                         body: formData,
                     });
-                    fetch(request).then(async (response) => {
-                        console.log(await response.text())
+                    fetch(request).then(async (_response) => {
+                        // console.log(await response.text())
                         resolve()
                     })
                 })

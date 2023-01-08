@@ -86,19 +86,25 @@ class VoiceChanger():
             self.onnx_session = None
 
     def destroy(self):
-        del self.net_g
-        del self.onnx_session
+        if hasattr(self, "net_g"):
+            del self.net_g
+        if hasattr(self, "onnx_session"):
+            del self.onnx_session    
 
     def get_info(self):
         data = asdict(self.settings)
-        data["providers"] = self.onnx_session.get_providers() if hasattr(self, "onnx_session") else ""
+        data["providers"] = self.onnx_session.get_providers() if self.onnx_session != None else ""
         files = ["config_file", "pyTorch_model_file", "onnx_model_file"]
         for f in files:
-            data[f] = os.path.basename(data[f])
+            if os.path.exists(f):
+                data[f] = os.path.basename(data[f])
+            else:
+                data[f] = ""
+
         return data
 
     def update_setteings(self, key:str, val:any):
-        if key == "onnxExecutionProvider":
+        if key == "onnxExecutionProvider" and self.onnx_session != None:
             if val == "CUDAExecutionProvider":
                 provider_options=[{'device_id': self.settings.gpu}]
                 self.onnx_session.set_providers(providers=[val], provider_options=provider_options)
@@ -107,7 +113,7 @@ class VoiceChanger():
             return self.get_info()
         elif key in self.settings.intData:
             setattr(self.settings, key, int(val))
-            if key == "gpu" and val >= 0 and val < self.gpu_num and hasattr(self, "onnx_session"):
+            if key == "gpu" and val >= 0 and val < self.gpu_num and self.onnx_session != None:
                 providers = self.onnx_session.get_providers()
                 print("Providers::::", providers)
                 if "CUDAExecutionProvider" in providers:
@@ -176,35 +182,40 @@ class VoiceChanger():
 
 
     def _onnx_inference(self, data, inputSize):
-        if hasattr(self, 'onnx_session'):
-            x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [x for x in data]
-            sid_tgt1 = torch.LongTensor([self.settings.dstId])
-            # if spec.size()[2] >= 8:
-            audio1 = self.onnx_session.run(
-                ["audio"],
-                {
-                    "specs": spec.numpy(),
-                    "lengths": spec_lengths.numpy(),
-                    "sid_src": sid_src.numpy(),
-                    "sid_tgt": sid_tgt1.numpy()
-                })[0][0,0] * self.hps.data.max_wav_value
-            if hasattr(self, 'np_prev_audio1') == True:
-                prev = self.np_prev_audio1[-1*inputSize:]
-                cur  = audio1[-2*inputSize:-1*inputSize]
-                # print(prev.shape, self.np_prev_strength.shape, cur.shape, self.np_cur_strength.shape)
-                powered_prev = prev * self.np_prev_strength
-                powered_cur = cur * self.np_cur_strength
-                result = powered_prev + powered_cur
-                #result = prev * self.np_prev_strength + cur * self.np_cur_strength
-            else:
-                cur = audio1[-2*inputSize:-1*inputSize]
-                result = cur
-            self.np_prev_audio1 = audio1
-            return result
+        if hasattr(self, "onnx_session") == False or self.onnx_session == None:
+            print("[Voice Changer] No ONNX session.")
+            return np.zeros(1).astype(np.int16)
+
+        x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [x for x in data]
+        sid_tgt1 = torch.LongTensor([self.settings.dstId])
+        # if spec.size()[2] >= 8:
+        audio1 = self.onnx_session.run(
+            ["audio"],
+            {
+                "specs": spec.numpy(),
+                "lengths": spec_lengths.numpy(),
+                "sid_src": sid_src.numpy(),
+                "sid_tgt": sid_tgt1.numpy()
+            })[0][0,0] * self.hps.data.max_wav_value
+        if hasattr(self, 'np_prev_audio1') == True:
+            prev = self.np_prev_audio1[-1*inputSize:]
+            cur  = audio1[-2*inputSize:-1*inputSize]
+            # print(prev.shape, self.np_prev_strength.shape, cur.shape, self.np_cur_strength.shape)
+            powered_prev = prev * self.np_prev_strength
+            powered_cur = cur * self.np_cur_strength
+            result = powered_prev + powered_cur
+            #result = prev * self.np_prev_strength + cur * self.np_cur_strength
         else:
-            raise ValueError(ERROR_NO_ONNX_SESSION, "No ONNX Session.")
+            cur = audio1[-2*inputSize:-1*inputSize]
+            result = cur
+        self.np_prev_audio1 = audio1
+        return result
 
     def _pyTorch_inference(self, data, inputSize):
+        if hasattr(self, "net_g") == False or self.net_g ==None:
+            print("[Voice Changer] No pyTorch session.")
+            return np.zeros(1).astype(np.int16)
+
         if self.settings.gpu < 0 or self.gpu_num == 0:
             with torch.no_grad():
                 x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [x.cpu() for x in data]
@@ -281,8 +292,11 @@ class VoiceChanger():
         except Exception as e:
             print("VC PROCESSING!!!! EXCEPTION!!!", e)            
             print(traceback.format_exc())
-            del self.np_prev_audio1
-            del self.prev_audio1
+            if hasattr(self, "np_prev_audio1"):
+                del self.np_prev_audio1
+            if hasattr(self, "prev_audio1"):
+                del self.prev_audio1
+            return np.zeros(1).astype(np.int16)
 
         result = result.astype(np.int16)
         # print("on_request result size:",result.shape)

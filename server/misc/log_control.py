@@ -9,7 +9,7 @@ import logging
 # logger = logging.getLogger("uvicorn.error")
 # logger.addFilter(UvicornSuppressFilter())
 # # logger.propagate = False
-# logger = logging.getLogger("multipart.multipart")
-# logger.propagate = False
+logger = logging.getLogger("multipart.multipart")
+logger.propagate = False
 
 logging.getLogger('asyncio').setLevel(logging.WARNING)
