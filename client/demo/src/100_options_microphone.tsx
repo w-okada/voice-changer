@@ -142,10 +142,23 @@ export const useMicrophoneOptions = () => {
                 await clientState.loadModel(serverSetting.configFile, serverSetting.pyTorchModel, serverSetting.onnxModel)
                 setUploadProgress(0)
                 setIsUploading(false)
+                // await clientState.updateSettings(ServerSettingKey.framework, serverSetting.framework)
+                // await clientState.updateSettings(ServerSettingKey.onnxExecutionProvider, serverSetting.onnxExecutionProvider)
+                // await clientState.updateSettings(ServerSettingKey.srcId, speakerSetting.srcId)
+                // await clientState.updateSettings(ServerSettingKey.dstId, speakerSetting.dstId)
+                // await clientState.updateSettings(ServerSettingKey.gpu, convertSetting.gpu)
+                // await clientState.updateSettings(ServerSettingKey.crossFadeOffsetRate, convertSetting.crossFadeOffsetRate)
+                // await clientState.updateSettings(ServerSettingKey.crossFadeEndRate, convertSetting.crossFadeEndRate)
             }
+
+
+
+
         }
         setLoadModelFunc(loadModel)
-    }, [serverSetting.configFile, serverSetting.pyTorchModel, serverSetting.onnxModel])
+    }, [serverSetting.configFile, serverSetting.pyTorchModel, serverSetting.onnxModel,
+    serverSetting.framework, serverSetting.onnxExecutionProvider, speakerSetting.srcId, speakerSetting.dstId, convertSetting.gpu, convertSetting.crossFadeOffsetRate, convertSetting.crossFadeEndRate
+    ])
 
 
     const voiceChangerSetting = useMemo(() => {

@@ -11,9 +11,9 @@ class VoiceChangerManager():
         return cls._instance
 
     def loadModel(self, config, model, onnx_model):
-        if hasattr(self, 'voiceChanger') == True:
-            self.voiceChanger.destroy()
-        self.voiceChanger = VoiceChanger(config, model, onnx_model)
+        if hasattr(self, 'voiceChanger') == False:
+            self.voiceChanger = VoiceChanger(config)
+        self.voiceChanger.loadModel(config, model, onnx_model)
 
     def get_info(self):
         if hasattr(self, 'voiceChanger'):

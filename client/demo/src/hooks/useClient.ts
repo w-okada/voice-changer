@@ -155,17 +155,19 @@ export const useClient = (props: UseClientProps): ClientState => {
     const uploadFile = useMemo(() => {
         return async (file: File, onprogress: (progress: number, end: boolean) => void) => {
             await initializedPromise
+            console.log("uploaded.....")
             const num = await voiceChangerClientRef.current.uploadFile(file, onprogress)
             const res = await voiceChangerClientRef.current.concatUploadedFile(file, num)
-            console.log("upload", num, res)
+            console.log("uploaded", num, res)
         }
     }, [])
 
     const loadModel = useMemo(() => {
         return async (configFile: File, pyTorchModelFile: File | null, onnxModelFile: File | null) => {
+            console.log("load model....")
             await initializedPromise
             await voiceChangerClientRef.current.loadModel(configFile, pyTorchModelFile, onnxModelFile)
-            console.log("load model")
+            console.log("loaded model")
         }
     }, [])
 

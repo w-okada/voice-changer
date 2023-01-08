@@ -96,7 +96,7 @@ export class ServerConfigurator {
 
     concatUploadedFile = async (file: File, chunkNum: number) => {
         const url = this.serverUrl + "/concat_uploaded_file"
-        new Promise<void>((resolve) => {
+        await new Promise<void>((resolve) => {
             const formData = new FormData();
             formData.append("filename", file.name);
             formData.append("filenameChunkNum", "" + chunkNum);

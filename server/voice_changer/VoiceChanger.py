@@ -36,9 +36,9 @@ class VocieChangerSettings():
 
 class VoiceChanger():
 
-    def __init__(self, config:str, pyTorch_model_file:str=None, onnx_model_file:str=None):
+    def __init__(self, config:str):
         # 初期化
-        self.settings = VocieChangerSettings(config_file=config, pyTorch_model_file=pyTorch_model_file, onnx_model_file=onnx_model_file)
+        self.settings = VocieChangerSettings(config_file=config)
         self.unpackedData_length=0
         # 共通で使用する情報を収集
         self.hps = utils.get_hparams_from_file(config)
@@ -53,6 +53,11 @@ class VoiceChanger():
 
         print(f"VoiceChanger Initialized (GPU_NUM:{self.gpu_num}, mps_enabled:{self.mps_enabled})")
 
+    def loadModel(self, config:str, pyTorch_model_file:str=None, onnx_model_file:str=None):
+        self.settings.config_file = config
+        self.settings.pyTorch_model_file = pyTorch_model_file
+        self.settings.onnx_model_file = onnx_model_file
+        
         # PyTorchモデル生成
         if pyTorch_model_file != None:
             self.net_g = SynthesizerTrn(
@@ -70,20 +75,13 @@ class VoiceChanger():
         if onnx_model_file != None:
             ort_options = onnxruntime.SessionOptions()
             ort_options.intra_op_num_threads = 8
-            # ort_options.execution_mode = onnxruntime.ExecutionMode.ORT_SEQUENTIAL
-            # ort_options.execution_mode = onnxruntime.ExecutionMode.ORT_PARALLEL
-            # ort_options.inter_op_num_threads = 8
             self.onnx_session = onnxruntime.InferenceSession(
                 onnx_model_file,
                 providers=providers
             )
-            # print("ONNX_MDEOL!1", self.onnx_session.get_providers())
-            # self.onnx_session.set_providers(providers=["CPUExecutionProvider"])
-            # print("ONNX_MDEOL!1", self.onnx_session.get_providers())
-            # self.onnx_session.set_providers(providers=["DmlExecutionProvider"])
-            # print("ONNX_MDEOL!1", self.onnx_session.get_providers())
         else:
             self.onnx_session = None
+
 
     def destroy(self):
         if hasattr(self, "net_g"):
