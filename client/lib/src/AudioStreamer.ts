@@ -58,12 +58,9 @@ export class AudioStreamer extends Duplex {
     }
 
     // Option Change
-    setServerUrl = (serverUrl: string, mode: Protocol, openTab: boolean = false) => {
+    setServerUrl = (serverUrl: string, mode: Protocol) => {
         this.serverUrl = serverUrl
         this.protocol = mode
-        if (openTab) {
-            window.open(serverUrl, '_blank')
-        }
         console.log(`[AudioStreamer] Server Setting:${this.serverUrl} ${this.protocol}`)
 
         this.createSocketIO()// mode check is done in the method.

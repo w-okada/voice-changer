@@ -88,16 +88,11 @@ class VoiceChanger():
     def set_onnx_provider(self, provider:str):
         if hasattr(self, "onnx_session"):
             self.onnx_session.set_providers(providers=[provider])
-            print("ONNX_MDEOL!1", self.onnx_session.get_providers())
+            print("ONNX_MDEOL: ", self.onnx_session.get_providers())
             return {"provider":self.onnx_session.get_providers()}
         
 
-    def on_request(self, gpu, srcId, dstId, timestamp, convertChunkNum, crossFadeLowerValue, crossFadeOffsetRate, crossFadeEndRate, unpackedData):
-        convertSize = convertChunkNum * 128 # 128sample/1chunk
-        if unpackedData.shape[0] * 2 > convertSize:
-            convertSize = unpackedData.shape[0] * 2
-
-        print("convert Size", convertChunkNum, convertSize)
+    def _generate_strength(self, crossFadeOffsetRate, crossFadeEndRate, unpackedData):
 
         if self.crossFadeOffsetRate != crossFadeOffsetRate or self.crossFadeEndRate != crossFadeEndRate or self.unpackedData_length != unpackedData.shape[0]:
             self.crossFadeOffsetRate = crossFadeOffsetRate
@@ -128,25 +123,37 @@ class VoiceChanger():
             if hasattr(self, 'prev_audio1') == True:
                 delattr(self,"prev_audio1")
 
+    def _generate_input(self, unpackedData, convertSize, srcId):
+        # 今回変換するデータをテンソルとして整形する
+        audio = torch.FloatTensor(unpackedData.astype(np.float32)) # float32でtensorfを作成
+        audio_norm = audio / self.hps.data.max_wav_value # normalize
+        audio_norm = audio_norm.unsqueeze(0) # unsqueeze
+        self.audio_buffer = torch.cat([self.audio_buffer, audio_norm], axis=1) # 過去のデータに連結
+        audio_norm = self.audio_buffer[:, -convertSize:] # 変換対象の部分だけ抽出
+        self.audio_buffer = audio_norm
+
+        spec = spectrogram_torch(audio_norm, self.hps.data.filter_length,
+                                    self.hps.data.sampling_rate, self.hps.data.hop_length, self.hps.data.win_length,
+                                    center=False)
+        spec = torch.squeeze(spec, 0)
+        sid = torch.LongTensor([int(srcId)])
+
+        data = (self.text_norm, spec, audio_norm, sid)
+        data = TextAudioSpeakerCollate()([data])
+        return data
+
+
+    def on_request(self, gpu, srcId, dstId, timestamp, convertChunkNum, crossFadeLowerValue, crossFadeOffsetRate, crossFadeEndRate, unpackedData):
+        convertSize = convertChunkNum * 128 # 128sample/1chunk
+        if unpackedData.shape[0] * 2 > convertSize:
+            convertSize = unpackedData.shape[0] * 2
+
+        print("convert Size", convertChunkNum, convertSize)
+
+        self._generate_strength(crossFadeOffsetRate, crossFadeEndRate, unpackedData)
+        data = self. _generate_input(unpackedData, convertSize, srcId)
 
         try:
-            # 今回変換するデータをテンソルとして整形する
-            audio = torch.FloatTensor(unpackedData.astype(np.float32)) # float32でtensorfを作成
-            audio_norm = audio / self.hps.data.max_wav_value # normalize
-            audio_norm = audio_norm.unsqueeze(0) # unsqueeze
-            self.audio_buffer = torch.cat([self.audio_buffer, audio_norm], axis=1) # 過去のデータに連結
-            audio_norm = self.audio_buffer[:, -convertSize:] # 変換対象の部分だけ抽出
-            self.audio_buffer = audio_norm
-
-            spec = spectrogram_torch(audio_norm, self.hps.data.filter_length,
-                                     self.hps.data.sampling_rate, self.hps.data.hop_length, self.hps.data.win_length,
-                                     center=False)
-            spec = torch.squeeze(spec, 0)
-            sid = torch.LongTensor([int(srcId)])
-
-            data = (self.text_norm, spec, audio_norm, sid)
-            data = TextAudioSpeakerCollate()([data])
-
             # if gpu < 0 or (self.gpu_num == 0 and not self.mps_enabled):
             if gpu == -2 and hasattr(self, 'onnx_session') == True:
                 x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [x for x in data]

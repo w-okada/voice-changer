@@ -1,7 +1,6 @@
 import { OnnxExecutionProvider } from "./const"
+import { validateUrl } from "./util"
 
-const DEBUG = false
-const DEBUG_BASE_URL = "http://localhost:18888"
 
 type FileChunk = {
     hash: number,
@@ -15,12 +14,10 @@ export type ServerInfo = {
     providers: string[]
 }
 
-
 export const getInfo = async (baseUrl: string) => {
-    const getInfoURL = DEBUG ? `${DEBUG_BASE_URL}/info` : `${baseUrl}/info`
-
+    const url = validateUrl(baseUrl) + "/info"
     const info = await new Promise<ServerInfo>((resolve) => {
-        const request = new Request(getInfoURL, {
+        const request = new Request(url, {
             method: 'GET',
         });
         fetch(request).then(async (response) => {
@@ -33,7 +30,7 @@ export const getInfo = async (baseUrl: string) => {
 
 
 export const uploadLargeFile = async (baseUrl: string, file: File, onprogress: (progress: number, end: boolean) => void) => {
-    const uploadURL = DEBUG ? `${DEBUG_BASE_URL}/upload_file` : `${baseUrl}/upload_file`
+    const url = validateUrl(baseUrl) + "/upload_file"
     onprogress(0, false)
     const size = 1024 * 1024;
     const fileChunks: FileChunk[] = [];
@@ -60,7 +57,7 @@ export const uploadLargeFile = async (baseUrl: string, file: File, onprogress: (
                 const formData = new FormData();
                 formData.append("file", chunk.chunk);
                 formData.append("filename", `${file.name}_${chunk.hash}`);
-                const request = new Request(uploadURL, {
+                const request = new Request(url, {
                     method: 'POST',
                     body: formData,
                 });
@@ -82,13 +79,12 @@ export const uploadLargeFile = async (baseUrl: string, file: File, onprogress: (
 }
 
 export const concatUploadedFile = async (baseUrl: string, file: File, chunkNum: number) => {
-    const loadModelURL = DEBUG ? `${DEBUG_BASE_URL}/concat_uploaded_file` : `${baseUrl}/concat_uploaded_file`
-
+    const url = validateUrl(baseUrl) + "/concat_uploaded_file"
     new Promise<void>((resolve) => {
         const formData = new FormData();
         formData.append("filename", file.name);
         formData.append("filenameChunkNum", "" + chunkNum);
-        const request = new Request(loadModelURL, {
+        const request = new Request(url, {
             method: 'POST',
             body: formData,
         });
@@ -100,13 +96,13 @@ export const concatUploadedFile = async (baseUrl: string, file: File, chunkNum: 
 }
 
 export const loadModel = async (baseUrl: string, configFile: File, pyTorchModelFile: File | null, onnxModelFile: File | null) => {
-    const loadModelURL = DEBUG ? `${DEBUG_BASE_URL}/load_model` : `${baseUrl}/load_model`
+    const url = validateUrl(baseUrl) + "/load_model"
     const loadP = new Promise<void>((resolve) => {
         const formData = new FormData();
         formData.append("pyTorchModelFilename", pyTorchModelFile?.name || "-");
         formData.append("onnxModelFilename", onnxModelFile?.name || "-");
         formData.append("configFilename", configFile.name);
-        const request = new Request(loadModelURL, {
+        const request = new Request(url, {
             method: 'POST',
             body: formData,
         });
@@ -119,7 +115,7 @@ export const loadModel = async (baseUrl: string, configFile: File, pyTorchModelF
 }
 
 export const setOnnxExecutionProvider = async (baseUrl: string, provider: OnnxExecutionProvider) => {
-    const url = DEBUG ? `${DEBUG_BASE_URL}/set_onnx_provider` : `${baseUrl}/set_onnx_provider`
+    const url = validateUrl(baseUrl) + "/set_onnx_provider"
     const loadP = new Promise<void>((resolve) => {
         const formData = new FormData();
         formData.append("provider", provider);

@@ -2,7 +2,7 @@ import { VoiceChangerWorkletNode, VolumeListener } from "./VoiceChangerWorkletNo
 // @ts-ignore
 import workerjs from "raw-loader!../worklet/dist/index.js";
 import { VoiceFocusDeviceTransformer, VoiceFocusTransformDevice } from "amazon-chime-sdk-js";
-import { createDummyMediaStream } from "./util";
+import { createDummyMediaStream, validateUrl } from "./util";
 import { BufferSize, DefaultVoiceChangerOptions, DefaultVoiceChangerRequestParamas, Protocol, VoiceChangerMode, VoiceChangerRequestParamas, VOICE_CHANGER_CLIENT_EXCEPTION } from "./const";
 import MicrophoneStream from "microphone-stream";
 import { AudioStreamer, Callbacks, AudioStreamerListeners } from "./AudioStreamer";
@@ -169,7 +169,21 @@ export class VoiceChnagerClient {
     }
     // Audio Streamer Settingg
     setServerUrl = (serverUrl: string, mode: Protocol, openTab: boolean = false) => {
-        this.audioStreamer.setServerUrl(serverUrl, mode, openTab)
+        const url = validateUrl(serverUrl)
+        const pageUrl = `${location.protocol}//${location.host}`
+        console.log("SERVER CHECK", url, pageUrl)
+
+        if (url != pageUrl && location.protocol == "https:") {
+            if (openTab) {
+                const value = window.confirm("MMVC Server is different from this page's origin. Open tab to open ssl connection. OK? (You can close the opened tab after ssl connection succeed.)");
+                if (value) {
+                    window.open(url, '_blank')
+                } else {
+                    alert("Your voice conversion may fail...")
+                }
+            }
+        }
+        this.audioStreamer.setServerUrl(validateUrl(serverUrl), mode)
     }
 
     setRequestParams = (val: VoiceChangerRequestParamas) => {
