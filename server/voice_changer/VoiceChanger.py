@@ -68,8 +68,6 @@ class VoiceChanger():
                 **self.hps.model)
             self.net_g.eval()
             utils.load_checkpoint(pyTorch_model_file, self.net_g, None)
-        else:
-            self.net_g = None
 
         # ONNXモデル生成
         if onnx_model_file != None:
@@ -79,9 +77,6 @@ class VoiceChanger():
                 onnx_model_file,
                 providers=providers
             )
-        else:
-            self.onnx_session = None
-
 
     def destroy(self):
         if hasattr(self, "net_g"):
