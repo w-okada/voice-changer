@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import { DefaultEventsMap } from "@socket.io/component-emitter";
 import { Duplex, DuplexOptions } from "readable-stream";
-import { DefaultVoiceChangerRequestParamas, Protocol, VoiceChangerMode, VoiceChangerRequestParamas, VOICE_CHANGER_CLIENT_EXCEPTION } from "./const";
+import { Protocol, VoiceChangerMode, VOICE_CHANGER_CLIENT_EXCEPTION } from "./const";
 
 export type Callbacks = {
     onVoiceReceived: (voiceChangerMode: VoiceChangerMode, data: ArrayBuffer) => void
@@ -11,6 +11,14 @@ export type AudioStreamerListeners = {
     notifyResponseTime: (time: number) => void
     notifyException: (code: VOICE_CHANGER_CLIENT_EXCEPTION, message: string) => void
 }
+
+export type AudioStreamerSettings = {
+    serverUrl: string;
+    protocol: Protocol;
+    inputChunkNum: number;
+    voiceChangerMode: VoiceChangerMode;
+}
+
 export class AudioStreamer extends Duplex {
     private callbacks: Callbacks
     private audioStreamerListeners: AudioStreamerListeners
@@ -18,8 +26,7 @@ export class AudioStreamer extends Duplex {
     private serverUrl = ""
     private socket: Socket<DefaultEventsMap, DefaultEventsMap> | null = null
     private voiceChangerMode: VoiceChangerMode = "realtime"
-    private requestParamas: VoiceChangerRequestParamas = DefaultVoiceChangerRequestParamas
-    private inputChunkNum = 10
+    private inputChunkNum = 128
     private requestChunks: ArrayBuffer[] = []
     private recordChunks: ArrayBuffer[] = []
     private isRecording = false
@@ -58,16 +65,15 @@ export class AudioStreamer extends Duplex {
     }
 
     // Option Change
-    setServerUrl = (serverUrl: string, mode: Protocol) => {
+    setServerUrl = (serverUrl: string) => {
         this.serverUrl = serverUrl
-        this.protocol = mode
         console.log(`[AudioStreamer] Server Setting:${this.serverUrl} ${this.protocol}`)
-
         this.createSocketIO()// mode check is done in the method.
     }
-
-    setRequestParams = (val: VoiceChangerRequestParamas) => {
-        this.requestParamas = val
+    setProtocol = (mode: Protocol) => {
+        this.protocol = mode
+        console.log(`[AudioStreamer] Server Setting:${this.serverUrl} ${this.protocol}`)
+        this.createSocketIO()// mode check is done in the method.
     }
 
     setInputChunkNum = (num: number) => {
@@ -76,6 +82,15 @@ export class AudioStreamer extends Duplex {
 
     setVoiceChangerMode = (val: VoiceChangerMode) => {
         this.voiceChangerMode = val
+    }
+
+    getSettings = (): AudioStreamerSettings => {
+        return {
+            serverUrl: this.serverUrl,
+            protocol: this.protocol,
+            inputChunkNum: this.inputChunkNum,
+            voiceChangerMode: this.voiceChangerMode
+        }
     }
 
 
@@ -191,7 +206,7 @@ export class AudioStreamer extends Duplex {
         const timestamp = Date.now()
         // console.log("REQUEST_MESSAGE:", [this.gpu, this.srcId, this.dstId, timestamp, newBuffer.buffer])
         // console.log("SERVER_URL", this.serverUrl, this.protocol)
-        const convertChunkNum = this.voiceChangerMode === "realtime" ? this.requestParamas.convertChunkNum : 0
+        // const convertChunkNum = this.voiceChangerMode === "realtime" ? this.requestParamas.convertChunkNum : 0
         if (this.protocol === "sio") {
             if (!this.socket) {
                 console.warn(`sio is not initialized`)
@@ -199,26 +214,26 @@ export class AudioStreamer extends Duplex {
             }
             // console.log("emit!")
             this.socket.emit('request_message', [
-                this.requestParamas.gpu,
-                this.requestParamas.srcId,
-                this.requestParamas.dstId,
+                // this.requestParamas.gpu,
+                // this.requestParamas.srcId,
+                // this.requestParamas.dstId,
                 timestamp,
-                convertChunkNum,
-                this.requestParamas.crossFadeLowerValue,
-                this.requestParamas.crossFadeOffsetRate,
-                this.requestParamas.crossFadeEndRate,
+                // convertChunkNum,
+                // this.requestParamas.crossFadeLowerValue,
+                // this.requestParamas.crossFadeOffsetRate,
+                // this.requestParamas.crossFadeEndRate,
                 newBuffer.buffer]);
         } else {
             const res = await postVoice(
                 this.serverUrl + "/test",
-                this.requestParamas.gpu,
-                this.requestParamas.srcId,
-                this.requestParamas.dstId,
+                // this.requestParamas.gpu,
+                // this.requestParamas.srcId,
+                // this.requestParamas.dstId,
                 timestamp,
-                convertChunkNum,
-                this.requestParamas.crossFadeLowerValue,
-                this.requestParamas.crossFadeOffsetRate,
-                this.requestParamas.crossFadeEndRate,
+                // convertChunkNum,
+                // this.requestParamas.crossFadeLowerValue,
+                // this.requestParamas.crossFadeOffsetRate,
+                // this.requestParamas.crossFadeEndRate,
                 newBuffer.buffer)
 
             if (res.byteLength < 128 * 2) {
@@ -233,24 +248,24 @@ export class AudioStreamer extends Duplex {
 
 export const postVoice = async (
     url: string,
-    gpu: number,
-    srcId: number,
-    dstId: number,
+    // gpu: number,
+    // srcId: number,
+    // dstId: number,
     timestamp: number,
-    convertChunkNum: number,
-    crossFadeLowerValue: number,
-    crossFadeOffsetRate: number,
-    crossFadeEndRate: number,
+    // convertChunkNum: number,
+    // crossFadeLowerValue: number,
+    // crossFadeOffsetRate: number,
+    // crossFadeEndRate: number,
     buffer: ArrayBuffer) => {
     const obj = {
-        gpu,
-        srcId,
-        dstId,
+        // gpu,
+        // srcId,
+        // dstId,
         timestamp,
-        convertChunkNum,
-        crossFadeLowerValue,
-        crossFadeOffsetRate,
-        crossFadeEndRate,
+        // convertChunkNum,
+        // crossFadeLowerValue,
+        // crossFadeOffsetRate,
+        // crossFadeEndRate,
         buffer: Buffer.from(buffer).toString('base64')
     };
     const body = JSON.stringify(obj);

@@ -1,5 +1,5 @@
 import os,shutil
-
+from typing import Union
 from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -20,7 +20,7 @@ class MMVC_Rest_Fileuploader:
         self.router.add_api_route("/info", self.get_info, methods=["GET"])
         self.router.add_api_route("/upload_file", self.post_upload_file, methods=["POST"])
         self.router.add_api_route("/concat_uploaded_file", self.post_concat_uploaded_file, methods=["POST"])
-        self.router.add_api_route("/set_onnx_provider", self.post_set_onnx_provider, methods=["POST"])
+        self.router.add_api_route("/update_setteings",self.post_update_setteings, methods=["POST"])
         self.router.add_api_route("/load_model", self.post_load_model, methods=["POST"])
         self.router.add_api_route("/load_model_for_train", self.post_load_model_for_train, methods=["POST"])
         self.router.add_api_route("/extract_voices", self.post_extract_voices, methods=["POST"])
@@ -35,13 +35,14 @@ class MMVC_Rest_Fileuploader:
             UPLOAD_DIR, filename, filenameChunkNum, UPLOAD_DIR)
         return {"concat": f"{modelFilePath}"}
     
-    def post_set_onnx_provider(self, provider: str = Form(...)):
-        res = self.voiceChangerManager.set_onnx_provider(provider)
-        json_compatible_item_data = jsonable_encoder(res)
-        return JSONResponse(content=json_compatible_item_data)
-
     def get_info(self):
         info = self.voiceChangerManager.get_info()
+        json_compatible_item_data = jsonable_encoder(info)
+        return JSONResponse(content=json_compatible_item_data)
+
+    def post_update_setteings(self, key:str=Form(...), val:Union[int, str, float]=Form(...)):
+        print("post_update_setteings", key, val)
+        info = self.voiceChangerManager.update_setteings(key, val)
         json_compatible_item_data = jsonable_encoder(info)
         return JSONResponse(content=json_compatible_item_data)
 

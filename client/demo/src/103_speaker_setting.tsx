@@ -88,7 +88,7 @@ export const useSpeakerSetting = () => {
             </div>
 
         )
-    }, [speakers])
+    }, [speakers, editSpeakerTargetId, editSpeakerTargetName])
 
 
     const speakerSetting = useMemo(() => {

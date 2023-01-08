@@ -1,8 +1,10 @@
+import { ServerInfo } from "@dannadori/voice-changer-client-js"
 import React, { useMemo, useState } from "react"
 
 export type UseServerControlProps = {
     convertStart: () => Promise<void>
     convertStop: () => Promise<void>
+    getInfo: () => Promise<void>
     volume: number,
     bufferingTime: number,
     responseTime: number
@@ -53,6 +55,29 @@ export const useServerControl = (props: UseServerControlProps) => {
     }, [props.volume, props.bufferingTime, props.responseTime])
 
 
+
+    const infoRow = useMemo(() => {
+        const onReloadClicked = async () => {
+            const info = await props.getInfo()
+            console.log("info", info)
+        }
+        return (
+            <>
+                <div className="body-row split-3-1-1-1-4 left-padding-1 guided">
+                    <div className="body-item-title left-padding-1">Info:</div>
+                    <div className="body-item-text">vol(rms):{props.volume.toFixed(4)}</div>
+                    <div className="body-item-text">buf(ms):{props.bufferingTime}</div>
+                    <div className="body-item-text">res(ms):{props.responseTime}</div>
+                    <div className="body-button-container">
+                        <div className="body-button" onClick={onReloadClicked}>reload</div>
+                    </div>
+                </div>
+            </>
+        )
+    }, [props.getInfo])
+
+
+
     const serverControl = useMemo(() => {
         return (
             <>
@@ -63,9 +88,10 @@ export const useServerControl = (props: UseServerControlProps) => {
                 </div>
                 {startButtonRow}
                 {performanceRow}
+                {infoRow}
             </>
         )
-    }, [startButtonRow, performanceRow])
+    }, [startButtonRow, performanceRow, infoRow])
 
     return {
         serverControl,

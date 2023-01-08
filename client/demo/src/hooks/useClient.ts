@@ -1,4 +1,4 @@
-import { BufferSize, createDummyMediaStream, Protocol, VoiceChangerMode, VoiceChangerRequestParamas, VoiceChnagerClient, uploadLargeFile, concatUploadedFile, OnnxExecutionProvider, setOnnxExecutionProvider } from "@dannadori/voice-changer-client-js"
+import { BufferSize, createDummyMediaStream, Protocol, ServerSettingKey, VoiceChangerMode, VoiceChnagerClient } from "@dannadori/voice-changer-client-js"
 import { useEffect, useMemo, useRef, useState } from "react"
 
 export type UseClientProps = {
@@ -11,14 +11,26 @@ export type ClientState = {
     bufferingTime: number;
     responseTime: number;
     volume: number;
+    // Client Setting
+    setServerUrl: (mmvcServerUrl: string) => Promise<void>
+    setProtocol: (protocol: Protocol) => Promise<void>
+    setInputChunkNum: (num: number) => Promise<void>
+    setVoiceChangerMode: (val: VoiceChangerMode) => Promise<void>
+
+    // Client Control
     start: (mmvcServerUrl: string, protocol: Protocol) => Promise<void>;
     stop: () => Promise<void>;
+
+    // Device Setting
     changeInput: (audioInput: MediaStream | string, bufferSize: BufferSize, vfForceDisable: boolean) => Promise<void>
-    changeInputChunkNum: (inputChunkNum: number) => void
-    changeVoiceChangeMode: (voiceChangerMode: VoiceChangerMode) => void
-    changeRequestParams: (params: VoiceChangerRequestParamas) => void
-    uploadFile: (baseUrl: string, file: File, onprogress: (progress: number, end: boolean) => void) => Promise<void>
-    changeOnnxExcecutionProvider: (baseUrl: string, provider: OnnxExecutionProvider) => Promise<void>
+
+    // Server Setting
+    uploadFile: (file: File, onprogress: (progress: number, end: boolean) => void) => Promise<void>
+    loadModel: (configFile: File, pyTorchModelFile: File | null, onnxModelFile: File | null) => Promise<void>
+    updateSettings: (key: ServerSettingKey, val: string | number) => Promise<any>
+
+    // Information
+    getInfo: () => Promise<void>
 }
 export const useClient = (props: UseClientProps): ClientState => {
 
@@ -53,7 +65,7 @@ export const useClient = (props: UseClientProps): ClientState => {
             })
             await voiceChangerClient.isInitialized()
             voiceChangerClientRef.current = voiceChangerClient
-            console.log("client initialized!!")
+            console.log("[useClient] client initialized")
             setClientInitialized(true)
 
             const audio = document.getElementById(props.audioOutputElementId) as HTMLAudioElement
@@ -63,13 +75,60 @@ export const useClient = (props: UseClientProps): ClientState => {
         initialized()
     }, [props.audioContext])
 
-    const start = useMemo(() => {
-        return async (mmvcServerUrl: string, protocol: Protocol) => {
+    // Client Setting
+    const setServerUrl = useMemo(() => {
+        return async (mmvcServerUrl: string) => {
             if (!voiceChangerClientRef.current) {
                 console.log("client is not initialized")
                 return
             }
-            voiceChangerClientRef.current.setServerUrl(mmvcServerUrl, protocol, true)
+            voiceChangerClientRef.current.setServerUrl(mmvcServerUrl, true)
+            voiceChangerClientRef.current.stop()
+        }
+    }, [])
+
+    const setProtocol = useMemo(() => {
+        return async (protocol: Protocol) => {
+            if (!voiceChangerClientRef.current) {
+                console.log("client is not initialized")
+                return
+            }
+            voiceChangerClientRef.current.setProtocol(protocol)
+            voiceChangerClientRef.current.stop()
+        }
+    }, [])
+
+    const setInputChunkNum = useMemo(() => {
+        return async (num: number) => {
+            if (!voiceChangerClientRef.current) {
+                console.log("client is not initialized")
+                return
+            }
+            voiceChangerClientRef.current.setInputChunkNum(num)
+            voiceChangerClientRef.current.stop()
+        }
+    }, [])
+
+    const setVoiceChangerMode = useMemo(() => {
+        return async (val: VoiceChangerMode) => {
+            if (!voiceChangerClientRef.current) {
+                console.log("client is not initialized")
+                return
+            }
+            voiceChangerClientRef.current.setVoiceChangerMode(val)
+            voiceChangerClientRef.current.stop()
+        }
+    }, [])
+
+
+    // Client Control
+    const start = useMemo(() => {
+        return async (mmvcServerUrl: string) => {
+            if (!voiceChangerClientRef.current) {
+                console.log("client is not initialized")
+                return
+            }
+            voiceChangerClientRef.current.setServerUrl(mmvcServerUrl, true)
             voiceChangerClientRef.current.start()
         }
     }, [])
@@ -83,68 +142,71 @@ export const useClient = (props: UseClientProps): ClientState => {
         }
     }, [])
 
+
+    // Device Setting
     const changeInput = useMemo(() => {
         return async (audioInput: MediaStream | string, bufferSize: BufferSize, vfForceDisable: boolean) => {
             if (!voiceChangerClientRef.current || !props.audioContext) {
-                console.log("not initialized", voiceChangerClientRef.current, props.audioContext)
+                console.log("[useClient] not initialized", voiceChangerClientRef.current, props.audioContext)
                 return
             }
             if (!audioInput || audioInput == "none") {
-                console.log("setup! 1")
+                console.log("[useClient] setup!(1)", audioInput)
                 const ms = createDummyMediaStream(props.audioContext)
                 await voiceChangerClientRef.current.setup(ms, bufferSize, vfForceDisable)
 
             } else {
-                console.log("setup! 2")
+                console.log("[useClient] setup!(2)", audioInput)
                 await voiceChangerClientRef.current.setup(audioInput, bufferSize, vfForceDisable)
             }
         }
     }, [props.audioContext])
 
 
-    const changeInputChunkNum = useMemo(() => {
-        return (inputChunkNum: number) => {
-            if (!voiceChangerClientRef.current) {
-                // console.log("client is not initialized")
-                return
-            }
-            voiceChangerClientRef.current.setInputChunkNum(inputChunkNum)
-        }
-    }, [])
 
-    const changeVoiceChangeMode = useMemo(() => {
-        return (voiceChangerMode: VoiceChangerMode) => {
-            if (!voiceChangerClientRef.current) {
-                // console.log("client is not initialized")
-                return
-            }
-            voiceChangerClientRef.current.setVoiceChangerMode(voiceChangerMode)
-        }
-    }, [])
-
-    const changeRequestParams = useMemo(() => {
-        return (params: VoiceChangerRequestParamas) => {
-            if (!voiceChangerClientRef.current) {
-                // console.log("client is not initialized")
-                return
-            }
-            voiceChangerClientRef.current.setRequestParams(params)
-        }
-    }, [])
-
+    // Server Setting
     const uploadFile = useMemo(() => {
-        return async (baseUrl: string, file: File, onprogress: (progress: number, end: boolean) => void) => {
-            const num = await uploadLargeFile(baseUrl, file, onprogress)
-            const res = await concatUploadedFile(baseUrl, file, num)
+        return async (file: File, onprogress: (progress: number, end: boolean) => void) => {
+            if (!voiceChangerClientRef.current) {
+                throw "[useClient] Client Not Initialized."
+            }
+            const num = await voiceChangerClientRef.current.uploadFile(file, onprogress)
+            const res = await voiceChangerClientRef.current.concatUploadedFile(file, num)
             console.log("upload", num, res)
         }
     }, [])
 
-    const changeOnnxExcecutionProvider = useMemo(() => {
-        return async (baseUrl: string, provider: OnnxExecutionProvider) => {
-            setOnnxExecutionProvider(baseUrl, provider)
+    const loadModel = useMemo(() => {
+        return async (configFile: File, pyTorchModelFile: File | null, onnxModelFile: File | null) => {
+            if (!voiceChangerClientRef.current) {
+                throw "[useClient] Client Not Initialized."
+            }
+            await voiceChangerClientRef.current.loadModel(configFile, pyTorchModelFile, onnxModelFile)
+            console.log("load model")
         }
     }, [])
+
+    const updateSettings = useMemo(() => {
+        return async (key: ServerSettingKey, val: string | number) => {
+            if (!voiceChangerClientRef.current) {
+                throw "[useClient] Client Not Initialized."
+            }
+            return await voiceChangerClientRef.current.updateServerSettings(key, "" + val)
+        }
+    }, [])
+
+    // Information
+    const getInfo = useMemo(() => {
+        return async () => {
+            if (!voiceChangerClientRef.current) {
+                throw "[useClient] Client Not Initialized."
+            }
+            const serverSettings = await voiceChangerClientRef.current.getServerSettings()
+            const clientSettings = await voiceChangerClientRef.current.getClientSettings()
+            console.log(serverSettings, clientSettings)
+        }
+    }, [])
+
 
     return {
         clientInitialized,
@@ -152,13 +214,20 @@ export const useClient = (props: UseClientProps): ClientState => {
         responseTime,
         volume,
 
+        setServerUrl,
+        setProtocol,
+        setInputChunkNum,
+        setVoiceChangerMode,
+
         start,
         stop,
-        uploadFile,
+
         changeInput,
-        changeInputChunkNum,
-        changeVoiceChangeMode,
-        changeRequestParams,
-        changeOnnxExcecutionProvider,
+
+        uploadFile,
+        loadModel,
+        updateSettings,
+
+        getInfo,
     }
 }

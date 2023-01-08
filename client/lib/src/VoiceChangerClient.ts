@@ -3,9 +3,10 @@ import { VoiceChangerWorkletNode, VolumeListener } from "./VoiceChangerWorkletNo
 import workerjs from "raw-loader!../worklet/dist/index.js";
 import { VoiceFocusDeviceTransformer, VoiceFocusTransformDevice } from "amazon-chime-sdk-js";
 import { createDummyMediaStream, validateUrl } from "./util";
-import { BufferSize, DefaultVoiceChangerOptions, DefaultVoiceChangerRequestParamas, Protocol, VoiceChangerMode, VoiceChangerRequestParamas, VOICE_CHANGER_CLIENT_EXCEPTION } from "./const";
+import { BufferSize, DefaultVoiceChangerOptions, Protocol, ServerSettingKey, VoiceChangerMode, VOICE_CHANGER_CLIENT_EXCEPTION } from "./const";
 import MicrophoneStream from "microphone-stream";
 import { AudioStreamer, Callbacks, AudioStreamerListeners } from "./AudioStreamer";
+import { ServerConfigurator } from "./ServerConfigurator";
 
 
 // オーディオデータの流れ
@@ -15,6 +16,7 @@ import { AudioStreamer, Callbacks, AudioStreamerListeners } from "./AudioStreame
 
 
 export class VoiceChnagerClient {
+    private configurator: ServerConfigurator
     private ctx: AudioContext
     private vfEnable = false
     private vf: VoiceFocusDeviceTransformer | null = null
@@ -61,6 +63,7 @@ export class VoiceChnagerClient {
     }
 
     constructor(ctx: AudioContext, vfEnable: boolean, audioStreamerListeners: AudioStreamerListeners, volumeListener: VolumeListener) {
+        this.configurator = new ServerConfigurator()
         this.ctx = ctx
         this.vfEnable = vfEnable
         this.promiseForInitialize = new Promise<void>(async (resolve) => {
@@ -72,7 +75,7 @@ export class VoiceChnagerClient {
             this.vcNode.connect(this.currentMediaStreamAudioDestinationNode) // vc node -> output node
             // (vc nodeにはaudio streamerのcallbackでデータが投げ込まれる)
             this.audioStreamer = new AudioStreamer(this.callbacks, audioStreamerListeners, { objectMode: true, })
-            this.audioStreamer.setRequestParams(DefaultVoiceChangerRequestParamas)
+            // this.audioStreamer.setRequestParams(DefaultVoiceChangerRequestParamas)
             this.audioStreamer.setInputChunkNum(DefaultVoiceChangerOptions.inputChunkNum)
             this.audioStreamer.setVoiceChangerMode(DefaultVoiceChangerOptions.voiceChangerMode)
 
@@ -168,7 +171,7 @@ export class VoiceChnagerClient {
         return this._isVoiceChanging
     }
     // Audio Streamer Settingg
-    setServerUrl = (serverUrl: string, mode: Protocol, openTab: boolean = false) => {
+    setServerUrl = (serverUrl: string, openTab: boolean = false) => {
         const url = validateUrl(serverUrl)
         const pageUrl = `${location.protocol}//${location.host}`
         console.log("SERVER CHECK", url, pageUrl)
@@ -183,11 +186,12 @@ export class VoiceChnagerClient {
                 }
             }
         }
-        this.audioStreamer.setServerUrl(validateUrl(serverUrl), mode)
+        this.audioStreamer.setServerUrl(url)
+        this.configurator.setServerUrl(url)
     }
 
-    setRequestParams = (val: VoiceChangerRequestParamas) => {
-        this.audioStreamer.setRequestParams(val)
+    setProtocol = (mode: Protocol) => {
+        this.audioStreamer.setProtocol(mode)
     }
 
     setInputChunkNum = (num: number) => {
@@ -197,6 +201,29 @@ export class VoiceChnagerClient {
     setVoiceChangerMode = (val: VoiceChangerMode) => {
         this.audioStreamer.setVoiceChangerMode(val)
     }
+
+    // Configurator Method
+    uploadFile = (file: File, onprogress: (progress: number, end: boolean) => void) => {
+        return this.configurator.uploadFile(file, onprogress)
+    }
+    concatUploadedFile = (file: File, chunkNum: number) => {
+        return this.configurator.concatUploadedFile(file, chunkNum)
+    }
+    loadModel = (configFile: File, pyTorchModelFile: File | null, onnxModelFile: File | null) => {
+        return this.configurator.loadModel(configFile, pyTorchModelFile, onnxModelFile)
+    }
+    updateServerSettings = (key: ServerSettingKey, val: string) => {
+        return this.configurator.updateSettings(key, val)
+    }
+
+    // Information
+    getClientSettings = () => {
+        return this.audioStreamer.getSettings()
+    }
+    getServerSettings = () => {
+        return this.configurator.getSettings()
+    }
+
 
 
 }

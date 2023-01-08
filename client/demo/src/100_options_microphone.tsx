@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
-import { AUDIO_ELEMENT_FOR_PLAY_RESULT, CHROME_EXTENSION } from "./const";
+import { AUDIO_ELEMENT_FOR_PLAY_RESULT } from "./const";
 import { useServerSetting } from "./101_server_setting";
 import { useDeviceSetting } from "./102_device_setting";
 import { useConvertSetting } from "./104_convert_setting";
@@ -8,6 +8,7 @@ import { useAdvancedSetting } from "./105_advanced_setting";
 import { useSpeakerSetting } from "./103_speaker_setting";
 import { useClient } from "./hooks/useClient";
 import { useServerControl } from "./106_server_control";
+import { ServerSettingKey } from "@dannadori/voice-changer-client-js";
 
 
 
@@ -19,8 +20,7 @@ export const useMicrophoneOptions = () => {
     })
 
     const serverSetting = useServerSetting({
-        uploadFile: clientState.uploadFile,
-        changeOnnxExcecutionProvider: clientState.changeOnnxExcecutionProvider
+        clientState
     })
     const deviceSetting = useDeviceSetting(audioContext)
     const speakerSetting = useSpeakerSetting()
@@ -31,6 +31,7 @@ export const useMicrophoneOptions = () => {
     const serverControl = useServerControl({
         convertStart: async () => { await clientState.start(serverSetting.mmvcServerUrl, serverSetting.protocol) },
         convertStop: async () => { clientState.stop() },
+        getInfo: clientState.getInfo,
         volume: clientState.volume,
         bufferingTime: clientState.bufferingTime,
         responseTime: clientState.responseTime
@@ -47,13 +48,73 @@ export const useMicrophoneOptions = () => {
         document.addEventListener('mousedown', createAudioContext);
     }, [])
 
-
-
+    // 101 ServerSetting
+    //// サーバ変更
     useEffect(() => {
-        console.log("input Cahngaga!")
+        if (!clientState.clientInitialized) return
+        clientState.setServerUrl(serverSetting.mmvcServerUrl)
+    }, [serverSetting.mmvcServerUrl])
+    //// プロトコル変更
+    useEffect(() => {
+        if (!clientState.clientInitialized) return
+        clientState.setProtocol(serverSetting.protocol)
+    }, [serverSetting.protocol])
+    //// フレームワーク変更
+    useEffect(() => {
+        if (!clientState.clientInitialized) return
+        clientState.updateSettings(ServerSettingKey.framework, serverSetting.framework)
+    }, [serverSetting.framework])
+    //// OnnxExecutionProvider変更
+    useEffect(() => {
+        if (!clientState.clientInitialized) return
+        clientState.updateSettings(ServerSettingKey.onnxExecutionProvider, serverSetting.onnxExecutionProvider)
+    }, [serverSetting.onnxExecutionProvider])
+
+    // 102 DeviceSetting
+    //// 入力情報の設定
+    useEffect(() => {
+        if (!clientState.clientInitialized) return
         clientState.changeInput(deviceSetting.audioInput, convertSetting.bufferSize, advancedSetting.vfForceDisabled)
     }, [clientState.clientInitialized, deviceSetting.audioInput, convertSetting.bufferSize, advancedSetting.vfForceDisabled])
 
+    // 103 SpeakerSetting
+    // 音声変換元、変換先の設定
+    useEffect(() => {
+        if (!clientState.clientInitialized) return
+        clientState.updateSettings(ServerSettingKey.srcId, speakerSetting.srcId)
+    }, [speakerSetting.srcId])
+    useEffect(() => {
+        if (!clientState.clientInitialized) return
+        clientState.updateSettings(ServerSettingKey.dstId, speakerSetting.dstId)
+    }, [speakerSetting.dstId])
+
+    // 104 ConvertSetting
+    useEffect(() => {
+        if (!clientState.clientInitialized) return
+        clientState.setInputChunkNum(convertSetting.inputChunkNum)
+    }, [convertSetting.inputChunkNum])
+    useEffect(() => {
+        if (!clientState.clientInitialized) return
+        clientState.updateSettings(ServerSettingKey.convertChunkNum, convertSetting.convertChunkNum)
+    }, [convertSetting.convertChunkNum])
+    useEffect(() => {
+        if (!clientState.clientInitialized) return
+        clientState.updateSettings(ServerSettingKey.gpu, convertSetting.gpu)
+    }, [convertSetting.gpu])
+    useEffect(() => {
+        if (!clientState.clientInitialized) return
+        clientState.updateSettings(ServerSettingKey.crossFadeOffsetRate, convertSetting.crossFadeOffsetRate)
+    }, [convertSetting.crossFadeOffsetRate])
+    useEffect(() => {
+        if (!clientState.clientInitialized) return
+        clientState.updateSettings(ServerSettingKey.crossFadeEndRate, convertSetting.crossFadeEndRate)
+    }, [convertSetting.crossFadeEndRate])
+
+    // 105 AdvancedSetting
+    useEffect(() => {
+        if (!clientState.clientInitialized) return
+        clientState.setVoiceChangerMode(advancedSetting.voiceChangerMode)
+    }, [advancedSetting.voiceChangerMode])
 
 
     // // const [options, setOptions] = useState<MicrophoneOptionsState>(InitMicrophoneOptionsState)

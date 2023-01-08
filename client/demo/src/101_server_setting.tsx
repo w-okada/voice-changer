@@ -1,10 +1,10 @@
-import { DefaultVoiceChangerOptions, OnnxExecutionProvider, Protocol, Framework, fileSelector, getInfo, loadModel } from "@dannadori/voice-changer-client-js"
-import React, { useEffect } from "react"
+import { DefaultVoiceChangerOptions, OnnxExecutionProvider, Protocol, Framework, fileSelector, ServerSettingKey } from "@dannadori/voice-changer-client-js"
+import React from "react"
 import { useMemo, useState } from "react"
+import { ClientState } from "./hooks/useClient"
 
 export type UseServerSettingProps = {
-    uploadFile: (baseUrl: string, file: File, onprogress: (progress: number, end: boolean) => void) => Promise<void>
-    changeOnnxExcecutionProvider: (baseUrl: string, provider: OnnxExecutionProvider) => Promise<void>
+    clientState: ClientState
 }
 
 export type ServerSettingState = {
@@ -80,24 +80,21 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 return
             }
             if (pyTorchModel) {
-                await props.uploadFile(mmvcServerUrl, pyTorchModel, (progress: number, end: boolean) => {
+                await props.clientState.uploadFile(pyTorchModel, (progress: number, end: boolean) => {
                     console.log(progress, end)
                 })
             }
             if (onnxModel) {
-                await props.uploadFile(mmvcServerUrl, onnxModel, (progress: number, end: boolean) => {
+                await props.clientState.uploadFile(onnxModel, (progress: number, end: boolean) => {
                     console.log(progress, end)
                 })
             }
-            await props.uploadFile(mmvcServerUrl, configFile, (progress: number, end: boolean) => {
+            await props.clientState.uploadFile(configFile, (progress: number, end: boolean) => {
                 console.log(progress, end)
             })
-            const res = await getInfo(mmvcServerUrl)
-            console.log(res)
 
-            const res2 = await loadModel(mmvcServerUrl, configFile, pyTorchModel, onnxModel)
-            console.log(res2)
-
+            await props.clientState.loadModel(configFile, pyTorchModel, onnxModel)
+            console.log("loaded")
         }
 
         return (
@@ -148,7 +145,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 </div>
             </>
         )
-    }, [pyTorchModel, configFile, onnxModel, mmvcServerUrl, props.uploadFile])
+    }, [pyTorchModel, configFile, onnxModel, mmvcServerUrl])
 
     const protocolRow = useMemo(() => {
         const onProtocolChanged = async (val: Protocol) => {
@@ -201,7 +198,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             return
         }
         const onOnnxExecutionProviderChanged = async (val: OnnxExecutionProvider) => {
-            await props.changeOnnxExcecutionProvider(mmvcServerUrl, val)
             setOnnxExecutionProvider(val)
         }
         return (

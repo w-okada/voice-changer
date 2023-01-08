@@ -83,13 +83,9 @@ export const useDeviceSetting = (audioContext: AudioContext | null): DeviceSetti
 
 
     useEffect(() => {
-        console.log("iiiiinnnppu1")
         if (!audioContext) {
-            console.log("iiiiinnnppu2")
             return
         }
-
-        console.log("iiiiinnnppu3")
         if (audioInputForGUI == "none") {
             const ms = createDummyMediaStream(audioContext)
             setAudioInput(ms)
@@ -168,6 +164,7 @@ export const useDeviceSetting = (audioContext: AudioContext | null): DeviceSetti
     }, [outputAudioDeviceInfo, audioOutputForGUI])
 
     useEffect(() => {
+        if (audioOutputForGUI == "none") return
         [AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_ORIGINAL].forEach(x => {
             const audio = document.getElementById(x) as HTMLAudioElement
             if (audio) {

@@ -36,6 +36,15 @@ export type Speaker = {
     "name": string,
 }
 
+
+export type ServerInfo = {
+    pyTorchModelFile: string,
+    onnxModelFile: string,
+    configFile: string,
+    providers: string[]
+}
+
+
 // Consts
 
 export const Protocol = {
@@ -79,6 +88,18 @@ export const Framework = {
     "ONNX": "ONNX",
 }
 export type Framework = typeof Framework[keyof typeof Framework]
+
+export const ServerSettingKey = {
+    "srcId": "srcId",
+    "dstId": "dstId",
+    "convertChunkNum": "convertChunkNum",
+    "gpu": "gpu",
+    "crossFadeOffsetRate": "crossFadeOffsetRate",
+    "crossFadeEndRate": "crossFadeEndRate",
+    "framework": "framework",
+    "onnxExecutionProvider": "onnxExecutionProvider"
+} as const
+export type ServerSettingKey = typeof ServerSettingKey[keyof typeof ServerSettingKey]
 
 // Defaults
 export const DefaultVoiceChangerRequestParamas: VoiceChangerRequestParamas = {

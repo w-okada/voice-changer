@@ -4,14 +4,14 @@ import React, { useMemo, useState } from "react"
 export type AdvancedSettingState = {
     advancedSetting: JSX.Element;
     vfForceDisabled: boolean;
-    voiceChangeMode: VoiceChangerMode;
+    voiceChangerMode: VoiceChangerMode;
 }
 
 
 export const useAdvancedSetting = (): AdvancedSettingState => {
 
     const [vfForceDisabled, setVfForceDisabled] = useState<boolean>(false)
-    const [voiceChangeMode, setVoiceChangeMode] = useState<VoiceChangerMode>("realtime")
+    const [voiceChangerMode, setVoiceChangerMode] = useState<VoiceChangerMode>("realtime")
 
     const vfForceDisableRow = useMemo(() => {
         return (
@@ -31,7 +31,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1 ">Voice Change Mode</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={voiceChangeMode} onChange={(e) => { setVoiceChangeMode(e.target.value as VoiceChangerMode) }}>
+                    <select className="body-select" value={voiceChangerMode} onChange={(e) => { setVoiceChangerMode(e.target.value as VoiceChangerMode) }}>
                         {
                             Object.values(VoiceChangerMode).map(x => {
                                 return <option key={x} value={x}>{x}</option>
@@ -60,7 +60,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
     return {
         advancedSetting,
         vfForceDisabled,
-        voiceChangeMode,
+        voiceChangerMode,
     }
 
 }
