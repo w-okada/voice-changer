@@ -27,23 +27,9 @@ class VoiceChangerManager():
         else:
             return {"no info":"no info"}
 
-    # def set_onnx_provider(self, provider:str):
-    #     if hasattr(self, 'voiceChanger'):
-    #         return self.voiceChanger.set_onnx_provider(provider)
-    #     else:
-    #         return {"error":"no voice changer"}
-
-
-    def changeVoice(self, gpu:int, srcId:int, dstId:int, timestamp:int, convertChunkNum:int, crossFadeLowerValue:float, crossFadeOffsetRate:float, crossFadeEndRate:float, unpackedData:any):
+    def changeVoice(self, unpackedData:any):
         if hasattr(self, 'voiceChanger') == True:
             return self.voiceChanger.on_request(unpackedData)
-        else:
-            print("Voice Change is not loaded. Did you load a correct model?")
-            return np.zeros(1).astype(np.int16)
-
-    def changeVoice_old(self, gpu, srcId, dstId, timestamp, prefixChunkSize, unpackedData):
-        if hasattr(self, 'voiceChanger') == True:
-            return self.voiceChanger.on_request(gpu, srcId, dstId, timestamp, prefixChunkSize, unpackedData)
         else:
             print("Voice Change is not loaded. Did you load a correct model?")
             return np.zeros(1).astype(np.int16)

@@ -20,24 +20,14 @@ class MMVC_Namespace(socketio.AsyncNamespace):
         pass
 
     async def on_request_message(self, sid, msg):
-        # print("on_request_message", torch.cuda.memory_allocated())
-        gpu = int(msg[0])
-        srcId = int(msg[1])
-        dstId = int(msg[2])
-        timestamp = int(msg[3])
-        convertChunkNum = int(msg[4])
-        crossFadeLowerValue = float(msg[5])
-        crossFadeOffsetRate = float(msg[6])
-        crossFadeEndRate = float(msg[7])
-        data = msg[8]
+        timestamp = int(msg[0])
+        data = msg[1]
         unpackedData = np.array(struct.unpack('<%sh' % (len(data) // struct.calcsize('<h')), data))
-
-        audio1 = self.voiceChangerManager.changeVoice(
-            gpu, srcId, dstId, timestamp, convertChunkNum, crossFadeLowerValue, crossFadeOffsetRate, crossFadeEndRate, unpackedData)
+        audio1 = self.voiceChangerManager.changeVoice(unpackedData)
         
         # print("sio result:", len(audio1), audio1.shape)
-        # bin = struct.pack('<%sh' % len(audio1), *audio1)
-        # await self.emit('response', [timestamp, bin])
+        bin = struct.pack('<%sh' % len(audio1), *audio1)
+        await self.emit('response', [timestamp, bin])
 
     def on_disconnect(self, sid):
         # print('[{}] disconnect'.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')))

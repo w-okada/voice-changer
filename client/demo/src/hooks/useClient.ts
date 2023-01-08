@@ -94,7 +94,6 @@ export const useClient = (props: UseClientProps): ClientState => {
                 return
             }
             voiceChangerClientRef.current.setProtocol(protocol)
-            voiceChangerClientRef.current.stop()
         }
     }, [])
 
@@ -105,7 +104,6 @@ export const useClient = (props: UseClientProps): ClientState => {
                 return
             }
             voiceChangerClientRef.current.setInputChunkNum(num)
-            voiceChangerClientRef.current.stop()
         }
     }, [])
 

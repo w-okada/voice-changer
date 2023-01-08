@@ -53,22 +53,22 @@ export const useMicrophoneOptions = () => {
     useEffect(() => {
         if (!clientState.clientInitialized) return
         clientState.setServerUrl(serverSetting.mmvcServerUrl)
-    }, [serverSetting.mmvcServerUrl])
+    }, [clientState.clientInitialized, serverSetting.mmvcServerUrl])
     //// プロトコル変更
     useEffect(() => {
         if (!clientState.clientInitialized) return
         clientState.setProtocol(serverSetting.protocol)
-    }, [serverSetting.protocol])
+    }, [clientState.clientInitialized, serverSetting.protocol])
     //// フレームワーク変更
     useEffect(() => {
         if (!clientState.clientInitialized) return
         clientState.updateSettings(ServerSettingKey.framework, serverSetting.framework)
-    }, [serverSetting.framework])
+    }, [clientState.clientInitialized, serverSetting.framework])
     //// OnnxExecutionProvider変更
     useEffect(() => {
         if (!clientState.clientInitialized) return
         clientState.updateSettings(ServerSettingKey.onnxExecutionProvider, serverSetting.onnxExecutionProvider)
-    }, [serverSetting.onnxExecutionProvider])
+    }, [clientState.clientInitialized, serverSetting.onnxExecutionProvider])
 
     // 102 DeviceSetting
     //// 入力情報の設定
@@ -82,58 +82,39 @@ export const useMicrophoneOptions = () => {
     useEffect(() => {
         if (!clientState.clientInitialized) return
         clientState.updateSettings(ServerSettingKey.srcId, speakerSetting.srcId)
-    }, [speakerSetting.srcId])
+    }, [clientState.clientInitialized, speakerSetting.srcId])
     useEffect(() => {
         if (!clientState.clientInitialized) return
         clientState.updateSettings(ServerSettingKey.dstId, speakerSetting.dstId)
-    }, [speakerSetting.dstId])
+    }, [clientState.clientInitialized, speakerSetting.dstId])
 
     // 104 ConvertSetting
     useEffect(() => {
         if (!clientState.clientInitialized) return
         clientState.setInputChunkNum(convertSetting.inputChunkNum)
-    }, [convertSetting.inputChunkNum])
+    }, [clientState.clientInitialized, convertSetting.inputChunkNum])
     useEffect(() => {
         if (!clientState.clientInitialized) return
         clientState.updateSettings(ServerSettingKey.convertChunkNum, convertSetting.convertChunkNum)
-    }, [convertSetting.convertChunkNum])
+    }, [clientState.clientInitialized, convertSetting.convertChunkNum])
     useEffect(() => {
         if (!clientState.clientInitialized) return
         clientState.updateSettings(ServerSettingKey.gpu, convertSetting.gpu)
-    }, [convertSetting.gpu])
+    }, [clientState.clientInitialized, convertSetting.gpu])
     useEffect(() => {
         if (!clientState.clientInitialized) return
         clientState.updateSettings(ServerSettingKey.crossFadeOffsetRate, convertSetting.crossFadeOffsetRate)
-    }, [convertSetting.crossFadeOffsetRate])
+    }, [clientState.clientInitialized, convertSetting.crossFadeOffsetRate])
     useEffect(() => {
         if (!clientState.clientInitialized) return
         clientState.updateSettings(ServerSettingKey.crossFadeEndRate, convertSetting.crossFadeEndRate)
-    }, [convertSetting.crossFadeEndRate])
+    }, [clientState.clientInitialized, convertSetting.crossFadeEndRate])
 
     // 105 AdvancedSetting
     useEffect(() => {
         if (!clientState.clientInitialized) return
         clientState.setVoiceChangerMode(advancedSetting.voiceChangerMode)
-    }, [advancedSetting.voiceChangerMode])
-
-
-    // // const [options, setOptions] = useState<MicrophoneOptionsState>(InitMicrophoneOptionsState)
-    // const [params, setParams] = useState<VoiceChangerRequestParamas>(DefaultVoiceChangerRequestParamas)
-    // const [options, setOptions] = useState<VoiceChangerOptions>(DefaultVoiceChangerOptions)
-    // const [isStarted, setIsStarted] = useState<boolean>(false)
-
-
-    // useEffect(() => {
-    //     const storeOptions = async () => {
-    //         if (CHROME_EXTENSION) {
-    //             // @ts-ignore
-    //             await chrome.storage.local.set({ microphoneOptions: options })
-    //         }
-    //     }
-    //     storeOptions()
-    // }, [options]) // loadより前に持ってくるとstorage内が初期化されるのでだめかも。（要検証）
-
-
+    }, [clientState.clientInitialized, advancedSetting.voiceChangerMode])
 
 
     const voiceChangerSetting = useMemo(() => {

@@ -33,6 +33,8 @@ export class VoiceChnagerClient {
     private promiseForInitialize: Promise<void>
     private _isVoiceChanging = false
 
+    private sslCertified: string[] = []
+
     private callbacks: Callbacks = {
         onVoiceReceived: (voiceChangerMode: VoiceChangerMode, data: ArrayBuffer): void => {
             // console.log(voiceChangerMode, data)
@@ -176,11 +178,12 @@ export class VoiceChnagerClient {
         const pageUrl = `${location.protocol}//${location.host}`
         console.log("SERVER CHECK", url, pageUrl)
 
-        if (url != pageUrl && location.protocol == "https:") {
+        if (url != pageUrl && location.protocol == "https:" && this.sslCertified.includes(url) == false) {
             if (openTab) {
                 const value = window.confirm("MMVC Server is different from this page's origin. Open tab to open ssl connection. OK? (You can close the opened tab after ssl connection succeed.)");
                 if (value) {
                     window.open(url, '_blank')
+                    this.sslCertified.push(url)
                 } else {
                     alert("Your voice conversion may fail...")
                 }

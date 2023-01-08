@@ -38,7 +38,7 @@ export const useServerControl = (props: UseServerControlProps) => {
             </div>
 
         )
-    }, [isStarted])
+    }, [isStarted, props.convertStart, props.convertStop])
 
     const performanceRow = useMemo(() => {
         return (

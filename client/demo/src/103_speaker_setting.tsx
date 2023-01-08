@@ -86,7 +86,6 @@ export const useSpeakerSetting = () => {
                     <div className="body-button" onClick={onSetSpeakerMappingClicked}>set</div>
                 </div>
             </div>
-
         )
     }, [speakers, editSpeakerTargetId, editSpeakerTargetName])
 
