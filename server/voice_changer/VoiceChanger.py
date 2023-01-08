@@ -119,6 +119,8 @@ class VoiceChanger():
                 if "CUDAExecutionProvider" in providers:
                     provider_options=[{'device_id': self.settings.gpu}]
                     self.onnx_session.set_providers(providers=["CUDAExecutionProvider"], provider_options=provider_options)
+            if key == "crossFadeOffsetRate" or key == "crossFadeEndRate":
+                self.unpackedData_length = 0
             return self.get_info()
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
