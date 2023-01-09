@@ -22,12 +22,17 @@ class MMVC_Namespace(socketio.AsyncNamespace):
     async def on_request_message(self, sid, msg):
         timestamp = int(msg[0])
         data = msg[1]
-        unpackedData = np.array(struct.unpack('<%sh' % (len(data) // struct.calcsize('<h')), data))
-        audio1 = self.voiceChangerManager.changeVoice(unpackedData)
-        
-        # print("sio result:", len(audio1), audio1.shape)
-        bin = struct.pack('<%sh' % len(audio1), *audio1)
-        await self.emit('response', [timestamp, bin])
+
+        if(isinstance(data, str)):
+            print(type(data))
+            print(data)
+            await self.emit('response', [timestamp, 0])
+        else:
+            unpackedData = np.array(struct.unpack('<%sh' % (len(data) // struct.calcsize('<h')), data))
+            audio1 = self.voiceChangerManager.changeVoice(unpackedData)
+            # print("sio result:", len(audio1), audio1.shape)
+            bin = struct.pack('<%sh' % len(audio1), *audio1)
+            await self.emit('response', [timestamp, bin])
 
     def on_disconnect(self, sid):
         # print('[{}] disconnect'.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
