@@ -38,11 +38,23 @@ export type Speaker = {
 
 
 export type ServerInfo = {
+    status: string
+    configFile: string,
     pyTorchModelFile: string,
     onnxModelFile: string,
-    configFile: string,
+    convertChunkNum: number,
+    crossFadeOffsetRate: number,
+    crossFadeEndRate: number,
+    gpu: number,
+    srcId: number,
+    dstId: number,
+    framework: Framework,
     providers: string[]
 }
+
+
+
+
 
 // Consts
 export const Protocol = {

@@ -26,9 +26,9 @@ class VocieChangerSettings():
     crossFadeEndRate:float = 0.9
     convertChunkNum:int = 32
     framework:str = "PyTorch" # PyTorch or ONNX
-    pyTorch_model_file:str = ""
-    onnx_model_file:str = ""
-    config_file:str = ""
+    pyTorchModelFile:str = ""
+    onnxModelFile:str = ""
+    configFile:str = ""
     # ↓mutableな物だけ列挙
     intData = ["gpu","srcId", "dstId", "convertChunkNum"]
     floatData = [ "crossFadeOffsetRate", "crossFadeEndRate",]
@@ -38,7 +38,7 @@ class VoiceChanger():
 
     def __init__(self, config:str):
         # 初期化
-        self.settings = VocieChangerSettings(config_file=config)
+        self.settings = VocieChangerSettings(configFile=config)
         self.unpackedData_length=0
         self.net_g = None
         self.onnx_session = None
@@ -58,9 +58,11 @@ class VoiceChanger():
         print(f"VoiceChanger Initialized (GPU_NUM:{self.gpu_num}, mps_enabled:{self.mps_enabled})")
 
     def loadModel(self, config:str, pyTorch_model_file:str=None, onnx_model_file:str=None):
-        self.settings.config_file = config
-        self.settings.pyTorch_model_file = pyTorch_model_file
-        self.settings.onnx_model_file = onnx_model_file
+        self.settings.configFile = config
+        if pyTorch_model_file != None:
+            self.settings.pyTorchModelFile = pyTorch_model_file
+        if onnx_model_file:
+            self.settings.onnxModelFile = onnx_model_file
         
         # PyTorchモデル生成
         if pyTorch_model_file != None:
@@ -90,10 +92,10 @@ class VoiceChanger():
     def get_info(self):
         data = asdict(self.settings)
 
-        data["providers"] = self.onnx_session.get_providers() if self.onnx_session != None else ""
-        files = ["config_file", "pyTorch_model_file", "onnx_model_file"]
+        data["providers"] = self.onnx_session.get_providers() if self.onnx_session != None else []
+        files = ["configFile", "pyTorchModelFile", "onnxModelFile"]
         for f in files:
-            if os.path.exists(f):
+            if data[f]!=None and os.path.exists(data[f]):
                 data[f] = os.path.basename(data[f])
             else:
                 data[f] = ""
@@ -126,8 +128,6 @@ class VoiceChanger():
 
         return self.get_info()
 
-        self.currentCrossFadeOffsetRate=0
-        self.currentCrossFadeEndRate=0
 
     def _generate_strength(self, unpackedData):
 

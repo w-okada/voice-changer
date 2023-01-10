@@ -227,6 +227,9 @@ body {
 }
 .body-item-text {
     color: rgb(30, 30, 30);
+    .body-item-text-item{
+        padding-left: 1rem;
+    }
 }
 
 .body-item-input {

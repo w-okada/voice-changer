@@ -1,4 +1,4 @@
-import { BufferSize, createDummyMediaStream, DefaultVoiceChangerOptions, DefaultVoiceChangerRequestParamas, Framework, OnnxExecutionProvider, Protocol, SampleRate, ServerSettingKey, Speaker, VoiceChangerMode, VoiceChnagerClient } from "@dannadori/voice-changer-client-js"
+import { ServerInfo, BufferSize, createDummyMediaStream, DefaultVoiceChangerOptions, DefaultVoiceChangerRequestParamas, Framework, OnnxExecutionProvider, Protocol, SampleRate, ServerSettingKey, Speaker, VoiceChangerMode, VoiceChnagerClient } from "@dannadori/voice-changer-client-js"
 import { useEffect, useMemo, useRef, useState } from "react"
 
 export type UseClientProps = {
@@ -38,8 +38,6 @@ export type SettingState = {
     // advanced setting
     vfForceDisabled: boolean
     voiceChangerMode: VoiceChangerMode
-
-
 }
 
 const InitialSettingState: SettingState = {
@@ -80,6 +78,7 @@ export type ClientState = {
 
     // Setting
     settingState: SettingState
+    serverInfo: ServerInfo | undefined
     setSettingState: (setting: SettingState) => void
 
     // Client Control
@@ -143,6 +142,8 @@ export const useClient = (props: UseClientProps): ClientState => {
 
     // (2) 設定
     const [settingState, setSettingState] = useState<SettingState>(InitialSettingState)
+    const [displaySettingState, setDisplaySettingState] = useState<SettingState>(InitialSettingState)
+    const [serverInfo, setServerInfo] = useState<ServerInfo>()
     const [uploadProgress, setUploadProgress] = useState<number>(0)
     const [isUploading, setIsUploading] = useState<boolean>(false)
 
@@ -153,6 +154,8 @@ export const useClient = (props: UseClientProps): ClientState => {
             await initializedPromise
             voiceChangerClientRef.current!.setServerUrl(settingState.mmvcServerUrl, true)
             voiceChangerClientRef.current!.stop()
+            getInfo()
+
         })()
     }, [settingState.mmvcServerUrl])
     // (b) プロトコル設定
@@ -167,13 +170,17 @@ export const useClient = (props: UseClientProps): ClientState => {
         (async () => {
             await initializedPromise
             const info = await voiceChangerClientRef.current!.updateServerSettings(ServerSettingKey.framework, "" + settingState.framework)
+            setServerInfo(info)
+
         })()
     }, [settingState.framework])
     // (d) OnnxExecutionProvider設定
     useEffect(() => {
         (async () => {
             await initializedPromise
-            const info = voiceChangerClientRef.current!.updateServerSettings(ServerSettingKey.onnxExecutionProvider, settingState.onnxExecutionProvider)
+            const info = await voiceChangerClientRef.current!.updateServerSettings(ServerSettingKey.onnxExecutionProvider, settingState.onnxExecutionProvider)
+            setServerInfo(info)
+
         })()
     }, [settingState.onnxExecutionProvider])
 
@@ -244,6 +251,8 @@ export const useClient = (props: UseClientProps): ClientState => {
         (async () => {
             await initializedPromise
             const info = await voiceChangerClientRef.current!.updateServerSettings(ServerSettingKey.srcId, "" + settingState.srcId)
+            setServerInfo(info)
+
         })()
     }, [settingState.srcId])
 
@@ -252,6 +261,8 @@ export const useClient = (props: UseClientProps): ClientState => {
         (async () => {
             await initializedPromise
             const info = await voiceChangerClientRef.current!.updateServerSettings(ServerSettingKey.dstId, "" + settingState.dstId)
+            setServerInfo(info)
+
         })()
     }, [settingState.dstId])
 
@@ -270,6 +281,7 @@ export const useClient = (props: UseClientProps): ClientState => {
         (async () => {
             await initializedPromise
             const info = await voiceChangerClientRef.current!.updateServerSettings(ServerSettingKey.convertChunkNum, "" + settingState.convertChunkNum)
+            setServerInfo(info)
         })()
     }, [settingState.convertChunkNum])
 
@@ -278,6 +290,7 @@ export const useClient = (props: UseClientProps): ClientState => {
         (async () => {
             await initializedPromise
             const info = await voiceChangerClientRef.current!.updateServerSettings(ServerSettingKey.gpu, "" + settingState.gpu)
+            setServerInfo(info)
         })()
     }, [settingState.gpu])
 
@@ -286,6 +299,7 @@ export const useClient = (props: UseClientProps): ClientState => {
         (async () => {
             await initializedPromise
             const info = await voiceChangerClientRef.current!.updateServerSettings(ServerSettingKey.crossFadeOffsetRate, "" + settingState.crossFadeOffsetRate)
+            setServerInfo(info)
         })()
     }, [settingState.crossFadeOffsetRate])
 
@@ -294,6 +308,7 @@ export const useClient = (props: UseClientProps): ClientState => {
         (async () => {
             await initializedPromise
             const info = await voiceChangerClientRef.current!.updateServerSettings(ServerSettingKey.crossFadeEndRate, "" + settingState.crossFadeEndRate)
+            setServerInfo(info)
         })()
     }, [settingState.crossFadeEndRate])
 
@@ -331,9 +346,32 @@ export const useClient = (props: UseClientProps): ClientState => {
             await initializedPromise
             const serverSettings = await voiceChangerClientRef.current!.getServerSettings()
             const clientSettings = await voiceChangerClientRef.current!.getClientSettings()
+            setServerInfo(serverSettings)
             console.log(serverSettings, clientSettings)
         }
     }, [])
+
+    // (x)
+    useEffect(() => {
+        if (serverInfo && serverInfo.status == "OK") {
+            setDisplaySettingState({
+                ...settingState,
+                convertChunkNum: serverInfo.convertChunkNum,
+                crossFadeOffsetRate: serverInfo.crossFadeOffsetRate,
+                crossFadeEndRate: serverInfo.crossFadeEndRate,
+                gpu: serverInfo.gpu,
+                srcId: serverInfo.srcId,
+                dstId: serverInfo.dstId,
+                framework: serverInfo.framework,
+                onnxExecutionProvider: serverInfo.providers.length > 0 ? serverInfo.providers[0] as OnnxExecutionProvider : "CPUExecutionProvider"
+            })
+        } else {
+            setDisplaySettingState({
+                ...settingState,
+            })
+        }
+
+    }, [settingState, serverInfo])
 
 
     return {
@@ -344,7 +382,8 @@ export const useClient = (props: UseClientProps): ClientState => {
         uploadProgress,
         isUploading,
 
-        settingState,
+        settingState: displaySettingState,
+        serverInfo,
         setSettingState,
         loadModel,
         start,
