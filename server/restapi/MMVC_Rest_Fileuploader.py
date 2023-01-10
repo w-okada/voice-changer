@@ -28,12 +28,14 @@ class MMVC_Rest_Fileuploader:
         self.onnx_provider=""
 
     def post_upload_file(self, file: UploadFile = File(...), filename: str = Form(...)):
-        return upload_file(UPLOAD_DIR, file, filename)
+        res = upload_file(UPLOAD_DIR, file, filename)
+        json_compatible_item_data = jsonable_encoder(res)
+        return JSONResponse(content=json_compatible_item_data)
 
     def post_concat_uploaded_file(self, filename: str = Form(...), filenameChunkNum: int = Form(...)):
-        modelFilePath = concat_file_chunks(
-            UPLOAD_DIR, filename, filenameChunkNum, UPLOAD_DIR)
-        return {"concat": f"{modelFilePath}"}
+        res = concat_file_chunks(UPLOAD_DIR, filename, filenameChunkNum, UPLOAD_DIR)
+        json_compatible_item_data = jsonable_encoder(res)
+        return JSONResponse(content=json_compatible_item_data)
     
     def get_info(self):
         info = self.voiceChangerManager.get_info()
@@ -57,8 +59,10 @@ class MMVC_Rest_Fileuploader:
         onnxModelFilePath = os.path.join(UPLOAD_DIR, onnxModelFilename) if onnxModelFilename != "-" else None
         configFilePath = os.path.join(UPLOAD_DIR, configFilename)
 
-        self.voiceChangerManager.loadModel(configFilePath, pyTorchModelFilePath, onnxModelFilePath)
-        return {"load": f"{configFilePath}, {pyTorchModelFilePath}, {onnxModelFilePath}"}
+        info = self.voiceChangerManager.loadModel(configFilePath, pyTorchModelFilePath, onnxModelFilePath)
+        json_compatible_item_data = jsonable_encoder(info)
+        return JSONResponse(content=json_compatible_item_data)
+        # return {"load": f"{configFilePath}, {pyTorchModelFilePath}, {onnxModelFilePath}"}
 
 
     def post_load_model_for_train(
@@ -83,3 +87,4 @@ class MMVC_Rest_Fileuploader:
             UPLOAD_DIR, zipFilename, zipFileChunkNum, UPLOAD_DIR)
         shutil.unpack_archive(zipFilePath, "MMVC_Trainer/dataset/textful/")
         return {"Zip file unpacked": f"{zipFilePath}"}
+        

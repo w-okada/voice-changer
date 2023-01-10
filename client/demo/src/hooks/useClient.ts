@@ -11,6 +11,12 @@ export type ClientState = {
     bufferingTime: number;
     responseTime: number;
     volume: number;
+
+    // Setting
+
+
+
+
     // Client Setting
     setServerUrl: (mmvcServerUrl: string) => Promise<void>
     setProtocol: (protocol: Protocol) => Promise<void>
@@ -36,17 +42,15 @@ export const useClient = (props: UseClientProps): ClientState => {
 
     const voiceChangerClientRef = useRef<VoiceChnagerClient | null>(null)
     const [clientInitialized, setClientInitialized] = useState<boolean>(false)
-
-    const [bufferingTime, setBufferingTime] = useState<number>(0)
-    const [responseTime, setResponseTime] = useState<number>(0)
-    const [volume, setVolume] = useState<number>(0)
-
     const initializedResolveRef = useRef<(value: void | PromiseLike<void>) => void>()
     const initializedPromise = useMemo(() => {
         return new Promise<void>((resolve) => {
             initializedResolveRef.current = resolve
         })
     }, [])
+    const [bufferingTime, setBufferingTime] = useState<number>(0)
+    const [responseTime, setResponseTime] = useState<number>(0)
+    const [volume, setVolume] = useState<number>(0)
 
     useEffect(() => {
         const initialized = async () => {
@@ -88,30 +92,30 @@ export const useClient = (props: UseClientProps): ClientState => {
     const setServerUrl = useMemo(() => {
         return async (mmvcServerUrl: string) => {
             await initializedPromise
-            voiceChangerClientRef.current.setServerUrl(mmvcServerUrl, true)
-            voiceChangerClientRef.current.stop()
+            voiceChangerClientRef.current!.setServerUrl(mmvcServerUrl, true)
+            voiceChangerClientRef.current!.stop()
         }
     }, [])
 
     const setProtocol = useMemo(() => {
         return async (protocol: Protocol) => {
             await initializedPromise
-            voiceChangerClientRef.current.setProtocol(protocol)
+            voiceChangerClientRef.current!.setProtocol(protocol)
         }
     }, [])
 
     const setInputChunkNum = useMemo(() => {
         return async (num: number) => {
             await initializedPromise
-            voiceChangerClientRef.current.setInputChunkNum(num)
+            voiceChangerClientRef.current!.setInputChunkNum(num)
         }
     }, [])
 
     const setVoiceChangerMode = useMemo(() => {
         return async (val: VoiceChangerMode) => {
             await initializedPromise
-            voiceChangerClientRef.current.setVoiceChangerMode(val)
-            voiceChangerClientRef.current.stop()
+            voiceChangerClientRef.current!.setVoiceChangerMode(val)
+            voiceChangerClientRef.current!.stop()
         }
     }, [])
 
@@ -120,14 +124,14 @@ export const useClient = (props: UseClientProps): ClientState => {
     const start = useMemo(() => {
         return async (mmvcServerUrl: string) => {
             await initializedPromise
-            voiceChangerClientRef.current.setServerUrl(mmvcServerUrl, true)
-            voiceChangerClientRef.current.start()
+            voiceChangerClientRef.current!.setServerUrl(mmvcServerUrl, true)
+            voiceChangerClientRef.current!.start()
         }
     }, [])
     const stop = useMemo(() => {
         return async () => {
             await initializedPromise
-            voiceChangerClientRef.current.stop()
+            voiceChangerClientRef.current!.stop()
         }
     }, [])
 
@@ -136,15 +140,14 @@ export const useClient = (props: UseClientProps): ClientState => {
     const changeInput = useMemo(() => {
         return async (audioInput: MediaStream | string, bufferSize: BufferSize, vfForceDisable: boolean) => {
             await initializedPromise
-            if (!props.audioContext) return
             if (!audioInput || audioInput == "none") {
                 console.log("[useClient] setup!(1)", audioInput)
-                const ms = createDummyMediaStream(props.audioContext)
-                await voiceChangerClientRef.current.setup(ms, bufferSize, vfForceDisable)
+                const ms = createDummyMediaStream(props.audioContext!)
+                await voiceChangerClientRef.current!.setup(ms, bufferSize, vfForceDisable)
 
             } else {
                 console.log("[useClient] setup!(2)", audioInput)
-                await voiceChangerClientRef.current.setup(audioInput, bufferSize, vfForceDisable)
+                await voiceChangerClientRef.current!.setup(audioInput, bufferSize, vfForceDisable)
             }
         }
     }, [props.audioContext])
@@ -155,8 +158,8 @@ export const useClient = (props: UseClientProps): ClientState => {
     const uploadFile = useMemo(() => {
         return async (file: File, onprogress: (progress: number, end: boolean) => void) => {
             await initializedPromise
-            const num = await voiceChangerClientRef.current.uploadFile(file, onprogress)
-            const res = await voiceChangerClientRef.current.concatUploadedFile(file, num)
+            const num = await voiceChangerClientRef.current!.uploadFile(file, onprogress)
+            const res = await voiceChangerClientRef.current!.concatUploadedFile(file, num)
             console.log("uploaded", num, res)
         }
     }, [])
@@ -164,7 +167,7 @@ export const useClient = (props: UseClientProps): ClientState => {
     const loadModel = useMemo(() => {
         return async (configFile: File, pyTorchModelFile: File | null, onnxModelFile: File | null) => {
             await initializedPromise
-            await voiceChangerClientRef.current.loadModel(configFile, pyTorchModelFile, onnxModelFile)
+            await voiceChangerClientRef.current!.loadModel(configFile, pyTorchModelFile, onnxModelFile)
             console.log("loaded model")
         }
     }, [])
@@ -172,7 +175,7 @@ export const useClient = (props: UseClientProps): ClientState => {
     const updateSettings = useMemo(() => {
         return async (key: ServerSettingKey, val: string | number) => {
             await initializedPromise
-            return await voiceChangerClientRef.current.updateServerSettings(key, "" + val)
+            return await voiceChangerClientRef.current!.updateServerSettings(key, "" + val)
         }
     }, [])
 
@@ -180,8 +183,8 @@ export const useClient = (props: UseClientProps): ClientState => {
     const getInfo = useMemo(() => {
         return async () => {
             await initializedPromise
-            const serverSettings = await voiceChangerClientRef.current.getServerSettings()
-            const clientSettings = await voiceChangerClientRef.current.getClientSettings()
+            const serverSettings = await voiceChangerClientRef.current!.getServerSettings()
+            const clientSettings = await voiceChangerClientRef.current!.getClientSettings()
             console.log(serverSettings, clientSettings)
         }
     }, [])

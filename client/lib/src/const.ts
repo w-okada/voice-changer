@@ -44,9 +44,7 @@ export type ServerInfo = {
     providers: string[]
 }
 
-
 // Consts
-
 export const Protocol = {
     "sio": "sio",
     "rest": "rest",

@@ -77,7 +77,6 @@ export class VoiceChnagerClient {
             this.vcNode.connect(this.currentMediaStreamAudioDestinationNode) // vc node -> output node
             // (vc nodeにはaudio streamerのcallbackでデータが投げ込まれる)
             this.audioStreamer = new AudioStreamer(this.callbacks, audioStreamerListeners, { objectMode: true, })
-            // this.audioStreamer.setRequestParams(DefaultVoiceChangerRequestParamas)
             this.audioStreamer.setInputChunkNum(DefaultVoiceChangerOptions.inputChunkNum)
             this.audioStreamer.setVoiceChangerMode(DefaultVoiceChangerOptions.voiceChangerMode)
 

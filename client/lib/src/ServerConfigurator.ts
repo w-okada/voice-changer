@@ -28,7 +28,7 @@ export class ServerConfigurator {
 
     updateSettings = async (key: ServerSettingKey, val: string) => {
         const url = this.serverUrl + "/update_setteings"
-        const p = new Promise<void>((resolve) => {
+        const info = await new Promise<ServerInfo>(async (resolve) => {
             const formData = new FormData();
             formData.append("key", key);
             formData.append("val", val);
@@ -36,12 +36,9 @@ export class ServerConfigurator {
                 method: 'POST',
                 body: formData,
             });
-            fetch(request).then(async (response) => {
-                console.log(await response.json())
-                resolve()
-            })
+            const res = await (await fetch(request)).json() as ServerInfo
+            resolve(res)
         })
-        const info = await p
         return info
     }
 
@@ -113,7 +110,7 @@ export class ServerConfigurator {
 
     loadModel = async (configFile: File, pyTorchModelFile: File | null, onnxModelFile: File | null) => {
         const url = this.serverUrl + "/load_model"
-        const loadP = new Promise<void>((resolve) => {
+        const info = new Promise<ServerInfo>(async (resolve) => {
             const formData = new FormData();
             formData.append("pyTorchModelFilename", pyTorchModelFile?.name || "-");
             formData.append("onnxModelFilename", onnxModelFile?.name || "-");
@@ -122,11 +119,9 @@ export class ServerConfigurator {
                 method: 'POST',
                 body: formData,
             });
-            fetch(request).then(async (response) => {
-                console.log(await response.text())
-                resolve()
-            })
+            const res = await (await fetch(request)).json() as ServerInfo
+            resolve(res)
         })
-        await loadP
+        return await info
     }
 }

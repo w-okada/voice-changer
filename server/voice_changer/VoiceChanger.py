@@ -40,6 +40,8 @@ class VoiceChanger():
         # 初期化
         self.settings = VocieChangerSettings(config_file=config)
         self.unpackedData_length=0
+        self.net_g = None
+        self.onnx_session = None
         # 共通で使用する情報を収集
         self.hps = utils.get_hparams_from_file(config)
         self.gpu_num = torch.cuda.device_count()
@@ -68,8 +70,6 @@ class VoiceChanger():
                 **self.hps.model)
             self.net_g.eval()
             utils.load_checkpoint(pyTorch_model_file, self.net_g, None)
-        if hasattr(self, "net_g") == False:
-            self.net_g = None
 
         # ONNXモデル生成
         if onnx_model_file != None:
@@ -79,14 +79,11 @@ class VoiceChanger():
                 onnx_model_file,
                 providers=providers
             )
-        if hasattr(self, "onnx_session") == False:
-            self.onnx_session = None
+        return self.get_info()
 
     def destroy(self):
-        if hasattr(self, "net_g"):
-            del self.net_g
-        if hasattr(self, "onnx_session"):
-            del self.onnx_session    
+        del self.net_g
+        del self.onnx_session    
 
     def get_info(self):
         data = asdict(self.settings)
@@ -108,7 +105,6 @@ class VoiceChanger():
                 self.onnx_session.set_providers(providers=[val], provider_options=provider_options)
             else:
                 self.onnx_session.set_providers(providers=[val])
-            return self.get_info()
         elif key in self.settings.intData:
             setattr(self.settings, key, int(val))
             if key == "gpu" and val >= 0 and val < self.gpu_num and self.onnx_session != None:
@@ -119,16 +115,13 @@ class VoiceChanger():
                     self.onnx_session.set_providers(providers=["CUDAExecutionProvider"], provider_options=provider_options)
             if key == "crossFadeOffsetRate" or key == "crossFadeEndRate":
                 self.unpackedData_length = 0
-            return self.get_info()
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
-            return self.get_info()
         elif key in self.settings.strData:
             setattr(self.settings, key, str(val))
-            return self.get_info()
         else:
             print(f"{key} is not mutalbe variable!")
-            return self.get_info()
+        return self.get_info()
 
 
 

@@ -9,8 +9,9 @@ def upload_file(upload_dirname:str, file:UploadFile, filename: str):
         upload_dir = open(os.path.join(upload_dirname, filename),'wb+')
         shutil.copyfileobj(fileobj, upload_dir)
         upload_dir.close()
-        return {"uploaded files": f"{filename} "}
-    return {"Error": "uploaded file is not found."}
+
+        return {"status":"OK", "msg": f"uploaded files {filename} "}
+    return {"status":"ERROR", "msg": "uploaded file is not found."}
 
 def concat_file_chunks(upload_dirname:str, filename:str, chunkNum:int, dest_dirname:str):
     target_file_name = os.path.join(dest_dirname, filename)
@@ -25,5 +26,5 @@ def concat_file_chunks(upload_dirname:str, filename:str, chunkNum:int, dest_dirn
             stored_chunk_file.close()
             os.unlink(chunk_file_path)
         target_file.close()
-    return target_file_name
+    return {"status":"OK", "msg": f"concat files {target_file_name} "}
 

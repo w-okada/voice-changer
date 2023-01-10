@@ -13,19 +13,25 @@ class VoiceChangerManager():
     def loadModel(self, config, model, onnx_model):
         if hasattr(self, 'voiceChanger') == False:
             self.voiceChanger = VoiceChanger(config)
-        self.voiceChanger.loadModel(config, model, onnx_model)
+        info = self.voiceChanger.loadModel(config, model, onnx_model)
+        info["status"]="OK"
+        return info
 
     def get_info(self):
         if hasattr(self, 'voiceChanger'):
-            return self.voiceChanger.get_info()
+            info = self.voiceChanger.get_info()
+            info["status"]="OK"
+            return info
         else:
-            return {"no info":"no info"}
+            return {"status":"ERROR", "msg":"no model loaded"}
 
     def update_setteings(self, key:str, val:any):
         if hasattr(self, 'voiceChanger'):
-            return self.voiceChanger.update_setteings(key, val)
+            info = self.voiceChanger.update_setteings(key, val)
+            info["status"]="OK"
+            return info
         else:
-            return {"no info":"no info"}
+            return {"status":"ERROR", "msg":"no model loaded"}
 
     def changeVoice(self, unpackedData:any):
         if hasattr(self, 'voiceChanger') == True:
