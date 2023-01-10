@@ -26,8 +26,8 @@ export type VoiceChangerOptions = {
     speakers: Speaker[],
     forceVfDisable: boolean,
     voiceChangerMode: VoiceChangerMode,
-    OnnxExecutionProvider: OnnxExecutionProvider,
-    Framework: Framework
+    onnxExecutionProvider: OnnxExecutionProvider,
+    framework: Framework
 }
 
 
@@ -141,8 +141,8 @@ export const DefaultVoiceChangerOptions: VoiceChangerOptions = {
     ],
     forceVfDisable: false,
     voiceChangerMode: "realtime",
-    Framework: "PyTorch",
-    OnnxExecutionProvider: "CPUExecutionProvider"
+    framework: "PyTorch",
+    onnxExecutionProvider: "CPUExecutionProvider"
 }
 
 

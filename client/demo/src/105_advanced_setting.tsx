@@ -1,37 +1,47 @@
 import { VoiceChangerMode } from "@dannadori/voice-changer-client-js"
 import React, { useMemo, useState } from "react"
+import { ClientState } from "./hooks/useClient"
+
+
+export type UseAdvancedSettingProps = {
+    clientState: ClientState
+}
 
 export type AdvancedSettingState = {
     advancedSetting: JSX.Element;
-    vfForceDisabled: boolean;
-    voiceChangerMode: VoiceChangerMode;
 }
 
-
-export const useAdvancedSetting = (): AdvancedSettingState => {
-
-    const [vfForceDisabled, setVfForceDisabled] = useState<boolean>(false)
-    const [voiceChangerMode, setVoiceChangerMode] = useState<VoiceChangerMode>("realtime")
+export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSettingState => {
 
     const vfForceDisableRow = useMemo(() => {
         return (
             <div className="body-row split-3-3-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-1 ">VF Disabled</div>
                 <div>
-                    <input type="checkbox" checked={vfForceDisabled} onChange={(e) => setVfForceDisabled(e.target.checked)} />
+                    <input type="checkbox" checked={props.clientState.settingState.vfForceDisabled} onChange={(e) => {
+                        props.clientState.setSettingState({
+                            ...props.clientState.settingState,
+                            vfForceDisabled: e.target.checked
+                        })
+                    }} />
                 </div>
                 <div className="body-button-container">
                 </div>
             </div>
         )
-    }, [vfForceDisabled])
+    }, [props.clientState.settingState])
 
     const voiceChangeModeRow = useMemo(() => {
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1 ">Voice Change Mode</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={voiceChangerMode} onChange={(e) => { setVoiceChangerMode(e.target.value as VoiceChangerMode) }}>
+                    <select className="body-select" value={props.clientState.settingState.voiceChangerMode} onChange={(e) => {
+                        props.clientState.setSettingState({
+                            ...props.clientState.settingState,
+                            voiceChangerMode: e.target.value as VoiceChangerMode
+                        })
+                    }}>
                         {
                             Object.values(VoiceChangerMode).map(x => {
                                 return <option key={x} value={x}>{x}</option>
@@ -41,7 +51,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 </div>
             </div>
         )
-    }, [])
+    }, [props.clientState.settingState])
 
     const advancedSetting = useMemo(() => {
         return (
@@ -59,8 +69,6 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
 
     return {
         advancedSetting,
-        vfForceDisabled,
-        voiceChangerMode,
     }
 
 }

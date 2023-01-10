@@ -1,6 +1,7 @@
 import { fileSelectorAsDataURL, createDummyMediaStream, SampleRate } from "@dannadori/voice-changer-client-js"
 import React, { useEffect, useMemo, useState } from "react"
 import { AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_CONVERTED, AUDIO_ELEMENT_FOR_TEST_ORIGINAL } from "./const"
+import { ClientState } from "./hooks/useClient";
 
 
 const reloadDevices = async () => {
@@ -29,22 +30,20 @@ const reloadDevices = async () => {
     const audioOutputs = mediaDeviceInfos.filter(x => { return x.kind == "audiooutput" })
     return [audioInputs, audioOutputs]
 }
-
+export type UseDeviceSettingProps = {
+    clientState: ClientState
+}
 
 export type DeviceSettingState = {
     deviceSetting: JSX.Element;
-    audioInput: string | MediaStream;
-    sampleRate: SampleRate;
 }
 
-export const useDeviceSetting = (audioContext: AudioContext | null): DeviceSettingState => {
+export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDeviceSettingProps): DeviceSettingState => {
     const [inputAudioDeviceInfo, setInputAudioDeviceInfo] = useState<MediaDeviceInfo[]>([])
     const [outputAudioDeviceInfo, setOutputAudioDeviceInfo] = useState<MediaDeviceInfo[]>([])
 
     const [audioInputForGUI, setAudioInputForGUI] = useState<string>("none")
-    const [audioInput, setAudioInput] = useState<string | MediaStream>("none")
     const [audioOutputForGUI, setAudioOutputForGUI] = useState<string>("none")
-    const [sampleRate, setSampleRate] = useState<SampleRate>(48000)
 
 
     useEffect(() => {
@@ -88,11 +87,17 @@ export const useDeviceSetting = (audioContext: AudioContext | null): DeviceSetti
         }
         if (audioInputForGUI == "none") {
             const ms = createDummyMediaStream(audioContext)
-            setAudioInput(ms)
+            props.clientState.setSettingState({
+                ...props.clientState.settingState,
+                audioInput: ms
+            })
         } else if (audioInputForGUI == "file") {
             // file selector (audioMediaInputRow)
         } else {
-            setAudioInput(audioInputForGUI)
+            props.clientState.setSettingState({
+                ...props.clientState.settingState,
+                audioInput: audioInputForGUI
+            })
         }
     }, [audioContext, audioInputForGUI])
 
@@ -111,8 +116,10 @@ export const useDeviceSetting = (audioContext: AudioContext | null): DeviceSetti
             const src = audioContext!.createMediaElementSource(audio);
             const dst = audioContext!.createMediaStreamDestination()
             src.connect(dst)
-            setAudioInput(dst.stream)
-
+            props.clientState.setSettingState({
+                ...props.clientState.settingState,
+                audioInput: dst.stream
+            })
             // original stream to play.
             const audio_org = document.getElementById(AUDIO_ELEMENT_FOR_TEST_ORIGINAL) as HTMLAudioElement
             audio_org.src = url
@@ -179,7 +186,13 @@ export const useDeviceSetting = (audioContext: AudioContext | null): DeviceSetti
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Sample Rate</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={sampleRate} onChange={(e) => { setSampleRate(Number(e.target.value) as SampleRate) }}>
+                    <select className="body-select" value={props.clientState.settingState.sampleRate} onChange={(e) => {
+                        props.clientState.setSettingState({
+                            ...props.clientState.settingState,
+                            sampleRate: Number(e.target.value) as SampleRate
+                        })
+
+                    }}>
                         {
                             Object.values(SampleRate).map(x => {
                                 return <option key={x} value={x}>{x}</option>
@@ -189,7 +202,7 @@ export const useDeviceSetting = (audioContext: AudioContext | null): DeviceSetti
                 </div>
             </div>
         )
-    }, [sampleRate])
+    }, [props.clientState.settingState])
 
 
 
@@ -211,7 +224,5 @@ export const useDeviceSetting = (audioContext: AudioContext | null): DeviceSetti
 
     return {
         deviceSetting,
-        audioInput,
-        sampleRate,
     }
 }

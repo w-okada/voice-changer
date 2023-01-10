@@ -42,6 +42,8 @@ class VoiceChanger():
         self.unpackedData_length=0
         self.net_g = None
         self.onnx_session = None
+        self.currentCrossFadeOffsetRate=0
+        self.currentCrossFadeEndRate=0
         # 共通で使用する情報を収集
         self.hps = utils.get_hparams_from_file(config)
         self.gpu_num = torch.cuda.device_count()
@@ -109,7 +111,7 @@ class VoiceChanger():
             setattr(self.settings, key, int(val))
             if key == "gpu" and val >= 0 and val < self.gpu_num and self.onnx_session != None:
                 providers = self.onnx_session.get_providers()
-                print("Providers::::", providers)
+                print("Providers:", providers)
                 if "CUDAExecutionProvider" in providers:
                     provider_options=[{'device_id': self.settings.gpu}]
                     self.onnx_session.set_providers(providers=["CUDAExecutionProvider"], provider_options=provider_options)
@@ -121,14 +123,18 @@ class VoiceChanger():
             setattr(self.settings, key, str(val))
         else:
             print(f"{key} is not mutalbe variable!")
+
         return self.get_info()
 
-
+        self.currentCrossFadeOffsetRate=0
+        self.currentCrossFadeEndRate=0
 
     def _generate_strength(self, unpackedData):
 
-        if self.unpackedData_length != unpackedData.shape[0]:
+        if self.unpackedData_length != unpackedData.shape[0] or self.currentCrossFadeOffsetRate != self.settings.crossFadeOffsetRate or self.currentCrossFadeEndRate != self.settings.crossFadeEndRate :
             self.unpackedData_length = unpackedData.shape[0]
+            self.currentCrossFadeOffsetRate = self.settings.crossFadeOffsetRate
+            self.currentCrossFadeEndRate = self.settings.crossFadeEndRate
             cf_offset = int(unpackedData.shape[0] * self.settings.crossFadeOffsetRate)
             cf_end   = int(unpackedData.shape[0] * self.settings.crossFadeEndRate)
             cf_range = cf_end - cf_offset

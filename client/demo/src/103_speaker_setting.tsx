@@ -1,24 +1,25 @@
-import { DefaultVoiceChangerRequestParamas, DefaultVoiceChangerOptions, Speaker } from "@dannadori/voice-changer-client-js"
-import React, { useMemo, useState } from "react"
+import React, { useMemo } from "react"
+import { ClientState } from "./hooks/useClient"
 
+export type UseSpeakerSettingProps = {
+    clientState: ClientState
+}
 
-export const useSpeakerSetting = () => {
-    const [speakers, setSpeakers] = useState<Speaker[]>(DefaultVoiceChangerOptions.speakers)
-    const [editSpeakerTargetId, setEditSpeakerTargetId] = useState<number>(0)
-    const [editSpeakerTargetName, setEditSpeakerTargetName] = useState<string>("")
-
-    const [srcId, setSrcId] = useState<number>(DefaultVoiceChangerRequestParamas.srcId)
-    const [dstId, setDstId] = useState<number>(DefaultVoiceChangerRequestParamas.dstId)
-
+export const useSpeakerSetting = (props: UseSpeakerSettingProps) => {
 
     const srcIdRow = useMemo(() => {
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Source Speaker Id</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={srcId} onChange={(e) => { setSrcId(Number(e.target.value)) }}>
+                    <select className="body-select" value={props.clientState.settingState.srcId} onChange={(e) => {
+                        props.clientState.setSettingState({
+                            ...props.clientState.settingState,
+                            srcId: Number(e.target.value)
+                        })
+                    }}>
                         {
-                            speakers.map(x => {
+                            props.clientState.settingState.speakers.map(x => {
                                 return <option key={x.id} value={x.id}>{x.name}({x.id})</option>
                             })
                         }
@@ -26,16 +27,21 @@ export const useSpeakerSetting = () => {
                 </div>
             </div>
         )
-    }, [srcId, speakers])
+    }, [props.clientState.settingState])
 
     const dstIdRow = useMemo(() => {
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Destination Speaker Id</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={dstId} onChange={(e) => { setDstId(Number(e.target.value)) }}>
+                    <select className="body-select" value={props.clientState.settingState.dstId} onChange={(e) => {
+                        props.clientState.setSettingState({
+                            ...props.clientState.settingState,
+                            dstId: Number(e.target.value)
+                        })
+                    }}>
                         {
-                            speakers.map(x => {
+                            props.clientState.settingState.speakers.map(x => {
                                 return <option key={x.id} value={x.id}>{x.name}({x.id})</option>
                             })
                         }
@@ -43,29 +49,38 @@ export const useSpeakerSetting = () => {
                 </div>
             </div>
         )
-    }, [dstId, speakers])
+    }, [props.clientState.settingState])
 
     const editSpeakerIdMappingRow = useMemo(() => {
         const onSetSpeakerMappingClicked = async () => {
-            const targetId = editSpeakerTargetId
-            const targetName = editSpeakerTargetName
-            const targetSpeaker = speakers.find(x => { return x.id == targetId })
+            const targetId = props.clientState.settingState.editSpeakerTargetId
+            const targetName = props.clientState.settingState.editSpeakerTargetName
+            const targetSpeaker = props.clientState.settingState.speakers.find(x => { return x.id == targetId })
             if (targetSpeaker) {
                 if (targetName.length == 0) { // Delete
-                    const newSpeakers = speakers.filter(x => { return x.id != targetId })
-                    setSpeakers(newSpeakers)
+                    const newSpeakers = props.clientState.settingState.speakers.filter(x => { return x.id != targetId })
+                    props.clientState.setSettingState({
+                        ...props.clientState.settingState,
+                        speakers: newSpeakers
+                    })
                 } else { // Update
                     targetSpeaker.name = targetName
-                    setSpeakers([...speakers])
+                    props.clientState.setSettingState({
+                        ...props.clientState.settingState,
+                        speakers: props.clientState.settingState.speakers
+                    })
                 }
             } else {
                 if (targetName.length == 0) { // Noop
                 } else {// add
-                    speakers.push({
+                    props.clientState.settingState.speakers.push({
                         id: targetId,
                         name: targetName
                     })
-                    setSpeakers([...speakers])
+                    props.clientState.setSettingState({
+                        ...props.clientState.settingState,
+                        speakers: props.clientState.settingState.speakers
+                    })
                 }
             }
         }
@@ -73,21 +88,29 @@ export const useSpeakerSetting = () => {
             <div className="body-row split-3-1-2-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Edit Speaker Mapping</div>
                 <div className="body-input-container">
-                    <input type="number" min={1} max={256} step={1} value={editSpeakerTargetId} onChange={(e) => {
+                    <input type="number" min={1} max={256} step={1} value={props.clientState.settingState.editSpeakerTargetId} onChange={(e) => {
                         const id = Number(e.target.value)
-                        setEditSpeakerTargetId(id)
-                        setEditSpeakerTargetName(speakers.find(x => { return x.id == id })?.name || "")
+                        props.clientState.setSettingState({
+                            ...props.clientState.settingState,
+                            editSpeakerTargetId: id,
+                            editSpeakerTargetName: props.clientState.settingState.speakers.find(x => { return x.id == id })?.name || ""
+                        })
                     }} />
                 </div>
                 <div className="body-input-container">
-                    <input type="text" value={editSpeakerTargetName} onChange={(e) => { setEditSpeakerTargetName(e.target.value) }} />
+                    <input type="text" value={props.clientState.settingState.editSpeakerTargetName} onChange={(e) => {
+                        props.clientState.setSettingState({
+                            ...props.clientState.settingState,
+                            editSpeakerTargetName: e.target.value
+                        })
+                    }} />
                 </div>
                 <div className="body-button-container">
                     <div className="body-button" onClick={onSetSpeakerMappingClicked}>set</div>
                 </div>
             </div>
         )
-    }, [speakers, editSpeakerTargetId, editSpeakerTargetName])
+    }, [props.clientState.settingState])
 
 
     const speakerSetting = useMemo(() => {
@@ -107,8 +130,6 @@ export const useSpeakerSetting = () => {
 
     return {
         speakerSetting,
-        srcId,
-        dstId,
     }
 
 }

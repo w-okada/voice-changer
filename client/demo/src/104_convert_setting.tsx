@@ -1,25 +1,16 @@
 import { DefaultVoiceChangerRequestParamas, DefaultVoiceChangerOptions, BufferSize } from "@dannadori/voice-changer-client-js"
 import React, { useMemo, useState } from "react"
+import { ClientState } from "./hooks/useClient"
 
-export type SpeakerSettingState = {
-    convertSetting: JSX.Element;
-    bufferSize: BufferSize;
-    inputChunkNum: number;
-    convertChunkNum: number;
-    gpu: number;
-    crossFadeOffsetRate: number;
-    crossFadeEndRate: number;
+export type UseConvertSettingProps = {
+    clientState: ClientState
 }
 
-export const useConvertSetting = (): SpeakerSettingState => {
+export type ConvertSettingState = {
+    convertSetting: JSX.Element;
+}
 
-    const [bufferSize, setBufferSize] = useState<BufferSize>(1024)
-    const [inputChunkNum, setInputChunkNum] = useState<number>(DefaultVoiceChangerOptions.inputChunkNum)
-    const [convertChunkNum, setConvertChunkNum] = useState<number>(DefaultVoiceChangerRequestParamas.convertChunkNum)
-    const [gpu, setGpu] = useState<number>(DefaultVoiceChangerRequestParamas.gpu)
-
-    const [crossFadeOffsetRate, setCrossFadeOffsetRate] = useState<number>(DefaultVoiceChangerRequestParamas.crossFadeOffsetRate)
-    const [crossFadeEndRate, setCrossFadeEndRate] = useState<number>(DefaultVoiceChangerRequestParamas.crossFadeEndRate)
+export const useConvertSetting = (props: UseConvertSettingProps): ConvertSettingState => {
 
     const bufferSizeRow = useMemo(() => {
         return (
@@ -27,7 +18,12 @@ export const useConvertSetting = (): SpeakerSettingState => {
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Buffer Size</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={bufferSize} onChange={(e) => { setBufferSize(Number(e.target.value) as BufferSize) }}>
+                    <select className="body-select" value={props.clientState.settingState.bufferSize} onChange={(e) => {
+                        props.clientState.setSettingState({
+                            ...props.clientState.settingState,
+                            bufferSize: Number(e.target.value) as BufferSize
+                        })
+                    }}>
                         {
                             Object.values(BufferSize).map(x => {
                                 return <option key={x} value={x}>{x}</option>
@@ -37,18 +33,23 @@ export const useConvertSetting = (): SpeakerSettingState => {
                 </div>
             </div>
         )
-    }, [bufferSize])
+    }, [props.clientState.settingState])
 
     const inputChunkNumRow = useMemo(() => {
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Input Chunk Num(128sample/chunk)</div>
                 <div className="body-input-container">
-                    <input type="number" min={1} max={256} step={1} value={inputChunkNum} onChange={(e) => { setInputChunkNum(Number(e.target.value)) }} />
+                    <input type="number" min={1} max={256} step={1} value={props.clientState.settingState.inputChunkNum} onChange={(e) => {
+                        props.clientState.setSettingState({
+                            ...props.clientState.settingState,
+                            inputChunkNum: Number(e.target.value)
+                        })
+                    }} />
                 </div>
             </div>
         )
-    }, [inputChunkNum])
+    }, [props.clientState.settingState])
 
     const convertChunkNumRow = useMemo(() => {
         return (
@@ -56,44 +57,64 @@ export const useConvertSetting = (): SpeakerSettingState => {
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Convert Chunk Num(128sample/chunk)</div>
                 <div className="body-input-container">
-                    <input type="number" min={1} max={256} step={1} value={convertChunkNum} onChange={(e) => { setConvertChunkNum(Number(e.target.value)) }} />
+                    <input type="number" min={1} max={256} step={1} value={props.clientState.settingState.convertChunkNum} onChange={(e) => {
+                        props.clientState.setSettingState({
+                            ...props.clientState.settingState,
+                            convertChunkNum: Number(e.target.value)
+                        })
+                    }} />
                 </div>
             </div>
         )
-    }, [convertChunkNum])
+    }, [props.clientState.settingState])
 
     const gpuRow = useMemo(() => {
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title  left-padding-1">GPU</div>
                 <div className="body-input-container">
-                    <input type="number" min={-2} max={5} step={1} value={gpu} onChange={(e) => { setGpu(Number(e.target.value)) }} />
+                    <input type="number" min={-2} max={5} step={1} value={props.clientState.settingState.gpu} onChange={(e) => {
+                        props.clientState.setSettingState({
+                            ...props.clientState.settingState,
+                            gpu: Number(e.target.value)
+                        })
+                    }} />
                 </div>
             </div>
         )
-    }, [gpu])
+    }, [props.clientState.settingState])
 
     const crossFadeOffsetRateRow = useMemo(() => {
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title  left-padding-1">Cross Fade Offset Rate</div>
                 <div className="body-input-container">
-                    <input type="number" min={0} max={1} step={0.1} value={crossFadeOffsetRate} onChange={(e) => { setCrossFadeOffsetRate(Number(e.target.value)) }} />
+                    <input type="number" min={0} max={1} step={0.1} value={props.clientState.settingState.crossFadeOffsetRate} onChange={(e) => {
+                        props.clientState.setSettingState({
+                            ...props.clientState.settingState,
+                            crossFadeOffsetRate: Number(e.target.value)
+                        })
+                    }} />
                 </div>
             </div>
         )
-    }, [crossFadeOffsetRate])
+    }, [props.clientState.settingState])
 
     const crossFadeEndRateRow = useMemo(() => {
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Cross Fade End Rate</div>
                 <div className="body-input-container">
-                    <input type="number" min={0} max={1} step={0.1} value={crossFadeEndRate} onChange={(e) => { setCrossFadeEndRate(Number(e.target.value)) }} />
+                    <input type="number" min={0} max={1} step={0.1} value={props.clientState.settingState.crossFadeEndRate} onChange={(e) => {
+                        props.clientState.setSettingState({
+                            ...props.clientState.settingState,
+                            crossFadeEndRate: Number(e.target.value)
+                        })
+                    }} />
                 </div>
             </div>
         )
-    }, [crossFadeEndRate])
+    }, [props.clientState.settingState])
 
     const convertSetting = useMemo(() => {
         return (
@@ -115,12 +136,6 @@ export const useConvertSetting = (): SpeakerSettingState => {
 
     return {
         convertSetting,
-        bufferSize,
-        inputChunkNum,
-        convertChunkNum,
-        gpu,
-        crossFadeOffsetRate,
-        crossFadeEndRate,
     }
 
 }
