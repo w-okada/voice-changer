@@ -4,13 +4,8 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update 
 RUN apt-get install -y python3-pip git
-# RUN apt-get install -y espeak
-# RUN apt-get install -y cmake
-
-#RUN pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
 
 RUN pip install torch torchvision torchaudio
-
 RUN pip install Cython==0.29.32
 RUN pip install numpy==1.22.4 
 RUN pip install scipy==1.9.0
@@ -42,11 +37,10 @@ ADD dummy /
 RUN git clone  --depth 1 https://github.com/w-okada/voice-changer.git -b v.1.3.0
 
 
-#FROM debian:bullseye-slim
-#FROM nvidia/cuda:12.0.0-runtime-ubuntu22.04
+#########
+# Prod  #
+#########
 FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
-
-
 
 RUN apt-get update \
         && apt-get install -y python3-pip espeak gosu libsndfile1-dev emacs \
@@ -55,7 +49,6 @@ RUN apt-get update \
 
 ### Copy from base
 COPY --from=base --chmod=777 /usr/local/lib/python3.10/dist-packages /usr/local/lib/python3.10/dist-packages
-
 COPY --from=base --chmod=777 /voice-changer /voice-changer
 COPY --from=base --chmod=777 /MMVC_Trainer /voice-changer/server/MMVC_Trainer
 RUN chmod 0777 /voice-changer/server/MMVC_Trainer
