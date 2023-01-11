@@ -16,7 +16,6 @@ export const useMicrophoneOptions = () => {
         audioContext: audioContext,
         audioOutputElementId: AUDIO_ELEMENT_FOR_PLAY_RESULT
     })
-    console.log("cs", clientState)
 
     const serverSetting = useServerSetting({ clientState })
     const deviceSetting = useDeviceSetting(audioContext, { clientState })

@@ -102,6 +102,8 @@ export const useClient = (props: UseClientProps): ClientState => {
     const [responseTime, setResponseTime] = useState<number>(0)
     const [volume, setVolume] = useState<number>(0)
 
+
+
     useEffect(() => {
         const initialized = async () => {
             if (!props.audioContext) {
@@ -276,7 +278,7 @@ export const useClient = (props: UseClientProps): ClientState => {
         })()
     }, [settingState.inputChunkNum])
 
-    // (b) input chunk num設定
+    // (b) convert chunk num設定
     useEffect(() => {
         (async () => {
             await initializedPromise
