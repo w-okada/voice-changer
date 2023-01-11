@@ -7,7 +7,7 @@ import { BufferSize, DefaultVoiceChangerOptions, Protocol, ServerSettingKey, Voi
 import MicrophoneStream from "microphone-stream";
 import { AudioStreamer, Callbacks, AudioStreamerListeners } from "./AudioStreamer";
 import { ServerConfigurator } from "./ServerConfigurator";
-
+import { VoiceChangerWorkletProcessorRequest } from "./@types/voice-changer-worklet-processor";
 
 // オーディオデータの流れ
 // input node(mic or MediaStream) -> [vf node] -> microphne stream -> audio streamer -> 
@@ -39,7 +39,15 @@ export class VoiceChnagerClient {
         onVoiceReceived: (voiceChangerMode: VoiceChangerMode, data: ArrayBuffer): void => {
             // console.log(voiceChangerMode, data)
             if (voiceChangerMode === "realtime") {
-                this.vcNode.postReceivedVoice(data)
+                const req: VoiceChangerWorkletProcessorRequest = {
+                    requestType: "voice",
+                    voice: data,
+                    numTrancateTreshold: 0,
+                    volTrancateThreshold: 0,
+                    volTrancateLength: 0
+                }
+
+                this.vcNode.postReceivedVoice(req)
                 return
             }
 

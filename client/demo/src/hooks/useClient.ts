@@ -389,7 +389,7 @@ export const useClient = (props: UseClientProps): ClientState => {
                 srcId: serverInfo.srcId,
                 dstId: serverInfo.dstId,
                 framework: serverInfo.framework,
-                onnxExecutionProvider: serverInfo.providers.length > 0 ? serverInfo.providers[0] as OnnxExecutionProvider : "CPUExecutionProvider"
+                onnxExecutionProvider: !!serverInfo.providers && serverInfo.providers.length > 0 ? serverInfo.providers[0] as OnnxExecutionProvider : "CPUExecutionProvider"
             })
         } else {
             setDisplaySettingState({

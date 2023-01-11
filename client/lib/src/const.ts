@@ -1,7 +1,7 @@
 
 // (★1) chunk sizeは 128サンプル, 256byte(int16)と定義。
 // (★2) 256byte(最低バッファサイズ256から間引いた個数x2byte)をchunkとして管理。
-
+// 24000sample -> 1sec, 128sample(1chunk) -> 5.333msec
 
 // types
 export type VoiceChangerRequestParamas = {

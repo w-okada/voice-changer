@@ -1,8 +1,26 @@
+export const RequestType = {
+    "voice": "voice",
+    "config": "config"
+} as const
+export type RequestType = typeof RequestType[keyof typeof RequestType]
+
+export type VoiceChangerWorkletProcessorRequest = {
+    requestType: RequestType,
+    voice: ArrayBuffer,
+    numTrancateTreshold: number
+    volTrancateThreshold: number
+    volTrancateLength: number
+}
 
 class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
     private BLOCK_SIZE = 128
     private initialized = false;
     private volume = 0
+    private numTrancateTreshold = 50
+    private volTrancateThreshold = 0.0005
+    private volTrancateLength = 32
+    private volTrancateCount = 0
+
     playBuffer: Float32Array[] = []
     /**
      * @constructor
@@ -13,9 +31,25 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
         this.port.onmessage = this.handleMessage.bind(this);
     }
 
+    calcVol = (data: Float32Array, prevVol: number) => {
+        const sum = data.reduce((prev, cur) => {
+            return prev + cur * cur
+        }, 0)
+        const rms = Math.sqrt(sum / data.length)
+        return Math.max(rms, prevVol * 0.95)
+    }
+
     handleMessage(event: any) {
-        // noop
-        const arrayBuffer = event.data.data as ArrayBuffer
+        const request = event.data.request as VoiceChangerWorkletProcessorRequest
+        if (request.requestType === "config") {
+            this.numTrancateTreshold = request.numTrancateTreshold
+            this.volTrancateLength = request.volTrancateLength
+            this.volTrancateThreshold = request.volTrancateThreshold
+            console.log("[worklet] worklet configured", request)
+            return
+        }
+
+        const arrayBuffer = request.voice
         // データは(int16)で受信
         const i16Data = new Int16Array(arrayBuffer)
         const f32Data = new Float32Array(i16Data.length)
@@ -25,7 +59,7 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
             f32Data[i] = float
         })
 
-        if (this.playBuffer.length > 50) {
+        if (this.playBuffer.length > this.numTrancateTreshold) {
             console.log("[worklet] Buffer truncated")
             while (this.playBuffer.length > 2) {
                 this.playBuffer.shift()
@@ -58,23 +92,36 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
         }
 
         if (this.playBuffer.length === 0) {
-            // console.log("[worklet] no play buffer")
+            console.log("[worklet] no play buffer")
             return true
         }
 
-        const data = this.playBuffer.shift()!
+        //// 一定期間無音状態が続いている場合はスキップ。
+        let voice: Float32Array | undefined
+        while (true) {
+            voice = this.playBuffer.shift()
+            if (!voice) {
+                break
+            }
+            this.volume = this.calcVol(voice, this.volume)
+            if (this.volume < this.volTrancateThreshold) {
+                this.volTrancateCount += 1
+            } else {
+                this.volTrancateCount = 0
+            }
 
-        const sum = data.reduce((prev, cur) => {
-            return prev + cur * cur
-        }, 0)
-        const rms = Math.sqrt(sum / data.length)
 
-        this.volume = Math.max(rms, this.volume * 0.95)
-        this.port.postMessage({ volume: this.volume });
+            if (this.volTrancateCount < this.volTrancateLength) {
+                break
+            } else {
+                console.log("silent...skip")
+            }
+        }
 
-
-
-        outputs[0][0].set(data)
+        if (voice) {
+            this.port.postMessage({ volume: this.volume });
+            outputs[0][0].set(voice)
+        }
 
         return true;
     }

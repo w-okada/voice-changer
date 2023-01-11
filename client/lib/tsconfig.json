@@ -29,6 +29,6 @@
     "skipLibCheck": true
   },
   /* tscコマンドで読み込むファイルを指定 */
-  "include": ["src/*.ts"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
 }
