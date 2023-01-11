@@ -2,6 +2,7 @@
 // (★1) chunk sizeは 128サンプル, 256byte(int16)と定義。
 // (★2) 256byte(最低バッファサイズ256から間引いた個数x2byte)をchunkとして管理。
 // 24000sample -> 1sec, 128sample(1chunk) -> 5.333msec
+// 187.5chunk -> 1sec
 
 // types
 export type VoiceChangerRequestParamas = {
@@ -31,6 +32,11 @@ export type VoiceChangerOptions = {
     framework: Framework
 }
 
+export type WorkletSetting = {
+    numTrancateTreshold: number,
+    volTrancateThreshold: number,
+    volTrancateLength: number
+}
 
 export type Speaker = {
     "id": number,
@@ -160,7 +166,11 @@ export const DefaultVoiceChangerOptions: VoiceChangerOptions = {
     onnxExecutionProvider: "CPUExecutionProvider"
 }
 
-
+export const DefaultWorkletSetting: WorkletSetting = {
+    numTrancateTreshold: 188,
+    volTrancateThreshold: 0.0005,
+    volTrancateLength: 32
+}
 
 export const VOICE_CHANGER_CLIENT_EXCEPTION = {
     ERR_SIO_CONNECT_FAILED: "ERR_SIO_CONNECT_FAILED",

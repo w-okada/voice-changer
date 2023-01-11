@@ -3,7 +3,7 @@ import { VoiceChangerWorkletNode, VolumeListener } from "./VoiceChangerWorkletNo
 import workerjs from "raw-loader!../worklet/dist/index.js";
 import { VoiceFocusDeviceTransformer, VoiceFocusTransformDevice } from "amazon-chime-sdk-js";
 import { createDummyMediaStream, validateUrl } from "./util";
-import { BufferSize, DefaultVoiceChangerOptions, Protocol, ServerSettingKey, VoiceChangerMode, VOICE_CHANGER_CLIENT_EXCEPTION } from "./const";
+import { BufferSize, DefaultVoiceChangerOptions, Protocol, ServerSettingKey, VoiceChangerMode, VOICE_CHANGER_CLIENT_EXCEPTION, WorkletSetting } from "./const";
 import MicrophoneStream from "microphone-stream";
 import { AudioStreamer, Callbacks, AudioStreamerListeners } from "./AudioStreamer";
 import { ServerConfigurator } from "./ServerConfigurator";
@@ -15,7 +15,7 @@ import { VoiceChangerWorkletProcessorRequest } from "./@types/voice-changer-work
 
 
 
-export class VoiceChnagerClient {
+export class VoiceChangerClient {
     private configurator: ServerConfigurator
     private ctx: AudioContext
     private vfEnable = false
@@ -207,6 +207,18 @@ export class VoiceChnagerClient {
 
     setVoiceChangerMode = (val: VoiceChangerMode) => {
         this.audioStreamer.setVoiceChangerMode(val)
+    }
+
+    // configure worklet
+    configureWorklet = (setting: WorkletSetting) => {
+        const req: VoiceChangerWorkletProcessorRequest = {
+            requestType: "config",
+            voice: new ArrayBuffer(1),
+            numTrancateTreshold: setting.numTrancateTreshold,
+            volTrancateThreshold: setting.volTrancateThreshold,
+            volTrancateLength: setting.volTrancateLength
+        }
+        this.vcNode.postReceivedVoice(req)
     }
 
     // Configurator Method

@@ -53,6 +53,53 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
         )
     }, [props.clientState.settingState])
 
+
+
+    const workletSettingRow = useMemo(() => {
+        return (
+            <>
+
+                <div className="body-row split-3-7 left-padding-1 guided">
+                    <div className="body-item-title left-padding-1">Trancate Num</div>
+                    <div className="body-input-container">
+                        <input type="number" min={50} max={300} step={1} value={props.clientState.workletSetting.setting.numTrancateTreshold} onChange={(e) => {
+                            props.clientState.workletSetting.setSetting({
+                                ...props.clientState.workletSetting.setting,
+                                numTrancateTreshold: Number(e.target.value)
+                            })
+                        }} />
+                    </div>
+                </div>
+
+                <div className="body-row split-3-7 left-padding-1 guided">
+                    <div className="body-item-title left-padding-1">Trancate Vol</div>
+                    <div className="body-input-container">
+                        <input type="number" min={0.0001} max={0.0009} step={0.0001} value={props.clientState.workletSetting.setting.volTrancateThreshold} onChange={(e) => {
+                            props.clientState.workletSetting.setSetting({
+                                ...props.clientState.workletSetting.setting,
+                                volTrancateThreshold: Number(e.target.value)
+                            })
+                        }} />
+                    </div>
+                </div>
+                <div className="body-row split-3-7 left-padding-1 guided">
+                    <div className="body-item-title left-padding-1">Trancate Vol Length</div>
+                    <div className="body-input-container">
+                        <input type="number" min={16} max={128} step={1} value={props.clientState.workletSetting.setting.volTrancateLength} onChange={(e) => {
+                            props.clientState.workletSetting.setSetting({
+                                ...props.clientState.workletSetting.setting,
+                                volTrancateLength: Number(e.target.value)
+                            })
+                        }} />
+                    </div>
+                </div>
+
+
+            </>
+        )
+    }, [props.clientState.workletSetting.setting, props.clientState.workletSetting.setSetting])
+
+
     const advancedSetting = useMemo(() => {
         return (
             <>
@@ -63,9 +110,10 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
                 </div>
                 {vfForceDisableRow}
                 {voiceChangeModeRow}
+                {workletSettingRow}
             </>
         )
-    }, [vfForceDisableRow, voiceChangeModeRow])
+    }, [vfForceDisableRow, voiceChangeModeRow, workletSettingRow])
 
     return {
         advancedSetting,

@@ -16,7 +16,7 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
     private BLOCK_SIZE = 128
     private initialized = false;
     private volume = 0
-    private numTrancateTreshold = 50
+    private numTrancateTreshold = 150
     private volTrancateThreshold = 0.0005
     private volTrancateLength = 32
     private volTrancateCount = 0
@@ -92,7 +92,7 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
         }
 
         if (this.playBuffer.length === 0) {
-            console.log("[worklet] no play buffer")
+            // console.log("[worklet] no play buffer")
             return true
         }
 
@@ -111,10 +111,10 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
             }
 
 
-            if (this.volTrancateCount < this.volTrancateLength) {
+            if (this.volTrancateCount < this.volTrancateLength || this.volTrancateLength < 0) {
                 break
             } else {
-                console.log("silent...skip")
+                // console.log("silent...skip")
             }
         }
 

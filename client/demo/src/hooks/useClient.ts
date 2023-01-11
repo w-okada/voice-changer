@@ -1,5 +1,6 @@
-import { ServerInfo, BufferSize, createDummyMediaStream, DefaultVoiceChangerOptions, DefaultVoiceChangerRequestParamas, Framework, OnnxExecutionProvider, Protocol, SampleRate, ServerSettingKey, Speaker, VoiceChangerMode, VoiceChnagerClient } from "@dannadori/voice-changer-client-js"
+import { ServerInfo, BufferSize, createDummyMediaStream, DefaultVoiceChangerOptions, DefaultVoiceChangerRequestParamas, Framework, OnnxExecutionProvider, Protocol, SampleRate, ServerSettingKey, Speaker, VoiceChangerMode, VoiceChangerClient } from "@dannadori/voice-changer-client-js"
 import { useEffect, useMemo, useRef, useState } from "react"
+import { useWorkletSetting, WorkletSettingState } from "./useWorkletSetting"
 
 export type UseClientProps = {
     audioContext: AudioContext | null
@@ -89,6 +90,9 @@ export type ClientState = {
     start: () => Promise<void>;
     stop: () => Promise<void>;
     getInfo: () => Promise<void>
+
+
+    workletSetting: WorkletSettingState
 }
 
 
@@ -96,7 +100,9 @@ export type ClientState = {
 export const useClient = (props: UseClientProps): ClientState => {
 
     // (1) クライアント初期化
-    const voiceChangerClientRef = useRef<VoiceChnagerClient | null>(null)
+    const voiceChangerClientRef = useRef<VoiceChangerClient | null>(null)
+    const [voiceChangerClient, setVoiceChangerClient] = useState<VoiceChangerClient | null>(voiceChangerClientRef.current)
+    const workletSetting = useWorkletSetting({ voiceChangerClient })
     const [clientInitialized, setClientInitialized] = useState<boolean>(false)
     const initializedResolveRef = useRef<(value: void | PromiseLike<void>) => void>()
     const initializedPromise = useMemo(() => {
@@ -123,7 +129,7 @@ export const useClient = (props: UseClientProps): ClientState => {
             if (!props.audioContext) {
                 return
             }
-            const voiceChangerClient = new VoiceChnagerClient(props.audioContext, true, {
+            const voiceChangerClient = new VoiceChangerClient(props.audioContext, true, {
                 notifySendBufferingTime: (val: number) => {
                     setBufferingTime(val)
                 },
@@ -143,6 +149,7 @@ export const useClient = (props: UseClientProps): ClientState => {
 
             await voiceChangerClient.isInitialized()
             voiceChangerClientRef.current = voiceChangerClient
+            setVoiceChangerClient(voiceChangerClientRef.current)
             console.log("[useClient] client initialized")
             setClientInitialized(true)
 
@@ -414,6 +421,7 @@ export const useClient = (props: UseClientProps): ClientState => {
     }, [])
 
 
+
     return {
         clientInitialized,
         bufferingTime,
@@ -429,5 +437,7 @@ export const useClient = (props: UseClientProps): ClientState => {
         start,
         stop,
         getInfo,
+
+        workletSetting
     }
 }
