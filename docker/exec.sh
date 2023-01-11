@@ -13,16 +13,17 @@ echo "PARAMS: $PARAMS"
 # echo "VERBOSE: $VERBOSE"
 echo "------"
 
-cd /voice-changer-internal/voice-change-service
+#cd /voice-changer-internal/voice-change-service
 # 起動
 if  [ "${MODE}" = "MMVC" ] ; then
-    if [[ -e /resources/setting.json ]]; then
-        echo "指定された設定(setting.json)を使用します。"
-        cp /resources/setting.json ../frontend/dist/assets/setting.json
-    fi
+    # if [[ -e /resources/setting.json ]]; then
+    #     echo "指定された設定(setting.json)を使用します。"
+    #     cp /resources/setting.json ../frontend/dist/assets/setting.json
+    # fi
 
-    find /resources/ -type f -name "config.json" | xargs -I{} sh -c 'echo "config.jsonをコピーします。" && cp {} ./'
+    # find /resources/ -type f -name "config.json" | xargs -I{} sh -c 'echo "config.jsonをコピーします。" && cp {} ./'
     find /resources/ -type f -name "*.pth"       | xargs -I{} sh -c 'echo "`basename {}`をコピーします。" && cp {} ./'
+    find /resources/ -type f -name "*.onnx"       | xargs -I{} sh -c 'echo "`basename {}`をコピーします。" && cp {} ./'
 
     echo "MMVCを起動します"
     python3 MMVCServerSIO.py -t MMVC $PARAMS #2>stderr.txt

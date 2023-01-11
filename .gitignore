@@ -1,2 +1,16 @@
 dummy
 node_modules
+__pycache__
+
+server/upload_dir/
+server/MMVC_Trainer/
+server/key
+server/info
+
+server/memo.txt
+
+client/lib/dist
+client/lib/worklet/dist
+# client/demo/dist/ # demo用に残す
+
+docker/cudnn/
