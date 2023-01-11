@@ -84,6 +84,22 @@ export const useConvertSetting = (props: UseConvertSettingProps): ConvertSetting
         )
     }, [props.clientState.settingState])
 
+    const crossFadeOverlapRateRow = useMemo(() => {
+        return (
+            <div className="body-row split-3-7 left-padding-1 guided">
+                <div className="body-item-title  left-padding-1">Cross Fade Overlap Rate</div>
+                <div className="body-input-container">
+                    <input type="number" min={0.1} max={1} step={0.1} value={props.clientState.settingState.crossFadeOverlapRate} onChange={(e) => {
+                        props.clientState.setSettingState({
+                            ...props.clientState.settingState,
+                            crossFadeOverlapRate: Number(e.target.value)
+                        })
+                    }} />
+                </div>
+            </div>
+        )
+    }, [props.clientState.settingState])
+
     const crossFadeOffsetRateRow = useMemo(() => {
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
@@ -128,11 +144,12 @@ export const useConvertSetting = (props: UseConvertSettingProps): ConvertSetting
                 {inputChunkNumRow}
                 {convertChunkNumRow}
                 {gpuRow}
+                {crossFadeOverlapRateRow}
                 {crossFadeOffsetRateRow}
                 {crossFadeEndRateRow}
             </>
         )
-    }, [bufferSizeRow, inputChunkNumRow, convertChunkNumRow, gpuRow, crossFadeOffsetRateRow, crossFadeEndRateRow])
+    }, [bufferSizeRow, inputChunkNumRow, convertChunkNumRow, gpuRow, crossFadeOverlapRateRow, crossFadeOffsetRateRow, crossFadeEndRateRow])
 
     return {
         convertSetting,

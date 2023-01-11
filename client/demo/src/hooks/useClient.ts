@@ -34,6 +34,7 @@ export type SettingState = {
     gpu: number
     crossFadeOffsetRate: number
     crossFadeEndRate: number
+    crossFadeOverlapRate: number
 
     // advanced setting
     vfForceDisabled: boolean
@@ -64,6 +65,8 @@ const InitialSettingState: SettingState = {
     gpu: DefaultVoiceChangerRequestParamas.gpu,
     crossFadeOffsetRate: DefaultVoiceChangerRequestParamas.crossFadeOffsetRate,
     crossFadeEndRate: DefaultVoiceChangerRequestParamas.crossFadeEndRate,
+    crossFadeOverlapRate: DefaultVoiceChangerRequestParamas.crossFadeOverlapRate,
+
     vfForceDisabled: DefaultVoiceChangerOptions.forceVfDisable,
     voiceChangerMode: DefaultVoiceChangerOptions.voiceChangerMode
 }
@@ -325,6 +328,16 @@ export const useClient = (props: UseClientProps): ClientState => {
         })()
     }, [settingState.crossFadeEndRate])
 
+    // (f) crossfade設定3
+    useEffect(() => {
+        (async () => {
+            await initializedPromise
+            const info = await voiceChangerClientRef.current!.updateServerSettings(ServerSettingKey.crossFadeOverlapRate, "" + settingState.crossFadeOverlapRate)
+            setServerInfo(info)
+        })()
+    }, [settingState.crossFadeOverlapRate])
+
+
     // (2-5) advanced setting
     //// VFDisableはinput設定で合わせて設定。
     // (a) voice changer mode
@@ -394,7 +407,8 @@ export const useClient = (props: UseClientProps): ClientState => {
         if (colab == "true") {
             setSettingState({
                 ...settingState,
-                protocol: "rest"
+                protocol: "rest",
+                inputChunkNum: 64
             })
         }
     }, [])

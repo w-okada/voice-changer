@@ -13,6 +13,7 @@ export type VoiceChangerRequestParamas = {
     crossFadeLowerValue: number,
     crossFadeOffsetRate: number,
     crossFadeEndRate: number,
+    crossFadeOverlapRate: number,
 
 }
 
@@ -106,6 +107,7 @@ export const ServerSettingKey = {
     "gpu": "gpu",
     "crossFadeOffsetRate": "crossFadeOffsetRate",
     "crossFadeEndRate": "crossFadeEndRate",
+    "crossFadeOverlapRate": "crossFadeOverlapRate",
     "framework": "framework",
     "onnxExecutionProvider": "onnxExecutionProvider"
 } as const
@@ -119,7 +121,8 @@ export const DefaultVoiceChangerRequestParamas: VoiceChangerRequestParamas = {
     gpu: 0,
     crossFadeLowerValue: 0.1,
     crossFadeOffsetRate: 0.1,
-    crossFadeEndRate: 0.9
+    crossFadeEndRate: 0.9,
+    crossFadeOverlapRate: 0.5
 }
 
 export const DefaultVoiceChangerOptions: VoiceChangerOptions = {
