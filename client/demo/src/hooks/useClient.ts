@@ -87,6 +87,9 @@ export type ClientState = {
     stop: () => Promise<void>;
     getInfo: () => Promise<void>
 }
+
+
+
 export const useClient = (props: UseClientProps): ClientState => {
 
     // (1) クライアント初期化
@@ -103,6 +106,14 @@ export const useClient = (props: UseClientProps): ClientState => {
     const [volume, setVolume] = useState<number>(0)
 
 
+    // Colab対応
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const colab = params.get("colab")
+        if (colab == "true") {
+
+        }
+    }, [])
 
     useEffect(() => {
         const initialized = async () => {
@@ -374,6 +385,19 @@ export const useClient = (props: UseClientProps): ClientState => {
         }
 
     }, [settingState, serverInfo])
+
+
+    // Colab対応
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const colab = params.get("colab")
+        if (colab == "true") {
+            setSettingState({
+                ...settingState,
+                protocol: "rest"
+            })
+        }
+    }, [])
 
 
     return {
