@@ -25,14 +25,14 @@
   "license": "ISC",
   "devDependencies": {
     "@types/audioworklet": "^0.0.36",
-    "@types/node": "^18.11.17",
-    "eslint": "^8.30.0",
-    "eslint-config-prettier": "^8.5.0",
+    "@types/node": "^18.11.18",
+    "eslint": "^8.31.0",
+    "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-react": "^7.31.11",
+    "eslint-plugin-react": "^7.32.0",
     "eslint-webpack-plugin": "^3.2.0",
     "npm-run-all": "^4.1.5",
-    "prettier": "^2.8.1",
+    "prettier": "^2.8.2",
     "raw-loader": "^4.0.2",
     "rimraf": "^3.0.2",
     "ts-loader": "^9.4.2",
@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "@types/readable-stream": "^2.3.15",
-    "amazon-chime-sdk-js": "^3.9.0",
+    "amazon-chime-sdk-js": "^3.10.0",
     "microphone-stream": "^6.0.1",
     "readable-stream": "^4.3.0",
     "socket.io-client": "^4.5.4"
