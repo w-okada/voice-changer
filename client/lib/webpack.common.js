@@ -32,4 +32,8 @@ module.exports = {
             process: "process/browser",
         }),
     ],
+    externals: {
+        react: "react",
+        "react-dom": "reactDOM",
+    }
 };

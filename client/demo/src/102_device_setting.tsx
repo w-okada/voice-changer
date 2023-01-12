@@ -1,7 +1,7 @@
 import { fileSelectorAsDataURL, createDummyMediaStream, SampleRate } from "@dannadori/voice-changer-client-js"
 import React, { useEffect, useMemo, useState } from "react"
 import { AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_CONVERTED, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK, AUDIO_ELEMENT_FOR_TEST_ORIGINAL } from "./const"
-import { ClientState } from "./hooks/useClient";
+import { ClientState } from "@dannadori/voice-changer-client-js";
 
 
 const reloadDevices = async () => {

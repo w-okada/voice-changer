@@ -1,6 +1,6 @@
 {
   "name": "@dannadori/voice-changer-client-js",
-  "version": "1.0.6",
+  "version": "1.0.12",
   "description": "",
   "main": "dist/index.js",
   "directories": {
@@ -26,6 +26,8 @@
   "devDependencies": {
     "@types/audioworklet": "^0.0.36",
     "@types/node": "^18.11.18",
+    "@types/react": "18.0.26",
+    "@types/react-dom": "18.0.10",
     "eslint": "^8.31.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-prettier": "^4.2.1",
@@ -43,6 +45,8 @@
   },
   "dependencies": {
     "@types/readable-stream": "^2.3.15",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "amazon-chime-sdk-js": "^3.10.0",
     "microphone-stream": "^6.0.1",
     "readable-stream": "^4.3.0",

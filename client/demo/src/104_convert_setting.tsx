@@ -1,5 +1,5 @@
 import React, { useMemo } from "react"
-import { ClientState } from "./hooks/useClient"
+import { ClientState } from "@dannadori/voice-changer-client-js";
 
 export type UseConvertSettingProps = {
     clientState: ClientState

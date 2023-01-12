@@ -1,6 +1,6 @@
 import { BufferSize, Protocol, SampleRate, VoiceChangerMode } from "@dannadori/voice-changer-client-js"
 import React, { useMemo, useState } from "react"
-import { ClientState } from "./hooks/useClient"
+import { ClientState } from "@dannadori/voice-changer-client-js";
 
 
 export type UseAdvancedSettingProps = {

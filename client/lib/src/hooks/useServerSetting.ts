@@ -1,5 +1,6 @@
-import { DefaultVoiceChangerServerSetting, Framework, OnnxExecutionProvider, ServerInfo, ServerSettingKey, VoiceChangerClient, VoiceChangerServerSetting, } from "@dannadori/voice-changer-client-js"
 import { useState, useMemo, useRef, useEffect } from "react"
+import { VoiceChangerServerSetting, ServerInfo, Framework, OnnxExecutionProvider, DefaultVoiceChangerServerSetting, ServerSettingKey } from "../const"
+import { VoiceChangerClient } from "../VoiceChangerClient"
 
 
 export type FileUploadSetting = {
@@ -168,7 +169,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             for (let i = 0; i < models.length; i++) {
                 const progRate = 1 / models.length
                 const progOffset = 100 * i * progRate
-                await _uploadFile(models[i], (progress: number, end: boolean) => {
+                await _uploadFile(models[i], (progress: number, _end: boolean) => {
                     // console.log(progress * progRate + progOffset, end, progRate,)
                     setUploadProgress(progress * progRate + progOffset)
                 })

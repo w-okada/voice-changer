@@ -6,8 +6,8 @@ import { useDeviceSetting } from "./102_device_setting";
 import { useConvertSetting } from "./104_convert_setting";
 import { useAdvancedSetting } from "./105_advanced_setting";
 import { useSpeakerSetting } from "./103_speaker_setting";
-import { useClient } from "./hooks/useClient";
 import { useServerControl } from "./106_server_control";
+import { useClient } from "@dannadori/voice-changer-client-js";
 
 export const useMicrophoneOptions = () => {
     const [audioContext, setAudioContext] = useState<AudioContext | null>(null)

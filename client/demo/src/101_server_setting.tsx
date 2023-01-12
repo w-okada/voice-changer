@@ -1,7 +1,7 @@
 import { OnnxExecutionProvider, Framework, fileSelector } from "@dannadori/voice-changer-client-js"
 import React from "react"
 import { useMemo } from "react"
-import { ClientState } from "./hooks/useClient"
+import { ClientState } from "@dannadori/voice-changer-client-js";
 
 export type UseServerSettingProps = {
     clientState: ClientState
