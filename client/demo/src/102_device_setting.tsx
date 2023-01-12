@@ -175,24 +175,6 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
         })
     }, [audioOutputForGUI])
 
-    const sampleRateRow = useMemo(() => {
-        return (
-            <div className="body-row split-3-7 left-padding-1 guided">
-                <div className="body-item-title left-padding-1">Sample Rate</div>
-                <div className="body-select-container">
-                    <select className="body-select" value={props.clientState.clientSetting.setting.sampleRate} onChange={(e) => {
-                        props.clientState.clientSetting.setSampleRate(Number(e.target.value) as SampleRate)
-                    }}>
-                        {
-                            Object.values(SampleRate).map(x => {
-                                return <option key={x} value={x}>{x}</option>
-                            })
-                        }
-                    </select>
-                </div>
-            </div>
-        )
-    }, [props.clientState.clientSetting.setting.sampleRate, props.clientState.clientSetting.setSampleRate])
 
     const deviceSetting = useMemo(() => {
         return (
@@ -204,11 +186,10 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
                 </div>
                 {audioInputRow}
                 {audioMediaInputRow}
-                {sampleRateRow}
                 {audioOutputRow}
             </>
         )
-    }, [audioInputRow, audioMediaInputRow, sampleRateRow, audioOutputRow])
+    }, [audioInputRow, audioMediaInputRow, audioOutputRow])
 
     return {
         deviceSetting,

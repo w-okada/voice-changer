@@ -12,24 +12,6 @@ export type ServerSettingState = {
 }
 
 export const useServerSettingArea = (props: UseServerSettingProps): ServerSettingState => {
-    const mmvcServerUrlRow = useMemo(() => {
-        const onSetServerClicked = async () => {
-            const input = document.getElementById("mmvc-server-url") as HTMLInputElement
-            props.clientState.clientSetting.setServerUrl(input.value)
-        }
-        return (
-            <div className="body-row split-3-3-4 left-padding-1 guided">
-                <div className="body-item-title left-padding-1">MMVC Server</div>
-                <div className="body-input-container">
-                    <input type="text" defaultValue={props.clientState.clientSetting.setting.mmvcServerUrl} id="mmvc-server-url" className="body-item-input" />
-                </div>
-                <div className="body-button-container">
-                    <div className="body-button" onClick={onSetServerClicked}>set</div>
-                </div>
-            </div>
-        )
-    }, [props.clientState.clientSetting.setting.mmvcServerUrl, props.clientState.clientSetting.setServerUrl])
-
     const uploadeModelRow = useMemo(() => {
         const onPyTorchFileLoadClicked = async () => {
             const file = await fileSelector("")
@@ -224,14 +206,13 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
                     <div className="body-select-container">
                     </div>
                 </div>
-                {mmvcServerUrlRow}
                 {uploadeModelRow}
                 {frameworkRow}
                 {onnxExecutionProviderRow}
                 {protocolRow}
             </>
         )
-    }, [mmvcServerUrlRow, uploadeModelRow, frameworkRow, onnxExecutionProviderRow, protocolRow])
+    }, [uploadeModelRow, frameworkRow, onnxExecutionProviderRow, protocolRow])
 
 
     return {
