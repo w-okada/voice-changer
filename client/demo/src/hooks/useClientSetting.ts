@@ -161,7 +161,7 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
             setProtocol("rest")
             setInputChunkNum(64)
         }
-    }, [])
+    }, [props.voiceChangerClient])
 
 
     return {
