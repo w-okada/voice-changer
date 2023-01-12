@@ -1,4 +1,4 @@
-import { OnnxExecutionProvider, Protocol, Framework, fileSelector } from "@dannadori/voice-changer-client-js"
+import { OnnxExecutionProvider, Framework, fileSelector } from "@dannadori/voice-changer-client-js"
 import React from "react"
 import { useMemo } from "react"
 import { ClientState } from "./hooks/useClient"

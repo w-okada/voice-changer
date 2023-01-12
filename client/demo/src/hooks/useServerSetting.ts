@@ -25,6 +25,7 @@ export type ServerSettingState = {
     setSrcId: (num: number) => Promise<boolean>;
     setDstId: (num: number) => Promise<boolean>;
     setConvertChunkNum: (num: number) => Promise<boolean>;
+    setMinConvertSize: (num: number) => Promise<boolean>
     setGpu: (num: number) => Promise<boolean>;
     setCrossFadeOffsetRate: (num: number) => Promise<boolean>;
     setCrossFadeEndRate: (num: number) => Promise<boolean>;
@@ -56,6 +57,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             _setSetting({
                 ...settingRef.current,
                 convertChunkNum: res.convertChunkNum,
+                minConvertSize: res.minConvertSize,
                 srcId: res.srcId,
                 dstId: res.dstId,
                 gpu: res.gpu,
@@ -103,6 +105,13 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         }
     }, [props.voiceChangerClient])
 
+    const setMinConvertSize = useMemo(() => {
+        return async (num: number) => {
+            return await _set_and_store(ServerSettingKey.minConvertSize, "" + num)
+        }
+    }, [props.voiceChangerClient])
+
+
     const setGpu = useMemo(() => {
         return async (num: number) => {
             return await _set_and_store(ServerSettingKey.gpu, "" + num)
@@ -124,6 +133,8 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             return await _set_and_store(ServerSettingKey.crossFadeOverlapRate, "" + num)
         }
     }, [props.voiceChangerClient])
+
+
 
     //////////////
     // 操作
@@ -218,6 +229,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         setSrcId,
         setDstId,
         setConvertChunkNum,
+        setMinConvertSize,
         setGpu,
         setCrossFadeOffsetRate,
         setCrossFadeEndRate,

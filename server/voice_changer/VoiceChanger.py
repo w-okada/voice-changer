@@ -26,12 +26,13 @@ class VocieChangerSettings():
     crossFadeEndRate:float = 0.9
     crossFadeOverlapRate:float = 0.9
     convertChunkNum:int = 32
+    minConvertSize:int = 0
     framework:str = "PyTorch" # PyTorch or ONNX
     pyTorchModelFile:str = ""
     onnxModelFile:str = ""
     configFile:str = ""
     # ↓mutableな物だけ列挙
-    intData = ["gpu","srcId", "dstId", "convertChunkNum"]
+    intData = ["gpu","srcId", "dstId", "convertChunkNum", "minConvertSize"]
     floatData = [ "crossFadeOffsetRate", "crossFadeEndRate", "crossFadeOverlapRate"]
     strData = ["framework"]
 
@@ -298,8 +299,9 @@ class VoiceChanger():
 
         if unpackedData.shape[0]*(1 + self.settings.crossFadeOverlapRate) + 1024 > convertSize:
             convertSize = int(unpackedData.shape[0]*(1 + self.settings.crossFadeOverlapRate)) + 1024
-
-        # print("convert Size", unpackedData.shape[0], unpackedData.shape[0]*(1 + self.settings.crossFadeOverlapRate), convertSize)
+        if convertSize < self.settings.minConvertSize:
+            convertSize = self.settings.minConvertSize
+        # print("convert Size", unpackedData.shape[0], unpackedData.shape[0]*(1 + self.settings.crossFadeOverlapRate), convertSize, self.settings.minConvertSize)
 
         self._generate_strength(unpackedData)
         data = self._generate_input(unpackedData, convertSize)

@@ -1,5 +1,4 @@
-import { BufferSize } from "@dannadori/voice-changer-client-js"
-import React, { useMemo, useState } from "react"
+import React, { useMemo } from "react"
 import { ClientState } from "./hooks/useClient"
 
 export type UseConvertSettingProps = {

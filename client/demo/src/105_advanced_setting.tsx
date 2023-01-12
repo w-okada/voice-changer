@@ -108,6 +108,20 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
         )
     }, [props.clientState.serverSetting.setting.convertChunkNum, props.clientState.serverSetting.setConvertChunkNum])
 
+    const minConvertSizeRow = useMemo(() => {
+        return (
+
+            <div className="body-row split-3-7 left-padding-1 guided">
+                <div className="body-item-title left-padding-1">Min Convert Size(byte)</div>
+                <div className="body-input-container">
+                    <input type="number" min={0} max={8196} step={8196} value={props.clientState.serverSetting.setting.minConvertSize} onChange={(e) => {
+                        props.clientState.serverSetting.setMinConvertSize(Number(e.target.value))
+                    }} />
+                </div>
+            </div>
+        )
+    }, [props.clientState.serverSetting.setting.minConvertSize, props.clientState.serverSetting.setMinConvertSize])
+
     const crossFadeOverlapRateRow = useMemo(() => {
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
@@ -240,6 +254,7 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
                 <div className="body-row divider"></div>
 
                 {convertChunkNumRow}
+                {minConvertSizeRow}
                 {crossFadeOverlapRateRow}
                 {crossFadeOffsetRateRow}
                 {crossFadeEndRateRow}
@@ -251,7 +266,7 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
                 <div className="body-row divider"></div>
             </>
         )
-    }, [showAdvancedSetting, mmvcServerUrlRow, protocolRow, sampleRateRow, bufferSizeRow, convertChunkNumRow, crossFadeOverlapRateRow, crossFadeOffsetRateRow, crossFadeEndRateRow, vfForceDisableRow, voiceChangeModeRow, workletSettingRow])
+    }, [showAdvancedSetting, mmvcServerUrlRow, protocolRow, sampleRateRow, bufferSizeRow, convertChunkNumRow, minConvertSizeRow, crossFadeOverlapRateRow, crossFadeOffsetRateRow, crossFadeEndRateRow, vfForceDisableRow, voiceChangeModeRow, workletSettingRow])
 
 
     const advancedSetting = useMemo(() => {

@@ -7,6 +7,8 @@
 // types
 export type VoiceChangerServerSetting = {
     convertChunkNum: number, // VITSに入力する変換サイズ。(入力データの2倍以上の大きさで指定。それより小さいものが指定された場合は、サーバ側で自動的に入力の2倍のサイズが設定される。)
+    minConvertSize: number, // この値より小さい場合にこの値に揃える。
+
     srcId: number,
     dstId: number,
     gpu: number,
@@ -50,6 +52,7 @@ export type ServerInfo = {
     pyTorchModelFile: string,
     onnxModelFile: string,
     convertChunkNum: number,
+    minConvertSize: number,
     crossFadeOffsetRate: number,
     crossFadeEndRate: number,
     crossFadeOverlapRate: number,
@@ -111,6 +114,7 @@ export const ServerSettingKey = {
     "srcId": "srcId",
     "dstId": "dstId",
     "convertChunkNum": "convertChunkNum",
+    "minConvertSize": "minConvertSize",
     "gpu": "gpu",
     "crossFadeOffsetRate": "crossFadeOffsetRate",
     "crossFadeEndRate": "crossFadeEndRate",
@@ -123,6 +127,7 @@ export type ServerSettingKey = typeof ServerSettingKey[keyof typeof ServerSettin
 // Defaults
 export const DefaultVoiceChangerServerSetting: VoiceChangerServerSetting = {
     convertChunkNum: 32, //（★１）
+    minConvertSize: 0,
     srcId: 107,
     dstId: 100,
     gpu: 0,
