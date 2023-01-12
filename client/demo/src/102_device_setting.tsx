@@ -1,6 +1,6 @@
 import { fileSelectorAsDataURL, createDummyMediaStream, SampleRate } from "@dannadori/voice-changer-client-js"
 import React, { useEffect, useMemo, useState } from "react"
-import { AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_CONVERTED, AUDIO_ELEMENT_FOR_TEST_ORIGINAL } from "./const"
+import { AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_CONVERTED, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK, AUDIO_ELEMENT_FOR_TEST_ORIGINAL } from "./const"
 import { ClientState } from "./hooks/useClient";
 
 
@@ -44,6 +44,7 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
 
     const [audioInputForGUI, setAudioInputForGUI] = useState<string>("none")
     const [audioOutputForGUI, setAudioOutputForGUI] = useState<string>("none")
+    const [fileInputEchoback, setFileInputEchoback] = useState<boolean>()//最初のmuteが有効になるように。undefined
 
 
     useEffect(() => {
@@ -114,6 +115,12 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
             const dst = audioContext!.createMediaStreamDestination()
             src.connect(dst)
             props.clientState.clientSetting.setAudioInput(dst.stream)
+
+            const audio_echo = document.getElementById(AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK) as HTMLAudioElement
+            audio_echo.srcObject = dst.stream
+            audio_echo.play()
+            setFileInputEchoback(false)
+
             // original stream to play.
             const audio_org = document.getElementById(AUDIO_ELEMENT_FOR_TEST_ORIGINAL) as HTMLAudioElement
             audio_org.src = url
@@ -135,14 +142,16 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
                     </div>
                     <div>
                         cnv:<audio id={AUDIO_ELEMENT_FOR_TEST_CONVERTED} controls></audio>
+                        <audio id={AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK} controls hidden></audio>
                     </div>
                 </div>
                 <div className="body-button-container">
                     <div className="body-button" onClick={onFileLoadClicked}>load</div>
+                    <input type="checkbox" checked={fileInputEchoback} onChange={(e) => { setFileInputEchoback(e.target.checked) }} /> echoback
                 </div>
             </div>
         )
-    }, [audioInputForGUI, props.clientState.clientSetting.setAudioInput])
+    }, [audioInputForGUI, props.clientState.clientSetting.setAudioInput, fileInputEchoback])
 
 
 
@@ -166,7 +175,7 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
 
     useEffect(() => {
         if (audioOutputForGUI == "none") return
-        [AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_ORIGINAL].forEach(x => {
+        [AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK].forEach(x => {
             const audio = document.getElementById(x) as HTMLAudioElement
             if (audio) {
                 // @ts-ignore
@@ -175,6 +184,14 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
         })
     }, [audioOutputForGUI])
 
+    useEffect(() => {
+        [AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK].forEach(x => {
+            const audio = document.getElementById(x) as HTMLAudioElement
+            if (audio) {
+                audio.volume = fileInputEchoback ? 1 : 0
+            }
+        })
+    }, [fileInputEchoback])
 
     const deviceSetting = useMemo(() => {
         return (

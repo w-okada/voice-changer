@@ -1,4 +1,4 @@
-import { OnnxExecutionProvider, Protocol, Framework, fileSelector } from "@dannadori/voice-changer-client-js"
+import { OnnxExecutionProvider, Framework, fileSelector } from "@dannadori/voice-changer-client-js"
 import React from "react"
 import { useMemo } from "react"
 import { ClientState } from "./hooks/useClient"
@@ -126,29 +126,6 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
         props.clientState.serverSetting.isUploading,
         props.clientState.serverSetting.uploadProgress])
 
-    const protocolRow = useMemo(() => {
-        const onProtocolChanged = async (val: Protocol) => {
-            props.clientState.clientSetting.setProtocol(val)
-        }
-        return (
-            <div className="body-row split-3-7 left-padding-1 guided">
-                <div className="body-item-title left-padding-1">Protocol</div>
-                <div className="body-select-container">
-                    <select className="body-select" value={props.clientState.clientSetting.setting.protocol} onChange={(e) => {
-                        onProtocolChanged(e.target.value as
-                            Protocol)
-                    }}>
-                        {
-                            Object.values(Protocol).map(x => {
-                                return <option key={x} value={x}>{x}</option>
-                            })
-                        }
-                    </select>
-                </div>
-            </div>
-        )
-    }, [props.clientState.clientSetting.setting.protocol, props.clientState.clientSetting.setProtocol])
-
     const frameworkRow = useMemo(() => {
         const onFrameworkChanged = async (val: Framework) => {
             props.clientState.serverSetting.setFramework(val)
@@ -209,10 +186,9 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
                 {uploadeModelRow}
                 {frameworkRow}
                 {onnxExecutionProviderRow}
-                {protocolRow}
             </>
         )
-    }, [uploadeModelRow, frameworkRow, onnxExecutionProviderRow, protocolRow])
+    }, [uploadeModelRow, frameworkRow, onnxExecutionProviderRow])
 
 
     return {

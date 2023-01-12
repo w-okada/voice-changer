@@ -1,4 +1,4 @@
-import { BufferSize, SampleRate, VoiceChangerMode } from "@dannadori/voice-changer-client-js"
+import { BufferSize, Protocol, SampleRate, VoiceChangerMode } from "@dannadori/voice-changer-client-js"
 import React, { useMemo, useState } from "react"
 import { ClientState } from "./hooks/useClient"
 
@@ -30,6 +30,30 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
             </div>
         )
     }, [props.clientState.clientSetting.setting.mmvcServerUrl, props.clientState.clientSetting.setServerUrl])
+
+    const protocolRow = useMemo(() => {
+        const onProtocolChanged = async (val: Protocol) => {
+            props.clientState.clientSetting.setProtocol(val)
+        }
+        return (
+            <div className="body-row split-3-7 left-padding-1 guided">
+                <div className="body-item-title left-padding-1">Protocol</div>
+                <div className="body-select-container">
+                    <select className="body-select" value={props.clientState.clientSetting.setting.protocol} onChange={(e) => {
+                        onProtocolChanged(e.target.value as
+                            Protocol)
+                    }}>
+                        {
+                            Object.values(Protocol).map(x => {
+                                return <option key={x} value={x}>{x}</option>
+                            })
+                        }
+                    </select>
+                </div>
+            </div>
+        )
+    }, [props.clientState.clientSetting.setting.protocol, props.clientState.clientSetting.setProtocol])
+
 
     const sampleRateRow = useMemo(() => {
         return (
@@ -83,6 +107,20 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
             </div>
         )
     }, [props.clientState.serverSetting.setting.convertChunkNum, props.clientState.serverSetting.setConvertChunkNum])
+
+    const minConvertSizeRow = useMemo(() => {
+        return (
+
+            <div className="body-row split-3-7 left-padding-1 guided">
+                <div className="body-item-title left-padding-1">Min Convert Size(byte)</div>
+                <div className="body-input-container">
+                    <input type="number" min={0} max={8196} step={8196} value={props.clientState.serverSetting.setting.minConvertSize} onChange={(e) => {
+                        props.clientState.serverSetting.setMinConvertSize(Number(e.target.value))
+                    }} />
+                </div>
+            </div>
+        )
+    }, [props.clientState.serverSetting.setting.minConvertSize, props.clientState.serverSetting.setMinConvertSize])
 
     const crossFadeOverlapRateRow = useMemo(() => {
         return (
@@ -209,12 +247,14 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
             <>
                 <div className="body-row divider"></div>
                 {mmvcServerUrlRow}
+                {protocolRow}
                 <div className="body-row divider"></div>
                 {sampleRateRow}
                 {bufferSizeRow}
                 <div className="body-row divider"></div>
 
                 {convertChunkNumRow}
+                {minConvertSizeRow}
                 {crossFadeOverlapRateRow}
                 {crossFadeOffsetRateRow}
                 {crossFadeEndRateRow}
@@ -226,7 +266,7 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
                 <div className="body-row divider"></div>
             </>
         )
-    }, [showAdvancedSetting, mmvcServerUrlRow, sampleRateRow, bufferSizeRow, convertChunkNumRow, crossFadeOverlapRateRow, crossFadeOffsetRateRow, crossFadeEndRateRow, vfForceDisableRow, voiceChangeModeRow, workletSettingRow])
+    }, [showAdvancedSetting, mmvcServerUrlRow, protocolRow, sampleRateRow, bufferSizeRow, convertChunkNumRow, minConvertSizeRow, crossFadeOverlapRateRow, crossFadeOffsetRateRow, crossFadeEndRateRow, vfForceDisableRow, voiceChangeModeRow, workletSettingRow])
 
 
     const advancedSetting = useMemo(() => {
