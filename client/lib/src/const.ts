@@ -5,7 +5,7 @@
 // 187.5chunk -> 1sec
 
 // types
-export type VoiceChangerRequestParamas = {
+export type VoiceChangerServerSetting = {
     convertChunkNum: number, // VITSに入力する変換サイズ。(入力データの2倍以上の大きさで指定。それより小さいものが指定された場合は、サーバ側で自動的に入力の2倍のサイズが設定される。)
     srcId: number,
     dstId: number,
@@ -16,9 +16,11 @@ export type VoiceChangerRequestParamas = {
     crossFadeEndRate: number,
     crossFadeOverlapRate: number,
 
+    framework: Framework
+    onnxExecutionProvider: OnnxExecutionProvider,
 }
 
-export type VoiceChangerOptions = {
+export type VoiceChangerClientSetting = {
     audioInput: string | MediaStream | null,
     mmvcServerUrl: string,
     protocol: Protocol,
@@ -28,8 +30,6 @@ export type VoiceChangerOptions = {
     speakers: Speaker[],
     forceVfDisable: boolean,
     voiceChangerMode: VoiceChangerMode,
-    onnxExecutionProvider: OnnxExecutionProvider,
-    framework: Framework
 }
 
 export type WorkletSetting = {
@@ -52,11 +52,12 @@ export type ServerInfo = {
     convertChunkNum: number,
     crossFadeOffsetRate: number,
     crossFadeEndRate: number,
+    crossFadeOverlapRate: number,
     gpu: number,
     srcId: number,
     dstId: number,
     framework: Framework,
-    providers: string[]
+    onnxExecutionProvider: string[]
 }
 
 
@@ -120,7 +121,7 @@ export const ServerSettingKey = {
 export type ServerSettingKey = typeof ServerSettingKey[keyof typeof ServerSettingKey]
 
 // Defaults
-export const DefaultVoiceChangerRequestParamas: VoiceChangerRequestParamas = {
+export const DefaultVoiceChangerServerSetting: VoiceChangerServerSetting = {
     convertChunkNum: 32, //（★１）
     srcId: 107,
     dstId: 100,
@@ -128,10 +129,13 @@ export const DefaultVoiceChangerRequestParamas: VoiceChangerRequestParamas = {
     crossFadeLowerValue: 0.1,
     crossFadeOffsetRate: 0.1,
     crossFadeEndRate: 0.9,
-    crossFadeOverlapRate: 0.5
+    crossFadeOverlapRate: 0.5,
+    framework: "PyTorch",
+    onnxExecutionProvider: "CPUExecutionProvider"
+
 }
 
-export const DefaultVoiceChangerOptions: VoiceChangerOptions = {
+export const DefaultVoiceChangerClientSetting: VoiceChangerClientSetting = {
     audioInput: null,
     mmvcServerUrl: "",
     protocol: "sio",
@@ -162,8 +166,6 @@ export const DefaultVoiceChangerOptions: VoiceChangerOptions = {
     ],
     forceVfDisable: false,
     voiceChangerMode: "realtime",
-    framework: "PyTorch",
-    onnxExecutionProvider: "CPUExecutionProvider"
 }
 
 export const DefaultWorkletSetting: WorkletSetting = {

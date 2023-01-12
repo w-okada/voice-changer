@@ -3,7 +3,7 @@ import { VoiceChangerWorkletNode, VolumeListener } from "./VoiceChangerWorkletNo
 import workerjs from "raw-loader!../worklet/dist/index.js";
 import { VoiceFocusDeviceTransformer, VoiceFocusTransformDevice } from "amazon-chime-sdk-js";
 import { createDummyMediaStream, validateUrl } from "./util";
-import { BufferSize, DefaultVoiceChangerOptions, Protocol, ServerSettingKey, VoiceChangerMode, VOICE_CHANGER_CLIENT_EXCEPTION, WorkletSetting } from "./const";
+import { BufferSize, DefaultVoiceChangerClientSetting, Protocol, ServerSettingKey, VoiceChangerMode, VOICE_CHANGER_CLIENT_EXCEPTION, WorkletSetting } from "./const";
 import MicrophoneStream from "microphone-stream";
 import { AudioStreamer, Callbacks, AudioStreamerListeners } from "./AudioStreamer";
 import { ServerConfigurator } from "./ServerConfigurator";
@@ -85,8 +85,8 @@ export class VoiceChangerClient {
             this.vcNode.connect(this.currentMediaStreamAudioDestinationNode) // vc node -> output node
             // (vc nodeにはaudio streamerのcallbackでデータが投げ込まれる)
             this.audioStreamer = new AudioStreamer(this.callbacks, audioStreamerListeners, { objectMode: true, })
-            this.audioStreamer.setInputChunkNum(DefaultVoiceChangerOptions.inputChunkNum)
-            this.audioStreamer.setVoiceChangerMode(DefaultVoiceChangerOptions.voiceChangerMode)
+            this.audioStreamer.setInputChunkNum(DefaultVoiceChangerClientSetting.inputChunkNum)
+            this.audioStreamer.setVoiceChangerMode(DefaultVoiceChangerClientSetting.voiceChangerMode)
 
             if (this.vfEnable) {
                 this.vf = await VoiceFocusDeviceTransformer.create({ variant: 'c20' })
