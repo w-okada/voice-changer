@@ -158,9 +158,8 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
         const params = new URLSearchParams(location.search);
         const colab = params.get("colab")
         if (colab == "true") {
-            settingRef.current.protocol = "rest"
-            settingRef.current.inputChunkNum = 64
-            _setSetting({ ...settingRef.current })
+            setProtocol("rest")
+            setInputChunkNum(64)
         }
     }, [])
 
