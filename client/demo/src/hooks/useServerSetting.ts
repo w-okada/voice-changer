@@ -1,5 +1,5 @@
 import { DefaultVoiceChangerServerSetting, Framework, OnnxExecutionProvider, ServerInfo, ServerSettingKey, VoiceChangerClient, VoiceChangerServerSetting, } from "@dannadori/voice-changer-client-js"
-import { useState, useMemo, useRef, } from "react"
+import { useState, useMemo, useRef, useEffect } from "react"
 
 
 export type FileUploadSetting = {
@@ -194,6 +194,20 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
 
         }
     }, [props.voiceChangerClient])
+
+
+    //////////////
+    // デフォルト設定
+    /////////////
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const colab = params.get("colab")
+        if (colab == "true") {
+        } else {
+        }
+    }, [props.voiceChangerClient])
+
+
 
     return {
         setting,

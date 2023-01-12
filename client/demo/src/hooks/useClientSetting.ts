@@ -150,9 +150,8 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
         }
     }, [props.voiceChangerClient])
 
-
     //////////////
-    // Colab対応
+    // デフォルト設定
     /////////////
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -160,8 +159,14 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
         if (colab == "true") {
             setProtocol("rest")
             setInputChunkNum(64)
+
+        } else {
+            setProtocol("sio")
+            setInputChunkNum(32)
+
         }
     }, [props.voiceChangerClient])
+
 
 
     return {

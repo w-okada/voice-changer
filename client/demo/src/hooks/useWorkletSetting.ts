@@ -1,5 +1,5 @@
 import { DefaultWorkletSetting, VoiceChangerClient, WorkletSetting } from "@dannadori/voice-changer-client-js"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 
 export type UseWorkletSettingProps = {
     voiceChangerClient: VoiceChangerClient | null
@@ -19,6 +19,28 @@ export const useWorkletSetting = (props: UseWorkletSettingProps): WorkletSetting
             if (!props.voiceChangerClient) return
             props.voiceChangerClient.configureWorklet(setting)
             _setSetting(setting)
+        }
+    }, [props.voiceChangerClient])
+
+
+    //////////////
+    // デフォルト設定
+    /////////////
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const colab = params.get("colab")
+        if (colab == "true") {
+            setSetting({
+                numTrancateTreshold: 300,
+                volTrancateThreshold: 0.0005,
+                volTrancateLength: 32,
+            })
+        } else {
+            setSetting({
+                numTrancateTreshold: 150,
+                volTrancateThreshold: 0.0005,
+                volTrancateLength: 32,
+            })
         }
     }, [props.voiceChangerClient])
 
