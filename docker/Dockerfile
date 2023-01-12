@@ -34,7 +34,7 @@ RUN python3 setup.py build_ext --inplace
 WORKDIR /
 ADD dummy /
 
-RUN git clone  --depth 1 https://github.com/w-okada/voice-changer.git -b v.1.3.0
+RUN git clone  --depth 1 https://github.com/w-okada/voice-changer.git -b v.1.3.3
 
 
 #########
