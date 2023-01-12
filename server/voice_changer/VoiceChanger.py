@@ -240,10 +240,17 @@ class VoiceChanger():
                     print(f"cur_strength move from {self.cur_strength.device} to cpu")
                     self.cur_strength = self.cur_strength.cpu()
 
-                if hasattr(self, 'prev_audio1') == True and self.prev_audio1.device == torch.device('cpu'):
-                    prev = self.prev_audio1[-1*inputSize:]
-                    cur  = audio1[-2*inputSize:-1*inputSize]
-                    result = prev * self.prev_strength + cur * self.cur_strength
+                if hasattr(self, 'prev_audio1') == True and self.prev_audio1.device == torch.device('cpu'): # prev_audio1が所望のデバイスに無い場合は一回休み。
+                    overlapSize = int(inputSize * self.settings.crossFadeOverlapRate)
+                    prev_overlap = self.prev_audio1[-1*overlapSize:]
+                    cur_overlap = audio1[-1*(inputSize + overlapSize) :-1*inputSize]
+                    powered_prev = prev_overlap * self.prev_strength
+                    powered_cur = cur_overlap * self.cur_strength
+                    powered_result = powered_prev + powered_cur
+
+                    cur = audio1[-1*inputSize:-1*overlapSize] # 今回のインプットの生部分。(インプット - 次回のCrossfade部分)。
+                    result = torch.cat([powered_result, cur],axis=0) # Crossfadeと今回のインプットの生部分を結合
+
                 else:
                     cur = audio1[-2*inputSize:-1*inputSize]
                     result = cur
@@ -267,17 +274,21 @@ class VoiceChanger():
 
 
                 if hasattr(self, 'prev_audio1') == True and self.prev_audio1.device == torch.device('cuda', self.settings.gpu):
-                    prev = self.prev_audio1[-1*inputSize:]
-                    cur  = audio1[-2*inputSize:-1*inputSize]
-                    result = prev * self.prev_strength + cur * self.cur_strength
-                    # print("merging...", prev.shape, cur.shape)
+                    overlapSize = int(inputSize * self.settings.crossFadeOverlapRate)
+                    prev_overlap = self.prev_audio1[-1*overlapSize:]
+                    cur_overlap = audio1[-1*(inputSize + overlapSize) :-1*inputSize]
+                    powered_prev = prev_overlap * self.prev_strength
+                    powered_cur = cur_overlap * self.cur_strength
+                    powered_result = powered_prev + powered_cur
+
+                    cur = audio1[-1*inputSize:-1*overlapSize] # 今回のインプットの生部分。(インプット - 次回のCrossfade部分)。
+                    result = torch.cat([powered_result, cur],axis=0) # Crossfadeと今回のインプットの生部分を結合
+
                 else:
                     cur = audio1[-2*inputSize:-1*inputSize]
                     result = cur
-                    # print("no merging...", cur.shape)
                 self.prev_audio1 = audio1
 
-                #print(result)                    
                 result = result.cpu().float().numpy()
         return result
             
