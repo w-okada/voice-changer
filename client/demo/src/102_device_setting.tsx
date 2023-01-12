@@ -68,7 +68,9 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
             <div className="body-row split-3-7 left-padding-1  guided">
                 <div className="body-item-title left-padding-1">AudioInput</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={audioInputForGUI} onChange={(e) => { setAudioInputForGUI(e.target.value) }}>
+                    <select className="body-select" value={audioInputForGUI} onChange={(e) => {
+                        setAudioInputForGUI(e.target.value)
+                    }}>
                         {
                             inputAudioDeviceInfo.map(x => {
                                 return <option key={x.deviceId} value={x.deviceId}>{x.label}</option>
@@ -85,21 +87,16 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
         if (!audioContext) {
             return
         }
+
         if (audioInputForGUI == "none") {
             const ms = createDummyMediaStream(audioContext)
-            props.clientState.setSettingState({
-                ...props.clientState.settingState,
-                audioInput: ms
-            })
+            props.clientState.clientSetting.setAudioInput(ms)
         } else if (audioInputForGUI == "file") {
             // file selector (audioMediaInputRow)
         } else {
-            props.clientState.setSettingState({
-                ...props.clientState.settingState,
-                audioInput: audioInputForGUI
-            })
+            props.clientState.clientSetting.setAudioInput(audioInputForGUI)
         }
-    }, [audioContext, audioInputForGUI])
+    }, [audioContext, audioInputForGUI, props.clientState.clientSetting.setAudioInput])
 
     const audioMediaInputRow = useMemo(() => {
         if (audioInputForGUI != "file") {
@@ -116,10 +113,7 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
             const src = audioContext!.createMediaElementSource(audio);
             const dst = audioContext!.createMediaStreamDestination()
             src.connect(dst)
-            props.clientState.setSettingState({
-                ...props.clientState.settingState,
-                audioInput: dst.stream
-            })
+            props.clientState.clientSetting.setAudioInput(dst.stream)
             // original stream to play.
             const audio_org = document.getElementById(AUDIO_ELEMENT_FOR_TEST_ORIGINAL) as HTMLAudioElement
             audio_org.src = url
@@ -148,7 +142,7 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
                 </div>
             </div>
         )
-    }, [audioInputForGUI])
+    }, [audioInputForGUI, props.clientState.clientSetting.setAudioInput])
 
 
 
@@ -181,30 +175,6 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
         })
     }, [audioOutputForGUI])
 
-    const sampleRateRow = useMemo(() => {
-        return (
-            <div className="body-row split-3-7 left-padding-1 guided">
-                <div className="body-item-title left-padding-1">Sample Rate</div>
-                <div className="body-select-container">
-                    <select className="body-select" value={props.clientState.settingState.sampleRate} onChange={(e) => {
-                        props.clientState.setSettingState({
-                            ...props.clientState.settingState,
-                            sampleRate: Number(e.target.value) as SampleRate
-                        })
-
-                    }}>
-                        {
-                            Object.values(SampleRate).map(x => {
-                                return <option key={x} value={x}>{x}</option>
-                            })
-                        }
-                    </select>
-                </div>
-            </div>
-        )
-    }, [props.clientState.settingState])
-
-
 
     const deviceSetting = useMemo(() => {
         return (
@@ -216,11 +186,10 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
                 </div>
                 {audioInputRow}
                 {audioMediaInputRow}
-                {sampleRateRow}
                 {audioOutputRow}
             </>
         )
-    }, [audioInputRow, audioMediaInputRow, sampleRateRow, audioOutputRow])
+    }, [audioInputRow, audioMediaInputRow, audioOutputRow])
 
     return {
         deviceSetting,

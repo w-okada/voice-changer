@@ -3,11 +3,11 @@ import { VoiceChangerWorkletNode, VolumeListener } from "./VoiceChangerWorkletNo
 import workerjs from "raw-loader!../worklet/dist/index.js";
 import { VoiceFocusDeviceTransformer, VoiceFocusTransformDevice } from "amazon-chime-sdk-js";
 import { createDummyMediaStream, validateUrl } from "./util";
-import { BufferSize, DefaultVoiceChangerOptions, Protocol, ServerSettingKey, VoiceChangerMode, VOICE_CHANGER_CLIENT_EXCEPTION } from "./const";
+import { BufferSize, DefaultVoiceChangerClientSetting, Protocol, ServerSettingKey, VoiceChangerMode, VOICE_CHANGER_CLIENT_EXCEPTION, WorkletSetting } from "./const";
 import MicrophoneStream from "microphone-stream";
 import { AudioStreamer, Callbacks, AudioStreamerListeners } from "./AudioStreamer";
 import { ServerConfigurator } from "./ServerConfigurator";
-
+import { VoiceChangerWorkletProcessorRequest } from "./@types/voice-changer-worklet-processor";
 
 // オーディオデータの流れ
 // input node(mic or MediaStream) -> [vf node] -> microphne stream -> audio streamer -> 
@@ -15,7 +15,7 @@ import { ServerConfigurator } from "./ServerConfigurator";
 
 
 
-export class VoiceChnagerClient {
+export class VoiceChangerClient {
     private configurator: ServerConfigurator
     private ctx: AudioContext
     private vfEnable = false
@@ -39,7 +39,15 @@ export class VoiceChnagerClient {
         onVoiceReceived: (voiceChangerMode: VoiceChangerMode, data: ArrayBuffer): void => {
             // console.log(voiceChangerMode, data)
             if (voiceChangerMode === "realtime") {
-                this.vcNode.postReceivedVoice(data)
+                const req: VoiceChangerWorkletProcessorRequest = {
+                    requestType: "voice",
+                    voice: data,
+                    numTrancateTreshold: 0,
+                    volTrancateThreshold: 0,
+                    volTrancateLength: 0
+                }
+
+                this.vcNode.postReceivedVoice(req)
                 return
             }
 
@@ -77,8 +85,8 @@ export class VoiceChnagerClient {
             this.vcNode.connect(this.currentMediaStreamAudioDestinationNode) // vc node -> output node
             // (vc nodeにはaudio streamerのcallbackでデータが投げ込まれる)
             this.audioStreamer = new AudioStreamer(this.callbacks, audioStreamerListeners, { objectMode: true, })
-            this.audioStreamer.setInputChunkNum(DefaultVoiceChangerOptions.inputChunkNum)
-            this.audioStreamer.setVoiceChangerMode(DefaultVoiceChangerOptions.voiceChangerMode)
+            this.audioStreamer.setInputChunkNum(DefaultVoiceChangerClientSetting.inputChunkNum)
+            this.audioStreamer.setVoiceChangerMode(DefaultVoiceChangerClientSetting.voiceChangerMode)
 
             if (this.vfEnable) {
                 this.vf = await VoiceFocusDeviceTransformer.create({ variant: 'c20' })
@@ -199,6 +207,18 @@ export class VoiceChnagerClient {
 
     setVoiceChangerMode = (val: VoiceChangerMode) => {
         this.audioStreamer.setVoiceChangerMode(val)
+    }
+
+    // configure worklet
+    configureWorklet = (setting: WorkletSetting) => {
+        const req: VoiceChangerWorkletProcessorRequest = {
+            requestType: "config",
+            voice: new ArrayBuffer(1),
+            numTrancateTreshold: setting.numTrancateTreshold,
+            volTrancateThreshold: setting.volTrancateThreshold,
+            volTrancateLength: setting.volTrancateLength
+        }
+        this.vcNode.postReceivedVoice(req)
     }
 
     // Configurator Method

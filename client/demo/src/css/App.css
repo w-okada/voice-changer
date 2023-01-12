@@ -209,6 +209,12 @@ body {
     /* border-bottom: 1px solid rgba(9, 133, 67, 0.3); */
 }
 
+.divider {
+    height:4px;
+    /* background-color: rgba(16, 210, 113, 0.1); */
+    background-color: rgba(31, 42, 36, 0.1);
+}
+
 .body-top-title {
     font-size: 3rem;
 }

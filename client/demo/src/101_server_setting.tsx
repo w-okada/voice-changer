@@ -11,28 +11,7 @@ export type ServerSettingState = {
     serverSetting: JSX.Element;
 }
 
-export const useServerSetting = (props: UseServerSettingProps): ServerSettingState => {
-    const mmvcServerUrlRow = useMemo(() => {
-        const onSetServerClicked = async () => {
-            const input = document.getElementById("mmvc-server-url") as HTMLInputElement
-            props.clientState.setSettingState({
-                ...props.clientState.settingState,
-                mmvcServerUrl: input.value
-            })
-        }
-        return (
-            <div className="body-row split-3-3-4 left-padding-1 guided">
-                <div className="body-item-title left-padding-1">MMVC Server</div>
-                <div className="body-input-container">
-                    <input type="text" defaultValue={props.clientState.settingState.mmvcServerUrl} id="mmvc-server-url" className="body-item-input" />
-                </div>
-                <div className="body-button-container">
-                    <div className="body-button" onClick={onSetServerClicked}>set</div>
-                </div>
-            </div>
-        )
-    }, [props.clientState.settingState])
-
+export const useServerSettingArea = (props: UseServerSettingProps): ServerSettingState => {
     const uploadeModelRow = useMemo(() => {
         const onPyTorchFileLoadClicked = async () => {
             const file = await fileSelector("")
@@ -40,14 +19,14 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 alert("モデルファイルの拡張子はpthである必要があります。")
                 return
             }
-            props.clientState.setSettingState({
-                ...props.clientState.settingState,
+            props.clientState.serverSetting.setFileUploadSetting({
+                ...props.clientState.serverSetting.fileUploadSetting,
                 pyTorchModel: file
             })
         }
         const onPyTorchFileClearClicked = () => {
-            props.clientState.setSettingState({
-                ...props.clientState.settingState,
+            props.clientState.serverSetting.setFileUploadSetting({
+                ...props.clientState.serverSetting.fileUploadSetting,
                 pyTorchModel: null
             })
         }
@@ -57,14 +36,14 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 alert("モデルファイルの拡張子はjsonである必要があります。")
                 return
             }
-            props.clientState.setSettingState({
-                ...props.clientState.settingState,
+            props.clientState.serverSetting.setFileUploadSetting({
+                ...props.clientState.serverSetting.fileUploadSetting,
                 configFile: file
             })
         }
         const onConfigFileClearClicked = () => {
-            props.clientState.setSettingState({
-                ...props.clientState.settingState,
+            props.clientState.serverSetting.setFileUploadSetting({
+                ...props.clientState.serverSetting.fileUploadSetting,
                 configFile: null
             })
         }
@@ -74,19 +53,19 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 alert("モデルファイルの拡張子はonnxである必要があります。")
                 return
             }
-            props.clientState.setSettingState({
-                ...props.clientState.settingState,
+            props.clientState.serverSetting.setFileUploadSetting({
+                ...props.clientState.serverSetting.fileUploadSetting,
                 onnxModel: file
             })
         }
         const onOnnxFileClearClicked = () => {
-            props.clientState.setSettingState({
-                ...props.clientState.settingState,
+            props.clientState.serverSetting.setFileUploadSetting({
+                ...props.clientState.serverSetting.fileUploadSetting,
                 onnxModel: null
             })
         }
         const onModelUploadClicked = async () => {
-            props.clientState.loadModel()
+            props.clientState.serverSetting.loadModel()
         }
 
         return (
@@ -101,19 +80,9 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                     </div>
                 </div>
                 <div className="body-row split-3-3-4 left-padding-1 guided">
-                    <div className="body-item-title left-padding-2">PyTorch(.pth)</div>
-                    <div className="body-item-text">
-                        <div>{props.clientState.settingState.pyTorchModel?.name}</div>
-                    </div>
-                    <div className="body-button-container">
-                        <div className="body-button" onClick={onPyTorchFileLoadClicked}>select</div>
-                        <div className="body-button left-margin-1" onClick={onPyTorchFileClearClicked}>clear</div>
-                    </div>
-                </div>
-                <div className="body-row split-3-3-4 left-padding-1 guided">
                     <div className="body-item-title left-padding-2">Config(.json)</div>
                     <div className="body-item-text">
-                        <div>{props.clientState.settingState.configFile?.name}</div>
+                        <div>{props.clientState.serverSetting.fileUploadSetting.configFile?.name}</div>
                     </div>
                     <div className="body-button-container">
                         <div className="body-button" onClick={onConfigFileLoadClicked}>select</div>
@@ -121,9 +90,19 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                     </div>
                 </div>
                 <div className="body-row split-3-3-4 left-padding-1 guided">
+                    <div className="body-item-title left-padding-2">PyTorch(.pth)</div>
+                    <div className="body-item-text">
+                        <div>{props.clientState.serverSetting.fileUploadSetting.pyTorchModel?.name}</div>
+                    </div>
+                    <div className="body-button-container">
+                        <div className="body-button" onClick={onPyTorchFileLoadClicked}>select</div>
+                        <div className="body-button left-margin-1" onClick={onPyTorchFileClearClicked}>clear</div>
+                    </div>
+                </div>
+                <div className="body-row split-3-3-4 left-padding-1 guided">
                     <div className="body-item-title left-padding-2">Onnx(.onnx)</div>
                     <div className="body-item-text">
-                        <div>{props.clientState.settingState.onnxModel?.name}</div>
+                        <div>{props.clientState.serverSetting.fileUploadSetting.onnxModel?.name}</div>
                     </div>
                     <div className="body-button-container">
                         <div className="body-button" onClick={onOnnxFileLoadClicked}>select</div>
@@ -133,7 +112,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 <div className="body-row split-3-3-4 left-padding-1 guided">
                     <div className="body-item-title left-padding-2"></div>
                     <div className="body-item-text">
-                        {props.clientState.isUploading ? `uploading.... ${props.clientState.uploadProgress}%` : ""}
+                        {props.clientState.serverSetting.isUploading ? `uploading.... ${props.clientState.serverSetting.uploadProgress}%` : ""}
                     </div>
                     <div className="body-button-container">
                         <div className="body-button" onClick={onModelUploadClicked}>upload</div>
@@ -142,23 +121,20 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             </>
         )
     }, [
-        props.clientState.settingState,
-        props.clientState.loadModel,
-        props.clientState.isUploading,
-        props.clientState.uploadProgress])
+        props.clientState.serverSetting.fileUploadSetting,
+        props.clientState.serverSetting.loadModel,
+        props.clientState.serverSetting.isUploading,
+        props.clientState.serverSetting.uploadProgress])
 
     const protocolRow = useMemo(() => {
         const onProtocolChanged = async (val: Protocol) => {
-            props.clientState.setSettingState({
-                ...props.clientState.settingState,
-                protocol: val
-            })
+            props.clientState.clientSetting.setProtocol(val)
         }
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Protocol</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={props.clientState.settingState.protocol} onChange={(e) => {
+                    <select className="body-select" value={props.clientState.clientSetting.setting.protocol} onChange={(e) => {
                         onProtocolChanged(e.target.value as
                             Protocol)
                     }}>
@@ -171,20 +147,17 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 </div>
             </div>
         )
-    }, [props.clientState.settingState])
+    }, [props.clientState.clientSetting.setting.protocol, props.clientState.clientSetting.setProtocol])
 
     const frameworkRow = useMemo(() => {
         const onFrameworkChanged = async (val: Framework) => {
-            props.clientState.setSettingState({
-                ...props.clientState.settingState,
-                framework: val
-            })
+            props.clientState.serverSetting.setFramework(val)
         }
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Framework</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={props.clientState.settingState.framework} onChange={(e) => {
+                    <select className="body-select" value={props.clientState.serverSetting.setting.framework} onChange={(e) => {
                         onFrameworkChanged(e.target.value as
                             Framework)
                     }}>
@@ -197,23 +170,20 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 </div>
             </div>
         )
-    }, [props.clientState.settingState])
+    }, [props.clientState.serverSetting.setting.framework, props.clientState.serverSetting.setFramework])
 
     const onnxExecutionProviderRow = useMemo(() => {
-        if (props.clientState.settingState.framework != "ONNX") {
+        if (props.clientState.serverSetting.setting.framework != "ONNX") {
             return
         }
         const onOnnxExecutionProviderChanged = async (val: OnnxExecutionProvider) => {
-            props.clientState.setSettingState({
-                ...props.clientState.settingState,
-                onnxExecutionProvider: val
-            })
+            props.clientState.serverSetting.setOnnxExecutionProvider(val)
         }
         return (
             <div className="body-row split-3-7 left-padding-1">
                 <div className="body-item-title left-padding-2">OnnxExecutionProvider</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={props.clientState.settingState.onnxExecutionProvider} onChange={(e) => {
+                    <select className="body-select" value={props.clientState.serverSetting.setting.onnxExecutionProvider} onChange={(e) => {
                         onOnnxExecutionProviderChanged(e.target.value as
                             OnnxExecutionProvider)
                     }}>
@@ -226,7 +196,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 </div>
             </div>
         )
-    }, [props.clientState.settingState])
+    }, [props.clientState.serverSetting.setting.framework, props.clientState.serverSetting.setting.onnxExecutionProvider, props.clientState.serverSetting.setOnnxExecutionProvider])
 
     const serverSetting = useMemo(() => {
         return (
@@ -236,14 +206,13 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                     <div className="body-select-container">
                     </div>
                 </div>
-                {mmvcServerUrlRow}
                 {uploadeModelRow}
                 {frameworkRow}
                 {onnxExecutionProviderRow}
                 {protocolRow}
             </>
         )
-    }, [mmvcServerUrlRow, uploadeModelRow, frameworkRow, onnxExecutionProviderRow, protocolRow])
+    }, [uploadeModelRow, frameworkRow, onnxExecutionProviderRow, protocolRow])
 
 
     return {

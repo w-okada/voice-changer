@@ -11,11 +11,11 @@ export const useServerControl = (props: UseServerControlProps) => {
     const startButtonRow = useMemo(() => {
         const onStartClicked = async () => {
             setIsStarted(true)
-            await props.clientState.start()
+            await props.clientState.clientSetting.start()
         }
         const onStopClicked = async () => {
             setIsStarted(false)
-            await props.clientState.stop()
+            await props.clientState.clientSetting.stop()
         }
         const startClassName = isStarted ? "body-button-active" : "body-button-stanby"
         const stopClassName = isStarted ? "body-button-stanby" : "body-button-active"
@@ -32,7 +32,7 @@ export const useServerControl = (props: UseServerControlProps) => {
             </div>
 
         )
-    }, [isStarted, props.clientState.start, props.clientState.stop])
+    }, [isStarted, props.clientState.clientSetting.start, props.clientState.clientSetting.stop])
 
     const performanceRow = useMemo(() => {
         return (
@@ -60,9 +60,9 @@ export const useServerControl = (props: UseServerControlProps) => {
                 <div className="body-row split-3-3-4 left-padding-1 guided">
                     <div className="body-item-title left-padding-1">Model Info:</div>
                     <div className="body-item-text">
-                        <span className="body-item-text-item">{props.clientState.serverInfo?.configFile || ""}</span>
-                        <span className="body-item-text-item">{props.clientState.serverInfo?.pyTorchModelFile || ""}</span>
-                        <span className="body-item-text-item">{props.clientState.serverInfo?.onnxModelFile || ""}</span>
+                        <span className="body-item-text-item">{props.clientState.serverSetting.serverInfo?.configFile || ""}</span>
+                        <span className="body-item-text-item">{props.clientState.serverSetting.serverInfo?.pyTorchModelFile || ""}</span>
+                        <span className="body-item-text-item">{props.clientState.serverSetting.serverInfo?.onnxModelFile || ""}</span>
 
 
                     </div>
@@ -72,7 +72,7 @@ export const useServerControl = (props: UseServerControlProps) => {
                 </div>
             </>
         )
-    }, [props.clientState.getInfo, props.clientState.serverInfo])
+    }, [props.clientState.getInfo, props.clientState.serverSetting.serverInfo])
 
 
 

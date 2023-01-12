@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { AUDIO_ELEMENT_FOR_PLAY_RESULT } from "./const";
-import { useServerSetting } from "./101_server_setting";
+import { useServerSettingArea } from "./101_server_setting";
 import { useDeviceSetting } from "./102_device_setting";
 import { useConvertSetting } from "./104_convert_setting";
 import { useAdvancedSetting } from "./105_advanced_setting";
@@ -17,7 +17,7 @@ export const useMicrophoneOptions = () => {
         audioOutputElementId: AUDIO_ELEMENT_FOR_PLAY_RESULT
     })
 
-    const serverSetting = useServerSetting({ clientState })
+    const serverSetting = useServerSettingArea({ clientState })
     const deviceSetting = useDeviceSetting(audioContext, { clientState })
     const speakerSetting = useSpeakerSetting({ clientState })
     const convertSetting = useConvertSetting({ clientState })

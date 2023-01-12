@@ -78,6 +78,9 @@ if __name__ == thisFilename or args.colab == True:
     MODEL = args.m if args.m != None else None
     ONNX_MODEL = args.o if args.o != None else None
 
+
+    if args.colab == True:
+        os.environ["colab"] = "True"
     # if os.getenv("EX_TB_PORT"):
     #     EX_TB_PORT = os.environ["EX_TB_PORT"]
     #     exApplitionInfo.external_tensorboard_port = int(EX_TB_PORT)

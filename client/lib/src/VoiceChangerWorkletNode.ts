@@ -1,3 +1,5 @@
+import { VoiceChangerWorkletProcessorRequest } from "./@types/voice-changer-worklet-processor";
+
 export type VolumeListener = {
     notifyVolume: (vol: number) => void
 }
@@ -11,10 +13,10 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
         console.log(`[worklet_node][voice-changer-worklet-processor] created.`);
     }
 
-    postReceivedVoice = (data: ArrayBuffer) => {
+    postReceivedVoice = (req: VoiceChangerWorkletProcessorRequest) => {
         this.port.postMessage({
-            data: data,
-        }, [data]);
+            request: req
+        }, [req.voice]);
     }
 
     handleMessage(event: any) {

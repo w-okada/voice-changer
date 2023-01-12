@@ -1,10 +1,11 @@
 
 // (★1) chunk sizeは 128サンプル, 256byte(int16)と定義。
 // (★2) 256byte(最低バッファサイズ256から間引いた個数x2byte)をchunkとして管理。
-
+// 24000sample -> 1sec, 128sample(1chunk) -> 5.333msec
+// 187.5chunk -> 1sec
 
 // types
-export type VoiceChangerRequestParamas = {
+export type VoiceChangerServerSetting = {
     convertChunkNum: number, // VITSに入力する変換サイズ。(入力データの2倍以上の大きさで指定。それより小さいものが指定された場合は、サーバ側で自動的に入力の2倍のサイズが設定される。)
     srcId: number,
     dstId: number,
@@ -13,10 +14,13 @@ export type VoiceChangerRequestParamas = {
     crossFadeLowerValue: number,
     crossFadeOffsetRate: number,
     crossFadeEndRate: number,
+    crossFadeOverlapRate: number,
 
+    framework: Framework
+    onnxExecutionProvider: OnnxExecutionProvider,
 }
 
-export type VoiceChangerOptions = {
+export type VoiceChangerClientSetting = {
     audioInput: string | MediaStream | null,
     mmvcServerUrl: string,
     protocol: Protocol,
@@ -26,10 +30,13 @@ export type VoiceChangerOptions = {
     speakers: Speaker[],
     forceVfDisable: boolean,
     voiceChangerMode: VoiceChangerMode,
-    onnxExecutionProvider: OnnxExecutionProvider,
-    framework: Framework
 }
 
+export type WorkletSetting = {
+    numTrancateTreshold: number,
+    volTrancateThreshold: number,
+    volTrancateLength: number
+}
 
 export type Speaker = {
     "id": number,
@@ -45,11 +52,12 @@ export type ServerInfo = {
     convertChunkNum: number,
     crossFadeOffsetRate: number,
     crossFadeEndRate: number,
+    crossFadeOverlapRate: number,
     gpu: number,
     srcId: number,
     dstId: number,
     framework: Framework,
-    providers: string[]
+    onnxExecutionProvider: string[]
 }
 
 
@@ -106,23 +114,28 @@ export const ServerSettingKey = {
     "gpu": "gpu",
     "crossFadeOffsetRate": "crossFadeOffsetRate",
     "crossFadeEndRate": "crossFadeEndRate",
+    "crossFadeOverlapRate": "crossFadeOverlapRate",
     "framework": "framework",
     "onnxExecutionProvider": "onnxExecutionProvider"
 } as const
 export type ServerSettingKey = typeof ServerSettingKey[keyof typeof ServerSettingKey]
 
 // Defaults
-export const DefaultVoiceChangerRequestParamas: VoiceChangerRequestParamas = {
+export const DefaultVoiceChangerServerSetting: VoiceChangerServerSetting = {
     convertChunkNum: 32, //（★１）
     srcId: 107,
     dstId: 100,
     gpu: 0,
     crossFadeLowerValue: 0.1,
     crossFadeOffsetRate: 0.1,
-    crossFadeEndRate: 0.9
+    crossFadeEndRate: 0.9,
+    crossFadeOverlapRate: 0.5,
+    framework: "PyTorch",
+    onnxExecutionProvider: "CPUExecutionProvider"
+
 }
 
-export const DefaultVoiceChangerOptions: VoiceChangerOptions = {
+export const DefaultVoiceChangerClientSetting: VoiceChangerClientSetting = {
     audioInput: null,
     mmvcServerUrl: "",
     protocol: "sio",
@@ -153,11 +166,13 @@ export const DefaultVoiceChangerOptions: VoiceChangerOptions = {
     ],
     forceVfDisable: false,
     voiceChangerMode: "realtime",
-    framework: "PyTorch",
-    onnxExecutionProvider: "CPUExecutionProvider"
 }
 
-
+export const DefaultWorkletSetting: WorkletSetting = {
+    numTrancateTreshold: 188,
+    volTrancateThreshold: 0.0005,
+    volTrancateLength: 32
+}
 
 export const VOICE_CHANGER_CLIENT_EXCEPTION = {
     ERR_SIO_CONNECT_FAILED: "ERR_SIO_CONNECT_FAILED",
