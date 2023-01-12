@@ -1,5 +1,7 @@
-import { BufferSize, createDummyMediaStream, DefaultVoiceChangerClientSetting, Protocol, SampleRate, Speaker, VoiceChangerClient, VoiceChangerClientSetting, VoiceChangerMode } from "@dannadori/voice-changer-client-js"
 import { useState, useMemo, useRef, useEffect } from "react"
+import { VoiceChangerClientSetting, Protocol, BufferSize, VoiceChangerMode, SampleRate, Speaker, DefaultVoiceChangerClientSetting } from "../const"
+import { createDummyMediaStream } from "../util"
+import { VoiceChangerClient } from "../VoiceChangerClient"
 
 export type UseClientSettingProps = {
     voiceChangerClient: VoiceChangerClient | null

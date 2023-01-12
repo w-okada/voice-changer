@@ -1,5 +1,5 @@
-import { VoiceChangerClient } from "@dannadori/voice-changer-client-js"
 import { useEffect, useMemo, useRef, useState } from "react"
+import { VoiceChangerClient } from "../VoiceChangerClient"
 import { ClientSettingState, useClientSetting } from "./useClientSetting"
 import { ServerSettingState, useServerSetting } from "./useServerSetting"
 import { useWorkletSetting, WorkletSettingState } from "./useWorkletSetting"

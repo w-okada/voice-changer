@@ -1,5 +1,6 @@
-import { DefaultWorkletSetting, VoiceChangerClient, WorkletSetting } from "@dannadori/voice-changer-client-js"
 import { useState, useMemo, useEffect } from "react"
+import { WorkletSetting, DefaultWorkletSetting } from "../const";
+import { VoiceChangerClient } from "../VoiceChangerClient";
 
 export type UseWorkletSettingProps = {
     voiceChangerClient: VoiceChangerClient | null
