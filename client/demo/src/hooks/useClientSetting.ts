@@ -33,7 +33,7 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
     const setServerUrl = useMemo(() => {
         return (url: string) => {
             if (!props.voiceChangerClient) return
-            props.voiceChangerClient.setServerUrl(url)
+            props.voiceChangerClient.setServerUrl(url, true)
             settingRef.current.mmvcServerUrl = url
             _setSetting({ ...settingRef.current })
         }

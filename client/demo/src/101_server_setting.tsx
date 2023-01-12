@@ -214,7 +214,7 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
                 </div>
             </div>
         )
-    }, [props.clientState.serverSetting.setting.onnxExecutionProvider, props.clientState.serverSetting.setOnnxExecutionProvider])
+    }, [props.clientState.serverSetting.setting.framework, props.clientState.serverSetting.setting.onnxExecutionProvider, props.clientState.serverSetting.setOnnxExecutionProvider])
 
     const serverSetting = useMemo(() => {
         return (
