@@ -8,8 +8,9 @@ from distutils.util import strtobool
 
 from scipy.io.wavfile import write, read
 
-sys.path.append("MMVC_Trainer")
-sys.path.append("MMVC_Trainer/text")
+# sys.path.append("MMVC_Trainer")
+# sys.path.append("MMVC_Trainer/text")
+sys.path.append("MMVC_Client/python")
 
 from fastapi.routing import APIRoute
 from fastapi import HTTPException,  FastAPI, UploadFile, File, Form

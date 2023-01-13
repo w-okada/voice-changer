@@ -4,16 +4,33 @@ import math, os, traceback
 from scipy.io.wavfile import write, read
 import numpy as np
 from dataclasses import dataclass, asdict
-import utils
-import commons
-from models import SynthesizerTrn
 
-from text.symbols import symbols
-from data_utils import TextAudioSpeakerLoader, TextAudioSpeakerCollate
-
-from mel_processing import spectrogram_torch
-from text import text_to_sequence, cleaned_text_to_sequence
 import onnxruntime
+
+
+# import utils
+# import commons
+# from models import SynthesizerTrn
+
+#from text.symbols import symbols
+# from data_utils import TextAudioSpeakerLoader, TextAudioSpeakerCollate
+
+# from mel_processing import spectrogram_torch
+
+#from text import text_to_sequence, cleaned_text_to_sequence
+
+
+################
+from symbols import symbols
+# from mmvc_client import get_hparams_from_file, load_checkpoint
+from models import SynthesizerTrn
+################
+
+# from voice_changer.utils import get_hparams_from_file, load_checkpoint
+# from voice_changer.models import SynthesizerTrn
+# from voice_changer.symbols import symbols
+
+from voice_changer.TrainerFunctions import TextAudioSpeakerCollate, spectrogram_torch, load_checkpoint, get_hparams_from_file
 
 providers = ['OpenVINOExecutionProvider',"CUDAExecutionProvider","DmlExecutionProvider","CPUExecutionProvider"]
 
@@ -49,12 +66,17 @@ class VoiceChanger():
         self.currentCrossFadeOverlapRate=0
         
         # 共通で使用する情報を収集
-        self.hps = utils.get_hparams_from_file(config)
+        # self.hps = utils.get_hparams_from_file(config)
+        self.hps = get_hparams_from_file(config)
         self.gpu_num = torch.cuda.device_count()
 
-        text_norm = text_to_sequence("a", self.hps.data.text_cleaners)
-        text_norm = commons.intersperse(text_norm, 0)
-        self.text_norm = torch.LongTensor(text_norm)
+        # text_norm = text_to_sequence("a", self.hps.data.text_cleaners)
+        # print("text_norm1: ",text_norm)
+        # text_norm = commons.intersperse(text_norm, 0)
+        # print("text_norm2: ",text_norm)
+        # self.text_norm = torch.LongTensor(text_norm)
+
+        self.text_norm = torch.LongTensor([0, 6, 0])        
         self.audio_buffer = torch.zeros(1, 0)
         self.prev_audio = np.zeros(1)
         self.mps_enabled = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
@@ -77,7 +99,8 @@ class VoiceChanger():
                 n_speakers=self.hps.data.n_speakers,
                 **self.hps.model)
             self.net_g.eval()
-            utils.load_checkpoint(pyTorch_model_file, self.net_g, None)
+            load_checkpoint(pyTorch_model_file, self.net_g, None)
+            # utils.load_checkpoint(pyTorch_model_file, self.net_g, None)
 
         # ONNXモデル生成
         if onnx_model_file != None:
@@ -232,7 +255,7 @@ class VoiceChanger():
             with torch.no_grad():
                 x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [x.cpu() for x in data]
                 sid_tgt1 = torch.LongTensor([self.settings.dstId]).cpu()
-                audio1 = (self.net_g.cpu().voice_conversion(spec, spec_lengths, sid_src=sid_src, sid_tgt=sid_tgt1)[0][0, 0].data * self.hps.data.max_wav_value)
+                audio1 = (self.net_g.cpu().voice_conversion(spec, spec_lengths, sid_src=sid_src, sid_tgt=sid_tgt1)[0, 0].data * self.hps.data.max_wav_value)
 
                 if self.prev_strength.device != torch.device('cpu'):
                     print(f"prev_strength move from {self.prev_strength.device} to cpu")
@@ -263,7 +286,7 @@ class VoiceChanger():
             with torch.no_grad():
                 x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [x.cuda(self.settings.gpu) for x in data]
                 sid_tgt1 = torch.LongTensor([self.settings.dstId]).cuda(self.settings.gpu)
-                audio1 = self.net_g.cuda(self.settings.gpu).voice_conversion(spec, spec_lengths, sid_src=sid_src, sid_tgt=sid_tgt1)[0][0, 0].data * self.hps.data.max_wav_value
+                audio1 = self.net_g.cuda(self.settings.gpu).voice_conversion(spec, spec_lengths, sid_src=sid_src, sid_tgt=sid_tgt1)[0, 0].data * self.hps.data.max_wav_value
 
                 if self.prev_strength.device != torch.device('cuda', self.settings.gpu):
                     print(f"prev_strength move from {self.prev_strength.device} to gpu{self.settings.gpu}")
