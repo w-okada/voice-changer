@@ -1,7 +1,5 @@
 import numpy as np
 from voice_changer.VoiceChanger import VoiceChanger
-from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
 
 class VoiceChangerManager():
     @classmethod

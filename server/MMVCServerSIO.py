@@ -1,27 +1,14 @@
-import sys, os, struct, argparse, shutil, traceback, base64, struct
-import numpy as np
+import sys, os, argparse
 import misc.log_control
 
 from dataclasses import dataclass
 from datetime import datetime
 from distutils.util import strtobool
 
-from scipy.io.wavfile import write, read
-
-# sys.path.append("MMVC_Trainer")
-# sys.path.append("MMVC_Trainer/text")
 sys.path.append("MMVC_Client/python")
 
-from fastapi.routing import APIRoute
-from fastapi import HTTPException,  FastAPI, UploadFile, File, Form
-
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
-
 import uvicorn
-import socketio
 
-from typing import Callable
 from mods.ssl import create_self_signed_cert
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 from sio.MMVC_SocketIOApp import MMVC_SocketIOApp
