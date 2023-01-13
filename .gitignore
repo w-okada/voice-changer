@@ -7,7 +7,7 @@ server/MMVC_Trainer/
 server/key
 server/info
 
-server/memo.txt
+server/memo.md
 
 client/lib/dist
 client/lib/worklet/dist
