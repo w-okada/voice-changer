@@ -15,7 +15,7 @@ from voice_changer.VoiceChangerManager import VoiceChangerManager
 from sio.MMVC_SocketIOApp import MMVC_SocketIOApp
 
 from restapi.MMVC_Rest import MMVC_Rest
-
+from const import SSL_KEY_DIR
 
 def setupArgParser():
     parser = argparse.ArgumentParser()
@@ -116,7 +116,7 @@ if __name__ == '__main__':
         # HTTPS key/cert作成
         if args.https and args.httpsSelfSigned == 1:
             # HTTPS(おれおれ証明書生成)
-            os.makedirs("./key", exist_ok=True)
+            os.makedirs(SSL_KEY_DIR, exist_ok=True)
             key_base_name = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}"
             keyname = f"{key_base_name}.key"
             certname = f"{key_base_name}.cert"
@@ -124,9 +124,9 @@ if __name__ == '__main__':
                                                                  "State": "Tokyo",
                                                                  "City": "Chuo-ku",
                                                                  "Organization": "F",
-                                                                 "Org. Unit": "F"}, cert_dir="./key")
-            key_path = os.path.join("./key", keyname)
-            cert_path = os.path.join("./key", certname)
+                                                                 "Org. Unit": "F"}, cert_dir=SSL_KEY_DIR)
+            key_path = os.path.join(SSL_KEY_DIR, keyname)
+            cert_path = os.path.join(SSL_KEY_DIR, certname)
             printMessage(
                 f"protocol: HTTPS(self-signed), key:{key_path}, cert:{cert_path}", level=1)
         elif args.https and args.httpsSelfSigned == 0:

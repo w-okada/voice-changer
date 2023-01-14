@@ -5,7 +5,7 @@ __pycache__
 server/upload_dir/
 server/MMVC_Trainer/
 server/MMVC_Client/
-server/key
+server/keys
 server/info
 
 server/memo.md
