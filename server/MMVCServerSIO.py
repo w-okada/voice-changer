@@ -20,12 +20,12 @@ def setupArgParser():
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", type=str, default="MMVC",
                         help="Server type. MMVC|TRAIN")
-    parser.add_argument("-p", type=int, default=8080, help="port")
+    parser.add_argument("-p", type=int, default=18888, help="port")
     parser.add_argument("-c", type=str, help="path for the config.json")
     parser.add_argument("-m", type=str, help="path for the model file")
     parser.add_argument("-o", type=str, help="path for the onnx model file")
     parser.add_argument("--https", type=strtobool,
-                        default=False, help="use https")
+                        default=True, help="use https")
     parser.add_argument("--httpsKey", type=str,
                         default="ssl.key", help="path for the key of https")
     parser.add_argument("--httpsCert", type=str,
