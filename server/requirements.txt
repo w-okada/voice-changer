@@ -1,9 +1,9 @@
-fastapi==0.88.0
-numpy==1.23.5
-pyOpenSSL==22.1.0
-python-multipart==0.0.5
+torch==1.13.1
+numpy==1.24.1
 python-socketio==5.7.2
-torch==1.13.0
+fastapi==0.89.1
+python-multipart==0.0.5
 uvicorn==0.20.0
 websockets==10.4
-onnxruntime==1.13.1
+pyOpenSSL==23.0.0
+onnxruntime-gpu==1.13.1
