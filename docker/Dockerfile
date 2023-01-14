@@ -7,7 +7,6 @@ RUN apt-get install -y python3-pip git
 
 RUN pip install torch==1.13.1
 RUN pip install numpy==1.24.1
-RUN pip install Unidecode==1.3.6
 RUN pip install python-socketio==5.7.2
 
 RUN pip install fastapi==0.89.1
