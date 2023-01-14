@@ -47,37 +47,35 @@ def printMessage(message, level=0):
     else:
         print(f"\033[47m    {message}\033[0m")
 
-
-
-global app_socketio
-global app_fastapi
+# global app_socketio
+# global app_fastapi
 
 parser = setupArgParser()
 args = parser.parse_args()
 
-printMessage(f"Phase name:{__name__}", level=2)
-thisFilename = os.path.basename(__file__)[:-3]
+# printMessage(f"Phase name:{__name__}", level=2)
+# thisFilename = os.path.basename(__file__)[:-3]
 
-if __name__ == thisFilename or args.colab == True:
-    printMessage(f"PHASE3:{__name__}", level=2)
-    TYPE = args.t
-    PORT = args.p
-    CONFIG = args.c
-    MODEL = args.m if args.m != None else None
-    ONNX_MODEL = args.o if args.o != None else None
+# if __name__ == thisFilename or args.colab == True:
+    # printMessage(f"PHASE3:{__name__}", level=2)
+TYPE = args.t
+PORT = args.p
+CONFIG = args.c
+MODEL = args.m if args.m != None else None
+ONNX_MODEL = args.o if args.o != None else None
 
 
-    if args.colab == True:
-        os.environ["colab"] = "True"
-    # if os.getenv("EX_TB_PORT"):
-    #     EX_TB_PORT = os.environ["EX_TB_PORT"]
-    #     exApplitionInfo.external_tensorboard_port = int(EX_TB_PORT)
+if args.colab == True:
+    os.environ["colab"] = "True"
+# if os.getenv("EX_TB_PORT"):
+#     EX_TB_PORT = os.environ["EX_TB_PORT"]
+#     exApplitionInfo.external_tensorboard_port = int(EX_TB_PORT)
 
-    voiceChangerManager = VoiceChangerManager.get_instance()    
-    if CONFIG and (MODEL or ONNX_MODEL):
-        voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL)
-    app_fastapi = MMVC_Rest.get_instance(voiceChangerManager)
-    app_socketio = MMVC_SocketIOApp.get_instance(app_fastapi, voiceChangerManager)
+voiceChangerManager = VoiceChangerManager.get_instance()    
+if CONFIG and (MODEL or ONNX_MODEL):
+    voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL)
+app_fastapi = MMVC_Rest.get_instance(voiceChangerManager)
+app_socketio = MMVC_SocketIOApp.get_instance(app_fastapi, voiceChangerManager)
 
 
 if __name__ == '__mp_main__':
