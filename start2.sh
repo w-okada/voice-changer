@@ -42,7 +42,7 @@ if [ "${MODE}" = "TRAIN" ]; then
         -e LOCAL_GID=$(id -g $USER) \
         -e EX_PORT=${EX_PORT} -e EX_TB_PORT=${EX_TB_PORT} \
         -e EX_IP="`hostname -I`" \
-        -p ${EX_PORT}:8080 -p ${EX_TB_PORT}:6006 \
+        -p ${EX_PORT}:18888 -p ${EX_TB_PORT}:6006 \
         $DOCKER_IMAGE "$@"
 
 
@@ -56,7 +56,7 @@ elif [ "${MODE}" = "MMVC" ]; then
         -e LOCAL_GID=$(id -g $USER) \
         -e EX_IP="`hostname -I`" \
         -e EX_PORT=${EX_PORT} \
-        -p ${EX_PORT}:8080 \
+        -p ${EX_PORT}:18888 \
         $DOCKER_IMAGE "$@"
     else
         echo "MMVCを起動します(only cpu)"
@@ -66,7 +66,7 @@ elif [ "${MODE}" = "MMVC" ]; then
         -e LOCAL_GID=$(id -g $USER) \
         -e EX_IP="`hostname -I`" \
         -e EX_PORT=${EX_PORT} \
-        -p ${EX_PORT}:8080 \
+        -p ${EX_PORT}:18888 \
         $DOCKER_IMAGE "$@"
     fi
 else

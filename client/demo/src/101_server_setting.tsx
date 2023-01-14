@@ -68,6 +68,10 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
             props.clientState.serverSetting.loadModel()
         }
 
+        const uploadButtonClassName = props.clientState.serverSetting.isUploading ? "body-button-disabled" : "body-button"
+        const uploadButtonAction = props.clientState.serverSetting.isUploading ? () => { } : onModelUploadClicked
+        const uploadButtonLabel = props.clientState.serverSetting.isUploading ? "wait..." : "upload"
+
         return (
             <>
                 <div className="body-row split-3-3-4 left-padding-1 guided">
@@ -115,7 +119,7 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
                         {props.clientState.serverSetting.isUploading ? `uploading.... ${props.clientState.serverSetting.uploadProgress}%` : ""}
                     </div>
                     <div className="body-button-container">
-                        <div className="body-button" onClick={onModelUploadClicked}>upload</div>
+                        <div className={uploadButtonClassName} onClick={uploadButtonAction}>{uploadButtonLabel}</div>
                     </div>
                 </div>
             </>

@@ -37,9 +37,24 @@ const App = () => {
 
     return (
         <div className="body">
-            <div className="body-row">
+            <div className="body-row split-6-4">
                 <div className="body-top-title">
                     Voice Changer Setting
+                </div>
+                <div className="body-top-title-belongings">
+                    <div className="belonging-item">
+                        <a className="link" href="https://github.com/w-okada/voice-changer" target="_blank" rel="noopener noreferrer">
+                            <img src="./assets/icons/github.svg" />
+                            <span>github</span>
+                        </a>
+                    </div>
+                    <div className="belonging-item">
+                        <a className="link" href="https://zenn.dev/wok/articles/s01_vc001_top" target="_blank" rel="noopener noreferrer">
+                            <img src="./assets/icons/help-circle.svg" />
+                            <span>manual</span>
+                        </a>
+                    </div>
+
                 </div>
             </div>
             {clearRow}

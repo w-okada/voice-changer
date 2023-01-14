@@ -63,6 +63,21 @@ body {
 }
 .body-row {
 }
+.split-6-4 {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 60%;
+    }
+    & > div:nth-child(2) {
+        left: 60%;
+        width: 40%;
+    }
+}
+
 .split-4-6 {
     display: flex;
     width: 100%;
@@ -218,6 +233,25 @@ body {
 .body-top-title {
     font-size: 3rem;
 }
+.body-top-title-belongings{
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    & > div {
+        margin-left:10px;
+        margin-right:10px;
+    }
+    &>.belonging-item{
+        &>.link{
+            text-decoration: none;
+            &>span{
+                font-size: small;
+            }
+        }
+    }
+}
+
+
 .body-section-title {
     font-size: 1.5rem;
     color: rgb(51, 49, 49);
@@ -246,28 +280,45 @@ body {
     display: flex;
     flex-direction: row;
     align-items: center;
+    & > div {
+        margin-left:5px;
+        margin-right:5px;
+        padding-left:20px;
+        padding-right:20px;
+        
+    }
     .body-button {
         user-select: none;
-        border: solid 1px #333;
+        border: solid 1px #999;
         border-radius: 2px;
-        padding: 2px;
         cursor:pointer;
         vertical-align:middle;
+        &:hover{
+            border: solid 1px #000;
+        }
+    }
+    .body-button-disabled {
+        user-select: none;
+        border: solid 1px #999;
+        border-radius: 2px;
+        vertical-align:middle;
+        background:#ddd;
     }
     .body-button-active {
         user-select: none;
         border: solid 1px #333;
         border-radius: 2px;
-        padding: 2px;
         background:#ada;
     }
     .body-button-stanby {
         user-select: none;
-        border: solid 1px #333;
+        border: solid 1px #999;
         border-radius: 2px;
-        padding: 2px;
         background:#aba;
         cursor:pointer;
+        &:hover{
+            border: solid 1px #000;
+        }
     }
 }
 .body-select-container {

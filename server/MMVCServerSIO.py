@@ -1,4 +1,5 @@
 import sys, os, argparse
+import socket
 import misc.log_control
 
 from dataclasses import dataclass
@@ -20,12 +21,12 @@ def setupArgParser():
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", type=str, default="MMVC",
                         help="Server type. MMVC|TRAIN")
-    parser.add_argument("-p", type=int, default=8080, help="port")
+    parser.add_argument("-p", type=int, default=18888, help="port")
     parser.add_argument("-c", type=str, help="path for the config.json")
     parser.add_argument("-m", type=str, help="path for the model file")
     parser.add_argument("-o", type=str, help="path for the onnx model file")
     parser.add_argument("--https", type=strtobool,
-                        default=False, help="use https")
+                        default=True, help="use https")
     parser.add_argument("--httpsKey", type=str,
                         default="ssl.key", help="path for the key of https")
     parser.add_argument("--httpsCert", type=str,
@@ -47,44 +48,42 @@ def printMessage(message, level=0):
     else:
         print(f"\033[47m    {message}\033[0m")
 
-
-
-global app_socketio
-global app_fastapi
+# global app_socketio
+# global app_fastapi
 
 parser = setupArgParser()
 args = parser.parse_args()
 
-printMessage(f"Phase name:{__name__}", level=2)
-thisFilename = os.path.basename(__file__)[:-3]
+# printMessage(f"Phase name:{__name__}", level=2)
+# thisFilename = os.path.basename(__file__)[:-3]
 
-if __name__ == thisFilename or args.colab == True:
-    printMessage(f"PHASE3:{__name__}", level=2)
-    TYPE = args.t
-    PORT = args.p
-    CONFIG = args.c
-    MODEL = args.m if args.m != None else None
-    ONNX_MODEL = args.o if args.o != None else None
+# if __name__ == thisFilename or args.colab == True:
+    # printMessage(f"PHASE3:{__name__}", level=2)
+TYPE = args.t
+PORT = args.p
+CONFIG = args.c
+MODEL = args.m if args.m != None else None
+ONNX_MODEL = args.o if args.o != None else None
 
 
-    if args.colab == True:
-        os.environ["colab"] = "True"
-    # if os.getenv("EX_TB_PORT"):
-    #     EX_TB_PORT = os.environ["EX_TB_PORT"]
-    #     exApplitionInfo.external_tensorboard_port = int(EX_TB_PORT)
+if args.colab == True:
+    os.environ["colab"] = "True"
+# if os.getenv("EX_TB_PORT"):
+#     EX_TB_PORT = os.environ["EX_TB_PORT"]
+#     exApplitionInfo.external_tensorboard_port = int(EX_TB_PORT)
 
-    voiceChangerManager = VoiceChangerManager.get_instance()    
-    if CONFIG and (MODEL or ONNX_MODEL):
-        voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL)
-    app_fastapi = MMVC_Rest.get_instance(voiceChangerManager)
-    app_socketio = MMVC_SocketIOApp.get_instance(app_fastapi, voiceChangerManager)
+voiceChangerManager = VoiceChangerManager.get_instance()    
+if CONFIG and (MODEL or ONNX_MODEL):
+    voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL)
+app_fastapi = MMVC_Rest.get_instance(voiceChangerManager)
+app_socketio = MMVC_SocketIOApp.get_instance(app_fastapi, voiceChangerManager)
 
 
 if __name__ == '__mp_main__':
-    printMessage(f"PHASE2:{__name__}", level=2)
+    printMessage(f"サーバプロセスを起動しています。", level=2)
 
 if __name__ == '__main__':
-    printMessage(f"PHASE1:{__name__}", level=2)
+    printMessage(f"Voice Changerを起動しています。", level=2)
     TYPE = args.t
     PORT = args.p
     CONFIG = args.c
@@ -94,7 +93,8 @@ if __name__ == '__main__':
         print("Type(-t) should be MMVC or TRAIN")
         exit(1)
 
-    printMessage(f"Start MMVC SocketIO Server", level=0)
+    # printMessage(f"Start MMVC SocketIO Server", level=0)
+    printMessage(f"-- 設定 -- ", level=1)
     printMessage(f"CONFIG:{CONFIG}, MODEL:{MODEL} ONNX_MODEL:{ONNX_MODEL}", level=1)
 
     if args.colab == False:
@@ -138,27 +138,42 @@ if __name__ == '__main__':
         else:
             # HTTP
             printMessage(f"protocol: HTTP", level=1)
+        printMessage(f"-- ---- -- ", level=1)
+
 
         # アドレス表示
+        printMessage(
+            f"ブラウザで次のURLを開いてください.", level=2)        
         if args.https == 1:
             printMessage(
-                f"open https://<IP>:<PORT>/ with your browser.", level=0)
+                f"https://<IP>:<PORT>/", level=1)
         else:
             printMessage(
-                f"open http://<IP>:<PORT>/ with your browser.", level=0)
+                f"http://<IP>:<PORT>/", level=1)
 
         if TYPE == "MMVC":
             path = ""
         else:
             path = "trainer"
-        if "EX_PORT" in locals() and "EX_IP" in locals() and args.https == 1:
-            printMessage(f"In many cases it is one of the following", level=1)
-            printMessage(f"https://localhost:{EX_PORT}/{path}", level=1)
-            for ip in EX_IP.strip().split(" "):
-                printMessage(f"https://{ip}:{EX_PORT}/{path}", level=1)
-        elif "EX_PORT" in locals() and "EX_IP" in locals() and args.https == 0:
-            printMessage(f"In many cases it is one of the following", level=1)
-            printMessage(f"http://localhost:{EX_PORT}/{path}", level=1)
+
+        printMessage(f"多くの場合は次のいずれかのURLにアクセスすると起動します。", level=2)
+        if "EX_PORT" in locals() and "EX_IP" in locals():  # シェルスクリプト経由起動(docker)
+            if args.https == 1:
+                printMessage(f"https://localhost:{EX_PORT}/{path}", level=1)
+                for ip in EX_IP.strip().split(" "):
+                    printMessage(f"https://{ip}:{EX_PORT}/{path}", level=1)
+            else:
+                printMessage(f"http://localhost:{EX_PORT}/{path}", level=1)
+        else: # 直接python起動
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            hostname = s.getsockname()[0]
+            if args.https == 1:
+                printMessage(f"https://localhost:{PORT}/{path}", level=1)
+                printMessage(f"https://{hostname}:{PORT}/{path}", level=1)
+            else:
+                printMessage(f"http://localhost:{PORT}/{path}", level=1)
+                printMessage(f"http://{hostname}:{PORT}/{path}", level=1)
 
     # サーバ起動
     if args.https:
@@ -167,7 +182,7 @@ if __name__ == '__main__':
             f"{os.path.basename(__file__)[:-3]}:app_socketio",
             host="0.0.0.0",
             port=int(PORT),
-            reload=True,
+            reload = False if hasattr(sys, "_MEIPASS") else True,
             ssl_keyfile=key_path,
             ssl_certfile=cert_path,
             # log_level="warning"
@@ -186,7 +201,7 @@ if __name__ == '__main__':
                 f"{os.path.basename(__file__)[:-3]}:app_socketio",
                 host="0.0.0.0",
                 port=int(PORT),
-                reload=True,
+                reload = False if hasattr(sys, "_MEIPASS") else True,
                 log_level="warning"
             )
 
