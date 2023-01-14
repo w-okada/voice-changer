@@ -45,9 +45,10 @@ MMVCでボイチェンを行うためのアプリです。
 - [超簡単バージョン](https://github.com/w-okada/voice-changer/blob/master/VoiceChangerDemo_Simple.ipynb): 事前設定なしでColabから実行できます。 
 - [普通バージョン](https://github.com/w-okada/voice-changer/blob/master/VoiceChangerDemo.ipynb): Google Driveと連携してモデルを読み込むことができます。
 
-また、バイナリ（α版）の配布も行っています。
+また、バイナリ（α版）の配布も行っています。M1 Mac版は、ダウンロード後、ターミナルで実行権限を付与して実行してください。
 
 - [M1 Mac v.1.3.5α](https://drive.google.com/file/d/1UJhitp0uZAhcQmcdve-iirDws4iMfD74/view?usp=sharing)
+
 
 - [Win  v.1.3.5α](https://drive.google.com/file/d/1UOEt3l4oxCsePOILChNG3B-yhHciHkQY/view?usp=sharing)
 
