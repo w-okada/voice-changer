@@ -165,7 +165,7 @@ if __name__ == '__main__':
             f"{os.path.basename(__file__)[:-3]}:app_socketio",
             host="0.0.0.0",
             port=int(PORT),
-            reload=True,
+            reload = False if hasattr(sys, "_MEIPASS") else True,
             ssl_keyfile=key_path,
             ssl_certfile=cert_path,
             # log_level="warning"
@@ -184,7 +184,7 @@ if __name__ == '__main__':
                 f"{os.path.basename(__file__)[:-3]}:app_socketio",
                 host="0.0.0.0",
                 port=int(PORT),
-                reload=True,
+                reload = False if hasattr(sys, "_MEIPASS") else True,
                 log_level="warning"
             )
 
