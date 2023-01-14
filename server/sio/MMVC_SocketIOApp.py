@@ -17,6 +17,10 @@ class MMVC_SocketIOApp():
                             'filename': f'{frontend_path}/assets/icons/github.svg',
                             'content_type': 'image/svg+xml'
                         },
+                        '/assets/icons/help-circle.svg': {
+                            'filename': f'{frontend_path}/assets/icons/help-circle.svg',
+                            'content_type': 'image/svg+xml'
+                        },
                         '': f'{frontend_path}',
                         '/': f'{frontend_path}/index.html',
                     }
