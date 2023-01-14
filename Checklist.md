@@ -1,9 +1,9 @@
 # Release Check List
 ## Run
-- [ ] Anaconda on WSL2
-- [ ] Docker on WSL2
 - [ ] Anaconda on Linux
 - [ ] Docker on Linux
+- [ ] Anaconda on WSL2
+- [ ] Docker on WSL2
 - [ ] Colab simple
 - [ ] Colab normal
 - [ ] Windows exe
