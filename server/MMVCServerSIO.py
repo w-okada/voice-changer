@@ -1,4 +1,5 @@
 import sys, os, argparse
+import socket
 import misc.log_control
 
 from dataclasses import dataclass
@@ -79,10 +80,10 @@ app_socketio = MMVC_SocketIOApp.get_instance(app_fastapi, voiceChangerManager)
 
 
 if __name__ == '__mp_main__':
-    printMessage(f"PHASE2:{__name__}", level=2)
+    printMessage(f"サーバプロセスを起動しています。", level=2)
 
 if __name__ == '__main__':
-    printMessage(f"PHASE1:{__name__}", level=2)
+    printMessage(f"Voice Changerを起動しています。", level=2)
     TYPE = args.t
     PORT = args.p
     CONFIG = args.c
@@ -92,7 +93,8 @@ if __name__ == '__main__':
         print("Type(-t) should be MMVC or TRAIN")
         exit(1)
 
-    printMessage(f"Start MMVC SocketIO Server", level=0)
+    # printMessage(f"Start MMVC SocketIO Server", level=0)
+    printMessage(f"-- 設定 -- ", level=1)
     printMessage(f"CONFIG:{CONFIG}, MODEL:{MODEL} ONNX_MODEL:{ONNX_MODEL}", level=1)
 
     if args.colab == False:
@@ -136,27 +138,42 @@ if __name__ == '__main__':
         else:
             # HTTP
             printMessage(f"protocol: HTTP", level=1)
+        printMessage(f"-- ---- -- ", level=1)
+
 
         # アドレス表示
+        printMessage(
+            f"ブラウザで次のURLを開いてください.", level=2)        
         if args.https == 1:
             printMessage(
-                f"open https://<IP>:<PORT>/ with your browser.", level=0)
+                f"https://<IP>:<PORT>/", level=1)
         else:
             printMessage(
-                f"open http://<IP>:<PORT>/ with your browser.", level=0)
+                f"http://<IP>:<PORT>/", level=1)
 
         if TYPE == "MMVC":
             path = ""
         else:
             path = "trainer"
-        if "EX_PORT" in locals() and "EX_IP" in locals() and args.https == 1:
-            printMessage(f"In many cases it is one of the following", level=1)
-            printMessage(f"https://localhost:{EX_PORT}/{path}", level=1)
-            for ip in EX_IP.strip().split(" "):
-                printMessage(f"https://{ip}:{EX_PORT}/{path}", level=1)
-        elif "EX_PORT" in locals() and "EX_IP" in locals() and args.https == 0:
-            printMessage(f"In many cases it is one of the following", level=1)
-            printMessage(f"http://localhost:{EX_PORT}/{path}", level=1)
+
+        printMessage(f"多くの場合は次のいずれかのURLにアクセスすると起動します。", level=2)
+        if "EX_PORT" in locals() and "EX_IP" in locals():  # シェルスクリプト経由起動(docker)
+            if args.https == 1:
+                printMessage(f"https://localhost:{EX_PORT}/{path}", level=1)
+                for ip in EX_IP.strip().split(" "):
+                    printMessage(f"https://{ip}:{EX_PORT}/{path}", level=1)
+            else:
+                printMessage(f"http://localhost:{EX_PORT}/{path}", level=1)
+        else: # 直接python起動
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            hostname = s.getsockname()[0]
+            if args.https == 1:
+                printMessage(f"https://localhost:{PORT}/{path}", level=1)
+                printMessage(f"https://{hostname}:{PORT}/{path}", level=1)
+            else:
+                printMessage(f"http://localhost:{PORT}/{path}", level=1)
+                printMessage(f"http://{hostname}:{PORT}/{path}", level=1)
 
     # サーバ起動
     if args.https:
