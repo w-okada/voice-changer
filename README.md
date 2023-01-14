@@ -52,7 +52,7 @@ MMVCでボイチェンを行うためのアプリです。
 
 - [Win  v.1.3.5α](https://drive.google.com/file/d/1UOEt3l4oxCsePOILChNG3B-yhHciHkQY/view?usp=sharing)
 
-- [Wind v.1.3.5DMLα](https://drive.google.com/file/d/1lJex64Y6RwkTTs72xB-pg9dQLjSuWi83/view?usp=sharing)
+- [Wind v.1.3.5DMLα]()
 
 https://user-images.githubusercontent.com/48346627/212490839-9727daff-8629-4bd7-a885-39b9058a7eba.mp4
 
