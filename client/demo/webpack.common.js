@@ -42,7 +42,7 @@ module.exports = {
             filename: "./index.html",
         }),
         new CopyPlugin({
-            patterns: [{ from: "public/assets", to: "asset" }],
+            patterns: [{ from: "public/assets", to: "assets" }],
         }),
         new CopyPlugin({
             patterns: [{ from: "public/favicon.ico", to: "favicon.ico" }],
