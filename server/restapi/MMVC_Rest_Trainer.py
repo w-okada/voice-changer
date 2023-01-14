@@ -18,7 +18,7 @@ from restapi.mods.Trainer_Speaker import mod_delete_speaker
 from dataclasses import dataclass
 
 INFO_DIR = "info"
-os.makedirs(INFO_DIR, exist_ok=True)
+# os.makedirs(INFO_DIR, exist_ok=True)
 
 @dataclass
 class ExApplicationInfo():

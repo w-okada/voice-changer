@@ -9,9 +9,9 @@ from restapi.mods.FileUploader import upload_file, concat_file_chunks
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 
 UPLOAD_DIR = "upload_dir"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+# os.makedirs(UPLOAD_DIR, exist_ok=True)
 MODEL_DIR = "MMVC_Trainer/logs"
-os.makedirs(MODEL_DIR, exist_ok=True)
+# os.makedirs(MODEL_DIR, exist_ok=True)
 
 class MMVC_Rest_Fileuploader:
     def __init__(self, voiceChangerManager:VoiceChangerManager):
