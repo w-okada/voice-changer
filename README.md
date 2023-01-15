@@ -80,7 +80,9 @@ Windows版とMac版を提供しています。事前準備は必要ありませ�
 - [MMVCServerSIO_win_onnxgpu_cudav.1.3.6.0.exe](https://drive.google.com/file/d/1BWNbIliP0hqB4M3lFpTrFtKHPn6z3KNf/view?usp=sharing) 1948MB
 - [MMVCServerSIO_win_onnxgpu_nocudav.1.3.6.0.exe](https://drive.google.com/file/d/1IPaZI53KOhl3eVktP4x0GwyqBngFGViS/view?usp=sharing) 255MB
 
-https://user-images.githubusercontent.com/48346627/212490839-9727daff-8629-4bd7-a885-39b9058a7eba.mp4
+
+https://user-images.githubusercontent.com/48346627/212569645-e30b7f4e-079d-4504-8cf8-7816c5f40b00.mp4
+
 
 詳細は、こちらの[Blog](https://zenn.dev/wok/articles/s01_vc001_top)をご確認ください。
 
