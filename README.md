@@ -73,7 +73,8 @@ Windows版とMac版を提供しています。事前準備は必要ありませ�
 ・NvidiaのGPUをお持ちでない方はonnxdirectMLが含まれるファイルをご利用ください。多くの場合は、onnxdirectML_nocudavの方で動きます。環境によってはgpuが認識されない場合が稀にあります。その場合はonnxgpu_cudaの方をご利用ください。（サイズが大きく違います。起動時間も遅くなります）
 
 
-- [MMVCServerSIO_mac_onnxcpu_v.1.3.6.0](https://drive.google.com/file/d/1Jfxz4NbjK-jt3yMIdC1Jhec9H47RxK6P/view?usp=sharing) 107MB
+- [MMVCServerSIO_mac_onnxcpu_v.1.3.6.0](https://drive.google.com/file/d/1NXfaClBvGg2GK9dmhjouqL7JCJm-Ngdd/view?usp=sharing) 181MB
+
 - [MMVCServerSIO_win_onnxdirectML_cudav.1.3.6.0.exe](https://drive.google.com/file/d/13ojs8VRconmARDGMoQapCVg3H9AG6PAz/view?usp=sharing) 1864MB
 - [MMVCServerSIO_win_onnxdirectML_nocudav.1.3.6.0.exe](https://drive.google.com/file/d/1MHJv2sx_AKxG8YrHvHTeksxGO1zsMTZl/view?usp=sharing) 171MB
 - [MMVCServerSIO_win_onnxgpu_cudav.1.3.6.0.exe](https://drive.google.com/file/d/1BWNbIliP0hqB4M3lFpTrFtKHPn6z3KNf/view?usp=sharing) 1948MB
@@ -124,4 +125,3 @@ https://twitter.com/DannadoriYellow/status/1613553862773997569?s=20&t=7CLD79h1F3
 本ソフトウェアの使用または使用不能により生じたいかなる直接損害・間接損害・波及的損害・結果的損害 または特別損害についても、一切責任を負いません。
 
 
-[test](https://drive.google.com/file/d/1NXfaClBvGg2GK9dmhjouqL7JCJm-Ngdd/view?usp=sharing)
