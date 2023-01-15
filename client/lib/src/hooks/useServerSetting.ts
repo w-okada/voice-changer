@@ -70,7 +70,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             })
             return true
         } else {
-            alert(`[ServerSetting] setting failed. [key:${key}, new:${newVal}, res:${res[key]}]`)
+            alert(`[ServerSetting] 設定が反映されていません([key:${key}, new:${newVal}, res:${res[key]}])。モデルの切り替えの場合、処理が非同期で行われるため反映されていないように見える場合があります。サーバコントロールのリロードボタンを押すとGUIに反映されるます。`)
             return false
         }
 
