@@ -271,7 +271,10 @@ body {
         padding-left: 1rem;
     }
 }
-
+.body-item-text-small {
+    color: rgb(30, 30, 30);
+    font-size: 0.7rem;
+}
 .body-item-input {
     width:90%;
 }

@@ -39,9 +39,16 @@ export const useServerControl = (props: UseServerControlProps) => {
             <>
                 <div className="body-row split-3-1-1-1-4 left-padding-1 guided">
                     <div className="body-item-title left-padding-1">monitor:</div>
-                    <div className="body-item-text">vol(rms):{props.clientState.volume.toFixed(4)}</div>
-                    <div className="body-item-text">buf(ms):{props.clientState.bufferingTime}</div>
-                    <div className="body-item-text">res(ms):{props.clientState.responseTime}</div>
+                    <div className="body-item-text">vol<span className="body-item-text-small">(rms)</span></div>
+                    <div className="body-item-text">buf<span className="body-item-text-small">(ms)</span></div>
+                    <div className="body-item-text">res<span className="body-item-text-small">(ms)</span></div>
+                    <div className="body-item-text"></div>
+                </div>
+                <div className="body-row split-3-1-1-1-4 left-padding-1 guided">
+                    <div className="body-item-title left-padding-1"></div>
+                    <div className="body-item-text">{props.clientState.volume.toFixed(4)}</div>
+                    <div className="body-item-text">{props.clientState.bufferingTime}</div>
+                    <div className="body-item-text">{props.clientState.responseTime}</div>
                     <div className="body-item-text"></div>
                 </div>
             </>
