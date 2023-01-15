@@ -48,6 +48,10 @@ export const useClient = (props: UseClientProps): ClientState => {
     const [volume, setVolume] = useState<number>(0)
 
 
+    // (1-4) エラーステータス
+    const errorCountRef = useRef<number>(0)
+
+
     // (2-1) 初期化処理
     useEffect(() => {
         const initialized = async () => {
@@ -64,6 +68,11 @@ export const useClient = (props: UseClientProps): ClientState => {
                 notifyException: (mes: string) => {
                     if (mes.length > 0) {
                         console.log(`error:${mes}`)
+                        errorCountRef.current += 1
+                        if (errorCountRef.current > 100) {
+                            alert("エラーが頻発しています。対象としているフレームワークのモデルがロードされているか確認してください。")
+                            errorCountRef.current = 0
+                        }
                     }
                 }
             }, {
