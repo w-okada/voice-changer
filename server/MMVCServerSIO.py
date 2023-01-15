@@ -1,4 +1,4 @@
-import sys, os, argparse
+import sys, os, argparse, platform
 import socket
 import misc.log_control
 
@@ -39,14 +39,25 @@ def setupArgParser():
 
 
 def printMessage(message, level=0):
-    if level == 0:
-        print(f"\033[17m{message}\033[0m")
-    elif level == 1:
-        print(f"\033[34m    {message}\033[0m")
-    elif level == 2:
-        print(f"\033[32m    {message}\033[0m")
+    pf = platform.system()
+    if pf == 'Windows':
+        if level == 0:
+            print(f"{message}")
+        elif level == 1:
+            print(f"    {message}")
+        elif level == 2:
+            print(f"    {message}")
+        else:
+            print(f"    {message}")
     else:
-        print(f"\033[47m    {message}\033[0m")
+        if level == 0:
+            print(f"\033[17m{message}\033[0m")
+        elif level == 1:
+            print(f"\033[34m    {message}\033[0m")
+        elif level == 2:
+            print(f"\033[32m    {message}\033[0m")
+        else:
+            print(f"\033[47m    {message}\033[0m")
 
 # global app_socketio
 # global app_fastapi
