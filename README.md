@@ -45,14 +45,20 @@ MMVCでボイチェンを行うためのアプリです。
 - [超簡単バージョン](https://github.com/w-okada/voice-changer/blob/master/VoiceChangerDemo_Simple.ipynb): 事前設定なしでColabから実行できます。 
 - [普通バージョン](https://github.com/w-okada/voice-changer/blob/master/VoiceChangerDemo.ipynb): Google Driveと連携してモデルを読み込むことができます。
 
-また、バイナリ（α版）の配布も行っています。M1 Mac版は、ダウンロード後、ターミナルで実行権限を付与して実行してください。
+また、バイナリ（α版）の配布も行っています。
+
+** M1 Mac版は、ダウンロード後、ターミナルで実行権限を付与して実行してください。
+
+** win版はcuda設定ができている場合はnocudaで実行可能なケースが多いです。環境によってcudaが認識されない場合はcudaの方をお試しください。
+
+- 
 
 - [M1 Mac v.1.3.5α](https://drive.google.com/file/d/1UJhitp0uZAhcQmcdve-iirDws4iMfD74/view?usp=sharing)
 
+- [Win onnxgpu-nocuda(軽量)](https://drive.google.com/file/d/1bbEGOpm3JiU0G7RaLIlJkBvSE5EieNOi/view?usp=sharing)
 
-- [Win  v.1.3.5α](https://drive.google.com/file/d/1UOEt3l4oxCsePOILChNG3B-yhHciHkQY/view?usp=sharing)
+- [Win onnxgpu-cuda(フル)](https://drive.google.com/file/d/1ZQlfoiZy2Npo3d9t9c4FwMEPG3QZnyBd/view?usp=sharing)
 
-- [Wind v.1.3.5DMLα]()
 
 https://user-images.githubusercontent.com/48346627/212490839-9727daff-8629-4bd7-a885-39b9058a7eba.mp4
 
