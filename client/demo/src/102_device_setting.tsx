@@ -6,7 +6,8 @@ import { ClientState } from "@dannadori/voice-changer-client-js";
 
 const reloadDevices = async () => {
     try {
-        await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        const ms = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
+        ms.getTracks().forEach(x => { x.stop() })
     } catch (e) {
         console.warn("Enumerate device error::", e)
     }
