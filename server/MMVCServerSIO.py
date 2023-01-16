@@ -36,8 +36,7 @@ def setupArgParser():
                         default=True, help="generate self-signed certificate")
     parser.add_argument("--colab", type=strtobool,
                         default=False, help="run on colab")
-    parser.add_argument("--openWindow", type=strtobool,
-                        default=True, help="open browser. only for local use")
+
     return parser
 
 
@@ -187,22 +186,6 @@ if __name__ == '__main__':
                 printMessage(f"https://{hostname}:{PORT}/{path}", level=1)
             else:
                 printMessage(f"http://localhost:{PORT}/{path}", level=1)
-                if args.openWindow:
-                    printMessage(f"ブラウザ(Chroem)の起動を試みています。", level=2)
-                    try:
-                        webbrowser.get('google-chrome')
-                        webbrowser.get('google-chrome').open(f"http://localhost:{PORT}/{path}", new=1, autoraise=True)
-                    except Exception as e:
-                        printMessage(f"!!! {e}", level=2)
-                        try:
-                            webbrowser.get("C:\Program Files\Google\Chrome\Application\chrome.exe")
-                            webbrowser.get("C:\Program Files\Google\Chrome\Application\chrome.exe").open(f"http://localhost:{PORT}/{path}", new=1, autoraise=True)
-                        except Exception as e:
-                            printMessage(f"{e}", level=1)
-                            printMessage(f"ブラウザの起動に失敗しました。", level=2)
-                            printMessage(f"手動でブラウザを立ち上げて表示されたURLにアクセスしてください。", level=2)
-                            print()
-                    # printMessage(f"http://{hostname}:{PORT}/{path}", level=1)
 
     # サーバ起動
     if args.https:
