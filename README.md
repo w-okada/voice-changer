@@ -72,9 +72,17 @@ Windows版とMac版を提供しています。事前準備は必要ありませ�
 
 ・NvidiaのGPUをお持ちでない方はonnxdirectMLが含まれるファイルをご利用ください。多くの場合は、onnxdirectML_nocudavの方で動きます。環境によってはgpuが認識されない場合が稀にあります。その場合はonnxgpu_cudaの方をご利用ください。（サイズが大きく違います。起動時間も遅くなります）
 
+### 最新バージョン
+- [MMVCServerSIO_mac_onnxcpu_v.1.3.6.1.zip](https://drive.google.com/file/d/1WTqPEOkZy19-Z149HZqBI31oi7ffg9Rf/view?usp=sharing) 154MB
+- [MMVCServerSIO_win_onnxdirectML_cuda_v.1.3.6.1.exe](https://drive.google.com/file/d/17ZDGa9IUJqm9hePbPczHC6zoqSj_d9CM/view?usp=sharing) 1864MB
+- [MMVCServerSIO_win_onnxdirectML_nocuda_v.1.3.6.1.exe](https://drive.google.com/file/d/1V9GF_Nn-FhS5BrwensTuzxkctBR4RUZy/view?usp=sharing) 171MB
+- [MMVCServerSIO_win_onnxgpu_cudav.1.3.6.1.exe](https://drive.google.com/file/d/138Jlol8ocy4hM12UNEqlQlZ9XphWOyZp/view?usp=sharing) 1948MB
+- [MMVCServerSIO_win_onnxgpu_nocudav.1.3.6.1.exe](https://drive.google.com/file/d/1fnVirudwkoNsY5kabG-295OrqgHzvcHf/view?usp=sharing) 255MB
 
+
+
+### 過去バージョン
 - [MMVCServerSIO_mac_onnxcpu_v.1.3.6.0](https://drive.google.com/file/d/1fWtvAN0OMygAUDoQlZ8TAZvLSMW_aI3B/view?usp=sharing) 181MB
-
 - [MMVCServerSIO_win_onnxdirectML_cudav.1.3.6.0.exe](https://drive.google.com/file/d/13ojs8VRconmARDGMoQapCVg3H9AG6PAz/view?usp=sharing) 1864MB
 - [MMVCServerSIO_win_onnxdirectML_nocudav.1.3.6.0.exe](https://drive.google.com/file/d/1MHJv2sx_AKxG8YrHvHTeksxGO1zsMTZl/view?usp=sharing) 171MB
 - [MMVCServerSIO_win_onnxgpu_cudav.1.3.6.0.exe](https://drive.google.com/file/d/1BWNbIliP0hqB4M3lFpTrFtKHPn6z3KNf/view?usp=sharing) 1948MB
