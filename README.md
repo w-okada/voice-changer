@@ -80,7 +80,6 @@ Windows版とMac版を提供しています。事前準備は必要ありませ�
 - [MMVCServerSIO_win_onnxgpu_nocudav.1.3.6.1.exe](https://drive.google.com/file/d/1fnVirudwkoNsY5kabG-295OrqgHzvcHf/view?usp=sharing) 255MB
 
 
-
 ### 過去バージョン
 - [MMVCServerSIO_mac_onnxcpu_v.1.3.6.0](https://drive.google.com/file/d/1fWtvAN0OMygAUDoQlZ8TAZvLSMW_aI3B/view?usp=sharing) 181MB
 - [MMVCServerSIO_win_onnxdirectML_cudav.1.3.6.0.exe](https://drive.google.com/file/d/13ojs8VRconmARDGMoQapCVg3H9AG6PAz/view?usp=sharing) 1864MB
