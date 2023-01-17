@@ -8,7 +8,7 @@ AIを使ったリアルタイムボイスチェンジャー[MMVC](https://github
 
 MMVCで必要となる一連の作業（トレーニング用の音声の録音、トレーニング、ボイスチェンジャ）の中で、音声の録音とボイスチェンジャを各種プラットフォームでお手軽に実行できます。
 
-**※ 公式のv1.3.2.0において、[トレーニング用ノートブック](https://github.com/isletennos/MMVC_Trainer)に大幅なユーザビリティ向上がありました。簡単化を目指していたこちらのトレーニング用アプリの役目は終了したと思われますので開発をストップしています（2023/01/10)。今後は公式のトレーニングの利用を推奨します。**
+※ トレーニングについては[公式ノートブック](https://github.com/isletennos/MMVC_Trainer)をご利用ください。
 
 ![image](https://user-images.githubusercontent.com/48346627/201169523-836e0f9e-2aca-4023-887c-52ecc219bcca.png)
 
@@ -26,12 +26,11 @@ MMVCで必要となる一連の作業（トレーニング用の音声の録音�
 ![image](https://user-images.githubusercontent.com/48346627/206640768-53f6052d-0a96-403b-a06c-6714a0b7471d.png)
 
 # 使用方法
-**v.1.3.x(2023/01/10~)でボイスチェンジャーの大幅な変更を行っています。**
 
 # (1) レコーダー（トレーニング用音声録音アプリ）
 MMVCトレーニング用の音声を簡単に録音できるアプリです。
 Github Pages上で実行できるため、ブラウザのみあれば様々なプラットフォームからご利用可能です。
-録音したデータは、ブラウザ上に保存されます。外部に一切漏れることはありません。
+録音したデータは、ブラウザ上に保存されます。外部に漏れることはありません。
 
 [録音アプリ on Github Pages](https://w-okada.github.io/voice-changer/)
 
@@ -64,36 +63,33 @@ MMVCのモデルをトレーニングが完了している場合、既にColabor
 実行形式のバイナリをダウンロードして実行することができます。
 Windows版とMac版を提供しています。事前準備は必要ありません。
 
-・Mac版はダウンロードファイルを解凍したのちに、アイコンをダブルクリックすると開発元を検証できない旨が示されます。コントロールキーを押してくクリックして実行してください。（詳細下記 *1）
+・Mac版はダウンロードファイルを解凍したのちに、アイコンをダブルクリックしてください。開発元を検証できない旨が示される場合は、再度コントロールキーを押してくダブルクリックして実行してください。（詳細下記 *1）
 
 ・Windows版は、directML版とGPU版を提供しています。
 
-・NvidiaのGPUをお持ちの方はonnxgpuが含まれるファイルをご利用ください。多くの場合はonnxgpu_nocudaの方で動きます。環境によってはgpuが認識されない場合が稀にあります。その場合はonnxgpu_cudaの方をご利用ください。（サイズが大きく違います。起動時間も遅くなります）
+・NvidiaのGPUをお持ちの方はonnxgpuがファイル名に含まれるファイルをご利用ください。多くの場合はonnxgpu_nocudaの方で動きます。環境によって極まれにgpuが認識されない場合があります。その場合はonnxgpu_cudaの方をご利用ください。（サイズが大きく違います。起動時間も遅くなります）
 
-・NvidiaのGPUをお持ちでない方はonnxdirectMLが含まれるファイルをご利用ください。多くの場合は、onnxdirectML_nocudavの方で動きます。環境によってはgpuが認識されない場合が稀にあります。その場合はonnxgpu_cudaの方をご利用ください。（サイズが大きく違います。起動時間も遅くなります）
+・NvidiaのGPUをお持ちでない方はonnxdirectMLが含まれるファイルをご利用ください。多くの場合は、onnxdirectML_nocudavの方で動きます。環境によって極まれにgpuが認識されない場合があります。その場合はonnxgpu_cudaの方をご利用ください。（サイズが大きく違います。起動時間も遅くなります）
 
 ### 最新バージョン
+- [MMVCServerSIO_mac_onnxcpu_v.1.3.7.0.zip](https://drive.google.com/file/d/1K_ihZ8hxbQq10qrxM1WUfUaj_vY6zwrW/view?usp=sharing) 154MB
+- [MMVCServerSIO_win_onnxdirectML_cuda_v.1.3.7.0.zip](https://drive.google.com/file/d/1IJHazaV60ophM6fbmzugZEjulLpBVJUi/view?usp=sharing) 1962MB
+- [MMVCServerSIO_win_onnxdirectML_nocuda_v.1.3.7.0.zip](https://drive.google.com/file/d/1_VzdUpiWb8lbIKNppwsFM5pYCAnixOap/view?usp=sharing) 198MB
+- [MMVCServerSIO_win_onnxgpu_cuda_v.1.3.7.0.zip](https://drive.google.com/file/d/1uRZHnDq2nVx4oRlXXiqZeE-ZjJlAFx5C/view?usp=sharing) 2057MB
+- [MMVCServerSIO_win_onnxgpu_nocuda_v.1.3.7.0.zip](https://drive.google.com/file/d/1DjSCsc_jKaH-TY6qqFbXz7Ya6tS58odb/view?usp=sharing) 293MB
+
+
+### 過去バージョン
 - [MMVCServerSIO_mac_onnxcpu_v.1.3.6.1.zip](https://drive.google.com/file/d/1WTqPEOkZy19-Z149HZqBI31oi7ffg9Rf/view?usp=sharing) 154MB
 - [MMVCServerSIO_win_onnxdirectML_cuda_v.1.3.6.1.exe](https://drive.google.com/file/d/17ZDGa9IUJqm9hePbPczHC6zoqSj_d9CM/view?usp=sharing) 1864MB
 - [MMVCServerSIO_win_onnxdirectML_nocuda_v.1.3.6.1.exe](https://drive.google.com/file/d/1V9GF_Nn-FhS5BrwensTuzxkctBR4RUZy/view?usp=sharing) 171MB
 - [MMVCServerSIO_win_onnxgpu_cudav.1.3.6.1.exe](https://drive.google.com/file/d/138Jlol8ocy4hM12UNEqlQlZ9XphWOyZp/view?usp=sharing) 1948MB
 - [MMVCServerSIO_win_onnxgpu_nocudav.1.3.6.1.exe](https://drive.google.com/file/d/1fnVirudwkoNsY5kabG-295OrqgHzvcHf/view?usp=sharing) 255MB
 
-
-### 過去バージョン
-- [MMVCServerSIO_mac_onnxcpu_v.1.3.6.0](https://drive.google.com/file/d/1fWtvAN0OMygAUDoQlZ8TAZvLSMW_aI3B/view?usp=sharing) 181MB
-- [MMVCServerSIO_win_onnxdirectML_cudav.1.3.6.0.exe](https://drive.google.com/file/d/13ojs8VRconmARDGMoQapCVg3H9AG6PAz/view?usp=sharing) 1864MB
-- [MMVCServerSIO_win_onnxdirectML_nocudav.1.3.6.0.exe](https://drive.google.com/file/d/1MHJv2sx_AKxG8YrHvHTeksxGO1zsMTZl/view?usp=sharing) 171MB
-- [MMVCServerSIO_win_onnxgpu_cudav.1.3.6.0.exe](https://drive.google.com/file/d/1BWNbIliP0hqB4M3lFpTrFtKHPn6z3KNf/view?usp=sharing) 1948MB
-- [MMVCServerSIO_win_onnxgpu_nocudav.1.3.6.0.exe](https://drive.google.com/file/d/1IPaZI53KOhl3eVktP4x0GwyqBngFGViS/view?usp=sharing) 255MB
-
-
 https://user-images.githubusercontent.com/48346627/212569645-e30b7f4e-079d-4504-8cf8-7816c5f40b00.mp4
 
 
 詳細は、こちらの[Blog](https://zenn.dev/wok/articles/s01_vc001_top)をご確認ください。
-
-(古いボイスチェンジャについては、引き続き[wiki](https://github.com/w-okada/voice-changer/wiki)をご確認ください。)
 
 
 *1 本ソフトウェアは開発元の署名しておりません。下記のように警告が出ますが、コントロールキーを押しながらアイコンをクリックすると実行できるようになります。これはAppleのセキュリティポリシーによるものです。実行は自己責任となります。
@@ -102,11 +98,13 @@ https://user-images.githubusercontent.com/48346627/212569645-e30b7f4e-079d-4504-
 
 
 ## (2-3) DockerやAnacondaなど環境構築を行った上での利用
-本リポジトリをクローンして利用します。WindowsではWSL2の環境構築が必須になります。また、WSL2上でDockerもしくはAnacondaなどの仮想環境の構築が必要となります。MacではAnacondaなどのPythonの仮想環境の構築が必要となります。事前準備が必要となりますが、多くの環境においてこの方法が一番高速で動きます。
+本リポジトリをクローンして利用します。WindowsではWSL2の環境構築が必須になります。また、WSL2上でDockerもしくはAnacondaなどの仮想環境の構築が必要となります。MacではAnacondaなどのPythonの仮想環境の構築が必要となります。事前準備が必要となりますが、多くの環境においてこの方法が一番高速で動きます。CPUのみでも動く可能性があります（下記のリアルタイム性の節を参照）。
 
 [WSL2とDockerのインストールの解説動画](https://youtu.be/POo_Cg0eFMU)
 
 [WSL2とAnacondaのインストールの解説動画](https://youtu.be/fba9Zhsukqw)
+
+操作方法は[wiki](https://github.com/w-okada/voice-changer/wiki/040_%E3%83%9C%E3%82%A4%E3%82%B9%E3%83%81%E3%82%A7%E3%83%B3%E3%82%B8%E3%83%A3%E3%83%BC)をご覧ください。
 
 # 説明動画
 | No  | タイトル                             | リンク                                  |
