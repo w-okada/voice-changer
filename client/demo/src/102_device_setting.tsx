@@ -138,11 +138,11 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
             <div className="body-row split-3-3-4 left-padding-1 guided">
                 <div className="body-item-title"></div>
                 <div className="body-item-text">
-                    <div>
+                    <div style={{ display: "none" }}>
                         org:<audio id={AUDIO_ELEMENT_FOR_TEST_ORIGINAL} controls></audio>
                     </div>
                     <div>
-                        cnv:<audio id={AUDIO_ELEMENT_FOR_TEST_CONVERTED} controls></audio>
+                        <audio id={AUDIO_ELEMENT_FOR_TEST_CONVERTED} controls></audio>
                         <audio id={AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK} controls hidden></audio>
                     </div>
                 </div>

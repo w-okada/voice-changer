@@ -1,14 +1,15 @@
-Voice Changer Trainer and Player
+VC Helper
 ----
 
 # 概要
 AIを使ったリアルタイムボイスチェンジャー[MMVC](https://github.com/isletennos/MMVC_Trainer)のヘルパーアプリケーションです。
 
-[解説動画](https://youtu.be/MOPqnDPqhAU)
 
 MMVCで必要となる一連の作業（トレーニング用の音声の録音、トレーニング、ボイスチェンジャ）の中で、音声の録音とボイスチェンジャを各種プラットフォームでお手軽に実行できます。
 
 ※ トレーニングについては[公式ノートブック](https://github.com/isletennos/MMVC_Trainer)をご利用ください。
+
+[解説動画](https://youtu.be/MOPqnDPqhAU)
 
 ![image](https://user-images.githubusercontent.com/48346627/201169523-836e0f9e-2aca-4023-887c-52ecc219bcca.png)
 
@@ -63,13 +64,16 @@ MMVCのモデルをトレーニングが完了している場合、既にColabor
 実行形式のバイナリをダウンロードして実行することができます。
 Windows版とMac版を提供しています。事前準備は必要ありません。
 
-・Mac版はダウンロードファイルを解凍したのちに、アイコンをダブルクリックしてください。開発元を検証できない旨が示される場合は、再度コントロールキーを押してくダブルクリックして実行してください。（詳細下記 *1）
+・Mac版はダウンロードファイルを解凍したのちに、MMVCServerSIOをダブルクリックしてください。開発元を検証できない旨が示される場合は、再度コントロールキーを押してクリックして実行してください。（詳細下記 *1）
 
-・Windows版は、directML版とGPU版を提供しています。
+・Windows版は、directML版とGPU版を提供しています。環境に応じたzipファイルをダウンロードしてください。ダンロードしたzipファイルを解凍して、MMVCServerSIO.exeを実行してください。
 
-・NvidiaのGPUをお持ちの方はonnxgpuがファイル名に含まれるファイルをご利用ください。多くの場合はonnxgpu_nocudaの方で動きます。環境によって極まれにgpuが認識されない場合があります。その場合はonnxgpu_cudaの方をご利用ください。（サイズが大きく違います。起動時間も遅くなります）
+・NvidiaのGPUをお持ちの方はonnxgpuがファイル名に含まれるファイルをご利用ください。多くの場合はonnxgpu_nocudaの方で動きます。環境によって極まれにgpuが認識されない場合があります。その場合はonnxgpu_cudaの方をご利用ください。（サイズが大きく違います。）
 
-・NvidiaのGPUをお持ちでない方はonnxdirectMLが含まれるファイルをご利用ください。多くの場合は、onnxdirectML_nocudavの方で動きます。環境によって極まれにgpuが認識されない場合があります。その場合はonnxgpu_cudaの方をご利用ください。（サイズが大きく違います。起動時間も遅くなります）
+・NvidiaのGPUをお持ちでない方はonnxdirectMLが含まれるファイルをご利用ください。多くの場合は、onnxdirectML_nocudavの方で動きます。環境によって極まれにgpuが認識されない場合があります。その場合はonnxgpu_cudaの方をご利用ください。（サイズが大きく違います。）
+
+・リモートからアクセスできるようにする方法など、より詳しくは[こちら](https://zenn.dev/wok/articles/s01_vc001_top)をご覧ください。
+
 
 ### 最新バージョン
 - [MMVCServerSIO_mac_onnxcpu_v.1.3.7.0.zip](https://drive.google.com/file/d/1K_ihZ8hxbQq10qrxM1WUfUaj_vY6zwrW/view?usp=sharing) 154MB
@@ -98,7 +102,7 @@ https://user-images.githubusercontent.com/48346627/212569645-e30b7f4e-079d-4504-
 
 
 ## (2-3) DockerやAnacondaなど環境構築を行った上での利用
-本リポジトリをクローンして利用します。WindowsではWSL2の環境構築が必須になります。また、WSL2上でDockerもしくはAnacondaなどの仮想環境の構築が必要となります。MacではAnacondaなどのPythonの仮想環境の構築が必要となります。事前準備が必要となりますが、多くの環境においてこの方法が一番高速で動きます。CPUのみでも動く可能性があります（下記のリアルタイム性の節を参照）。
+本リポジトリをクローンして利用します。WindowsではWSL2の環境構築が必須になります。また、WSL2上でDockerもしくはAnacondaなどの仮想環境の構築が必要となります。MacではAnacondaなどのPythonの仮想環境の構築が必要となります。事前準備が必要となりますが、多くの環境においてこの方法が一番高速で動きます。**<font color="red"> GPUが無くてもそこそこ新しいCPUであれば十分動く可能性があります </font>（下記のリアルタイム性の節を参照）**。
 
 [WSL2とDockerのインストールの解説動画](https://youtu.be/POo_Cg0eFMU)
 
