@@ -19,14 +19,13 @@ MMVCで必要となる一連の作業（トレーニング用の音声の録音�
 - MMVCモデルを用いたリアルタイムボイスチェンジャー
   - リアルタイム話者切り替え
   - CPU/GPU切り替え
-  - リアルタイム/ニアリアルタイム声質変換
-
 
 本アプリケーションのリアルタイムボイスチェンジャーは、サーバ・クライアント構成で動きます。MMVCのサーバを別のPC上で動かすことで、ゲーム実況など他の負荷の高い処理への影響を抑えながら動かすことができます。
 
 ![image](https://user-images.githubusercontent.com/48346627/206640768-53f6052d-0a96-403b-a06c-6714a0b7471d.png)
 
 # 使用方法
+詳細は[こちら](https://zenn.dev/wok/articles/s01_vc001_top)に纏まっています。
 
 # (1) レコーダー（トレーニング用音声録音アプリ）
 MMVCトレーニング用の音声を簡単に録音できるアプリです。
@@ -38,7 +37,7 @@ Github Pages上で実行できるため、ブラウザのみあれば様々な�
 [解説動画](https://youtu.be/s_GirFEGvaA)
 
 
-詳細については[wiki](https://github.com/w-okada/voice-changer/wiki)をご確認ください。
+詳細については[こちら](https://zenn.dev/wok/articles/s01_vc002_record_voice_for_mmvc)をご確認ください。
 
 
 # (2) プレイヤー（ボイスチェンジャーアプリ）
@@ -109,18 +108,6 @@ https://user-images.githubusercontent.com/48346627/212569645-e30b7f4e-079d-4504-
 [WSL2とAnacondaのインストールの解説動画](https://youtu.be/fba9Zhsukqw)
 
 操作方法は[wiki](https://github.com/w-okada/voice-changer/wiki/040_%E3%83%9C%E3%82%A4%E3%82%B9%E3%83%81%E3%82%A7%E3%83%B3%E3%82%B8%E3%83%A3%E3%83%BC)をご覧ください。
-
-# 説明動画
-| No  | タイトル                             | リンク                                  |
-| --- | ------------------------------------ | --------------------------------------- |
-| 01  | ざっくり説明編                       | [youtube](https://youtu.be/MOPqnDPqhAU) |
-| 02  | ユーザー音声の録音編                 | [youtube](https://youtu.be/s_GirFEGvaA) |
-| 03  | トレーニング編                       | 作成中                                  |
-| 04a | Colabでボイチェン編                  | [youtube](https://youtu.be/TogfMzXH1T0) |
-| 04b | PCでボイチェン編                     | 欠番(ex1, ex2, 04aの内容と被るため)     |
-| ex1 | 番外編：WSL2とDockerのインストール   | [youtube](https://youtu.be/POo_Cg0eFMU) |
-| ex2 | 番外編：WSL2とAnacondaのインストール | [youtube](https://youtu.be/fba9Zhsukqw) |
-
 
 ## リアルタイム性
 
