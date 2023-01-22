@@ -107,7 +107,7 @@ https://user-images.githubusercontent.com/48346627/212569645-e30b7f4e-079d-4504-
 
 [WSL2とAnacondaのインストールの解説動画](https://youtu.be/fba9Zhsukqw)
 
-操作方法は[wiki](https://github.com/w-okada/voice-changer/wiki/040_%E3%83%9C%E3%82%A4%E3%82%B9%E3%83%81%E3%82%A7%E3%83%B3%E3%82%B8%E3%83%A3%E3%83%BC)をご覧ください。
+操作方法は[こちら](https://zenn.dev/wok/articles/s01_vc007_mmvc_with_linux_wsl2)をご覧ください。
 
 ## リアルタイム性
 
