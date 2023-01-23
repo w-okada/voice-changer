@@ -15,7 +15,9 @@ export const useServerControl = (props: UseServerControlProps) => {
         }
         const onStopClicked = async () => {
             setIsStarted(false)
+            console.log("stop click1")
             await props.clientState.clientSetting.stop()
+            console.log("stop click2")
         }
         const startClassName = isStarted ? "body-button-active" : "body-button-stanby"
         const stopClassName = isStarted ? "body-button-stanby" : "body-button-active"
