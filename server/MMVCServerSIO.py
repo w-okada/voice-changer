@@ -1,4 +1,16 @@
-import sys, os, argparse, platform
+import multiprocessing as mp
+import subprocess
+from const import SSL_KEY_DIR
+from restapi.MMVC_Rest import MMVC_Rest
+from sio.MMVC_SocketIOApp import MMVC_SocketIOApp
+from voice_changer.VoiceChangerManager import VoiceChangerManager
+from mods.ssl import create_self_signed_cert
+import webbrowser
+import uvicorn
+import sys
+import os
+import argparse
+import platform
 import socket
 import misc.log_control
 
@@ -8,15 +20,6 @@ from distutils.util import strtobool
 
 sys.path.append("MMVC_Client/python")
 
-import uvicorn
-import webbrowser
-
-from mods.ssl import create_self_signed_cert
-from voice_changer.VoiceChangerManager import VoiceChangerManager
-from sio.MMVC_SocketIOApp import MMVC_SocketIOApp
-
-from restapi.MMVC_Rest import MMVC_Rest
-from const import SSL_KEY_DIR
 
 def setupArgParser():
     parser = argparse.ArgumentParser()
@@ -64,19 +67,31 @@ def printMessage(message, level=0):
 # global app_socketio
 # global app_fastapi
 
+
 parser = setupArgParser()
-args = parser.parse_args()
+# args = parser.parse_args()
+args, unknown = parser.parse_known_args()
 
 # printMessage(f"Phase name:{__name__}", level=2)
 # thisFilename = os.path.basename(__file__)[:-3]
 
 # if __name__ == thisFilename or args.colab == True:
-    # printMessage(f"PHASE3:{__name__}", level=2)
+# printMessage(f"PHASE3:{__name__}", level=2)
 TYPE = args.t
 PORT = args.p
 CONFIG = args.c
 MODEL = args.m if args.m != None else None
 ONNX_MODEL = args.o if args.o != None else None
+
+
+def localServer():
+    uvicorn.run(
+        f"{os.path.basename(__file__)[:-3]}:app_socketio",
+        host="0.0.0.0",
+        port=int(PORT),
+        reload=False if hasattr(sys, "_MEIPASS") else True,
+        log_level="warning"
+    )
 
 
 if args.colab == True:
@@ -85,7 +100,7 @@ if args.colab == True:
 #     EX_TB_PORT = os.environ["EX_TB_PORT"]
 #     exApplitionInfo.external_tensorboard_port = int(EX_TB_PORT)
 
-voiceChangerManager = VoiceChangerManager.get_instance()    
+voiceChangerManager = VoiceChangerManager.get_instance()
 if CONFIG and (MODEL or ONNX_MODEL):
     voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL)
 app_fastapi = MMVC_Rest.get_instance(voiceChangerManager)
@@ -96,6 +111,9 @@ if __name__ == '__mp_main__':
     printMessage(f"サーバプロセスを起動しています。", level=2)
 
 if __name__ == '__main__':
+    if sys.platform.startswith('win'):
+        mp.freeze_support()
+
     printMessage(f"Voice Changerを起動しています。", level=2)
     TYPE = args.t
     PORT = args.p
@@ -153,10 +171,9 @@ if __name__ == '__main__':
             printMessage(f"protocol: HTTP", level=1)
         printMessage(f"-- ---- -- ", level=1)
 
-
         # アドレス表示
         printMessage(
-            f"ブラウザで次のURLを開いてください.", level=2)        
+            f"ブラウザで次のURLを開いてください.", level=2)
         if args.https == 1:
             printMessage(
                 f"https://<IP>:<PORT>/", level=1)
@@ -177,7 +194,7 @@ if __name__ == '__main__':
                     printMessage(f"https://{ip}:{EX_PORT}/{path}", level=1)
             else:
                 printMessage(f"http://localhost:{EX_PORT}/{path}", level=1)
-        else: # 直接python起動
+        else:  # 直接python起動
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.connect(("8.8.8.8", 80))
             hostname = s.getsockname()[0]
@@ -194,7 +211,7 @@ if __name__ == '__main__':
             f"{os.path.basename(__file__)[:-3]}:app_socketio",
             host="0.0.0.0",
             port=int(PORT),
-            reload = False if hasattr(sys, "_MEIPASS") else True,
+            reload=False if hasattr(sys, "_MEIPASS") else True,
             ssl_keyfile=key_path,
             ssl_certfile=cert_path,
             # log_level="warning"
@@ -209,11 +226,21 @@ if __name__ == '__main__':
                 log_level="warning"
             )
         else:
-            uvicorn.run(
-                f"{os.path.basename(__file__)[:-3]}:app_socketio",
-                host="0.0.0.0",
-                port=int(PORT),
-                reload = False if hasattr(sys, "_MEIPASS") else True,
-                log_level="warning"
-            )
+            # uvicorn.run(
+            #     f"{os.path.basename(__file__)[:-3]}:app_socketio",
+            #     host="0.0.0.0",
+            #     port=int(PORT),
+            #     reload = False if hasattr(sys, "_MEIPASS") else True,
+            #     log_level="warning"
+            # )
 
+            p = mp.Process(name="p", target=localServer)
+            p.start()
+            try:
+                if sys.platform.startswith('win'):
+                    process = subprocess.Popen(["voice-changer-native-client.exe", "-u", f"http://localhost:{PORT}/{path}"])
+                    return_code = process.wait()
+                    print("client clonsed.")
+                    p.terminate()
+            except Exception as e:
+                print(e)
