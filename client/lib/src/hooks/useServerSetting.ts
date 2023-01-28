@@ -179,10 +179,10 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 console.log(progress, end)
             })
 
-            const serverInfo = await props.voiceChangerClient.loadModel(fileUploadSetting.configFile, fileUploadSetting.pyTorchModel, fileUploadSetting.onnxModel)
-            console.log(serverInfo)
+            await props.voiceChangerClient.loadModel(fileUploadSetting.configFile, fileUploadSetting.pyTorchModel, fileUploadSetting.onnxModel)
             setUploadProgress(0)
             setIsUploading(false)
+            reloadServerInfo()
         }
     }, [fileUploadSetting, props.voiceChangerClient])
 
@@ -203,7 +203,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 framework: res.framework,
                 onnxExecutionProvider: (!!res.onnxExecutionProvider && res.onnxExecutionProvider.length > 0) ? res.onnxExecutionProvider[0] as OnnxExecutionProvider : DefaultVoiceChangerServerSetting.onnxExecutionProvider
             })
-
         }
     }, [props.voiceChangerClient])
 

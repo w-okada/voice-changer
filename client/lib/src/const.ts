@@ -135,7 +135,7 @@ export const DefaultVoiceChangerServerSetting: VoiceChangerServerSetting = {
     crossFadeOffsetRate: 0.1,
     crossFadeEndRate: 0.9,
     crossFadeOverlapRate: 0.5,
-    framework: "PyTorch",
+    framework: "ONNX",
     onnxExecutionProvider: "CPUExecutionProvider"
 
 }
