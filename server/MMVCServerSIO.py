@@ -1,6 +1,6 @@
 import multiprocessing as mp
 import subprocess
-from const import SSL_KEY_DIR
+from const import NATIVE_CLIENT_FILE, SSL_KEY_DIR
 from restapi.MMVC_Rest import MMVC_Rest
 from sio.MMVC_SocketIOApp import MMVC_SocketIOApp
 from voice_changer.VoiceChangerManager import VoiceChangerManager
@@ -111,8 +111,7 @@ if __name__ == '__mp_main__':
     printMessage(f"サーバプロセスを起動しています。", level=2)
 
 if __name__ == '__main__':
-    if sys.platform.startswith('win'):
-        mp.freeze_support()
+    mp.freeze_support()
 
     printMessage(f"Voice Changerを起動しています。", level=2)
     TYPE = args.t
@@ -240,7 +239,13 @@ if __name__ == '__main__':
                 if sys.platform.startswith('win'):
                     process = subprocess.Popen(["voice-changer-native-client.exe", "-u", f"http://localhost:{PORT}/{path}"])
                     return_code = process.wait()
-                    print("client clonsed.")
+                    print("client closed.")
                     p.terminate()
+                elif sys.platform.startswith('darwin'):
+                    process = subprocess.Popen([NATIVE_CLIENT_FILE, "-u", f"http://localhost:{PORT}/{path}"])
+                    return_code = process.wait()
+                    print("client closed.")
+                    p.terminate()
+
             except Exception as e:
                 print(e)
