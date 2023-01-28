@@ -1,24 +1,23 @@
-import multiprocessing as mp
-import subprocess
-from const import NATIVE_CLIENT_FILE_MAC, NATIVE_CLIENT_FILE_WIN, SSL_KEY_DIR
-from restapi.MMVC_Rest import MMVC_Rest
-from sio.MMVC_SocketIOApp import MMVC_SocketIOApp
-from voice_changer.VoiceChangerManager import VoiceChangerManager
-from mods.ssl import create_self_signed_cert
-import webbrowser
-import uvicorn
 import sys
+sys.path.append("MMVC_Client/python")
+
+from distutils.util import strtobool
+from datetime import datetime
+from dataclasses import dataclass
+import misc.log_control
+import socket
+import platform
 import os
 import argparse
-import platform
-import socket
-import misc.log_control
-
-from dataclasses import dataclass
-from datetime import datetime
-from distutils.util import strtobool
-
-sys.path.append("MMVC_Client/python")
+import uvicorn
+import webbrowser
+from mods.ssl import create_self_signed_cert
+from voice_changer.VoiceChangerManager import VoiceChangerManager
+from sio.MMVC_SocketIOApp import MMVC_SocketIOApp
+from restapi.MMVC_Rest import MMVC_Rest
+from const import NATIVE_CLIENT_FILE_MAC, NATIVE_CLIENT_FILE_WIN, SSL_KEY_DIR
+import subprocess
+import multiprocessing as mp
 
 
 def setupArgParser():
