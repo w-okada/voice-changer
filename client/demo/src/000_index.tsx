@@ -36,7 +36,7 @@ const App = () => {
 
 
     return (
-        <div className="body">
+        <div className="main-body">
             <div className="body-row split-6-4">
                 <div className="body-top-title">
                     Voice Changer Setting
