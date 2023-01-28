@@ -1,5 +1,5 @@
 import { OnnxExecutionProvider, Framework, fileSelector } from "@dannadori/voice-changer-client-js"
-import React from "react"
+import React, { useState } from "react"
 import { useMemo } from "react"
 import { ClientState } from "@dannadori/voice-changer-client-js";
 
@@ -12,6 +12,7 @@ export type ServerSettingState = {
 }
 
 export const useServerSettingArea = (props: UseServerSettingProps): ServerSettingState => {
+    const [showPyTorch, setShowPyTorch] = useState<boolean>(false)
     const uploadeModelRow = useMemo(() => {
         const onPyTorchFileLoadClicked = async () => {
             const file = await fileSelector("")
@@ -80,7 +81,11 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
                         <div></div>
                     </div>
                     <div className="body-item-text">
-                        <div></div>
+                        <div>
+                            <input type="checkbox" checked={showPyTorch} onChange={(e) => {
+                                setShowPyTorch(e.target.checked)
+                            }} /> enable PyTorch
+                        </div>
                     </div>
                 </div>
                 <div className="body-row split-3-3-4 left-padding-1 guided">
@@ -94,16 +99,6 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
                     </div>
                 </div>
                 <div className="body-row split-3-3-4 left-padding-1 guided">
-                    <div className="body-item-title left-padding-2">PyTorch(.pth)</div>
-                    <div className="body-item-text">
-                        <div>{props.clientState.serverSetting.fileUploadSetting.pyTorchModel?.name}</div>
-                    </div>
-                    <div className="body-button-container">
-                        <div className="body-button" onClick={onPyTorchFileLoadClicked}>select</div>
-                        <div className="body-button left-margin-1" onClick={onPyTorchFileClearClicked}>clear</div>
-                    </div>
-                </div>
-                <div className="body-row split-3-3-4 left-padding-1 guided">
                     <div className="body-item-title left-padding-2">Onnx(.onnx)</div>
                     <div className="body-item-text">
                         <div>{props.clientState.serverSetting.fileUploadSetting.onnxModel?.name}</div>
@@ -113,6 +108,25 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
                         <div className="body-button left-margin-1" onClick={onOnnxFileClearClicked}>clear</div>
                     </div>
                 </div>
+                {showPyTorch ?
+                    (
+                        <div className="body-row split-3-3-4 left-padding-1 guided">
+                            <div className="body-item-title left-padding-2">PyTorch(.pth)</div>
+                            <div className="body-item-text">
+                                <div>{props.clientState.serverSetting.fileUploadSetting.pyTorchModel?.name}</div>
+                            </div>
+                            <div className="body-button-container">
+                                <div className="body-button" onClick={onPyTorchFileLoadClicked}>select</div>
+                                <div className="body-button left-margin-1" onClick={onPyTorchFileClearClicked}>clear</div>
+                            </div>
+                        </div>
+
+                    )
+                    :
+                    (
+                        <></>
+                    )
+                }
                 <div className="body-row split-3-3-4 left-padding-1 guided">
                     <div className="body-item-title left-padding-2"></div>
                     <div className="body-item-text">
@@ -128,7 +142,8 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
         props.clientState.serverSetting.fileUploadSetting,
         props.clientState.serverSetting.loadModel,
         props.clientState.serverSetting.isUploading,
-        props.clientState.serverSetting.uploadProgress])
+        props.clientState.serverSetting.uploadProgress,
+        showPyTorch])
 
     const frameworkRow = useMemo(() => {
         const onFrameworkChanged = async (val: Framework) => {
