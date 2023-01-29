@@ -22,7 +22,10 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
             }
             props.clientState.serverSetting.setFileUploadSetting({
                 ...props.clientState.serverSetting.fileUploadSetting,
-                pyTorchModel: file
+                pyTorchModel: {
+                    data: await file.arrayBuffer(),
+                    filename: file.name
+                }
             })
         }
         const onPyTorchFileClearClicked = () => {
@@ -39,7 +42,10 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
             }
             props.clientState.serverSetting.setFileUploadSetting({
                 ...props.clientState.serverSetting.fileUploadSetting,
-                configFile: file
+                configFile: {
+                    data: await file.arrayBuffer(),
+                    filename: file.name
+                }
             })
         }
         const onConfigFileClearClicked = () => {
@@ -56,7 +62,10 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
             }
             props.clientState.serverSetting.setFileUploadSetting({
                 ...props.clientState.serverSetting.fileUploadSetting,
-                onnxModel: file
+                onnxModel: {
+                    data: await file.arrayBuffer(),
+                    filename: file.name
+                }
             })
         }
         const onOnnxFileClearClicked = () => {
@@ -91,7 +100,7 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
                 <div className="body-row split-3-3-4 left-padding-1 guided">
                     <div className="body-item-title left-padding-2">Config(.json)</div>
                     <div className="body-item-text">
-                        <div>{props.clientState.serverSetting.fileUploadSetting.configFile?.name}</div>
+                        <div>{props.clientState.serverSetting.fileUploadSetting.configFile?.filename}</div>
                     </div>
                     <div className="body-button-container">
                         <div className="body-button" onClick={onConfigFileLoadClicked}>select</div>
@@ -101,7 +110,7 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
                 <div className="body-row split-3-3-4 left-padding-1 guided">
                     <div className="body-item-title left-padding-2">Onnx(.onnx)</div>
                     <div className="body-item-text">
-                        <div>{props.clientState.serverSetting.fileUploadSetting.onnxModel?.name}</div>
+                        <div>{props.clientState.serverSetting.fileUploadSetting.onnxModel?.filename}</div>
                     </div>
                     <div className="body-button-container">
                         <div className="body-button" onClick={onOnnxFileLoadClicked}>select</div>
@@ -113,7 +122,7 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
                         <div className="body-row split-3-3-4 left-padding-1 guided">
                             <div className="body-item-title left-padding-2">PyTorch(.pth)</div>
                             <div className="body-item-text">
-                                <div>{props.clientState.serverSetting.fileUploadSetting.pyTorchModel?.name}</div>
+                                <div>{props.clientState.serverSetting.fileUploadSetting.pyTorchModel?.filename}</div>
                             </div>
                             <div className="body-button-container">
                                 <div className="body-button" onClick={onPyTorchFileLoadClicked}>select</div>

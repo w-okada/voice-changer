@@ -3,7 +3,7 @@ import { ServerInfo, ServerSettingKey } from "./const";
 
 type FileChunk = {
     hash: number,
-    chunk: Blob
+    chunk: ArrayBuffer
 }
 export class ServerConfigurator {
     private serverUrl = ""
@@ -42,16 +42,16 @@ export class ServerConfigurator {
         return info
     }
 
-    uploadFile = async (file: File, onprogress: (progress: number, end: boolean) => void) => {
+    uploadFile = async (buf: ArrayBuffer, filename: string, onprogress: (progress: number, end: boolean) => void) => {
         const url = this.serverUrl + "/upload_file"
         onprogress(0, false)
         const size = 1024 * 1024;
         const fileChunks: FileChunk[] = [];
         let index = 0; // index値
-        for (let cur = 0; cur < file.size; cur += size) {
+        for (let cur = 0; cur < buf.byteLength; cur += size) {
             fileChunks.push({
                 hash: index++,
-                chunk: file.slice(cur, cur + size),
+                chunk: buf.slice(cur, cur + size),
             });
         }
 
@@ -68,8 +68,8 @@ export class ServerConfigurator {
                 }
                 const p = new Promise<void>((resolve) => {
                     const formData = new FormData();
-                    formData.append("file", chunk.chunk);
-                    formData.append("filename", `${file.name}_${chunk.hash}`);
+                    formData.append("file", new Blob([chunk.chunk]));
+                    formData.append("filename", `${filename}_${chunk.hash}`);
                     const request = new Request(url, {
                         method: 'POST',
                         body: formData,
@@ -91,11 +91,11 @@ export class ServerConfigurator {
         return chunkNum
     }
 
-    concatUploadedFile = async (file: File, chunkNum: number) => {
+    concatUploadedFile = async (filename: string, chunkNum: number) => {
         const url = this.serverUrl + "/concat_uploaded_file"
         await new Promise<void>((resolve) => {
             const formData = new FormData();
-            formData.append("filename", file.name);
+            formData.append("filename", filename);
             formData.append("filenameChunkNum", "" + chunkNum);
             const request = new Request(url, {
                 method: 'POST',
@@ -108,13 +108,13 @@ export class ServerConfigurator {
         })
     }
 
-    loadModel = async (configFile: File, pyTorchModelFile: File | null, onnxModelFile: File | null) => {
+    loadModel = async (configFilename: string, pyTorchModelFilename: string | null, onnxModelFilename: string | null) => {
         const url = this.serverUrl + "/load_model"
         const info = new Promise<ServerInfo>(async (resolve) => {
             const formData = new FormData();
-            formData.append("pyTorchModelFilename", pyTorchModelFile?.name || "-");
-            formData.append("onnxModelFilename", onnxModelFile?.name || "-");
-            formData.append("configFilename", configFile.name);
+            formData.append("pyTorchModelFilename", pyTorchModelFilename || "-");
+            formData.append("onnxModelFilename", onnxModelFilename || "-");
+            formData.append("configFilename", configFilename);
             const request = new Request(url, {
                 method: 'POST',
                 body: formData,

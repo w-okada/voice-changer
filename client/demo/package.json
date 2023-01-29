@@ -48,7 +48,7 @@
         "webpack-dev-server": "^4.11.1"
     },
     "dependencies": {
-        "@dannadori/voice-changer-client-js": "^1.0.57",
+        "@dannadori/voice-changer-client-js": "^1.0.58",
         "react": "^18.2.0",
         "react-dom": "^18.2.0"
     }

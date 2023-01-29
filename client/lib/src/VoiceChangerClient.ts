@@ -236,14 +236,14 @@ export class VoiceChangerClient {
     }
 
     // Configurator Method
-    uploadFile = (file: File, onprogress: (progress: number, end: boolean) => void) => {
-        return this.configurator.uploadFile(file, onprogress)
+    uploadFile = (buf: ArrayBuffer, filename: string, onprogress: (progress: number, end: boolean) => void) => {
+        return this.configurator.uploadFile(buf, filename, onprogress)
     }
-    concatUploadedFile = (file: File, chunkNum: number) => {
-        return this.configurator.concatUploadedFile(file, chunkNum)
+    concatUploadedFile = (filename: string, chunkNum: number) => {
+        return this.configurator.concatUploadedFile(filename, chunkNum)
     }
-    loadModel = (configFile: File, pyTorchModelFile: File | null, onnxModelFile: File | null) => {
-        return this.configurator.loadModel(configFile, pyTorchModelFile, onnxModelFile)
+    loadModel = (configFilename: string, pyTorchModelFilename: string | null, onnxModelFilename: string | null) => {
+        return this.configurator.loadModel(configFilename, pyTorchModelFilename, onnxModelFilename)
     }
     updateServerSettings = (key: ServerSettingKey, val: string) => {
         return this.configurator.updateSettings(key, val)
