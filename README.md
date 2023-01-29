@@ -75,19 +75,20 @@ Windows版とMac版を提供しています。事前準備は必要ありませ�
 
 
 ### 最新バージョン
+- [MMVCServerSIO_mac_onnxcpu_v.1.3.7.2.zip](https://drive.google.com/file/d/1AcJaQXH8ZtlCSrifvRBWdat19HD_A2fr/view?usp=sharing) 365MB
+- [MMVCServerSIO_win_onnxdirectML_cuda_v.1.3.7.2.zip](https://drive.google.com/file/d/1WKW3uqmIi9D13Jzao8jWVqx2KANmmQji/view?usp=sharing) 2050MB
+- [MMVCServerSIO_win_onnxdirectML_nocuda_v.1.3.7.2.zip](https://drive.google.com/file/d/1b8Lqwb7emvd85NwRANPglKWzceJYcgBg/view?usp=sharing) 286MB
+- [MMVCServerSIO_win_onnxgpu_cuda_v.1.3.7.2.zip](https://drive.google.com/file/d/1XcEslgeyo_SsjeFozyWl0zc4izFVGXHE/view?usp=sharing) 2144MB
+- [MMVCServerSIO_win_onnxgpu_nocuda_v.1.3.7.2.zip](https://drive.google.com/file/d/1ST7g6jCNm_xe_Q6bj_O-50RMFTDNt_u0/view?usp=sharing) 380MB
+
+
+### 過去バージョン
 - [MMVCServerSIO_mac_onnxcpu_v.1.3.7.0.zip](https://drive.google.com/file/d/1K_ihZ8hxbQq10qrxM1WUfUaj_vY6zwrW/view?usp=sharing) 154MB
 - [MMVCServerSIO_win_onnxdirectML_cuda_v.1.3.7.0.zip](https://drive.google.com/file/d/1IJHazaV60ophM6fbmzugZEjulLpBVJUi/view?usp=sharing) 1962MB
 - [MMVCServerSIO_win_onnxdirectML_nocuda_v.1.3.7.0.zip](https://drive.google.com/file/d/1_VzdUpiWb8lbIKNppwsFM5pYCAnixOap/view?usp=sharing) 198MB
 - [MMVCServerSIO_win_onnxgpu_cuda_v.1.3.7.0.zip](https://drive.google.com/file/d/1uRZHnDq2nVx4oRlXXiqZeE-ZjJlAFx5C/view?usp=sharing) 2057MB
 - [MMVCServerSIO_win_onnxgpu_nocuda_v.1.3.7.0.zip](https://drive.google.com/file/d/1DjSCsc_jKaH-TY6qqFbXz7Ya6tS58odb/view?usp=sharing) 293MB
 
-
-### 過去バージョン
-- [MMVCServerSIO_mac_onnxcpu_v.1.3.6.1.zip](https://drive.google.com/file/d/1WTqPEOkZy19-Z149HZqBI31oi7ffg9Rf/view?usp=sharing) 154MB
-- [MMVCServerSIO_win_onnxdirectML_cuda_v.1.3.6.1.exe](https://drive.google.com/file/d/17ZDGa9IUJqm9hePbPczHC6zoqSj_d9CM/view?usp=sharing) 1864MB
-- [MMVCServerSIO_win_onnxdirectML_nocuda_v.1.3.6.1.exe](https://drive.google.com/file/d/1V9GF_Nn-FhS5BrwensTuzxkctBR4RUZy/view?usp=sharing) 171MB
-- [MMVCServerSIO_win_onnxgpu_cudav.1.3.6.1.exe](https://drive.google.com/file/d/138Jlol8ocy4hM12UNEqlQlZ9XphWOyZp/view?usp=sharing) 1948MB
-- [MMVCServerSIO_win_onnxgpu_nocudav.1.3.6.1.exe](https://drive.google.com/file/d/1fnVirudwkoNsY5kabG-295OrqgHzvcHf/view?usp=sharing) 255MB
 
 https://user-images.githubusercontent.com/48346627/212569645-e30b7f4e-079d-4504-8cf8-7816c5f40b00.mp4
 
