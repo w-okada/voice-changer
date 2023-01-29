@@ -27,7 +27,7 @@
         "babel-loader": "^9.1.2",
         "copy-webpack-plugin": "^11.0.0",
         "css-loader": "^6.7.3",
-        "eslint": "^8.32.0",
+        "eslint": "^8.33.0",
         "eslint-config-prettier": "^8.6.0",
         "eslint-plugin-prettier": "^4.2.1",
         "eslint-plugin-react": "^7.32.1",
@@ -48,7 +48,7 @@
         "webpack-dev-server": "^4.11.1"
     },
     "dependencies": {
-        "@dannadori/voice-changer-client-js": "^1.0.55",
+        "@dannadori/voice-changer-client-js": "^1.0.57",
         "react": "^18.2.0",
         "react-dom": "^18.2.0"
     }

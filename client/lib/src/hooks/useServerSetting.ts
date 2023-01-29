@@ -64,6 +64,17 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
     // 初期化 その２ クライアントに設定
     useEffect(() => {
         if (!props.voiceChangerClient) return
+        props.voiceChangerClient.updateServerSettings(ServerSettingKey.framework, setting.framework)
+        props.voiceChangerClient.updateServerSettings(ServerSettingKey.onnxExecutionProvider, setting.onnxExecutionProvider)
+        props.voiceChangerClient.updateServerSettings(ServerSettingKey.srcId, "" + setting.srcId)
+        props.voiceChangerClient.updateServerSettings(ServerSettingKey.dstId, "" + setting.dstId)
+        props.voiceChangerClient.updateServerSettings(ServerSettingKey.convertChunkNum, "" + setting.convertChunkNum)
+        props.voiceChangerClient.updateServerSettings(ServerSettingKey.minConvertSize, "" + setting.minConvertSize)
+        props.voiceChangerClient.updateServerSettings(ServerSettingKey.gpu, "" + setting.gpu)
+        props.voiceChangerClient.updateServerSettings(ServerSettingKey.crossFadeOffsetRate, "" + setting.crossFadeOffsetRate)
+        props.voiceChangerClient.updateServerSettings(ServerSettingKey.crossFadeEndRate, "" + setting.crossFadeEndRate)
+        props.voiceChangerClient.updateServerSettings(ServerSettingKey.crossFadeOverlapRate, "" + setting.crossFadeOverlapRate)
+
         // props.voiceChangerClient.setServerUrl(settingRef.current.mmvcServerUrl)
         // props.voiceChangerClient.setInputChunkNum(settingRef.current.inputChunkNum)
         // props.voiceChangerClient.setProtocol(settingRef.current.protocol)
