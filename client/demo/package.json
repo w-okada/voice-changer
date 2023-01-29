@@ -12,8 +12,10 @@
         "start": "webpack-dev-server  --config webpack.dev.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "keywords": [],
-    "author": "",
+    "keywords": [
+        "voice conversion"
+    ],
+    "author": "wataru.okada@flect.co.jp",
     "license": "ISC",
     "devDependencies": {
         "@babel/plugin-transform-runtime": "^7.19.6",
@@ -48,7 +50,7 @@
         "webpack-dev-server": "^4.11.1"
     },
     "dependencies": {
-        "@dannadori/voice-changer-client-js": "^1.0.58",
+        "@dannadori/voice-changer-client-js": "^1.0.66",
         "react": "^18.2.0",
         "react-dom": "^18.2.0"
     }

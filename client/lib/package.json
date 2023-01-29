@@ -1,6 +1,6 @@
 {
   "name": "@dannadori/voice-changer-client-js",
-  "version": "1.0.58",
+  "version": "1.0.66",
   "description": "",
   "main": "dist/index.js",
   "directories": {
@@ -20,8 +20,10 @@
     "release": "npm version patch && npm publish --access=public",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "voice conversion"
+  ],
+  "author": "wataru.okada@flect.co.jp",
   "license": "ISC",
   "devDependencies": {
     "@types/audioworklet": "^0.0.36",

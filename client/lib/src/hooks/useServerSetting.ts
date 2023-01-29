@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react"
-import { VoiceChangerServerSetting, ServerInfo, Framework, OnnxExecutionProvider, DefaultVoiceChangerServerSetting, ServerSettingKey, INDEXEDDB_KEY_SERVER } from "../const"
+import { VoiceChangerServerSetting, ServerInfo, Framework, OnnxExecutionProvider, DefaultVoiceChangerServerSetting, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
@@ -11,8 +11,9 @@ import { useIndexedDB } from "./useIndexedDB"
 // }
 
 type ModelData = {
-    data: ArrayBuffer
-    filename: string
+    file?: File
+    data?: ArrayBuffer
+    filename?: string
 }
 
 export type FileUploadSetting = {
@@ -71,6 +72,12 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 settingRef.current = setting as VoiceChangerServerSetting
             }
             _setSetting({ ...settingRef.current })
+
+            const fileuploadSetting = await getItem(INDEXEDDB_KEY_MODEL_DATA)
+            if (!fileuploadSetting) {
+            } else {
+                setFileUploadSetting(fileuploadSetting as FileUploadSetting)
+            }
         }
 
         loadCache()
@@ -88,11 +95,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         props.voiceChangerClient.updateServerSettings(ServerSettingKey.crossFadeOffsetRate, "" + setting.crossFadeOffsetRate)
         props.voiceChangerClient.updateServerSettings(ServerSettingKey.crossFadeEndRate, "" + setting.crossFadeEndRate)
         props.voiceChangerClient.updateServerSettings(ServerSettingKey.crossFadeOverlapRate, "" + setting.crossFadeOverlapRate)
-
-        // props.voiceChangerClient.setServerUrl(settingRef.current.mmvcServerUrl)
-        // props.voiceChangerClient.setInputChunkNum(settingRef.current.inputChunkNum)
-        // props.voiceChangerClient.setProtocol(settingRef.current.protocol)
-        // props.voiceChangerClient.setVoiceChangerMode(settingRef.current.voiceChangerMode)
 
     }, [props.voiceChangerClient])
 
@@ -189,8 +191,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         }
     }, [props.voiceChangerClient])
 
-
-
     //////////////
     // 操作
     /////////////
@@ -201,8 +201,8 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
     const _uploadFile = useMemo(() => {
         return async (modelData: ModelData, onprogress: (progress: number, end: boolean) => void) => {
             if (!props.voiceChangerClient) return
-            const num = await props.voiceChangerClient.uploadFile(modelData.data, modelData.filename, onprogress)
-            const res = await props.voiceChangerClient.concatUploadedFile(modelData.filename, num)
+            const num = await props.voiceChangerClient.uploadFile(modelData.data!, modelData.filename!, onprogress)
+            const res = await props.voiceChangerClient.concatUploadedFile(modelData.filename!, num)
             console.log("uploaded", num, res)
         }
     }, [props.voiceChangerClient])
@@ -218,10 +218,24 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             }
             if (!props.voiceChangerClient) return
 
-
             setUploadProgress(0)
             setIsUploading(true)
 
+            // ファイルをメモリにロード
+            if (fileUploadSetting.onnxModel && !fileUploadSetting.onnxModel.data) {
+                fileUploadSetting.onnxModel.data = await fileUploadSetting.onnxModel.file!.arrayBuffer()
+                fileUploadSetting.onnxModel.filename = await fileUploadSetting.onnxModel.file!.name
+            }
+            if (fileUploadSetting.pyTorchModel && !fileUploadSetting.pyTorchModel.data) {
+                fileUploadSetting.pyTorchModel.data = await fileUploadSetting.pyTorchModel.file!.arrayBuffer()
+                fileUploadSetting.pyTorchModel.filename = await fileUploadSetting.pyTorchModel.file!.name
+            }
+            if (!fileUploadSetting.configFile.data) {
+                fileUploadSetting.configFile.data = await fileUploadSetting.configFile.file!.arrayBuffer()
+                fileUploadSetting.configFile.filename = await fileUploadSetting.configFile.file!.name
+            }
+
+            // ファイルをサーバにアップロード
             const models = [fileUploadSetting.onnxModel, fileUploadSetting.pyTorchModel].filter(x => { return x != null }) as ModelData[]
             for (let i = 0; i < models.length; i++) {
                 const progRate = 1 / models.length
@@ -236,7 +250,17 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 console.log(progress, end)
             })
 
-            await props.voiceChangerClient.loadModel(fileUploadSetting.configFile.filename, fileUploadSetting.pyTorchModel?.filename || null, fileUploadSetting.onnxModel?.filename || null)
+            const loadPromise = props.voiceChangerClient.loadModel(fileUploadSetting.configFile.filename!, fileUploadSetting.pyTorchModel?.filename || null, fileUploadSetting.onnxModel?.filename || null)
+
+            // サーバでロード中にキャッシュにセーブ
+            const saveData: FileUploadSetting = {
+                pyTorchModel: fileUploadSetting.pyTorchModel ? { data: fileUploadSetting.pyTorchModel.data, filename: fileUploadSetting.pyTorchModel.filename } : null,
+                onnxModel: fileUploadSetting.onnxModel ? { data: fileUploadSetting.onnxModel.data, filename: fileUploadSetting.onnxModel.filename } : null,
+                configFile: { data: fileUploadSetting.configFile.data, filename: fileUploadSetting.configFile.filename }
+            }
+            setItem(INDEXEDDB_KEY_MODEL_DATA, saveData)
+
+            await loadPromise
             setUploadProgress(0)
             setIsUploading(false)
             reloadServerInfo()
@@ -311,6 +335,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
 
     const clearSetting = async () => {
         await removeItem(INDEXEDDB_KEY_SERVER)
+        await removeItem(INDEXEDDB_KEY_MODEL_DATA)
     }
 
 
