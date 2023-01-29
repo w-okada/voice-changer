@@ -40,5 +40,16 @@ bash start2.sh
 (4) Readmeにリンクをはる
 
 (5) Branch 解除。Tag化
-
+```
+git add ...
+git commit -m "wip: releasing"
+git push
+git checkout - && git merge - && git push && git checkout -
+git checkout -
+git branch -d v.1...
+git tag v.1...
+git push origin v.1
+git branch v.1....
+git checkout v.1...
+```
 (6) Colabチェック
