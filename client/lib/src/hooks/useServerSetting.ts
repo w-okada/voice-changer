@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from "react"
-import { VoiceChangerServerSetting, ServerInfo, Framework, OnnxExecutionProvider, DefaultVoiceChangerServerSetting, ServerSettingKey } from "../const"
+import { VoiceChangerServerSetting, ServerInfo, Framework, OnnxExecutionProvider, DefaultVoiceChangerServerSetting, ServerSettingKey, INDEXEDDB_KEY_SERVER } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
+import { useIndexedDB } from "./useIndexedDB"
 
 
 export type FileUploadSetting = {
@@ -19,6 +20,7 @@ export type UseServerSettingProps = {
 
 export type ServerSettingState = {
     setting: VoiceChangerServerSetting;
+    clearSetting: () => Promise<void>
     serverInfo: ServerInfo | undefined;
     fileUploadSetting: FileUploadSetting
     setFramework: (framework: Framework) => Promise<boolean>;
@@ -43,6 +45,31 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
     const [setting, _setSetting] = useState<VoiceChangerServerSetting>(settingRef.current)
     const [serverInfo, _setServerInfo] = useState<ServerInfo>()
     const [fileUploadSetting, setFileUploadSetting] = useState<FileUploadSetting>(InitialFileUploadSetting)
+    const { setItem, getItem, removeItem } = useIndexedDB()
+
+
+    // 初期化 その１ DBから取得
+    useEffect(() => {
+        const loadCache = async () => {
+            const setting = await getItem(INDEXEDDB_KEY_SERVER)
+            if (!setting) {
+            } else {
+                settingRef.current = setting as VoiceChangerServerSetting
+            }
+            _setSetting({ ...settingRef.current })
+        }
+
+        loadCache()
+    }, [])
+    // 初期化 その２ クライアントに設定
+    useEffect(() => {
+        if (!props.voiceChangerClient) return
+        // props.voiceChangerClient.setServerUrl(settingRef.current.mmvcServerUrl)
+        // props.voiceChangerClient.setInputChunkNum(settingRef.current.inputChunkNum)
+        // props.voiceChangerClient.setProtocol(settingRef.current.protocol)
+        // props.voiceChangerClient.setVoiceChangerMode(settingRef.current.voiceChangerMode)
+
+    }, [props.voiceChangerClient])
 
     //////////////
     // 設定
@@ -55,7 +82,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
 
         _setServerInfo(res)
         if (newVal == res[key]) {
-            _setSetting({
+            const newSetting: VoiceChangerServerSetting = {
                 ...settingRef.current,
                 convertChunkNum: res.convertChunkNum,
                 minConvertSize: res.minConvertSize,
@@ -67,7 +94,9 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 crossFadeOverlapRate: res.crossFadeOverlapRate,
                 framework: res.framework,
                 onnxExecutionProvider: (!!res.onnxExecutionProvider && res.onnxExecutionProvider.length > 0) ? res.onnxExecutionProvider[0] as OnnxExecutionProvider : DefaultVoiceChangerServerSetting.onnxExecutionProvider
-            })
+            }
+            _setSetting(newSetting)
+            setItem(INDEXEDDB_KEY_SERVER, newSetting)
             return true
         } else {
             alert(`[ServerSetting] 設定が反映されていません([key:${key}, new:${newVal}, res:${res[key]}])。モデルの切り替えの場合、処理が非同期で行われるため反映されていないように見える場合があります。サーバコントロールのリロードボタンを押すとGUIに反映されるます。`)
@@ -206,22 +235,14 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         }
     }, [props.voiceChangerClient])
 
-
-    //////////////
-    // デフォルト設定
-    /////////////
-    useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const colab = params.get("colab")
-        if (colab == "true") {
-        } else {
-        }
-    }, [props.voiceChangerClient])
-
+    const clearSetting = async () => {
+        await removeItem(INDEXEDDB_KEY_SERVER)
+    }
 
 
     return {
         setting,
+        clearSetting,
         serverInfo,
         fileUploadSetting,
         setFramework,

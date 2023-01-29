@@ -1,7 +1,8 @@
 import { useState, useMemo, useRef, useEffect } from "react"
-import { VoiceChangerClientSetting, Protocol, BufferSize, VoiceChangerMode, SampleRate, Speaker, DefaultVoiceChangerClientSetting } from "../const"
+import { VoiceChangerClientSetting, Protocol, BufferSize, VoiceChangerMode, SampleRate, Speaker, DefaultVoiceChangerClientSetting, INDEXEDDB_KEY_CLIENT } from "../const"
 import { createDummyMediaStream } from "../util"
 import { VoiceChangerClient } from "../VoiceChangerClient"
+import { useIndexedDB } from "./useIndexedDB"
 
 export type UseClientSettingProps = {
     voiceChangerClient: VoiceChangerClient | null
@@ -10,6 +11,7 @@ export type UseClientSettingProps = {
 
 export type ClientSettingState = {
     setting: VoiceChangerClientSetting;
+    clearSetting: () => Promise<void>
     setServerUrl: (url: string) => void;
     setProtocol: (proto: Protocol) => void;
     setAudioInput: (audioInput: string | MediaStream | null) => Promise<void>
@@ -28,6 +30,57 @@ export type ClientSettingState = {
 export const useClientSetting = (props: UseClientSettingProps): ClientSettingState => {
     const settingRef = useRef<VoiceChangerClientSetting>(DefaultVoiceChangerClientSetting)
     const [setting, _setSetting] = useState<VoiceChangerClientSetting>(settingRef.current)
+    const { setItem, getItem, removeItem } = useIndexedDB()
+
+    // 初期化 その１ DBから取得
+    useEffect(() => {
+        const loadCache = async () => {
+            const setting = await getItem(INDEXEDDB_KEY_CLIENT)
+            if (!setting) {
+                // デフォルト設定
+                console.log("No Chache",)
+                const params = new URLSearchParams(location.search);
+                const colab = params.get("colab")
+                if (colab == "true") {
+                    settingRef.current.protocol = "rest"
+                    settingRef.current.inputChunkNum = 64
+                } else {
+                    settingRef.current.protocol = "sio"
+                    settingRef.current.inputChunkNum = 32
+                }
+            } else {
+                settingRef.current = setting as VoiceChangerClientSetting
+            }
+            _setSetting({ ...settingRef.current })
+        }
+
+        loadCache()
+    }, [])
+    // 初期化 その２ クライアントに設定
+    useEffect(() => {
+        if (!props.voiceChangerClient) return
+        props.voiceChangerClient.setServerUrl(settingRef.current.mmvcServerUrl)
+        props.voiceChangerClient.setInputChunkNum(settingRef.current.inputChunkNum)
+        props.voiceChangerClient.setProtocol(settingRef.current.protocol)
+        props.voiceChangerClient.setVoiceChangerMode(settingRef.current.voiceChangerMode)
+
+        // Input, bufferSize, VoiceFocus Disableは_setInputで設定
+        _setInput()
+    }, [props.voiceChangerClient])
+
+
+    const setSetting = async (setting: VoiceChangerClientSetting) => {
+        const storeData = { ...setting }
+        if (typeof storeData.audioInput != "string") {
+            storeData.audioInput = null
+        }
+        setItem(INDEXEDDB_KEY_CLIENT, storeData)
+        _setSetting(setting)
+    }
+
+    const clearSetting = async () => {
+        await removeItem(INDEXEDDB_KEY_CLIENT)
+    }
 
     //////////////
     // 設定
@@ -37,7 +90,7 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
             if (!props.voiceChangerClient) return
             props.voiceChangerClient.setServerUrl(url, true)
             settingRef.current.mmvcServerUrl = url
-            _setSetting({ ...settingRef.current })
+            setSetting({ ...settingRef.current })
         }
     }, [props.voiceChangerClient])
 
@@ -46,20 +99,20 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
             if (!props.voiceChangerClient) return
             props.voiceChangerClient.setProtocol(proto)
             settingRef.current.protocol = proto
-            _setSetting({ ...settingRef.current })
+            setSetting({ ...settingRef.current })
         }
     }, [props.voiceChangerClient])
 
     const _setInput = async () => {
         if (!props.voiceChangerClient) return
-
+        // console.log("[useClient] setup!(0)", settingRef.current.audioInput)
         if (!settingRef.current.audioInput || settingRef.current.audioInput == "none") {
-            console.log("[useClient] setup!(1)", settingRef.current.audioInput)
+            // console.log("[useClient] setup!(1)", settingRef.current.audioInput)
             const ms = createDummyMediaStream(props.audioContext!)
             await props.voiceChangerClient.setup(ms, settingRef.current.bufferSize, settingRef.current.forceVfDisable)
 
         } else {
-            console.log("[useClient] setup!(2)", settingRef.current.audioInput)
+            // console.log("[useClient] setup!(2)", settingRef.current.audioInput)
             await props.voiceChangerClient.setup(settingRef.current.audioInput, settingRef.current.bufferSize, settingRef.current.forceVfDisable)
         }
     }
@@ -69,9 +122,8 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
             if (!props.voiceChangerClient) return
             settingRef.current.audioInput = audioInput
             await _setInput()
-            _setSetting({ ...settingRef.current })
+            setSetting({ ...settingRef.current })
         }
-
     }, [props.voiceChangerClient])
 
     const setBufferSize = useMemo(() => {
@@ -79,7 +131,7 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
             if (!props.voiceChangerClient) return
             settingRef.current.bufferSize = bufferSize
             await _setInput()
-            _setSetting({ ...settingRef.current })
+            setSetting({ ...settingRef.current })
         }
     }, [props.voiceChangerClient])
 
@@ -88,7 +140,7 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
             if (!props.voiceChangerClient) return
             settingRef.current.forceVfDisable = vfForceDisabled
             await _setInput()
-            _setSetting({ ...settingRef.current })
+            setSetting({ ...settingRef.current })
         }
     }, [props.voiceChangerClient])
 
@@ -97,7 +149,7 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
             if (!props.voiceChangerClient) return
             props.voiceChangerClient.setInputChunkNum(num)
             settingRef.current.inputChunkNum = num
-            _setSetting({ ...settingRef.current })
+            setSetting({ ...settingRef.current })
         }
     }, [props.voiceChangerClient])
 
@@ -106,7 +158,7 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
             if (!props.voiceChangerClient) return
             props.voiceChangerClient.setVoiceChangerMode(mode)
             settingRef.current.voiceChangerMode = mode
-            _setSetting({ ...settingRef.current })
+            setSetting({ ...settingRef.current })
         }
     }, [props.voiceChangerClient])
 
@@ -115,7 +167,7 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
             if (!props.voiceChangerClient) return
             //props.voiceChangerClient.setSampleRate(num) // Not Implemented
             settingRef.current.sampleRate = num
-            _setSetting({ ...settingRef.current })
+            setSetting({ ...settingRef.current })
         }
     }, [props.voiceChangerClient])
 
@@ -123,7 +175,7 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
         return (speakers: Speaker[]) => {
             if (!props.voiceChangerClient) return
             settingRef.current.speakers = speakers
-            _setSetting({ ...settingRef.current })
+            setSetting({ ...settingRef.current })
         }
     }, [props.voiceChangerClient])
 
@@ -152,27 +204,10 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
         }
     }, [props.voiceChangerClient])
 
-    //////////////
-    // デフォルト設定
-    /////////////
-    useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const colab = params.get("colab")
-        if (colab == "true") {
-            setProtocol("rest")
-            setInputChunkNum(64)
-
-        } else {
-            setProtocol("sio")
-            setInputChunkNum(32)
-
-        }
-    }, [props.voiceChangerClient])
-
-
 
     return {
         setting,
+        clearSetting,
         setServerUrl,
         setProtocol,
         setAudioInput,

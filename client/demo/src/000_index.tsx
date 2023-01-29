@@ -9,14 +9,10 @@ const root = createRoot(container);
 
 const App = () => {
 
-    const { voiceChangerSetting } = useMicrophoneOptions()
+    const { voiceChangerSetting, clearSetting } = useMicrophoneOptions()
 
     const onClearSettingClicked = async () => {
-        //@ts-ignore
-        await chrome.storage.local.clear();
-        //@ts-ignore
-        await chrome.storage.sync.clear();
-
+        clearSetting()
         location.reload()
     }
 

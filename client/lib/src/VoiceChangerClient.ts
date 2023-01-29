@@ -13,7 +13,7 @@ import { VoiceChangerWorkletProcessorRequest } from "./@types/voice-changer-work
 // input node(mic or MediaStream) -> [vf node] -> microphne stream -> audio streamer -> 
 //    sio/rest server -> audio streamer-> vc node -> output node
 
-
+import { BlockingQueue } from "./utils/BlockingQueue";
 
 export class VoiceChangerClient {
     private configurator: ServerConfigurator
@@ -34,6 +34,8 @@ export class VoiceChangerClient {
     private _isVoiceChanging = false
 
     private sslCertified: string[] = []
+
+    private sem = new BlockingQueue<number>();
 
     private callbacks: Callbacks = {
         onVoiceReceived: (voiceChangerMode: VoiceChangerMode, data: ArrayBuffer): void => {
@@ -73,6 +75,7 @@ export class VoiceChangerClient {
     }
 
     constructor(ctx: AudioContext, vfEnable: boolean, audioStreamerListeners: AudioStreamerListeners, volumeListener: VolumeListener) {
+        this.sem.enqueue(0);
         this.configurator = new ServerConfigurator()
         this.ctx = ctx
         this.vfEnable = vfEnable
@@ -98,6 +101,15 @@ export class VoiceChangerClient {
         })
     }
 
+    private lock = async () => {
+        const num = await this.sem.dequeue();
+        return num;
+    };
+    private unlock = (num: number) => {
+        this.sem.enqueue(num + 1);
+    };
+
+
     isInitialized = async () => {
         if (this.promiseForInitialize) {
             await this.promiseForInitialize
@@ -107,6 +119,7 @@ export class VoiceChangerClient {
 
     // forceVfDisable is for the condition that vf is enabled in constructor. 
     setup = async (input: string | MediaStream, bufferSize: BufferSize, forceVfDisable: boolean = false) => {
+        const lockNum = await this.lock()
         // condition check
         if (!this.vcNode) {
             console.warn("vc node is not initialized.")
@@ -156,6 +169,7 @@ export class VoiceChangerClient {
         } else {
             this.micStream.playRecording()
         }
+        await this.unlock(lockNum)
     }
     get stream(): MediaStream {
         return this.currentMediaStreamAudioDestinationNode.stream

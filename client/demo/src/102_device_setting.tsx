@@ -1,7 +1,8 @@
 import { fileSelectorAsDataURL, createDummyMediaStream, SampleRate } from "@dannadori/voice-changer-client-js"
 import React, { useEffect, useMemo, useState } from "react"
-import { AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_CONVERTED, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK, AUDIO_ELEMENT_FOR_TEST_ORIGINAL } from "./const"
+import { AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_CONVERTED, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, INDEXEDDB_KEY_AUDIO_OUTPUT } from "./const"
 import { ClientState } from "@dannadori/voice-changer-client-js";
+import { useIndexedDB } from "./hooks/useIndexedDB";
 
 
 const reloadDevices = async () => {
@@ -46,24 +47,28 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
     const [audioInputForGUI, setAudioInputForGUI] = useState<string>("none")
     const [audioOutputForGUI, setAudioOutputForGUI] = useState<string>("none")
     const [fileInputEchoback, setFileInputEchoback] = useState<boolean>()//最初のmuteが有効になるように。undefined
-
+    const { getItem, setItem } = useIndexedDB()
 
     useEffect(() => {
         const initialize = async () => {
             const audioInfo = await reloadDevices()
             setInputAudioDeviceInfo(audioInfo[0])
             setOutputAudioDeviceInfo(audioInfo[1])
-            // if (CHROME_EXTENSION) {
-            //     //@ts-ignore
-            //     const storedOptions = await chrome.storage.local.get("microphoneOptions")
-            //     if (storedOptions) {
-            //         setOptions(storedOptions)
-            //     }
-            // }
         }
         initialize()
     }, [])
 
+    useEffect(() => {
+        if (typeof props.clientState.clientSetting.setting.audioInput == "string") {
+            if (inputAudioDeviceInfo.find(x => {
+                // console.log("COMPARE:", x.deviceId, props.clientState.clientSetting.setting.audioInput)
+                return x.deviceId == props.clientState.clientSetting.setting.audioInput
+            })) {
+                setAudioInputForGUI(props.clientState.clientSetting.setting.audioInput)
+
+            }
+        }
+    }, [inputAudioDeviceInfo, props.clientState.clientSetting.setting.audioInput])
 
     const audioInputRow = useMemo(() => {
         return (
@@ -82,7 +87,7 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
                 </div>
             </div>
         )
-    }, [inputAudioDeviceInfo, audioInputForGUI])
+    }, [inputAudioDeviceInfo, audioInputForGUI, props.clientState.clientSetting.setting.audioInput])
 
 
     useEffect(() => {
@@ -90,10 +95,7 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
             return
         }
 
-        if (audioInputForGUI == "none") {
-            const ms = createDummyMediaStream(audioContext)
-            props.clientState.clientSetting.setAudioInput(ms)
-        } else if (audioInputForGUI == "file") {
+        if (audioInputForGUI == "file") {
             // file selector (audioMediaInputRow)
         } else {
             props.clientState.clientSetting.setAudioInput(audioInputForGUI)
@@ -161,7 +163,10 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">AudioOutput</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={audioOutputForGUI} onChange={(e) => { setAudioOutputForGUI(e.target.value) }}>
+                    <select className="body-select" value={audioOutputForGUI} onChange={(e) => {
+                        setAudioOutputForGUI(e.target.value)
+                        setItem(INDEXEDDB_KEY_AUDIO_OUTPUT, e.target.value)
+                    }}>
                         {
                             outputAudioDeviceInfo.map(x => {
                                 return <option key={x.deviceId} value={x.deviceId}>{x.label}</option>
@@ -175,15 +180,32 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
     }, [outputAudioDeviceInfo, audioOutputForGUI])
 
     useEffect(() => {
-        if (audioOutputForGUI == "none") return
         [AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK].forEach(x => {
             const audio = document.getElementById(x) as HTMLAudioElement
             if (audio) {
-                // @ts-ignore
-                audio.setSinkId(audioOutputForGUI)
+                if (audioOutputForGUI == "none") {
+                    // @ts-ignore
+                    audio.setSinkId("")
+
+                } else {
+                    // @ts-ignore
+                    audio.setSinkId(audioOutputForGUI)
+                }
             }
         })
     }, [audioOutputForGUI])
+
+
+    useEffect(() => {
+        const loadCache = async () => {
+            const key = await getItem(INDEXEDDB_KEY_AUDIO_OUTPUT)
+            if (key) {
+                setAudioOutputForGUI(key as string)
+            }
+        }
+        loadCache()
+    }, [])
+
 
     useEffect(() => {
         [AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK].forEach(x => {

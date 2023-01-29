@@ -10,7 +10,6 @@ export type ConvertSettingState = {
 }
 
 export const useConvertSetting = (props: UseConvertSettingProps): ConvertSettingState => {
-
     const inputChunkNumRow = useMemo(() => {
         return (
             <div className="body-row split-3-7 left-padding-1 guided">

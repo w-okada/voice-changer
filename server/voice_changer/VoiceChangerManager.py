@@ -1,37 +1,37 @@
 import numpy as np
 from voice_changer.VoiceChanger import VoiceChanger
 
+
 class VoiceChangerManager():
     @classmethod
     def get_instance(cls):
         if not hasattr(cls, "_instance"):
             cls._instance = cls()
+            cls._instance.voiceChanger = VoiceChanger()
         return cls._instance
 
     def loadModel(self, config, model, onnx_model):
-        if hasattr(self, 'voiceChanger') == False:
-            self.voiceChanger = VoiceChanger(config)
         info = self.voiceChanger.loadModel(config, model, onnx_model)
-        info["status"]="OK"
+        info["status"] = "OK"
         return info
 
     def get_info(self):
         if hasattr(self, 'voiceChanger'):
             info = self.voiceChanger.get_info()
-            info["status"]="OK"
+            info["status"] = "OK"
             return info
         else:
-            return {"status":"ERROR", "msg":"no model loaded"}
+            return {"status": "ERROR", "msg": "no model loaded"}
 
-    def update_setteings(self, key:str, val:any):
+    def update_setteings(self, key: str, val: any):
         if hasattr(self, 'voiceChanger'):
             info = self.voiceChanger.update_setteings(key, val)
-            info["status"]="OK"
+            info["status"] = "OK"
             return info
         else:
-            return {"status":"ERROR", "msg":"no model loaded"}
+            return {"status": "ERROR", "msg": "no model loaded"}
 
-    def changeVoice(self, unpackedData:any):
+    def changeVoice(self, unpackedData: any):
         if hasattr(self, 'voiceChanger') == True:
             return self.voiceChanger.on_request(unpackedData)
         else:

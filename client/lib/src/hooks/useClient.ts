@@ -19,6 +19,7 @@ export type ClientState = {
     volume: number;
 
     getInfo: () => Promise<void>
+    clearSetting: () => Promise<void>
 }
 
 
@@ -105,6 +106,11 @@ export const useClient = (props: UseClientProps): ClientState => {
     }, [clientSetting, serverSetting])
 
 
+    const clearSetting = async () => {
+        await clientSetting.clearSetting()
+        await workletSetting.clearSetting()
+        await serverSetting.clearSetting()
+    }
 
     return {
         bufferingTime,
@@ -116,5 +122,6 @@ export const useClient = (props: UseClientProps): ClientState => {
         clientSetting,
         workletSetting,
         serverSetting,
+        clearSetting,
     }
 }

@@ -37,9 +37,9 @@ class VocieChangerSettings():
 
 class VoiceChanger():
 
-    def __init__(self, config: str):
+    def __init__(self):
         # 初期化
-        self.settings = VocieChangerSettings(configFile=config)
+        self.settings = VocieChangerSettings()
         self.unpackedData_length = 0
         self.net_g = None
         self.onnx_session = None
@@ -47,17 +47,7 @@ class VoiceChanger():
         self.currentCrossFadeEndRate = 0
         self.currentCrossFadeOverlapRate = 0
 
-        # 共通で使用する情報を収集
-        # self.hps = utils.get_hparams_from_file(config)
-        self.hps = get_hparams_from_file(config)
         self.gpu_num = torch.cuda.device_count()
-
-        # text_norm = text_to_sequence("a", self.hps.data.text_cleaners)
-        # print("text_norm1: ",text_norm)
-        # text_norm = commons.intersperse(text_norm, 0)
-        # print("text_norm2: ",text_norm)
-        # self.text_norm = torch.LongTensor(text_norm)
-
         self.text_norm = torch.LongTensor([0, 6, 0])
         self.audio_buffer = torch.zeros(1, 0)
         self.prev_audio = np.zeros(1)
@@ -67,6 +57,7 @@ class VoiceChanger():
 
     def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None):
         self.settings.configFile = config
+        self.hps = get_hparams_from_file(config)
         if pyTorch_model_file != None:
             self.settings.pyTorchModelFile = pyTorch_model_file
         if onnx_model_file:

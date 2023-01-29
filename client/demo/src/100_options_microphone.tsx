@@ -24,6 +24,10 @@ export const useMicrophoneOptions = () => {
     const advancedSetting = useAdvancedSetting({ clientState })
     const serverControl = useServerControl({ clientState })
 
+    const clearSetting = async () => {
+        await clientState.clearSetting()
+    }
+
     useEffect(() => {
         const createAudioContext = () => {
             const ctx = new AudioContext()
@@ -59,6 +63,7 @@ export const useMicrophoneOptions = () => {
 
     return {
         voiceChangerSetting,
+        clearSetting
     }
 }
 
