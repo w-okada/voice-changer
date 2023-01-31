@@ -11,6 +11,7 @@
     "copy:backend": "docker run -v `pwd`/demo:/demo --entrypoint /bin/bash -ti voice-changer -c \"cp -r /voice-changer-internal/voice-change-service/* /demo/ && rm -rf /demo/MMVC_Trainer/.git && rm -rf /demo/MMVC_Trainer/.gitignore \"",
     "create:demo": "run-p copy:frontend copy:backend",
     "push:docker": "bash script/001_pushDocker.sh",
+    "push:docker:trainer": "bash script/002_pushDockerTrainer.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

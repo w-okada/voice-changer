@@ -1,3 +1,8 @@
+#!/bin/bash
+set -eu
+
+DOCKER_IMAGE=dannadori/trainer:20230131_182050
+
 docker run --gpus all --rm -ti \
     -v `pwd`/trainer/dataset:/MMVC_Trainer/dataset \
     -v `pwd`/trainer/configs:/MMVC_Trainer/configs \
@@ -7,7 +12,7 @@ docker run --gpus all --rm -ti \
     -v `pwd`/trainer/logs:/MMVC_Trainer/logs \
     -v `pwd`/trainer/filelists:/MMVC_Trainer/filelists \
     -p 5000:5000 \
-    trainer /bin/bash
+    $DOCKER_IMAGE /bin/bash
 
 
 

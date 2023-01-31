@@ -41,9 +41,9 @@ trainer/dataset/
 └── multi_speaker_correspondence.txt
 ```
 
-(2) start.shをrootにコピー
+(2) start_trainer.shをrootにコピー
 
-(3) `bash start.sh`を実行
+(3) `bash start_trainer.sh`を実行
 
 (4) Docker内で次のコマンドを実行
 batch sizeは適宜調整
