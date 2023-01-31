@@ -6,6 +6,7 @@
   "scripts": {
     "build:docker": "date +%Y%m%d%H%M%S > docker/dummy && DOCKER_BUILDKIT=1 docker build -f docker/Dockerfile docker/ -t voice-changer",
     "build:docker:onnx": "DOCKER_BUILDKIT=1 docker build -f docker_onnx/Dockerfile docker/ -t onnx-converter",
+    "build:docker:trainer": "DOCKER_BUILDKIT=1 docker build -f docker_trainer/Dockerfile docker_trainer/ -t trainer",
     "copy:frontend": "docker run -v `pwd`/frontend/dist:/frontend/dist --entrypoint /bin/bash -ti voice-changer -c \"cp -r /voice-changer-internal/frontend/dist/* /frontend/dist\"",
     "copy:backend": "docker run -v `pwd`/demo:/demo --entrypoint /bin/bash -ti voice-changer -c \"cp -r /voice-changer-internal/voice-change-service/* /demo/ && rm -rf /demo/MMVC_Trainer/.git && rm -rf /demo/MMVC_Trainer/.gitignore \"",
     "create:demo": "run-p copy:frontend copy:backend",
