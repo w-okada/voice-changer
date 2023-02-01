@@ -5,7 +5,6 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get -y update && apt-get install -y emacs git curl python3-pip libsndfile1-dev ffmpeg
 
 RUN git clone --depth 1 -b v1.5.0.0_SiFiGAN https://github.com/isletennos/MMVC_Trainer.git
-
 ADD /model/D_v15_best.pth /MMVC_Trainer/fine_model/
 ADD /model/G_v15_best.pth /MMVC_Trainer/fine_model/
 
@@ -25,6 +24,8 @@ RUN pip install matplotlib==3.6.3
 ADD /warmup.py /
 RUN python3 warmup.py
 WORKDIR /MMVC_Trainer/
+
+RUN cp -r /MMVC_Trainer/configs /MMVC_Trainer/configs_org
 
 # python3 normalize.py True
 # python3 create_dataset.py -f train_config -s 24000 -m dataset/multi_speaker_correspondence.txt

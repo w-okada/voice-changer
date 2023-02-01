@@ -48,6 +48,7 @@ trainer/dataset/
 (4) Docker内で次のコマンドを実行
 batch sizeは適宜調整
 ```sh
+$ cp configs_org/baseconfig.json configs/
 $ python3 normalize.py True
 $ python3 create_dataset.py -f train_config -s 24000 -m dataset/multi_speaker_correspondence.txt
 $ tensorboard --logdir logs --port 5000

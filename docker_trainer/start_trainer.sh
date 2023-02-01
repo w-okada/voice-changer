@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-DOCKER_IMAGE=dannadori/trainer:20230131_182050
+DOCKER_IMAGE=dannadori/trainer:20230201_111603
 
 docker run --gpus all --rm -ti \
     -v `pwd`/trainer/dataset:/MMVC_Trainer/dataset \
