@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-DOCKER_IMAGE=dannadori/trainer:20230201_111603
+DOCKER_IMAGE=dannadori/trainer:20230205_043458
 
 docker run --gpus all --rm -ti \
     -v `pwd`/trainer/dataset:/MMVC_Trainer/dataset \
@@ -13,7 +13,5 @@ docker run --gpus all --rm -ti \
     -v `pwd`/trainer/filelists:/MMVC_Trainer/filelists \
     -p 5000:5000 \
     $DOCKER_IMAGE /bin/bash
-
-
 
 

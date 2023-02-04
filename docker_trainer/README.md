@@ -51,6 +51,10 @@ batch sizeは適宜調整
 $ cp configs_org/baseconfig.json configs/
 $ python3 normalize.py True
 $ python3 create_dataset.py -f train_config -s 24000 -m dataset/multi_speaker_correspondence.txt
-$ tensorboard --logdir logs --port 5000
+$ tensorboard --logdir logs --port 5000 --bind_all &
+# batch size 変更
 $ python3 train_ms.py -c configs/train_config.json -m 20220306_24000 -fg fine_model/G_v15_best.pth -fd fine_model/D_v15_best.pth
+
+
+$ python3 train_ms.py -c configs/train_config.json -m 20220306_24000
 ```
