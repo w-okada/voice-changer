@@ -17,7 +17,7 @@ RUN pip install tensorboard==2.11.2
 RUN pip install pytz==2022.7.1
 RUN pip install pyworld==0.3.2
 RUN pip install retry==0.9.2
-RUN pip install numpy==1.21.6
+#RUN pip install numpy==1.21.6
 RUN pip install h5py==3.8.0
 #RUN pip install h5py==3.1.0
 RUN pip install matplotlib==3.6.3
@@ -33,6 +33,7 @@ RUN git checkout 1109f1201e1ee9008ee61dc221d620eb1c93d7d0
 
 ADD /model/D_v15_best.pth /MMVC_Trainer/fine_model/
 ADD /model/G_v15_best.pth /MMVC_Trainer/fine_model/
+
 RUN cp -r /MMVC_Trainer/configs /MMVC_Trainer/configs_org
 
 
