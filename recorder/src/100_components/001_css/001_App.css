@@ -1,0 +1,63 @@
+@import url("https://fonts.googleapis.com/css2?family=Chicle&family=Poppins:ital,wght@0,200;0,400;0,600;1,200;1,400;1,600&display=swap");
+
+@import "./002_Front.css";
+@import "./010_Frame.css";
+@import "./020_Header.css";
+@import "./030_Body.css";
+
+@import "./101_RotatedButton.css";
+/* ;
+@import "./010_Dialog.css";
+@import "./101_processing.css";
+@import "./102_RotatedButton.css";
+@import "./103_tooltips.css";
+@import "./104_signage.css"; */
+:root {
+    --text-color: #333;
+    --company-color1: rgba(64, 119, 187, 1);
+    --company-color2: rgba(29, 47, 78, 1);
+    --company-color3: rgba(255, 255, 255, 1);
+    --company-color1-alpha: rgba(64, 119, 187, 0.3);
+    --company-color2-alpha: rgba(29, 47, 78, 0.3);
+    --company-color3-alpha: rgba(255, 255, 255, 0.3);
+    --global-shadow-color: rgba(0, 0, 0, 0.4);
+
+    --sidebar-transition-time: 0.3s;
+    --sidebar-transition-animation: ease-in-out;
+
+    --header-height: 1.5rem;
+    --right-sidebar-width: 320px;
+
+    --dialog-border-color: rgba(100, 100, 100, 1);
+    --dialog-shadow-color: rgba(0, 0, 0, 0.3);
+    --dialog-background-color: rgba(255, 255, 255, 1);
+    --dialog-primary-color: rgba(19, 70, 209, 1);
+    --dialog-active-color: rgba(40, 70, 209, 1);
+    --dialog-input-border-color: rgba(200, 200, 200, 1);
+    --dialog-submit-button-color: rgba(180, 190, 230, 1);
+    --dialog-cancel-button-color: rgba(235, 80, 80, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+html {
+    font-size: 16px;
+}
+body {
+    height: 100%;
+    width: 100%;
+    color: var(--text-color);
+    background: linear-gradient(45deg, var(--company-color1) 0, 5%, var(--company-color2) 5% 10%, var(--company-color3) 10% 80%, var(--company-color1) 80% 85%, var(--company-color2) 85% 100%);
+}
+
+.application-container {
+    position: relative;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    list-style-type: none;
+}

@@ -1,0 +1,59 @@
+.front-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+}
+.front-title {
+    font-size: 4rem;
+    font-weight: 100;
+}
+.front-description {
+    font-size: 0.9rem;
+    text-align: center;
+}
+.front-description-img {
+    height: 2rem;
+    width: 50%;
+    height: 50%;
+    border: 3px solid;
+}
+.front-description-strong {
+    color: #f66;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+.front-start-button {
+    font-size: 4rem;
+    border: 3px solid #333;
+    width: 500px;
+    padding: 15px;
+    cursor: pointer;
+    text-align: center;
+    margin: 100px 0 0 0 auto;
+    user-select: none;
+}
+.front-start-button-color {
+    background: #fee;
+}
+.front-note {
+    font-size: 1rem;
+}
+.front-attention {
+    font-size: 0.8rem;
+    color: #f55;
+    font-weight: 600;
+}
+.front-disclaimer {
+    font-size: 0.8rem;
+}
+
+.front-clear-setting{
+    color:#999;
+    border:solid 2px #999;
+    padding:2px;
+    border-radius:4px;
+    user-select:none;
+    cursor:pointer;
+}

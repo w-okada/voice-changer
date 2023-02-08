@@ -1,0 +1,70 @@
+/* 前提条件 */
+
+.rotate-button-container {
+    height: var(--header-height);
+    width: var(--header-height);
+    position: relative;
+}
+.rotate-button {
+    display: none;
+}
+.rotate-button ~ .rotate-lable {
+    padding: 2px;
+    position: absolute;
+    transition: all 0.3s;
+    cursor: pointer;
+    height: var(--header-height);
+    width: var(--header-height);
+}
+.rotate-button ~ .rotate-lable > * {
+    width: 100%;
+    height: 100%;
+    float: left;
+    transition: all 0.3s;
+    .spin-on {
+        width: 100%;
+        height: 100%;
+        display: none;
+    }
+    .spin-off {
+        width: 100%;
+        height: 100%;
+        display: blcok;
+    }
+}
+.rotate-button ~ .rotate-lable > .colored {
+    color: rgba(200, 200, 200, 0.8);
+    background: rgba(0, 0, 0, 1);
+    transition: all 0.3s;
+    .spin-on {
+        display: none;
+    }
+    .spin-off {
+        display: block;
+    }
+}
+.rotate-button:checked ~ .rotate-lable > .colored {
+    color: rgba(50, 240, 50, 0.8);
+    background: rgba(60, 60, 60, 1);
+    transition: all 0.3s;
+    .spin-on {
+        display: block;
+    }
+    .spin-off {
+        display: none;
+    }
+}
+
+.rotate-button:checked ~ .rotate-lable > .spinner {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-180deg);
+    transition: all 0.3s;
+    box-sizing: border-box;
+    .spin-on {
+        display: block;
+    }
+    .spin-off {
+        display: none;
+    }
+}
