@@ -4,9 +4,6 @@ import { Duplex, DuplexOptions } from "readable-stream";
 import MicrophoneStream from "microphone-stream";
 import { useAppSetting } from "../003_provider/AppSettingProvider";
 
-
-
-
 export type MediaRecorderState = {
     micMediaStream: MediaStream | undefined,
     vfMediaStream: MediaStream | undefined
@@ -27,6 +24,8 @@ export type MediaRecorderStateAndMethod = MediaRecorderState & {
     }
 }
 
+
+// AudioInputデータを蓄積するAudiowStreamer
 class AudioStreamer extends Duplex {
     chunks: Float32Array[] = []
     SampleRate: number
@@ -45,32 +44,20 @@ class AudioStreamer extends Duplex {
         this.initializeData()
     }
 
+    // 蓄積したデータをWavに変換して返す
     getRecordedData = () => {
         const sampleSize = this.chunks.reduce((prev, cur) => {
             return prev + cur.length
         }, 0)
         const samples = new Float32Array(sampleSize);
         let sampleIndex = 0
-        // this.chunks.forEach(floatArray => {
-        //     floatArray.forEach(val => {
-        //         samples[sampleIndex] = val
-        //         sampleIndex++;
-        //     })
-        // })
+
         for (let i = 0; i < this.chunks.length; i++) {
             for (let j = 0; j < this.chunks[i].length; j++) {
                 samples[sampleIndex] = this.chunks[i][j];
                 sampleIndex++;
             }
         }
-
-        // console.log("samples:c2", this.chunks[0][0])
-        // console.log("samples:c2", this.chunks[0][1])
-        // console.log("samples:c2", this.chunks[0])
-        // console.log("samples:s", samples[0])
-        // console.log("samples:s", samples[1])
-        // console.log("samples:s", samples[2])
-        // console.log("samples:s", samples)
 
         const writeString = (view: DataView, offset: number, string: string) => {
             for (var i = 0; i < string.length; i++) {
@@ -107,28 +94,14 @@ class AudioStreamer extends Duplex {
         const audioBlob = new Blob([view], { type: 'audio/wav' });
         const duration = samples.length / this.SampleRate
 
-        // audioBlob.arrayBuffer().then((buffer) => {
-        //     console.log("DATALENGTH1", samples.length * 2)
-        //     const oldView = new DataView(buffer);
-        //     console.log("DATALENGTH2", view.getUint32(40, true))
-        //     console.log("DATALENGTH3", oldView.getUint32(40, true))
-        // })
-
-
         return { audioBlob, duration, samples }
 
-        // var url = URL.createObjectURL(audioBlob);
-        // // var a = document.createElement('a');
-        // // a.href = url;
-        // // a.download = 'test.wav';
-        // // a.click();
-        // // return this.chunks
-        // return url
     }
 
+    // AudioInputを蓄積
     public _write(chunk: AudioBuffer, _encoding: any, callback: any) {
         const buffer = chunk.getChannelData(0);
-        console.log("SAMPLERATE:", chunk.sampleRate, chunk.numberOfChannels, chunk.length)
+        // console.log("SAMPLERATE:", chunk.sampleRate, chunk.numberOfChannels, chunk.length)
         var bufferData = new Float32Array(chunk.length);
         for (var i = 0; i < chunk.length; i++) {
             bufferData[i] = buffer[i];
@@ -152,6 +125,7 @@ export const useMediaRecorder = (): MediaRecorderStateAndMethod => {
     const [micMediaStream, setMicMediaStream] = useState<MediaStream>()
     const [vfMediaStream, setVfMediaStream] = useState<MediaStream>()
 
+    // 生の(ノイキャンなしの)データ蓄積用Streamer
     const micAudioStreamer = useMemo(() => {
         return new AudioStreamer({ objectMode: true, SampleRate: applicationSetting.applicationSetting.sample_rate })
     }, [])
@@ -165,6 +139,7 @@ export const useMediaRecorder = (): MediaRecorderStateAndMethod => {
         return s
     }, [])
 
+    // ノイキャンしたデータの蓄積用Streamer
     const vfAudioStreamer = useMemo(() => {
         return new AudioStreamer({ objectMode: true, SampleRate: applicationSetting.applicationSetting.sample_rate })
     }, [])
@@ -179,6 +154,12 @@ export const useMediaRecorder = (): MediaRecorderStateAndMethod => {
     }, [])
 
 
+    // AudioInput変更のトリガー
+    useEffect(() => {
+        setNewAudioInputDevice(deviceManagerState.audioInputDeviceId || "")
+    }, [deviceManagerState.audioInputDeviceId])
+
+    // AudioInput変更のトリガーによりinputのパイプラインを再生成する
     const setNewAudioInputDevice = async (deviceId: string) => {
         console.log("setNewAudioInputDevice", deviceId)
         let vf = voiceFocusDeviceTransformer
@@ -231,9 +212,7 @@ export const useMediaRecorder = (): MediaRecorderStateAndMethod => {
         vfStream.setStream(outputNode.stream)
         vfStream.pauseRecording()
     }
-    useEffect(() => {
-        setNewAudioInputDevice(deviceManagerState.audioInputDeviceId || "")
-    }, [deviceManagerState.audioInputDeviceId])
+
 
     const startRecord = () => {
         console.log("start record")
@@ -242,6 +221,7 @@ export const useMediaRecorder = (): MediaRecorderStateAndMethod => {
         vfAudioStreamer.clearRecordedData()
         vfStream!.playRecording()
     }
+
     const pauseRecord = () => {
         micStream!.pauseRecording()
         vfStream!.pauseRecording()

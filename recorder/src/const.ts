@@ -11,11 +11,10 @@ export const generateTextFileName = (prefix: string, index: number) => {
     return `${prefix}${indexString}.txt`
 }
 
-export const generateWavNameForLocalStorage = (prefix: string, index: number) => {
+export const generateDataNameForLocalStorage = (prefix: string, index: number) => {
     const indexString = String(index + 1).padStart(3, '0')
-    const vfString = `${prefix}${indexString}_vf`
-    const micString = `${prefix}${indexString}_mic`
-    return { micString, vfString }
+    const dataName = `${prefix}${indexString}_mic`
+    return { dataName }
 }
 export const generateRegionNameForLocalStorage = (prefix: string, index: number) => {
     const indexString = String(index + 1).padStart(3, '0')
