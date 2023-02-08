@@ -45,8 +45,7 @@ export const ExportController = () => {
                 const textData = targetCorpus.text[j]
                 const textHiraData = targetCorpus.text_hira[j]
                 // 生データ
-                // zip.file(`raw/${fileName}`, userData.micWavBlob);
-                // updateProgress(corpus.text.length * 6, processedNum++);
+                zip.file(`raw/${fileName}`, userData.micWavBlob);
 
                 // // 24Khzデータ
                 // const wav24Khz = convert48KhzTo24Khz(userData.micWavBlob);
@@ -58,14 +57,11 @@ export const ExportController = () => {
                 const region = userData.region
                 const start = region ? region[0] : 0;
                 const end = region ? region[1] : 0;
-                // console.log("REGION", region)
-                // const wav24KhzTrim = convert48KhzTo24Khz(userData.micWavBlob, start, end);
-                // zip.file(`rawTrim24k/${fileName}`, wav24KhzTrim);
-                // updateProgress(corpus.text.length * 6, processedNum++);
+                const wav24KhzTrim = convert48KhzTo24Khz(userData.micWavBlob, start, end);
+                zip.file(`rawTrim24k/${fileName}`, wav24KhzTrim);
 
                 // VF生データ
                 zip.file(`00_myvoice/vf/${fileName}`, userData.vfWavBlob);
-                // updateProgress(corpus.text.length * 6, processedNum++);
 
                 // // VF 24Khzデータ
                 // const vfWav24Khz = convert48KhzTo24Khz(userData.vfWavBlob);
@@ -75,7 +71,6 @@ export const ExportController = () => {
                 // VF Cropデータ
                 const vfWav24KhzTrim = convert48KhzTo24Khz(userData.vfWavBlob, start, end);
                 zip.file(`00_myvoice/wav/${fileName}`, vfWav24KhzTrim);
-                // updateProgress(corpus.text.length * 6, processedNum++);
 
                 // TXT
                 zip.file(`00_myvoice/text/${textFileName}`, textHiraData);
