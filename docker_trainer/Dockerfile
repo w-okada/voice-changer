@@ -26,10 +26,14 @@ RUN pip install matplotlib==3.6.3
 ADD /warmup.py /
 RUN python3 warmup.py
 
+ADD dummy /
+
 RUN git clone --depth 1 -b v1.5.0.0_SiFiGAN https://github.com/isletennos/MMVC_Trainer.git 
 WORKDIR /MMVC_Trainer/
 
-RUN git checkout 1109f1201e1ee9008ee61dc221d620eb1c93d7d0
+#RUN git checkout 1109f1201e1ee9008ee61dc221d620eb1c93d7d0
+RUN git checkout f28a1514b6731c36bd68989c600bff0a3b217d75
+
 
 ADD /model/D_v15_best.pth /MMVC_Trainer/fine_model/
 ADD /model/G_v15_best.pth /MMVC_Trainer/fine_model/
