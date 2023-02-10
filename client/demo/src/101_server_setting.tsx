@@ -12,7 +12,7 @@ export type ServerSettingState = {
 }
 
 export const useServerSettingArea = (props: UseServerSettingProps): ServerSettingState => {
-    const [showPyTorch, setShowPyTorch] = useState<boolean>(false)
+    const [showPyTorch, setShowPyTorch] = useState<boolean>(true)
     const uploadeModelRow = useMemo(() => {
         const onPyTorchFileLoadClicked = async () => {
             const file = await fileSelector("")
