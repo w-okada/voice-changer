@@ -48,6 +48,7 @@ export type ServerSettingState = {
     setCrossFadeOffsetRate: (num: number) => Promise<boolean>;
     setCrossFadeEndRate: (num: number) => Promise<boolean>;
     setCrossFadeOverlapRate: (num: number) => Promise<boolean>;
+    setF0Factor: (num: number) => Promise<boolean>;
     reloadServerInfo: () => Promise<void>;
     setFileUploadSetting: (val: FileUploadSetting) => void
     loadModel: () => Promise<void>
@@ -95,6 +96,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         props.voiceChangerClient.updateServerSettings(ServerSettingKey.crossFadeOffsetRate, "" + setting.crossFadeOffsetRate)
         props.voiceChangerClient.updateServerSettings(ServerSettingKey.crossFadeEndRate, "" + setting.crossFadeEndRate)
         props.voiceChangerClient.updateServerSettings(ServerSettingKey.crossFadeOverlapRate, "" + setting.crossFadeOverlapRate)
+        props.voiceChangerClient.updateServerSettings(ServerSettingKey.f0Factor, "" + setting.f0Factor)
 
     }, [props.voiceChangerClient])
 
@@ -120,7 +122,8 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 crossFadeEndRate: res.crossFadeEndRate,
                 crossFadeOverlapRate: res.crossFadeOverlapRate,
                 framework: res.framework,
-                onnxExecutionProvider: (!!res.onnxExecutionProvider && res.onnxExecutionProvider.length > 0) ? res.onnxExecutionProvider[0] as OnnxExecutionProvider : DefaultVoiceChangerServerSetting.onnxExecutionProvider
+                onnxExecutionProvider: (!!res.onnxExecutionProvider && res.onnxExecutionProvider.length > 0) ? res.onnxExecutionProvider[0] as OnnxExecutionProvider : DefaultVoiceChangerServerSetting.onnxExecutionProvider,
+                f0Factor: res.f0Factor
             }
             _setSetting(newSetting)
             setItem(INDEXEDDB_KEY_SERVER, newSetting)
@@ -191,6 +194,11 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         }
     }, [props.voiceChangerClient])
 
+    const setF0Factor = useMemo(() => {
+        return async (num: number) => {
+            return await _set_and_store(ServerSettingKey.f0Factor, "" + num)
+        }
+    }, [props.voiceChangerClient])
     //////////////
     // 操作
     /////////////
@@ -328,7 +336,8 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 crossFadeEndRate: res.crossFadeEndRate,
                 crossFadeOverlapRate: res.crossFadeOverlapRate,
                 framework: res.framework,
-                onnxExecutionProvider: (!!res.onnxExecutionProvider && res.onnxExecutionProvider.length > 0) ? res.onnxExecutionProvider[0] as OnnxExecutionProvider : DefaultVoiceChangerServerSetting.onnxExecutionProvider
+                onnxExecutionProvider: (!!res.onnxExecutionProvider && res.onnxExecutionProvider.length > 0) ? res.onnxExecutionProvider[0] as OnnxExecutionProvider : DefaultVoiceChangerServerSetting.onnxExecutionProvider,
+                f0Factor: res.f0Factor
             })
         }
     }, [props.voiceChangerClient])
@@ -354,6 +363,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         setCrossFadeOffsetRate,
         setCrossFadeEndRate,
         setCrossFadeOverlapRate,
+        setF0Factor,
         reloadServerInfo,
         setFileUploadSetting,
         loadModel,

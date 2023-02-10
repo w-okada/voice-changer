@@ -147,6 +147,28 @@ body {
         width: 40%;
     }
 }
+.split-3-2-1-4 {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 30%;
+    }
+    & > div:nth-child(2) {
+        left: 30%;
+        width: 20%;
+    }
+    & > div:nth-child(3) {
+        left: 50%;
+        width: 10%;
+    }
+    & > div:nth-child(4) {
+        left: 60%;
+        width: 40%;
+    }
+}
 .split-3-2-2-2-1 {
     display: flex;
     width: 100%;

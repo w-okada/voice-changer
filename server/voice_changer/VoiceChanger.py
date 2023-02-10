@@ -10,7 +10,12 @@ import onnxruntime
 from symbols import symbols
 from models import SynthesizerTrn
 
-from voice_changer.TrainerFunctions import TextAudioSpeakerCollate, spectrogram_torch, load_checkpoint, get_hparams_from_file
+import pyworld as pw
+
+# from voice_changer.TrainerFunctions import TextAudioSpeakerCollate, spectrogram_torch, load_checkpoint, get_hparams_from_file
+
+from voice_changer.client_modules import convert_continuos_f0, spectrogram_torch, TextAudioSpeakerCollate, get_hparams_from_file, load_checkpoint
+
 
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
@@ -26,12 +31,15 @@ class VocieChangerSettings():
     convertChunkNum: int = 32
     minConvertSize: int = 0
     framework: str = "ONNX"  # PyTorch or ONNX
+    f0Factor: float = 1.0
+
     pyTorchModelFile: str = ""
     onnxModelFile: str = ""
     configFile: str = ""
+
     # ↓mutableな物だけ列挙
     intData = ["gpu", "srcId", "dstId", "convertChunkNum", "minConvertSize"]
-    floatData = ["crossFadeOffsetRate", "crossFadeEndRate", "crossFadeOverlapRate"]
+    floatData = ["crossFadeOffsetRate", "crossFadeEndRate", "crossFadeOverlapRate", "f0Factor"]
     strData = ["framework"]
 
 
@@ -66,11 +74,23 @@ class VoiceChanger():
         # PyTorchモデル生成
         if pyTorch_model_file != None:
             self.net_g = SynthesizerTrn(
-                len(symbols),
-                self.hps.data.filter_length // 2 + 1,
-                self.hps.train.segment_size // self.hps.data.hop_length,
+                spec_channels=self.hps.data.filter_length // 2 + 1,
+                segment_size=self.hps.train.segment_size // self.hps.data.hop_length,
+                inter_channels=self.hps.model.inter_channels,
+                hidden_channels=self.hps.model.hidden_channels,
+                upsample_rates=self.hps.model.upsample_rates,
+                upsample_initial_channel=self.hps.model.upsample_initial_channel,
+                upsample_kernel_sizes=self.hps.model.upsample_kernel_sizes,
+                n_flow=self.hps.model.n_flow,
+                dec_out_channels=1,
+                dec_kernel_size=7,
                 n_speakers=self.hps.data.n_speakers,
-                **self.hps.model)
+                gin_channels=self.hps.model.gin_channels,
+                requires_grad_pe=self.hps.requires_grad.pe,
+                requires_grad_flow=self.hps.requires_grad.flow,
+                requires_grad_text_enc=self.hps.requires_grad.text_enc,
+                requires_grad_dec=self.hps.requires_grad.dec
+            )
             self.net_g.eval()
             load_checkpoint(pyTorch_model_file, self.net_g, None)
             # utils.load_checkpoint(pyTorch_model_file, self.net_g, None)
@@ -174,14 +194,31 @@ class VoiceChanger():
         audio_norm = self.audio_buffer[:, -convertSize:]  # 変換対象の部分だけ抽出
         self.audio_buffer = audio_norm
 
+        # TBD: numpy <--> pytorch変換が行ったり来たりしているが、まずは動かすことを最優先。
+        audio_norm_np = audio_norm.squeeze().numpy().astype(np.double)
+        _f0, _time = pw.dio(audio_norm_np, self.hps.data.sampling_rate, frame_period=5.5)
+        f0 = pw.stonemask(audio_norm_np, _f0, _time, self.hps.data.sampling_rate)
+        f0 = convert_continuos_f0(f0, int(audio_norm_np.shape[0] / self.hps.data.hop_length))
+        f0 = torch.from_numpy(f0.astype(np.float32))
+
         spec = spectrogram_torch(audio_norm, self.hps.data.filter_length,
                                  self.hps.data.sampling_rate, self.hps.data.hop_length, self.hps.data.win_length,
                                  center=False)
+        # dispose_stft_specs = 2
+        # spec = spec[:, dispose_stft_specs:-dispose_stft_specs]
+        # f0 = f0[dispose_stft_specs:-dispose_stft_specs]
         spec = torch.squeeze(spec, 0)
         sid = torch.LongTensor([int(self.settings.srcId)])
 
-        data = (self.text_norm, spec, audio_norm, sid)
-        data = TextAudioSpeakerCollate()([data])
+        # data = (self.text_norm, spec, audio_norm, sid)
+        # data = TextAudioSpeakerCollate()([data])
+        data = TextAudioSpeakerCollate(
+            sample_rate=self.hps.data.sampling_rate,
+            hop_size=self.hps.data.hop_length,
+            f0_factor=self.settings.f0Factor  # TBD: parameter
+            # f0_factor=2.4  # TBD: parameter
+        )([(spec, sid, f0)])
+
         return data
 
     def _onnx_inference(self, data, inputSize):
@@ -224,10 +261,15 @@ class VoiceChanger():
 
         if self.settings.gpu < 0 or self.gpu_num == 0:
             with torch.no_grad():
-                x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [x.cpu() for x in data]
-                sid_tgt1 = torch.LongTensor([self.settings.dstId]).cpu()
-                audio1 = (self.net_g.cpu().voice_conversion(spec, spec_lengths, sid_src=sid_src,
-                          sid_tgt=sid_tgt1)[0, 0].data * self.hps.data.max_wav_value)
+                spec, spec_lengths, sid_src, sin, d = data
+                spec = spec.cpu()
+                spec_lengths = spec_lengths.cpu()
+                sid_src = sid_src.cpu()
+                sin = sin.cpu()
+                d = tuple([d[:1].cpu() for d in d])
+                sid_target = torch.LongTensor([self.settings.dstId]).cpu()
+
+                audio1 = self.net_g.cpu().voice_conversion(spec, spec_lengths, sin, d, sid_src, sid_target)[0, 0].data * self.hps.data.max_wav_value
 
                 if self.prev_strength.device != torch.device('cpu'):
                     print(f"prev_strength move from {self.prev_strength.device} to cpu")
@@ -256,11 +298,21 @@ class VoiceChanger():
 
         else:
             with torch.no_grad():
-                x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [x.cuda(self.settings.gpu) for x in data]
-                sid_tgt1 = torch.LongTensor([self.settings.dstId]).cuda(self.settings.gpu)
-                audio1 = self.net_g.cuda(self.settings.gpu).voice_conversion(spec, spec_lengths, sid_src=sid_src,
-                                                                             sid_tgt=sid_tgt1)[0, 0].data * self.hps.data.max_wav_value
+                spec, spec_lengths, sid_src, sin, d = data
+                spec = spec.cuda(self.settings.gpu)
+                spec_lengths = spec_lengths.cuda(self.settings.gpu)
+                sid_src = sid_src.cuda(self.settings.gpu)
+                sin = sin.cuda(self.settings.gpu)
+                d = tuple([d[:1].cuda(self.settings.gpu) for d in d])
+                sid_target = torch.LongTensor([self.settings.dstId]).cuda(self.settings.gpu)
 
+                # audio1 = self.net_g.cuda(self.settings.gpu).voice_conversion(spec, spec_lengths, sid_src=sid_src,
+                #  sid_tgt=sid_tgt1)[0, 0].data * self.hps.data.max_wav_value
+
+                audio1 = self.net_g.cuda(self.settings.gpu).voice_conversion(spec, spec_lengths, sin, d,
+                                                                             sid_src, sid_target)[0, 0].data * self.hps.data.max_wav_value
+
+                # audio1 = audio1[10:-10]
                 if self.prev_strength.device != torch.device('cuda', self.settings.gpu):
                     print(f"prev_strength move from {self.prev_strength.device} to gpu{self.settings.gpu}")
                     self.prev_strength = self.prev_strength.cuda(self.settings.gpu)

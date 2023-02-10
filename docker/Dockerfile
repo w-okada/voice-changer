@@ -23,7 +23,7 @@ RUN cd MMVC_Client && git checkout 04f3fec4fd82dea6657026ec4e1cd80fb29a415c && c
 WORKDIR /
 ADD dummy /
 
-RUN git clone  --depth 1 https://github.com/w-okada/voice-changer.git
+RUN git clone --depth 1 https://github.com/w-okada/voice-changer.git
 
 
 #########

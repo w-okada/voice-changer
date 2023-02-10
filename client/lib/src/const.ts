@@ -20,6 +20,8 @@ export type VoiceChangerServerSetting = {
 
     framework: Framework
     onnxExecutionProvider: OnnxExecutionProvider,
+
+    f0Factor: number
 }
 
 export type VoiceChangerClientSetting = {
@@ -61,6 +63,7 @@ export type ServerInfo = {
     dstId: number,
     framework: Framework,
     onnxExecutionProvider: string[]
+    f0Factor: number
 }
 
 
@@ -120,7 +123,8 @@ export const ServerSettingKey = {
     "crossFadeEndRate": "crossFadeEndRate",
     "crossFadeOverlapRate": "crossFadeOverlapRate",
     "framework": "framework",
-    "onnxExecutionProvider": "onnxExecutionProvider"
+    "onnxExecutionProvider": "onnxExecutionProvider",
+    "f0Factor": "f0Factor"
 } as const
 export type ServerSettingKey = typeof ServerSettingKey[keyof typeof ServerSettingKey]
 
@@ -136,6 +140,7 @@ export const DefaultVoiceChangerServerSetting: VoiceChangerServerSetting = {
     crossFadeEndRate: 0.9,
     crossFadeOverlapRate: 0.5,
     framework: "ONNX",
+    f0Factor: 1.0,
     onnxExecutionProvider: "CPUExecutionProvider"
 
 }
