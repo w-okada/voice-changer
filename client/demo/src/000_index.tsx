@@ -36,6 +36,7 @@ const App = () => {
             <div className="body-row split-6-4">
                 <div className="body-top-title">
                     Voice Changer Setting
+                    <span className="body-top-title-version">for v.1.5.x</span>
                 </div>
                 <div className="body-top-title-belongings">
                     <div className="belonging-item">

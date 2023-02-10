@@ -254,6 +254,11 @@ body {
 .body-top-title {
     font-size: 3rem;
 }
+.body-top-title-version {
+    margin-left: 2rem;
+    font-size: 1.2rem;
+    background: linear-gradient(transparent 60%, yellow 30%);
+}
 .body-top-title-belongings {
     display: flex;
     align-items: flex-end;
