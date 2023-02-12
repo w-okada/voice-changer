@@ -22,8 +22,8 @@ Windows, Mac(M1等Apple silicon), Linux, Google Colaboratoryでの動作をサ�
 ![image](https://user-images.githubusercontent.com/48346627/206640768-53f6052d-0a96-403b-a06c-6714a0b7471d.png)
 
 # 使用方法
-詳細は[こちら(v.1.3.x)](https://zenn.dev/wok/books/0002_vc-helper-v_1_3)に纏まっています。[^1]
-[^1]: v1.5.xは[こちら](https://zenn.dev/wok/books/0003_vc-helper-v_1_5)
+詳細は[こちら(v.1.3.x)](https://zenn.dev/wok/books/0002_vc-helper-v_1_3)に纏まっています。
+(v1.5.xは[こちら](https://zenn.dev/wok/books/0003_vc-helper-v_1_5))
 
 # (1) レコーダー（トレーニング用音声録音アプリ）
 MMVCトレーニング用の音声を簡単に録音できるアプリです。
