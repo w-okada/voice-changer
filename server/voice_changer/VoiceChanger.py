@@ -82,7 +82,7 @@ class VocieChangerSettings():
     crossFadeOverlapRate: float = 0.9
     convertChunkNum: int = 32
     minConvertSize: int = 0
-    framework: str = "ONNX"  # PyTorch or ONNX
+    framework: str = "PyTorch"  # PyTorch or ONNX
     f0Factor: float = 1.0
 
     pyTorchModelFile: str = ""

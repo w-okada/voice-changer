@@ -10,7 +10,7 @@ export const useSpeakerSetting = (props: UseSpeakerSettingProps) => {
     const [editSpeakerTargetName, setEditSpeakerTargetName] = useState<string>("")
 
     const srcIdRow = useMemo(() => {
-        const selected = props.clientState.clientSetting.setting.correspondences.find(x => {
+        const selected = props.clientState.clientSetting.setting.correspondences?.find(x => {
             return x.sid == props.clientState.serverSetting.setting.srcId
         })
         return (
@@ -24,7 +24,7 @@ export const useSpeakerSetting = (props: UseSpeakerSettingProps) => {
                             // props.clientState.clientSetting.setting.speakers.map(x => {
                             //     return <option key={x.id} value={x.id}>{x.name}({x.id})</option>
                             // })
-                            props.clientState.clientSetting.setting.correspondences.map(x => {
+                            props.clientState.clientSetting.setting.correspondences?.map(x => {
                                 return <option key={x.sid} value={x.sid}>{x.dirname}({x.sid})</option>
                             })
 
@@ -40,7 +40,7 @@ export const useSpeakerSetting = (props: UseSpeakerSettingProps) => {
     }, [props.clientState.clientSetting.setting.speakers, props.clientState.serverSetting.setting.srcId, props.clientState.clientSetting.setting.correspondences, props.clientState.serverSetting.setSrcId])
 
     const dstIdRow = useMemo(() => {
-        const selected = props.clientState.clientSetting.setting.correspondences.find(x => {
+        const selected = props.clientState.clientSetting.setting.correspondences?.find(x => {
             return x.sid == props.clientState.serverSetting.setting.dstId
         })
         return (
@@ -54,7 +54,7 @@ export const useSpeakerSetting = (props: UseSpeakerSettingProps) => {
                             // props.clientState.clientSetting.setting.speakers.map(x => {
                             //     return <option key={x.id} value={x.id}>{x.name}({x.id})</option>
                             // })
-                            props.clientState.clientSetting.setting.correspondences.map(x => {
+                            props.clientState.clientSetting.setting.correspondences?.map(x => {
                                 return <option key={x.sid} value={x.sid}>{x.dirname}({x.sid})</option>
                             })
                         }
@@ -116,10 +116,10 @@ export const useSpeakerSetting = (props: UseSpeakerSettingProps) => {
 
 
     const f0FactorRow = useMemo(() => {
-        const src = props.clientState.clientSetting.setting.correspondences.find(x => {
+        const src = props.clientState.clientSetting.setting.correspondences?.find(x => {
             return x.sid == props.clientState.serverSetting.setting.srcId
         })
-        const dst = props.clientState.clientSetting.setting.correspondences.find(x => {
+        const dst = props.clientState.clientSetting.setting.correspondences?.find(x => {
             return x.sid == props.clientState.serverSetting.setting.dstId
         })
 

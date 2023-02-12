@@ -141,14 +141,14 @@ export type ServerSettingKey = typeof ServerSettingKey[keyof typeof ServerSettin
 export const DefaultVoiceChangerServerSetting: VoiceChangerServerSetting = {
     convertChunkNum: 32, //（★１）
     minConvertSize: 0,
-    srcId: 107,
-    dstId: 100,
+    srcId: 0,
+    dstId: 101,
     gpu: 0,
     crossFadeLowerValue: 0.1,
     crossFadeOffsetRate: 0.1,
     crossFadeEndRate: 0.9,
     crossFadeOverlapRate: 0.5,
-    framework: "ONNX",
+    framework: "PyTorch",
     f0Factor: 1.0,
     onnxExecutionProvider: "CPUExecutionProvider"
 

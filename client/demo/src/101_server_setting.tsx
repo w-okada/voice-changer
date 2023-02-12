@@ -90,7 +90,7 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
         const configFilenameText = props.clientState.serverSetting.fileUploadSetting.configFile?.filename || props.clientState.serverSetting.fileUploadSetting.configFile?.file?.name || ""
         const onnxModelFilenameText = props.clientState.serverSetting.fileUploadSetting.onnxModel?.filename || props.clientState.serverSetting.fileUploadSetting.onnxModel?.file?.name || ""
         const pyTorchFilenameText = props.clientState.serverSetting.fileUploadSetting.pyTorchModel?.filename || props.clientState.serverSetting.fileUploadSetting.pyTorchModel?.file?.name || ""
-        const correspondenceFileText = JSON.stringify(props.clientState.clientSetting.setting.correspondences.map(x => { return x.dirname }))
+        const correspondenceFileText = props.clientState.clientSetting.setting.correspondences ? JSON.stringify(props.clientState.clientSetting.setting.correspondences.map(x => { return x.dirname })) : ""
 
         return (
             <>
