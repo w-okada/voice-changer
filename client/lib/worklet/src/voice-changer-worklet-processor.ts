@@ -60,7 +60,7 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
     }
 
     handleMessage(event: any) {
-        const request = event.data.request as VoiceChangerWorkletProcessorRequest
+        const request = event.data as VoiceChangerWorkletProcessorRequest
         if (request.requestType === "config") {
             this.numTrancateTreshold = request.numTrancateTreshold
             this.volTrancateLength = request.volTrancateLength
