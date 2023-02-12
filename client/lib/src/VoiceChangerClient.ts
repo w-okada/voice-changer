@@ -24,10 +24,14 @@ export class VoiceChangerClient {
     private currentMediaStream: MediaStream | null = null
     private currentMediaStreamAudioSourceNode: MediaStreamAudioSourceNode | null = null
     private outputNodeFromVF: MediaStreamAudioDestinationNode | null = null
+    private inputGainNode: GainNode | null = null
+    private outputGainNode: GainNode | null = null
     private micStream: MicrophoneStream | null = null
     private audioStreamer!: AudioStreamer
     private vcNode!: VoiceChangerWorkletNode
     private currentMediaStreamAudioDestinationNode!: MediaStreamAudioDestinationNode
+
+    private inputGain = 1.0
 
     private promiseForInitialize: Promise<void>
     private _isVoiceChanging = false
@@ -76,7 +80,9 @@ export class VoiceChangerClient {
 
             this.vcNode = new VoiceChangerWorkletNode(this.ctx, voiceChangerWorkletListener); // vc node 
             this.currentMediaStreamAudioDestinationNode = this.ctx.createMediaStreamDestination() // output node
-            this.vcNode.connect(this.currentMediaStreamAudioDestinationNode) // vc node -> output node
+            this.outputGainNode = this.ctx.createGain()
+            this.vcNode.connect(this.outputGainNode) // vc node -> output node
+            this.outputGainNode.connect(this.currentMediaStreamAudioDestinationNode)
             // (vc nodeにはaudio streamerのcallbackでデータが投げ込まれる)
             this.audioStreamer = new AudioStreamer(this.callbacks, audioStreamerListeners, { objectMode: true, })
             this.audioStreamer.setInputChunkNum(DefaultVoiceChangerClientSetting.inputChunkNum)
@@ -149,14 +155,21 @@ export class VoiceChangerClient {
         // connect nodes.
         if (this.currentDevice && forceVfDisable == false) {
             this.currentMediaStreamAudioSourceNode = this.ctx.createMediaStreamSource(this.currentMediaStream) // input node
+            this.inputGainNode = this.ctx.createGain()
+            this.inputGainNode.gain.value = this.inputGain
+            this.currentMediaStreamAudioSourceNode.connect(this.inputGainNode)
+
             this.currentDevice.chooseNewInnerDevice(this.currentMediaStream)
             const voiceFocusNode = await this.currentDevice.createAudioNode(this.ctx); // vf node
-            this.currentMediaStreamAudioSourceNode.connect(voiceFocusNode.start) // input node -> vf node
+            this.inputGainNode.connect(voiceFocusNode.start) // input node -> vf node
             voiceFocusNode.end.connect(this.outputNodeFromVF!)
             this.micStream.setStream(this.outputNodeFromVF!.stream) // vf node -> mic stream
         } else {
             console.log("VF disabled")
-            this.micStream.setStream(this.currentMediaStream) // input device -> mic stream
+            this.inputGainNode = this.ctx.createGain()
+            this.inputGainNode.gain.value = this.inputGain
+            const inputDestinationNodeForMicStream = this.ctx.createMediaStreamDestination()
+            this.micStream.setStream(inputDestinationNodeForMicStream.stream) // input device -> mic stream
         }
         this.micStream.pipe(this.audioStreamer) // mic stream -> audio streamer
         if (!this._isVoiceChanging) {
@@ -251,6 +264,22 @@ export class VoiceChangerClient {
     updateServerSettings = (key: ServerSettingKey, val: string) => {
         return this.configurator.updateSettings(key, val)
     }
+
+    setInputGain = (val: number) => {
+        this.inputGain = val
+        if (!this.inputGainNode) {
+            return
+        }
+        this.inputGainNode.gain.value = val
+    }
+
+    setOutputGain = (val: number) => {
+        if (!this.outputGainNode) {
+            return
+        }
+        this.outputGainNode.gain.value = val
+    }
+
 
     // Information
     getClientSettings = () => {

@@ -125,6 +125,87 @@ body {
         width: 40%;
     }
 }
+
+.split-2-5-3 {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 20%;
+    }
+    & > div:nth-child(2) {
+        left: 20%;
+        width: 50%;
+    }
+    & > div:nth-child(3) {
+        left: 70%;
+        width: 30%;
+    }
+}
+.split-4-4-2 {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 40%;
+    }
+    & > div:nth-child(2) {
+        left: 40%;
+        width: 40%;
+    }
+    & > div:nth-child(3) {
+        left: 80%;
+        width: 20%;
+    }
+}
+.split-3-2-2-3 {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 30%;
+    }
+    & > div:nth-child(2) {
+        left: 30%;
+        width: 20%;
+    }
+    & > div:nth-child(3) {
+        left: 50%;
+        width: 20%;
+    }
+    & > div:nth-child(4) {
+        left: 70%;
+        width: 30%;
+    }
+}
+.split-3-2-3-2 {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 30%;
+    }
+    & > div:nth-child(2) {
+        left: 30%;
+        width: 20%;
+    }
+    & > div:nth-child(3) {
+        left: 50%;
+        width: 30%;
+    }
+    & > div:nth-child(4) {
+        left: 80%;
+        width: 20%;
+    }
+}
 .split-3-1-2-4 {
     display: flex;
     width: 100%;
@@ -302,6 +383,9 @@ body {
 .body-item-text-small {
     color: rgb(30, 30, 30);
     font-size: 0.7rem;
+}
+.body-input-container {
+    display: flex;
 }
 .body-item-input {
     width: 90%;

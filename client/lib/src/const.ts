@@ -35,6 +35,9 @@ export type VoiceChangerClientSetting = {
     correspondences: Correspondence[],
     forceVfDisable: boolean,
     voiceChangerMode: VoiceChangerMode,
+
+    inputGain: number
+    outputGain: number
 }
 
 export type WorkletSetting = {
@@ -183,6 +186,8 @@ export const DefaultVoiceChangerClientSetting: VoiceChangerClientSetting = {
     correspondences: [],
     forceVfDisable: false,
     voiceChangerMode: "realtime",
+    inputGain: 1.0,
+    outputGain: 1.0
 }
 
 export const DefaultWorkletSetting: WorkletSetting = {

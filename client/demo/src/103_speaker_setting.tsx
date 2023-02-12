@@ -151,7 +151,7 @@ export const useSpeakerSetting = (props: UseSpeakerSettingProps) => {
                 </div>
                 {srcIdRow}
                 {dstIdRow}
-                {editSpeakerIdMappingRow}
+                {/* {editSpeakerIdMappingRow} */}
                 {f0FactorRow}
             </>
         )

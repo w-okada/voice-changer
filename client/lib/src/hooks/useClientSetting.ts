@@ -22,7 +22,8 @@ export type ClientSettingState = {
     setSampleRate: (num: SampleRate) => void
     setSpeakers: (speakers: Speaker[]) => void
     setCorrespondences: (file: File | null) => Promise<void>
-
+    setInputGain: (val: number) => void
+    setOutputGain: (val: number) => void
     start: () => Promise<void>
     stop: () => Promise<void>
     reloadClientSetting: () => Promise<void>
@@ -64,6 +65,7 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
         props.voiceChangerClient.setInputChunkNum(settingRef.current.inputChunkNum)
         props.voiceChangerClient.setProtocol(settingRef.current.protocol)
         props.voiceChangerClient.setVoiceChangerMode(settingRef.current.voiceChangerMode)
+        props.voiceChangerClient.setInputGain(settingRef.current.inputGain)
 
         // Input, bufferSize, VoiceFocus Disableは_setInputで設定
         _setInput()
@@ -207,6 +209,23 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
         }
     }, [props.voiceChangerClient])
 
+    const setInputGain = useMemo(() => {
+        return (val: number) => {
+            if (!props.voiceChangerClient) return
+            props.voiceChangerClient.setInputGain(val)
+            settingRef.current.inputGain = val
+            setSetting({ ...settingRef.current })
+        }
+    }, [props.voiceChangerClient])
+    const setOutputGain = useMemo(() => {
+        return (val: number) => {
+            if (!props.voiceChangerClient) return
+            props.voiceChangerClient.setOutputGain(val)
+            settingRef.current.outputGain = val
+            setSetting({ ...settingRef.current })
+        }
+    }, [props.voiceChangerClient])
+
     //////////////
     // 操作
     /////////////
@@ -245,6 +264,8 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
         setSampleRate,
         setSpeakers,
         setCorrespondences,
+        setInputGain,
+        setOutputGain,
 
         start,
         stop,
