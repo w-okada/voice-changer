@@ -1,13 +1,14 @@
 import { VoiceChangerWorkletProcessorRequest } from "./@types/voice-changer-worklet-processor";
 import { WorkletSetting } from "./const";
 
-export type VolumeListener = {
+export type VoiceChangerWorkletListener = {
     notifyVolume: (vol: number) => void
+    notifyOutputRecordData: (data: Float32Array[]) => void
 }
 
 export class VoiceChangerWorkletNode extends AudioWorkletNode {
-    private listener: VolumeListener
-    constructor(context: AudioContext, listener: VolumeListener) {
+    private listener: VoiceChangerWorkletListener
+    constructor(context: AudioContext, listener: VoiceChangerWorkletListener) {
         super(context, "voice-changer-worklet-processor");
         this.port.onmessage = this.handleMessage.bind(this);
         this.listener = listener
@@ -30,7 +31,7 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
         if (event.data.responseType === "volume") {
             this.listener.notifyVolume(event.data.volume as number)
         } else if (event.data.responseType === "recordData") {
-
+            this.listener.notifyOutputRecordData(event.data.recordData as Float32Array[])
         } else {
             console.warn(`[worklet_node][voice-changer-worklet-processor] unknown response ${event.data.responseType}`, event.data)
         }

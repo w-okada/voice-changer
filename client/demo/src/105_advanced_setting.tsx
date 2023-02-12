@@ -214,7 +214,8 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
                     </div>
                 </div>
 
-                <div className="body-row split-3-7 left-padding-1 guided">
+                {/* v.1.5.xより Silent skipは廃止 */}
+                {/* <div className="body-row split-3-7 left-padding-1 guided">
                     <div className="body-item-title left-padding-1">Trancate Vol</div>
                     <div className="body-input-container">
                         <input type="number" min={0.0001} max={0.0009} step={0.0001} value={props.clientState.workletSetting.setting.volTrancateThreshold} onChange={(e) => {
@@ -235,7 +236,7 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
                             })
                         }} />
                     </div>
-                </div>
+                </div> */}
             </>
         )
     }, [props.clientState.workletSetting.setting, props.clientState.workletSetting.setSetting])

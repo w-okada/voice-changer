@@ -100,6 +100,8 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
             const float = (x >= 0x8000) ? -(0x10000 - x) / 0x8000 : x / 0x7FFF;
             f32Data[i] = float
         })
+        // console.log("[worklet] i16Data", i16Data)
+        // console.log("[worklet] f32Data", f32Data)
 
         if (this.playBuffer.length > this.numTrancateTreshold) {
             console.log("[worklet] Buffer truncated")
@@ -156,9 +158,11 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
             }
 
 
+            // V.1.5.0よりsilent skipで音飛びするようになったので無効化
             if (this.volTrancateCount < this.volTrancateLength || this.volTrancateLength < 0) {
                 break
             } else {
+                break
                 // console.log("silent...skip")
             }
         }

@@ -29,13 +29,13 @@ const reloadDevices = async () => {
         toJSON: () => { }
     })
     const audioOutputs = mediaDeviceInfos.filter(x => { return x.kind == "audiooutput" })
-    audioOutputs.push({
-        deviceId: "record",
-        groupId: "record",
-        kind: "audiooutput",
-        label: "record",
-        toJSON: () => { }
-    })
+    // audioOutputs.push({
+    //     deviceId: "record",
+    //     groupId: "record",
+    //     kind: "audiooutput",
+    //     label: "record",
+    //     toJSON: () => { }
+    // })
     return [audioInputs, audioOutputs]
 }
 export type UseDeviceSettingProps = {
@@ -56,6 +56,8 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
     const { getItem, setItem } = useIndexedDB()
 
     const audioSrcNode = useRef<MediaElementAudioSourceNode>()
+
+    const [outputRecordingStarted, setOutputRecordingStarted] = useState<boolean>(false)
 
     useEffect(() => {
         const initialize = async () => {
@@ -195,6 +197,36 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
         )
     }, [outputAudioDeviceInfo, audioOutputForGUI])
 
+    const audioOutputRecordingRow = useMemo(() => {
+        // if (audioOutputForGUI != "record") {
+        //     return <></>
+        // }
+        const onOutputRecordStartClicked = async () => {
+            setOutputRecordingStarted(true)
+            await props.clientState.workletSetting.startOutputRecording()
+        }
+        const onOutputRecordStopClicked = async () => {
+            setOutputRecordingStarted(false)
+            await props.clientState.workletSetting.stopOutputRecording()
+        }
+
+        const startClassName = outputRecordingStarted ? "body-button-active" : "body-button-stanby"
+        const stopClassName = outputRecordingStarted ? "body-button-stanby" : "body-button-active"
+
+        return (
+            <div className="body-row split-3-3-4 left-padding-1  guided">
+                <div className="body-item-title left-padding-2">output record</div>
+                <div className="body-button-container">
+                    <div onClick={onOutputRecordStartClicked} className={startClassName}>start</div>
+                    <div onClick={onOutputRecordStopClicked} className={stopClassName}>stop</div>
+                </div>
+                <div className="body-input-container">
+                </div>
+            </div>
+        )
+
+    }, [audioOutputForGUI, outputRecordingStarted, props.clientState.workletSetting.startOutputRecording, props.clientState.workletSetting.stopOutputRecording])
+
     useEffect(() => {
         [AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK].forEach(x => {
             const audio = document.getElementById(x) as HTMLAudioElement
@@ -204,17 +236,23 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
                     audio.setSinkId("")
                     if (x == AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK) {
                         audio.volume = fileInputEchoback ? 1 : 0
+                    } else {
+                        audio.volume = 1
                     }
+                } else if (audioOutputForGUI == "record") {
+                    audio.volume = 0
                 } else {
                     // @ts-ignore
                     audio.setSinkId(audioOutputForGUI)
                     if (x == AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK) {
                         audio.volume = fileInputEchoback ? 1 : 0
+                    } else {
+                        audio.volume = 1
                     }
                 }
             }
         })
-    }, [audioOutputForGUI, audioInputForGUI])
+    }, [audioOutputForGUI])
 
 
     useEffect(() => {
@@ -248,9 +286,75 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
                 {audioInputRow}
                 {audioMediaInputRow}
                 {audioOutputRow}
+                {audioOutputRecordingRow}
             </>
         )
-    }, [audioInputRow, audioMediaInputRow, audioOutputRow])
+    }, [audioInputRow, audioMediaInputRow, audioOutputRow, audioOutputRecordingRow])
+
+
+    // 出力の録音データ(from worklet)がストアされたら実行
+    useEffect(() => {
+        if (!props.clientState.outputRecordData || props.clientState.outputRecordData?.length == 0) {
+            return
+        }
+        const f32Datas = props.clientState.outputRecordData
+        const sampleSize = f32Datas.reduce((prev, cur) => {
+            return prev + cur.length
+        }, 0)
+        const samples = new Float32Array(sampleSize);
+        let sampleIndex = 0
+
+        for (let i = 0; i < f32Datas.length; i++) {
+            for (let j = 0; j < f32Datas[i].length; j++) {
+                samples[sampleIndex] = f32Datas[i][j];
+                sampleIndex++;
+            }
+        }
+
+
+        const writeString = (view: DataView, offset: number, string: string) => {
+            for (var i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        };
+
+        const floatTo16BitPCM = (output: DataView, offset: number, input: Float32Array) => {
+            for (var i = 0; i < input.length; i++, offset += 2) {
+                var s = Math.max(-1, Math.min(1, input[i]));
+                output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+            }
+        };
+
+        const buffer = new ArrayBuffer(44 + samples.length * 2);
+        const view = new DataView(buffer);
+
+        // https://www.youfit.co.jp/archives/1418
+        writeString(view, 0, 'RIFF');  // RIFFヘッダ
+        view.setUint32(4, 32 + samples.length * 2, true); // これ以降のファイルサイズ
+        writeString(view, 8, 'WAVE'); // WAVEヘッダ
+        writeString(view, 12, 'fmt '); // fmtチャンク
+        view.setUint32(16, 16, true); // fmtチャンクのバイト数
+        view.setUint16(20, 1, true); // フォーマットID
+        view.setUint16(22, 1, true); // チャンネル数
+        view.setUint32(24, 48000, true); // サンプリングレート
+        view.setUint32(28, 48000 * 2, true); // データ速度
+        view.setUint16(32, 2, true); // ブロックサイズ
+        view.setUint16(34, 16, true); // サンプルあたりのビット数
+        writeString(view, 36, 'data'); // dataチャンク
+        view.setUint32(40, samples.length * 2, true); // 波形データのバイト数
+        floatTo16BitPCM(view, 44, samples); // 波形データ
+        const audioBlob = new Blob([view], { type: 'audio/wav' });
+
+        const url = URL.createObjectURL(audioBlob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `output.wav`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+    }, [props.clientState.outputRecordData])
 
     return {
         deviceSetting,

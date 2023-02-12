@@ -17,6 +17,7 @@ export type ClientState = {
     bufferingTime: number;
     responseTime: number;
     volume: number;
+    outputRecordData: Float32Array[] | null;
 
     getInfo: () => Promise<void>
     clearSetting: () => Promise<void>
@@ -47,6 +48,7 @@ export const useClient = (props: UseClientProps): ClientState => {
     const [bufferingTime, setBufferingTime] = useState<number>(0)
     const [responseTime, setResponseTime] = useState<number>(0)
     const [volume, setVolume] = useState<number>(0)
+    const [outputRecordData, setOutputRecordData] = useState<Float32Array[] | null>(null)
 
 
     // (1-4) エラーステータス
@@ -79,6 +81,9 @@ export const useClient = (props: UseClientProps): ClientState => {
             }, {
                 notifyVolume: (vol: number) => {
                     setVolume(vol)
+                },
+                notifyOutputRecordData: (data: Float32Array[]) => {
+                    setOutputRecordData(data)
                 }
             })
 
@@ -116,6 +121,7 @@ export const useClient = (props: UseClientProps): ClientState => {
         bufferingTime,
         responseTime,
         volume,
+        outputRecordData,
 
         getInfo,
 

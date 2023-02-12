@@ -399,9 +399,9 @@ class VoiceChanger():
                 result = result.cpu().float().numpy()
         return result
 
-    def on_request_(self, unpackedData: any):
+    def on_request(self, unpackedData: any):
         convertSize = self.settings.convertChunkNum * 128  # 128sample/1chunk
-        self.stream_in.write(unpackedData.astype(np.int16).tobytes())
+        # self.stream_in.write(unpackedData.astype(np.int16).tobytes())
         # print("convsize:", unpackedData.shape[0] * (1 + self.settings.crossFadeOverlapRate))
         if unpackedData.shape[0] * (1 + self.settings.crossFadeOverlapRate) + 1024 > convertSize:
             convertSize = int(unpackedData.shape[0] * (1 + self.settings.crossFadeOverlapRate)) + 1024
@@ -464,7 +464,7 @@ class VoiceChanger():
         # signal = signal.astype(np.int16).tobytes()
         return signal
 
-    def on_request(self, unpackedData: any):
+    def on_request_(self, unpackedData: any):
 
         self._generate_strength(unpackedData)
 
@@ -546,5 +546,6 @@ class VoiceChanger():
             self.prev_audio = audio
             self.out.write(audio)
             self.stream_in.write(unpackedData.tobytes())
+            # print(audio1)
 
         return audio1

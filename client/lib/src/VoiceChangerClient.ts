@@ -1,4 +1,4 @@
-import { VoiceChangerWorkletNode, VolumeListener } from "./VoiceChangerWorkletNode";
+import { VoiceChangerWorkletNode, VoiceChangerWorkletListener } from "./VoiceChangerWorkletNode";
 // @ts-ignore
 import workerjs from "raw-loader!../worklet/dist/index.js";
 import { VoiceFocusDeviceTransformer, VoiceFocusTransformDevice } from "amazon-chime-sdk-js";
@@ -65,7 +65,7 @@ export class VoiceChangerClient {
         }
     }
 
-    constructor(ctx: AudioContext, vfEnable: boolean, audioStreamerListeners: AudioStreamerListeners, volumeListener: VolumeListener) {
+    constructor(ctx: AudioContext, vfEnable: boolean, audioStreamerListeners: AudioStreamerListeners, voiceChangerWorkletListener: VoiceChangerWorkletListener) {
         this.sem.enqueue(0);
         this.configurator = new ServerConfigurator()
         this.ctx = ctx
@@ -74,7 +74,7 @@ export class VoiceChangerClient {
             const scriptUrl = URL.createObjectURL(new Blob([workerjs], { type: "text/javascript" }));
             await this.ctx.audioWorklet.addModule(scriptUrl)
 
-            this.vcNode = new VoiceChangerWorkletNode(this.ctx, volumeListener); // vc node 
+            this.vcNode = new VoiceChangerWorkletNode(this.ctx, voiceChangerWorkletListener); // vc node 
             this.currentMediaStreamAudioDestinationNode = this.ctx.createMediaStreamDestination() // output node
             this.vcNode.connect(this.currentMediaStreamAudioDestinationNode) // vc node -> output node
             // (vc nodeにはaudio streamerのcallbackでデータが投げ込まれる)
@@ -125,7 +125,11 @@ export class VoiceChangerClient {
         }
         if (typeof input == "string") {
             this.currentMediaStream = await navigator.mediaDevices.getUserMedia({
-                audio: { deviceId: input }
+                audio: {
+                    deviceId: input,
+                    // echoCancellation: false,
+                    // noiseSuppression: false
+                }
             })
         } else {
             this.currentMediaStream = input
@@ -227,10 +231,10 @@ export class VoiceChangerClient {
         this.vcNode.configure(setting)
     }
     startOutputRecordingWorklet = () => {
-
+        this.vcNode.startOutputRecordingWorklet()
     }
     stopOutputRecordingWorklet = () => {
-
+        this.vcNode.stopOutputRecordingWorklet()
     }
 
 
