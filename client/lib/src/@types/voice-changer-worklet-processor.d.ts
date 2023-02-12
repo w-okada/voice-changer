@@ -1,6 +1,8 @@
 export declare const RequestType: {
     readonly voice: "voice";
     readonly config: "config";
+    readonly startRecording: "startRecording";
+    readonly stopRecording: "stopRecording";
 };
 export type RequestType = typeof RequestType[keyof typeof RequestType];
 export type VoiceChangerWorkletProcessorRequest = {

@@ -225,15 +225,23 @@ export class VoiceChangerClient {
 
     // configure worklet
     configureWorklet = (setting: WorkletSetting) => {
-        const req: VoiceChangerWorkletProcessorRequest = {
-            requestType: "config",
-            voice: new ArrayBuffer(1),
-            numTrancateTreshold: setting.numTrancateTreshold,
-            volTrancateThreshold: setting.volTrancateThreshold,
-            volTrancateLength: setting.volTrancateLength
-        }
-        this.vcNode.postReceivedVoice(req)
+        // const req: VoiceChangerWorkletProcessorRequest = {
+        //     requestType: "config",
+        //     voice: new ArrayBuffer(1),
+        //     numTrancateTreshold: setting.numTrancateTreshold,
+        //     volTrancateThreshold: setting.volTrancateThreshold,
+        //     volTrancateLength: setting.volTrancateLength
+        // }
+        // this.vcNode.postReceivedVoice(req)
+        this.vcNode.configure(setting)
     }
+    startOutputRecordingWorklet = () => {
+
+    }
+    stopOutputRecordingWorklet = () => {
+
+    }
+
 
     // Configurator Method
     uploadFile = (buf: ArrayBuffer, filename: string, onprogress: (progress: number, end: boolean) => void) => {

@@ -29,6 +29,13 @@ const reloadDevices = async () => {
         toJSON: () => { }
     })
     const audioOutputs = mediaDeviceInfos.filter(x => { return x.kind == "audiooutput" })
+    audioOutputs.push({
+        deviceId: "record",
+        groupId: "record",
+        kind: "audiooutput",
+        label: "record",
+        toJSON: () => { }
+    })
     return [audioInputs, audioOutputs]
 }
 export type UseDeviceSettingProps = {

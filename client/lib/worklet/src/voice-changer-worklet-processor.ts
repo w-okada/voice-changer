@@ -1,8 +1,19 @@
 export const RequestType = {
     "voice": "voice",
-    "config": "config"
+    "config": "config",
+    "startRecording": "startRecording",
+    "stopRecording": "stopRecording"
 } as const
 export type RequestType = typeof RequestType[keyof typeof RequestType]
+
+
+export const ResponseType = {
+    "volume": "volume",
+    "recordData": "recordData"
+} as const
+export type ResponseType = typeof ResponseType[keyof typeof ResponseType]
+
+
 
 export type VoiceChangerWorkletProcessorRequest = {
     requestType: RequestType,
@@ -10,6 +21,12 @@ export type VoiceChangerWorkletProcessorRequest = {
     numTrancateTreshold: number
     volTrancateThreshold: number
     volTrancateLength: number
+}
+
+export type VoiceChangerWorkletProcessorResponse = {
+    responseType: ResponseType,
+    volume?: number,
+    recordData?: Float32Array[]
 }
 
 class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
@@ -21,7 +38,10 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
     private volTrancateLength = 32
     private volTrancateCount = 0
 
+    private isRecording = false
+
     playBuffer: Float32Array[] = []
+    recordingBuffer: Float32Array[] = []
     /**
      * @constructor
      */
@@ -46,6 +66,28 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
             this.volTrancateLength = request.volTrancateLength
             this.volTrancateThreshold = request.volTrancateThreshold
             console.log("[worklet] worklet configured", request)
+            return
+        } else if (request.requestType === "startRecording") {
+            if (this.isRecording) {
+                console.warn("[worklet] recoring is already started")
+                return
+            }
+            this.isRecording = true
+            this.recordingBuffer = []
+            return
+        } else if (request.requestType === "stopRecording") {
+            if (!this.isRecording) {
+                console.warn("[worklet] recoring is not started")
+                return
+            }
+            this.isRecording = false
+            const recordResponse: VoiceChangerWorkletProcessorResponse = {
+                responseType: ResponseType.recordData,
+                recordData: this.recordingBuffer
+
+            }
+            this.port.postMessage(recordResponse);
+            this.recordingBuffer = []
             return
         }
 
@@ -80,6 +122,9 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
             f32Block![frameIndexInBlock + 1] = (currentFrame + nextFrame) / 2
             if (f32Block!.length === frameIndexInBlock + 2) {
                 this.playBuffer.push(f32Block!)
+                if (this.isRecording) {
+                    this.recordingBuffer.push(f32Block!)
+                }
             }
         }
     }
@@ -119,7 +164,11 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
         }
 
         if (voice) {
-            this.port.postMessage({ volume: this.volume });
+            const volumeResponse: VoiceChangerWorkletProcessorResponse = {
+                responseType: ResponseType.volume,
+                volume: this.volume
+            }
+            this.port.postMessage(volumeResponse);
             outputs[0][0].set(voice)
         }
 
