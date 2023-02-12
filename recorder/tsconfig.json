@@ -1,0 +1,33 @@
+{
+    "compilerOptions": {
+        "target": "ES2020",
+        "jsx": "react",
+        "lib": ["dom"],
+
+        /* ファイル名の大文字小文字を区別 */
+        "forceConsistentCasingInFileNames": true,
+
+        /* 型チェック関係のオプション */
+        "strict": true,
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitReturns": true,
+
+        /* Module解決方法 */
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "isolatedModules": true,
+        "allowSyntheticDefaultImports": true,
+
+        /* 型チェックだけさせたいので出力なし */
+        // "noEmit": true,
+        /* For avoid WebGL2 error */
+        /* https://stackoverflow.com/questions/52846622/error-ts2430-interface-webglrenderingcontext-incorrectly-extends-interface-w */
+        "skipLibCheck": true
+    },
+    /* tscコマンドで読み込むファイルを指定 */
+    "include": ["src/**/*.ts", "src/**/*.tsx"],
+    "exclude": ["node_modules"]
+}

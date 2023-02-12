@@ -1,0 +1,77 @@
+/* Header */
+.header-container {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    height: var(--header-height);
+    width: 100vw;
+}
+/* Body*/
+.body-container {
+    position: fixed;
+    top: var(--header-height);
+    left: 0px;
+    height: calc(100vh - var(--header-height));
+    background: linear-gradient(45deg, var(--company-color1) 0, 5%, var(--company-color2) 5% 10%, var(--company-color3) 10% 80%, var(--company-color1) 80% 85%, var(--company-color2) 85% 100%);
+}
+.open-right-sidebar-checkbox:checked + .body-container {
+    width: calc(100vw - var(--right-sidebar-width));
+    transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
+}
+.open-right-sidebar-checkbox + .body-container {
+    width: calc(100vw);
+    transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
+}
+
+/* RightSidebar*/
+.right-sidebar-container {
+    position: fixed;
+    top: var(--header-height);
+    height: calc(100vh - var(--header-height));
+    display: flex;
+    flex-direction: column;
+    width: var(--right-sidebar-width);
+    background: var(--company-color3);
+    z-index: 100;
+}
+
+.right-sidebar-container:before {
+    content: "";
+    position: absolute;
+    height: 100vh;
+    width: var(--right-sidebar-width);
+    background: var(--company-color2-alpha);
+    z-index: -1;
+}
+.right-sidebar-container:after {
+    content: "";
+    position: absolute;
+    height: 100vh;
+    width: var(--right-sidebar-width);
+    background: var(--company-color1-alpha);
+    clip-path: ellipse(158% 41% at 60% 30%);
+    z-index: -1;
+}
+.open-right-sidebar-checkbox:checked + .right-sidebar-container {
+    right: 0;
+    transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
+}
+.open-right-sidebar-checkbox + .right-sidebar-container {
+    right: calc(-1 * var(--right-sidebar-width));
+    transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
+}
+
+.split-2-5-3 {
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 20%;
+    }
+    & > div:nth-child(2) {
+        left: 20%;
+        width: 50%;
+    }
+    & > div:nth-child(3) {
+        left: 70%;
+        width: 30%;
+    }
+}

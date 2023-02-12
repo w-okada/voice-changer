@@ -1,0 +1,371 @@
+@import url("https://fonts.googleapis.com/css2?family=Chicle&family=Poppins:ital,wght@0,200;0,400;0,600;1,200;1,400;1,600&display=swap");
+
+/* @import "./002_Frame.css";
+
+@import "./010_Dialog.css";
+@import "./101_processing.css";
+@import "./102_RotatedButton.css";
+@import "./103_tooltips.css";
+@import "./104_signage.css"; */
+:root {
+    --text-color: #333;
+    --company-color1: rgba(64, 119, 187, 1);
+    --company-color2: rgba(29, 47, 78, 1);
+    --company-color3: rgba(255, 255, 255, 1);
+    --company-color1-alpha: rgba(64, 119, 187, 0.3);
+    --company-color2-alpha: rgba(29, 47, 78, 0.3);
+    --company-color3-alpha: rgba(255, 255, 255, 0.3);
+    --global-shadow-color: rgba(0, 0, 0, 0.4);
+
+    --sidebar-transition-time: 0.3s;
+    --sidebar-transition-animation: ease-in-out;
+
+    --header-height: 1.5rem;
+    --right-sidebar-width: 320px;
+
+    --dialog-border-color: rgba(100, 100, 100, 1);
+    --dialog-shadow-color: rgba(0, 0, 0, 0.3);
+    --dialog-background-color: rgba(255, 255, 255, 1);
+    --dialog-primary-color: rgba(19, 70, 209, 1);
+    --dialog-active-color: rgba(40, 70, 209, 1);
+    --dialog-input-border-color: rgba(200, 200, 200, 1);
+    --dialog-submit-button-color: rgba(180, 190, 230, 1);
+    --dialog-cancel-button-color: rgba(235, 80, 80, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+html {
+    font-size: 16px;
+}
+body {
+    height: 100%;
+    width: 100%;
+    color: var(--text-color);
+    background: linear-gradient(45deg, var(--company-color1) 0, 5%, var(--company-color2) 5% 10%, var(--company-color3) 10% 80%, var(--company-color1) 80% 85%, var(--company-color2) 85% 100%);
+}
+
+.application-container {
+    position: relative;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    list-style-type: none;
+}
+
+.state-control-checkbox {
+    display: none;
+}
+
+.video-for-recorder-container {
+    position: absolute;
+    left: -1000px;
+    width: 30px;
+    height: 30px;
+}
+
+/*  */
+/*  */
+/*  */
+/* start button */
+.front-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+}
+.front-title {
+    font-size: 4rem;
+    font-weight: 100;
+}
+.front-description {
+    font-size: 0.9rem;
+    text-align: center;
+}
+.front-description-img {
+    height: 2rem;
+    width: 50%;
+    height: 50%;
+    border: 3px solid;
+}
+.front-description-strong {
+    color: #f66;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+.front-start-button {
+    font-size: 4rem;
+    border: 3px solid #333;
+    background: #eef;
+    width: 500px;
+    padding: 15px;
+    cursor: pointer;
+    text-align: center;
+    margin: 100px 0 0 0 auto;
+    user-select: none;
+}
+.front-note {
+    font-size: 1rem;
+}
+.front-attention {
+    font-size: 0.8rem;
+    color: #f55;
+    font-weight: 600;
+}
+.front-disclaimer {
+    font-size: 0.8rem;
+}
+
+/* Header */
+
+.header {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    height: var(--header-height);
+    background: #ffe;
+    width: 100vw;
+    display: flex;
+    justify-content: space-between;
+}
+.header-application-title-container {
+    display: flex;
+}
+.header-application-title-logo {
+    width: var(--header-height);
+    height: var(--header-height);
+    padding: 2px 2px 2px 2px;
+    margin: 0px 2px 0px 5px;
+}
+.header-application-title-text {
+    font-weight: 600;
+    margin: 0px 2px 0px 2px;
+}
+
+.header-device-selector-container {
+    margin: 0 10px 0 0;
+    display: flex;
+}
+.header-device-selector-text {
+    margin: 0px 2px 0px 10px;
+}
+.device-selector-option {
+    font-size: 1rem;
+}
+.device-selector-select {
+    max-width: 10rem;
+    font-size: 0.7rem;
+}
+
+/* Body */
+.body {
+    position: fixed;
+    top: var(--header-height);
+    width: 100%;
+    height: calc(100% - var(--header-height));
+}
+/* Body -> Controller */
+.controller {
+    display: flex;
+    margin: 10px 0 10px 40px;
+}
+/* Body -> Controller -> Corpus */
+.corpus-selector-label {
+    font-size: 1.3rem;
+    font-weight: 600;
+    padding: 0 4px 0 4px;
+}
+.corpus-selector-option {
+    font-size: 1rem;
+    padding: 0 4px 0 4px;
+}
+.corpus-selector-select {
+    max-width: 10rem;
+    font-size: 1rem;
+    padding: 0 4px 0 4px;
+}
+
+/* Body -> Controller -> Text Index */
+.text-index-selector-container {
+    display: flex;
+    user-select: none;
+    padding: 0 40px 0 40px;
+    text-align: center;
+}
+.text-index-selector-button {
+    color: #333;
+    cursor: pointer;
+    font-size: 1.3rem;
+    font-weight: 600;
+    border: 1px solid #000;
+    width: 30px;
+    border-radius: 3px;
+}
+.text-index-selector-button-disable {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #ddd;
+    border: 1px solid #000;
+    width: 30px;
+    border-radius: 3px;
+}
+.text-index-selector-current-index {
+    font-size: 1.3rem;
+    font-weight: 600;
+    padding: 0 2px 0 2px;
+    width: 100px;
+}
+
+/* Body -> Controller -> Audio Controller */
+.audio-controller-button-container {
+    display: flex;
+    user-select: none;
+    text-align: center;
+}
+.audio-controller-button {
+    color: #000;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid #444;
+    border-radius: 3px;
+    width: 100px;
+    margin: 0 4px 0 4px;
+}
+.audio-controller-button-disabled {
+    color: #aaa;
+    border: 1px solid #444;
+    border-radius: 3px;
+    width: 100px;
+    margin: 0 4px 0 4px;
+}
+.audio-controller-button-active {
+    color: #444;
+    font-weight: 600;
+    background: #dfd;
+    border: 1px solid #444;
+    border-radius: 3px;
+    width: 100px;
+    margin: 0 4px 0 4px;
+}
+.audio-controller-button-attention {
+    color: #44f;
+    font-weight: 600;
+    cursor: pointer;
+    background: #fcc;
+    border: 1px solid #444;
+    border-radius: 3px;
+    width: 100px;
+    margin: 0 4px 0 4px;
+}
+/* Body -> Controller -> Export Controller */
+.export-controller-button-container {
+    display: flex;
+    flex-direction: row;
+    user-select: none;
+    text-align: center;
+    padding: 0 60px 0 60px;
+}
+.export-controller-button-export {
+    color: #000;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid #444;
+    border-radius: 3px;
+    width: 100px;
+    margin: 0 4px 0 4px;
+}
+.export-controller-button-export-disabled {
+    color: #aaa;
+    font-weight: 600;
+    border: 1px solid #444;
+    border-radius: 3px;
+    width: 100px;
+    margin: 0 4px 0 4px;
+}
+.export-controller-button-export-memo {
+    color: rgb(190, 129, 75);
+    font-weight: 600;
+}
+.export-controller-export-progress {
+}
+/*  */
+/*  */
+/*  */
+/*  */
+.recorder-card-container {
+    height: 300px;
+    width: 90%;
+    margin: 0 20px 0 20px;
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+.recorder-card-list {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
+}
+.recorder-card {
+    border: 1px solid rgb(103, 103, 103);
+    background: rgba(255, 255, 238, 0.8);
+    height: 300px;
+    width: 100%;
+    border-radius: 15px;
+}
+.recorder-card-title {
+    font-size: 1.5rem;
+    padding: 10px;
+    color: #644;
+}
+.recorder-card-text {
+    font-size: 1.7rem;
+    padding: 4px 10px 4px 10px;
+    color: #c44;
+}
+.recorder-card-text_hira {
+    font-size: 1.7rem;
+    padding: 4px 10px 4px 10px;
+    color: #477;
+}
+
+/*  */
+/*  */
+/*  */
+.waveform-container,
+.mel-spectrogram-container
+ {
+    width: 500px;
+    box-sizing: content-box;
+    /* border: 1px solid #aaa; */
+    margin: 20px auto;
+    /* padding: 30px; */
+    background: #fff;
+}
+.mel-spectrogram-div{
+    width:100%;
+    height:150px;
+    display:flex;
+    object-fit:contain;
+    margin-top:10px;
+}
+.mel-spectrogram-canvas{
+    width: 100%;
+}
+.waveform-header {
+    display: flex;
+}
+.waveform-header-item {
+    padding: 0 5px 0 5px;
+    width: 300px;
+}
+.waveform-header-item-warn {
+    padding: 0 5px 0 5px;
+    width: 200px;
+    color: #f00;
+}
