@@ -1,31 +1,29 @@
 VC Helper
 ----
-
-# 概要
-AIを使ったリアルタイムボイスチェンジャー[MMVC](https://github.com/isletennos/MMVC_Trainer)のヘルパーアプリケーションです。
-
-
-MMVCで必要となる一連の作業（トレーニング用の音声の録音、トレーニング、ボイスチェンジャ）の中で、音声の録音とボイスチェンジャを各種プラットフォームでお手軽に実行できます。
+# VC Helperとは
+[VC Helper](https://github.com/w-okada/voice-changer)はAIを使ったリアルタイムボイスチェンジャー[MMVC](https://github.com/isletennos/MMVC_Trainer)のヘルパーアプリケーションです。MMVCで必要となるトレーニング用の音声の録音とボイスチェンジャを各種プラットフォームでお手軽に実行できます。
+[解説動画](https://www.nicovideo.jp/watch/sm41507891)
 
 ※ トレーニングについては[公式ノートブック](https://github.com/isletennos/MMVC_Trainer)をご利用ください。
 
-[解説動画](https://youtu.be/MOPqnDPqhAU)
-
 ![image](https://user-images.githubusercontent.com/48346627/201169523-836e0f9e-2aca-4023-887c-52ecc219bcca.png)
 
-このアプリケーションを用いることで、以下のことを簡単に行うことができます。
 
-- MMVCトレーニング用の音声録音 
-- MMVCモデルを用いたリアルタイムボイスチェンジャー
-  - リアルタイム話者切り替え
-  - CPU/GPU切り替え
+# 特徴
+1. 複数のプラットフォームで動作
+Windows, Mac(M1等Apple silicon), Linux, Google Colaboratoryでの動作をサポートしています。
 
+2. 音声録音用アプリのインストールが不要
+音声録音をGithub Pagesにホストしてあるアプリケーション上で実行可能です。全てブラウザ上で動くため、特別なアプリケーションのインストールは不要です。また、完全にブラウザアプリケーションとして動くのでデータがサーバに送信されることもありません。
+
+3. ボイチェンを別のPC上で実行して負荷を分散
 本アプリケーションのリアルタイムボイスチェンジャーは、サーバ・クライアント構成で動きます。MMVCのサーバを別のPC上で動かすことで、ゲーム実況など他の負荷の高い処理への影響を抑えながら動かすことができます。
 
 ![image](https://user-images.githubusercontent.com/48346627/206640768-53f6052d-0a96-403b-a06c-6714a0b7471d.png)
 
 # 使用方法
-詳細は[こちら](https://zenn.dev/wok/articles/s01_vc001_top)に纏まっています。
+詳細は[こちら(v.1.3.x)](https://zenn.dev/wok/books/0002_vc-helper-v_1_3)に纏まっています。[^1]
+[^1]: v1.5.xは[こちら](https://zenn.dev/wok/books/0003_vc-helper-v_1_5)
 
 # (1) レコーダー（トレーニング用音声録音アプリ）
 MMVCトレーニング用の音声を簡単に録音できるアプリです。
@@ -35,9 +33,6 @@ Github Pages上で実行できるため、ブラウザのみあれば様々な�
 [録音アプリ on Github Pages](https://w-okada.github.io/voice-changer/)
 
 [解説動画](https://youtu.be/s_GirFEGvaA)
-
-
-詳細については[こちら](https://zenn.dev/wok/articles/s01_vc002_record_voice_for_mmvc)をご確認ください。
 
 
 # (2) プレイヤー（ボイスチェンジャーアプリ）
@@ -64,7 +59,7 @@ MMVCのモデルをトレーニングが完了している場合、既にColabor
 Windows版とMac版を提供しています。事前準備は必要ありません。
 
 
-・Mac版はダウンロードファイルを解凍したのちに、MMVCServerSIOをダブルクリックしてください。開発元を検証できない旨が示される場合は、再度コントロールキーを押してクリックして実行してください。（詳細下記 *1）
+・Mac版はダウンロードファイルを解凍したのちに、MMVCServerSIOをダブルクリックしてください。開発元を検証できない旨が示される場合は、再度コントロールキーを押してクリックして実行してください(or 右クリックから実行してください)。（詳細下記 *1）
 
 ・Windows版は、directML版とGPU版を提供しています。環境に応じたzipファイルをダウンロードしてください。ダンロードしたzipファイルを解凍して、MMVCServerSIO.exeを実行してください。
 
@@ -72,10 +67,12 @@ Windows版とMac版を提供しています。事前準備は必要ありませ�
 
 ・NvidiaのGPUをお持ちでない方はonnxdirectMLが含まれるファイルをご利用ください。多くの場合は、onnxdirectML_nocudaの方で動きます。環境によって極まれにgpuが認識されない場合があります。その場合はonnxgpu_cudaの方をご利用ください。（サイズが大きく違います。）
 
-・リモートからアクセスできるようにする方法など、より詳しくは[こちら](https://zenn.dev/wok/articles/s01_vc001_top)をご覧ください。
+・リモートからアクセスできるようにする方法など、より詳しくは[こちら](https://zenn.dev/wok/books/0002_vc-helper-v_1_3)をご覧ください。
 
+### アルファ版(for v.1.5.x)
+- [MMVCServerSIO_win_cuda_v.1.5.0.1a.zip](https://drive.google.com/file/d/1Am0awpHS7NAotITdbnEPg4gl4lxvgWhX/view?usp=sharing)
 
-### 最新バージョン
+### 最新バージョン(for v.1.3.x)
 - [MMVCServerSIO_mac_onnxcpu_v.1.3.7.2.zip](https://drive.google.com/file/d/1AcJaQXH8ZtlCSrifvRBWdat19HD_A2fr/view?usp=sharing) 365MB
 - [MMVCServerSIO_win_onnxdirectML_cuda_v.1.3.7.2.zip](https://drive.google.com/file/d/1WKW3uqmIi9D13Jzao8jWVqx2KANmmQji/view?usp=sharing) 2050MB
 - [MMVCServerSIO_win_onnxdirectML_nocuda_v.1.3.7.2.zip](https://drive.google.com/file/d/1b8Lqwb7emvd85NwRANPglKWzceJYcgBg/view?usp=sharing) 286MB
@@ -94,8 +91,6 @@ Windows版とMac版を提供しています。事前準備は必要ありませ�
 https://user-images.githubusercontent.com/48346627/212569645-e30b7f4e-079d-4504-8cf8-7816c5f40b00.mp4
 
 
-
-
 *1 本ソフトウェアは開発元の署名しておりません。下記のように警告が出ますが、コントロールキーを押しながらアイコンをクリックすると実行できるようになります。これはAppleのセキュリティポリシーによるものです。実行は自己責任となります。
 
 ![image](https://user-images.githubusercontent.com/48346627/212567711-c4a8d599-e24c-4fa3-8145-a5df7211f023.png)
@@ -107,8 +102,6 @@ https://user-images.githubusercontent.com/48346627/212569645-e30b7f4e-079d-4504-
 [WSL2とDockerのインストールの解説動画](https://youtu.be/POo_Cg0eFMU)
 
 [WSL2とAnacondaのインストールの解説動画](https://youtu.be/fba9Zhsukqw)
-
-操作方法は[こちら](https://zenn.dev/wok/articles/s01_vc007_mmvc_with_linux_wsl2)をご覧ください。
 
 ## リアルタイム性
 
