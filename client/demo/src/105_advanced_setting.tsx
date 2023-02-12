@@ -205,7 +205,7 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
                 <div className="body-row split-3-7 left-padding-1 guided">
                     <div className="body-item-title left-padding-1">Trancate Num</div>
                     <div className="body-input-container">
-                        <input type="number" min={50} max={300} step={1} value={props.clientState.workletSetting.setting.numTrancateTreshold} onChange={(e) => {
+                        <input type="number" min={5} max={300} step={1} value={props.clientState.workletSetting.setting.numTrancateTreshold} onChange={(e) => {
                             props.clientState.workletSetting.setSetting({
                                 ...props.clientState.workletSetting.setting,
                                 numTrancateTreshold: Number(e.target.value)

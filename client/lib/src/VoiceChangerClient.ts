@@ -153,12 +153,11 @@ export class VoiceChangerClient {
             context: this.ctx
         })
         // connect nodes.
+        this.currentMediaStreamAudioSourceNode = this.ctx.createMediaStreamSource(this.currentMediaStream)
+        this.inputGainNode = this.ctx.createGain()
+        this.inputGainNode.gain.value = this.inputGain
+        this.currentMediaStreamAudioSourceNode.connect(this.inputGainNode)
         if (this.currentDevice && forceVfDisable == false) {
-            this.currentMediaStreamAudioSourceNode = this.ctx.createMediaStreamSource(this.currentMediaStream) // input node
-            this.inputGainNode = this.ctx.createGain()
-            this.inputGainNode.gain.value = this.inputGain
-            this.currentMediaStreamAudioSourceNode.connect(this.inputGainNode)
-
             this.currentDevice.chooseNewInnerDevice(this.currentMediaStream)
             const voiceFocusNode = await this.currentDevice.createAudioNode(this.ctx); // vf node
             this.inputGainNode.connect(voiceFocusNode.start) // input node -> vf node
@@ -166,9 +165,8 @@ export class VoiceChangerClient {
             this.micStream.setStream(this.outputNodeFromVF!.stream) // vf node -> mic stream
         } else {
             console.log("VF disabled")
-            this.inputGainNode = this.ctx.createGain()
-            this.inputGainNode.gain.value = this.inputGain
             const inputDestinationNodeForMicStream = this.ctx.createMediaStreamDestination()
+            this.inputGainNode.connect(inputDestinationNodeForMicStream)
             this.micStream.setStream(inputDestinationNodeForMicStream.stream) // input device -> mic stream
         }
         this.micStream.pipe(this.audioStreamer) // mic stream -> audio streamer

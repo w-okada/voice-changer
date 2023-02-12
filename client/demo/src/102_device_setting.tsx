@@ -140,6 +140,7 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
             const audio_echo = document.getElementById(AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK) as HTMLAudioElement
             audio_echo.srcObject = dst.stream
             audio_echo.play()
+            audio_echo.volume = 0
             setFileInputEchoback(false)
 
             // original stream to play.
@@ -235,12 +236,10 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
                     // @ts-ignore
                     audio.setSinkId("")
                     if (x == AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK) {
-                        audio.volume = fileInputEchoback ? 1 : 0
+                        audio.volume = 0
                     } else {
-                        audio.volume = 1
+                        audio.volume = 0
                     }
-                } else if (audioOutputForGUI == "record") {
-                    audio.volume = 0
                 } else {
                     // @ts-ignore
                     audio.setSinkId(audioOutputForGUI)
