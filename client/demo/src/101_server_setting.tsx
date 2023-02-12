@@ -71,6 +71,14 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
                 onnxModel: null
             })
         }
+        const onCorrespondenceFileLoadClicked = async () => {
+            const file = await fileSelector("")
+            props.clientState.clientSetting.setCorrespondences(file)
+        }
+        const onCorrespondenceFileClearClicked = () => {
+            props.clientState.clientSetting.setCorrespondences(null)
+        }
+
         const onModelUploadClicked = async () => {
             props.clientState.serverSetting.loadModel()
         }
@@ -82,6 +90,7 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
         const configFilenameText = props.clientState.serverSetting.fileUploadSetting.configFile?.filename || props.clientState.serverSetting.fileUploadSetting.configFile?.file?.name || ""
         const onnxModelFilenameText = props.clientState.serverSetting.fileUploadSetting.onnxModel?.filename || props.clientState.serverSetting.fileUploadSetting.onnxModel?.file?.name || ""
         const pyTorchFilenameText = props.clientState.serverSetting.fileUploadSetting.pyTorchModel?.filename || props.clientState.serverSetting.fileUploadSetting.pyTorchModel?.file?.name || ""
+        const correspondenceFileText = JSON.stringify(props.clientState.clientSetting.setting.correspondences.map(x => { return x.dirname }))
 
         return (
             <>
@@ -98,6 +107,7 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
                         </div>
                     </div>
                 </div>
+
                 <div className="body-row split-3-3-4 left-padding-1 guided">
                     <div className="body-item-title left-padding-2">Config(.json)</div>
                     <div className="body-item-text">
@@ -108,6 +118,17 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
                         <div className="body-button left-margin-1" onClick={onConfigFileClearClicked}>clear</div>
                     </div>
                 </div>
+                <div className="body-row split-3-3-4 left-padding-1 guided">
+                    <div className="body-item-title left-padding-2">Correspondence</div>
+                    <div className="body-item-text">
+                        <div>{correspondenceFileText}</div>
+                    </div>
+                    <div className="body-button-container">
+                        <div className="body-button" onClick={onCorrespondenceFileLoadClicked}>select</div>
+                        <div className="body-button left-margin-1" onClick={onCorrespondenceFileClearClicked}>clear</div>
+                    </div>
+                </div>
+
                 <div className="body-row split-3-3-4 left-padding-1 guided">
                     <div className="body-item-title left-padding-2">Onnx(.onnx)</div>
                     <div className="body-item-text">
@@ -153,6 +174,7 @@ export const useServerSettingArea = (props: UseServerSettingProps): ServerSettin
         props.clientState.serverSetting.loadModel,
         props.clientState.serverSetting.isUploading,
         props.clientState.serverSetting.uploadProgress,
+        props.clientState.clientSetting.setting.correspondences,
         showPyTorch])
 
     const frameworkRow = useMemo(() => {

@@ -32,6 +32,7 @@ export type VoiceChangerClientSetting = {
     bufferSize: BufferSize, // 256, 512, 1024, 2048, 4096, 8192, 16384 (for mic stream)
     inputChunkNum: number, // n of (256 x n) for send buffer
     speakers: Speaker[],
+    correspondences: Correspondence[],
     forceVfDisable: boolean,
     voiceChangerMode: VoiceChangerMode,
 }
@@ -45,6 +46,11 @@ export type WorkletSetting = {
 export type Speaker = {
     "id": number,
     "name": string,
+}
+export type Correspondence = {
+    "sid": number,
+    "correspondence": number,
+    "dirname": string
 }
 
 
@@ -154,26 +160,27 @@ export const DefaultVoiceChangerClientSetting: VoiceChangerClientSetting = {
     inputChunkNum: 48,
     speakers: [
         {
-            "id": 100,
-            "name": "ずんだもん"
-        },
-        {
-            "id": 107,
+            "id": 0,
             "name": "user"
         },
         {
             "id": 101,
-            "name": "そら"
+            "name": "ずんだもん"
         },
         {
             "id": 102,
-            "name": "めたん"
+            "name": "そら"
         },
         {
             "id": 103,
+            "name": "めたん"
+        },
+        {
+            "id": 104,
             "name": "つむぎ"
         }
     ],
+    correspondences: [],
     forceVfDisable: false,
     voiceChangerMode: "realtime",
 }

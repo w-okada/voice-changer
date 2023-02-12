@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react"
-import { VoiceChangerClientSetting, Protocol, BufferSize, VoiceChangerMode, SampleRate, Speaker, DefaultVoiceChangerClientSetting, INDEXEDDB_KEY_CLIENT } from "../const"
+import { VoiceChangerClientSetting, Protocol, BufferSize, VoiceChangerMode, SampleRate, Speaker, DefaultVoiceChangerClientSetting, INDEXEDDB_KEY_CLIENT, Correspondence } from "../const"
 import { createDummyMediaStream } from "../util"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
@@ -21,6 +21,7 @@ export type ClientSettingState = {
     setVoiceChangerMode: (mode: VoiceChangerMode) => void
     setSampleRate: (num: SampleRate) => void
     setSpeakers: (speakers: Speaker[]) => void
+    setCorrespondences: (file: File | null) => Promise<void>
 
     start: () => Promise<void>
     stop: () => Promise<void>
@@ -179,6 +180,33 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
         }
     }, [props.voiceChangerClient])
 
+    const setCorrespondences = useMemo(() => {
+        return async (file: File | null) => {
+            if (!props.voiceChangerClient) return
+            if (!file) {
+                settingRef.current.correspondences = []
+            } else {
+                const correspondenceText = await file.text()
+                const cors = correspondenceText.split("\n").map(line => {
+                    const items = line.split("|")
+                    if (items.length != 3) {
+                        console.warn("Invalid Correspondence Line:", line)
+                        return null
+                    } else {
+                        const cor: Correspondence = {
+                            sid: Number(items[0]),
+                            correspondence: Number(items[1]),
+                            dirname: items[2]
+                        }
+                        return cor
+                    }
+                }).filter(x => { return x != null }) as Correspondence[]
+                settingRef.current.correspondences = cors
+            }
+            setSetting({ ...settingRef.current })
+        }
+    }, [props.voiceChangerClient])
+
     //////////////
     // 操作
     /////////////
@@ -204,7 +232,6 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
         }
     }, [props.voiceChangerClient])
 
-
     return {
         setting,
         clearSetting,
@@ -217,6 +244,7 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
         setVoiceChangerMode,
         setSampleRate,
         setSpeakers,
+        setCorrespondences,
 
         start,
         stop,

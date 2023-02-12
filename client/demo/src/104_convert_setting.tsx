@@ -12,13 +12,18 @@ export type ConvertSettingState = {
 export const useConvertSetting = (props: UseConvertSettingProps): ConvertSettingState => {
     const inputChunkNumRow = useMemo(() => {
         return (
-            <div className="body-row split-3-7 left-padding-1 guided">
+            <div className="body-row split-3-2-1-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Input Chunk Num(128sample/chunk)</div>
                 <div className="body-input-container">
                     <input type="number" min={1} max={256} step={1} value={props.clientState.clientSetting.setting.inputChunkNum} onChange={(e) => {
                         props.clientState.clientSetting.setInputChunkNum(Number(e.target.value))
                     }} />
                 </div>
+                <div className="body-item-text">
+                    <div>buff: {(props.clientState.clientSetting.setting.inputChunkNum * 128 * 1000 / 24000).toFixed(1)}ms</div>
+                </div>
+                <div className="body-item-text"></div>
+
             </div>
         )
     }, [props.clientState.clientSetting.setting.inputChunkNum, props.clientState.clientSetting.setInputChunkNum])

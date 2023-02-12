@@ -292,6 +292,9 @@ body {
 }
 .body-item-text {
     color: rgb(30, 30, 30);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     .body-item-text-item {
         padding-left: 1rem;
     }

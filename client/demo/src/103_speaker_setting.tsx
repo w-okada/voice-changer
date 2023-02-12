@@ -10,42 +10,63 @@ export const useSpeakerSetting = (props: UseSpeakerSettingProps) => {
     const [editSpeakerTargetName, setEditSpeakerTargetName] = useState<string>("")
 
     const srcIdRow = useMemo(() => {
+        const selected = props.clientState.clientSetting.setting.correspondences.find(x => {
+            return x.sid == props.clientState.serverSetting.setting.srcId
+        })
         return (
-            <div className="body-row split-3-7 left-padding-1 guided">
+            <div className="body-row split-3-2-1-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Source Speaker Id</div>
                 <div className="body-select-container">
                     <select className="body-select" value={props.clientState.serverSetting.setting.srcId} onChange={(e) => {
                         props.clientState.serverSetting.setSrcId(Number(e.target.value))
                     }}>
                         {
-                            props.clientState.clientSetting.setting.speakers.map(x => {
-                                return <option key={x.id} value={x.id}>{x.name}({x.id})</option>
+                            // props.clientState.clientSetting.setting.speakers.map(x => {
+                            //     return <option key={x.id} value={x.id}>{x.name}({x.id})</option>
+                            // })
+                            props.clientState.clientSetting.setting.correspondences.map(x => {
+                                return <option key={x.sid} value={x.sid}>{x.dirname}({x.sid})</option>
                             })
+
                         }
                     </select>
                 </div>
+                <div className="body-item-text">
+                    <div>F0: {selected?.correspondence.toFixed(1) || ""}</div>
+                </div>
+                <div className="body-item-text"></div>
             </div>
         )
-    }, [props.clientState.clientSetting.setting.speakers, props.clientState.serverSetting.setting.srcId, props.clientState.serverSetting.setSrcId])
+    }, [props.clientState.clientSetting.setting.speakers, props.clientState.serverSetting.setting.srcId, props.clientState.clientSetting.setting.correspondences, props.clientState.serverSetting.setSrcId])
 
     const dstIdRow = useMemo(() => {
+        const selected = props.clientState.clientSetting.setting.correspondences.find(x => {
+            return x.sid == props.clientState.serverSetting.setting.dstId
+        })
         return (
-            <div className="body-row split-3-7 left-padding-1 guided">
+            <div className="body-row split-3-2-1-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Destination Speaker Id</div>
                 <div className="body-select-container">
                     <select className="body-select" value={props.clientState.serverSetting.setting.dstId} onChange={(e) => {
                         props.clientState.serverSetting.setDstId(Number(e.target.value))
                     }}>
                         {
-                            props.clientState.clientSetting.setting.speakers.map(x => {
-                                return <option key={x.id} value={x.id}>{x.name}({x.id})</option>
+                            // props.clientState.clientSetting.setting.speakers.map(x => {
+                            //     return <option key={x.id} value={x.id}>{x.name}({x.id})</option>
+                            // })
+                            props.clientState.clientSetting.setting.correspondences.map(x => {
+                                return <option key={x.sid} value={x.sid}>{x.dirname}({x.sid})</option>
                             })
                         }
                     </select>
                 </div>
+                <div className="body-item-text">
+                    <div>F0: {selected?.correspondence.toFixed(1) || ""}</div>
+                </div>
+                <div className="body-item-text"></div>
             </div>
         )
-    }, [props.clientState.clientSetting.setting.speakers, props.clientState.serverSetting.setting.dstId, props.clientState.serverSetting.setDstId])
+    }, [props.clientState.clientSetting.setting.speakers, props.clientState.serverSetting.setting.dstId, props.clientState.clientSetting.setting.correspondences, props.clientState.serverSetting.setDstId])
 
     const editSpeakerIdMappingRow = useMemo(() => {
         const onSetSpeakerMappingClicked = async () => {
@@ -95,6 +116,15 @@ export const useSpeakerSetting = (props: UseSpeakerSettingProps) => {
 
 
     const f0FactorRow = useMemo(() => {
+        const src = props.clientState.clientSetting.setting.correspondences.find(x => {
+            return x.sid == props.clientState.serverSetting.setting.srcId
+        })
+        const dst = props.clientState.clientSetting.setting.correspondences.find(x => {
+            return x.sid == props.clientState.serverSetting.setting.dstId
+        })
+
+        const recommendedF0Factor = dst && src ? dst.correspondence / src.correspondence : 0
+
         return (
             <div className="body-row split-3-2-1-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">F0 Factor</div>
@@ -106,10 +136,10 @@ export const useSpeakerSetting = (props: UseSpeakerSettingProps) => {
                 <div className="body-item-text">
                     <div>{props.clientState.serverSetting.setting.f0Factor}</div>
                 </div>
-                <div className="body-item-text"></div>
+                <div className="body-item-text">recommended:{recommendedF0Factor.toFixed(1)}</div>
             </div>
         )
-    }, [props.clientState.serverSetting.setting.f0Factor, props.clientState.serverSetting.setF0Factor])
+    }, [props.clientState.serverSetting.setting.f0Factor, props.clientState.serverSetting.setting.srcId, props.clientState.serverSetting.setting.dstId, props.clientState.clientSetting.setting.correspondences, props.clientState.serverSetting.setF0Factor])
 
     const speakerSetting = useMemo(() => {
         return (

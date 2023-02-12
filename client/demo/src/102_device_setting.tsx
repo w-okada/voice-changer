@@ -1,5 +1,5 @@
 import { fileSelectorAsDataURL, useIndexedDB } from "@dannadori/voice-changer-client-js"
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import { AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_CONVERTED, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, INDEXEDDB_KEY_AUDIO_OUTPUT } from "./const"
 import { ClientState } from "@dannadori/voice-changer-client-js";
 
@@ -47,6 +47,8 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
     const [audioOutputForGUI, setAudioOutputForGUI] = useState<string>("none")
     const [fileInputEchoback, setFileInputEchoback] = useState<boolean>()//最初のmuteが有効になるように。undefined
     const { getItem, setItem } = useIndexedDB()
+
+    const audioSrcNode = useRef<MediaElementAudioSourceNode>()
 
     useEffect(() => {
         const initialize = async () => {
@@ -111,11 +113,19 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
 
             // input stream for client.
             const audio = document.getElementById(AUDIO_ELEMENT_FOR_TEST_CONVERTED) as HTMLAudioElement
+            audio.pause()
+            audio.srcObject = null
             audio.src = url
             await audio.play()
-            const src = audioContext!.createMediaElementSource(audio);
+            if (!audioSrcNode.current) {
+                audioSrcNode.current = audioContext!.createMediaElementSource(audio);
+            }
+            if (audioSrcNode.current.mediaElement != audio) {
+                audioSrcNode.current = audioContext!.createMediaElementSource(audio);
+            }
+
             const dst = audioContext!.createMediaStreamDestination()
-            src.connect(dst)
+            audioSrcNode.current.connect(dst)
             props.clientState.clientSetting.setAudioInput(dst.stream)
 
             const audio_echo = document.getElementById(AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK) as HTMLAudioElement
@@ -185,14 +195,19 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
                 if (audioOutputForGUI == "none") {
                     // @ts-ignore
                     audio.setSinkId("")
-
+                    if (x == AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK) {
+                        audio.volume = fileInputEchoback ? 1 : 0
+                    }
                 } else {
                     // @ts-ignore
                     audio.setSinkId(audioOutputForGUI)
+                    if (x == AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK) {
+                        audio.volume = fileInputEchoback ? 1 : 0
+                    }
                 }
             }
         })
-    }, [audioOutputForGUI])
+    }, [audioOutputForGUI, audioInputForGUI])
 
 
     useEffect(() => {
