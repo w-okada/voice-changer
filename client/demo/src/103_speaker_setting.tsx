@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { ClientState } from "@dannadori/voice-changer-client-js";
 
 export type UseSpeakerSettingProps = {
@@ -8,6 +8,18 @@ export type UseSpeakerSettingProps = {
 export const useSpeakerSetting = (props: UseSpeakerSettingProps) => {
     const [editSpeakerTargetId, setEditSpeakerTargetId] = useState<number>(0)
     const [editSpeakerTargetName, setEditSpeakerTargetName] = useState<string>("")
+
+    useEffect(() => {
+        const src = props.clientState.clientSetting.setting.correspondences?.find(x => {
+            return x.sid == props.clientState.serverSetting.setting.srcId
+        })
+        const dst = props.clientState.clientSetting.setting.correspondences?.find(x => {
+            return x.sid == props.clientState.serverSetting.setting.dstId
+        })
+        const recommendedF0Factor = dst && src ? dst.correspondence / src.correspondence : 0
+        props.clientState.serverSetting.setF0Factor(recommendedF0Factor)
+
+    }, [props.clientState.serverSetting.setting.srcId, props.clientState.serverSetting.setting.dstId])
 
     const srcIdRow = useMemo(() => {
         const selected = props.clientState.clientSetting.setting.correspondences?.find(x => {
@@ -132,7 +144,7 @@ export const useSpeakerSetting = (props: UseSpeakerSettingProps) => {
                     <input type="range" className="body-item-input-slider" min="0.1" max="5.0" step="0.1" value={props.clientState.serverSetting.setting.f0Factor} onChange={(e) => {
                         props.clientState.serverSetting.setF0Factor(Number(e.target.value))
                     }}></input>
-                    <span className="body-item-input-slider-val">{props.clientState.serverSetting.setting.f0Factor}</span>
+                    <span className="body-item-input-slider-val">{props.clientState.serverSetting.setting.f0Factor.toFixed(1)}</span>
                 </div>
                 <div className="body-item-text"></div>
                 <div className="body-item-text">recommend: {recommendedF0Factor.toFixed(1)}</div>
