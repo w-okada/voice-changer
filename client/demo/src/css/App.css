@@ -444,8 +444,16 @@ body {
         }
     }
 }
-.body-select-container {
-    .body-select {
-        color: rgb(30, 30, 30);
+.body-select {
+    color: rgb(30, 30, 30);
+    max-width: 100%;
+}
+
+.body-image-container-quality-analyze,
+.body-wav-container-quality-analyze {
+    display: flex;
+    width: 100%;
+    & > img {
+        width: 50%;
     }
 }

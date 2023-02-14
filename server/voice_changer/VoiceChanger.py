@@ -22,6 +22,13 @@ providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecution
 
 import wave
 
+import matplotlib
+matplotlib.use('Agg')
+import pylab
+import librosa
+import librosa.display
+SAMPLING_RATE = 24000
+
 
 class MockStream:
     """
@@ -194,6 +201,18 @@ class VoiceChanger():
 
         return data
 
+    def _get_f0_dio(self, y, sr=SAMPLING_RATE):
+        _f0, time = pw.dio(y, sr, frame_period=5)
+        f0 = pw.stonemask(y, _f0, time, sr)
+        time = np.linspace(0, y.shape[0] / sr, len(time))
+        return f0, time
+
+    def _get_f0_harvest(self, y, sr=SAMPLING_RATE):
+        _f0, time = pw.harvest(y, sr, frame_period=5)
+        f0 = pw.stonemask(y, _f0, time, sr)
+        time = np.linspace(0, y.shape[0] / sr, len(time))
+        return f0, time
+
     def update_setteings(self, key: str, val: any):
         if key == "onnxExecutionProvider" and self.onnx_session != None:
             if val == "CUDAExecutionProvider":
@@ -215,6 +234,32 @@ class VoiceChanger():
                 self.unpackedData_length = 0
             if key == "recordIO" and val == 1:
                 self._setupRecordIO()
+            if key == "recordIO" and val == 0:
+                try:
+                    stream_input_file = os.path.join(TMP_DIR, "in.wav")
+                    analyze_file_dio = os.path.join(TMP_DIR, "analyze-dio.png")
+                    analyze_file_harvest = os.path.join(TMP_DIR, "analyze-harvest.png")
+                    y, sr = librosa.load(stream_input_file, SAMPLING_RATE)
+                    y = y.astype(np.float64)
+                    spec = librosa.amplitude_to_db(np.abs(librosa.stft(y, n_fft=2048, win_length=2048, hop_length=128)), ref=np.max)
+                    f0_dio, times = self._get_f0_dio(y)
+                    f0_harvest, times = self._get_f0_harvest(y)
+
+                    pylab.close()
+                    HOP_LENGTH = 128
+                    img = librosa.display.specshow(spec, sr=SAMPLING_RATE, hop_length=HOP_LENGTH, x_axis='time', y_axis='log', )
+                    pylab.plot(times, f0_dio, label='f0', color=(0, 1, 1, 0.6), linewidth=3)
+                    pylab.savefig(analyze_file_dio)
+
+                    pylab.close()
+                    HOP_LENGTH = 128
+                    img = librosa.display.specshow(spec, sr=SAMPLING_RATE, hop_length=HOP_LENGTH, x_axis='time', y_axis='log', )
+                    pylab.plot(times, f0_harvest, label='f0', color=(0, 1, 1, 0.6), linewidth=3)
+                    pylab.savefig(analyze_file_harvest)
+
+                except Exception as e:
+                    print("recordIO exception", e)
+
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:

@@ -1,5 +1,5 @@
 import { BufferSize, DownSamplingMode, F0Detector, Protocol, SampleRate, VoiceChangerMode } from "@dannadori/voice-changer-client-js"
-import React, { useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { ClientState } from "@dannadori/voice-changer-client-js";
 
 
@@ -10,9 +10,31 @@ export type UseQualityControlProps = {
 export type QualityControlState = {
     qualityControl: JSX.Element;
 }
+const reloadDevices = async () => {
+    try {
+        const ms = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
+        ms.getTracks().forEach(x => { x.stop() })
+    } catch (e) {
+        console.warn("Enumerate device error::", e)
+    }
+    const mediaDeviceInfos = await navigator.mediaDevices.enumerateDevices();
+    const audioOutputs = mediaDeviceInfos.filter(x => { return x.kind == "audiooutput" })
+
+    return audioOutputs
+}
+
 
 export const useQualityControl = (props: UseQualityControlProps): QualityControlState => {
     const [showQualityControl, setShowQualityControl] = useState<boolean>(false)
+    const [outputAudioDeviceInfo, setOutputAudioDeviceInfo] = useState<MediaDeviceInfo[]>([])
+    const [audioOutputForGUI, setAudioOutputForGUI] = useState<string>("none")
+    useEffect(() => {
+        const initialize = async () => {
+            const audioInfo = await reloadDevices()
+            setOutputAudioDeviceInfo(audioInfo)
+        }
+        initialize()
+    }, [])
 
 
     const noiseControlRow = useMemo(() => {
@@ -94,23 +116,90 @@ export const useQualityControl = (props: UseQualityControlProps): QualityControl
 
 
     const recordIORow = useMemo(() => {
+        const setReocrdIO = async (val: number) => {
+            await props.clientState.serverSetting.setRecordIO(val)
+            if (val == 0) {
+                const imageContainer = document.getElementById("quality-control-analyze-image-container") as HTMLDivElement
+                imageContainer.innerHTML = ""
+                const image = document.createElement("img")
+                image.src = "/tmp/analyze-dio.png?" + new Date().getTime()
+                imageContainer.appendChild(image)
+                const image2 = document.createElement("img")
+                image2.src = "/tmp/analyze-harvest.png?" + new Date().getTime()
+                imageContainer.appendChild(image2)
+
+                const wavContainer = document.getElementById("quality-control-analyze-wav-container") as HTMLDivElement
+                wavContainer.innerHTML = ""
+                const media1 = document.createElement("audio") as HTMLAudioElement
+                media1.src = "/tmp/in.wav?" + new Date().getTime()
+                media1.controls = true
+                // @ts-ignore
+                media1.setSinkId(audioOutputForGUI)
+                wavContainer.appendChild(media1)
+                const media2 = document.createElement("audio") as HTMLAudioElement
+                media2.src = "/tmp/out.wav?" + new Date().getTime()
+                media2.controls = true
+                // @ts-ignore
+                media2.setSinkId(audioOutputForGUI)
+                wavContainer.appendChild(media2)
+            }
+        }
         return (
-            <div className="body-row split-3-7 left-padding-1 guided">
-                <div className="body-item-title left-padding-1 ">recordIO</div>
-                <div className="body-select-container">
-                    <select className="body-select" value={props.clientState.serverSetting.setting.recordIO} onChange={(e) => {
-                        props.clientState.serverSetting.setRecordIO(Number(e.target.value))
-                    }}>
-                        {
-                            Object.values([0, 1]).map(x => {
-                                return <option key={x} value={x}>{x}</option>
-                            })
-                        }
-                    </select>
+            <>
+                <div className="body-row split-3-7 left-padding-1 guided">
+                    <div className="body-item-title left-padding-1 ">recordIO</div>
+                    <div className="body-select-container">
+                        <select className="body-select" value={props.clientState.serverSetting.setting.recordIO} onChange={(e) => {
+                            setReocrdIO(Number(e.target.value))
+                        }}>
+                            {
+                                Object.values([0, 1]).map(x => {
+                                    return <option key={x} value={x}>{x}</option>
+                                })
+                            }
+                        </select>
+                    </div>
                 </div>
-            </div>
+                <div className="body-row split-3-7 left-padding-1 guided">
+                    <div className="body-item-title left-padding-1 ">
+                        <div>
+                            Spectrogram
+                        </div>
+                        <div>
+                            <span>(left: dio, right:harvest)</span>
+                        </div>
+                    </div>
+                    <div className="body-image-container-quality-analyze" id="quality-control-analyze-image-container">
+                    </div>
+                </div>
+                <div className="body-row split-3-7 left-padding-1 guided">
+                    <div className="body-item-title left-padding-1 ">
+                        <div>
+                            wav (left:input, right:output)
+                        </div>
+                        <select className="body-select" value={audioOutputForGUI} onChange={(e) => {
+                            setAudioOutputForGUI(e.target.value)
+                            const wavContainer = document.getElementById("quality-control-analyze-wav-container") as HTMLDivElement
+                            wavContainer.childNodes.forEach(x => {
+                                if (x instanceof HTMLAudioElement) {
+                                    //@ts-ignore
+                                    x.setSinkId(e.target.value)
+                                }
+                            })
+                        }}>
+                            {
+                                outputAudioDeviceInfo.map(x => {
+                                    return <option key={x.deviceId} value={x.deviceId}>{x.label}</option>
+                                })
+                            }
+                        </select>
+                    </div>
+                    <div className="body-wav-container-quality-analyze" id="quality-control-analyze-wav-container">
+                    </div>
+                </div>
+            </>
         )
-    }, [props.clientState.serverSetting.setting.recordIO, props.clientState.serverSetting.setRecordIO])
+    }, [props.clientState.serverSetting.setting.recordIO, props.clientState.serverSetting.setRecordIO, outputAudioDeviceInfo, audioOutputForGUI])
 
     const QualityControlContent = useMemo(() => {
         if (!showQualityControl) return <></>
