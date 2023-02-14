@@ -1,4 +1,4 @@
-import { BufferSize, Protocol, SampleRate, VoiceChangerMode } from "@dannadori/voice-changer-client-js"
+import { BufferSize, DownSamplingMode, Protocol, SampleRate, VoiceChangerMode } from "@dannadori/voice-changer-client-js"
 import React, { useMemo, useState } from "react"
 import { ClientState } from "@dannadori/voice-changer-client-js";
 
@@ -197,6 +197,26 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
     }, [props.clientState.clientSetting.setting.voiceChangerMode, props.clientState.clientSetting.setVoiceChangerMode])
 
 
+    const downSamplingModeRow = useMemo(() => {
+        return (
+            <div className="body-row split-3-7 left-padding-1 guided">
+                <div className="body-item-title left-padding-1 ">DownSamplingMode</div>
+                <div className="body-select-container">
+                    <select className="body-select" value={props.clientState.clientSetting.setting.downSamplingMode} onChange={(e) => {
+                        props.clientState.clientSetting.setDownSamplingMode(e.target.value as DownSamplingMode)
+                    }}>
+                        {
+                            Object.values(DownSamplingMode).map(x => {
+                                return <option key={x} value={x}>{x}</option>
+                            })
+                        }
+                    </select>
+                </div>
+            </div>
+        )
+    }, [props.clientState.clientSetting.setting.downSamplingMode, props.clientState.clientSetting.setDownSamplingMode])
+
+
 
     const workletSettingRow = useMemo(() => {
         return (
@@ -265,9 +285,10 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
                 <div className="body-row divider"></div>
                 {workletSettingRow}
                 <div className="body-row divider"></div>
+                {downSamplingModeRow}
             </>
         )
-    }, [showAdvancedSetting, mmvcServerUrlRow, protocolRow, sampleRateRow, bufferSizeRow, convertChunkNumRow, minConvertSizeRow, crossFadeOverlapRateRow, crossFadeOffsetRateRow, crossFadeEndRateRow, vfForceDisableRow, voiceChangeModeRow, workletSettingRow])
+    }, [showAdvancedSetting, mmvcServerUrlRow, protocolRow, sampleRateRow, bufferSizeRow, convertChunkNumRow, minConvertSizeRow, crossFadeOverlapRateRow, crossFadeOffsetRateRow, crossFadeEndRateRow, vfForceDisableRow, voiceChangeModeRow, workletSettingRow, downSamplingModeRow])
 
 
     const advancedSetting = useMemo(() => {

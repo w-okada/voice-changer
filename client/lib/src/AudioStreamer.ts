@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import { DefaultEventsMap } from "@socket.io/component-emitter";
 import { Duplex, DuplexOptions } from "readable-stream";
-import { Protocol, VoiceChangerMode, VOICE_CHANGER_CLIENT_EXCEPTION } from "./const";
+import { DownSamplingMode, Protocol, VoiceChangerMode, VOICE_CHANGER_CLIENT_EXCEPTION } from "./const";
 
 export type Callbacks = {
     onVoiceReceived: (voiceChangerMode: VoiceChangerMode, data: ArrayBuffer) => void
@@ -19,6 +19,7 @@ export type AudioStreamerSettings = {
     voiceChangerMode: VoiceChangerMode;
 }
 
+
 export class AudioStreamer extends Duplex {
     private callbacks: Callbacks
     private audioStreamerListeners: AudioStreamerListeners
@@ -33,6 +34,11 @@ export class AudioStreamer extends Duplex {
 
     // performance monitor
     private bufferStart = 0;
+
+    // Flags 
+    // private downSamplingMode: DownSamplingMode = DownSamplingMode.decimate
+    private downSamplingMode: DownSamplingMode = DownSamplingMode.average
+
 
     constructor(callbacks: Callbacks, audioStreamerListeners: AudioStreamerListeners, options?: DuplexOptions) {
         super(options);
@@ -84,6 +90,11 @@ export class AudioStreamer extends Duplex {
         this.voiceChangerMode = val
     }
 
+    // set Flags
+    setDownSamplingMode = (val: DownSamplingMode) => {
+        this.downSamplingMode = val
+    }
+
     getSettings = (): AudioStreamerSettings => {
         return {
             serverUrl: this.serverUrl,
@@ -107,27 +118,70 @@ export class AudioStreamer extends Duplex {
         callback();
     }
 
-    private _write_realtime = (buffer: Float32Array) => {
-        // bufferSize個のデータ（48Khz）が入ってくる。
-        //// 48000Hz で入ってくるので間引いて24000Hzに変換する。
-        //// バイトサイズは周波数変換で(x1/2), 16bit(2byte)で(x2)
-        const arrayBuffer = new ArrayBuffer((buffer.length / 2) * 2)
-        const dataView = new DataView(arrayBuffer);
-
-        for (let i = 0; i < buffer.length; i++) {
-            if (i % 2 == 0) {
-                let s = Math.max(-1, Math.min(1, buffer[i]));
-                s = s < 0 ? s * 0x8000 : s * 0x7FFF
-                // ２分の１個目で２バイトずつ進むので((i/2)*2)
-                dataView.setInt16((i / 2) * 2, s, true);
-            }
+    _averageDownsampleBuffer(buffer: Float32Array, originalSampleRate: number, destinationSamplerate: number) {
+        if (originalSampleRate == destinationSamplerate) {
+            return buffer;
         }
+        if (destinationSamplerate > originalSampleRate) {
+            throw "downsampling rate show be smaller than original sample rate";
+        }
+        const sampleRateRatio = originalSampleRate / destinationSamplerate;
+        const newLength = Math.round(buffer.length / sampleRateRatio);
+        const result = new Float32Array(newLength);
+        let offsetResult = 0;
+        let offsetBuffer = 0;
+        while (offsetResult < result.length) {
+            var nextOffsetBuffer = Math.round((offsetResult + 1) * sampleRateRatio);
+            // Use average value of skipped samples
+            var accum = 0, count = 0;
+            for (var i = offsetBuffer; i < nextOffsetBuffer && i < buffer.length; i++) {
+                accum += buffer[i];
+                count++;
+            }
+            result[offsetResult] = accum / count;
+            // Or you can simply get rid of the skipped samples:
+            // result[offsetResult] = buffer[nextOffsetBuffer];
+            offsetResult++;
+            offsetBuffer = nextOffsetBuffer;
+        }
+        return result;
+    }
+
+
+    private _write_realtime = (buffer: Float32Array) => {
+        let downsampledBuffer: Float32Array | null = null
+        if (this.downSamplingMode == DownSamplingMode.decimate) {
+            //////// (Kind 1) 間引き //////////
+            // bufferSize個のデータ（48Khz）が入ってくる。
+            //// 48000Hz で入ってくるので間引いて24000Hzに変換する。
+            downsampledBuffer = new Float32Array(buffer.length / 2);
+            for (let i = 0; i < buffer.length; i++) {
+                if (i % 2 == 0) {
+                    downsampledBuffer[i / 2] = buffer[i]
+                }
+            }
+        } else {
+            //////// (Kind 2) 平均 //////////
+            downsampledBuffer = this._averageDownsampleBuffer(buffer, 48000, 24000)
+        }
+
+        // Float to signed16
+        const arrayBuffer = new ArrayBuffer(downsampledBuffer.length * 2)
+        const dataView = new DataView(arrayBuffer);
+        for (let i = 0; i < downsampledBuffer.length; i++) {
+            let s = Math.max(-1, Math.min(1, downsampledBuffer[i]));
+            s = s < 0 ? s * 0x8000 : s * 0x7FFF
+            dataView.setInt16(i * 2, s, true);
+        }
+
+
         // 256byte(最低バッファサイズ256から間引いた個数x2byte)をchunkとして管理
         const chunkByteSize = 256 // (const.ts ★1)
         for (let i = 0; i < arrayBuffer.byteLength / chunkByteSize; i++) {
             const ab = arrayBuffer.slice(i * chunkByteSize, (i + 1) * chunkByteSize)
             this.requestChunks.push(ab)
         }
+
 
         //// リクエストバッファの中身が、リクエスト送信数と違う場合は処理終了。
         if (this.requestChunks.length < this.inputChunkNum) {
@@ -198,15 +252,7 @@ export class AudioStreamer extends Duplex {
     }
 
     private sendBuffer = async (newBuffer: Uint8Array) => {
-        // if (this.serverUrl.length == 0) {
-        //     // console.warn("no server url")
-        //     // return
-        //     // throw "no server url"
-        // }
         const timestamp = Date.now()
-        // console.log("REQUEST_MESSAGE:", [this.gpu, this.srcId, this.dstId, timestamp, newBuffer.buffer])
-        // console.log("SERVER_URL", this.serverUrl, this.protocol)
-        // const convertChunkNum = this.voiceChangerMode === "realtime" ? this.requestParamas.convertChunkNum : 0
         if (this.protocol === "sio") {
             if (!this.socket) {
                 console.warn(`sio is not initialized`)
@@ -214,26 +260,12 @@ export class AudioStreamer extends Duplex {
             }
             // console.log("emit!")
             this.socket.emit('request_message', [
-                // this.requestParamas.gpu,
-                // this.requestParamas.srcId,
-                // this.requestParamas.dstId,
                 timestamp,
-                // convertChunkNum,
-                // this.requestParamas.crossFadeLowerValue,
-                // this.requestParamas.crossFadeOffsetRate,
-                // this.requestParamas.crossFadeEndRate,
                 newBuffer.buffer]);
         } else {
             const res = await postVoice(
                 this.serverUrl + "/test",
-                // this.requestParamas.gpu,
-                // this.requestParamas.srcId,
-                // this.requestParamas.dstId,
                 timestamp,
-                // convertChunkNum,
-                // this.requestParamas.crossFadeLowerValue,
-                // this.requestParamas.crossFadeOffsetRate,
-                // this.requestParamas.crossFadeEndRate,
                 newBuffer.buffer)
 
             if (res.byteLength < 128 * 2) {
@@ -248,24 +280,10 @@ export class AudioStreamer extends Duplex {
 
 export const postVoice = async (
     url: string,
-    // gpu: number,
-    // srcId: number,
-    // dstId: number,
     timestamp: number,
-    // convertChunkNum: number,
-    // crossFadeLowerValue: number,
-    // crossFadeOffsetRate: number,
-    // crossFadeEndRate: number,
     buffer: ArrayBuffer) => {
     const obj = {
-        // gpu,
-        // srcId,
-        // dstId,
         timestamp,
-        // convertChunkNum,
-        // crossFadeLowerValue,
-        // crossFadeOffsetRate,
-        // crossFadeEndRate,
         buffer: Buffer.from(buffer).toString('base64')
     };
     const body = JSON.stringify(obj);
@@ -283,7 +301,6 @@ export const postVoice = async (
     const changedVoiceBase64 = receivedJson["changedVoiceBase64"]
     const buf = Buffer.from(changedVoiceBase64, "base64")
     const ab = new ArrayBuffer(buf.length);
-    // console.log("RECIV", buf.length)
     const view = new Uint8Array(ab);
     for (let i = 0; i < buf.length; ++i) {
         view[i] = buf[i];

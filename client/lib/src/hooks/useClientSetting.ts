@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from "react"
-import { VoiceChangerClientSetting, Protocol, BufferSize, VoiceChangerMode, SampleRate, Speaker, DefaultVoiceChangerClientSetting, INDEXEDDB_KEY_CLIENT, Correspondence } from "../const"
+
+import { VoiceChangerClientSetting, Protocol, BufferSize, VoiceChangerMode, SampleRate, Speaker, DefaultVoiceChangerClientSetting, INDEXEDDB_KEY_CLIENT, Correspondence, DownSamplingMode } from "../const"
 import { createDummyMediaStream } from "../util"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
@@ -19,6 +20,7 @@ export type ClientSettingState = {
     setVfForceDisabled: (vfForceDisabled: boolean) => Promise<void>
     setInputChunkNum: (num: number) => void;
     setVoiceChangerMode: (mode: VoiceChangerMode) => void
+    setDownSamplingMode: (mode: DownSamplingMode) => void
     setSampleRate: (num: SampleRate) => void
     setSpeakers: (speakers: Speaker[]) => void
     setCorrespondences: (file: File | null) => Promise<void>
@@ -165,6 +167,17 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
         }
     }, [props.voiceChangerClient])
 
+    const setDownSamplingMode = useMemo(() => {
+        return (mode: DownSamplingMode) => {
+            if (!props.voiceChangerClient) return
+            props.voiceChangerClient.setDownSamplingMode(mode)
+            settingRef.current.downSamplingMode = mode
+            setSetting({ ...settingRef.current })
+        }
+    }, [props.voiceChangerClient])
+
+
+
     const setSampleRate = useMemo(() => {
         return (num: SampleRate) => {
             if (!props.voiceChangerClient) return
@@ -261,6 +274,7 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
         setVfForceDisabled,
         setInputChunkNum,
         setVoiceChangerMode,
+        setDownSamplingMode,
         setSampleRate,
         setSpeakers,
         setCorrespondences,

@@ -3,7 +3,7 @@ import { VoiceChangerWorkletNode, VoiceChangerWorkletListener } from "./VoiceCha
 import workerjs from "raw-loader!../worklet/dist/index.js";
 import { VoiceFocusDeviceTransformer, VoiceFocusTransformDevice } from "amazon-chime-sdk-js";
 import { createDummyMediaStream, validateUrl } from "./util";
-import { BufferSize, DefaultVoiceChangerClientSetting, Protocol, ServerSettingKey, VoiceChangerMode, VOICE_CHANGER_CLIENT_EXCEPTION, WorkletSetting } from "./const";
+import { BufferSize, DefaultVoiceChangerClientSetting, DownSamplingMode, Protocol, ServerSettingKey, VoiceChangerMode, VOICE_CHANGER_CLIENT_EXCEPTION, WorkletSetting } from "./const";
 import MicrophoneStream from "microphone-stream";
 import { AudioStreamer, Callbacks, AudioStreamerListeners } from "./AudioStreamer";
 import { ServerConfigurator } from "./ServerConfigurator";
@@ -133,6 +133,9 @@ export class VoiceChangerClient {
             this.currentMediaStream = await navigator.mediaDevices.getUserMedia({
                 audio: {
                     deviceId: input,
+                    channelCount: 1,
+                    sampleRate: 48000,
+                    sampleSize: 16,
                     // echoCancellation: false,
                     // noiseSuppression: false
                 }
@@ -227,6 +230,10 @@ export class VoiceChangerClient {
 
     setVoiceChangerMode = (val: VoiceChangerMode) => {
         this.audioStreamer.setVoiceChangerMode(val)
+    }
+    ////  Audio Streamer Flag
+    setDownSamplingMode = (val: DownSamplingMode) => {
+        this.audioStreamer.setDownSamplingMode(val)
     }
 
     // configure worklet

@@ -4,6 +4,7 @@
 // 24000sample -> 1sec, 128sample(1chunk) -> 5.333msec
 // 187.5chunk -> 1sec
 
+
 // types
 export type VoiceChangerServerSetting = {
     convertChunkNum: number, // VITSに入力する変換サイズ。(入力データの2倍以上の大きさで指定。それより小さいものが指定された場合は、サーバ側で自動的に入力の2倍のサイズが設定される。)
@@ -35,6 +36,7 @@ export type VoiceChangerClientSetting = {
     correspondences: Correspondence[],
     forceVfDisable: boolean,
     voiceChangerMode: VoiceChangerMode,
+    downSamplingMode: DownSamplingMode,
 
     inputGain: number
     outputGain: number
@@ -91,6 +93,12 @@ export const VoiceChangerMode = {
     "near-realtime": "near-realtime",
 } as const
 export type VoiceChangerMode = typeof VoiceChangerMode[keyof typeof VoiceChangerMode]
+
+export const DownSamplingMode = {
+    "decimate": "decimate",
+    "average": "average"
+} as const
+export type DownSamplingMode = typeof DownSamplingMode[keyof typeof DownSamplingMode]
 
 export const SampleRate = {
     "48000": 48000,
@@ -186,6 +194,7 @@ export const DefaultVoiceChangerClientSetting: VoiceChangerClientSetting = {
     correspondences: [],
     forceVfDisable: false,
     voiceChangerMode: "realtime",
+    downSamplingMode: "average",
     inputGain: 1.0,
     outputGain: 1.0
 }

@@ -10,6 +10,7 @@
         "build:prod": "npm-run-all clean webpack:prod",
         "build:dev": "npm-run-all clean webpack:dev",
         "start": "webpack-dev-server  --config webpack.dev.js",
+        "build:mod": "cd ../lib && npm run build:dev && cd - && cp -r ../lib/dist/* node_modules/@dannadori/voice-changer-client-js/dist/",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [

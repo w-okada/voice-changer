@@ -401,7 +401,7 @@ class VoiceChanger():
 
     def on_request(self, unpackedData: any):
         convertSize = self.settings.convertChunkNum * 128  # 128sample/1chunk
-        # self.stream_in.write(unpackedData.astype(np.int16).tobytes())
+        self.stream_in.write(unpackedData.astype(np.int16).tobytes())
         # print("convsize:", unpackedData.shape[0] * (1 + self.settings.crossFadeOverlapRate))
         if unpackedData.shape[0] * (1 + self.settings.crossFadeOverlapRate) + 1024 > convertSize:
             convertSize = int(unpackedData.shape[0] * (1 + self.settings.crossFadeOverlapRate)) + 1024

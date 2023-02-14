@@ -30,7 +30,9 @@ export const useMicrophoneOptions = () => {
 
     useEffect(() => {
         const createAudioContext = () => {
-            const ctx = new AudioContext()
+            const ctx = new AudioContext({
+                sampleRate: 48000,
+            })
             setAudioContext(ctx)
             document.removeEventListener('touchstart', createAudioContext);
             document.removeEventListener('mousedown', createAudioContext);
