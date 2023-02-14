@@ -17,7 +17,9 @@ export type ClientSettingState = {
     setProtocol: (proto: Protocol) => void;
     setAudioInput: (audioInput: string | MediaStream | null) => Promise<void>
     setBufferSize: (bufferSize: BufferSize) => Promise<void>
-    setVfForceDisabled: (vfForceDisabled: boolean) => Promise<void>
+    setEchoCancel: (voiceFocus: boolean) => Promise<void>
+    setNoiseSuppression: (voiceFocus: boolean) => Promise<void>
+    setNoiseSuppression2: (voiceFocus: boolean) => Promise<void>
     setInputChunkNum: (num: number) => void;
     setVoiceChangerMode: (mode: VoiceChangerMode) => void
     setDownSamplingMode: (mode: DownSamplingMode) => void
@@ -110,15 +112,13 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
 
     const _setInput = async () => {
         if (!props.voiceChangerClient) return
-        // console.log("[useClient] setup!(0)", settingRef.current.audioInput)
         if (!settingRef.current.audioInput || settingRef.current.audioInput == "none") {
             // console.log("[useClient] setup!(1)", settingRef.current.audioInput)
             const ms = createDummyMediaStream(props.audioContext!)
-            await props.voiceChangerClient.setup(ms, settingRef.current.bufferSize, settingRef.current.forceVfDisable)
-
+            await props.voiceChangerClient.setup(ms, settingRef.current.bufferSize, settingRef.current.echoCancel, settingRef.current.noiseSuppression, settingRef.current.noiseSuppression2)
         } else {
             // console.log("[useClient] setup!(2)", settingRef.current.audioInput)
-            await props.voiceChangerClient.setup(settingRef.current.audioInput, settingRef.current.bufferSize, settingRef.current.forceVfDisable)
+            await props.voiceChangerClient.setup(settingRef.current.audioInput, settingRef.current.bufferSize, settingRef.current.echoCancel, settingRef.current.noiseSuppression, settingRef.current.noiseSuppression2)
         }
     }
 
@@ -140,10 +140,28 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
         }
     }, [props.voiceChangerClient])
 
-    const setVfForceDisabled = useMemo(() => {
-        return async (vfForceDisabled: boolean) => {
+    const setEchoCancel = useMemo(() => {
+        return async (val: boolean) => {
             if (!props.voiceChangerClient) return
-            settingRef.current.forceVfDisable = vfForceDisabled
+            settingRef.current.echoCancel = val
+            await _setInput()
+            setSetting({ ...settingRef.current })
+        }
+    }, [props.voiceChangerClient])
+
+    const setNoiseSuppression = useMemo(() => {
+        return async (val: boolean) => {
+            if (!props.voiceChangerClient) return
+            settingRef.current.noiseSuppression = val
+            await _setInput()
+            setSetting({ ...settingRef.current })
+        }
+    }, [props.voiceChangerClient])
+
+    const setNoiseSuppression2 = useMemo(() => {
+        return async (val: boolean) => {
+            if (!props.voiceChangerClient) return
+            settingRef.current.noiseSuppression2 = val
             await _setInput()
             setSetting({ ...settingRef.current })
         }
@@ -271,7 +289,9 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
         setProtocol,
         setAudioInput,
         setBufferSize,
-        setVfForceDisabled,
+        setEchoCancel,
+        setNoiseSuppression,
+        setNoiseSuppression2,
         setInputChunkNum,
         setVoiceChangerMode,
         setDownSamplingMode,

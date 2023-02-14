@@ -9,7 +9,7 @@ from restapi.MMVC_Rest_Hello import MMVC_Rest_Hello
 from restapi.MMVC_Rest_VoiceChanger import MMVC_Rest_VoiceChanger
 from restapi.MMVC_Rest_Fileuploader import MMVC_Rest_Fileuploader
 from restapi.MMVC_Rest_Trainer import MMVC_Rest_Trainer
-from const import frontend_path
+from const import frontend_path, TMP_DIR
 
 
 class ValidationErrorLoggingRoute(APIRoute):
@@ -27,10 +27,11 @@ class ValidationErrorLoggingRoute(APIRoute):
 
         return custom_route_handler
 
+
 class MMVC_Rest:
 
     @classmethod
-    def get_instance(cls, voiceChangerManager:VoiceChangerManager):
+    def get_instance(cls, voiceChangerManager: VoiceChangerManager):
         if not hasattr(cls, "_instance"):
             app_fastapi = FastAPI()
             app_fastapi.router.route_class = ValidationErrorLoggingRoute
@@ -50,6 +51,8 @@ class MMVC_Rest:
 
             app_fastapi.mount(
                 "/recorder", StaticFiles(directory=f'{frontend_path}', html=True), name="static")
+            app_fastapi.mount(
+                "/tmp", StaticFiles(directory=f'{TMP_DIR}'), name="static")
 
             restHello = MMVC_Rest_Hello()
             app_fastapi.include_router(restHello.router)

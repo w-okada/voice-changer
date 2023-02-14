@@ -23,6 +23,8 @@ export type VoiceChangerServerSetting = {
     onnxExecutionProvider: OnnxExecutionProvider,
 
     f0Factor: number
+    f0Detector: string // dio or harvest
+    recordIO: number // 0:off, 1:on
 }
 
 export type VoiceChangerClientSetting = {
@@ -34,7 +36,9 @@ export type VoiceChangerClientSetting = {
     inputChunkNum: number, // n of (256 x n) for send buffer
     speakers: Speaker[],
     correspondences: Correspondence[],
-    forceVfDisable: boolean,
+    echoCancel: boolean,
+    noiseSuppression: boolean,
+    noiseSuppression2: boolean,
     voiceChangerMode: VoiceChangerMode,
     downSamplingMode: DownSamplingMode,
 
@@ -75,6 +79,8 @@ export type ServerInfo = {
     framework: Framework,
     onnxExecutionProvider: string[]
     f0Factor: number
+    f0Detector: string
+    recordIO: number
 }
 
 
@@ -130,6 +136,12 @@ export const Framework = {
 }
 export type Framework = typeof Framework[keyof typeof Framework]
 
+export const F0Detector = {
+    "dio": "dio",
+    "harvest": "harvest",
+}
+export type F0Detector = typeof F0Detector[keyof typeof F0Detector]
+
 export const ServerSettingKey = {
     "srcId": "srcId",
     "dstId": "dstId",
@@ -141,7 +153,9 @@ export const ServerSettingKey = {
     "crossFadeOverlapRate": "crossFadeOverlapRate",
     "framework": "framework",
     "onnxExecutionProvider": "onnxExecutionProvider",
-    "f0Factor": "f0Factor"
+    "f0Factor": "f0Factor",
+    "f0Detector": "f0Detector",
+    "recordIO": "recordIO"
 } as const
 export type ServerSettingKey = typeof ServerSettingKey[keyof typeof ServerSettingKey]
 
@@ -158,8 +172,9 @@ export const DefaultVoiceChangerServerSetting: VoiceChangerServerSetting = {
     crossFadeOverlapRate: 0.5,
     framework: "PyTorch",
     f0Factor: 1.0,
-    onnxExecutionProvider: "CPUExecutionProvider"
-
+    onnxExecutionProvider: "CPUExecutionProvider",
+    f0Detector: "dio",
+    recordIO: 0
 }
 
 export const DefaultVoiceChangerClientSetting: VoiceChangerClientSetting = {
@@ -192,7 +207,9 @@ export const DefaultVoiceChangerClientSetting: VoiceChangerClientSetting = {
         }
     ],
     correspondences: [],
-    forceVfDisable: false,
+    echoCancel: true,
+    noiseSuppression: true,
+    noiseSuppression2: false,
     voiceChangerMode: "realtime",
     downSamplingMode: "average",
     inputGain: 1.0,

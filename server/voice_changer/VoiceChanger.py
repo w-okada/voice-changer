@@ -1,4 +1,4 @@
-from const import ERROR_NO_ONNX_SESSION
+from const import ERROR_NO_ONNX_SESSION, TMP_DIR
 import torch
 import os
 import traceback
@@ -84,15 +84,17 @@ class VocieChangerSettings():
     minConvertSize: int = 0
     framework: str = "PyTorch"  # PyTorch or ONNX
     f0Factor: float = 1.0
+    f0Detector: str = "dio"  # dio or harvest
+    recordIO: int = 1  # 0:off, 1:on
 
     pyTorchModelFile: str = ""
     onnxModelFile: str = ""
     configFile: str = ""
 
     # ↓mutableな物だけ列挙
-    intData = ["gpu", "srcId", "dstId", "convertChunkNum", "minConvertSize"]
+    intData = ["gpu", "srcId", "dstId", "convertChunkNum", "minConvertSize", "recordIO"]
     floatData = ["crossFadeOffsetRate", "crossFadeEndRate", "crossFadeOverlapRate", "f0Factor"]
-    strData = ["framework"]
+    strData = ["framework", "f0Detector"]
 
 
 class VoiceChanger():
@@ -113,14 +115,25 @@ class VoiceChanger():
         self.prev_audio = np.zeros(1)
         self.mps_enabled = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
 
-        mock_stream = MockStream(24000)
-        mock_stream.open_outputfile("out.wav")
-        self.out = mock_stream
-        mock_stream_in = MockStream(24000)
-        mock_stream_in.open_outputfile("in.wav")
-        self.stream_in = mock_stream_in
+        self._setupRecordIO()
 
         print(f"VoiceChanger Initialized (GPU_NUM:{self.gpu_num}, mps_enabled:{self.mps_enabled})")
+
+    def _setupRecordIO(self):
+        # IO Recorder Setup
+        mock_stream_out = MockStream(24000)
+        stream_output_file = os.path.join(TMP_DIR, "out.wav")
+        if os.path.exists(stream_output_file):
+            os.unlink(stream_output_file)
+        mock_stream_out.open_outputfile(stream_output_file)
+        self.stream_out = mock_stream_out
+
+        mock_stream_in = MockStream(24000)
+        stream_input_file = os.path.join(TMP_DIR, "in.wav")
+        if os.path.exists(stream_input_file):
+            os.unlink(stream_input_file)
+        mock_stream_in.open_outputfile(stream_input_file)
+        self.stream_in = mock_stream_in
 
     def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None):
         self.settings.configFile = config
@@ -200,6 +213,8 @@ class VoiceChanger():
                     self.onnx_session.set_providers(providers=["CUDAExecutionProvider"], provider_options=provider_options)
             if key == "crossFadeOffsetRate" or key == "crossFadeEndRate":
                 self.unpackedData_length = 0
+            if key == "recordIO" and val == 1:
+                self._setupRecordIO()
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
@@ -256,10 +271,11 @@ class VoiceChanger():
 
         # TBD: numpy <--> pytorch変換が行ったり来たりしているが、まずは動かすことを最優先。
         audio_norm_np = audio_norm.squeeze().numpy().astype(np.float64)
-        _f0, _time = pw.dio(audio_norm_np, self.hps.data.sampling_rate, frame_period=5.5)
-        f0 = pw.stonemask(audio_norm_np, _f0, _time, self.hps.data.sampling_rate)
-        # print("type:", audio_norm_np.dtype)
-        # f0, t = pw.harvest(audio_norm_np, self.hps.data.sampling_rate, frame_period=5.5, f0_floor=71.0, f0_ceil=1000.0)
+        if self.settings.f0Detector == "dio":
+            _f0, _time = pw.dio(audio_norm_np, self.hps.data.sampling_rate, frame_period=5.5)
+            f0 = pw.stonemask(audio_norm_np, _f0, _time, self.hps.data.sampling_rate)
+        else:
+            f0, t = pw.harvest(audio_norm_np, self.hps.data.sampling_rate, frame_period=5.5, f0_floor=71.0, f0_ceil=1000.0)
         f0 = convert_continuos_f0(f0, int(audio_norm_np.shape[0] / self.hps.data.hop_length))
         f0 = torch.from_numpy(f0.astype(np.float32))
 
@@ -280,7 +296,7 @@ class VoiceChanger():
             f0_factor=self.settings.f0Factor
         )([(spec, sid, f0)])
 
-        return data
+        return data, f0.numpy()
 
     def _onnx_inference(self, data, inputSize):
         if hasattr(self, "onnx_session") == False or self.onnx_session == None:
@@ -401,7 +417,6 @@ class VoiceChanger():
 
     def on_request(self, unpackedData: any):
         convertSize = self.settings.convertChunkNum * 128  # 128sample/1chunk
-        self.stream_in.write(unpackedData.astype(np.int16).tobytes())
         # print("convsize:", unpackedData.shape[0] * (1 + self.settings.crossFadeOverlapRate))
         if unpackedData.shape[0] * (1 + self.settings.crossFadeOverlapRate) + 1024 > convertSize:
             convertSize = int(unpackedData.shape[0] * (1 + self.settings.crossFadeOverlapRate)) + 1024
@@ -412,7 +427,8 @@ class VoiceChanger():
         # convertSize = 8192
 
         self._generate_strength(unpackedData)
-        data = self._generate_input(unpackedData, convertSize)
+        # f0はデバッグ用
+        data, f0 = self._generate_input(unpackedData, convertSize)
 
         try:
             if self.settings.framework == "ONNX":
@@ -431,6 +447,9 @@ class VoiceChanger():
 
         result = result.astype(np.int16)
         # print("on_request result size:",result.shape)
+        if self.settings.recordIO == 1:
+            self.stream_in.write(unpackedData.astype(np.int16).tobytes())
+            self.stream_out.write(result.tobytes())
         return result
 
 

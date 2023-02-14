@@ -115,8 +115,10 @@ export class VoiceChangerClient {
     }
 
     // forceVfDisable is for the condition that vf is enabled in constructor. 
-    setup = async (input: string | MediaStream, bufferSize: BufferSize, forceVfDisable: boolean = false) => {
+    //noiseSuppression2 => VoiceFocus
+    setup = async (input: string | MediaStream, bufferSize: BufferSize, echoCancel: boolean = true, noiseSuppression: boolean = true, noiseSuppression2: boolean = false) => {
         const lockNum = await this.lock()
+        console.log(`Input Setup=> echo: ${echoCancel}, noise1: ${noiseSuppression}, noise2: ${noiseSuppression2}`)
         // condition check
         if (!this.vcNode) {
             console.warn("vc node is not initialized.")
@@ -136,10 +138,16 @@ export class VoiceChangerClient {
                     channelCount: 1,
                     sampleRate: 48000,
                     sampleSize: 16,
-                    // echoCancellation: false,
-                    // noiseSuppression: false
+                    autoGainControl: false,
+                    echoCancellation: echoCancel,
+                    noiseSuppression: noiseSuppression
                 }
             })
+            // this.currentMediaStream.getAudioTracks().forEach((x) => {
+            //     console.log("MIC Setting(cap)", x.getCapabilities())
+            //     console.log("MIC Setting(const)", x.getConstraints())
+            //     console.log("MIC Setting(setting)", x.getSettings())
+            // })
         } else {
             this.currentMediaStream = input
         }
@@ -160,14 +168,13 @@ export class VoiceChangerClient {
         this.inputGainNode = this.ctx.createGain()
         this.inputGainNode.gain.value = this.inputGain
         this.currentMediaStreamAudioSourceNode.connect(this.inputGainNode)
-        if (this.currentDevice && forceVfDisable == false) {
+        if (this.currentDevice && noiseSuppression2) {
             this.currentDevice.chooseNewInnerDevice(this.currentMediaStream)
             const voiceFocusNode = await this.currentDevice.createAudioNode(this.ctx); // vf node
             this.inputGainNode.connect(voiceFocusNode.start) // input node -> vf node
             voiceFocusNode.end.connect(this.outputNodeFromVF!)
             this.micStream.setStream(this.outputNodeFromVF!.stream) // vf node -> mic stream
         } else {
-            console.log("VF disabled")
             const inputDestinationNodeForMicStream = this.ctx.createMediaStreamDestination()
             this.inputGainNode.connect(inputDestinationNodeForMicStream)
             this.micStream.setStream(inputDestinationNodeForMicStream.stream) // input device -> mic stream

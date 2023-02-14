@@ -388,7 +388,16 @@ body {
     display: flex;
 }
 .body-item-input {
-    width: 90%;
+    width: 60%;
+}
+.body-item-input-slider {
+    width: 60%;
+}
+.body-item-input-slider-label {
+    margin-right: 1rem;
+}
+.body-item-input-slider-val {
+    margin-left: 1rem;
 }
 
 .body-button-container {

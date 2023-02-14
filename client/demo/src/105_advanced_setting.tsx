@@ -1,4 +1,4 @@
-import { BufferSize, DownSamplingMode, Protocol, SampleRate, VoiceChangerMode } from "@dannadori/voice-changer-client-js"
+import { BufferSize, DownSamplingMode, F0Detector, Protocol, SampleRate, VoiceChangerMode } from "@dannadori/voice-changer-client-js"
 import React, { useMemo, useState } from "react"
 import { ClientState } from "@dannadori/voice-changer-client-js";
 
@@ -162,21 +162,6 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
     }, [props.clientState.serverSetting.setting.crossFadeEndRate, props.clientState.serverSetting.setCrossFadeEndRate])
 
 
-    const vfForceDisableRow = useMemo(() => {
-        return (
-            <div className="body-row split-3-3-4 left-padding-1 guided">
-                <div className="body-item-title left-padding-1 ">VF Disabled</div>
-                <div>
-                    <input type="checkbox" checked={props.clientState.clientSetting.setting.forceVfDisable} onChange={(e) => {
-                        props.clientState.clientSetting.setVfForceDisabled(e.target.checked)
-                    }} />
-                </div>
-                <div className="body-button-container">
-                </div>
-            </div>
-        )
-    }, [props.clientState.clientSetting.setting.forceVfDisable, props.clientState.clientSetting.setVfForceDisabled])
-
     const voiceChangeModeRow = useMemo(() => {
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
@@ -215,7 +200,6 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
             </div>
         )
     }, [props.clientState.clientSetting.setting.downSamplingMode, props.clientState.clientSetting.setDownSamplingMode])
-
 
 
     const workletSettingRow = useMemo(() => {
@@ -280,15 +264,15 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
                 {crossFadeOffsetRateRow}
                 {crossFadeEndRateRow}
                 <div className="body-row divider"></div>
-                {vfForceDisableRow}
                 {voiceChangeModeRow}
                 <div className="body-row divider"></div>
                 {workletSettingRow}
                 <div className="body-row divider"></div>
                 {downSamplingModeRow}
+
             </>
         )
-    }, [showAdvancedSetting, mmvcServerUrlRow, protocolRow, sampleRateRow, bufferSizeRow, convertChunkNumRow, minConvertSizeRow, crossFadeOverlapRateRow, crossFadeOffsetRateRow, crossFadeEndRateRow, vfForceDisableRow, voiceChangeModeRow, workletSettingRow, downSamplingModeRow])
+    }, [showAdvancedSetting, mmvcServerUrlRow, protocolRow, sampleRateRow, bufferSizeRow, convertChunkNumRow, minConvertSizeRow, crossFadeOverlapRateRow, crossFadeOffsetRateRow, crossFadeEndRateRow, voiceChangeModeRow, workletSettingRow, downSamplingModeRow])
 
 
     const advancedSetting = useMemo(() => {

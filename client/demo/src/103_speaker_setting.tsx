@@ -129,14 +129,13 @@ export const useSpeakerSetting = (props: UseSpeakerSettingProps) => {
             <div className="body-row split-3-2-1-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">F0 Factor</div>
                 <div className="body-input-container">
-                    <input type="range" className="body-item-input" min="0.1" max="5.0" step="0.1" value={props.clientState.serverSetting.setting.f0Factor} onChange={(e) => {
+                    <input type="range" className="body-item-input-slider" min="0.1" max="5.0" step="0.1" value={props.clientState.serverSetting.setting.f0Factor} onChange={(e) => {
                         props.clientState.serverSetting.setF0Factor(Number(e.target.value))
                     }}></input>
+                    <span className="body-item-input-slider-val">{props.clientState.serverSetting.setting.f0Factor}</span>
                 </div>
-                <div className="body-item-text">
-                    <div>{props.clientState.serverSetting.setting.f0Factor}</div>
-                </div>
-                <div className="body-item-text">recommended:{recommendedF0Factor.toFixed(1)}</div>
+                <div className="body-item-text"></div>
+                <div className="body-item-text">recommend: {recommendedF0Factor.toFixed(1)}</div>
             </div>
         )
     }, [props.clientState.serverSetting.setting.f0Factor, props.clientState.serverSetting.setting.srcId, props.clientState.serverSetting.setting.dstId, props.clientState.clientSetting.setting.correspondences, props.clientState.serverSetting.setF0Factor])

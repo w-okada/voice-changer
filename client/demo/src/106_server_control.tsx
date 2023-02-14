@@ -30,31 +30,13 @@ export const useServerControl = (props: UseServerControlProps) => {
                     <div onClick={onStopClicked} className={stopClassName}>stop</div>
                 </div>
                 <div>
-                    <div className="body-input-container split-4-4-2">
-                        <div>gain(in)</div>
-                        <input type="range" className="body-item-input" min="0.0" max="1.0" step="0.1" value={props.clientState.clientSetting.setting.inputGain} onChange={(e) => {
-                            props.clientState.clientSetting.setInputGain(Number(e.target.value))
-                        }}></input>
-                        <div>{props.clientState.clientSetting.setting.inputGain}</div>
-                    </div>
-                    <div className="body-input-container split-4-4-2">
-                        <div>gain(out)</div>
-                        <input type="range" className="body-item-input" min="0.0" max="1.0" step="0.1" value={props.clientState.clientSetting.setting.outputGain} onChange={(e) => {
-                            props.clientState.clientSetting.setOutputGain(Number(e.target.value))
-                        }}></input>
-                        <div>{props.clientState.clientSetting.setting.outputGain}</div>
-                    </div>
                 </div>
-
                 <div className="body-input-container">
                 </div>
             </div>
 
         )
-    }, [isStarted, props.clientState.clientSetting.start, props.clientState.clientSetting.stop,
-        props.clientState.clientSetting.setInputGain, props.clientState.clientSetting.setting.inputGain,
-        props.clientState.clientSetting.setOutputGain, props.clientState.clientSetting.setting.outputGain
-    ])
+    }, [isStarted, props.clientState.clientSetting.start, props.clientState.clientSetting.stop])
 
     const performanceRow = useMemo(() => {
         return (

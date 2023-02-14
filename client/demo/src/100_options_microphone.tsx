@@ -8,6 +8,7 @@ import { useAdvancedSetting } from "./105_advanced_setting";
 import { useSpeakerSetting } from "./103_speaker_setting";
 import { useServerControl } from "./106_server_control";
 import { useClient } from "@dannadori/voice-changer-client-js";
+import { useQualityControl } from "./107_qulity_control";
 
 export const useMicrophoneOptions = () => {
     const [audioContext, setAudioContext] = useState<AudioContext | null>(null)
@@ -23,6 +24,7 @@ export const useMicrophoneOptions = () => {
     const convertSetting = useConvertSetting({ clientState })
     const advancedSetting = useAdvancedSetting({ clientState })
     const serverControl = useServerControl({ clientState })
+    const qualityControl = useQualityControl({ clientState })
 
     const clearSetting = async () => {
         await clientState.clearSetting()
@@ -51,6 +53,7 @@ export const useMicrophoneOptions = () => {
                 {serverControl.serverControl}
                 {serverSetting.serverSetting}
                 {deviceSetting.deviceSetting}
+                {qualityControl.qualityControl}
                 {speakerSetting.speakerSetting}
                 {convertSetting.convertSetting}
                 {advancedSetting.advancedSetting}
@@ -61,7 +64,8 @@ export const useMicrophoneOptions = () => {
     deviceSetting.deviceSetting,
     speakerSetting.speakerSetting,
     convertSetting.convertSetting,
-    advancedSetting.advancedSetting])
+    advancedSetting.advancedSetting,
+    qualityControl.qualityControl])
 
     return {
         voiceChangerSetting,
