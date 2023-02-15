@@ -47,9 +47,6 @@ export const useMicrophoneOptions = () => {
     const voiceChangerSetting = useMemo(() => {
         return (
             <>
-                <div className="body-row left-padding-1">
-                    <div className="body-section-title">Virtual Microphone</div>
-                </div>
                 {serverControl.serverControl}
                 {serverSetting.serverSetting}
                 {deviceSetting.deviceSetting}
