@@ -36,6 +36,9 @@ const App = () => {
                         <img src="./assets/icons/help-circle.svg" />
                         <span>manual</span>
                     </a>
+                    <a className="link" href="https://www.buymeacoffee.com/wokad" target="_blank" rel="noopener noreferrer">
+                        <img className="donate-img" src="./assets/buymeacoffee.png" />
+                    </a>
                 </span>
                 <span className="belongings">
 

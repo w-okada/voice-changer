@@ -1,5 +1,4 @@
 import { ClientState, useClient } from "@dannadori/voice-changer-client-js"
-import { useEffect, useState } from "react"
 import { AUDIO_ELEMENT_FOR_PLAY_RESULT } from "../const"
 
 export type UseVCClientProps = {
