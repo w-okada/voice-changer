@@ -178,7 +178,7 @@ export const useQualityControl = (): QualityControlState => {
         return (
             <>
                 <div className="body-row split-3-7 left-padding-1 guided">
-                    <div className="body-item-title left-padding-1 ">Analyzer</div>
+                    <div className="body-item-title left-padding-1 ">Analyzer(Experimental)</div>
                     <div className="body-button-container">
                     </div>
                 </div>

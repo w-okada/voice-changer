@@ -128,17 +128,28 @@ class VoiceChanger():
 
     def _setupRecordIO(self):
         # IO Recorder Setup
+        if hasattr(self, "stream_out"):
+            self.stream_out.close()
         mock_stream_out = MockStream(24000)
         stream_output_file = os.path.join(TMP_DIR, "out.wav")
         if os.path.exists(stream_output_file):
+            print("delete old analyze file.", stream_output_file)
             os.remove(stream_output_file)
+        else:
+            print("old analyze file not exist.", stream_output_file)
+
         mock_stream_out.open_outputfile(stream_output_file)
         self.stream_out = mock_stream_out
 
+        if hasattr(self, "stream_in"):
+            self.stream_in.close()
         mock_stream_in = MockStream(24000)
         stream_input_file = os.path.join(TMP_DIR, "in.wav")
         if os.path.exists(stream_input_file):
+            print("delete old analyze file.", stream_input_file)
             os.remove(stream_input_file)
+        else:
+            print("old analyze file not exist.", stream_output_file)
         mock_stream_in.open_outputfile(stream_input_file)
         self.stream_in = mock_stream_in
 
