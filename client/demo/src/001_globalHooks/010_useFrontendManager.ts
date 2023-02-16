@@ -43,7 +43,7 @@ export const useFrontendManager = (): FrontendManagerStateAndMethod => {
         openSpeakerSettingCheckbox.updateState(true)
         openConverterSettingCheckbox.updateState(true)
 
-        openQualityControlCheckbox.updateState(true)
+        // openQualityControlCheckbox.updateState(true)
 
     }, [])
 
