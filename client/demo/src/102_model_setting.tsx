@@ -11,8 +11,6 @@ export type ServerSettingState = {
 export const useModelSettingArea = (): ServerSettingState => {
     const appState = useAppState()
     const [showPyTorch, setShowPyTorch] = useState<boolean>(true)
-    const [showDetail, setShowDetail] = useState<boolean>(true)
-
 
     const accodionButton = useMemo(() => {
         const accodionButtonProps: HeaderButtonProps = {
@@ -25,31 +23,6 @@ export const useModelSettingArea = (): ServerSettingState => {
         };
         return <HeaderButton {...accodionButtonProps}></HeaderButton>;
     }, []);
-
-
-    // If already model is set, show summarry.
-    const settingDone = useMemo(() => {
-        if (
-            appState.serverSetting.fileUploadSetting.configFile?.filename && // Config file
-            (
-                appState.serverSetting.fileUploadSetting.onnxModel?.filename || // Model file
-                appState.serverSetting.fileUploadSetting.pyTorchModel?.filename
-            ) &&
-            appState.clientSetting.setting.correspondences.length > 0 // Corresopondence file
-        ) {
-            return true
-        } else {
-            false
-        }
-    }, [
-        appState.serverSetting.fileUploadSetting,
-        appState.clientSetting.setting.correspondences
-    ])
-
-    const uploadeModelSummaryRow = useMemo(() => {
-
-
-    }, [settingDone, showDetail])
 
     const uploadeModelRow = useMemo(() => {
         const onPyTorchFileLoadClicked = async () => {
@@ -276,6 +249,7 @@ export const useModelSettingArea = (): ServerSettingState => {
                         <span className="title" onClick={() => { appState.frontendManagerState.stateControls.openModelSettingCheckbox.updateState(!appState.frontendManagerState.stateControls.openModelSettingCheckbox.checked()) }}>
                             Model Setting
                         </span>
+                        <span></span>
                     </div>
 
                     <div className="partition-content">

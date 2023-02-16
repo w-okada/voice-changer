@@ -108,12 +108,12 @@ body {
 }
 .state-control-checkbox:checked + .partition .partition-content {
     max-height: 700px;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.3);
     transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
 }
 .state-control-checkbox + .partition .partition-content {
     max-height: 0px;
-    background: #eef;
+    background: rgba(233, 233, 255, 0.3);
     transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
 }
 
@@ -383,7 +383,7 @@ body {
 }
 
 .divider {
-    height: 4px;
+    height: 0.8rem;
     /* background-color: rgba(16, 210, 113, 0.1); */
     background-color: rgba(31, 42, 36, 0.1);
 }
@@ -479,11 +479,21 @@ body {
     max-width: 100%;
 }
 
-.body-image-container-quality-analyze,
-.body-wav-container-quality-analyze {
+.body-select-50 {
+    color: rgb(30, 30, 30);
+    max-width: 50%;
+}
+
+.body-image-container,
+.body-wav-container {
     display: flex;
     width: 100%;
-    & > img {
+    .body-image-container-title,
+    .body-wav-container-title {
+        width: 50%;
+    }
+    .body-image-container-img,
+    .body-wav-container-wav {
         width: 50%;
     }
 }

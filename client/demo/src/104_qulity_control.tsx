@@ -36,6 +36,7 @@ export const useQualityControl = (): QualityControlState => {
         return <HeaderButton {...accodionButtonProps}></HeaderButton>;
     }, []);
 
+    const [recording, setRecording] = useState<boolean>(false)
     const [outputAudioDeviceInfo, setOutputAudioDeviceInfo] = useState<MediaDeviceInfo[]>([])
     const [audioOutputForGUI, setAudioOutputForGUI] = useState<string>("none")
     useEffect(() => {
@@ -126,68 +127,84 @@ export const useQualityControl = (): QualityControlState => {
 
 
     const recordIORow = useMemo(() => {
-        const setReocrdIO = async (val: number) => {
-            await appState.serverSetting.setRecordIO(val)
-            if (val == 0) {
-                const imageContainer = document.getElementById("quality-control-analyze-image-container") as HTMLDivElement
-                imageContainer.innerHTML = ""
-                const image = document.createElement("img")
-                image.src = "/tmp/analyze-dio.png?" + new Date().getTime()
-                imageContainer.appendChild(image)
-                const image2 = document.createElement("img")
-                image2.src = "/tmp/analyze-harvest.png?" + new Date().getTime()
-                imageContainer.appendChild(image2)
-
-                const wavContainer = document.getElementById("quality-control-analyze-wav-container") as HTMLDivElement
-                wavContainer.innerHTML = ""
-                const media1 = document.createElement("audio") as HTMLAudioElement
-                media1.src = "/tmp/in.wav?" + new Date().getTime()
-                media1.controls = true
-                // @ts-ignore
-                media1.setSinkId(audioOutputForGUI)
-                wavContainer.appendChild(media1)
-                const media2 = document.createElement("audio") as HTMLAudioElement
-                media2.src = "/tmp/out.wav?" + new Date().getTime()
-                media2.controls = true
-                // @ts-ignore
-                media2.setSinkId(audioOutputForGUI)
-                wavContainer.appendChild(media2)
-            }
+        const onRecordStartClicked = async () => {
+            setRecording(true)
+            await appState.serverSetting.setRecordIO(1)
         }
+        const onRecordStopClicked = async () => {
+            setRecording(false)
+            await appState.serverSetting.setRecordIO(0)
+            // set spectrogram (dio)
+            const imageContainerDio = document.getElementById("body-image-container-img-dio") as HTMLDivElement
+            imageContainerDio.innerHTML = ""
+            const imageDio = document.createElement("img")
+            imageDio.src = "/tmp/analyze-dio.png?" + new Date().getTime()
+            imageContainerDio.appendChild(imageDio)
+
+            // set spectrogram (harvest)
+            const imageContainerHarvest = document.getElementById("body-image-container-img-harvest") as HTMLDivElement
+            const imageHarvest = document.createElement("img")
+            imageHarvest.src = "/tmp/analyze-harvest.png?" + new Date().getTime()
+            imageContainerHarvest.appendChild(imageHarvest)
+
+            // set wav (input)
+            const wavContainerInput = document.getElementById("body-wav-container-wav-input") as HTMLDivElement
+            wavContainerInput.innerHTML = ""
+            const mediaInput = document.createElement("audio") as HTMLAudioElement
+            mediaInput.src = "/tmp/in.wav?" + new Date().getTime()
+            mediaInput.controls = true
+            // @ts-ignore
+            mediaInput.setSinkId(audioOutputForGUI)
+            wavContainerInput.appendChild(mediaInput)
+
+            // set wav (output)
+            const wavContainerOutput = document.getElementById("body-wav-container-wav-output") as HTMLDivElement
+            const mediaOutput = document.createElement("audio") as HTMLAudioElement
+            mediaOutput.src = "/tmp/out.wav?" + new Date().getTime()
+            mediaOutput.controls = true
+            // @ts-ignore
+            mediaOutput.setSinkId(audioOutputForGUI)
+            wavContainerOutput.appendChild(mediaOutput)
+        }
+
+        const startClassName = recording ? "body-button-active" : "body-button-stanby"
+        const stopClassName = recording ? "body-button-stanby" : "body-button-active"
+
         return (
             <>
                 <div className="body-row split-3-7 left-padding-1 guided">
-                    <div className="body-item-title left-padding-1 ">recordIO</div>
-                    <div className="body-select-container">
-                        <select className="body-select" value={appState.serverSetting.setting.recordIO} onChange={(e) => {
-                            setReocrdIO(Number(e.target.value))
-                        }}>
-                            {
-                                Object.values([0, 1]).map(x => {
-                                    return <option key={x} value={x}>{x}</option>
-                                })
-                            }
-                        </select>
+                    <div className="body-item-title left-padding-1 ">Analyzer</div>
+                    <div className="body-button-container">
                     </div>
                 </div>
                 <div className="body-row split-3-7 left-padding-1 guided">
-                    <div className="body-item-title left-padding-1 ">
-                        <div>
-                            Spectrogram
-                        </div>
-                        <div>
-                            <span>(left: dio, right:harvest)</span>
-                        </div>
+                    <div className="body-item-title left-padding-2 ">
+                        Sampling
                     </div>
-                    <div className="body-image-container-quality-analyze" id="quality-control-analyze-image-container">
+                    <div className="body-button-container">
+                        <div onClick={onRecordStartClicked} className={startClassName}>Start</div>
+                        <div onClick={onRecordStopClicked} className={stopClassName}>Stop</div>
+                    </div>
+                </div>
+
+
+                <div className="body-row split-3-7 left-padding-1 guided">
+                    <div className="body-item-title left-padding-2 ">
+                        Spectrogram
+                    </div>
+                    <div className="body-image-container">
+                        <div className="body-image-container-title">PyWorld Dio</div>
+                        <div className="body-image-container-title">PyWorld Harvest</div>
+                        <div className="body-image-container-img" id="body-image-container-img-dio"></div>
+                        <div className="body-image-container-img" id="body-image-container-img-harvest"></div>
                     </div>
                 </div>
                 <div className="body-row split-3-7 left-padding-1 guided">
-                    <div className="body-item-title left-padding-1 ">
+                    <div className="body-item-title left-padding-2 ">
                         <div>
-                            wav (left:input, right:output)
+                            Play
                         </div>
-                        <select className="body-select" value={audioOutputForGUI} onChange={(e) => {
+                        <select className="body-select-50" value={audioOutputForGUI} onChange={(e) => {
                             setAudioOutputForGUI(e.target.value)
                             const wavContainer = document.getElementById("quality-control-analyze-wav-container") as HTMLDivElement
                             wavContainer.childNodes.forEach(x => {
@@ -204,7 +221,11 @@ export const useQualityControl = (): QualityControlState => {
                             }
                         </select>
                     </div>
-                    <div className="body-wav-container-quality-analyze" id="quality-control-analyze-wav-container">
+                    <div className="body-wav-container">
+                        <div className="body-wav-container-title">Input</div>
+                        <div className="body-wav-container-title">Output</div>
+                        <div className="body-wav-container-wav" id="body-wav-container-wav-input"></div>
+                        <div className="body-wav-container-wav" id="body-wav-container-wav-output"></div>
                     </div>
                 </div>
             </>
@@ -217,6 +238,7 @@ export const useQualityControl = (): QualityControlState => {
                 {noiseControlRow}
                 {gainControlRow}
                 {f0DetectorRow}
+                <div className="body-row divider"></div>
                 {recordIORow}
             </>
         )

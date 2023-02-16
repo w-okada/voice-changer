@@ -1,5 +1,5 @@
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { StateControlCheckbox, useStateControlCheckbox } from "../hooks/useStateControlCheckbox";
 import { OpenAdvancedSettingCheckbox, OpenConverterSettingCheckbox, OpenDeviceSettingCheckbox, OpenModelSettingCheckbox, OpenQualityControlCheckbox, OpenServerControlCheckbox, OpenSpeakerSettingCheckbox } from "../const"
 export type StateControls = {
@@ -30,6 +30,16 @@ export const useFrontendManager = (): FrontendManagerStateAndMethod => {
     const openConverterSettingCheckbox = useStateControlCheckbox(OpenConverterSettingCheckbox);
     const openAdvancedSettingCheckbox = useStateControlCheckbox(OpenAdvancedSettingCheckbox);
 
+    useEffect(() => {
+        openServerControlCheckbox.updateState(true)
+        openModelSettingCheckbox.updateState(true)
+        openDeviceSettingCheckbox.updateState(true)
+        openSpeakerSettingCheckbox.updateState(true)
+        openConverterSettingCheckbox.updateState(true)
+
+        openQualityControlCheckbox.updateState(true)
+
+    }, [])
 
 
     const returnValue = {
