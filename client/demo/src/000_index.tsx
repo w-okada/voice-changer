@@ -10,7 +10,7 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { far } from "@fortawesome/free-regular-svg-icons";
 import { fab } from "@fortawesome/free-brands-svg-icons";
-import { AppRootProvider, useAppRoot } from "./001_provider/001_AppRootProvider";
+import { AppRootProvider } from "./001_provider/001_AppRootProvider";
 
 library.add(fas, far, fab);
 
@@ -79,15 +79,13 @@ const App = () => {
             {mainSetting}
         </>
     )
-
 }
 
 const AppStateWrapper = () => {
-    const appRoot = useAppRoot()
-    if (!appRoot.audioContextState.audioContext) {
-        return <>please click window</>
-    }
-
+    // const appRoot = useAppRoot()
+    // if (!appRoot.audioContextState.audioContext) {
+    //     return <>please click window</>
+    // }
     return (
         <AppStateProvider>
             <App></App>

@@ -25,7 +25,7 @@ export const useAppState = (): AppStateValue => {
 
 export const AppStateProvider = ({ children }: Props) => {
     const appRoot = useAppRoot()
-    const clientState = useVCClient({ audioContext: appRoot.audioContextState.audioContext! })
+    const clientState = useVCClient({ audioContext: appRoot.audioContextState.audioContext })
     const frontendManagerState = useFrontendManager();
 
     const providerValue: AppStateValue = {

@@ -135,36 +135,28 @@ export const useQualityControl = (): QualityControlState => {
             setRecording(false)
             await appState.serverSetting.setRecordIO(0)
             // set spectrogram (dio)
-            const imageContainerDio = document.getElementById("body-image-container-img-dio") as HTMLDivElement
-            imageContainerDio.innerHTML = ""
-            const imageDio = document.createElement("img")
+            const imageDio = document.getElementById("body-image-container-img-dio") as HTMLImageElement
             imageDio.src = "/tmp/analyze-dio.png?" + new Date().getTime()
-            imageContainerDio.appendChild(imageDio)
+            imageDio.style.width = "100%"
 
             // set spectrogram (harvest)
-            const imageContainerHarvest = document.getElementById("body-image-container-img-harvest") as HTMLDivElement
-            const imageHarvest = document.createElement("img")
+            const imageHarvest = document.getElementById("body-image-container-img-harvest") as HTMLImageElement
             imageHarvest.src = "/tmp/analyze-harvest.png?" + new Date().getTime()
-            imageContainerHarvest.appendChild(imageHarvest)
+            imageHarvest.style.width = "100%"
 
             // set wav (input)
-            const wavContainerInput = document.getElementById("body-wav-container-wav-input") as HTMLDivElement
-            wavContainerInput.innerHTML = ""
-            const mediaInput = document.createElement("audio") as HTMLAudioElement
-            mediaInput.src = "/tmp/in.wav?" + new Date().getTime()
-            mediaInput.controls = true
+            const wavInput = document.getElementById("body-wav-container-wav-input") as HTMLAudioElement
+            wavInput.src = "/tmp/in.wav?" + new Date().getTime()
+            wavInput.controls = true
             // @ts-ignore
-            mediaInput.setSinkId(audioOutputForGUI)
-            wavContainerInput.appendChild(mediaInput)
+            wavInput.setSinkId(audioOutputForGUI)
 
             // set wav (output)
-            const wavContainerOutput = document.getElementById("body-wav-container-wav-output") as HTMLDivElement
-            const mediaOutput = document.createElement("audio") as HTMLAudioElement
-            mediaOutput.src = "/tmp/out.wav?" + new Date().getTime()
-            mediaOutput.controls = true
+            const wavOutput = document.getElementById("body-wav-container-wav-output") as HTMLAudioElement
+            wavOutput.src = "/tmp/out.wav?" + new Date().getTime()
+            wavOutput.controls = true
             // @ts-ignore
-            mediaOutput.setSinkId(audioOutputForGUI)
-            wavContainerOutput.appendChild(mediaOutput)
+            wavOutput.setSinkId(audioOutputForGUI)
         }
 
         const startClassName = recording ? "body-button-active" : "body-button-stanby"
@@ -192,11 +184,20 @@ export const useQualityControl = (): QualityControlState => {
                     <div className="body-item-title left-padding-2 ">
                         Spectrogram
                     </div>
-                    <div className="body-image-container">
-                        <div className="body-image-container-title">PyWorld Dio</div>
-                        <div className="body-image-container-title">PyWorld Harvest</div>
-                        <div className="body-image-container-img" id="body-image-container-img-dio"></div>
-                        <div className="body-image-container-img" id="body-image-container-img-harvest"></div>
+                    <div>
+                        <div className="body-image-container">
+                            <div className="body-image-container-title">PyWorld Dio</div>
+                            <div className="body-image-container-title">PyWorld Harvest</div>
+                        </div>
+                        <div className="body-image-container">
+                            <div className="body-image-container-img" >
+                                <img src="" alt="" id="body-image-container-img-dio" />
+                            </div>
+                            <div className="body-image-container-img">
+                                <img src="" alt="" id="body-image-container-img-harvest" />
+
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div className="body-row split-3-7 left-padding-1 guided">
@@ -206,13 +207,12 @@ export const useQualityControl = (): QualityControlState => {
                         </div>
                         <select className="body-select-50" value={audioOutputForGUI} onChange={(e) => {
                             setAudioOutputForGUI(e.target.value)
-                            const wavContainer = document.getElementById("quality-control-analyze-wav-container") as HTMLDivElement
-                            wavContainer.childNodes.forEach(x => {
-                                if (x instanceof HTMLAudioElement) {
-                                    //@ts-ignore
-                                    x.setSinkId(e.target.value)
-                                }
-                            })
+                            const wavInput = document.getElementById("body-wav-container-wav-input") as HTMLAudioElement
+                            const wavOutput = document.getElementById("body-wav-container-wav-output") as HTMLAudioElement
+                            //@ts-ignore
+                            wavInput.setSinkId(e.target.value)
+                            //@ts-ignore
+                            wavOutput.setSinkId(e.target.value)
                         }}>
                             {
                                 outputAudioDeviceInfo.map(x => {
@@ -221,11 +221,19 @@ export const useQualityControl = (): QualityControlState => {
                             }
                         </select>
                     </div>
-                    <div className="body-wav-container">
-                        <div className="body-wav-container-title">Input</div>
-                        <div className="body-wav-container-title">Output</div>
-                        <div className="body-wav-container-wav" id="body-wav-container-wav-input"></div>
-                        <div className="body-wav-container-wav" id="body-wav-container-wav-output"></div>
+                    <div>
+                        <div className="body-wav-container">
+                            <div className="body-wav-container-title">Input</div>
+                            <div className="body-wav-container-title">Output</div>
+                        </div>
+                        <div className="body-wav-container">
+                            <div className="body-wav-container-wav">
+                                <audio src="" id="body-wav-container-wav-input"></audio>
+                            </div>
+                            <div className="body-wav-container-wav" >
+                                <audio src="" id="body-wav-container-wav-output"></audio>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </>

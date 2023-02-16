@@ -1,10 +1,11 @@
-import React, { useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { useAppState } from "./001_provider/001_AppStateProvider";
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./components/101_HeaderButton";
 
 export const useServerControl = () => {
     const appState = useAppState()
     const [isStarted, setIsStarted] = useState<boolean>(false)
+    const [startWithAudioContextCreate, setStartWithAudioContextCreate] = useState<boolean>(false)
 
     const accodionButton = useMemo(() => {
         const accodionButtonProps: HeaderButtonProps = {
@@ -18,18 +19,30 @@ export const useServerControl = () => {
         return <HeaderButton {...accodionButtonProps}></HeaderButton>;
     }, []);
 
-
+    useEffect(() => {
+        if (!startWithAudioContextCreate) {
+            return
+        }
+        setIsStarted(true)
+        appState.clientSetting.start()
+    }, [startWithAudioContextCreate])
 
     const startButtonRow = useMemo(() => {
         const onStartClicked = async () => {
-            setIsStarted(true)
-            await appState.clientSetting.start()
+            if (!appState.audioContext) {
+                await new Promise<void>((resolve) => {
+                    console.log("wait 2000ms")
+                    setTimeout(resolve, 1000 * 2)
+                })
+                setStartWithAudioContextCreate(true)
+            } else {
+                setIsStarted(true)
+                await appState.clientSetting.start()
+            }
         }
         const onStopClicked = async () => {
             setIsStarted(false)
-            console.log("stop click1")
             await appState.clientSetting.stop()
-            console.log("stop click2")
         }
         const startClassName = isStarted ? "body-button-active" : "body-button-stanby"
         const stopClassName = isStarted ? "body-button-stanby" : "body-button-active"

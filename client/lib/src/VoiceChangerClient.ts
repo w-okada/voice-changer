@@ -185,6 +185,7 @@ export class VoiceChangerClient {
         } else {
             this.micStream.playRecording()
         }
+        console.log("Input Setup=> success")
         await this.unlock(lockNum)
     }
     get stream(): MediaStream {
