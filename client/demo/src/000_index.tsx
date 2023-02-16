@@ -38,7 +38,9 @@ const App = () => {
                     </a>
                     <a className="link" href="https://www.buymeacoffee.com/wokad" target="_blank" rel="noopener noreferrer">
                         <img className="donate-img" src="./assets/buymeacoffee.png" />
+                        <span>コーヒーを寄付</span>
                     </a>
+
                 </span>
                 <span className="belongings">
 
