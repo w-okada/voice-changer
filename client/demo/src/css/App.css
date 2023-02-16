@@ -1,6 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Chicle&family=Poppins:ital,wght@0,200;0,400;0,600;1,200;1,400;1,600&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Yusei+Magic&display=swap");
 
+@import "./101_RotatedButton.css";
+
 :root {
     --text-color: #333;
     --company-color1: rgba(64, 119, 187, 1);
@@ -11,7 +13,7 @@
     --company-color3-alpha: rgba(255, 255, 255, 0.3);
     --global-shadow-color: rgba(0, 0, 0, 0.4);
 
-    --sidebar-transition-time: 0.3s;
+    --sidebar-transition-time: 0.2s;
     --sidebar-transition-time-quick: 0.1s;
     --sidebar-transition-animation: ease-in-out;
 
@@ -52,6 +54,8 @@ body {
     height: 100%;
     width: 100%;
 }
+
+/* Main + Section Partition*/
 .main-body {
     height: 100%;
     width: 100%;
@@ -60,9 +64,61 @@ body {
     display: flex;
     flex-direction: column;
     font-size: 1rem;
+    user-select: none;
+    /* Title */
+    .top-title {
+        .title {
+            font-size: 3rem;
+        }
+        .top-title-version {
+            margin-left: 2rem;
+            font-size: 1.2rem;
+            background: linear-gradient(transparent 60%, yellow 30%);
+        }
+        .belongings {
+            margin-left: 1rem;
+            margin-right: 1rem;
+            .link {
+                margin-left: 1rem;
+            }
+        }
+    }
+
+    /* Partition */
+    .partition {
+        width: 100%;
+        .partition-header {
+            font-weight: 700;
+            color: rgb(71, 69, 69);
+            display: flex;
+            .caret {
+                width: 2rem;
+            }
+            .title {
+                font-size: 1.1rem;
+            }
+        }
+        .partition-content {
+            position: static;
+            overflow-y: hidden;
+        }
+        .row-split {
+        }
+    }
 }
-.body-row {
+.state-control-checkbox:checked + .partition .partition-content {
+    max-height: 700px;
+    background: #fff;
+    transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
 }
+.state-control-checkbox + .partition .partition-content {
+    max-height: 0px;
+    background: #eef;
+    transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
+}
+
+/* ROW */
+
 .split-6-4 {
     display: flex;
     width: 100%;
@@ -330,32 +386,6 @@ body {
     height: 4px;
     /* background-color: rgba(16, 210, 113, 0.1); */
     background-color: rgba(31, 42, 36, 0.1);
-}
-
-.body-top-title {
-    font-size: 3rem;
-}
-.body-top-title-version {
-    margin-left: 2rem;
-    font-size: 1.2rem;
-    background: linear-gradient(transparent 60%, yellow 30%);
-}
-.body-top-title-belongings {
-    display: flex;
-    align-items: flex-end;
-    justify-content: flex-start;
-    & > div {
-        margin-left: 10px;
-        margin-right: 10px;
-    }
-    & > .belonging-item {
-        & > .link {
-            text-decoration: none;
-            & > span {
-                font-size: small;
-            }
-        }
-    }
 }
 
 .body-section-title {

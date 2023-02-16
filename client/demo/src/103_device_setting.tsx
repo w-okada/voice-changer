@@ -1,7 +1,8 @@
 import { fileSelectorAsDataURL, useIndexedDB } from "@dannadori/voice-changer-client-js"
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_CONVERTED, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, INDEXEDDB_KEY_AUDIO_OUTPUT } from "./const"
-import { ClientState } from "@dannadori/voice-changer-client-js";
+import { useAppState } from "./001_provider/001_AppStateProvider";
+import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./components/101_HeaderButton";
 
 
 const reloadDevices = async () => {
@@ -38,15 +39,25 @@ const reloadDevices = async () => {
     // })
     return [audioInputs, audioOutputs]
 }
-export type UseDeviceSettingProps = {
-    clientState: ClientState
-}
 
 export type DeviceSettingState = {
     deviceSetting: JSX.Element;
 }
 
-export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDeviceSettingProps): DeviceSettingState => {
+export const useDeviceSetting = (): DeviceSettingState => {
+    const appState = useAppState()
+    const accodionButton = useMemo(() => {
+        const accodionButtonProps: HeaderButtonProps = {
+            stateControlCheckbox: appState.frontendManagerState.stateControls.openDeviceSettingCheckbox,
+            tooltip: "Open/Close",
+            onIcon: ["fas", "caret-up"],
+            offIcon: ["fas", "caret-up"],
+            animation: AnimationTypes.spinner,
+            tooltipClass: "tooltip-right",
+        };
+        return <HeaderButton {...accodionButtonProps}></HeaderButton>;
+    }, []);
+
     const [inputAudioDeviceInfo, setInputAudioDeviceInfo] = useState<MediaDeviceInfo[]>([])
     const [outputAudioDeviceInfo, setOutputAudioDeviceInfo] = useState<MediaDeviceInfo[]>([])
 
@@ -69,16 +80,16 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
     }, [])
 
     useEffect(() => {
-        if (typeof props.clientState.clientSetting.setting.audioInput == "string") {
+        if (typeof appState.clientSetting.setting.audioInput == "string") {
             if (inputAudioDeviceInfo.find(x => {
-                // console.log("COMPARE:", x.deviceId, props.clientState.clientSetting.setting.audioInput)
-                return x.deviceId == props.clientState.clientSetting.setting.audioInput
+                // console.log("COMPARE:", x.deviceId, appState.clientSetting.setting.audioInput)
+                return x.deviceId == appState.clientSetting.setting.audioInput
             })) {
-                setAudioInputForGUI(props.clientState.clientSetting.setting.audioInput)
+                setAudioInputForGUI(appState.clientSetting.setting.audioInput)
 
             }
         }
-    }, [inputAudioDeviceInfo, props.clientState.clientSetting.setting.audioInput])
+    }, [inputAudioDeviceInfo, appState.clientSetting.setting.audioInput])
 
     const audioInputRow = useMemo(() => {
         return (
@@ -97,20 +108,16 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
                 </div>
             </div>
         )
-    }, [inputAudioDeviceInfo, audioInputForGUI, props.clientState.clientSetting.setting.audioInput])
+    }, [inputAudioDeviceInfo, audioInputForGUI, appState.clientSetting.setting.audioInput])
 
 
     useEffect(() => {
-        if (!audioContext) {
-            return
-        }
-
         if (audioInputForGUI == "file") {
             // file selector (audioMediaInputRow)
         } else {
-            props.clientState.clientSetting.setAudioInput(audioInputForGUI)
+            appState.clientSetting.setAudioInput(audioInputForGUI)
         }
-    }, [audioContext, audioInputForGUI, props.clientState.clientSetting.setAudioInput])
+    }, [appState.audioContext, audioInputForGUI, appState.clientSetting.setAudioInput])
 
     const audioMediaInputRow = useMemo(() => {
         if (audioInputForGUI != "file") {
@@ -127,15 +134,15 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
             audio.src = url
             await audio.play()
             if (!audioSrcNode.current) {
-                audioSrcNode.current = audioContext!.createMediaElementSource(audio);
+                audioSrcNode.current = appState.audioContext!.createMediaElementSource(audio);
             }
             if (audioSrcNode.current.mediaElement != audio) {
-                audioSrcNode.current = audioContext!.createMediaElementSource(audio);
+                audioSrcNode.current = appState.audioContext!.createMediaElementSource(audio);
             }
 
-            const dst = audioContext!.createMediaStreamDestination()
+            const dst = appState.audioContext.createMediaStreamDestination()
             audioSrcNode.current.connect(dst)
-            props.clientState.clientSetting.setAudioInput(dst.stream)
+            appState.clientSetting.setAudioInput(dst.stream)
 
             const audio_echo = document.getElementById(AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK) as HTMLAudioElement
             audio_echo.srcObject = dst.stream
@@ -173,7 +180,7 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
                 </div>
             </div>
         )
-    }, [audioInputForGUI, props.clientState.clientSetting.setAudioInput, fileInputEchoback])
+    }, [audioInputForGUI, appState.clientSetting.setAudioInput, fileInputEchoback])
 
 
 
@@ -204,11 +211,11 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
         // }
         const onOutputRecordStartClicked = async () => {
             setOutputRecordingStarted(true)
-            await props.clientState.workletSetting.startOutputRecording()
+            await appState.workletSetting.startOutputRecording()
         }
         const onOutputRecordStopClicked = async () => {
             setOutputRecordingStarted(false)
-            await props.clientState.workletSetting.stopOutputRecording()
+            await appState.workletSetting.stopOutputRecording()
         }
 
         const startClassName = outputRecordingStarted ? "body-button-active" : "body-button-stanby"
@@ -226,7 +233,7 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
             </div>
         )
 
-    }, [audioOutputForGUI, outputRecordingStarted, props.clientState.workletSetting.startOutputRecording, props.clientState.workletSetting.stopOutputRecording])
+    }, [audioOutputForGUI, outputRecordingStarted, appState.workletSetting.startOutputRecording, appState.workletSetting.stopOutputRecording])
 
     useEffect(() => {
         [AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK].forEach(x => {
@@ -277,15 +284,25 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
     const deviceSetting = useMemo(() => {
         return (
             <>
-                <div className="body-row split-3-7 left-padding-1">
-                    <div className="body-sub-section-title">Device Setting</div>
-                    <div className="body-select-container">
+                {appState.frontendManagerState.stateControls.openDeviceSettingCheckbox.trigger}
+
+                <div className="partition">
+                    <div className="partition-header">
+                        <span className="caret">
+                            {accodionButton}
+                        </span>
+                        <span className="title" onClick={() => { appState.frontendManagerState.stateControls.openDeviceSettingCheckbox.updateState(!appState.frontendManagerState.stateControls.openDeviceSettingCheckbox.checked()) }}>
+                            Device Setting
+                        </span>
+                    </div>
+
+                    <div className="partition-content">
+                        {audioInputRow}
+                        {audioMediaInputRow}
+                        {audioOutputRow}
+                        {audioOutputRecordingRow}
                     </div>
                 </div>
-                {audioInputRow}
-                {audioMediaInputRow}
-                {audioOutputRow}
-                {audioOutputRecordingRow}
             </>
         )
     }, [audioInputRow, audioMediaInputRow, audioOutputRow, audioOutputRecordingRow])
@@ -293,10 +310,10 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
 
     // 出力の録音データ(from worklet)がストアされたら実行
     useEffect(() => {
-        if (!props.clientState.outputRecordData || props.clientState.outputRecordData?.length == 0) {
+        if (!appState.outputRecordData || appState.outputRecordData?.length == 0) {
             return
         }
-        const f32Datas = props.clientState.outputRecordData
+        const f32Datas = appState.outputRecordData
         const sampleSize = f32Datas.reduce((prev, cur) => {
             return prev + cur.length
         }, 0)
@@ -353,7 +370,7 @@ export const useDeviceSetting = (audioContext: AudioContext | null, props: UseDe
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-    }, [props.clientState.outputRecordData])
+    }, [appState.outputRecordData])
 
     return {
         deviceSetting,

@@ -1,45 +1,54 @@
-import { BufferSize, DownSamplingMode, F0Detector, Protocol, SampleRate, VoiceChangerMode } from "@dannadori/voice-changer-client-js"
+import { BufferSize, DownSamplingMode, Protocol, SampleRate, VoiceChangerMode } from "@dannadori/voice-changer-client-js"
 import React, { useMemo, useState } from "react"
 import { ClientState } from "@dannadori/voice-changer-client-js";
-
-
-export type UseAdvancedSettingProps = {
-    clientState: ClientState
-}
+import { useAppState } from "./001_provider/001_AppStateProvider";
+import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./components/101_HeaderButton";
 
 export type AdvancedSettingState = {
     advancedSetting: JSX.Element;
 }
 
-export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSettingState => {
-    const [showAdvancedSetting, setShowAdvancedSetting] = useState<boolean>(false)
+export const useAdvancedSetting = (): AdvancedSettingState => {
+    const appState = useAppState()
+    const accodionButton = useMemo(() => {
+        const accodionButtonProps: HeaderButtonProps = {
+            stateControlCheckbox: appState.frontendManagerState.stateControls.openAdvancedSettingCheckbox,
+            tooltip: "Open/Close",
+            onIcon: ["fas", "caret-up"],
+            offIcon: ["fas", "caret-up"],
+            animation: AnimationTypes.spinner,
+            tooltipClass: "tooltip-right",
+        };
+        return <HeaderButton {...accodionButtonProps}></HeaderButton>;
+    }, []);
+
     const mmvcServerUrlRow = useMemo(() => {
         const onSetServerClicked = async () => {
             const input = document.getElementById("mmvc-server-url") as HTMLInputElement
-            props.clientState.clientSetting.setServerUrl(input.value)
+            appState.clientSetting.setServerUrl(input.value)
         }
         return (
             <div className="body-row split-3-3-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">MMVC Server</div>
                 <div className="body-input-container">
-                    <input type="text" defaultValue={props.clientState.clientSetting.setting.mmvcServerUrl} id="mmvc-server-url" className="body-item-input" />
+                    <input type="text" defaultValue={appState.clientSetting.setting.mmvcServerUrl} id="mmvc-server-url" className="body-item-input" />
                 </div>
                 <div className="body-button-container">
                     <div className="body-button" onClick={onSetServerClicked}>set</div>
                 </div>
             </div>
         )
-    }, [props.clientState.clientSetting.setting.mmvcServerUrl, props.clientState.clientSetting.setServerUrl])
+    }, [appState.clientSetting.setting.mmvcServerUrl, appState.clientSetting.setServerUrl])
 
     const protocolRow = useMemo(() => {
         const onProtocolChanged = async (val: Protocol) => {
-            props.clientState.clientSetting.setProtocol(val)
+            appState.clientSetting.setProtocol(val)
         }
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Protocol</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={props.clientState.clientSetting.setting.protocol} onChange={(e) => {
+                    <select className="body-select" value={appState.clientSetting.setting.protocol} onChange={(e) => {
                         onProtocolChanged(e.target.value as
                             Protocol)
                     }}>
@@ -52,7 +61,7 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
                 </div>
             </div>
         )
-    }, [props.clientState.clientSetting.setting.protocol, props.clientState.clientSetting.setProtocol])
+    }, [appState.clientSetting.setting.protocol, appState.clientSetting.setProtocol])
 
 
     const sampleRateRow = useMemo(() => {
@@ -60,8 +69,8 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Sample Rate</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={props.clientState.clientSetting.setting.sampleRate} onChange={(e) => {
-                        props.clientState.clientSetting.setSampleRate(Number(e.target.value) as SampleRate)
+                    <select className="body-select" value={appState.clientSetting.setting.sampleRate} onChange={(e) => {
+                        appState.clientSetting.setSampleRate(Number(e.target.value) as SampleRate)
                     }}>
                         {
                             Object.values(SampleRate).map(x => {
@@ -72,7 +81,7 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
                 </div>
             </div>
         )
-    }, [props.clientState.clientSetting.setting.sampleRate, props.clientState.clientSetting.setSampleRate])
+    }, [appState.clientSetting.setting.sampleRate, appState.clientSetting.setSampleRate])
 
     const bufferSizeRow = useMemo(() => {
         return (
@@ -80,8 +89,8 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Buffer Size</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={props.clientState.clientSetting.setting.bufferSize} onChange={(e) => {
-                        props.clientState.clientSetting.setBufferSize(Number(e.target.value) as BufferSize)
+                    <select className="body-select" value={appState.clientSetting.setting.bufferSize} onChange={(e) => {
+                        appState.clientSetting.setBufferSize(Number(e.target.value) as BufferSize)
                     }}>
                         {
                             Object.values(BufferSize).map(x => {
@@ -92,7 +101,7 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
                 </div>
             </div>
         )
-    }, [props.clientState.clientSetting.setting.bufferSize, props.clientState.clientSetting.setBufferSize])
+    }, [appState.clientSetting.setting.bufferSize, appState.clientSetting.setBufferSize])
 
     const convertChunkNumRow = useMemo(() => {
         return (
@@ -100,13 +109,13 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Convert Chunk Num(128sample/chunk)</div>
                 <div className="body-input-container">
-                    <input type="number" min={1} max={256} step={1} value={props.clientState.serverSetting.setting.convertChunkNum} onChange={(e) => {
-                        props.clientState.serverSetting.setConvertChunkNum(Number(e.target.value))
+                    <input type="number" min={1} max={256} step={1} value={appState.serverSetting.setting.convertChunkNum} onChange={(e) => {
+                        appState.serverSetting.setConvertChunkNum(Number(e.target.value))
                     }} />
                 </div>
             </div>
         )
-    }, [props.clientState.serverSetting.setting.convertChunkNum, props.clientState.serverSetting.setConvertChunkNum])
+    }, [appState.serverSetting.setting.convertChunkNum, appState.serverSetting.setConvertChunkNum])
 
     const minConvertSizeRow = useMemo(() => {
         return (
@@ -114,52 +123,52 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Min Convert Size(byte)</div>
                 <div className="body-input-container">
-                    <input type="number" min={0} max={8196} step={8196} value={props.clientState.serverSetting.setting.minConvertSize} onChange={(e) => {
-                        props.clientState.serverSetting.setMinConvertSize(Number(e.target.value))
+                    <input type="number" min={0} max={8196} step={8196} value={appState.serverSetting.setting.minConvertSize} onChange={(e) => {
+                        appState.serverSetting.setMinConvertSize(Number(e.target.value))
                     }} />
                 </div>
             </div>
         )
-    }, [props.clientState.serverSetting.setting.minConvertSize, props.clientState.serverSetting.setMinConvertSize])
+    }, [appState.serverSetting.setting.minConvertSize, appState.serverSetting.setMinConvertSize])
 
     const crossFadeOverlapRateRow = useMemo(() => {
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title  left-padding-1">Cross Fade Overlap Rate</div>
                 <div className="body-input-container">
-                    <input type="number" min={0.1} max={1} step={0.1} value={props.clientState.serverSetting.setting.crossFadeOverlapRate} onChange={(e) => {
-                        props.clientState.serverSetting.setCrossFadeOverlapRate(Number(e.target.value))
+                    <input type="number" min={0.1} max={1} step={0.1} value={appState.serverSetting.setting.crossFadeOverlapRate} onChange={(e) => {
+                        appState.serverSetting.setCrossFadeOverlapRate(Number(e.target.value))
                     }} />
                 </div>
             </div>
         )
-    }, [props.clientState.serverSetting.setting.crossFadeOverlapRate, props.clientState.serverSetting.setCrossFadeOverlapRate])
+    }, [appState.serverSetting.setting.crossFadeOverlapRate, appState.serverSetting.setCrossFadeOverlapRate])
 
     const crossFadeOffsetRateRow = useMemo(() => {
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title  left-padding-1">Cross Fade Offset Rate</div>
                 <div className="body-input-container">
-                    <input type="number" min={0} max={1} step={0.1} value={props.clientState.serverSetting.setting.crossFadeOffsetRate} onChange={(e) => {
-                        props.clientState.serverSetting.setCrossFadeOffsetRate(Number(e.target.value))
+                    <input type="number" min={0} max={1} step={0.1} value={appState.serverSetting.setting.crossFadeOffsetRate} onChange={(e) => {
+                        appState.serverSetting.setCrossFadeOffsetRate(Number(e.target.value))
                     }} />
                 </div>
             </div>
         )
-    }, [props.clientState.serverSetting.setting.crossFadeOffsetRate, props.clientState.serverSetting.setCrossFadeOffsetRate])
+    }, [appState.serverSetting.setting.crossFadeOffsetRate, appState.serverSetting.setCrossFadeOffsetRate])
 
     const crossFadeEndRateRow = useMemo(() => {
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Cross Fade End Rate</div>
                 <div className="body-input-container">
-                    <input type="number" min={0} max={1} step={0.1} value={props.clientState.serverSetting.setting.crossFadeEndRate} onChange={(e) => {
-                        props.clientState.serverSetting.setCrossFadeEndRate(Number(e.target.value))
+                    <input type="number" min={0} max={1} step={0.1} value={appState.serverSetting.setting.crossFadeEndRate} onChange={(e) => {
+                        appState.serverSetting.setCrossFadeEndRate(Number(e.target.value))
                     }} />
                 </div>
             </div>
         )
-    }, [props.clientState.serverSetting.setting.crossFadeEndRate, props.clientState.serverSetting.setCrossFadeEndRate])
+    }, [appState.serverSetting.setting.crossFadeEndRate, appState.serverSetting.setCrossFadeEndRate])
 
 
     const voiceChangeModeRow = useMemo(() => {
@@ -167,8 +176,8 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1 ">Voice Change Mode</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={props.clientState.clientSetting.setting.voiceChangerMode} onChange={(e) => {
-                        props.clientState.clientSetting.setVoiceChangerMode(e.target.value as VoiceChangerMode)
+                    <select className="body-select" value={appState.clientSetting.setting.voiceChangerMode} onChange={(e) => {
+                        appState.clientSetting.setVoiceChangerMode(e.target.value as VoiceChangerMode)
                     }}>
                         {
                             Object.values(VoiceChangerMode).map(x => {
@@ -179,7 +188,7 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
                 </div>
             </div>
         )
-    }, [props.clientState.clientSetting.setting.voiceChangerMode, props.clientState.clientSetting.setVoiceChangerMode])
+    }, [appState.clientSetting.setting.voiceChangerMode, appState.clientSetting.setVoiceChangerMode])
 
 
     const downSamplingModeRow = useMemo(() => {
@@ -187,8 +196,8 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1 ">DownSamplingMode</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={props.clientState.clientSetting.setting.downSamplingMode} onChange={(e) => {
-                        props.clientState.clientSetting.setDownSamplingMode(e.target.value as DownSamplingMode)
+                    <select className="body-select" value={appState.clientSetting.setting.downSamplingMode} onChange={(e) => {
+                        appState.clientSetting.setDownSamplingMode(e.target.value as DownSamplingMode)
                     }}>
                         {
                             Object.values(DownSamplingMode).map(x => {
@@ -199,7 +208,7 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
                 </div>
             </div>
         )
-    }, [props.clientState.clientSetting.setting.downSamplingMode, props.clientState.clientSetting.setDownSamplingMode])
+    }, [appState.clientSetting.setting.downSamplingMode, appState.clientSetting.setDownSamplingMode])
 
 
     const workletSettingRow = useMemo(() => {
@@ -209,9 +218,9 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
                 <div className="body-row split-3-7 left-padding-1 guided">
                     <div className="body-item-title left-padding-1">Trancate Num</div>
                     <div className="body-input-container">
-                        <input type="number" min={5} max={300} step={1} value={props.clientState.workletSetting.setting.numTrancateTreshold} onChange={(e) => {
-                            props.clientState.workletSetting.setSetting({
-                                ...props.clientState.workletSetting.setting,
+                        <input type="number" min={5} max={300} step={1} value={appState.workletSetting.setting.numTrancateTreshold} onChange={(e) => {
+                            appState.workletSetting.setSetting({
+                                ...appState.workletSetting.setting,
                                 numTrancateTreshold: Number(e.target.value)
                             })
                         }} />
@@ -222,9 +231,9 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
                 {/* <div className="body-row split-3-7 left-padding-1 guided">
                     <div className="body-item-title left-padding-1">Trancate Vol</div>
                     <div className="body-input-container">
-                        <input type="number" min={0.0001} max={0.0009} step={0.0001} value={props.clientState.workletSetting.setting.volTrancateThreshold} onChange={(e) => {
-                            props.clientState.workletSetting.setSetting({
-                                ...props.clientState.workletSetting.setting,
+                        <input type="number" min={0.0001} max={0.0009} step={0.0001} value={appState.workletSetting.setting.volTrancateThreshold} onChange={(e) => {
+                            appState.workletSetting.setSetting({
+                                ...appState.workletSetting.setting,
                                 volTrancateThreshold: Number(e.target.value)
                             })
                         }} />
@@ -233,9 +242,9 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
                 <div className="body-row split-3-7 left-padding-1 guided">
                     <div className="body-item-title left-padding-1">Trancate Vol Length</div>
                     <div className="body-input-container">
-                        <input type="number" min={16} max={128} step={1} value={props.clientState.workletSetting.setting.volTrancateLength} onChange={(e) => {
-                            props.clientState.workletSetting.setSetting({
-                                ...props.clientState.workletSetting.setting,
+                        <input type="number" min={16} max={128} step={1} value={appState.workletSetting.setting.volTrancateLength} onChange={(e) => {
+                            appState.workletSetting.setSetting({
+                                ...appState.workletSetting.setting,
                                 volTrancateLength: Number(e.target.value)
                             })
                         }} />
@@ -243,11 +252,10 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
                 </div> */}
             </>
         )
-    }, [props.clientState.workletSetting.setting, props.clientState.workletSetting.setSetting])
+    }, [appState.workletSetting.setting, appState.workletSetting.setSetting])
 
 
     const advanceSettingContent = useMemo(() => {
-        if (!showAdvancedSetting) return <></>
         return (
             <>
                 <div className="body-row divider"></div>
@@ -272,24 +280,30 @@ export const useAdvancedSetting = (props: UseAdvancedSettingProps): AdvancedSett
 
             </>
         )
-    }, [showAdvancedSetting, mmvcServerUrlRow, protocolRow, sampleRateRow, bufferSizeRow, convertChunkNumRow, minConvertSizeRow, crossFadeOverlapRateRow, crossFadeOffsetRateRow, crossFadeEndRateRow, voiceChangeModeRow, workletSettingRow, downSamplingModeRow])
+    }, [mmvcServerUrlRow, protocolRow, sampleRateRow, bufferSizeRow, convertChunkNumRow, minConvertSizeRow, crossFadeOverlapRateRow, crossFadeOffsetRateRow, crossFadeEndRateRow, voiceChangeModeRow, workletSettingRow, downSamplingModeRow])
 
 
     const advancedSetting = useMemo(() => {
         return (
             <>
-                <div className="body-row split-3-7 left-padding-1">
-                    <div className="body-sub-section-title">Advanced Setting</div>
-                    <div>
-                        <input type="checkbox" checked={showAdvancedSetting} onChange={(e) => {
-                            setShowAdvancedSetting(e.target.checked)
-                        }} /> show
+                {appState.frontendManagerState.stateControls.openAdvancedSettingCheckbox.trigger}
+                <div className="partition">
+                    <div className="partition-header">
+                        <span className="caret">
+                            {accodionButton}
+                        </span>
+                        <span className="title" onClick={() => { appState.frontendManagerState.stateControls.openAdvancedSettingCheckbox.updateState(!appState.frontendManagerState.stateControls.openAdvancedSettingCheckbox.checked()) }}>
+                            Advanced Setting
+                        </span>
+                    </div>
+
+                    <div className="partition-content">
+                        {advanceSettingContent}
                     </div>
                 </div>
-                {advanceSettingContent}
             </>
         )
-    }, [showAdvancedSetting, advanceSettingContent])
+    }, [advanceSettingContent])
 
     return {
         advancedSetting,

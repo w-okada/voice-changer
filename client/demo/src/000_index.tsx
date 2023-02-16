@@ -3,20 +3,52 @@ import { createRoot } from "react-dom/client";
 import "./css/App.css"
 import { useMemo, } from "react";
 import { useMicrophoneOptions } from "./100_options_microphone";
+import { AppStateProvider, useAppState } from "./001_provider/001_AppStateProvider";
+
+
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { fas } from "@fortawesome/free-solid-svg-icons";
+import { far } from "@fortawesome/free-regular-svg-icons";
+import { fab } from "@fortawesome/free-brands-svg-icons";
+import { AppRootProvider, useAppRoot } from "./001_provider/001_AppRootProvider";
+
+library.add(fas, far, fab);
+
 
 const container = document.getElementById("app")!;
 const root = createRoot(container);
 
 const App = () => {
+    const appState = useAppState()
+    const { voiceChangerSetting } = useMicrophoneOptions()
 
-    const { voiceChangerSetting, clearSetting } = useMicrophoneOptions()
+    const titleRow = useMemo(() => {
+        return (
+            <div className="top-title">
+                <span className="title">Voice Changer Setting</span>
+                <span className="top-title-version">for v.1.5.x</span>
+                <span className="belongings">
+                    <a className="link" href="https://github.com/w-okada/voice-changer" target="_blank" rel="noopener noreferrer">
+                        <img src="./assets/icons/github.svg" />
+                        <span>github</span>
+                    </a>
+                    <a className="link" href="https://zenn.dev/wok/books/0003_vc-helper-v_1_5" target="_blank" rel="noopener noreferrer">
+                        <img src="./assets/icons/help-circle.svg" />
+                        <span>manual</span>
+                    </a>
+                </span>
+                <span className="belongings">
 
-    const onClearSettingClicked = async () => {
-        clearSetting()
-        location.reload()
-    }
+                </span>
+            </div>
+        )
+    }, [])
 
     const clearRow = useMemo(() => {
+        const onClearSettingClicked = async () => {
+            await appState.clearSetting()
+            location.reload()
+        }
         return (
             <>
                 <div className="body-row split-3-3-4 left-padding-1">
@@ -30,39 +62,41 @@ const App = () => {
         )
     }, [])
 
+    const mainSetting = useMemo(() => {
+        return (
+            <>
+                <div className="main-body">
+                    {titleRow}
+                    {clearRow}
+                    {voiceChangerSetting}
+                </div>
+            </>
+
+        )
+    }, [voiceChangerSetting])
+    return (
+        <>
+            {mainSetting}
+        </>
+    )
+
+}
+
+const AppStateWrapper = () => {
+    const appRoot = useAppRoot()
+    if (!appRoot.audioContextState.audioContext) {
+        return <>please click window</>
+    }
 
     return (
-        <div className="main-body">
-            <div className="body-row split-6-4">
-                <div className="body-top-title">
-                    Voice Changer Setting
-                    <span className="body-top-title-version">for v.1.5.x</span>
-                </div>
-                <div className="body-top-title-belongings">
-                    <div className="belonging-item">
-                        <a className="link" href="https://github.com/w-okada/voice-changer" target="_blank" rel="noopener noreferrer">
-                            <img src="./assets/icons/github.svg" />
-                            <span>github</span>
-                        </a>
-                    </div>
-                    <div className="belonging-item">
-                        <a className="link" href="https://zenn.dev/wok/articles/s01_vc001_top" target="_blank" rel="noopener noreferrer">
-                            <img src="./assets/icons/help-circle.svg" />
-                            <span>manual</span>
-                        </a>
-                    </div>
-
-                </div>
-            </div>
-            {clearRow}
-            {voiceChangerSetting}
-            <div>
-                <audio id="audio-output"></audio>
-            </div>
-        </div>
+        <AppStateProvider>
+            <App></App>
+        </AppStateProvider>
     )
 }
 
 root.render(
-    <App></App>
+    <AppRootProvider>
+        <AppStateWrapper></AppStateWrapper>
+    </AppRootProvider>
 );
