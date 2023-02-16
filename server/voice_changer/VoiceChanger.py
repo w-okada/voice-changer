@@ -131,14 +131,14 @@ class VoiceChanger():
         mock_stream_out = MockStream(24000)
         stream_output_file = os.path.join(TMP_DIR, "out.wav")
         if os.path.exists(stream_output_file):
-            os.unlink(stream_output_file)
+            os.remove(stream_output_file)
         mock_stream_out.open_outputfile(stream_output_file)
         self.stream_out = mock_stream_out
 
         mock_stream_in = MockStream(24000)
         stream_input_file = os.path.join(TMP_DIR, "in.wav")
         if os.path.exists(stream_input_file):
-            os.unlink(stream_input_file)
+            os.remove(stream_input_file)
         mock_stream_in.open_outputfile(stream_input_file)
         self.stream_in = mock_stream_in
 
@@ -235,6 +235,8 @@ class VoiceChanger():
             if key == "recordIO" and val == 1:
                 self._setupRecordIO()
             if key == "recordIO" and val == 0:
+                pass
+            if key == "recordIO" and val == 2:
                 try:
                     stream_input_file = os.path.join(TMP_DIR, "in.wav")
                     analyze_file_dio = os.path.join(TMP_DIR, "analyze-dio.png")

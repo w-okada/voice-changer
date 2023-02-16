@@ -14,12 +14,18 @@ export type StateControls = {
 
 type FrontendManagerState = {
     stateControls: StateControls
+    isConverting: boolean,
+    isAnalyzing: boolean
 };
 
 export type FrontendManagerStateAndMethod = FrontendManagerState & {
+    setIsConverting: (val: boolean) => void
+    setIsAnalyzing: (val: boolean) => void
 }
 
 export const useFrontendManager = (): FrontendManagerStateAndMethod => {
+    const [isConverting, setIsConverting] = useState<boolean>(false)
+    const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false)
 
     // (1) Controller Switch
     const openServerControlCheckbox = useStateControlCheckbox(OpenServerControlCheckbox);
@@ -51,7 +57,11 @@ export const useFrontendManager = (): FrontendManagerStateAndMethod => {
             openSpeakerSettingCheckbox,
             openConverterSettingCheckbox,
             openAdvancedSettingCheckbox
-        }
+        },
+        isConverting,
+        setIsConverting,
+        isAnalyzing,
+        setIsAnalyzing
     };
     return returnValue;
 };

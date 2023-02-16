@@ -4,7 +4,6 @@ import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./components/10
 
 export const useServerControl = () => {
     const appState = useAppState()
-    const [isStarted, setIsStarted] = useState<boolean>(false)
     const [startWithAudioContextCreate, setStartWithAudioContextCreate] = useState<boolean>(false)
 
     const accodionButton = useMemo(() => {
@@ -23,7 +22,7 @@ export const useServerControl = () => {
         if (!startWithAudioContextCreate) {
             return
         }
-        setIsStarted(true)
+        appState.frontendManagerState.setIsConverting(true)
         appState.clientSetting.start()
     }, [startWithAudioContextCreate])
 
@@ -36,16 +35,16 @@ export const useServerControl = () => {
                 })
                 setStartWithAudioContextCreate(true)
             } else {
-                setIsStarted(true)
+                appState.frontendManagerState.setIsConverting(true)
                 await appState.clientSetting.start()
             }
         }
         const onStopClicked = async () => {
-            setIsStarted(false)
+            appState.frontendManagerState.setIsConverting(false)
             await appState.clientSetting.stop()
         }
-        const startClassName = isStarted ? "body-button-active" : "body-button-stanby"
-        const stopClassName = isStarted ? "body-button-stanby" : "body-button-active"
+        const startClassName = appState.frontendManagerState.isConverting ? "body-button-active" : "body-button-stanby"
+        const stopClassName = appState.frontendManagerState.isConverting ? "body-button-stanby" : "body-button-active"
 
         return (
             <div className="body-row split-3-2-2-3 left-padding-1  guided">
@@ -60,7 +59,7 @@ export const useServerControl = () => {
                 </div>
             </div>
         )
-    }, [isStarted, appState.clientSetting.start, appState.clientSetting.stop])
+    }, [appState.frontendManagerState.isConverting, appState.clientSetting.start, appState.clientSetting.stop])
 
     const performanceRow = useMemo(() => {
         return (

@@ -134,6 +134,14 @@ export const useQualityControl = (): QualityControlState => {
         const onRecordStopClicked = async () => {
             setRecording(false)
             await appState.serverSetting.setRecordIO(0)
+        }
+        const onRecordAnalizeClicked = async () => {
+            if (appState.frontendManagerState.isConverting) {
+                alert("please stop voice conversion. 解析処理と音声変換を同時に行うことはできません。音声変化をストップしてください。")
+                return
+            }
+            appState.frontendManagerState.setIsAnalyzing(true)
+            await appState.serverSetting.setRecordIO(2)
             // set spectrogram (dio)
             const imageDio = document.getElementById("body-image-container-img-dio") as HTMLImageElement
             imageDio.src = "/tmp/analyze-dio.png?" + new Date().getTime()
@@ -157,10 +165,15 @@ export const useQualityControl = (): QualityControlState => {
             wavOutput.controls = true
             // @ts-ignore
             wavOutput.setSinkId(audioOutputForGUI)
+            appState.frontendManagerState.setIsAnalyzing(false)
         }
 
         const startClassName = recording ? "body-button-active" : "body-button-stanby"
         const stopClassName = recording ? "body-button-stanby" : "body-button-active"
+        const analyzeClassName = appState.frontendManagerState.isAnalyzing ? "body-button-active" : "body-button-stanby"
+        const analyzeLabel = appState.frontendManagerState.isAnalyzing ? "wait..." : "Analyze"
+
+
 
         return (
             <>
@@ -176,6 +189,7 @@ export const useQualityControl = (): QualityControlState => {
                     <div className="body-button-container">
                         <div onClick={onRecordStartClicked} className={startClassName}>Start</div>
                         <div onClick={onRecordStopClicked} className={stopClassName}>Stop</div>
+                        <div onClick={onRecordAnalizeClicked} className={analyzeClassName}>{analyzeLabel}</div>
                     </div>
                 </div>
 
@@ -238,7 +252,7 @@ export const useQualityControl = (): QualityControlState => {
                 </div>
             </>
         )
-    }, [appState.serverSetting.setting.recordIO, appState.serverSetting.setRecordIO, outputAudioDeviceInfo, audioOutputForGUI])
+    }, [appState.serverSetting.setting.recordIO, appState.serverSetting.setRecordIO, outputAudioDeviceInfo, audioOutputForGUI, appState.frontendManagerState.isAnalyzing, appState.frontendManagerState.isConverting])
 
     const QualityControlContent = useMemo(() => {
         return (
