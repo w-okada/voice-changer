@@ -1,4 +1,4 @@
-import { ServerInfo, ServerSettingKey } from "./const";
+import { ServerAudioDevices, ServerInfo, ServerSettingKey } from "./const";
 
 
 type FileChunk = {
@@ -127,14 +127,14 @@ export class ServerConfigurator {
 
 
     // Local Mic
-    getServerMicrophones = async () => {
-        const url = this.serverUrl + "/microphone"
-        const info = await new Promise<ServerInfo>((resolve) => {
+    getServerDevices = async () => {
+        const url = this.serverUrl + "/device"
+        const info = await new Promise<ServerAudioDevices>((resolve) => {
             const request = new Request(url, {
                 method: 'GET',
             });
             fetch(request).then(async (response) => {
-                const json = await response.json() as ServerInfo
+                const json = await response.json() as ServerAudioDevices
                 resolve(json)
             })
         })

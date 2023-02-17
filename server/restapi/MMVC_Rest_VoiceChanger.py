@@ -23,11 +23,11 @@ class MMVC_Rest_VoiceChanger:
         self.voiceChangerManager = voiceChangerManager
         self.router = APIRouter()
         self.router.add_api_route("/test", self.test, methods=["POST"])
-        self.router.add_api_route("/microphone", self.get_microphone, methods=["GET"])
+        self.router.add_api_route("/device", self.get_device, methods=["GET"])
 
         self.tlock = threading.Lock()
 
-    def get_microphone(self):
+    def get_device(self):
         audio = pyaudio.PyAudio()
         audio_input_devices = []
         audio_output_devices = []

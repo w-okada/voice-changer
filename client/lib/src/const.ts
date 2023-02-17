@@ -25,6 +25,7 @@ export type VoiceChangerServerSetting = {
     f0Factor: number
     f0Detector: string // dio or harvest
     recordIO: number // 0:off, 1:on
+    serverMicProps: string
 }
 
 export type VoiceChangerClientSetting = {
@@ -81,9 +82,20 @@ export type ServerInfo = {
     f0Factor: number
     f0Detector: string
     recordIO: number
+    serverMicProps: string
 }
 
+export type ServerAudioDevice = {
+    kind: string,
+    index: number,
+    name: string,
+    hostAPI: string
+}
 
+export type ServerAudioDevices = {
+    audio_input_devices: ServerAudioDevice[]
+    audio_output_devices: ServerAudioDevice[]
+}
 
 
 
@@ -155,7 +167,8 @@ export const ServerSettingKey = {
     "onnxExecutionProvider": "onnxExecutionProvider",
     "f0Factor": "f0Factor",
     "f0Detector": "f0Detector",
-    "recordIO": "recordIO"
+    "recordIO": "recordIO",
+    "serverMicProps": "serverMicProps",
 } as const
 export type ServerSettingKey = typeof ServerSettingKey[keyof typeof ServerSettingKey]
 
@@ -174,7 +187,9 @@ export const DefaultVoiceChangerServerSetting: VoiceChangerServerSetting = {
     f0Factor: 1.0,
     onnxExecutionProvider: "CPUExecutionProvider",
     f0Detector: "dio",
-    recordIO: 0
+    recordIO: 0,
+    serverMicProps: ""
+
 }
 
 export const DefaultVoiceChangerClientSetting: VoiceChangerClientSetting = {

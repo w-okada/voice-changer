@@ -17,7 +17,7 @@ class MMVC_Namespace(socketio.AsyncNamespace):
         return cls._instance
 
     def on_connect(self, sid, environ):
-        # print('[{}] connet sid : {}'.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S') , sid))
+        print('[{}] connet sid : {}'.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), sid))
         pass
 
     async def on_request_message(self, sid, msg):

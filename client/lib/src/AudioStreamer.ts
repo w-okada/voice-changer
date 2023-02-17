@@ -55,7 +55,10 @@ export class AudioStreamer extends Duplex {
             this.socket.on('connect_error', (err) => {
                 this.audioStreamerListeners.notifyException(VOICE_CHANGER_CLIENT_EXCEPTION.ERR_SIO_CONNECT_FAILED, `[SIO] rconnection failed ${err}`)
             })
-            this.socket.on('connect', () => console.log(`[SIO] sonnect to ${this.serverUrl}`));
+            this.socket.on('connect', () => {
+                console.log(`[SIO] sonnect to ${this.serverUrl}`)
+                console.log(`[SIO] ${this.socket?.id}`)
+            });
             this.socket.on('response', (response: any[]) => {
                 const cur = Date.now()
                 const responseTime = cur - response[0]
@@ -103,6 +106,11 @@ export class AudioStreamer extends Duplex {
             voiceChangerMode: this.voiceChangerMode
         }
     }
+
+    getSocketId = () => {
+        return this.socket?.id
+    }
+
 
 
     // Main Process

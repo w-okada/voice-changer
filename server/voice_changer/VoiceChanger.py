@@ -29,6 +29,10 @@ import librosa
 import librosa.display
 SAMPLING_RATE = 24000
 
+import pyaudio
+import json
+from multiprocessing import Process, Queue
+
 
 class MockStream:
     """
@@ -93,6 +97,7 @@ class VocieChangerSettings():
     f0Factor: float = 1.0
     f0Detector: str = "dio"  # dio or harvest
     recordIO: int = 1  # 0:off, 1:on
+    serverMicProps: str = ""
 
     pyTorchModelFile: str = ""
     onnxModelFile: str = ""
@@ -101,7 +106,11 @@ class VocieChangerSettings():
     # ↓mutableな物だけ列挙
     intData = ["gpu", "srcId", "dstId", "convertChunkNum", "minConvertSize", "recordIO"]
     floatData = ["crossFadeOffsetRate", "crossFadeEndRate", "crossFadeOverlapRate", "f0Factor"]
-    strData = ["framework", "f0Detector"]
+    strData = ["framework", "f0Detector", "serverMicProps"]
+
+
+def readMicrophone(queue, sid, deviceIndex):
+    print("READ MIC", queue, sid, deviceIndex)
 
 
 class VoiceChanger():
@@ -277,6 +286,35 @@ class VoiceChanger():
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
             setattr(self.settings, key, str(val))
+            if key == "serverMicProps":
+                if hasattr(self, "serverMicrophoneReaderProcess"):
+                    self.serverMicrophoneReaderProcess.terminate()
+
+                if len(val) == 0:
+                    print("server mic close")
+
+                    pass
+                else:
+                    props = json.loads(val)
+                    print(props)
+                    sid = props["sid"]
+                    deviceIndex = props["deviceIndex"]
+                    self.serverMicrophoneReaderProcessQueue = Queue()
+                    self.serverMicrophoneReaderProcess = Process(target=readMicrophone, args=(
+                        self.serverMicrophoneReaderProcessQueue, sid, deviceIndex,))
+                    self.serverMicrophoneReaderProcess.start()
+
+                    try:
+                        print(sid, deviceIndex)
+                    except Exception as e:
+                        print(e)
+                # audio = pyaudio.PyAudio()
+                # audio_input_stream = audio.open(format=pyaudio.paInt16,
+                #                                 channels=1,
+                #                                 rate=SAMPLING_RATE,
+                #                                 frames_per_buffer=4096,
+                #                                 input_device_index=val,
+                #                                 input=True)
         else:
             print(f"{key} is not mutalbe variable!")
 
@@ -626,3 +664,6 @@ class VoiceChanger():
             # print(audio1)
 
         return audio1
+
+    def __del__(self):
+        print("DESTRUCTOR")

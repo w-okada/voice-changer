@@ -116,8 +116,9 @@ export class VoiceChangerClient {
 
     // forceVfDisable is for the condition that vf is enabled in constructor. 
     //noiseSuppression2 => VoiceFocus
-    setup = async (input: string | MediaStream, bufferSize: BufferSize, echoCancel: boolean = true, noiseSuppression: boolean = true, noiseSuppression2: boolean = false) => {
+    setup = async (input: string | MediaStream | null, bufferSize: BufferSize, echoCancel: boolean = true, noiseSuppression: boolean = true, noiseSuppression2: boolean = false) => {
         const lockNum = await this.lock()
+
         console.log(`Input Setup=> echo: ${echoCancel}, noise1: ${noiseSuppression}, noise2: ${noiseSuppression2}`)
         // condition check
         if (!this.vcNode) {
@@ -131,6 +132,17 @@ export class VoiceChangerClient {
             this.currentMediaStream.getTracks().forEach(x => { x.stop() })
             this.currentMediaStream = null
         }
+
+        //// Input デバイスがnullの時はmicStreamを止めてリターン
+        if (!input) {
+            console.log(`Input Setup=> client mic is disabled.`)
+            if (this.micStream) {
+                this.micStream.pauseRecording()
+            }
+            await this.unlock(lockNum)
+            return
+        }
+
         if (typeof input == "string") {
             this.currentMediaStream = await navigator.mediaDevices.getUserMedia({
                 audio: {
@@ -302,6 +314,14 @@ export class VoiceChangerClient {
         return this.configurator.getSettings()
     }
 
+    getServerDevices = () => {
+        return this.configurator.getServerDevices()
+    }
+
+
+    getSocketId = () => {
+        return this.audioStreamer.getSocketId()
+    }
 
 
 }

@@ -1,7 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from "react"
 
 import { VoiceChangerClientSetting, Protocol, BufferSize, VoiceChangerMode, SampleRate, Speaker, DefaultVoiceChangerClientSetting, INDEXEDDB_KEY_CLIENT, Correspondence, DownSamplingMode } from "../const"
-import { createDummyMediaStream } from "../util"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
@@ -113,9 +112,7 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
     const _setInput = async () => {
         if (!props.voiceChangerClient) return
         if (!settingRef.current.audioInput || settingRef.current.audioInput == "none") {
-            // console.log("[useClient] setup!(1)", settingRef.current.audioInput)
-            const ms = createDummyMediaStream(props.audioContext!)
-            await props.voiceChangerClient.setup(ms, settingRef.current.bufferSize, settingRef.current.echoCancel, settingRef.current.noiseSuppression, settingRef.current.noiseSuppression2)
+            await props.voiceChangerClient.setup(null, settingRef.current.bufferSize, settingRef.current.echoCancel, settingRef.current.noiseSuppression, settingRef.current.noiseSuppression2)
         } else {
             // console.log("[useClient] setup!(2)", settingRef.current.audioInput)
             await props.voiceChangerClient.setup(settingRef.current.audioInput, settingRef.current.bufferSize, settingRef.current.echoCancel, settingRef.current.noiseSuppression, settingRef.current.noiseSuppression2)

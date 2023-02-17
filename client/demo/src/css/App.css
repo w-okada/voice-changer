@@ -97,6 +97,17 @@ body {
             .title {
                 font-size: 1.1rem;
             }
+            .belongings {
+                font-weight: 400;
+                font-size: 0.8rem;
+                display: flex;
+                flex-direction: row;
+                align-items: flex-end;
+                margin-left: 10px;
+                .belongings-checkbox {
+                    margin-bottom: 3px;
+                }
+            }
         }
         .partition-content {
             position: static;

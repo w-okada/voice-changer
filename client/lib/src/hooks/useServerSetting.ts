@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react"
-import { VoiceChangerServerSetting, ServerInfo, Framework, OnnxExecutionProvider, DefaultVoiceChangerServerSetting, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA } from "../const"
+import { VoiceChangerServerSetting, ServerInfo, Framework, OnnxExecutionProvider, DefaultVoiceChangerServerSetting, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ServerAudioDevices } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
@@ -51,9 +51,11 @@ export type ServerSettingState = {
     setF0Factor: (num: number) => Promise<boolean>;
     setF0Detector: (val: string) => Promise<boolean>;
     setRecordIO: (num: number) => Promise<boolean>;
+    setServerMicrophone: (index: number) => Promise<boolean | undefined>
     reloadServerInfo: () => Promise<void>;
     setFileUploadSetting: (val: FileUploadSetting) => void
     loadModel: () => Promise<void>
+    getServerDevices: () => Promise<ServerAudioDevices>
     uploadProgress: number
     isUploading: boolean
 }
@@ -218,6 +220,19 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             return await _set_and_store(ServerSettingKey.recordIO, "" + num)
         }
     }, [props.voiceChangerClient])
+    const setServerMicrophone = useMemo(() => {
+        return async (index: number) => {
+            if (!props.voiceChangerClient) {
+                return
+            }
+            const sid = props.voiceChangerClient.getSocketId()
+            const serverMicProps = {
+                sid: sid,
+                deviceIndex: index
+            }
+            return await _set_and_store(ServerSettingKey.serverMicProps, JSON.stringify(serverMicProps))
+        }
+    }, [props.voiceChangerClient])
     //////////////
     // 操作
     /////////////
@@ -368,6 +383,16 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         await removeItem(INDEXEDDB_KEY_MODEL_DATA)
     }
 
+    const getServerDevices = async (): Promise<ServerAudioDevices> => {
+        if (!props.voiceChangerClient) {
+            return {
+                audio_input_devices: [],
+                audio_output_devices: []
+            }
+        }
+        const res = await props.voiceChangerClient.getServerDevices()
+        return res
+    }
 
     return {
         setting,
@@ -387,9 +412,11 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         setF0Factor,
         setF0Detector,
         setRecordIO,
+        setServerMicrophone,
         reloadServerInfo,
         setFileUploadSetting,
         loadModel,
+        getServerDevices,
         uploadProgress,
         isUploading,
     }
