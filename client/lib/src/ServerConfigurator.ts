@@ -124,4 +124,20 @@ export class ServerConfigurator {
         })
         return await info
     }
+
+
+    // Local Mic
+    getServerMicrophones = async () => {
+        const url = this.serverUrl + "/microphone"
+        const info = await new Promise<ServerInfo>((resolve) => {
+            const request = new Request(url, {
+                method: 'GET',
+            });
+            fetch(request).then(async (response) => {
+                const json = await response.json() as ServerInfo
+                resolve(json)
+            })
+        })
+        return info
+    }
 }
