@@ -1,4 +1,4 @@
-import { BufferSize, DownSamplingMode, InputSampleRate, Protocol, SampleRate, VoiceChangerMode } from "@dannadori/voice-changer-client-js"
+import { BufferSize, CrossFadeOverlapSize, DownSamplingMode, InputSampleRate, Protocol, SampleRate, VoiceChangerMode } from "@dannadori/voice-changer-client-js"
 import React, { useMemo } from "react"
 import { useAppState } from "./001_provider/001_AppStateProvider";
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./components/101_HeaderButton";
@@ -164,6 +164,26 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
         )
     }, [appState.serverSetting.setting.crossFadeOverlapRate, appState.serverSetting.setCrossFadeOverlapRate])
 
+
+    const crossFadeOverlapSizeRow = useMemo(() => {
+        return (
+            <div className="body-row split-3-7 left-padding-1 guided">
+                <div className="body-item-title  left-padding-1">Cross Fade Overlap Size</div>
+                <div className="body-select-container">
+                    <select className="body-select" value={appState.serverSetting.setting.crossFadeOverlapSize} onChange={(e) => {
+                        appState.serverSetting.setCrossFadeOverlapSize(Number(e.target.value) as CrossFadeOverlapSize)
+                    }}>
+                        {
+                            Object.values(CrossFadeOverlapSize).map(x => {
+                                return <option key={x} value={x}>{x}</option>
+                            })
+                        }
+                    </select>
+                </div>
+            </div>
+        )
+    }, [appState.serverSetting.setting.crossFadeOverlapSize, appState.serverSetting.setCrossFadeOverlapSize])
+
     const crossFadeOffsetRateRow = useMemo(() => {
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
@@ -290,6 +310,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 {convertChunkNumRow}
                 {minConvertSizeRow}
                 {crossFadeOverlapRateRow}
+                {crossFadeOverlapSizeRow}
                 {crossFadeOffsetRateRow}
                 {crossFadeEndRateRow}
                 <div className="body-row divider"></div>
@@ -301,7 +322,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
 
             </>
         )
-    }, [mmvcServerUrlRow, protocolRow, sampleRateRow, sendingSampleRateRow, bufferSizeRow, convertChunkNumRow, minConvertSizeRow, crossFadeOverlapRateRow, crossFadeOffsetRateRow, crossFadeEndRateRow, voiceChangeModeRow, workletSettingRow, downSamplingModeRow])
+    }, [mmvcServerUrlRow, protocolRow, sampleRateRow, sendingSampleRateRow, bufferSizeRow, convertChunkNumRow, minConvertSizeRow, crossFadeOverlapRateRow, crossFadeOverlapSizeRow, crossFadeOffsetRateRow, crossFadeEndRateRow, voiceChangeModeRow, workletSettingRow, downSamplingModeRow])
 
 
     const advancedSetting = useMemo(() => {

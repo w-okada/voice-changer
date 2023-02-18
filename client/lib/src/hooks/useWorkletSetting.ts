@@ -18,7 +18,7 @@ export type WorkletSettingState = {
 export const useWorkletSetting = (props: UseWorkletSettingProps): WorkletSettingState => {
     const [setting, _setSetting] = useState<WorkletSetting>(DefaultWorkletSetting)
     const { setItem, getItem, removeItem } = useIndexedDB()
-    // 初期化 その１ DBから取得
+    // DBから設定取得（キャッシュによる初期化）
     useEffect(() => {
         const loadCache = async () => {
             const setting = await getItem(INDEXEDDB_KEY_WORKLET)
@@ -48,7 +48,7 @@ export const useWorkletSetting = (props: UseWorkletSettingProps): WorkletSetting
         loadCache()
     }, [])
 
-    // クライアントに設定  初期化, 設定変更
+    // クライアントへ設定反映  初期化, 設定変更
     useEffect(() => {
         if (!props.voiceChangerClient) return
         props.voiceChangerClient.configureWorklet(setting)

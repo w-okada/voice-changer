@@ -107,7 +107,7 @@ export const useClient = (props: UseClientProps): ClientState => {
     const getInfo = useMemo(() => {
         return async () => {
             await initializedPromise
-            await clientSetting.reloadClientSetting()
+            await clientSetting.reloadClientSetting() // 実質的な処理の意味はない
             await serverSetting.reloadServerInfo()
         }
     }, [clientSetting, serverSetting])

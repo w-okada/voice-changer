@@ -259,9 +259,14 @@ export class VoiceChangerClient {
         this.audioStreamer.setSendingSampleRate(val)
     }
 
-    // configure worklet
+
+    /////////////////////////////////////////////////////
+    // コンポーネント設定、操作
+    /////////////////////////////////////////////////////
+    //##  Server ##//
+
+    //##  Worklet ##//
     configureWorklet = (setting: WorkletSetting) => {
-        console.log("configureWorklet", setting)
         this.vcNode.configure(setting)
     }
     startOutputRecordingWorklet = () => {

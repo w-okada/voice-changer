@@ -91,7 +91,7 @@ class VocieChangerSettings():
     dstId: int = 100
     crossFadeOffsetRate: float = 0.1
     crossFadeEndRate: float = 0.9
-    crossFadeOverlapRate: float = 0.9
+    crossFadeOverlapSize: int = 4096
     convertChunkNum: int = 32
     minConvertSize: int = 0
     framework: str = "PyTorch"  # PyTorch or ONNX
@@ -106,8 +106,8 @@ class VocieChangerSettings():
     configFile: str = ""
 
     # ↓mutableな物だけ列挙
-    intData = ["gpu", "srcId", "dstId", "convertChunkNum", "minConvertSize", "recordIO", "inputSampleRate"]
-    floatData = ["crossFadeOffsetRate", "crossFadeEndRate", "crossFadeOverlapRate", "f0Factor"]
+    intData = ["gpu", "srcId", "dstId", "convertChunkNum", "minConvertSize", "recordIO", "inputSampleRate", "crossFadeOverlapSize"]
+    floatData = ["crossFadeOffsetRate", "crossFadeEndRate", "f0Factor"]
     strData = ["framework", "f0Detector", "serverMicProps"]
 
 
@@ -125,7 +125,7 @@ class VoiceChanger():
         self.onnx_session = None
         self.currentCrossFadeOffsetRate = 0
         self.currentCrossFadeEndRate = 0
-        self.currentCrossFadeOverlapRate = 0
+        self.currentCrossFadeOverlapSize = 0
 
         self.gpu_num = torch.cuda.device_count()
         self.text_norm = torch.LongTensor([0, 6, 0])
@@ -324,14 +324,17 @@ class VoiceChanger():
 
     def _generate_strength(self, unpackedData):
 
-        if self.unpackedData_length != unpackedData.shape[0] or self.currentCrossFadeOffsetRate != self.settings.crossFadeOffsetRate or self.currentCrossFadeEndRate != self.settings.crossFadeEndRate or self.currentCrossFadeOverlapRate != self.settings.crossFadeOverlapRate:
+        if self.unpackedData_length != unpackedData.shape[0] or \
+                self.currentCrossFadeOffsetRate != self.settings.crossFadeOffsetRate or \
+                self.currentCrossFadeEndRate != self.settings.crossFadeEndRate or \
+                self.currentCrossFadeOverlapSize != self.settings.crossFadeOverlapSize:
+
             self.unpackedData_length = unpackedData.shape[0]
             self.currentCrossFadeOffsetRate = self.settings.crossFadeOffsetRate
             self.currentCrossFadeEndRate = self.settings.crossFadeEndRate
-            self.currentCrossFadeOverlapRate = self.settings.crossFadeOverlapRate
+            self.currentCrossFadeOverlapSize = self.settings.crossFadeOverlapSize
 
-            overlapSize = int(unpackedData.shape[0] * self.settings.crossFadeOverlapRate)
-
+            overlapSize = min(self.settings.crossFadeOverlapSize, self.unpackedData_length)
             cf_offset = int(overlapSize * self.settings.crossFadeOffsetRate)
             cf_end = int(overlapSize * self.settings.crossFadeEndRate)
             cf_range = cf_end - cf_offset
@@ -413,7 +416,7 @@ class VoiceChanger():
                 "sid_tgt": sid_tgt1.numpy()
             })[0][0, 0] * self.hps.data.max_wav_value
         if hasattr(self, 'np_prev_audio1') == True:
-            overlapSize = int(inputSize * self.settings.crossFadeOverlapRate)
+            overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
             prev_overlap = self.np_prev_audio1[-1 * overlapSize:]
             cur_overlap = audio1[-1 * (inputSize + overlapSize):-1 * inputSize]
             # print(prev_overlap.shape, self.np_prev_strength.shape, cur_overlap.shape, self.np_cur_strength.shape)
@@ -454,7 +457,7 @@ class VoiceChanger():
                     self.cur_strength = self.cur_strength.cpu()
 
                 if hasattr(self, 'prev_audio1') == True and self.prev_audio1.device == torch.device('cpu'):  # prev_audio1が所望のデバイスに無い場合は一回休み。
-                    overlapSize = int(inputSize * self.settings.crossFadeOverlapRate)
+                    overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
                     prev_overlap = self.prev_audio1[-1 * overlapSize:]
                     cur_overlap = audio1[-1 * (inputSize + overlapSize):-1 * inputSize]
                     powered_prev = prev_overlap * self.prev_strength
@@ -495,12 +498,15 @@ class VoiceChanger():
                     self.cur_strength = self.cur_strength.cuda(self.settings.gpu)
 
                 if hasattr(self, 'prev_audio1') == True and self.prev_audio1.device == torch.device('cuda', self.settings.gpu):
-                    overlapSize = int(inputSize * self.settings.crossFadeOverlapRate)
+                    overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
                     prev_overlap = self.prev_audio1[-1 * overlapSize:]
                     cur_overlap = audio1[-1 * (inputSize + overlapSize):-1 * inputSize]
                     powered_prev = prev_overlap * self.prev_strength
                     powered_cur = cur_overlap * self.cur_strength
                     powered_result = powered_prev + powered_cur
+
+                    print(overlapSize, prev_overlap.shape, cur_overlap.shape, self.prev_strength.shape, self.cur_strength.shape)
+                    print(self.prev_audio1.shape, audio1.shape, inputSize, overlapSize)
 
                     cur = audio1[-1 * inputSize:-1 * overlapSize]  # 今回のインプットの生部分。(インプット - 次回のCrossfade部分)。
                     result = torch.cat([powered_result, cur], axis=0)  # Crossfadeと今回のインプットの生部分を結合
@@ -517,15 +523,11 @@ class VoiceChanger():
         if self.settings.inputSampleRate != 24000:
             print("convert sampling rate!", self.settings.inputSampleRate)
             unpackedData = resampy.resample(unpackedData, 48000, 24000)
-        convertSize = self.settings.convertChunkNum * 128  # 128sample/1chunk
-        # print("convsize:", unpackedData.shape[0] * (1 + self.settings.crossFadeOverlapRate))
-        if unpackedData.shape[0] * (1 + self.settings.crossFadeOverlapRate) + 1024 > convertSize:
-            convertSize = int(unpackedData.shape[0] * (1 + self.settings.crossFadeOverlapRate)) + 1024
-        if convertSize < self.settings.minConvertSize:
-            convertSize = self.settings.minConvertSize
-        # print("convert Size", unpackedData.shape[0], unpackedData.shape[0]*(1 + self.settings.crossFadeOverlapRate), convertSize, self.settings.minConvertSize)
 
-        # convertSize = 8192
+        convertSize = unpackedData.shape[0] + min(self.settings.crossFadeOverlapSize, unpackedData.shape[0])
+        print(convertSize, unpackedData.shape[0])
+        if convertSize < 8192:
+            convertSize = 8192
 
         self._generate_strength(unpackedData)
         # f0はデバッグ用

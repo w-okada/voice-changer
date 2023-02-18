@@ -48,6 +48,7 @@ export type ServerSettingState = {
     setCrossFadeOffsetRate: (num: number) => Promise<boolean>;
     setCrossFadeEndRate: (num: number) => Promise<boolean>;
     setCrossFadeOverlapRate: (num: number) => Promise<boolean>;
+    setCrossFadeOverlapSize: (num: number) => Promise<boolean>;
     setF0Factor: (num: number) => Promise<boolean>;
     setF0Detector: (val: string) => Promise<boolean>;
     setRecordIO: (num: number) => Promise<boolean>;
@@ -69,7 +70,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
     const { setItem, getItem, removeItem } = useIndexedDB()
 
 
-    // 初期化 その１ DBから取得
+    // DBから設定取得（キャッシュによる初期化）
     useEffect(() => {
         const loadCache = async () => {
             const setting = await getItem(INDEXEDDB_KEY_SERVER)
@@ -88,7 +89,8 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
 
         loadCache()
     }, [])
-    // 初期化 その２ クライアントに設定
+
+    // クライアントへ設定反映  初期化, 設定変更
     useEffect(() => {
         if (!props.voiceChangerClient) return
         props.voiceChangerClient.updateServerSettings(ServerSettingKey.framework, setting.framework)
@@ -106,7 +108,11 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         props.voiceChangerClient.updateServerSettings(ServerSettingKey.recordIO, "" + setting.recordIO)
 
 
-    }, [props.voiceChangerClient])
+        // setting["convertChunkNum"] = 1
+        // const a = "convertChunkNum"
+        // setting[a] = ""
+
+    }, [props.voiceChangerClient, setting])
 
     //////////////
     // 設定
@@ -129,6 +135,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 crossFadeOffsetRate: res.crossFadeOffsetRate,
                 crossFadeEndRate: res.crossFadeEndRate,
                 crossFadeOverlapRate: res.crossFadeOverlapRate,
+                crossFadeOverlapSize: res.crossFadeOverlapSize,
                 framework: res.framework,
                 onnxExecutionProvider: (!!res.onnxExecutionProvider && res.onnxExecutionProvider.length > 0) ? res.onnxExecutionProvider[0] as OnnxExecutionProvider : DefaultVoiceChangerServerSetting.onnxExecutionProvider,
                 f0Factor: res.f0Factor,
@@ -145,6 +152,47 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         }
 
     }
+
+    // // New Trial
+    // // 設定 _setSettingがトリガでuseEffectが呼ばれて、workletに設定が飛ぶ
+    // const setSetting = useMemo(() => {
+    //     return (setting: ) => {
+
+
+    //         if (!props.voiceChangerClient) return false
+
+    //         const res = await props.voiceChangerClient.updateServerSettings(key, "" + newVal)
+
+    //         _setServerInfo(res)
+    //         if (newVal == res[key]) {
+    //             const newSetting: VoiceChangerServerSetting = {
+    //                 ...settingRef.current,
+    //                 convertChunkNum: res.convertChunkNum,
+    //                 minConvertSize: res.minConvertSize,
+    //                 srcId: res.srcId,
+    //                 dstId: res.dstId,
+    //                 gpu: res.gpu,
+    //                 crossFadeOffsetRate: res.crossFadeOffsetRate,
+    //                 crossFadeEndRate: res.crossFadeEndRate,
+    //                 crossFadeOverlapRate: res.crossFadeOverlapRate,
+    //                 crossFadeOverlapSize: res.crossFadeOverlapSize,
+    //                 framework: res.framework,
+    //                 onnxExecutionProvider: (!!res.onnxExecutionProvider && res.onnxExecutionProvider.length > 0) ? res.onnxExecutionProvider[0] as OnnxExecutionProvider : DefaultVoiceChangerServerSetting.onnxExecutionProvider,
+    //                 f0Factor: res.f0Factor,
+    //                 f0Detector: res.f0Detector,
+    //                 recordIO: res.recordIO
+
+    //             }
+    //             _setSetting(newSetting)
+    //             setItem(INDEXEDDB_KEY_SERVER, newSetting)
+    //             return true
+    //         } else {
+    //             alert(`[ServerSetting] 設定が反映されていません([key:${key}, new:${newVal}, res:${res[key]}])。モデルの切り替えの場合、処理が非同期で行われるため反映されていないように見える場合があります。サーバコントロールのリロードボタンを押すとGUIに反映されるます。`)
+    //             return false
+    //         }
+
+    //     }
+    // }, [props.voiceChangerClient])
 
     const setFramework = useMemo(() => {
         return async (framework: Framework) => {
@@ -204,6 +252,12 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             return await _set_and_store(ServerSettingKey.crossFadeOverlapRate, "" + num)
         }
     }, [props.voiceChangerClient])
+    const setCrossFadeOverlapSize = useMemo(() => {
+        return async (num: number) => {
+            return await _set_and_store(ServerSettingKey.crossFadeOverlapSize, "" + num)
+        }
+    }, [props.voiceChangerClient])
+
 
     const setF0Factor = useMemo(() => {
         return async (num: number) => {
@@ -370,6 +424,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         setCrossFadeOffsetRate,
         setCrossFadeEndRate,
         setCrossFadeOverlapRate,
+        setCrossFadeOverlapSize,
         setF0Factor,
         setF0Detector,
         setRecordIO,
