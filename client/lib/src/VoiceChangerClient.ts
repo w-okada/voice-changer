@@ -261,14 +261,7 @@ export class VoiceChangerClient {
 
     // configure worklet
     configureWorklet = (setting: WorkletSetting) => {
-        // const req: VoiceChangerWorkletProcessorRequest = {
-        //     requestType: "config",
-        //     voice: new ArrayBuffer(1),
-        //     numTrancateTreshold: setting.numTrancateTreshold,
-        //     volTrancateThreshold: setting.volTrancateThreshold,
-        //     volTrancateLength: setting.volTrancateLength
-        // }
-        // this.vcNode.postReceivedVoice(req)
+        console.log("configureWorklet", setting)
         this.vcNode.configure(setting)
     }
     startOutputRecordingWorklet = () => {

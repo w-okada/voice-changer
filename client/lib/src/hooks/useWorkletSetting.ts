@@ -48,21 +48,22 @@ export const useWorkletSetting = (props: UseWorkletSettingProps): WorkletSetting
         loadCache()
     }, [])
 
-    // 初期化 その２ クライアントに設定
+    // クライアントに設定  初期化, 設定変更
     useEffect(() => {
         if (!props.voiceChangerClient) return
         props.voiceChangerClient.configureWorklet(setting)
     }, [props.voiceChangerClient, setting])
 
+    // 設定 _setSettingがトリガでuseEffectが呼ばれて、workletに設定が飛ぶ
     const setSetting = useMemo(() => {
         return (setting: WorkletSetting) => {
             if (!props.voiceChangerClient) return
-            props.voiceChangerClient.configureWorklet(setting)
             _setSetting(setting)
             setItem(INDEXEDDB_KEY_WORKLET, setting)
         }
     }, [props.voiceChangerClient])
 
+    // その他 オペレーション
     const clearSetting = async () => {
         await removeItem(INDEXEDDB_KEY_WORKLET)
     }

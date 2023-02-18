@@ -10,16 +10,20 @@ export type UseClientProps = {
 }
 
 export type ClientState = {
+    // 各種設定I/Fへの参照
     workletSetting: WorkletSettingState
     clientSetting: ClientSettingState
     serverSetting: ServerSettingState
 
+    // モニタリングデータ
     bufferingTime: number;
     responseTime: number;
     volume: number;
-    outputRecordData: Float32Array[] | null;
+    outputRecordData: Float32Array[] | null; // Serverから帰ってきたデータをレコードしたもの
 
+    // 情報取得
     getInfo: () => Promise<void>
+    // 設定クリア
     clearSetting: () => Promise<void>
 }
 
@@ -39,21 +43,19 @@ export const useClient = (props: UseClientProps): ClientState => {
     }, [])
 
 
-    // (1-2) 各種設定
+    // (1-2) 各種設定I/F
     const clientSetting = useClientSetting({ voiceChangerClient, audioContext: props.audioContext })
     const workletSetting = useWorkletSetting({ voiceChangerClient })
     const serverSetting = useServerSetting({ voiceChangerClient })
 
-    // (1-3) ステータス
+    // (1-3) モニタリングデータ
     const [bufferingTime, setBufferingTime] = useState<number>(0)
     const [responseTime, setResponseTime] = useState<number>(0)
     const [volume, setVolume] = useState<number>(0)
     const [outputRecordData, setOutputRecordData] = useState<Float32Array[] | null>(null)
 
-
     // (1-4) エラーステータス
     const errorCountRef = useRef<number>(0)
-
 
     // (2-1) 初期化処理
     useEffect(() => {
@@ -118,16 +120,21 @@ export const useClient = (props: UseClientProps): ClientState => {
     }
 
     return {
+        // 各種設定I/Fへの参照
+        clientSetting,
+        workletSetting,
+        serverSetting,
+
+        // モニタリングデータ
         bufferingTime,
         responseTime,
         volume,
         outputRecordData,
 
+        // 情報取得
         getInfo,
 
-        clientSetting,
-        workletSetting,
-        serverSetting,
+        // 設定クリア
         clearSetting,
     }
 }

@@ -316,52 +316,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         }
     }, [fileUploadSetting, props.voiceChangerClient])
 
-    // const _uploadFile = useMemo(() => {
-    //     return async (file: File, onprogress: (progress: number, end: boolean) => void) => {
-    //         if (!props.voiceChangerClient) return
-    //         const num = await props.voiceChangerClient.uploadFile(file, onprogress)
-    //         const res = await props.voiceChangerClient.concatUploadedFile(file, num)
-    //         console.log("uploaded", num, res)
-    //     }
-    // }, [props.voiceChangerClient])
-    // const loadModel = useMemo(() => {
-    //     return async () => {
-    //         if (!fileUploadSetting.pyTorchModel && !fileUploadSetting.onnxModel) {
-    //             alert("PyTorchモデルとONNXモデルのどちらか一つ以上指定する必要があります。")
-    //             return
-    //         }
-    //         if (!fileUploadSetting.configFile) {
-    //             alert("Configファイルを指定する必要があります。")
-    //             return
-    //         }
-    //         if (!props.voiceChangerClient) return
-
-
-    //         setUploadProgress(0)
-    //         setIsUploading(true)
-    //         const models = [fileUploadSetting.pyTorchModel, fileUploadSetting.onnxModel].filter(x => { return x != null }) as File[]
-    //         for (let i = 0; i < models.length; i++) {
-    //             const progRate = 1 / models.length
-    //             const progOffset = 100 * i * progRate
-    //             await _uploadFile(models[i], (progress: number, _end: boolean) => {
-    //                 // console.log(progress * progRate + progOffset, end, progRate,)
-    //                 setUploadProgress(progress * progRate + progOffset)
-    //             })
-    //         }
-
-    //         await _uploadFile(fileUploadSetting.configFile, (progress: number, end: boolean) => {
-    //             console.log(progress, end)
-    //         })
-
-    //         await props.voiceChangerClient.loadModel(fileUploadSetting.configFile, fileUploadSetting.pyTorchModel, fileUploadSetting.onnxModel)
-    //         setUploadProgress(0)
-    //         setIsUploading(false)
-    //         reloadServerInfo()
-    //     }
-    // }, [fileUploadSetting, props.voiceChangerClient])
-
-
-
     const reloadServerInfo = useMemo(() => {
         return async () => {
             if (!props.voiceChangerClient) return
