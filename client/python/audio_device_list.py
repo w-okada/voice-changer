@@ -1,5 +1,5 @@
 import pyaudio
-
+import json
 if __name__ == '__main__':
     audio = pyaudio.PyAudio()
     audio_input_devices = []
@@ -26,7 +26,6 @@ if __name__ == '__main__':
             audio_output_devices.append({"kind": "audiooutput", "index": deviceIndex, "name": deviceName, "hostAPI": hostAPI})
     audio_devices["audio_input_devices"] = audio_input_devices
     audio_devices["audio_output_devices"] = audio_output_devices
+    json_str = json.dumps(audio_devices, indent=2, ensure_ascii=True)
 
-    json_compatible_item_data = jsonable_encoder(audio_devices)
-
-    print(json_compatible_item_data)
+    print(json_str)

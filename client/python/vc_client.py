@@ -116,13 +116,14 @@ if __name__ == '__main__':
         input_device_index=inputDevice,
         input=True)
 
+    print("output device", outputDevice)
     if outputDevice >= 0:
         audio_output_stream = audio.open(
             format=pyaudio.paInt16,
             channels=1,
             rate=24000,
             frames_per_buffer=BUFFER_SIZE,
-            input_device_index=outputDevice,
+            output_device_index=outputDevice,
             output=True)
     else:
         audio_output_stream = None
