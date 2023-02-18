@@ -4,6 +4,8 @@ module.exports = {
     entry: "./src/index.ts",
     resolve: {
         extensions: [".ts", ".js"],
+        fallback: {
+        }
     },
     module: {
         rules: [

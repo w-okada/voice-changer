@@ -26,6 +26,7 @@ export type VoiceChangerServerSetting = {
     f0Detector: string // dio or harvest
     recordIO: number // 0:off, 1:on
     serverMicProps: string
+    inputSampleRate: InputSampleRate
 }
 
 export type VoiceChangerClientSetting = {
@@ -33,6 +34,7 @@ export type VoiceChangerClientSetting = {
     mmvcServerUrl: string,
     protocol: Protocol,
     sampleRate: SampleRate, // 48000Hz
+    sendingSampleRate: SendingSampleRate,
     bufferSize: BufferSize, // 256, 512, 1024, 2048, 4096, 8192, 16384 (for mic stream)
     inputChunkNum: number, // n of (256 x n) for send buffer
     speakers: Speaker[],
@@ -83,6 +85,7 @@ export type ServerInfo = {
     f0Detector: string
     recordIO: number
     serverMicProps: string
+    inputSampleRate: InputSampleRate
 }
 
 export type ServerAudioDevice = {
@@ -122,6 +125,18 @@ export const SampleRate = {
     "48000": 48000,
 } as const
 export type SampleRate = typeof SampleRate[keyof typeof SampleRate]
+
+export const SendingSampleRate = {
+    "48000": 48000,
+    "24000": 24000
+} as const
+export type SendingSampleRate = typeof SendingSampleRate[keyof typeof SendingSampleRate]
+
+export const InputSampleRate = {
+    "48000": 48000,
+    "24000": 24000
+} as const
+export type InputSampleRate = typeof InputSampleRate[keyof typeof InputSampleRate]
 
 export const BufferSize = {
     "256": 256,
@@ -169,6 +184,7 @@ export const ServerSettingKey = {
     "f0Detector": "f0Detector",
     "recordIO": "recordIO",
     "serverMicProps": "serverMicProps",
+    "inputSampleRate": "inputSampleRate",
 } as const
 export type ServerSettingKey = typeof ServerSettingKey[keyof typeof ServerSettingKey]
 
@@ -188,8 +204,8 @@ export const DefaultVoiceChangerServerSetting: VoiceChangerServerSetting = {
     onnxExecutionProvider: "CPUExecutionProvider",
     f0Detector: "dio",
     recordIO: 0,
-    serverMicProps: ""
-
+    serverMicProps: "",
+    inputSampleRate: 48000
 }
 
 export const DefaultVoiceChangerClientSetting: VoiceChangerClientSetting = {
@@ -197,6 +213,7 @@ export const DefaultVoiceChangerClientSetting: VoiceChangerClientSetting = {
     mmvcServerUrl: "",
     protocol: "sio",
     sampleRate: 48000,
+    sendingSampleRate: 48000,
     bufferSize: 1024,
     inputChunkNum: 48,
     speakers: [

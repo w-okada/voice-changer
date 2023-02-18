@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react"
-import { VoiceChangerServerSetting, ServerInfo, Framework, OnnxExecutionProvider, DefaultVoiceChangerServerSetting, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ServerAudioDevices } from "../const"
+import { VoiceChangerServerSetting, ServerInfo, Framework, OnnxExecutionProvider, DefaultVoiceChangerServerSetting, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ServerAudioDevices, InputSampleRate } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
@@ -52,6 +52,7 @@ export type ServerSettingState = {
     setF0Detector: (val: string) => Promise<boolean>;
     setRecordIO: (num: number) => Promise<boolean>;
     setServerMicrophone: (index: number) => Promise<boolean | undefined>
+    setInputSampleRate: (num: InputSampleRate) => Promise<boolean>
     reloadServerInfo: () => Promise<void>;
     setFileUploadSetting: (val: FileUploadSetting) => void
     loadModel: () => Promise<void>
@@ -231,6 +232,12 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 deviceIndex: index
             }
             return await _set_and_store(ServerSettingKey.serverMicProps, JSON.stringify(serverMicProps))
+        }
+    }, [props.voiceChangerClient])
+
+    const setInputSampleRate = useMemo(() => {
+        return async (num: number) => {
+            return await _set_and_store(ServerSettingKey.inputSampleRate, "" + num)
         }
     }, [props.voiceChangerClient])
     //////////////
@@ -413,6 +420,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         setF0Detector,
         setRecordIO,
         setServerMicrophone,
+        setInputSampleRate,
         reloadServerInfo,
         setFileUploadSetting,
         loadModel,

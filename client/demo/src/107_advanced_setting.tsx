@@ -1,6 +1,5 @@
-import { BufferSize, DownSamplingMode, Protocol, SampleRate, VoiceChangerMode } from "@dannadori/voice-changer-client-js"
-import React, { useMemo, useState } from "react"
-import { ClientState } from "@dannadori/voice-changer-client-js";
+import { BufferSize, DownSamplingMode, InputSampleRate, Protocol, SampleRate, VoiceChangerMode } from "@dannadori/voice-changer-client-js"
+import React, { useMemo } from "react"
 import { useAppState } from "./001_provider/001_AppStateProvider";
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./components/101_HeaderButton";
 
@@ -82,6 +81,27 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
             </div>
         )
     }, [appState.clientSetting.setting.sampleRate, appState.clientSetting.setSampleRate])
+
+    const sendingSampleRateRow = useMemo(() => {
+        return (
+            <div className="body-row split-3-7 left-padding-1 guided">
+                <div className="body-item-title left-padding-1">Sending Sample Rate</div>
+                <div className="body-select-container">
+                    <select className="body-select" value={appState.clientSetting.setting.sendingSampleRate} onChange={(e) => {
+                        appState.clientSetting.setSendingSampleRate(Number(e.target.value) as InputSampleRate)
+                        appState.serverSetting.setInputSampleRate(Number(e.target.value) as InputSampleRate)
+
+                    }}>
+                        {
+                            Object.values(InputSampleRate).map(x => {
+                                return <option key={x} value={x}>{x}</option>
+                            })
+                        }
+                    </select>
+                </div>
+            </div>
+        )
+    }, [appState.clientSetting.setting.sendingSampleRate, appState.clientSetting.setSendingSampleRate, appState.serverSetting.setInputSampleRate])
 
     const bufferSizeRow = useMemo(() => {
         return (
@@ -263,6 +283,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 {protocolRow}
                 <div className="body-row divider"></div>
                 {sampleRateRow}
+                {sendingSampleRateRow}
                 {bufferSizeRow}
                 <div className="body-row divider"></div>
 
@@ -280,7 +301,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
 
             </>
         )
-    }, [mmvcServerUrlRow, protocolRow, sampleRateRow, bufferSizeRow, convertChunkNumRow, minConvertSizeRow, crossFadeOverlapRateRow, crossFadeOffsetRateRow, crossFadeEndRateRow, voiceChangeModeRow, workletSettingRow, downSamplingModeRow])
+    }, [mmvcServerUrlRow, protocolRow, sampleRateRow, sendingSampleRateRow, bufferSizeRow, convertChunkNumRow, minConvertSizeRow, crossFadeOverlapRateRow, crossFadeOffsetRateRow, crossFadeEndRateRow, voiceChangeModeRow, workletSettingRow, downSamplingModeRow])
 
 
     const advancedSetting = useMemo(() => {

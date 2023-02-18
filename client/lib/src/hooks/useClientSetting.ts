@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from "react"
 
-import { VoiceChangerClientSetting, Protocol, BufferSize, VoiceChangerMode, SampleRate, Speaker, DefaultVoiceChangerClientSetting, INDEXEDDB_KEY_CLIENT, Correspondence, DownSamplingMode } from "../const"
+import { VoiceChangerClientSetting, Protocol, BufferSize, VoiceChangerMode, SampleRate, Speaker, DefaultVoiceChangerClientSetting, INDEXEDDB_KEY_CLIENT, Correspondence, DownSamplingMode, SendingSampleRate } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
@@ -22,6 +22,7 @@ export type ClientSettingState = {
     setInputChunkNum: (num: number) => void;
     setVoiceChangerMode: (mode: VoiceChangerMode) => void
     setDownSamplingMode: (mode: DownSamplingMode) => void
+    setSendingSampleRate: (val: SendingSampleRate) => void
     setSampleRate: (num: SampleRate) => void
     setSpeakers: (speakers: Speaker[]) => void
     setCorrespondences: (file: File | null) => Promise<void>
@@ -191,6 +192,15 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
         }
     }, [props.voiceChangerClient])
 
+    const setSendingSampleRate = useMemo(() => {
+        return (val: SendingSampleRate) => {
+            if (!props.voiceChangerClient) return
+            props.voiceChangerClient.setSendingSampleRate(val)
+            settingRef.current.sendingSampleRate = val
+            setSetting({ ...settingRef.current })
+        }
+    }, [props.voiceChangerClient])
+
 
 
     const setSampleRate = useMemo(() => {
@@ -292,6 +302,7 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
         setInputChunkNum,
         setVoiceChangerMode,
         setDownSamplingMode,
+        setSendingSampleRate,
         setSampleRate,
         setSpeakers,
         setCorrespondences,

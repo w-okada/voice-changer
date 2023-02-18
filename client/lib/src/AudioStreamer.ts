@@ -1,7 +1,8 @@
 import { io, Socket } from "socket.io-client";
 import { DefaultEventsMap } from "@socket.io/component-emitter";
 import { Duplex, DuplexOptions } from "readable-stream";
-import { DownSamplingMode, Protocol, VoiceChangerMode, VOICE_CHANGER_CLIENT_EXCEPTION } from "./const";
+import { DefaultVoiceChangerClientSetting, DownSamplingMode, Protocol, SendingSampleRate, VoiceChangerMode, VOICE_CHANGER_CLIENT_EXCEPTION } from "./const";
+
 
 export type Callbacks = {
     onVoiceReceived: (voiceChangerMode: VoiceChangerMode, data: ArrayBuffer) => void
@@ -38,7 +39,7 @@ export class AudioStreamer extends Duplex {
     // Flags 
     // private downSamplingMode: DownSamplingMode = DownSamplingMode.decimate
     private downSamplingMode: DownSamplingMode = DownSamplingMode.average
-
+    private sendingSampleRate: number = DefaultVoiceChangerClientSetting.sendingSampleRate
 
     constructor(callbacks: Callbacks, audioStreamerListeners: AudioStreamerListeners, options?: DuplexOptions) {
         super(options);
@@ -96,6 +97,9 @@ export class AudioStreamer extends Duplex {
     // set Flags
     setDownSamplingMode = (val: DownSamplingMode) => {
         this.downSamplingMode = val
+    }
+    setSendingSampleRate = (val: SendingSampleRate) => {
+        this.sendingSampleRate = val
     }
 
     getSettings = (): AudioStreamerSettings => {
@@ -156,9 +160,12 @@ export class AudioStreamer extends Duplex {
     }
 
 
-    private _write_realtime = (buffer: Float32Array) => {
+    private _write_realtime = async (buffer: Float32Array) => {
+
         let downsampledBuffer: Float32Array | null = null
-        if (this.downSamplingMode == DownSamplingMode.decimate) {
+        if (this.sendingSampleRate == 48000) {
+            downsampledBuffer = buffer
+        } else if (this.downSamplingMode == DownSamplingMode.decimate) {
             //////// (Kind 1) 間引き //////////
             // bufferSize個のデータ（48Khz）が入ってくる。
             //// 48000Hz で入ってくるので間引いて24000Hzに変換する。
@@ -170,7 +177,8 @@ export class AudioStreamer extends Duplex {
             }
         } else {
             //////// (Kind 2) 平均 //////////
-            downsampledBuffer = this._averageDownsampleBuffer(buffer, 48000, 24000)
+            // downsampledBuffer = this._averageDownsampleBuffer(buffer, 48000, 24000)
+            downsampledBuffer = this._averageDownsampleBuffer(buffer, 48000, this.sendingSampleRate)
         }
 
         // Float to signed16
@@ -184,7 +192,9 @@ export class AudioStreamer extends Duplex {
 
 
         // 256byte(最低バッファサイズ256から間引いた個数x2byte)をchunkとして管理
-        const chunkByteSize = 256 // (const.ts ★1)
+        // const chunkByteSize = 256 // (const.ts ★1)
+        // const chunkByteSize = 256 * 2 // (const.ts ★1)
+        const chunkByteSize = (256 * 2) * (this.sendingSampleRate / 48000) // (const.ts ★1)
         for (let i = 0; i < arrayBuffer.byteLength / chunkByteSize; i++) {
             const ab = arrayBuffer.slice(i * chunkByteSize, (i + 1) * chunkByteSize)
             this.requestChunks.push(ab)
