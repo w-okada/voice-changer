@@ -98,7 +98,7 @@ class VocieChangerSettings():
 
     f0Factor: float = 1.0
     f0Detector: str = "dio"  # dio or harvest
-    recordIO: int = 1  # 0:off, 1:on
+    recordIO: int = 0  # 0:off, 1:on
 
     framework: str = "PyTorch"  # PyTorch or ONNX
     pyTorchModelFile: str = ""
