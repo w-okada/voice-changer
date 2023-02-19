@@ -25,18 +25,18 @@ export const useConvertSetting = (): ConvertSettingState => {
             <div className="body-row split-3-2-1-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Input Chunk Num(128sample/chunk)</div>
                 <div className="body-input-container">
-                    <input type="number" min={1} max={256} step={1} value={appState.streamerSetting.audioStreamerSetting.inputChunkNum} onChange={(e) => {
-                        appState.streamerSetting.updateAudioStreamerSetting({ ...appState.streamerSetting.audioStreamerSetting, inputChunkNum: Number(e.target.value) })
+                    <input type="number" min={1} max={256} step={1} value={appState.workletNodeSetting.workletNodeSetting.inputChunkNum} onChange={(e) => {
+                        appState.workletNodeSetting.updateWorkletNodeSetting({ ...appState.workletNodeSetting.workletNodeSetting, inputChunkNum: Number(e.target.value) })
                     }} />
                 </div>
                 <div className="body-item-text">
-                    <div>buff: {(appState.streamerSetting.audioStreamerSetting.inputChunkNum * 128 * 1000 / 24000).toFixed(1)}ms</div>
+                    <div>buff: {(appState.workletNodeSetting.workletNodeSetting.inputChunkNum * 128 * 1000 / 48000).toFixed(1)}ms</div>
                 </div>
                 <div className="body-item-text"></div>
 
             </div>
         )
-    }, [appState.streamerSetting.audioStreamerSetting.inputChunkNum, appState.streamerSetting.updateAudioStreamerSetting])
+    }, [appState.workletNodeSetting.workletNodeSetting.inputChunkNum, appState.workletNodeSetting.updateWorkletNodeSetting])
 
     const gpuRow = useMemo(() => {
         return (

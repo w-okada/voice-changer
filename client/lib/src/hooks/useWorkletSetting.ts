@@ -11,8 +11,8 @@ export type WorkletSettingState = {
     setting: WorkletSetting;
     clearSetting: () => Promise<void>
     setSetting: (setting: WorkletSetting) => void;
-    startOutputRecording: () => void
-    stopOutputRecording: () => Promise<void>
+    // startOutputRecording: () => void
+    // stopOutputRecording: () => Promise<void>
 }
 
 export const useWorkletSetting = (props: UseWorkletSettingProps): WorkletSettingState => {
@@ -68,26 +68,26 @@ export const useWorkletSetting = (props: UseWorkletSettingProps): WorkletSetting
         await removeItem(INDEXEDDB_KEY_WORKLET)
     }
 
-    const startOutputRecording = useMemo(() => {
-        return () => {
-            if (!props.voiceChangerClient) return
-            props.voiceChangerClient.startOutputRecordingWorklet()
-        }
-    }, [props.voiceChangerClient])
+    // const startOutputRecording = useMemo(() => {
+    //     return () => {
+    //         if (!props.voiceChangerClient) return
+    //         props.voiceChangerClient.startOutputRecordingWorklet()
+    //     }
+    // }, [props.voiceChangerClient])
 
-    const stopOutputRecording = useMemo(() => {
-        return async () => {
-            if (!props.voiceChangerClient) return
-            props.voiceChangerClient.stopOutputRecordingWorklet()
-        }
-    }, [props.voiceChangerClient])
+    // const stopOutputRecording = useMemo(() => {
+    //     return async () => {
+    //         if (!props.voiceChangerClient) return
+    //         props.voiceChangerClient.stopOutputRecordingWorklet()
+    //     }
+    // }, [props.voiceChangerClient])
 
 
     return {
         setting,
         clearSetting,
         setSetting,
-        startOutputRecording,
-        stopOutputRecording
+        // startOutputRecording,
+        // stopOutputRecording
     }
 }

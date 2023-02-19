@@ -3,14 +3,12 @@ import { VoiceChangerWorkletNode, VoiceChangerWorkletListener } from "./VoiceCha
 import workerjs from "raw-loader!../worklet/dist/index.js";
 import { VoiceFocusDeviceTransformer, VoiceFocusTransformDevice } from "amazon-chime-sdk-js";
 import { createDummyMediaStream, validateUrl } from "./util";
-import { AudioStreamerSetting, DefaultVoiceChangerClientSetting, ServerSettingKey, VoiceChangerClientSetting, VOICE_CHANGER_CLIENT_EXCEPTION, WorkletSetting } from "./const";
-import MicrophoneStream from "microphone-stream";
-import { AudioStreamer, Callbacks, AudioStreamerListeners } from "./AudioStreamer";
+import { DefaultVoiceChangerClientSetting, ServerSettingKey, VoiceChangerClientSetting, WorkletNodeSetting, WorkletSetting } from "./const";
 import { ServerConfigurator } from "./ServerConfigurator";
 
 // オーディオデータの流れ
-// input node(mic or MediaStream) -> [vf node] -> microphne stream -> audio streamer -> 
-//    sio/rest server -> audio streamer-> vc node -> output node
+// input node(mic or MediaStream) -> [vf node] -> [vc node] -> 
+//    sio/rest server ->  [vc node] -> output node
 
 import { BlockingQueue } from "./utils/BlockingQueue";
 
@@ -23,11 +21,8 @@ export class VoiceChangerClient {
 
     private currentMediaStream: MediaStream | null = null
     private currentMediaStreamAudioSourceNode: MediaStreamAudioSourceNode | null = null
-    private outputNodeFromVF: MediaStreamAudioDestinationNode | null = null
     private inputGainNode: GainNode | null = null
     private outputGainNode: GainNode | null = null
-    private micStream: MicrophoneStream | null = null
-    private audioStreamer!: AudioStreamer
     private vcNode!: VoiceChangerWorkletNode
     private currentMediaStreamAudioDestinationNode!: MediaStreamAudioDestinationNode
 
@@ -41,13 +36,7 @@ export class VoiceChangerClient {
 
     private sem = new BlockingQueue<number>();
 
-    private callbacks: Callbacks = {
-        onVoiceReceived: (data: ArrayBuffer): void => {
-            this.vcNode.postReceivedVoice(data)
-        }
-    }
-
-    constructor(ctx: AudioContext, vfEnable: boolean, audioStreamerListeners: AudioStreamerListeners, voiceChangerWorkletListener: VoiceChangerWorkletListener) {
+    constructor(ctx: AudioContext, vfEnable: boolean, voiceChangerWorkletListener: VoiceChangerWorkletListener) {
         this.sem.enqueue(0);
         this.configurator = new ServerConfigurator()
         this.ctx = ctx
@@ -62,14 +51,11 @@ export class VoiceChangerClient {
             this.outputGainNode.gain.value = this.setting.outputGain
             this.vcNode.connect(this.outputGainNode) // vc node -> output node
             this.outputGainNode.connect(this.currentMediaStreamAudioDestinationNode)
-            // (vc nodeにはaudio streamerのcallbackでデータが投げ込まれる)
-            this.audioStreamer = new AudioStreamer(this.callbacks, audioStreamerListeners, { objectMode: true, })
 
             if (this.vfEnable) {
                 this.vf = await VoiceFocusDeviceTransformer.create({ variant: 'c20' })
                 const dummyMediaStream = createDummyMediaStream(this.ctx)
                 this.currentDevice = (await this.vf.createTransformDevice(dummyMediaStream)) || null;
-                this.outputNodeFromVF = this.ctx.createMediaStreamDestination();
             }
             resolve()
         })
@@ -94,7 +80,6 @@ export class VoiceChangerClient {
     // オペレーション
     /////////////////////////////////////////////////////
     /// Operations ///
-    // setup = async (input: string | MediaStream | null, bufferSize: BufferSize, echoCancel: boolean = true, noiseSuppression: boolean = true, noiseSuppression2: boolean = false) => {
     setup = async () => {
         const lockNum = await this.lock()
 
@@ -115,9 +100,7 @@ export class VoiceChangerClient {
         //// Input デバイスがnullの時はmicStreamを止めてリターン
         if (!this.setting.audioInput) {
             console.log(`Input Setup=> client mic is disabled.`)
-            if (this.micStream) {
-                this.micStream.pauseRecording()
-            }
+            this.vcNode.stopRecording()
             await this.unlock(lockNum)
             return
         }
@@ -143,17 +126,6 @@ export class VoiceChangerClient {
             this.currentMediaStream = this.setting.audioInput
         }
 
-        // create mic stream
-        if (this.micStream) {
-            this.micStream.unpipe()
-            this.micStream.destroy()
-            this.micStream = null
-        }
-        this.micStream = new MicrophoneStream({
-            objectMode: true,
-            bufferSize: this.setting.bufferSize,
-            context: this.ctx
-        })
         // connect nodes.
         this.currentMediaStreamAudioSourceNode = this.ctx.createMediaStreamSource(this.currentMediaStream)
         this.inputGainNode = this.ctx.createGain()
@@ -163,11 +135,8 @@ export class VoiceChangerClient {
             this.currentDevice.chooseNewInnerDevice(this.currentMediaStream)
             const voiceFocusNode = await this.currentDevice.createAudioNode(this.ctx); // vf node
             this.inputGainNode.connect(voiceFocusNode.start) // input node -> vf node
-            voiceFocusNode.end.connect(this.outputNodeFromVF!)
-            // this.micStream.setStream(this.outputNodeFromVF!.stream) // vf node -> mic stream
+            voiceFocusNode.end.connect(this.vcNode)
         } else {
-            // const inputDestinationNodeForMicStream = this.ctx.createMediaStreamDestination()
-            // this.inputGainNode.connect(inputDestinationNodeForMicStream)
             console.log("input___ media stream", this.currentMediaStream)
             this.currentMediaStream.getTracks().forEach(x => {
                 console.log("input___ media stream set", x.getSettings())
@@ -177,17 +146,6 @@ export class VoiceChangerClient {
             console.log("input___ media node", this.currentMediaStreamAudioSourceNode)
             console.log("input___ gain node", this.inputGainNode.channelCount, this.inputGainNode)
             this.inputGainNode.connect(this.vcNode)
-
-
-
-
-            // this.micStream.setStream(inputDestinationNodeForMicStream.stream) // input device -> mic stream
-        }
-        this.micStream.pipe(this.audioStreamer) // mic stream -> audio streamer
-        if (!this._isVoiceChanging) {
-            this.micStream.pauseRecording()
-        } else {
-            this.micStream.playRecording()
         }
         console.log("Input Setup=> success")
         await this.unlock(lockNum)
@@ -197,18 +155,14 @@ export class VoiceChangerClient {
     }
 
     start = () => {
-        if (!this.micStream) {
-            throw `Exception:${VOICE_CHANGER_CLIENT_EXCEPTION.ERR_MIC_STREAM_NOT_INITIALIZED}`
-            return
-        }
-        this.micStream.playRecording()
+        this.vcNode.startRecording()
         this._isVoiceChanging = true
     }
     stop = () => {
-        if (!this.micStream) { return }
-        this.micStream.pauseRecording()
+        this.vcNode.stopRecording()
         this._isVoiceChanging = false
     }
+
     get isVoiceChanging(): boolean {
         return this._isVoiceChanging
     }
@@ -231,7 +185,7 @@ export class VoiceChangerClient {
                 }
             }
         }
-        this.audioStreamer.updateSetting({ ...this.audioStreamer.getSettings(), serverUrl: url })
+        this.vcNode.updateSetting({ ...this.vcNode.getSettings(), serverUrl: url })
         this.configurator.setServerUrl(url)
     }
 
@@ -260,9 +214,6 @@ export class VoiceChangerClient {
         if (reconstructInputRequired) {
             this.setup()
         }
-
-
-
     }
 
     setInputGain = (val: number) => {
@@ -301,17 +252,17 @@ export class VoiceChangerClient {
     configureWorklet = (setting: WorkletSetting) => {
         this.vcNode.configure(setting)
     }
-    startOutputRecordingWorklet = () => {
-        this.vcNode.startOutputRecordingWorklet()
+    startRecording = () => {
+        this.vcNode.startRecording()
     }
-    stopOutputRecordingWorklet = () => {
-        this.vcNode.stopOutputRecordingWorklet()
+    stopRecording = () => {
+        this.vcNode.stopRecording()
     }
 
 
-    //##  Audio Streamer ##//
-    updateAudioStreamerSetting = (setting: AudioStreamerSetting) => {
-        this.audioStreamer.updateSetting(setting)
+    //##  Worklet Node ##//
+    updateWorkletNodeSetting = (setting: WorkletNodeSetting) => {
+        this.vcNode.updateSetting(setting)
     }
 
 
@@ -320,16 +271,14 @@ export class VoiceChangerClient {
     /////////////////////////////////////////////////////
     // Information
     getClientSettings = () => {
-        return this.audioStreamer.getSettings()
+        return this.vcNode.getSettings()
     }
     getServerSettings = () => {
         return this.configurator.getSettings()
     }
 
-
     getSocketId = () => {
-        return this.audioStreamer.getSocketId()
+        return this.vcNode.getSocketId()
     }
-
 
 }

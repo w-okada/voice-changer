@@ -132,7 +132,7 @@ export const DefaultWorkletSetting: WorkletSetting = {
     volTrancateLength: 32
 }
 ///////////////////////
-// Audio Streamerセッティング
+// Worklet Nodeセッティング
 ///////////////////////
 export const Protocol = {
     "sio": "sio",
@@ -153,14 +153,14 @@ export const DownSamplingMode = {
 export type DownSamplingMode = typeof DownSamplingMode[keyof typeof DownSamplingMode]
 
 
-export type AudioStreamerSetting = {
+export type WorkletNodeSetting = {
     serverUrl: string,
     protocol: Protocol,
     sendingSampleRate: SendingSampleRate,
     inputChunkNum: number,
     downSamplingMode: DownSamplingMode,
 }
-export const DefaultAudioStreamerSetting: AudioStreamerSetting = {
+export const DefaultWorkletNodeSetting: WorkletNodeSetting = {
     serverUrl: "",
     protocol: "sio",
     sendingSampleRate: 48000,
@@ -265,7 +265,7 @@ export const INDEXEDDB_DB_APP_NAME = "INDEXEDDB_KEY_VOICE_CHANGER"
 export const INDEXEDDB_DB_NAME = "INDEXEDDB_KEY_VOICE_CHANGER_DB"
 export const INDEXEDDB_KEY_CLIENT = "INDEXEDDB_KEY_VOICE_CHANGER_LIB_CLIENT"
 export const INDEXEDDB_KEY_SERVER = "INDEXEDDB_KEY_VOICE_CHANGER_LIB_SERVER"
-export const INDEXEDDB_KEY_STREAMER = "INDEXEDDB_KEY_VOICE_CHANGER_LIB_STREAMER"
+export const INDEXEDDB_KEY_WORKLETNODE = "INDEXEDDB_KEY_VOICE_CHANGER_LIB_WORKLETNODE"
 export const INDEXEDDB_KEY_MODEL_DATA = "INDEXEDDB_KEY_VOICE_CHANGER_LIB_MODEL_DATA"
 export const INDEXEDDB_KEY_WORKLET = "INDEXEDDB_KEY_VOICE_CHANGER_LIB_WORKLET"
 

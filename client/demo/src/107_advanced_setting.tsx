@@ -30,24 +30,24 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
             <div className="body-row split-3-3-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">MMVC Server</div>
                 <div className="body-input-container">
-                    <input type="text" defaultValue={appState.streamerSetting.audioStreamerSetting.serverUrl} id="mmvc-server-url" className="body-item-input" />
+                    <input type="text" defaultValue={appState.workletNodeSetting.workletNodeSetting.serverUrl} id="mmvc-server-url" className="body-item-input" />
                 </div>
                 <div className="body-button-container">
                     <div className="body-button" onClick={onSetServerClicked}>set</div>
                 </div>
             </div>
         )
-    }, [appState.streamerSetting.audioStreamerSetting.serverUrl, appState.clientSetting.setServerUrl])
+    }, [appState.workletNodeSetting.workletNodeSetting.serverUrl, appState.clientSetting.setServerUrl])
 
     const protocolRow = useMemo(() => {
         const onProtocolChanged = async (val: Protocol) => {
-            appState.streamerSetting.updateAudioStreamerSetting({ ...appState.streamerSetting.audioStreamerSetting, protocol: val })
+            appState.workletNodeSetting.updateWorkletNodeSetting({ ...appState.workletNodeSetting.workletNodeSetting, protocol: val })
         }
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Protocol</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={appState.streamerSetting.audioStreamerSetting.protocol} onChange={(e) => {
+                    <select className="body-select" value={appState.workletNodeSetting.workletNodeSetting.protocol} onChange={(e) => {
                         onProtocolChanged(e.target.value as
                             Protocol)
                     }}>
@@ -60,7 +60,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 </div>
             </div>
         )
-    }, [appState.streamerSetting.audioStreamerSetting.protocol, appState.streamerSetting.updateAudioStreamerSetting])
+    }, [appState.workletNodeSetting.workletNodeSetting.protocol, appState.workletNodeSetting.updateWorkletNodeSetting])
 
 
     const sampleRateRow = useMemo(() => {
@@ -87,8 +87,8 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Sending Sample Rate</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={appState.streamerSetting.audioStreamerSetting.sendingSampleRate} onChange={(e) => {
-                        appState.streamerSetting.updateAudioStreamerSetting({ ...appState.streamerSetting.audioStreamerSetting, sendingSampleRate: Number(e.target.value) as InputSampleRate })
+                    <select className="body-select" value={appState.workletNodeSetting.workletNodeSetting.sendingSampleRate} onChange={(e) => {
+                        appState.workletNodeSetting.updateWorkletNodeSetting({ ...appState.workletNodeSetting.workletNodeSetting, sendingSampleRate: Number(e.target.value) as InputSampleRate })
                         appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, inputSampleRate: Number(e.target.value) as InputSampleRate })
                     }}>
                         {
@@ -100,7 +100,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 </div>
             </div>
         )
-    }, [appState.streamerSetting.audioStreamerSetting.sendingSampleRate, appState.streamerSetting.updateAudioStreamerSetting, appState.serverSetting.updateServerSettings])
+    }, [appState.workletNodeSetting.workletNodeSetting.sendingSampleRate, appState.workletNodeSetting.updateWorkletNodeSetting, appState.serverSetting.updateServerSettings])
 
     const bufferSizeRow = useMemo(() => {
         return (
@@ -174,8 +174,8 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1 ">DownSamplingMode</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={appState.streamerSetting.audioStreamerSetting.downSamplingMode} onChange={(e) => {
-                        appState.streamerSetting.updateAudioStreamerSetting({ ...appState.streamerSetting.audioStreamerSetting, downSamplingMode: e.target.value as DownSamplingMode })
+                    <select className="body-select" value={appState.workletNodeSetting.workletNodeSetting.downSamplingMode} onChange={(e) => {
+                        appState.workletNodeSetting.updateWorkletNodeSetting({ ...appState.workletNodeSetting.workletNodeSetting, downSamplingMode: e.target.value as DownSamplingMode })
                     }}>
                         {
                             Object.values(DownSamplingMode).map(x => {
@@ -186,7 +186,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 </div>
             </div>
         )
-    }, [appState.streamerSetting.audioStreamerSetting.downSamplingMode, appState.streamerSetting.updateAudioStreamerSetting])
+    }, [appState.workletNodeSetting.workletNodeSetting.downSamplingMode, appState.workletNodeSetting.updateWorkletNodeSetting])
 
 
     const workletSettingRow = useMemo(() => {

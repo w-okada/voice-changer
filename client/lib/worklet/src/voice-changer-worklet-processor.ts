@@ -9,7 +9,6 @@ export type RequestType = typeof RequestType[keyof typeof RequestType]
 
 export const ResponseType = {
     "volume": "volume",
-    "recordData": "recordData",
     "inputData": "inputData"
 } as const
 export type ResponseType = typeof ResponseType[keyof typeof ResponseType]
@@ -43,7 +42,6 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
     private isRecording = false
 
     playBuffer: Float32Array[] = []
-    recordingBuffer: Float32Array[] = []
     /**
      * @constructor
      */
@@ -75,7 +73,6 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
                 return
             }
             this.isRecording = true
-            this.recordingBuffer = []
             return
         } else if (request.requestType === "stopRecording") {
             if (!this.isRecording) {
@@ -83,13 +80,6 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
                 return
             }
             this.isRecording = false
-            const recordResponse: VoiceChangerWorkletProcessorResponse = {
-                responseType: ResponseType.recordData,
-                recordData: this.recordingBuffer
-
-            }
-            this.port.postMessage(recordResponse);
-            this.recordingBuffer = []
             return
         }
 
@@ -126,9 +116,6 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
             f32Block![frameIndexInBlock + 1] = (currentFrame + nextFrame) / 2
             if (f32Block!.length === frameIndexInBlock + 2) {
                 this.playBuffer.push(f32Block!)
-                if (this.isRecording) {
-                    this.recordingBuffer.push(f32Block!)
-                }
             }
         }
     }
@@ -148,8 +135,10 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
             return true;
         }
 
-        if (_inputs.length > 0 && _inputs[0].length > 0) {
-            this.pushData(_inputs[0][0])
+        if (this.isRecording) {
+            if (_inputs.length > 0 && _inputs[0].length > 0) {
+                this.pushData(_inputs[0][0])
+            }
         }
 
         if (this.playBuffer.length === 0) {
