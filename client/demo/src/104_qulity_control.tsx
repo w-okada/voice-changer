@@ -110,8 +110,8 @@ export const useQualityControl = (): QualityControlState => {
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1 ">F0 Detector</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={appState.serverSetting.setting.f0Detector} onChange={(e) => {
-                        appState.serverSetting.setF0Detector(e.target.value as F0Detector)
+                    <select className="body-select" value={appState.serverSetting.serverSetting.f0Detector} onChange={(e) => {
+                        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, f0Detector: e.target.value as F0Detector })
                     }}>
                         {
                             Object.values(F0Detector).map(x => {
@@ -123,17 +123,17 @@ export const useQualityControl = (): QualityControlState => {
                 </div>
             </div>
         )
-    }, [appState.serverSetting.setting.f0Detector, appState.serverSetting.setF0Detector])
+    }, [appState.serverSetting.serverSetting.f0Detector, appState.serverSetting.updateServerSettings])
 
 
     const recordIORow = useMemo(() => {
         const onRecordStartClicked = async () => {
             setRecording(true)
-            await appState.serverSetting.setRecordIO(1)
+            appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, recordIO: 1 })
         }
         const onRecordStopClicked = async () => {
             setRecording(false)
-            await appState.serverSetting.setRecordIO(0)
+            appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, recordIO: 0 })
         }
         const onRecordAnalizeClicked = async () => {
             if (appState.frontendManagerState.isConverting) {
@@ -141,7 +141,7 @@ export const useQualityControl = (): QualityControlState => {
                 return
             }
             appState.frontendManagerState.setIsAnalyzing(true)
-            await appState.serverSetting.setRecordIO(2)
+            appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, recordIO: 2 })
             // set spectrogram (dio)
             const imageDio = document.getElementById("body-image-container-img-dio") as HTMLImageElement
             imageDio.src = "/tmp/analyze-dio.png?" + new Date().getTime()
@@ -252,7 +252,7 @@ export const useQualityControl = (): QualityControlState => {
                 </div>
             </>
         )
-    }, [appState.serverSetting.setting.recordIO, appState.serverSetting.setRecordIO, outputAudioDeviceInfo, audioOutputForGUI, appState.frontendManagerState.isAnalyzing, appState.frontendManagerState.isConverting])
+    }, [appState.serverSetting.serverSetting.recordIO, appState.serverSetting.updateServerSettings, outputAudioDeviceInfo, audioOutputForGUI, appState.frontendManagerState.isAnalyzing, appState.frontendManagerState.isConverting])
 
     const QualityControlContent = useMemo(() => {
         return (

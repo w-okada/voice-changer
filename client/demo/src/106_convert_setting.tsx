@@ -43,13 +43,13 @@ export const useConvertSetting = (): ConvertSettingState => {
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title  left-padding-1">GPU</div>
                 <div className="body-input-container">
-                    <input type="number" min={-2} max={5} step={1} value={appState.serverSetting.setting.gpu} onChange={(e) => {
-                        appState.serverSetting.setGpu(Number(e.target.value))
+                    <input type="number" min={-2} max={5} step={1} value={appState.serverSetting.serverSetting.gpu} onChange={(e) => {
+                        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, gpu: Number(e.target.value) })
                     }} />
                 </div>
             </div>
         )
-    }, [appState.serverSetting.setting.gpu, appState.serverSetting.setGpu])
+    }, [appState.serverSetting.serverSetting.gpu, appState.serverSetting.updateServerSettings])
 
 
     const convertSetting = useMemo(() => {

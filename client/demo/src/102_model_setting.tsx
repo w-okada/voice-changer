@@ -190,13 +190,13 @@ export const useModelSettingArea = (): ServerSettingState => {
 
     const frameworkRow = useMemo(() => {
         const onFrameworkChanged = async (val: Framework) => {
-            appState.serverSetting.setFramework(val)
+            appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, framework: val })
         }
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Framework</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={appState.serverSetting.setting.framework} onChange={(e) => {
+                    <select className="body-select" value={appState.serverSetting.serverSetting.framework} onChange={(e) => {
                         onFrameworkChanged(e.target.value as
                             Framework)
                     }}>
@@ -209,20 +209,20 @@ export const useModelSettingArea = (): ServerSettingState => {
                 </div>
             </div>
         )
-    }, [appState.serverSetting.setting.framework, appState.serverSetting.setFramework])
+    }, [appState.serverSetting.serverSetting.framework, appState.serverSetting.updateServerSettings])
 
     const onnxExecutionProviderRow = useMemo(() => {
-        if (appState.serverSetting.setting.framework != "ONNX") {
+        if (appState.serverSetting.serverSetting.framework != "ONNX") {
             return
         }
         const onOnnxExecutionProviderChanged = async (val: OnnxExecutionProvider) => {
-            appState.serverSetting.setOnnxExecutionProvider(val)
+            appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, onnxExecutionProvider: val })
         }
         return (
             <div className="body-row split-3-7 left-padding-1">
                 <div className="body-item-title left-padding-2">OnnxExecutionProvider</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={appState.serverSetting.setting.onnxExecutionProvider} onChange={(e) => {
+                    <select className="body-select" value={appState.serverSetting.serverSetting.onnxExecutionProvider} onChange={(e) => {
                         onOnnxExecutionProviderChanged(e.target.value as
                             OnnxExecutionProvider)
                     }}>
@@ -235,7 +235,7 @@ export const useModelSettingArea = (): ServerSettingState => {
                 </div>
             </div>
         )
-    }, [appState.serverSetting.setting.framework, appState.serverSetting.setting.onnxExecutionProvider, appState.serverSetting.setOnnxExecutionProvider])
+    }, [appState.serverSetting.serverSetting.framework, appState.serverSetting.serverSetting.onnxExecutionProvider, appState.serverSetting.updateServerSettings])
 
     const modelSetting = useMemo(() => {
         return (

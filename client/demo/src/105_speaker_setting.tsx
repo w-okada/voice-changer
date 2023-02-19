@@ -19,33 +19,45 @@ export const useSpeakerSetting = () => {
     const [editSpeakerTargetId, setEditSpeakerTargetId] = useState<number>(0)
     const [editSpeakerTargetName, setEditSpeakerTargetName] = useState<string>("")
 
-    useEffect(() => {
+    // useEffect(() => {
+    //     const src = appState.clientSetting.setting.correspondences?.find(x => {
+    //         return x.sid == appState.serverSetting.serverSetting.srcId
+    //     })
+    //     const dst = appState.clientSetting.setting.correspondences?.find(x => {
+    //         return x.sid == appState.serverSetting.serverSetting.dstId
+    //     })
+    //     const recommendedF0Factor = dst && src ? dst.correspondence / src.correspondence : 0
+    //     appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, f0Factor: recommendedF0Factor })
+
+    // }, [appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId, appState.serverSetting.updateServerSettings])
+
+
+    const calcDefaultF0Factor = (srcId: number, dstId: number) => {
         const src = appState.clientSetting.setting.correspondences?.find(x => {
-            return x.sid == appState.serverSetting.setting.srcId
+            return x.sid == srcId
         })
         const dst = appState.clientSetting.setting.correspondences?.find(x => {
-            return x.sid == appState.serverSetting.setting.dstId
+            return x.sid == dstId
         })
         const recommendedF0Factor = dst && src ? dst.correspondence / src.correspondence : 0
-        appState.serverSetting.setF0Factor(recommendedF0Factor)
+        return recommendedF0Factor
+    }
 
-    }, [appState.serverSetting.setting.srcId, appState.serverSetting.setting.dstId])
+    console.log()
 
     const srcIdRow = useMemo(() => {
         const selected = appState.clientSetting.setting.correspondences?.find(x => {
-            return x.sid == appState.serverSetting.setting.srcId
+            return x.sid == appState.serverSetting.serverSetting.srcId
         })
         return (
             <div className="body-row split-3-2-1-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Source Speaker Id</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={appState.serverSetting.setting.srcId} onChange={(e) => {
-                        appState.serverSetting.setSrcId(Number(e.target.value))
+                    <select className="body-select" value={appState.serverSetting.serverSetting.srcId} onChange={(e) => {
+                        const recF0 = calcDefaultF0Factor(Number(e.target.value), appState.serverSetting.serverSetting.dstId)
+                        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, srcId: Number(e.target.value), f0Factor: recF0 })
                     }}>
                         {
-                            // appState.clientSetting.setting.speakers.map(x => {
-                            //     return <option key={x.id} value={x.id}>{x.name}({x.id})</option>
-                            // })
                             appState.clientSetting.setting.correspondences?.map(x => {
                                 return <option key={x.sid} value={x.sid}>{x.dirname}({x.sid})</option>
                             })
@@ -59,18 +71,20 @@ export const useSpeakerSetting = () => {
                 <div className="body-item-text"></div>
             </div>
         )
-    }, [appState.clientSetting.setting.speakers, appState.serverSetting.setting.srcId, appState.clientSetting.setting.correspondences, appState.serverSetting.setSrcId])
+    }, [appState.clientSetting.setting.speakers, appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId, appState.clientSetting.setting.correspondences, appState.serverSetting.updateServerSettings])
 
     const dstIdRow = useMemo(() => {
         const selected = appState.clientSetting.setting.correspondences?.find(x => {
-            return x.sid == appState.serverSetting.setting.dstId
+            return x.sid == appState.serverSetting.serverSetting.dstId
         })
         return (
             <div className="body-row split-3-2-1-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Destination Speaker Id</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={appState.serverSetting.setting.dstId} onChange={(e) => {
-                        appState.serverSetting.setDstId(Number(e.target.value))
+                    <select className="body-select" value={appState.serverSetting.serverSetting.dstId} onChange={(e) => {
+                        const recF0 = calcDefaultF0Factor(appState.serverSetting.serverSetting.srcId, Number(e.target.value))
+                        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, dstId: Number(e.target.value), f0Factor: recF0 })
+
                     }}>
                         {
                             // appState.clientSetting.setting.speakers.map(x => {
@@ -88,7 +102,7 @@ export const useSpeakerSetting = () => {
                 <div className="body-item-text"></div>
             </div>
         )
-    }, [appState.clientSetting.setting.speakers, appState.serverSetting.setting.dstId, appState.clientSetting.setting.correspondences, appState.serverSetting.setDstId])
+    }, [appState.clientSetting.setting.speakers, appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId, appState.clientSetting.setting.correspondences, appState.serverSetting.updateServerSettings])
 
     const editSpeakerIdMappingRow = useMemo(() => {
         const onSetSpeakerMappingClicked = async () => {
@@ -139,10 +153,10 @@ export const useSpeakerSetting = () => {
 
     const f0FactorRow = useMemo(() => {
         const src = appState.clientSetting.setting.correspondences?.find(x => {
-            return x.sid == appState.serverSetting.setting.srcId
+            return x.sid == appState.serverSetting.serverSetting.srcId
         })
         const dst = appState.clientSetting.setting.correspondences?.find(x => {
-            return x.sid == appState.serverSetting.setting.dstId
+            return x.sid == appState.serverSetting.serverSetting.dstId
         })
 
         const recommendedF0Factor = dst && src ? dst.correspondence / src.correspondence : 0
@@ -151,16 +165,16 @@ export const useSpeakerSetting = () => {
             <div className="body-row split-3-2-1-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">F0 Factor</div>
                 <div className="body-input-container">
-                    <input type="range" className="body-item-input-slider" min="0.1" max="5.0" step="0.1" value={appState.serverSetting.setting.f0Factor} onChange={(e) => {
-                        appState.serverSetting.setF0Factor(Number(e.target.value))
+                    <input type="range" className="body-item-input-slider" min="0.1" max="5.0" step="0.1" value={appState.serverSetting.serverSetting.f0Factor} onChange={(e) => {
+                        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, f0Factor: Number(e.target.value) })
                     }}></input>
-                    <span className="body-item-input-slider-val">{appState.serverSetting.setting.f0Factor.toFixed(1)}</span>
+                    <span className="body-item-input-slider-val">{appState.serverSetting.serverSetting.f0Factor.toFixed(1)}</span>
                 </div>
                 <div className="body-item-text"></div>
                 <div className="body-item-text">recommend: {recommendedF0Factor.toFixed(1)}</div>
             </div>
         )
-    }, [appState.serverSetting.setting.f0Factor, appState.serverSetting.setting.srcId, appState.serverSetting.setting.dstId, appState.clientSetting.setting.correspondences, appState.serverSetting.setF0Factor])
+    }, [appState.serverSetting.serverSetting.f0Factor, appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId, appState.clientSetting.setting.correspondences, appState.serverSetting.updateServerSettings])
 
     const speakerSetting = useMemo(() => {
         return (

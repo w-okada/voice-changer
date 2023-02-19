@@ -89,26 +89,26 @@ class VocieChangerSettings():
     gpu: int = 0
     srcId: int = 107
     dstId: int = 100
+
+    inputSampleRate: int = 48000  # 48000 or 24000
+
     crossFadeOffsetRate: float = 0.1
     crossFadeEndRate: float = 0.9
     crossFadeOverlapSize: int = 4096
-    convertChunkNum: int = 32
-    minConvertSize: int = 0
-    framework: str = "PyTorch"  # PyTorch or ONNX
+
     f0Factor: float = 1.0
     f0Detector: str = "dio"  # dio or harvest
     recordIO: int = 1  # 0:off, 1:on
-    serverMicProps: str = ""
-    inputSampleRate: int = 48000  # 48000 or 24000
 
+    framework: str = "PyTorch"  # PyTorch or ONNX
     pyTorchModelFile: str = ""
     onnxModelFile: str = ""
     configFile: str = ""
 
     # ↓mutableな物だけ列挙
-    intData = ["gpu", "srcId", "dstId", "convertChunkNum", "minConvertSize", "recordIO", "inputSampleRate", "crossFadeOverlapSize"]
+    intData = ["gpu", "srcId", "dstId", "inputSampleRate", "crossFadeOverlapSize", "recordIO"]
     floatData = ["crossFadeOffsetRate", "crossFadeEndRate", "f0Factor"]
-    strData = ["framework", "f0Detector", "serverMicProps"]
+    strData = ["framework", "f0Detector"]
 
 
 def readMicrophone(queue, sid, deviceIndex):
@@ -288,35 +288,6 @@ class VoiceChanger():
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
             setattr(self.settings, key, str(val))
-            if key == "serverMicProps":
-                if hasattr(self, "serverMicrophoneReaderProcess"):
-                    self.serverMicrophoneReaderProcess.terminate()
-
-                if len(val) == 0:
-                    print("server mic close")
-
-                    pass
-                else:
-                    props = json.loads(val)
-                    print(props)
-                    sid = props["sid"]
-                    deviceIndex = props["deviceIndex"]
-                    self.serverMicrophoneReaderProcessQueue = Queue()
-                    self.serverMicrophoneReaderProcess = Process(target=readMicrophone, args=(
-                        self.serverMicrophoneReaderProcessQueue, sid, deviceIndex,))
-                    self.serverMicrophoneReaderProcess.start()
-
-                    try:
-                        print(sid, deviceIndex)
-                    except Exception as e:
-                        print(e)
-                # audio = pyaudio.PyAudio()
-                # audio_input_stream = audio.open(format=pyaudio.paInt16,
-                #                                 channels=1,
-                #                                 rate=SAMPLING_RATE,
-                #                                 frames_per_buffer=4096,
-                #                                 input_device_index=val,
-                #                                 input=True)
         else:
             print(f"{key} is not mutalbe variable!")
 
@@ -505,8 +476,8 @@ class VoiceChanger():
                     powered_cur = cur_overlap * self.cur_strength
                     powered_result = powered_prev + powered_cur
 
-                    print(overlapSize, prev_overlap.shape, cur_overlap.shape, self.prev_strength.shape, self.cur_strength.shape)
-                    print(self.prev_audio1.shape, audio1.shape, inputSize, overlapSize)
+                    # print(overlapSize, prev_overlap.shape, cur_overlap.shape, self.prev_strength.shape, self.cur_strength.shape)
+                    # print(self.prev_audio1.shape, audio1.shape, inputSize, overlapSize)
 
                     cur = audio1[-1 * inputSize:-1 * overlapSize]  # 今回のインプットの生部分。(インプット - 次回のCrossfade部分)。
                     result = torch.cat([powered_result, cur], axis=0)  # Crossfadeと今回のインプットの生部分を結合
@@ -521,11 +492,11 @@ class VoiceChanger():
 
     def on_request(self, unpackedData: any):
         if self.settings.inputSampleRate != 24000:
-            print("convert sampling rate!", self.settings.inputSampleRate)
+            # print("convert sampling rate!", self.settings.inputSampleRate)
             unpackedData = resampy.resample(unpackedData, 48000, 24000)
 
         convertSize = unpackedData.shape[0] + min(self.settings.crossFadeOverlapSize, unpackedData.shape[0])
-        print(convertSize, unpackedData.shape[0])
+        # print(convertSize, unpackedData.shape[0])
         if convertSize < 8192:
             convertSize = 8192
 

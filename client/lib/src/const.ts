@@ -4,34 +4,127 @@
 // 24000sample -> 1sec, 128sample(1chunk) -> 5.333msec
 // 187.5chunk -> 1sec
 
+///////////////////////
+// サーバセッティング
+///////////////////////
+export const InputSampleRate = {
+    "48000": 48000,
+    "24000": 24000
+} as const
+export type InputSampleRate = typeof InputSampleRate[keyof typeof InputSampleRate]
 
-// types
+export const CrossFadeOverlapSize = {
+    "1024": 1024,
+    "2048": 2048,
+    "4096": 4096,
+} as const
+export type CrossFadeOverlapSize = typeof CrossFadeOverlapSize[keyof typeof CrossFadeOverlapSize]
+
+
+export const OnnxExecutionProvider = {
+    "CPUExecutionProvider": "CPUExecutionProvider",
+    "CUDAExecutionProvider": "CUDAExecutionProvider",
+    "DmlExecutionProvider": "DmlExecutionProvider",
+    "OpenVINOExecutionProvider": "OpenVINOExecutionProvider",
+} as const
+export type OnnxExecutionProvider = typeof OnnxExecutionProvider[keyof typeof OnnxExecutionProvider]
+
+export const Framework = {
+    "PyTorch": "PyTorch",
+    "ONNX": "ONNX",
+} as const
+export type Framework = typeof Framework[keyof typeof Framework]
+
+export const F0Detector = {
+    "dio": "dio",
+    "harvest": "harvest",
+} as const
+export type F0Detector = typeof F0Detector[keyof typeof F0Detector]
+
+
+
+export const ServerSettingKey = {
+    "srcId": "srcId",
+    "dstId": "dstId",
+    "gpu": "gpu",
+
+    "crossFadeOffsetRate": "crossFadeOffsetRate",
+    "crossFadeEndRate": "crossFadeEndRate",
+    "crossFadeOverlapSize": "crossFadeOverlapSize",
+
+    "framework": "framework",
+    "onnxExecutionProvider": "onnxExecutionProvider",
+
+    "f0Factor": "f0Factor",
+    "f0Detector": "f0Detector",
+    "recordIO": "recordIO",
+
+    "inputSampleRate": "inputSampleRate",
+} as const
+export type ServerSettingKey = typeof ServerSettingKey[keyof typeof ServerSettingKey]
+
+
 export type VoiceChangerServerSetting = {
-
-    // VITSに入力する変換サイズ。(入力データの2倍以上の大きさで指定。それより小さいものが指定された場合は、
-    // サーバ側で自動的に入力の2倍のサイズが設定される。)
-    convertChunkNum: number,
-    minConvertSize: number, // この値より小さい場合にこの値に揃える。
-
     srcId: number,
     dstId: number,
     gpu: number,
 
-    crossFadeLowerValue: number,
     crossFadeOffsetRate: number,
     crossFadeEndRate: number,
-    crossFadeOverlapRate: number,
-    crossFadeOverlapSize: number,
+    crossFadeOverlapSize: CrossFadeOverlapSize,
 
     framework: Framework
     onnxExecutionProvider: OnnxExecutionProvider,
 
     f0Factor: number
-    f0Detector: string // dio or harvest
+    f0Detector: F0Detector // dio or harvest
     recordIO: number // 0:off, 1:on
-    serverMicProps: string
+
     inputSampleRate: InputSampleRate
 }
+
+export type ServerInfo = VoiceChangerServerSetting & {
+    status: string
+    configFile: string,
+    pyTorchModelFile: string,
+    onnxModelFile: string,
+    onnxExecutionProviders: OnnxExecutionProvider[]
+}
+
+export const DefaultServerSetting: ServerInfo = {
+    srcId: 0,
+    dstId: 101,
+    gpu: 0,
+
+    crossFadeOffsetRate: 0.1,
+    crossFadeEndRate: 0.9,
+    crossFadeOverlapSize: CrossFadeOverlapSize[4096],
+
+    framework: Framework.PyTorch,
+    f0Factor: 1.0,
+    onnxExecutionProvider: OnnxExecutionProvider.CPUExecutionProvider,
+    f0Detector: F0Detector.dio,
+    recordIO: 0,
+
+    inputSampleRate: 48000,
+
+    // 
+    status: "ok",
+    configFile: "",
+    pyTorchModelFile: "",
+    onnxModelFile: "",
+    onnxExecutionProviders: []
+}
+
+
+///////////////////////
+// Workletセッティング
+///////////////////////
+
+///////////////////////
+// Clientセッティング
+///////////////////////
+
 
 export type VoiceChangerClientSetting = {
     audioInput: string | MediaStream | null,
@@ -69,29 +162,6 @@ export type Correspondence = {
     "dirname": string
 }
 
-
-export type ServerInfo = {
-    status: string
-    configFile: string,
-    pyTorchModelFile: string,
-    onnxModelFile: string,
-    convertChunkNum: number,
-    minConvertSize: number,
-    crossFadeOffsetRate: number,
-    crossFadeEndRate: number,
-    crossFadeOverlapRate: number,
-    crossFadeOverlapSize: number,
-    gpu: number,
-    srcId: number,
-    dstId: number,
-    framework: Framework,
-    onnxExecutionProvider: string[]
-    f0Factor: number
-    f0Detector: string
-    recordIO: number
-    serverMicProps: string
-    inputSampleRate: InputSampleRate
-}
 
 export type ServerAudioDevice = {
     kind: string,
@@ -137,12 +207,6 @@ export const SendingSampleRate = {
 } as const
 export type SendingSampleRate = typeof SendingSampleRate[keyof typeof SendingSampleRate]
 
-export const InputSampleRate = {
-    "48000": 48000,
-    "24000": 24000
-} as const
-export type InputSampleRate = typeof InputSampleRate[keyof typeof InputSampleRate]
-
 export const BufferSize = {
     "256": 256,
     "512": 512,
@@ -154,73 +218,8 @@ export const BufferSize = {
 } as const
 export type BufferSize = typeof BufferSize[keyof typeof BufferSize]
 
-export const OnnxExecutionProvider = {
-    "CPUExecutionProvider": "CPUExecutionProvider",
-    "CUDAExecutionProvider": "CUDAExecutionProvider",
-    "DmlExecutionProvider": "DmlExecutionProvider",
-    "OpenVINOExecutionProvider": "OpenVINOExecutionProvider",
-} as const
-export type OnnxExecutionProvider = typeof OnnxExecutionProvider[keyof typeof OnnxExecutionProvider]
-
-export const Framework = {
-    "PyTorch": "PyTorch",
-    "ONNX": "ONNX",
-} as const
-export type Framework = typeof Framework[keyof typeof Framework]
-
-export const F0Detector = {
-    "dio": "dio",
-    "harvest": "harvest",
-} as const
-export type F0Detector = typeof F0Detector[keyof typeof F0Detector]
-
-export const CrossFadeOverlapSize = {
-    "1024": 1024,
-    "2048": 2048,
-    "4096": 4096,
-} as const
-export type CrossFadeOverlapSize = typeof CrossFadeOverlapSize[keyof typeof CrossFadeOverlapSize]
-
-export const ServerSettingKey = {
-    "srcId": "srcId",
-    "dstId": "dstId",
-    "convertChunkNum": "convertChunkNum",
-    "minConvertSize": "minConvertSize",
-    "gpu": "gpu",
-    "crossFadeOffsetRate": "crossFadeOffsetRate",
-    "crossFadeEndRate": "crossFadeEndRate",
-    "crossFadeOverlapRate": "crossFadeOverlapRate",
-    "crossFadeOverlapSize": "crossFadeOverlapSize",
-    "framework": "framework",
-    "onnxExecutionProvider": "onnxExecutionProvider",
-    "f0Factor": "f0Factor",
-    "f0Detector": "f0Detector",
-    "recordIO": "recordIO",
-    "serverMicProps": "serverMicProps",
-    "inputSampleRate": "inputSampleRate",
-} as const
-export type ServerSettingKey = typeof ServerSettingKey[keyof typeof ServerSettingKey]
-
 // Defaults
-export const DefaultVoiceChangerServerSetting: VoiceChangerServerSetting = {
-    convertChunkNum: 32, //（★１）
-    minConvertSize: 0,
-    srcId: 0,
-    dstId: 101,
-    gpu: 0,
-    crossFadeLowerValue: 0.1,
-    crossFadeOffsetRate: 0.1,
-    crossFadeEndRate: 0.9,
-    crossFadeOverlapRate: 0.5,
-    crossFadeOverlapSize: CrossFadeOverlapSize[4096],
-    framework: "PyTorch",
-    f0Factor: 1.0,
-    onnxExecutionProvider: "CPUExecutionProvider",
-    f0Detector: "dio",
-    recordIO: 0,
-    serverMicProps: "",
-    inputSampleRate: 48000
-}
+
 
 export const DefaultVoiceChangerClientSetting: VoiceChangerClientSetting = {
     audioInput: null,

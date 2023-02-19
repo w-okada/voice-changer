@@ -157,7 +157,6 @@ export const useDeviceSetting = (): DeviceSettingState => {
             } else {
                 console.log("server mic")
                 appState.clientSetting.setAudioInput(null)
-                appState.serverSetting.setServerMicrophone(Number(audioInputForGUI))
             }
         }
     }, [appState.audioContext, audioInputForGUI, appState.clientSetting.setAudioInput])

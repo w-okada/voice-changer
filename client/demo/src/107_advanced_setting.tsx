@@ -89,8 +89,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 <div className="body-select-container">
                     <select className="body-select" value={appState.clientSetting.setting.sendingSampleRate} onChange={(e) => {
                         appState.clientSetting.setSendingSampleRate(Number(e.target.value) as InputSampleRate)
-                        appState.serverSetting.setInputSampleRate(Number(e.target.value) as InputSampleRate)
-
+                        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, inputSampleRate: Number(e.target.value) as InputSampleRate })
                     }}>
                         {
                             Object.values(InputSampleRate).map(x => {
@@ -101,7 +100,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 </div>
             </div>
         )
-    }, [appState.clientSetting.setting.sendingSampleRate, appState.clientSetting.setSendingSampleRate, appState.serverSetting.setInputSampleRate])
+    }, [appState.clientSetting.setting.sendingSampleRate, appState.clientSetting.setSendingSampleRate, appState.serverSetting.updateServerSettings])
 
     const bufferSizeRow = useMemo(() => {
         return (
@@ -123,55 +122,14 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
         )
     }, [appState.clientSetting.setting.bufferSize, appState.clientSetting.setBufferSize])
 
-    const convertChunkNumRow = useMemo(() => {
-        return (
-
-            <div className="body-row split-3-7 left-padding-1 guided">
-                <div className="body-item-title left-padding-1">Convert Chunk Num(128sample/chunk)</div>
-                <div className="body-input-container">
-                    <input type="number" min={1} max={256} step={1} value={appState.serverSetting.setting.convertChunkNum} onChange={(e) => {
-                        appState.serverSetting.setConvertChunkNum(Number(e.target.value))
-                    }} />
-                </div>
-            </div>
-        )
-    }, [appState.serverSetting.setting.convertChunkNum, appState.serverSetting.setConvertChunkNum])
-
-    const minConvertSizeRow = useMemo(() => {
-        return (
-
-            <div className="body-row split-3-7 left-padding-1 guided">
-                <div className="body-item-title left-padding-1">Min Convert Size(byte)</div>
-                <div className="body-input-container">
-                    <input type="number" min={0} max={8196} step={8196} value={appState.serverSetting.setting.minConvertSize} onChange={(e) => {
-                        appState.serverSetting.setMinConvertSize(Number(e.target.value))
-                    }} />
-                </div>
-            </div>
-        )
-    }, [appState.serverSetting.setting.minConvertSize, appState.serverSetting.setMinConvertSize])
-
-    const crossFadeOverlapRateRow = useMemo(() => {
-        return (
-            <div className="body-row split-3-7 left-padding-1 guided">
-                <div className="body-item-title  left-padding-1">Cross Fade Overlap Rate</div>
-                <div className="body-input-container">
-                    <input type="number" min={0.1} max={1} step={0.1} value={appState.serverSetting.setting.crossFadeOverlapRate} onChange={(e) => {
-                        appState.serverSetting.setCrossFadeOverlapRate(Number(e.target.value))
-                    }} />
-                </div>
-            </div>
-        )
-    }, [appState.serverSetting.setting.crossFadeOverlapRate, appState.serverSetting.setCrossFadeOverlapRate])
-
 
     const crossFadeOverlapSizeRow = useMemo(() => {
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title  left-padding-1">Cross Fade Overlap Size</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={appState.serverSetting.setting.crossFadeOverlapSize} onChange={(e) => {
-                        appState.serverSetting.setCrossFadeOverlapSize(Number(e.target.value) as CrossFadeOverlapSize)
+                    <select className="body-select" value={appState.serverSetting.serverSetting.crossFadeOverlapSize} onChange={(e) => {
+                        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, crossFadeOverlapSize: Number(e.target.value) as CrossFadeOverlapSize })
                     }}>
                         {
                             Object.values(CrossFadeOverlapSize).map(x => {
@@ -182,33 +140,33 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 </div>
             </div>
         )
-    }, [appState.serverSetting.setting.crossFadeOverlapSize, appState.serverSetting.setCrossFadeOverlapSize])
+    }, [appState.serverSetting.serverSetting.crossFadeOverlapSize, appState.serverSetting.updateServerSettings])
 
     const crossFadeOffsetRateRow = useMemo(() => {
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title  left-padding-1">Cross Fade Offset Rate</div>
                 <div className="body-input-container">
-                    <input type="number" min={0} max={1} step={0.1} value={appState.serverSetting.setting.crossFadeOffsetRate} onChange={(e) => {
-                        appState.serverSetting.setCrossFadeOffsetRate(Number(e.target.value))
+                    <input type="number" min={0} max={1} step={0.1} value={appState.serverSetting.serverSetting.crossFadeOffsetRate} onChange={(e) => {
+                        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, crossFadeOffsetRate: Number(e.target.value) })
                     }} />
                 </div>
             </div>
         )
-    }, [appState.serverSetting.setting.crossFadeOffsetRate, appState.serverSetting.setCrossFadeOffsetRate])
+    }, [appState.serverSetting.serverSetting.crossFadeOffsetRate, appState.serverSetting.updateServerSettings])
 
     const crossFadeEndRateRow = useMemo(() => {
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Cross Fade End Rate</div>
                 <div className="body-input-container">
-                    <input type="number" min={0} max={1} step={0.1} value={appState.serverSetting.setting.crossFadeEndRate} onChange={(e) => {
-                        appState.serverSetting.setCrossFadeEndRate(Number(e.target.value))
+                    <input type="number" min={0} max={1} step={0.1} value={appState.serverSetting.serverSetting.crossFadeEndRate} onChange={(e) => {
+                        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, crossFadeEndRate: Number(e.target.value) })
                     }} />
                 </div>
             </div>
         )
-    }, [appState.serverSetting.setting.crossFadeEndRate, appState.serverSetting.setCrossFadeEndRate])
+    }, [appState.serverSetting.serverSetting.crossFadeEndRate, appState.serverSetting.updateServerSettings])
 
 
     const voiceChangeModeRow = useMemo(() => {
@@ -306,10 +264,6 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 {sendingSampleRateRow}
                 {bufferSizeRow}
                 <div className="body-row divider"></div>
-
-                {convertChunkNumRow}
-                {minConvertSizeRow}
-                {crossFadeOverlapRateRow}
                 {crossFadeOverlapSizeRow}
                 {crossFadeOffsetRateRow}
                 {crossFadeEndRateRow}
@@ -322,7 +276,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
 
             </>
         )
-    }, [mmvcServerUrlRow, protocolRow, sampleRateRow, sendingSampleRateRow, bufferSizeRow, convertChunkNumRow, minConvertSizeRow, crossFadeOverlapRateRow, crossFadeOverlapSizeRow, crossFadeOffsetRateRow, crossFadeEndRateRow, voiceChangeModeRow, workletSettingRow, downSamplingModeRow])
+    }, [mmvcServerUrlRow, protocolRow, sampleRateRow, sendingSampleRateRow, bufferSizeRow, crossFadeOverlapSizeRow, crossFadeOffsetRateRow, crossFadeEndRateRow, voiceChangeModeRow, workletSettingRow, downSamplingModeRow])
 
 
     const advancedSetting = useMemo(() => {
