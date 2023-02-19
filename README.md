@@ -70,8 +70,8 @@ Windows版とMac版を提供しています。事前準備は必要ありませ�
 ・リモートからアクセスできるようにする方法など、より詳しくは[こちら](https://zenn.dev/wok/books/0002_vc-helper-v_1_3)をご覧ください。
 
 ### アルファ版(for v.1.5.x)
-- [MMVCServerSIO_win_cuda_v.1.5.0.3a.zip](https://drive.google.com/file/d/1WxUyZ69Hbuu6p6TBvW0DX0Qt2a-2NQlw/view?usp=sharing) 2.5GB
-- [MMVCServerSIO_mac_cpu_v.1.5.0.3a.zip](https://drive.google.com/file/d/1u9sc0so1w5kkf_g8UBTVJ61gAQ84W2oF/view?usp=sharing) 509MB
+- [MMVCServerSIO_win_cuda_v.1.5.0.4a.zip](https://drive.google.com/file/d/1FIOds2TuNjdw2XNNWNdN1OSwCK9svS6b/view?usp=sharing) 2.5GB
+- [MMVCServerSIO_mac_cpu_v.1.5.0.4a.zip](https://drive.google.com/file/d/10JHbED9Vj5Y-zJIBtag_XXMHE9-MhAyF/view?usp=sharing) 509MB
 - 
 ### 最新バージョン(for v.1.3.x)
 - [MMVCServerSIO_mac_onnxcpu_v.1.3.7.2.zip](https://drive.google.com/file/d/1AcJaQXH8ZtlCSrifvRBWdat19HD_A2fr/view?usp=sharing) 365MB
@@ -82,6 +82,8 @@ Windows版とMac版を提供しています。事前準備は必要ありませ�
 
 
 ### 過去バージョン(for v.1.5.x)
+- [MMVCServerSIO_win_cuda_v.1.5.0.3a.zip](https://drive.google.com/file/d/1WxUyZ69Hbuu6p6TBvW0DX0Qt2a-2NQlw/view?usp=sharing) 2.5GB
+- [MMVCServerSIO_mac_cpu_v.1.5.0.3a.zip](https://drive.google.com/file/d/1u9sc0so1w5kkf_g8UBTVJ61gAQ84W2oF/view?usp=sharing) 509MB
 - [MMVCServerSIO_win_cuda_v.1.5.0.1a.zip](https://drive.google.com/file/d/1Am0awpHS7NAotITdbnEPg4gl4lxvgWhX/view?usp=sharing) 2.5GB
 - [MMVCServerSIO_mac_cpu_v.1.5.0.1a.zip](https://drive.google.com/file/d/19yREPKWe88ycAFPXCPVVYnUatlYfYjTS/view?usp=sharing) 449MB
 
