@@ -1,4 +1,4 @@
-import { BufferSize, CrossFadeOverlapSize, DownSamplingMode, InputSampleRate, Protocol, SampleRate, VoiceChangerMode } from "@dannadori/voice-changer-client-js"
+import { BufferSize, CrossFadeOverlapSize, DownSamplingMode, InputSampleRate, Protocol, SampleRate } from "@dannadori/voice-changer-client-js"
 import React, { useMemo } from "react"
 import { useAppState } from "./001_provider/001_AppStateProvider";
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./components/101_HeaderButton";
@@ -30,24 +30,24 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
             <div className="body-row split-3-3-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">MMVC Server</div>
                 <div className="body-input-container">
-                    <input type="text" defaultValue={appState.clientSetting.setting.mmvcServerUrl} id="mmvc-server-url" className="body-item-input" />
+                    <input type="text" defaultValue={appState.streamerSetting.audioStreamerSetting.serverUrl} id="mmvc-server-url" className="body-item-input" />
                 </div>
                 <div className="body-button-container">
                     <div className="body-button" onClick={onSetServerClicked}>set</div>
                 </div>
             </div>
         )
-    }, [appState.clientSetting.setting.mmvcServerUrl, appState.clientSetting.setServerUrl])
+    }, [appState.streamerSetting.audioStreamerSetting.serverUrl, appState.clientSetting.setServerUrl])
 
     const protocolRow = useMemo(() => {
         const onProtocolChanged = async (val: Protocol) => {
-            appState.clientSetting.setProtocol(val)
+            appState.streamerSetting.setSetting({ ...appState.streamerSetting.audioStreamerSetting, protocol: val })
         }
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Protocol</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={appState.clientSetting.setting.protocol} onChange={(e) => {
+                    <select className="body-select" value={appState.streamerSetting.audioStreamerSetting.protocol} onChange={(e) => {
                         onProtocolChanged(e.target.value as
                             Protocol)
                     }}>
@@ -60,7 +60,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 </div>
             </div>
         )
-    }, [appState.clientSetting.setting.protocol, appState.clientSetting.setProtocol])
+    }, [appState.streamerSetting.audioStreamerSetting.protocol, appState.streamerSetting.setSetting])
 
 
     const sampleRateRow = useMemo(() => {
@@ -68,8 +68,8 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Sample Rate</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={appState.clientSetting.setting.sampleRate} onChange={(e) => {
-                        appState.clientSetting.setSampleRate(Number(e.target.value) as SampleRate)
+                    <select className="body-select" value={appState.clientSetting.clientSetting.sampleRate} onChange={(e) => {
+                        appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, sampleRate: Number(e.target.value) as SampleRate })
                     }}>
                         {
                             Object.values(SampleRate).map(x => {
@@ -80,15 +80,15 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 </div>
             </div>
         )
-    }, [appState.clientSetting.setting.sampleRate, appState.clientSetting.setSampleRate])
+    }, [appState.clientSetting.clientSetting.sampleRate, appState.clientSetting.updateClientSetting])
 
     const sendingSampleRateRow = useMemo(() => {
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Sending Sample Rate</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={appState.clientSetting.setting.sendingSampleRate} onChange={(e) => {
-                        appState.clientSetting.setSendingSampleRate(Number(e.target.value) as InputSampleRate)
+                    <select className="body-select" value={appState.streamerSetting.audioStreamerSetting.sendingSampleRate} onChange={(e) => {
+                        appState.streamerSetting.setSetting({ ...appState.streamerSetting.audioStreamerSetting, sendingSampleRate: Number(e.target.value) as InputSampleRate })
                         appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, inputSampleRate: Number(e.target.value) as InputSampleRate })
                     }}>
                         {
@@ -100,7 +100,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 </div>
             </div>
         )
-    }, [appState.clientSetting.setting.sendingSampleRate, appState.clientSetting.setSendingSampleRate, appState.serverSetting.updateServerSettings])
+    }, [appState.streamerSetting.audioStreamerSetting.sendingSampleRate, appState.streamerSetting.setSetting, appState.serverSetting.updateServerSettings])
 
     const bufferSizeRow = useMemo(() => {
         return (
@@ -108,8 +108,8 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Buffer Size</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={appState.clientSetting.setting.bufferSize} onChange={(e) => {
-                        appState.clientSetting.setBufferSize(Number(e.target.value) as BufferSize)
+                    <select className="body-select" value={appState.clientSetting.clientSetting.bufferSize} onChange={(e) => {
+                        appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, bufferSize: Number(e.target.value) as BufferSize })
                     }}>
                         {
                             Object.values(BufferSize).map(x => {
@@ -120,7 +120,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 </div>
             </div>
         )
-    }, [appState.clientSetting.setting.bufferSize, appState.clientSetting.setBufferSize])
+    }, [appState.clientSetting.clientSetting.bufferSize, appState.clientSetting.updateClientSetting])
 
 
     const crossFadeOverlapSizeRow = useMemo(() => {
@@ -169,33 +169,13 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
     }, [appState.serverSetting.serverSetting.crossFadeEndRate, appState.serverSetting.updateServerSettings])
 
 
-    const voiceChangeModeRow = useMemo(() => {
-        return (
-            <div className="body-row split-3-7 left-padding-1 guided">
-                <div className="body-item-title left-padding-1 ">Voice Change Mode</div>
-                <div className="body-select-container">
-                    <select className="body-select" value={appState.clientSetting.setting.voiceChangerMode} onChange={(e) => {
-                        appState.clientSetting.setVoiceChangerMode(e.target.value as VoiceChangerMode)
-                    }}>
-                        {
-                            Object.values(VoiceChangerMode).map(x => {
-                                return <option key={x} value={x}>{x}</option>
-                            })
-                        }
-                    </select>
-                </div>
-            </div>
-        )
-    }, [appState.clientSetting.setting.voiceChangerMode, appState.clientSetting.setVoiceChangerMode])
-
-
     const downSamplingModeRow = useMemo(() => {
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1 ">DownSamplingMode</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={appState.clientSetting.setting.downSamplingMode} onChange={(e) => {
-                        appState.clientSetting.setDownSamplingMode(e.target.value as DownSamplingMode)
+                    <select className="body-select" value={appState.streamerSetting.audioStreamerSetting.downSamplingMode} onChange={(e) => {
+                        appState.streamerSetting.setSetting({ ...appState.streamerSetting.audioStreamerSetting, downSamplingMode: e.target.value as DownSamplingMode })
                     }}>
                         {
                             Object.values(DownSamplingMode).map(x => {
@@ -206,7 +186,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 </div>
             </div>
         )
-    }, [appState.clientSetting.setting.downSamplingMode, appState.clientSetting.setDownSamplingMode])
+    }, [appState.streamerSetting.audioStreamerSetting.downSamplingMode, appState.streamerSetting.setSetting])
 
 
     const workletSettingRow = useMemo(() => {
@@ -268,15 +248,13 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 {crossFadeOffsetRateRow}
                 {crossFadeEndRateRow}
                 <div className="body-row divider"></div>
-                {voiceChangeModeRow}
-                <div className="body-row divider"></div>
                 {workletSettingRow}
                 <div className="body-row divider"></div>
                 {downSamplingModeRow}
 
             </>
         )
-    }, [mmvcServerUrlRow, protocolRow, sampleRateRow, sendingSampleRateRow, bufferSizeRow, crossFadeOverlapSizeRow, crossFadeOffsetRateRow, crossFadeEndRateRow, voiceChangeModeRow, workletSettingRow, downSamplingModeRow])
+    }, [mmvcServerUrlRow, protocolRow, sampleRateRow, sendingSampleRateRow, bufferSizeRow, crossFadeOverlapSizeRow, crossFadeOffsetRateRow, crossFadeEndRateRow, workletSettingRow, downSamplingModeRow])
 
 
     const advancedSetting = useMemo(() => {

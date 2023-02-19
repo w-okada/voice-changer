@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { VoiceChangerClient } from "../VoiceChangerClient"
+import { AudioStreamerSettingState, useAudioStreamerSetting } from "./useAudioStreamerSetting"
 import { ClientSettingState, useClientSetting } from "./useClientSetting"
 import { ServerSettingState, useServerSetting } from "./useServerSetting"
 import { useWorkletSetting, WorkletSettingState } from "./useWorkletSetting"
@@ -13,6 +14,7 @@ export type ClientState = {
     // 各種設定I/Fへの参照
     workletSetting: WorkletSettingState
     clientSetting: ClientSettingState
+    streamerSetting: AudioStreamerSettingState
     serverSetting: ServerSettingState
 
     // モニタリングデータ
@@ -45,6 +47,7 @@ export const useClient = (props: UseClientProps): ClientState => {
 
     // (1-2) 各種設定I/F
     const clientSetting = useClientSetting({ voiceChangerClient, audioContext: props.audioContext })
+    const streamerSetting = useAudioStreamerSetting({ voiceChangerClient })
     const workletSetting = useWorkletSetting({ voiceChangerClient })
     const serverSetting = useServerSetting({ voiceChangerClient })
 
@@ -118,10 +121,12 @@ export const useClient = (props: UseClientProps): ClientState => {
         await workletSetting.clearSetting()
         await serverSetting.clearSetting()
     }
+    console.log("AUDIO STREAMER SETTING USE CLIENT", clientSetting, streamerSetting)
 
     return {
         // 各種設定I/Fへの参照
         clientSetting,
+        streamerSetting,
         workletSetting,
         serverSetting,
 

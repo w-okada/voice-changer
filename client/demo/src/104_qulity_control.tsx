@@ -53,18 +53,18 @@ export const useQualityControl = (): QualityControlState => {
             <div className="body-row split-3-2-2-2-1 left-padding-1 guided">
                 <div className="body-item-title left-padding-1 ">Noise Suppression</div>
                 <div>
-                    <input type="checkbox" checked={appState.clientSetting.setting.echoCancel} onChange={(e) => {
-                        appState.clientSetting.setEchoCancel(e.target.checked)
+                    <input type="checkbox" checked={appState.clientSetting.clientSetting.echoCancel} onChange={(e) => {
+                        appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, echoCancel: e.target.checked })
                     }} /> echo cancel
                 </div>
                 <div>
-                    <input type="checkbox" checked={appState.clientSetting.setting.noiseSuppression} onChange={(e) => {
-                        appState.clientSetting.setNoiseSuppression(e.target.checked)
+                    <input type="checkbox" checked={appState.clientSetting.clientSetting.noiseSuppression} onChange={(e) => {
+                        appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, noiseSuppression: e.target.checked })
                     }} /> suppression1
                 </div>
                 <div>
-                    <input type="checkbox" checked={appState.clientSetting.setting.noiseSuppression2} onChange={(e) => {
-                        appState.clientSetting.setNoiseSuppression2(e.target.checked)
+                    <input type="checkbox" checked={appState.clientSetting.clientSetting.noiseSuppression2} onChange={(e) => {
+                        appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, noiseSuppression2: e.target.checked })
                     }} /> suppression2
                 </div>
                 <div className="body-button-container">
@@ -72,9 +72,10 @@ export const useQualityControl = (): QualityControlState => {
             </div>
         )
     }, [
-        appState.clientSetting.setting.echoCancel, appState.clientSetting.setEchoCancel,
-        appState.clientSetting.setting.noiseSuppression, appState.clientSetting.setNoiseSuppression,
-        appState.clientSetting.setting.noiseSuppression2, appState.clientSetting.setNoiseSuppression2,
+        appState.clientSetting.clientSetting.echoCancel,
+        appState.clientSetting.clientSetting.noiseSuppression,
+        appState.clientSetting.clientSetting.noiseSuppression2,
+        appState.clientSetting.updateClientSetting
     ])
 
     const gainControlRow = useMemo(() => {
@@ -83,25 +84,26 @@ export const useQualityControl = (): QualityControlState => {
                 <div className="body-item-title left-padding-1 ">Gain Control</div>
                 <div>
                     <span className="body-item-input-slider-label">in</span>
-                    <input type="range" className="body-item-input-slider" min="0.0" max="1.0" step="0.1" value={appState.clientSetting.setting.inputGain} onChange={(e) => {
-                        appState.clientSetting.setInputGain(Number(e.target.value))
+                    <input type="range" className="body-item-input-slider" min="0.0" max="1.0" step="0.1" value={appState.clientSetting.clientSetting.inputGain} onChange={(e) => {
+                        appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, inputGain: Number(e.target.value) })
                     }}></input>
-                    <span className="body-item-input-slider-val">{appState.clientSetting.setting.inputGain}</span>
+                    <span className="body-item-input-slider-val">{appState.clientSetting.clientSetting.inputGain}</span>
                 </div>
                 <div>
                     <span className="body-item-input-slider-label">out</span>
-                    <input type="range" className="body-item-input-slider" min="0.0" max="1.0" step="0.1" value={appState.clientSetting.setting.outputGain} onChange={(e) => {
-                        appState.clientSetting.setOutputGain(Number(e.target.value))
+                    <input type="range" className="body-item-input-slider" min="0.0" max="1.0" step="0.1" value={appState.clientSetting.clientSetting.outputGain} onChange={(e) => {
+                        appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, outputGain: Number(e.target.value) })
                     }}></input>
-                    <span className="body-item-input-slider-val">{appState.clientSetting.setting.outputGain}</span>
+                    <span className="body-item-input-slider-val">{appState.clientSetting.clientSetting.outputGain}</span>
                 </div>
                 <div className="body-button-container">
                 </div>
             </div>
         )
     }, [
-        appState.clientSetting.setting.inputGain, appState.clientSetting.setting.inputGain,
-        appState.clientSetting.setting.outputGain, appState.clientSetting.setOutputGain,
+        appState.clientSetting.clientSetting.inputGain,
+        appState.clientSetting.clientSetting.outputGain,
+        appState.clientSetting.updateClientSetting
     ])
 
     const f0DetectorRow = useMemo(() => {

@@ -1,4 +1,4 @@
-import { fileSelectorAsDataURL, ServerAudioDevice, useIndexedDB } from "@dannadori/voice-changer-client-js"
+import { fileSelectorAsDataURL, useIndexedDB } from "@dannadori/voice-changer-client-js"
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_CONVERTED, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, INDEXEDDB_KEY_AUDIO_OUTPUT } from "./const"
 import { useAppState } from "./001_provider/001_AppStateProvider";
@@ -60,7 +60,6 @@ export const useDeviceSetting = (): DeviceSettingState => {
 
     const [inputAudioDeviceInfo, setInputAudioDeviceInfo] = useState<MediaDeviceInfo[]>([])
     const [outputAudioDeviceInfo, setOutputAudioDeviceInfo] = useState<MediaDeviceInfo[]>([])
-    const [serverInputAudioDeviceInfo, setServerInputAudioDeviceInfo] = useState<ServerAudioDevice[]>([])
 
     const [audioInputForGUI, setAudioInputForGUI] = useState<string>("none")
     const [audioOutputForGUI, setAudioOutputForGUI] = useState<string>("none")
@@ -79,30 +78,30 @@ export const useDeviceSetting = (): DeviceSettingState => {
             const audioInfo = await reloadDevices()
             setInputAudioDeviceInfo(audioInfo[0])
             setOutputAudioDeviceInfo(audioInfo[1])
-            if (useServerMicrophone) {
-                try {
-                    const serverDevices = await appState.serverSetting.getServerDevices()
-                    setServerInputAudioDeviceInfo(serverDevices.audio_input_devices)
-                } catch (e) {
-                    console.warn(e)
-                }
-            }
+            // if (useServerMicrophone) {
+            //     try {
+            //         const serverDevices = await appState.serverSetting.getServerDevices()
+            //         setServerInputAudioDeviceInfo(serverDevices.audio_input_devices)
+            //     } catch (e) {
+            //         console.warn(e)
+            //     }
+            // }
         }
         initialize()
     }, [useServerMicrophone])
 
     // キャッシュの設定は反映（たぶん、設定操作の時も起動していしまう。が問題は起こらないはず）
     useEffect(() => {
-        if (typeof appState.clientSetting.setting.audioInput == "string") {
+        if (typeof appState.clientSetting.clientSetting.audioInput == "string") {
             if (inputAudioDeviceInfo.find(x => {
                 // console.log("COMPARE:", x.deviceId, appState.clientSetting.setting.audioInput)
-                return x.deviceId == appState.clientSetting.setting.audioInput
+                return x.deviceId == appState.clientSetting.clientSetting.audioInput
             })) {
-                setAudioInputForGUI(appState.clientSetting.setting.audioInput)
+                setAudioInputForGUI(appState.clientSetting.clientSetting.audioInput)
 
             }
         }
-    }, [inputAudioDeviceInfo, appState.clientSetting.setting.audioInput])
+    }, [inputAudioDeviceInfo, appState.clientSetting.clientSetting.audioInput])
 
     const audioInputRow = useMemo(() => {
         if (useServerMicrophone) {
@@ -126,40 +125,18 @@ export const useDeviceSetting = (): DeviceSettingState => {
         )
     }, [inputAudioDeviceInfo, audioInputForGUI, useServerMicrophone])
 
-    const audioInputServerRow = useMemo(() => {
-        if (!useServerMicrophone) {
-            return <></>
-        }
-        return (
-            <div className="body-row split-3-7 left-padding-1  guided">
-                <div className="body-item-title left-padding-1">AudioInput(Server)</div>
-                <div className="body-select-container">
-                    <select className="body-select" value={audioInputForGUI} onChange={(e) => {
-                        setAudioInputForGUI(e.target.value)
-                    }}>
-                        {
-                            serverInputAudioDeviceInfo.map(x => {
-                                return <option key={x.name} value={x.index}>{x.name}</option>
-                            })
-                        }
-                    </select>
-                </div>
-            </div>
-        )
-    }, [serverInputAudioDeviceInfo, audioInputForGUI, useServerMicrophone])
-
     useEffect(() => {
         if (audioInputForGUI == "file") {
             // file selector (audioMediaInputRow)
         } else {
             if (!useServerMicrophone) {
-                appState.clientSetting.setAudioInput(audioInputForGUI)
+                appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, audioInput: audioInputForGUI })
             } else {
                 console.log("server mic")
-                appState.clientSetting.setAudioInput(null)
+                appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, audioInput: null })
             }
         }
-    }, [appState.audioContext, audioInputForGUI, appState.clientSetting.setAudioInput])
+    }, [appState.audioContext, audioInputForGUI, appState.clientSetting.updateClientSetting])
 
     const audioMediaInputRow = useMemo(() => {
         if (audioInputForGUI != "file") {
@@ -184,7 +161,7 @@ export const useDeviceSetting = (): DeviceSettingState => {
 
             const dst = appState.audioContext.createMediaStreamDestination()
             audioSrcNode.current.connect(dst)
-            appState.clientSetting.setAudioInput(dst.stream)
+            appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, audioInput: dst.stream })
 
             const audio_echo = document.getElementById(AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK) as HTMLAudioElement
             audio_echo.srcObject = dst.stream
@@ -222,7 +199,7 @@ export const useDeviceSetting = (): DeviceSettingState => {
                 </div>
             </div>
         )
-    }, [audioInputForGUI, appState.clientSetting.setAudioInput, fileInputEchoback])
+    }, [audioInputForGUI, appState.clientSetting.updateClientSetting, fileInputEchoback])
 
 
 
@@ -345,7 +322,6 @@ export const useDeviceSetting = (): DeviceSettingState => {
 
                     <div className="partition-content">
                         {audioInputRow}
-                        {audioInputServerRow}
                         {audioMediaInputRow}
                         {audioOutputRow}
                         {audioOutputRecordingRow}
@@ -353,7 +329,7 @@ export const useDeviceSetting = (): DeviceSettingState => {
                 </div>
             </>
         )
-    }, [audioInputRow, audioInputServerRow, audioMediaInputRow, audioOutputRow, audioOutputRecordingRow, useServerMicrophone])
+    }, [audioInputRow, audioMediaInputRow, audioOutputRow, audioOutputRecordingRow, useServerMicrophone])
 
 
     // 出力の録音データ(from worklet)がストアされたら実行

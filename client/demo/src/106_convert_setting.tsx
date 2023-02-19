@@ -25,18 +25,18 @@ export const useConvertSetting = (): ConvertSettingState => {
             <div className="body-row split-3-2-1-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Input Chunk Num(128sample/chunk)</div>
                 <div className="body-input-container">
-                    <input type="number" min={1} max={256} step={1} value={appState.clientSetting.setting.inputChunkNum} onChange={(e) => {
-                        appState.clientSetting.setInputChunkNum(Number(e.target.value))
+                    <input type="number" min={1} max={256} step={1} value={appState.streamerSetting.audioStreamerSetting.inputChunkNum} onChange={(e) => {
+                        appState.streamerSetting.setSetting({ ...appState.streamerSetting.audioStreamerSetting, inputChunkNum: Number(e.target.value) })
                     }} />
                 </div>
                 <div className="body-item-text">
-                    <div>buff: {(appState.clientSetting.setting.inputChunkNum * 128 * 1000 / 24000).toFixed(1)}ms</div>
+                    <div>buff: {(appState.streamerSetting.audioStreamerSetting.inputChunkNum * 128 * 1000 / 24000).toFixed(1)}ms</div>
                 </div>
                 <div className="body-item-text"></div>
 
             </div>
         )
-    }, [appState.clientSetting.setting.inputChunkNum, appState.clientSetting.setInputChunkNum])
+    }, [appState.streamerSetting.audioStreamerSetting.inputChunkNum, appState.streamerSetting.setSetting])
 
     const gpuRow = useMemo(() => {
         return (

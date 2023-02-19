@@ -33,10 +33,10 @@ export const useSpeakerSetting = () => {
 
 
     const calcDefaultF0Factor = (srcId: number, dstId: number) => {
-        const src = appState.clientSetting.setting.correspondences?.find(x => {
+        const src = appState.serverSetting.serverSetting.correspondences?.find(x => {
             return x.sid == srcId
         })
-        const dst = appState.clientSetting.setting.correspondences?.find(x => {
+        const dst = appState.serverSetting.serverSetting.correspondences?.find(x => {
             return x.sid == dstId
         })
         const recommendedF0Factor = dst && src ? dst.correspondence / src.correspondence : 0
@@ -46,7 +46,7 @@ export const useSpeakerSetting = () => {
     console.log()
 
     const srcIdRow = useMemo(() => {
-        const selected = appState.clientSetting.setting.correspondences?.find(x => {
+        const selected = appState.serverSetting.serverSetting.correspondences?.find(x => {
             return x.sid == appState.serverSetting.serverSetting.srcId
         })
         return (
@@ -58,7 +58,7 @@ export const useSpeakerSetting = () => {
                         appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, srcId: Number(e.target.value), f0Factor: recF0 })
                     }}>
                         {
-                            appState.clientSetting.setting.correspondences?.map(x => {
+                            appState.serverSetting.serverSetting.correspondences?.map(x => {
                                 return <option key={x.sid} value={x.sid}>{x.dirname}({x.sid})</option>
                             })
 
@@ -71,10 +71,10 @@ export const useSpeakerSetting = () => {
                 <div className="body-item-text"></div>
             </div>
         )
-    }, [appState.clientSetting.setting.speakers, appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId, appState.clientSetting.setting.correspondences, appState.serverSetting.updateServerSettings])
+    }, [appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId, appState.serverSetting.serverSetting.correspondences, appState.serverSetting.updateServerSettings])
 
     const dstIdRow = useMemo(() => {
-        const selected = appState.clientSetting.setting.correspondences?.find(x => {
+        const selected = appState.serverSetting.serverSetting.correspondences?.find(x => {
             return x.sid == appState.serverSetting.serverSetting.dstId
         })
         return (
@@ -90,7 +90,7 @@ export const useSpeakerSetting = () => {
                             // appState.clientSetting.setting.speakers.map(x => {
                             //     return <option key={x.id} value={x.id}>{x.name}({x.id})</option>
                             // })
-                            appState.clientSetting.setting.correspondences?.map(x => {
+                            appState.serverSetting.serverSetting.correspondences?.map(x => {
                                 return <option key={x.sid} value={x.sid}>{x.dirname}({x.sid})</option>
                             })
                         }
@@ -102,60 +102,60 @@ export const useSpeakerSetting = () => {
                 <div className="body-item-text"></div>
             </div>
         )
-    }, [appState.clientSetting.setting.speakers, appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId, appState.clientSetting.setting.correspondences, appState.serverSetting.updateServerSettings])
+    }, [appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId, appState.serverSetting.serverSetting.correspondences, appState.serverSetting.updateServerSettings])
 
-    const editSpeakerIdMappingRow = useMemo(() => {
-        const onSetSpeakerMappingClicked = async () => {
-            const targetId = editSpeakerTargetId
-            const targetName = editSpeakerTargetName
-            const targetSpeaker = appState.clientSetting.setting.speakers.find(x => { return x.id == targetId })
-            if (targetSpeaker) {
-                if (targetName.length == 0) { // Delete
-                    const newSpeakers = appState.clientSetting.setting.speakers.filter(x => { return x.id != targetId })
-                    appState.clientSetting.setSpeakers(newSpeakers)
-                } else { // Update
-                    targetSpeaker.name = targetName
-                    appState.clientSetting.setSpeakers([...appState.clientSetting.setting.speakers])
-                }
-            } else {
-                if (targetName.length == 0) { // Noop
-                } else {// add
-                    appState.clientSetting.setting.speakers.push({
-                        id: targetId,
-                        name: targetName
-                    })
-                    appState.clientSetting.setSpeakers([...appState.clientSetting.setting.speakers])
-                }
-            }
-        }
-        return (
-            <div className="body-row split-3-1-2-4 left-padding-1 guided">
-                <div className="body-item-title left-padding-1">Edit Speaker Mapping</div>
-                <div className="body-input-container">
-                    <input type="number" min={1} max={256} step={1} value={editSpeakerTargetId} onChange={(e) => {
-                        const id = Number(e.target.value)
-                        setEditSpeakerTargetId(id)
-                        setEditSpeakerTargetName(appState.clientSetting.setting.speakers.find(x => { return x.id == id })?.name || "")
-                    }} />
-                </div>
-                <div className="body-input-container">
-                    <input type="text" value={editSpeakerTargetName} onChange={(e) => {
-                        setEditSpeakerTargetName(e.target.value)
-                    }} />
-                </div>
-                <div className="body-button-container">
-                    <div className="body-button" onClick={onSetSpeakerMappingClicked}>set</div>
-                </div>
-            </div>
-        )
-    }, [appState.clientSetting.setting.speakers, editSpeakerTargetId, editSpeakerTargetName])
+    // const editSpeakerIdMappingRow = useMemo(() => {
+    //     const onSetSpeakerMappingClicked = async () => {
+    //         const targetId = editSpeakerTargetId
+    //         const targetName = editSpeakerTargetName
+    //         const targetSpeaker = appState.clientSetting.setting.speakers.find(x => { return x.id == targetId })
+    //         if (targetSpeaker) {
+    //             if (targetName.length == 0) { // Delete
+    //                 const newSpeakers = appState.clientSetting.setting.speakers.filter(x => { return x.id != targetId })
+    //                 appState.clientSetting.setSpeakers(newSpeakers)
+    //             } else { // Update
+    //                 targetSpeaker.name = targetName
+    //                 appState.clientSetting.setSpeakers([...appState.clientSetting.setting.speakers])
+    //             }
+    //         } else {
+    //             if (targetName.length == 0) { // Noop
+    //             } else {// add
+    //                 appState.clientSetting.setting.speakers.push({
+    //                     id: targetId,
+    //                     name: targetName
+    //                 })
+    //                 appState.clientSetting.setSpeakers([...appState.clientSetting.setting.speakers])
+    //             }
+    //         }
+    //     }
+    //     return (
+    //         <div className="body-row split-3-1-2-4 left-padding-1 guided">
+    //             <div className="body-item-title left-padding-1">Edit Speaker Mapping</div>
+    //             <div className="body-input-container">
+    //                 <input type="number" min={1} max={256} step={1} value={editSpeakerTargetId} onChange={(e) => {
+    //                     const id = Number(e.target.value)
+    //                     setEditSpeakerTargetId(id)
+    //                     setEditSpeakerTargetName(appState.clientSetting.setting.speakers.find(x => { return x.id == id })?.name || "")
+    //                 }} />
+    //             </div>
+    //             <div className="body-input-container">
+    //                 <input type="text" value={editSpeakerTargetName} onChange={(e) => {
+    //                     setEditSpeakerTargetName(e.target.value)
+    //                 }} />
+    //             </div>
+    //             <div className="body-button-container">
+    //                 <div className="body-button" onClick={onSetSpeakerMappingClicked}>set</div>
+    //             </div>
+    //         </div>
+    //     )
+    // }, [appState.clientSetting.setting.speakers, editSpeakerTargetId, editSpeakerTargetName])
 
 
     const f0FactorRow = useMemo(() => {
-        const src = appState.clientSetting.setting.correspondences?.find(x => {
+        const src = appState.serverSetting.serverSetting.correspondences?.find(x => {
             return x.sid == appState.serverSetting.serverSetting.srcId
         })
-        const dst = appState.clientSetting.setting.correspondences?.find(x => {
+        const dst = appState.serverSetting.serverSetting.correspondences?.find(x => {
             return x.sid == appState.serverSetting.serverSetting.dstId
         })
 
@@ -174,7 +174,7 @@ export const useSpeakerSetting = () => {
                 <div className="body-item-text">recommend: {recommendedF0Factor.toFixed(1)}</div>
             </div>
         )
-    }, [appState.serverSetting.serverSetting.f0Factor, appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId, appState.clientSetting.setting.correspondences, appState.serverSetting.updateServerSettings])
+    }, [appState.serverSetting.serverSetting.f0Factor, appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId, appState.serverSetting.serverSetting.correspondences, appState.serverSetting.updateServerSettings])
 
     const speakerSetting = useMemo(() => {
         return (
@@ -198,7 +198,7 @@ export const useSpeakerSetting = () => {
                 </div>
             </>
         )
-    }, [srcIdRow, dstIdRow, editSpeakerIdMappingRow, f0FactorRow])
+    }, [srcIdRow, dstIdRow, f0FactorRow])
 
     return {
         speakerSetting,

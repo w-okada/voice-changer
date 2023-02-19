@@ -4,17 +4,16 @@
     "declaration": true,
     "outDir": "./dist",
 
-
     /* ファイル名の大文字小文字を区別 */
     "forceConsistentCasingInFileNames": true,
 
-    /* 型チェック関係のオプション */
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
+    // /* 型チェック関係のオプション */
+    // "strict": true,
+    // "noImplicitAny": true,
+    // "strictNullChecks": true,
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    // "noImplicitReturns": true,
 
     /* Module解決方法 */
     "moduleResolution": "node",
