@@ -164,11 +164,24 @@ export class VoiceChangerClient {
             const voiceFocusNode = await this.currentDevice.createAudioNode(this.ctx); // vf node
             this.inputGainNode.connect(voiceFocusNode.start) // input node -> vf node
             voiceFocusNode.end.connect(this.outputNodeFromVF!)
-            this.micStream.setStream(this.outputNodeFromVF!.stream) // vf node -> mic stream
+            // this.micStream.setStream(this.outputNodeFromVF!.stream) // vf node -> mic stream
         } else {
-            const inputDestinationNodeForMicStream = this.ctx.createMediaStreamDestination()
-            this.inputGainNode.connect(inputDestinationNodeForMicStream)
-            this.micStream.setStream(inputDestinationNodeForMicStream.stream) // input device -> mic stream
+            // const inputDestinationNodeForMicStream = this.ctx.createMediaStreamDestination()
+            // this.inputGainNode.connect(inputDestinationNodeForMicStream)
+            console.log("input___ media stream", this.currentMediaStream)
+            this.currentMediaStream.getTracks().forEach(x => {
+                console.log("input___ media stream set", x.getSettings())
+                console.log("input___ media stream con", x.getConstraints())
+                console.log("input___ media stream cap", x.getCapabilities())
+            })
+            console.log("input___ media node", this.currentMediaStreamAudioSourceNode)
+            console.log("input___ gain node", this.inputGainNode.channelCount, this.inputGainNode)
+            this.inputGainNode.connect(this.vcNode)
+
+
+
+
+            // this.micStream.setStream(inputDestinationNodeForMicStream.stream) // input device -> mic stream
         }
         this.micStream.pipe(this.audioStreamer) // mic stream -> audio streamer
         if (!this._isVoiceChanging) {

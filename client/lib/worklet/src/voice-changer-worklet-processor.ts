@@ -9,7 +9,8 @@ export type RequestType = typeof RequestType[keyof typeof RequestType]
 
 export const ResponseType = {
     "volume": "volume",
-    "recordData": "recordData"
+    "recordData": "recordData",
+    "inputData": "inputData"
 } as const
 export type ResponseType = typeof ResponseType[keyof typeof ResponseType]
 
@@ -27,6 +28,7 @@ export type VoiceChangerWorkletProcessorResponse = {
     responseType: ResponseType,
     volume?: number,
     recordData?: Float32Array[]
+    inputData?: Float32Array
 }
 
 class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
@@ -132,10 +134,22 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
     }
 
 
+    pushData = (inputData: Float32Array) => {
+        const volumeResponse: VoiceChangerWorkletProcessorResponse = {
+            responseType: ResponseType.inputData,
+            inputData: inputData
+        }
+        this.port.postMessage(volumeResponse);
+    }
+
     process(_inputs: Float32Array[][], outputs: Float32Array[][], _parameters: Record<string, Float32Array>) {
         if (!this.initialized) {
             console.warn("[worklet] worklet_process not ready");
             return true;
+        }
+
+        if (_inputs.length > 0 && _inputs[0].length > 0) {
+            this.pushData(_inputs[0][0])
         }
 
         if (this.playBuffer.length === 0) {
@@ -174,6 +188,7 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
             }
             this.port.postMessage(volumeResponse);
             outputs[0][0].set(voice)
+            outputs[0][1].set(voice)
         }
 
         return true;
