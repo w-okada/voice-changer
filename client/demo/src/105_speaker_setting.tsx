@@ -27,8 +27,11 @@ export const useSpeakerSetting = () => {
         const recommendedF0Factor = dst && src ? dst.correspondence / src.correspondence : 0
         return recommendedF0Factor
     }
+    useEffect(() => {
+        const recF0 = calcDefaultF0Factor(appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId)
+        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, f0Factor: recF0 })
+    }, [appState.clientSetting.clientSetting.correspondences])
 
-    console.log()
 
     const srcIdRow = useMemo(() => {
         const selected = appState.clientSetting.clientSetting.correspondences?.find(x => {
