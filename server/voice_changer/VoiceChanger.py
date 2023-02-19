@@ -87,8 +87,8 @@ class MockStream:
 @dataclass
 class VocieChangerSettings():
     gpu: int = 0
-    srcId: int = 107
-    dstId: int = 100
+    srcId: int = 0
+    dstId: int = 101
 
     inputSampleRate: int = 48000  # 48000 or 24000
 

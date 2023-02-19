@@ -24,6 +24,7 @@ export const useSpeakerSetting = () => {
         const dst = appState.clientSetting.clientSetting.correspondences?.find(x => {
             return x.sid == dstId
         })
+        console.log("calcDefaultF0Factor", srcId, dstId, src, dst)
         const recommendedF0Factor = dst && src ? dst.correspondence / src.correspondence : 0
         return recommendedF0Factor
     }
