@@ -114,8 +114,11 @@ export class VoiceChangerClient {
         return true
     }
 
-    // forceVfDisable is for the condition that vf is enabled in constructor. 
-    //noiseSuppression2 => VoiceFocus
+
+    /////////////////////////////////////////////////////
+    // オペレーション
+    /////////////////////////////////////////////////////
+    /// Operations ///
     setup = async (input: string | MediaStream | null, bufferSize: BufferSize, echoCancel: boolean = true, noiseSuppression: boolean = true, noiseSuppression2: boolean = false) => {
         const lockNum = await this.lock()
 
@@ -220,7 +223,10 @@ export class VoiceChangerClient {
     get isVoiceChanging(): boolean {
         return this._isVoiceChanging
     }
-    // Audio Streamer Settingg
+
+    ////////////////////////
+    /// 設定
+    //////////////////////////////
     setServerUrl = (serverUrl: string, openTab: boolean = false) => {
         const url = validateUrl(serverUrl)
         const pageUrl = `${location.protocol}//${location.host}`
@@ -240,6 +246,51 @@ export class VoiceChangerClient {
         this.configurator.setServerUrl(url)
     }
 
+    setInputGain = (val: number) => {
+        this.inputGain = val
+        if (!this.inputGainNode) {
+            return
+        }
+        this.inputGainNode.gain.value = val
+    }
+
+    setOutputGain = (val: number) => {
+        if (!this.outputGainNode) {
+            return
+        }
+        this.outputGainNode.gain.value = val
+    }
+
+    /////////////////////////////////////////////////////
+    // コンポーネント設定、操作
+    /////////////////////////////////////////////////////
+    //##  Server ##//
+    updateServerSettings = (key: ServerSettingKey, val: string) => {
+        return this.configurator.updateSettings(key, val)
+    }
+    uploadFile = (buf: ArrayBuffer, filename: string, onprogress: (progress: number, end: boolean) => void) => {
+        return this.configurator.uploadFile(buf, filename, onprogress)
+    }
+    concatUploadedFile = (filename: string, chunkNum: number) => {
+        return this.configurator.concatUploadedFile(filename, chunkNum)
+    }
+    loadModel = (configFilename: string, pyTorchModelFilename: string | null, onnxModelFilename: string | null) => {
+        return this.configurator.loadModel(configFilename, pyTorchModelFilename, onnxModelFilename)
+    }
+
+    //##  Worklet ##//
+    configureWorklet = (setting: WorkletSetting) => {
+        this.vcNode.configure(setting)
+    }
+    startOutputRecordingWorklet = () => {
+        this.vcNode.startOutputRecordingWorklet()
+    }
+    stopOutputRecordingWorklet = () => {
+        this.vcNode.stopOutputRecordingWorklet()
+    }
+
+
+    //##  Audio Streamer ##//
     setProtocol = (mode: Protocol) => {
         this.audioStreamer.setProtocol(mode)
     }
@@ -261,62 +312,14 @@ export class VoiceChangerClient {
 
 
     /////////////////////////////////////////////////////
-    // コンポーネント設定、操作
+    // 情報取得
     /////////////////////////////////////////////////////
-    //##  Server ##//
-
-    //##  Worklet ##//
-    configureWorklet = (setting: WorkletSetting) => {
-        this.vcNode.configure(setting)
-    }
-    startOutputRecordingWorklet = () => {
-        this.vcNode.startOutputRecordingWorklet()
-    }
-    stopOutputRecordingWorklet = () => {
-        this.vcNode.stopOutputRecordingWorklet()
-    }
-
-
-    // Configurator Method
-    uploadFile = (buf: ArrayBuffer, filename: string, onprogress: (progress: number, end: boolean) => void) => {
-        return this.configurator.uploadFile(buf, filename, onprogress)
-    }
-    concatUploadedFile = (filename: string, chunkNum: number) => {
-        return this.configurator.concatUploadedFile(filename, chunkNum)
-    }
-    loadModel = (configFilename: string, pyTorchModelFilename: string | null, onnxModelFilename: string | null) => {
-        return this.configurator.loadModel(configFilename, pyTorchModelFilename, onnxModelFilename)
-    }
-    updateServerSettings = (key: ServerSettingKey, val: string) => {
-        return this.configurator.updateSettings(key, val)
-    }
-
-    setInputGain = (val: number) => {
-        this.inputGain = val
-        if (!this.inputGainNode) {
-            return
-        }
-        this.inputGainNode.gain.value = val
-    }
-
-    setOutputGain = (val: number) => {
-        if (!this.outputGainNode) {
-            return
-        }
-        this.outputGainNode.gain.value = val
-    }
-
-
     // Information
     getClientSettings = () => {
         return this.audioStreamer.getSettings()
     }
     getServerSettings = () => {
         return this.configurator.getSettings()
-    }
-
-    getServerDevices = () => {
-        return this.configurator.getServerDevices()
     }
 
 

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react"
-import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ServerAudioDevices, DefaultServerSetting } from "../const"
+import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, DefaultServerSetting } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
@@ -37,8 +37,6 @@ export type ServerSettingState = {
     loadModel: () => Promise<void>
     uploadProgress: number
     isUploading: boolean
-
-    getServerDevices: () => Promise<ServerAudioDevices>
 
 }
 
@@ -196,16 +194,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         await removeItem(INDEXEDDB_KEY_MODEL_DATA)
     }
 
-    const getServerDevices = async (): Promise<ServerAudioDevices> => {
-        if (!props.voiceChangerClient) {
-            return {
-                audio_input_devices: [],
-                audio_output_devices: []
-            }
-        }
-        const res = await props.voiceChangerClient.getServerDevices()
-        return res
-    }
 
     return {
         serverSetting,
@@ -218,7 +206,5 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         loadModel,
         uploadProgress,
         isUploading,
-
-        getServerDevices,
     }
 }

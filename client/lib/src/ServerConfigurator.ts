@@ -1,4 +1,4 @@
-import { ServerAudioDevices, ServerInfo, ServerSettingKey } from "./const";
+import { ServerInfo, ServerSettingKey } from "./const";
 
 
 type FileChunk = {
@@ -7,6 +7,12 @@ type FileChunk = {
 }
 export class ServerConfigurator {
     private serverUrl = ""
+
+    setServerUrl = (serverUrl: string) => {
+        this.serverUrl = serverUrl
+        console.log(`[ServerConfigurator] Server URL: ${this.serverUrl}`)
+    }
+
     getSettings = async () => {
         const url = this.serverUrl + "/info"
         const info = await new Promise<ServerInfo>((resolve) => {
@@ -19,11 +25,6 @@ export class ServerConfigurator {
             })
         })
         return info
-    }
-
-    setServerUrl = (serverUrl: string) => {
-        this.serverUrl = serverUrl
-        console.log(`[ServerConfigurator] Server URL: ${this.serverUrl}`)
     }
 
     updateSettings = async (key: ServerSettingKey, val: string) => {
@@ -125,19 +126,4 @@ export class ServerConfigurator {
         return await info
     }
 
-
-    // Local Mic
-    getServerDevices = async () => {
-        const url = this.serverUrl + "/device"
-        const info = await new Promise<ServerAudioDevices>((resolve) => {
-            const request = new Request(url, {
-                method: 'GET',
-            });
-            fetch(request).then(async (response) => {
-                const json = await response.json() as ServerAudioDevices
-                resolve(json)
-            })
-        })
-        return info
-    }
 }
