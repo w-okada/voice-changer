@@ -133,8 +133,6 @@ class VoiceChanger():
         self.prev_audio = np.zeros(1)
         self.mps_enabled = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
 
-        self._setupRecordIO()
-
         print(f"VoiceChanger Initialized (GPU_NUM:{self.gpu_num}, mps_enabled:{self.mps_enabled})")
 
     def _setupRecordIO(self):

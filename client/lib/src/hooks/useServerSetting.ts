@@ -93,7 +93,9 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                     const res = await props.voiceChangerClient.updateServerSettings(k, "" + new_v)
 
                     setServerSetting(res)
-                    setItem(INDEXEDDB_KEY_SERVER, res)
+                    const storeData = { ...res }
+                    storeData.recordIO = 0
+                    setItem(INDEXEDDB_KEY_SERVER, storeData)
                 }
             }
         }
@@ -183,7 +185,9 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             if (!props.voiceChangerClient) return
             const res = await props.voiceChangerClient.getServerSettings()
             setServerSetting(res)
-            setItem(INDEXEDDB_KEY_SERVER, res)
+            const storeData = { ...res }
+            storeData.recordIO = 0
+            setItem(INDEXEDDB_KEY_SERVER, storeData)
         }
     }, [props.voiceChangerClient])
 
