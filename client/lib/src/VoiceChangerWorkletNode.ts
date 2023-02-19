@@ -133,7 +133,6 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
                 downsampledBuffer = inputData
             } else if (this.setting.downSamplingMode == DownSamplingMode.decimate) {
                 //////// (Kind 1) 間引き //////////
-                // bufferSize個のデータ（48Khz）が入ってくる。
                 //// 48000Hz で入ってくるので間引いて24000Hzに変換する。
                 downsampledBuffer = new Float32Array(inputData.length / 2);
                 for (let i = 0; i < inputData.length; i++) {

@@ -1,4 +1,4 @@
-import { BufferSize, CrossFadeOverlapSize, DownSamplingMode, InputSampleRate, Protocol, SampleRate } from "@dannadori/voice-changer-client-js"
+import { CrossFadeOverlapSize, DownSamplingMode, InputSampleRate, Protocol, SampleRate } from "@dannadori/voice-changer-client-js"
 import React, { useMemo } from "react"
 import { useAppState } from "./001_provider/001_AppStateProvider";
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./components/101_HeaderButton";
@@ -101,27 +101,6 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
             </div>
         )
     }, [appState.workletNodeSetting.workletNodeSetting.sendingSampleRate, appState.workletNodeSetting.updateWorkletNodeSetting, appState.serverSetting.updateServerSettings])
-
-    const bufferSizeRow = useMemo(() => {
-        return (
-
-            <div className="body-row split-3-7 left-padding-1 guided">
-                <div className="body-item-title left-padding-1">Buffer Size</div>
-                <div className="body-select-container">
-                    <select className="body-select" value={appState.clientSetting.clientSetting.bufferSize} onChange={(e) => {
-                        appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, bufferSize: Number(e.target.value) as BufferSize })
-                    }}>
-                        {
-                            Object.values(BufferSize).map(x => {
-                                return <option key={x} value={x}>{x}</option>
-                            })
-                        }
-                    </select>
-                </div>
-            </div>
-        )
-    }, [appState.clientSetting.clientSetting.bufferSize, appState.clientSetting.updateClientSetting])
-
 
     const crossFadeOverlapSizeRow = useMemo(() => {
         return (
@@ -242,7 +221,6 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 <div className="body-row divider"></div>
                 {sampleRateRow}
                 {sendingSampleRateRow}
-                {bufferSizeRow}
                 <div className="body-row divider"></div>
                 {crossFadeOverlapSizeRow}
                 {crossFadeOffsetRateRow}
@@ -254,7 +232,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
 
             </>
         )
-    }, [mmvcServerUrlRow, protocolRow, sampleRateRow, sendingSampleRateRow, bufferSizeRow, crossFadeOverlapSizeRow, crossFadeOffsetRateRow, crossFadeEndRateRow, workletSettingRow, downSamplingModeRow])
+    }, [mmvcServerUrlRow, protocolRow, sampleRateRow, sendingSampleRateRow, crossFadeOverlapSizeRow, crossFadeOffsetRateRow, crossFadeEndRateRow, workletSettingRow, downSamplingModeRow])
 
 
     const advancedSetting = useMemo(() => {

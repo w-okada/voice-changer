@@ -194,7 +194,6 @@ export class VoiceChangerClient {
         let reconstructInputRequired = false
         if (
             this.setting.audioInput != setting.audioInput ||
-            this.setting.bufferSize != setting.bufferSize ||
             this.setting.echoCancel != setting.echoCancel ||
             this.setting.noiseSuppression != setting.noiseSuppression ||
             this.setting.noiseSuppression2 != setting.noiseSuppression2 ||

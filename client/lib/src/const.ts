@@ -176,17 +176,6 @@ export const SampleRate = {
 } as const
 export type SampleRate = typeof SampleRate[keyof typeof SampleRate]
 
-export const BufferSize = {
-    "256": 256,
-    "512": 512,
-    "1024": 1024,
-    "2048": 2048,
-    "4096": 4096,
-    "8192": 8192,
-    "16384": 16384
-} as const
-export type BufferSize = typeof BufferSize[keyof typeof BufferSize]
-
 export type Speaker = {
     "id": number,
     "name": string,
@@ -199,7 +188,6 @@ export type Correspondence = {
 export type VoiceChangerClientSetting = {
     audioInput: string | MediaStream | null,
     sampleRate: SampleRate, // 48000Hz
-    bufferSize: BufferSize, // 256, 512, 1024, 2048, 4096, 8192, 16384 (for mic stream)
     echoCancel: boolean,
     noiseSuppression: boolean,
     noiseSuppression2: boolean
@@ -213,7 +201,6 @@ export type VoiceChangerClientSetting = {
 export const DefaultVoiceChangerClientSetting: VoiceChangerClientSetting = {
     audioInput: null,
     sampleRate: 48000,
-    bufferSize: 1024,
     speakers: [
         {
             "id": 0,
