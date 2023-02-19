@@ -237,8 +237,8 @@ export const DefaultVoiceChangerClientSetting: VoiceChangerClientSetting = {
         }
     ],
     correspondences: [],
-    echoCancel: true,
-    noiseSuppression: true,
+    echoCancel: false,
+    noiseSuppression: false,
     noiseSuppression2: false,
     inputGain: 1.0,
     outputGain: 1.0
