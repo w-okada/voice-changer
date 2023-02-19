@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react"
+import { AudioStreamer } from "../AudioStreamer"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { AudioStreamerSettingState, useAudioStreamerSetting } from "./useAudioStreamerSetting"
 import { ClientSettingState, useClientSetting } from "./useClientSetting"
@@ -118,10 +119,10 @@ export const useClient = (props: UseClientProps): ClientState => {
 
     const clearSetting = async () => {
         await clientSetting.clearSetting()
+        await streamerSetting.clearSetting()
         await workletSetting.clearSetting()
         await serverSetting.clearSetting()
     }
-    console.log("AUDIO STREAMER SETTING USE CLIENT", clientSetting, streamerSetting)
 
     return {
         // 各種設定I/Fへの参照

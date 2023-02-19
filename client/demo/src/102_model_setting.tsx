@@ -100,11 +100,12 @@ export const useModelSettingArea = (): ServerSettingState => {
                     return cor
                 }
             }).filter(x => { return x != null }) as Correspondence[]
-            appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, correspondences: cors })
+            console.log(cors)
+            appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, correspondences: cors })
 
         }
         const onCorrespondenceFileClearClicked = () => {
-            appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, correspondences: [] })
+            appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, correspondences: [] })
         }
 
         const onModelUploadClicked = async () => {
@@ -118,7 +119,7 @@ export const useModelSettingArea = (): ServerSettingState => {
         const configFilenameText = appState.serverSetting.fileUploadSetting.configFile?.filename || appState.serverSetting.fileUploadSetting.configFile?.file?.name || ""
         const onnxModelFilenameText = appState.serverSetting.fileUploadSetting.onnxModel?.filename || appState.serverSetting.fileUploadSetting.onnxModel?.file?.name || ""
         const pyTorchFilenameText = appState.serverSetting.fileUploadSetting.pyTorchModel?.filename || appState.serverSetting.fileUploadSetting.pyTorchModel?.file?.name || ""
-        const correspondenceFileText = appState.serverSetting.serverSetting.correspondences ? JSON.stringify(appState.serverSetting.serverSetting.correspondences.map(x => { return x.dirname })) : ""
+        const correspondenceFileText = appState.clientSetting.clientSetting.correspondences ? JSON.stringify(appState.clientSetting.clientSetting.correspondences.map(x => { return x.dirname })) : ""
 
         return (
             <>
@@ -202,7 +203,7 @@ export const useModelSettingArea = (): ServerSettingState => {
         appState.serverSetting.loadModel,
         appState.serverSetting.isUploading,
         appState.serverSetting.uploadProgress,
-        appState.serverSetting.serverSetting.correspondences,
+        appState.clientSetting.clientSetting.correspondences,
         appState.serverSetting.updateServerSettings,
         appState.serverSetting.setFileUploadSetting,
         showPyTorch])

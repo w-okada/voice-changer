@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react"
 
-import { INDEXEDDB_KEY_CLIENT, INDEXEDDB_KEY_STREAMER, AudioStreamerSetting, DefaultAudioStreamerSetting } from "../const"
+import { INDEXEDDB_KEY_STREAMER, AudioStreamerSetting, DefaultAudioStreamerSetting } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
@@ -11,7 +11,7 @@ export type UseAudioStreamerSettingProps = {
 export type AudioStreamerSettingState = {
     audioStreamerSetting: AudioStreamerSetting;
     clearSetting: () => Promise<void>
-    setSetting: (setting: AudioStreamerSetting) => void
+    updateAudioStreamerSetting: (setting: AudioStreamerSetting) => void
 
 }
 
@@ -48,30 +48,27 @@ export const useAudioStreamerSetting = (props: UseAudioStreamerSettingProps): Au
     /////////////
 
 
-    // const setServerUrl = useMemo(() => {
-    //     return (url: string) => {
-    //         if (!props.voiceChangerClient) return
-    //         props.voiceChangerClient.setServerUrl(url, true)
-    //         settingRef.current.mmvcServerUrl = url
-    //         setSetting({ ...settingRef.current })
-    //     }
-    // }, [props.voiceChangerClient])
-
-    const setSetting = useMemo(() => {
-        return (setting: AudioStreamerSetting) => {
+    const updateAudioStreamerSetting = useMemo(() => {
+        return (_audioStreamerSetting: AudioStreamerSetting) => {
             if (!props.voiceChangerClient) return
-            _setAudioStreamerSetting(setting)
-            setItem(INDEXEDDB_KEY_CLIENT, setting)
-            props.voiceChangerClient.updateAudioStreamerSetting(setting)
+            for (let k in _audioStreamerSetting) {
+                const cur_v = audioStreamerSetting[k]
+                const new_v = _audioStreamerSetting[k]
+                if (cur_v != new_v) {
+                    _setAudioStreamerSetting(_audioStreamerSetting)
+                    setItem(INDEXEDDB_KEY_STREAMER, _audioStreamerSetting)
+                    props.voiceChangerClient.updateAudioStreamerSetting(_audioStreamerSetting)
+                    break
+                }
+            }
         }
-    }, [props.voiceChangerClient])
+    }, [props.voiceChangerClient, audioStreamerSetting])
 
 
-    console.log("AUDIO STREAMER SETTING", audioStreamerSetting)
     return {
         audioStreamerSetting,
         clearSetting,
-        setSetting,
+        updateAudioStreamerSetting,
 
     }
 }

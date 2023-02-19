@@ -62,10 +62,17 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
     // 設定
     /////////////
     const updateClientSetting = useMemo(() => {
-        return (clientSetting: VoiceChangerClientSetting) => {
+        return (_clientSetting: VoiceChangerClientSetting) => {
             if (!props.voiceChangerClient) return
-            // storeSetting(clientSetting)
-            // props.voiceChangerClient.updateClientSetting(clientSetting)
+            for (let k in _clientSetting) {
+                const cur_v = clientSetting[k]
+                const new_v = _clientSetting[k]
+                if (cur_v != new_v) {
+                    storeSetting(_clientSetting)
+                    props.voiceChangerClient.updateClientSetting(_clientSetting)
+                    break
+                }
+            }
         }
     }, [props.voiceChangerClient, clientSetting])
 

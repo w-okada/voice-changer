@@ -41,7 +41,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
 
     const protocolRow = useMemo(() => {
         const onProtocolChanged = async (val: Protocol) => {
-            appState.streamerSetting.setSetting({ ...appState.streamerSetting.audioStreamerSetting, protocol: val })
+            appState.streamerSetting.updateAudioStreamerSetting({ ...appState.streamerSetting.audioStreamerSetting, protocol: val })
         }
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
@@ -60,7 +60,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 </div>
             </div>
         )
-    }, [appState.streamerSetting.audioStreamerSetting.protocol, appState.streamerSetting.setSetting])
+    }, [appState.streamerSetting.audioStreamerSetting.protocol, appState.streamerSetting.updateAudioStreamerSetting])
 
 
     const sampleRateRow = useMemo(() => {
@@ -88,7 +88,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 <div className="body-item-title left-padding-1">Sending Sample Rate</div>
                 <div className="body-select-container">
                     <select className="body-select" value={appState.streamerSetting.audioStreamerSetting.sendingSampleRate} onChange={(e) => {
-                        appState.streamerSetting.setSetting({ ...appState.streamerSetting.audioStreamerSetting, sendingSampleRate: Number(e.target.value) as InputSampleRate })
+                        appState.streamerSetting.updateAudioStreamerSetting({ ...appState.streamerSetting.audioStreamerSetting, sendingSampleRate: Number(e.target.value) as InputSampleRate })
                         appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, inputSampleRate: Number(e.target.value) as InputSampleRate })
                     }}>
                         {
@@ -100,7 +100,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 </div>
             </div>
         )
-    }, [appState.streamerSetting.audioStreamerSetting.sendingSampleRate, appState.streamerSetting.setSetting, appState.serverSetting.updateServerSettings])
+    }, [appState.streamerSetting.audioStreamerSetting.sendingSampleRate, appState.streamerSetting.updateAudioStreamerSetting, appState.serverSetting.updateServerSettings])
 
     const bufferSizeRow = useMemo(() => {
         return (
@@ -175,7 +175,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 <div className="body-item-title left-padding-1 ">DownSamplingMode</div>
                 <div className="body-select-container">
                     <select className="body-select" value={appState.streamerSetting.audioStreamerSetting.downSamplingMode} onChange={(e) => {
-                        appState.streamerSetting.setSetting({ ...appState.streamerSetting.audioStreamerSetting, downSamplingMode: e.target.value as DownSamplingMode })
+                        appState.streamerSetting.updateAudioStreamerSetting({ ...appState.streamerSetting.audioStreamerSetting, downSamplingMode: e.target.value as DownSamplingMode })
                     }}>
                         {
                             Object.values(DownSamplingMode).map(x => {
@@ -186,7 +186,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 </div>
             </div>
         )
-    }, [appState.streamerSetting.audioStreamerSetting.downSamplingMode, appState.streamerSetting.setSetting])
+    }, [appState.streamerSetting.audioStreamerSetting.downSamplingMode, appState.streamerSetting.updateAudioStreamerSetting])
 
 
     const workletSettingRow = useMemo(() => {

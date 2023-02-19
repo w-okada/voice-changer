@@ -131,11 +131,11 @@ export const useQualityControl = (): QualityControlState => {
     const recordIORow = useMemo(() => {
         const onRecordStartClicked = async () => {
             setRecording(true)
-            appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, recordIO: 1 })
+            await appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, recordIO: 1 })
         }
         const onRecordStopClicked = async () => {
             setRecording(false)
-            appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, recordIO: 0 })
+            await appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, recordIO: 0 })
         }
         const onRecordAnalizeClicked = async () => {
             if (appState.frontendManagerState.isConverting) {
@@ -143,7 +143,7 @@ export const useQualityControl = (): QualityControlState => {
                 return
             }
             appState.frontendManagerState.setIsAnalyzing(true)
-            appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, recordIO: 2 })
+            await appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, recordIO: 2 })
             // set spectrogram (dio)
             const imageDio = document.getElementById("body-image-container-img-dio") as HTMLImageElement
             imageDio.src = "/tmp/analyze-dio.png?" + new Date().getTime()

@@ -30,6 +30,13 @@ const reloadDevices = async () => {
         toJSON: () => { }
     })
     const audioOutputs = mediaDeviceInfos.filter(x => { return x.kind == "audiooutput" })
+    audioOutputs.push({
+        deviceId: "none",
+        groupId: "none",
+        kind: "audiooutput",
+        label: "none",
+        toJSON: () => { }
+    })
     // audioOutputs.push({
     //     deviceId: "record",
     //     groupId: "record",
@@ -98,7 +105,6 @@ export const useDeviceSetting = (): DeviceSettingState => {
                 return x.deviceId == appState.clientSetting.clientSetting.audioInput
             })) {
                 setAudioInputForGUI(appState.clientSetting.clientSetting.audioInput)
-
             }
         }
     }, [inputAudioDeviceInfo, appState.clientSetting.clientSetting.audioInput])

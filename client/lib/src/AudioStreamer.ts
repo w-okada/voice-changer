@@ -28,6 +28,7 @@ export class AudioStreamer extends Duplex {
         super(options);
         this.callbacks = callbacks
         this.audioStreamerListeners = audioStreamerListeners
+        this.createSocketIO()
     }
 
     private createSocketIO = () => {

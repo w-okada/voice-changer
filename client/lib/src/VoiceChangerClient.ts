@@ -236,10 +236,20 @@ export class VoiceChangerClient {
             reconstructInputRequired = true
         }
 
+        if (this.setting.inputGain != setting.inputGain) {
+            this.setInputGain(setting.inputGain)
+        }
+        if (this.setting.outputGain != setting.outputGain) {
+            this.setOutputGain(setting.outputGain)
+        }
+
         this.setting = setting
         if (reconstructInputRequired) {
             this.setup()
         }
+
+
+
     }
 
     setInputGain = (val: number) => {

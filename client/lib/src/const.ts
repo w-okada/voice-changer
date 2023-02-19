@@ -41,6 +41,8 @@ export const F0Detector = {
 } as const
 export type F0Detector = typeof F0Detector[keyof typeof F0Detector]
 
+
+
 export const ServerSettingKey = {
     "srcId": "srcId",
     "dstId": "dstId",
@@ -62,16 +64,6 @@ export const ServerSettingKey = {
 export type ServerSettingKey = typeof ServerSettingKey[keyof typeof ServerSettingKey]
 
 
-export type Speaker = {
-    "id": number,
-    "name": string,
-}
-export type Correspondence = {
-    "sid": number,
-    "correspondence": number,
-    "dirname": string
-}
-
 export type VoiceChangerServerSetting = {
     srcId: number,
     dstId: number,
@@ -89,7 +81,6 @@ export type VoiceChangerServerSetting = {
     recordIO: number // 0:off, 1:on
 
     inputSampleRate: InputSampleRate
-
 }
 
 export type ServerInfo = VoiceChangerServerSetting & {
@@ -98,9 +89,6 @@ export type ServerInfo = VoiceChangerServerSetting & {
     pyTorchModelFile: string,
     onnxModelFile: string,
     onnxExecutionProviders: OnnxExecutionProvider[]
-
-    speakers: Speaker[],
-    correspondences: Correspondence[],
 }
 
 export const DefaultServerSetting: ServerInfo = {
@@ -125,32 +113,7 @@ export const DefaultServerSetting: ServerInfo = {
     configFile: "",
     pyTorchModelFile: "",
     onnxModelFile: "",
-    onnxExecutionProviders: [],
-
-    //
-    speakers: [
-        {
-            "id": 0,
-            "name": "user"
-        },
-        {
-            "id": 101,
-            "name": "ずんだもん"
-        },
-        {
-            "id": 102,
-            "name": "そら"
-        },
-        {
-            "id": 103,
-            "name": "めたん"
-        },
-        {
-            "id": 104,
-            "name": "つむぎ"
-        }
-    ],
-    correspondences: [],
+    onnxExecutionProviders: []
 }
 
 
@@ -224,6 +187,15 @@ export const BufferSize = {
 } as const
 export type BufferSize = typeof BufferSize[keyof typeof BufferSize]
 
+export type Speaker = {
+    "id": number,
+    "name": string,
+}
+export type Correspondence = {
+    "sid": number,
+    "correspondence": number,
+    "dirname": string
+}
 export type VoiceChangerClientSetting = {
     audioInput: string | MediaStream | null,
     sampleRate: SampleRate, // 48000Hz
@@ -232,7 +204,8 @@ export type VoiceChangerClientSetting = {
     noiseSuppression: boolean,
     noiseSuppression2: boolean
 
-
+    speakers: Speaker[],
+    correspondences: Correspondence[],
     inputGain: number
     outputGain: number
 }
@@ -241,7 +214,29 @@ export const DefaultVoiceChangerClientSetting: VoiceChangerClientSetting = {
     audioInput: null,
     sampleRate: 48000,
     bufferSize: 1024,
-
+    speakers: [
+        {
+            "id": 0,
+            "name": "user"
+        },
+        {
+            "id": 101,
+            "name": "ずんだもん"
+        },
+        {
+            "id": 102,
+            "name": "そら"
+        },
+        {
+            "id": 103,
+            "name": "めたん"
+        },
+        {
+            "id": 104,
+            "name": "つむぎ"
+        }
+    ],
+    correspondences: [],
     echoCancel: true,
     noiseSuppression: true,
     noiseSuppression2: false,

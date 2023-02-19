@@ -16,27 +16,12 @@ export const useSpeakerSetting = () => {
         return <HeaderButton {...accodionButtonProps}></HeaderButton>;
     }, []);
 
-    const [editSpeakerTargetId, setEditSpeakerTargetId] = useState<number>(0)
-    const [editSpeakerTargetName, setEditSpeakerTargetName] = useState<string>("")
-
-    // useEffect(() => {
-    //     const src = appState.clientSetting.setting.correspondences?.find(x => {
-    //         return x.sid == appState.serverSetting.serverSetting.srcId
-    //     })
-    //     const dst = appState.clientSetting.setting.correspondences?.find(x => {
-    //         return x.sid == appState.serverSetting.serverSetting.dstId
-    //     })
-    //     const recommendedF0Factor = dst && src ? dst.correspondence / src.correspondence : 0
-    //     appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, f0Factor: recommendedF0Factor })
-
-    // }, [appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId, appState.serverSetting.updateServerSettings])
-
 
     const calcDefaultF0Factor = (srcId: number, dstId: number) => {
-        const src = appState.serverSetting.serverSetting.correspondences?.find(x => {
+        const src = appState.clientSetting.clientSetting.correspondences?.find(x => {
             return x.sid == srcId
         })
-        const dst = appState.serverSetting.serverSetting.correspondences?.find(x => {
+        const dst = appState.clientSetting.clientSetting.correspondences?.find(x => {
             return x.sid == dstId
         })
         const recommendedF0Factor = dst && src ? dst.correspondence / src.correspondence : 0
@@ -46,7 +31,7 @@ export const useSpeakerSetting = () => {
     console.log()
 
     const srcIdRow = useMemo(() => {
-        const selected = appState.serverSetting.serverSetting.correspondences?.find(x => {
+        const selected = appState.clientSetting.clientSetting.correspondences?.find(x => {
             return x.sid == appState.serverSetting.serverSetting.srcId
         })
         return (
@@ -58,7 +43,7 @@ export const useSpeakerSetting = () => {
                         appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, srcId: Number(e.target.value), f0Factor: recF0 })
                     }}>
                         {
-                            appState.serverSetting.serverSetting.correspondences?.map(x => {
+                            appState.clientSetting.clientSetting.correspondences?.map(x => {
                                 return <option key={x.sid} value={x.sid}>{x.dirname}({x.sid})</option>
                             })
 
@@ -71,10 +56,10 @@ export const useSpeakerSetting = () => {
                 <div className="body-item-text"></div>
             </div>
         )
-    }, [appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId, appState.serverSetting.serverSetting.correspondences, appState.serverSetting.updateServerSettings])
+    }, [appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId, appState.clientSetting.clientSetting.correspondences, appState.serverSetting.updateServerSettings])
 
     const dstIdRow = useMemo(() => {
-        const selected = appState.serverSetting.serverSetting.correspondences?.find(x => {
+        const selected = appState.clientSetting.clientSetting.correspondences?.find(x => {
             return x.sid == appState.serverSetting.serverSetting.dstId
         })
         return (
@@ -90,7 +75,7 @@ export const useSpeakerSetting = () => {
                             // appState.clientSetting.setting.speakers.map(x => {
                             //     return <option key={x.id} value={x.id}>{x.name}({x.id})</option>
                             // })
-                            appState.serverSetting.serverSetting.correspondences?.map(x => {
+                            appState.clientSetting.clientSetting.correspondences?.map(x => {
                                 return <option key={x.sid} value={x.sid}>{x.dirname}({x.sid})</option>
                             })
                         }
@@ -102,7 +87,7 @@ export const useSpeakerSetting = () => {
                 <div className="body-item-text"></div>
             </div>
         )
-    }, [appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId, appState.serverSetting.serverSetting.correspondences, appState.serverSetting.updateServerSettings])
+    }, [appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId, appState.clientSetting.clientSetting.correspondences, appState.serverSetting.updateServerSettings])
 
     // const editSpeakerIdMappingRow = useMemo(() => {
     //     const onSetSpeakerMappingClicked = async () => {
@@ -152,10 +137,10 @@ export const useSpeakerSetting = () => {
 
 
     const f0FactorRow = useMemo(() => {
-        const src = appState.serverSetting.serverSetting.correspondences?.find(x => {
+        const src = appState.clientSetting.clientSetting.correspondences?.find(x => {
             return x.sid == appState.serverSetting.serverSetting.srcId
         })
-        const dst = appState.serverSetting.serverSetting.correspondences?.find(x => {
+        const dst = appState.clientSetting.clientSetting.correspondences?.find(x => {
             return x.sid == appState.serverSetting.serverSetting.dstId
         })
 
@@ -174,7 +159,7 @@ export const useSpeakerSetting = () => {
                 <div className="body-item-text">recommend: {recommendedF0Factor.toFixed(1)}</div>
             </div>
         )
-    }, [appState.serverSetting.serverSetting.f0Factor, appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId, appState.serverSetting.serverSetting.correspondences, appState.serverSetting.updateServerSettings])
+    }, [appState.serverSetting.serverSetting.f0Factor, appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId, appState.clientSetting.clientSetting.correspondences, appState.serverSetting.updateServerSettings])
 
     const speakerSetting = useMemo(() => {
         return (
