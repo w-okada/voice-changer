@@ -1,6 +1,6 @@
 {
   "name": "@dannadori/voice-changer-client-js",
-  "version": "1.0.70",
+  "version": "1.0.72",
   "description": "",
   "main": "dist/index.js",
   "directories": {
@@ -48,13 +48,9 @@
   "dependencies": {
     "@types/readable-stream": "^2.3.15",
     "amazon-chime-sdk-js": "^3.11.0",
-    "install": "^0.13.0",
     "localforage": "^1.10.0",
-    "microphone-stream": "^6.0.1",
-    "path-browserify": "^1.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "readable-stream": "^4.3.0",
     "socket.io-client": "^4.6.0"
   }
 }

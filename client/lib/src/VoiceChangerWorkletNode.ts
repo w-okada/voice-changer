@@ -5,7 +5,6 @@ import { DefaultEventsMap } from "@socket.io/component-emitter";
 
 export type VoiceChangerWorkletListener = {
     notifyVolume: (vol: number) => void
-    notifyOutputRecordData: (data: Float32Array[]) => void
     notifySendBufferingTime: (time: number) => void
     notifyResponseTime: (time: number) => void
     notifyException: (code: VOICE_CHANGER_CLIENT_EXCEPTION, message: string) => void
@@ -19,6 +18,9 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
     private socket: Socket<DefaultEventsMap, DefaultEventsMap> | null = null
     // performance monitor
     private bufferStart = 0;
+
+    private isOutputRecording = false;
+    private recordingOutputChunk: Float32Array[] = []
 
     constructor(context: AudioContext, listener: VoiceChangerWorkletListener) {
         super(context, "voice-changer-worklet-processor");
@@ -78,14 +80,42 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
     }
 
     private postReceivedVoice = (data: ArrayBuffer) => {
+        // Int16 to Float
+        const i16Data = new Int16Array(data)
+        const f32Data = new Float32Array(i16Data.length)
+        // console.log(`[worklet] f32DataLength${f32Data.length} i16DataLength${i16Data.length}`)
+        i16Data.forEach((x, i) => {
+            const float = (x >= 0x8000) ? -(0x10000 - x) / 0x8000 : x / 0x7FFF;
+            f32Data[i] = float
+        })
+
+        // アップサンプリング
+        let upSampledBuffer: Float32Array | null = null
+        if (this.setting.sendingSampleRate == 48000) {
+            upSampledBuffer = f32Data
+        } else {
+            upSampledBuffer = new Float32Array(f32Data.length * 2)
+            for (let i = 0; i < f32Data.length; i++) {
+                const currentFrame = f32Data[i]
+                const nextFrame = i + 1 < f32Data.length ? f32Data[i + 1] : f32Data[i]
+                upSampledBuffer[i * 2] = currentFrame
+                upSampledBuffer[i * 2 + 1] = (currentFrame + nextFrame) / 2
+            }
+        }
+
         const req: VoiceChangerWorkletProcessorRequest = {
             requestType: "voice",
-            voice: data,
+            voice: upSampledBuffer,
             numTrancateTreshold: 0,
             volTrancateThreshold: 0,
             volTrancateLength: 0
         }
         this.port.postMessage(req)
+
+        if (this.isOutputRecording) {
+            this.recordingOutputChunk.push(upSampledBuffer)
+        }
+
     }
 
     private _averageDownsampleBuffer(buffer: Float32Array, originalSampleRate: number, destinationSamplerate: number) {
@@ -121,8 +151,6 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
         // console.log(`[Node:handleMessage_] `, event.data.volume);
         if (event.data.responseType === "volume") {
             this.listener.notifyVolume(event.data.volume as number)
-        } else if (event.data.responseType === "recordData") {
-            this.listener.notifyOutputRecordData(event.data.recordData as Float32Array[])
         } else if (event.data.responseType === "inputData") {
             const inputData = event.data.inputData as Float32Array
             // console.log("receive input data", inputData)
@@ -227,9 +255,9 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
         this.port.postMessage(req)
     }
 
-    startRecording = () => {
+    start = () => {
         const req: VoiceChangerWorkletProcessorRequest = {
-            requestType: "startRecording",
+            requestType: "start",
             voice: new ArrayBuffer(1),
             numTrancateTreshold: 0,
             volTrancateThreshold: 0,
@@ -238,15 +266,36 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
         this.port.postMessage(req)
 
     }
-    stopRecording = () => {
+    stop = () => {
         const req: VoiceChangerWorkletProcessorRequest = {
-            requestType: "stopRecording",
+            requestType: "stop",
             voice: new ArrayBuffer(1),
             numTrancateTreshold: 0,
             volTrancateThreshold: 0,
             volTrancateLength: 0
         }
         this.port.postMessage(req)
+    }
+
+    startOutputRecording = () => {
+        this.recordingOutputChunk = []
+        this.isOutputRecording = true
+    }
+    stopOutputRecording = () => {
+        this.isOutputRecording = false
+
+        const dataSize = this.recordingOutputChunk.reduce((prev, cur) => {
+            return prev + cur.length
+        }, 0)
+        const samples = new Float32Array(dataSize);
+        let sampleIndex = 0
+        for (let i = 0; i < this.recordingOutputChunk.length; i++) {
+            for (let j = 0; j < this.recordingOutputChunk[i].length; j++) {
+                samples[sampleIndex] = this.recordingOutputChunk[i][j];
+                sampleIndex++;
+            }
+        }
+        return samples
     }
 }
 

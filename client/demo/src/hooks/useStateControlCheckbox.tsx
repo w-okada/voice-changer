@@ -12,7 +12,7 @@ export const useStateControlCheckbox = (className: string, changeCallback?: (new
     const currentValForTriggerCallbackRef = useRef<boolean>(false);
     // (4) トリガチェックボックス
     const callback = useMemo(() => {
-        console.log("generate callback function", className);
+        // console.log("generate callback function", className);
         return (newVal: boolean) => {
             if (!changeCallback) {
                 return;

@@ -524,4 +524,8 @@ class VoiceChanger():
         if self.settings.recordIO == 1:
             self.stream_in.write(unpackedData.astype(np.int16).tobytes())
             self.stream_out.write(result.tobytes())
+
+        if self.settings.inputSampleRate != 24000:
+            result = resampy.resample(result, 24000, 48000).astype(np.int16)
+
         return result

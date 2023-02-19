@@ -90,9 +90,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 const cur_v = serverSetting[k]
                 const new_v = setting[k]
                 if (cur_v != new_v) {
-                    console.log("update server setting!!!4", k, cur_v, new_v)
                     const res = await props.voiceChangerClient.updateServerSettings(k, "" + new_v)
-                    console.log("update server setting!!!5", res)
 
                     setServerSetting(res)
                     setItem(INDEXEDDB_KEY_SERVER, res)

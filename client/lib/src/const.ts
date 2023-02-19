@@ -127,7 +127,7 @@ export type WorkletSetting = {
     volTrancateLength: number
 }
 export const DefaultWorkletSetting: WorkletSetting = {
-    numTrancateTreshold: 188,
+    numTrancateTreshold: 100,
     volTrancateThreshold: 0.0005,
     volTrancateLength: 32
 }

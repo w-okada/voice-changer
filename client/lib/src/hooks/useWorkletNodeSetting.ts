@@ -12,6 +12,8 @@ export type WorkletNodeSettingState = {
     workletNodeSetting: WorkletNodeSetting;
     clearSetting: () => Promise<void>
     updateWorkletNodeSetting: (setting: WorkletNodeSetting) => void
+    startOutputRecording: () => void
+    stopOutputRecording: () => Promise<Float32Array>
 
 }
 
@@ -51,8 +53,8 @@ export const useWorkletNodeSetting = (props: UseWorkletNodeSettingProps): Workle
         return (_workletNodeSetting: WorkletNodeSetting) => {
             if (!props.voiceChangerClient) return
             for (let k in _workletNodeSetting) {
-                const cur_v = workletNodeSetting[k]
-                const new_v = _workletNodeSetting[k]
+                const cur_v = workletNodeSetting[k as keyof WorkletNodeSetting]
+                const new_v = _workletNodeSetting[k as keyof WorkletNodeSetting]
                 if (cur_v != new_v) {
                     _setWorkletNodeSetting(_workletNodeSetting)
                     setItem(INDEXEDDB_KEY_WORKLETNODE, _workletNodeSetting)
@@ -63,11 +65,26 @@ export const useWorkletNodeSetting = (props: UseWorkletNodeSettingProps): Workle
         }
     }, [props.voiceChangerClient, workletNodeSetting])
 
+    const startOutputRecording = useMemo(() => {
+        return () => {
+            if (!props.voiceChangerClient) return
+            props.voiceChangerClient.startOutputRecording()
+        }
+    }, [props.voiceChangerClient])
+
+    const stopOutputRecording = useMemo(() => {
+        return async () => {
+            if (!props.voiceChangerClient) return new Float32Array()
+            return props.voiceChangerClient.stopOutputRecording()
+        }
+    }, [props.voiceChangerClient])
+
 
     return {
         workletNodeSetting,
         clearSetting,
         updateWorkletNodeSetting,
-
+        startOutputRecording,
+        stopOutputRecording
     }
 }

@@ -100,7 +100,7 @@ export class VoiceChangerClient {
         //// Input デバイスがnullの時はmicStreamを止めてリターン
         if (!this.setting.audioInput) {
             console.log(`Input Setup=> client mic is disabled.`)
-            this.vcNode.stopRecording()
+            this.vcNode.stop()
             await this.unlock(lockNum)
             return
         }
@@ -137,14 +137,14 @@ export class VoiceChangerClient {
             this.inputGainNode.connect(voiceFocusNode.start) // input node -> vf node
             voiceFocusNode.end.connect(this.vcNode)
         } else {
-            console.log("input___ media stream", this.currentMediaStream)
-            this.currentMediaStream.getTracks().forEach(x => {
-                console.log("input___ media stream set", x.getSettings())
-                console.log("input___ media stream con", x.getConstraints())
-                console.log("input___ media stream cap", x.getCapabilities())
-            })
-            console.log("input___ media node", this.currentMediaStreamAudioSourceNode)
-            console.log("input___ gain node", this.inputGainNode.channelCount, this.inputGainNode)
+            // console.log("input___ media stream", this.currentMediaStream)
+            // this.currentMediaStream.getTracks().forEach(x => {
+            //     console.log("input___ media stream set", x.getSettings())
+            //     console.log("input___ media stream con", x.getConstraints())
+            //     console.log("input___ media stream cap", x.getCapabilities())
+            // })
+            // console.log("input___ media node", this.currentMediaStreamAudioSourceNode)
+            // console.log("input___ gain node", this.inputGainNode.channelCount, this.inputGainNode)
             this.inputGainNode.connect(this.vcNode)
         }
         console.log("Input Setup=> success")
@@ -155,11 +155,11 @@ export class VoiceChangerClient {
     }
 
     start = () => {
-        this.vcNode.startRecording()
+        this.vcNode.start()
         this._isVoiceChanging = true
     }
     stop = () => {
-        this.vcNode.stopRecording()
+        this.vcNode.stop()
         this._isVoiceChanging = false
     }
 
@@ -251,11 +251,11 @@ export class VoiceChangerClient {
     configureWorklet = (setting: WorkletSetting) => {
         this.vcNode.configure(setting)
     }
-    startRecording = () => {
-        this.vcNode.startRecording()
+    startOutputRecording = () => {
+        this.vcNode.startOutputRecording()
     }
-    stopRecording = () => {
-        this.vcNode.stopRecording()
+    stopOutputRecording = () => {
+        return this.vcNode.stopOutputRecording()
     }
 
 

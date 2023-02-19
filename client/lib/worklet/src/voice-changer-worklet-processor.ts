@@ -1,8 +1,8 @@
 export const RequestType = {
     "voice": "voice",
     "config": "config",
-    "startRecording": "startRecording",
-    "stopRecording": "stopRecording"
+    "start": "start",
+    "stop": "stop"
 } as const
 export type RequestType = typeof RequestType[keyof typeof RequestType]
 
@@ -17,7 +17,7 @@ export type ResponseType = typeof ResponseType[keyof typeof ResponseType]
 
 export type VoiceChangerWorkletProcessorRequest = {
     requestType: RequestType,
-    voice: ArrayBuffer,
+    voice: Float32Array,
     numTrancateTreshold: number
     volTrancateThreshold: number
     volTrancateLength: number
@@ -67,14 +67,14 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
             this.volTrancateThreshold = request.volTrancateThreshold
             console.log("[worklet] worklet configured", request)
             return
-        } else if (request.requestType === "startRecording") {
+        } else if (request.requestType === "start") {
             if (this.isRecording) {
                 console.warn("[worklet] recoring is already started")
                 return
             }
             this.isRecording = true
             return
-        } else if (request.requestType === "stopRecording") {
+        } else if (request.requestType === "stop") {
             if (!this.isRecording) {
                 console.warn("[worklet] recoring is not started")
                 return
@@ -83,18 +83,6 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
             return
         }
 
-        const arrayBuffer = request.voice
-        // データは(int16)で受信
-        const i16Data = new Int16Array(arrayBuffer)
-        const f32Data = new Float32Array(i16Data.length)
-        // console.log(`[worklet] f32DataLength${f32Data.length} i16DataLength${i16Data.length}`)
-        i16Data.forEach((x, i) => {
-            const float = (x >= 0x8000) ? -(0x10000 - x) / 0x8000 : x / 0x7FFF;
-            f32Data[i] = float
-        })
-        // console.log("[worklet] i16Data", i16Data)
-        // console.log("[worklet] f32Data", f32Data)
-
         if (this.playBuffer.length > this.numTrancateTreshold) {
             console.log("[worklet] Buffer truncated")
             while (this.playBuffer.length > 2) {
@@ -102,21 +90,11 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
             }
         }
 
-        // アップサンプリングしてPlayバッファに蓄積
-        let f32Block: Float32Array
-        for (let i = 0; i < f32Data.length; i++) {
-            const frameIndexInBlock = (i * 2) % this.BLOCK_SIZE //
-            if (frameIndexInBlock === 0) {
-                f32Block = new Float32Array(this.BLOCK_SIZE)
-            }
-
-            const currentFrame = f32Data[i]
-            const nextFrame = i + 1 < f32Data.length ? f32Data[i + 1] : f32Data[i]
-            f32Block![frameIndexInBlock] = currentFrame
-            f32Block![frameIndexInBlock + 1] = (currentFrame + nextFrame) / 2
-            if (f32Block!.length === frameIndexInBlock + 2) {
-                this.playBuffer.push(f32Block!)
-            }
+        const f32Data = request.voice
+        const chunkNum = f32Data.length / this.BLOCK_SIZE
+        for (let i = 0; i < chunkNum; i++) {
+            const block = f32Data.slice(i * this.BLOCK_SIZE, (i + 1) * this.BLOCK_SIZE)
+            this.playBuffer.push(block)
         }
     }
 
