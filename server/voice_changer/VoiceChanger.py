@@ -30,7 +30,7 @@ SAMPLING_RATE = 24000
 
 
 class MockStream:
-    """
+    """gi
     オーディオストリーミング入出力をファイル入出力にそのまま置き換えるためのモック
     """
 
@@ -84,7 +84,7 @@ class VocieChangerSettings():
     srcId: int = 0
     dstId: int = 101
 
-    inputSampleRate: int = 48000  # 48000 or 24000
+    inputSampleRate: int = 24000  # 48000 or 24000
 
     crossFadeOffsetRate: float = 0.1
     crossFadeEndRate: float = 0.9
