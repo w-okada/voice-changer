@@ -6,7 +6,7 @@ import { DefaultEventsMap } from "@socket.io/component-emitter";
 export type VoiceChangerWorkletListener = {
     notifyVolume: (vol: number) => void
     notifySendBufferingTime: (time: number) => void
-    notifyResponseTime: (time: number) => void
+    notifyResponseTime: (time: number, perf?: number[]) => void
     notifyException: (code: VOICE_CHANGER_CLIENT_EXCEPTION, message: string) => void
 }
 
@@ -69,11 +69,12 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
                 const cur = Date.now()
                 const responseTime = cur - response[0]
                 const result = response[1] as ArrayBuffer
+                const perf = response[2]
                 if (result.byteLength < 128 * 2) {
                     this.listener.notifyException(VOICE_CHANGER_CLIENT_EXCEPTION.ERR_SIO_INVALID_RESPONSE, `[SIO] recevied data is too short ${result.byteLength}`)
                 } else {
                     this.postReceivedVoice(response[1])
-                    this.listener.notifyResponseTime(responseTime)
+                    this.listener.notifyResponseTime(responseTime, perf)
                 }
             });
         }

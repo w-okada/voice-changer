@@ -19,8 +19,8 @@ export type ClientState = {
 
     // モニタリングデータ
     bufferingTime: number;
-    responseTime: number;
     volume: number;
+    performance: PerformanceData
 
     // 情報取得
     getInfo: () => Promise<void>
@@ -28,7 +28,18 @@ export type ClientState = {
     clearSetting: () => Promise<void>
 }
 
-
+export type PerformanceData = {
+    responseTime: number
+    preprocessTime: number
+    mainprocessTime: number
+    postprocessTime: number
+}
+const InitialPerformanceData: PerformanceData = {
+    responseTime: 0,
+    preprocessTime: 0,
+    mainprocessTime: 0,
+    postprocessTime: 0
+}
 
 export const useClient = (props: UseClientProps): ClientState => {
 
@@ -52,7 +63,7 @@ export const useClient = (props: UseClientProps): ClientState => {
 
     // (1-3) モニタリングデータ
     const [bufferingTime, setBufferingTime] = useState<number>(0)
-    const [responseTime, setResponseTime] = useState<number>(0)
+    const [performance, setPerformance] = useState<PerformanceData>(InitialPerformanceData)
     const [volume, setVolume] = useState<number>(0)
 
     // (1-4) エラーステータス
@@ -68,8 +79,12 @@ export const useClient = (props: UseClientProps): ClientState => {
                 notifySendBufferingTime: (val: number) => {
                     setBufferingTime(val)
                 },
-                notifyResponseTime: (val: number) => {
-                    setResponseTime(val)
+                notifyResponseTime: (val: number, perf?: number[]) => {
+                    const responseTime = val
+                    const preprocessTime = perf ? Math.ceil(perf[0] * 1000) : 0
+                    const mainprocessTime = perf ? Math.ceil(perf[1] * 1000) : 0
+                    const postprocessTime = perf ? Math.ceil(perf[2] * 1000) : 0
+                    setPerformance({ responseTime, preprocessTime, mainprocessTime, postprocessTime })
                 },
                 notifyException: (mes: string) => {
                     if (mes.length > 0) {
@@ -126,8 +141,8 @@ export const useClient = (props: UseClientProps): ClientState => {
 
         // モニタリングデータ
         bufferingTime,
-        responseTime,
         volume,
+        performance,
 
         // 情報取得
         getInfo,

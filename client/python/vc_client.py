@@ -89,8 +89,9 @@ class MyCustomNamespace(socketio.ClientNamespace):
         timestamp = msg[0]
         responseTime = time.time() * 1000 - timestamp
         data = msg[1]
-        print(f"RT:{responseTime}msec")
-        unpackedData = struct.unpack('<%sh' % (len(data) // struct.calcsize('<h')), data)
+        perf = msg[2]
+        print(f"RT:{responseTime}msec", perf)
+        # unpackedData = struct.unpack('<%sh' % (len(data) // struct.calcsize('<h')), data)
 
         if self.file_output_stream != None:
             self.file_output_stream.write(data)

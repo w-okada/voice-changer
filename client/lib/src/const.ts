@@ -96,9 +96,9 @@ export const DefaultServerSetting: ServerInfo = {
     dstId: 101,
     gpu: 0,
 
-    crossFadeOffsetRate: 0.1,
-    crossFadeEndRate: 0.9,
-    crossFadeOverlapSize: CrossFadeOverlapSize[4096],
+    crossFadeOffsetRate: 0.0,
+    crossFadeEndRate: 1.0,
+    crossFadeOverlapSize: CrossFadeOverlapSize[1024],
 
     framework: Framework.PyTorch,
     f0Factor: 1.0,
@@ -106,7 +106,7 @@ export const DefaultServerSetting: ServerInfo = {
     f0Detector: F0Detector.dio,
     recordIO: 0,
 
-    inputSampleRate: 48000,
+    inputSampleRate: 24000,
 
     // 
     status: "ok",
@@ -163,7 +163,7 @@ export type WorkletNodeSetting = {
 export const DefaultWorkletNodeSetting: WorkletNodeSetting = {
     serverUrl: "",
     protocol: "sio",
-    sendingSampleRate: 48000,
+    sendingSampleRate: 24000,
     inputChunkNum: 48,
     downSamplingMode: "average"
 }

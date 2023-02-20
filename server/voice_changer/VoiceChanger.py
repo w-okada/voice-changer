@@ -12,11 +12,10 @@ from symbols import symbols
 from models import SynthesizerTrn
 
 import pyworld as pw
-
-# from voice_changer.TrainerFunctions import TextAudioSpeakerCollate, spectrogram_torch, load_checkpoint, get_hparams_from_file
-
 from voice_changer.client_modules import convert_continuos_f0, spectrogram_torch, TextAudioSpeakerCollate, get_hparams_from_file, load_checkpoint
 
+import time
+import multiprocessing as mp
 
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
@@ -29,10 +28,6 @@ import pylab
 import librosa
 import librosa.display
 SAMPLING_RATE = 24000
-
-import pyaudio
-import json
-from multiprocessing import Process, Queue
 
 
 class MockStream:
@@ -366,7 +361,7 @@ class VoiceChanger():
             f0_factor=self.settings.f0Factor
         )([(spec, sid, f0)])
 
-        return data, f0.numpy()
+        return data
 
     def _onnx_inference(self, data, inputSize):
         if hasattr(self, "onnx_session") == False or self.onnx_session == None:
@@ -489,41 +484,64 @@ class VoiceChanger():
         return result
 
     def on_request(self, unpackedData: any):
-        if self.settings.inputSampleRate != 24000:
-            # print("convert sampling rate!", self.settings.inputSampleRate)
-            unpackedData = resampy.resample(unpackedData, 48000, 24000)
 
-        convertSize = unpackedData.shape[0] + min(self.settings.crossFadeOverlapSize, unpackedData.shape[0])
-        # print(convertSize, unpackedData.shape[0])
-        if convertSize < 8192:
-            convertSize = 8192
+        with Timer("pre-process") as t:
+            if self.settings.inputSampleRate != 24000:
+                # print("convert sampling rate!", self.settings.inputSampleRate)
+                unpackedData = resampy.resample(unpackedData, 48000, 24000)
+            convertSize = unpackedData.shape[0] + min(self.settings.crossFadeOverlapSize, unpackedData.shape[0])
+            # print(convertSize, unpackedData.shape[0])
+            if convertSize < 8192:
+                convertSize = 8192
+            if convertSize % 128 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
+                convertSize = convertSize + (128 - (convertSize % 128))
+            self._generate_strength(unpackedData)
+            data = self._generate_input(unpackedData, convertSize)
+        preprocess_time = t.secs
 
-        self._generate_strength(unpackedData)
-        # f0はデバッグ用
-        data, f0 = self._generate_input(unpackedData, convertSize)
+        with Timer("main-process") as t:
+            try:
+                if self.settings.framework == "ONNX":
+                    result = self._onnx_inference(data, unpackedData.shape[0])
+                else:
+                    result = self._pyTorch_inference(data, unpackedData.shape[0])
 
-        try:
-            if self.settings.framework == "ONNX":
-                result = self._onnx_inference(data, unpackedData.shape[0])
-            else:
-                result = self._pyTorch_inference(data, unpackedData.shape[0])
+            except Exception as e:
+                print("VC PROCESSING!!!! EXCEPTION!!!", e)
+                print(traceback.format_exc())
+                if hasattr(self, "np_prev_audio1"):
+                    del self.np_prev_audio1
+                if hasattr(self, "prev_audio1"):
+                    del self.prev_audio1
+                return np.zeros(1).astype(np.int16)
+        mainprocess_time = t.secs
 
-        except Exception as e:
-            print("VC PROCESSING!!!! EXCEPTION!!!", e)
-            print(traceback.format_exc())
-            if hasattr(self, "np_prev_audio1"):
-                del self.np_prev_audio1
-            if hasattr(self, "prev_audio1"):
-                del self.prev_audio1
-            return np.zeros(1).astype(np.int16)
+        with Timer("post-process") as t:
 
-        result = result.astype(np.int16)
-        # print("on_request result size:",result.shape)
-        if self.settings.recordIO == 1:
-            self.stream_in.write(unpackedData.astype(np.int16).tobytes())
-            self.stream_out.write(result.tobytes())
+            result = result.astype(np.int16)
+            # print("on_request result size:",result.shape)
+            if self.settings.recordIO == 1:
+                self.stream_in.write(unpackedData.astype(np.int16).tobytes())
+                self.stream_out.write(result.tobytes())
 
-        if self.settings.inputSampleRate != 24000:
-            result = resampy.resample(result, 24000, 48000).astype(np.int16)
+            if self.settings.inputSampleRate != 24000:
+                result = resampy.resample(result, 24000, 48000).astype(np.int16)
+        postprocess_time = t.secs
 
-        return result
+        perf = [preprocess_time, mainprocess_time, postprocess_time]
+        return result, perf
+
+
+##############
+class Timer(object):
+    def __init__(self, title: str):
+        self.title = title
+
+    def __enter__(self):
+        self.start = time.time()
+        return self
+
+    def __exit__(self, *args):
+        self.end = time.time()
+        self.secs = self.end - self.start
+        self.msecs = self.secs * 1000  # millisecs

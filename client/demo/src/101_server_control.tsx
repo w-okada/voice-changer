@@ -5,6 +5,7 @@ import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./components/10
 export const useServerControl = () => {
     const appState = useAppState()
     const [startWithAudioContextCreate, setStartWithAudioContextCreate] = useState<boolean>(false)
+    const [showPerformanceDetail, setShowPerformanceDetail] = useState<boolean>(false)
 
     const accodionButton = useMemo(() => {
         const accodionButtonProps: HeaderButtonProps = {
@@ -62,6 +63,8 @@ export const useServerControl = () => {
     }, [appState.frontendManagerState.isConverting, appState.clientSetting.start, appState.clientSetting.stop])
 
     const performanceRow = useMemo(() => {
+        const performanceDetailLabel = showPerformanceDetail ? "[pre, main, post] <<" : "more >>"
+        const performanceData = showPerformanceDetail ? `[${appState.performance.preprocessTime}, ${appState.performance.mainprocessTime},${appState.performance.postprocessTime}]` : ""
         return (
             <>
                 <div className="body-row split-3-1-1-1-4 left-padding-1 guided">
@@ -69,20 +72,20 @@ export const useServerControl = () => {
                     <div className="body-item-text">vol<span className="body-item-text-small">(rms)</span></div>
                     <div className="body-item-text">buf<span className="body-item-text-small">(ms)</span></div>
                     <div className="body-item-text">res<span className="body-item-text-small">(ms)</span></div>
-                    <div className="body-item-text"></div>
+                    <div className="body-item-text">
+                        <span onClick={() => { setShowPerformanceDetail(!showPerformanceDetail) }} >{performanceDetailLabel}</span>
+                    </div>
                 </div>
                 <div className="body-row split-3-1-1-1-4 left-padding-1 guided">
                     <div className="body-item-title left-padding-1"></div>
                     <div className="body-item-text">{appState.volume.toFixed(4)}</div>
                     <div className="body-item-text">{appState.bufferingTime}</div>
-                    <div className="body-item-text">{appState.responseTime}</div>
-                    <div className="body-item-text"></div>
+                    <div className="body-item-text">{appState.performance.responseTime}</div>
+                    <div className="body-item-text">{performanceData}</div>
                 </div>
             </>
         )
-    }, [appState.volume, appState.bufferingTime, appState.responseTime])
-
-
+    }, [appState.volume, appState.bufferingTime, appState.performance, showPerformanceDetail])
 
     const infoRow = useMemo(() => {
         const onReloadClicked = async () => {
