@@ -136,6 +136,20 @@ export const useQualityControl = (): QualityControlState => {
         const onRecordStopClicked = async () => {
             setRecording(false)
             await appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, recordIO: 0 })
+
+            // set wav (input)
+            const wavInput = document.getElementById("body-wav-container-wav-input") as HTMLAudioElement
+            wavInput.src = "/tmp/in.wav?" + new Date().getTime()
+            wavInput.controls = true
+            // @ts-ignore
+            wavInput.setSinkId(audioOutputForGUI)
+
+            // set wav (output)
+            const wavOutput = document.getElementById("body-wav-container-wav-output") as HTMLAudioElement
+            wavOutput.src = "/tmp/out.wav?" + new Date().getTime()
+            wavOutput.controls = true
+            // @ts-ignore
+            wavOutput.setSinkId(audioOutputForGUI)
         }
         const onRecordAnalizeClicked = async () => {
             if (appState.frontendManagerState.isConverting) {
@@ -154,19 +168,6 @@ export const useQualityControl = (): QualityControlState => {
             imageHarvest.src = "/tmp/analyze-harvest.png?" + new Date().getTime()
             imageHarvest.style.width = "100%"
 
-            // set wav (input)
-            const wavInput = document.getElementById("body-wav-container-wav-input") as HTMLAudioElement
-            wavInput.src = "/tmp/in.wav?" + new Date().getTime()
-            wavInput.controls = true
-            // @ts-ignore
-            wavInput.setSinkId(audioOutputForGUI)
-
-            // set wav (output)
-            const wavOutput = document.getElementById("body-wav-container-wav-output") as HTMLAudioElement
-            wavOutput.src = "/tmp/out.wav?" + new Date().getTime()
-            wavOutput.controls = true
-            // @ts-ignore
-            wavOutput.setSinkId(audioOutputForGUI)
             appState.frontendManagerState.setIsAnalyzing(false)
         }
 
@@ -174,8 +175,6 @@ export const useQualityControl = (): QualityControlState => {
         const stopClassName = recording ? "body-button-stanby" : "body-button-active"
         const analyzeClassName = appState.frontendManagerState.isAnalyzing ? "body-button-active" : "body-button-stanby"
         const analyzeLabel = appState.frontendManagerState.isAnalyzing ? "wait..." : "Analyze"
-
-
 
         return (
             <>
@@ -195,6 +194,55 @@ export const useQualityControl = (): QualityControlState => {
                     </div>
                 </div>
 
+                <div className="body-row split-3-2-2-3 left-padding-1 guided">
+                    <div className="body-item-title left-padding-2 ">
+                        <div>
+                            Play
+                        </div>
+                        <select className="body-select-50 left-margin-2" value={audioOutputForGUI} onChange={(e) => {
+                            setAudioOutputForGUI(e.target.value)
+                            const wavInput = document.getElementById("body-wav-container-wav-input") as HTMLAudioElement
+                            const wavOutput = document.getElementById("body-wav-container-wav-output") as HTMLAudioElement
+                            //@ts-ignore
+                            wavInput.setSinkId(e.target.value)
+                            //@ts-ignore
+                            wavOutput.setSinkId(e.target.value)
+                        }}>
+                            {
+                                outputAudioDeviceInfo.map(x => {
+                                    return <option key={x.deviceId} value={x.deviceId}>{x.label}</option>
+                                })
+                            }
+                        </select>
+                    </div>
+                    {/* <div>
+                        <div className="body-wav-container">
+                            <div className="body-wav-container-title">Input</div>
+                            <div className="body-wav-container-title">Output</div>
+                        </div>
+                        <div className="body-wav-container">
+                            <div className="body-wav-container-wav">
+                                <audio src="" id="body-wav-container-wav-input"></audio>
+                            </div>
+                            <div className="body-wav-container-wav" >
+                                <audio src="" id="body-wav-container-wav-output"></audio>
+                            </div>
+                        </div>
+                    </div> */}
+                    <div>
+                        <div className="body-wav-container-title">Input</div>
+                        <div className="body-wav-container-wav">
+                            <audio src="" id="body-wav-container-wav-input"></audio>
+                        </div>
+                    </div>
+                    <div >
+                        <div className="body-wav-container-title">Output</div>
+                        <div className="body-wav-container-wav" >
+                            <audio src="" id="body-wav-container-wav-output"></audio>
+                        </div>
+                    </div>
+                    <div></div>
+                </div>
 
                 <div className="body-row split-3-7 left-padding-1 guided">
                     <div className="body-item-title left-padding-2 ">
@@ -216,42 +264,7 @@ export const useQualityControl = (): QualityControlState => {
                         </div>
                     </div>
                 </div>
-                <div className="body-row split-3-7 left-padding-1 guided">
-                    <div className="body-item-title left-padding-2 ">
-                        <div>
-                            Play
-                        </div>
-                        <select className="body-select-50" value={audioOutputForGUI} onChange={(e) => {
-                            setAudioOutputForGUI(e.target.value)
-                            const wavInput = document.getElementById("body-wav-container-wav-input") as HTMLAudioElement
-                            const wavOutput = document.getElementById("body-wav-container-wav-output") as HTMLAudioElement
-                            //@ts-ignore
-                            wavInput.setSinkId(e.target.value)
-                            //@ts-ignore
-                            wavOutput.setSinkId(e.target.value)
-                        }}>
-                            {
-                                outputAudioDeviceInfo.map(x => {
-                                    return <option key={x.deviceId} value={x.deviceId}>{x.label}</option>
-                                })
-                            }
-                        </select>
-                    </div>
-                    <div>
-                        <div className="body-wav-container">
-                            <div className="body-wav-container-title">Input</div>
-                            <div className="body-wav-container-title">Output</div>
-                        </div>
-                        <div className="body-wav-container">
-                            <div className="body-wav-container-wav">
-                                <audio src="" id="body-wav-container-wav-input"></audio>
-                            </div>
-                            <div className="body-wav-container-wav" >
-                                <audio src="" id="body-wav-container-wav-output"></audio>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
             </>
         )
     }, [appState.serverSetting.serverSetting.recordIO, appState.serverSetting.updateServerSettings, outputAudioDeviceInfo, audioOutputForGUI, appState.frontendManagerState.isAnalyzing, appState.frontendManagerState.isConverting])
