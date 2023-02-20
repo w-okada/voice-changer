@@ -15,7 +15,6 @@ import pyworld as pw
 from voice_changer.client_modules import convert_continuos_f0, spectrogram_torch, TextAudioSpeakerCollate, get_hparams_from_file, load_checkpoint
 
 import time
-import multiprocessing as mp
 
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
@@ -487,7 +486,6 @@ class VoiceChanger():
 
         with Timer("pre-process") as t:
             if self.settings.inputSampleRate != 24000:
-                # print("convert sampling rate!", self.settings.inputSampleRate)
                 unpackedData = resampy.resample(unpackedData, 48000, 24000)
             convertSize = unpackedData.shape[0] + min(self.settings.crossFadeOverlapSize, unpackedData.shape[0])
             # print(convertSize, unpackedData.shape[0])
