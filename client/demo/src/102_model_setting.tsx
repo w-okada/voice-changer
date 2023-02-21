@@ -238,6 +238,7 @@ export const useModelSettingArea = (): ServerSettingState => {
         const onOnnxExecutionProviderChanged = async (val: OnnxExecutionProvider) => {
             appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, onnxExecutionProvider: val })
         }
+        console.log("setting", appState.serverSetting.serverSetting)
         return (
             <div className="body-row split-3-7 left-padding-1">
                 <div className="body-item-title left-padding-2">OnnxExecutionProvider</div>

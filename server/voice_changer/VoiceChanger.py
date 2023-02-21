@@ -205,7 +205,7 @@ class VoiceChanger():
     def get_info(self):
         data = asdict(self.settings)
 
-        data["onnxExecutionProvider"] = self.onnx_session.get_providers() if self.onnx_session != None else []
+        data["onnxExecutionProviders"] = self.onnx_session.get_providers() if self.onnx_session != None else []
         files = ["configFile", "pyTorchModelFile", "onnxModelFile"]
         for f in files:
             if data[f] != None and os.path.exists(data[f]):
