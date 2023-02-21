@@ -29,11 +29,17 @@ export const useServerControl = () => {
 
     const startButtonRow = useMemo(() => {
         const onStartClicked = async () => {
-            if (!appState.audioContext) {
-                await new Promise<void>((resolve) => {
-                    console.log("wait 2000ms")
-                    setTimeout(resolve, 1000 * 2)
-                })
+            if (!appState.initializedRef.current) {
+                while (true) {
+                    // console.log("wait 500ms")
+                    await new Promise<void>((resolve) => {
+                        setTimeout(resolve, 500)
+                    })
+                    // console.log("initiliazed", appState.initializedRef.current)
+                    if (appState.initializedRef.current) {
+                        break
+                    }
+                }
                 setStartWithAudioContextCreate(true)
             } else {
                 appState.frontendManagerState.setIsConverting(true)

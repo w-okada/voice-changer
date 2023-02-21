@@ -28,6 +28,10 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
     useEffect(() => {
         const loadCache = async () => {
             const setting = await getItem(INDEXEDDB_KEY_CLIENT) as VoiceChangerClientSetting
+            if (!setting) {
+                return
+            }
+
             console.log("[ClientSetting] Load Setting from db", setting)
             if (setting.audioInput == "null") {
                 setting.audioInput = null

@@ -13,8 +13,8 @@ export const useAudioConfig = (): AudioConfigState => {
             document.removeEventListener('mousedown', createAudioContext);
             setAudioContext(ctx)
         }
-        document.addEventListener('touchstart', createAudioContext);
-        document.addEventListener('mousedown', createAudioContext);
+        document.addEventListener('touchstart', createAudioContext, false);
+        document.addEventListener('mousedown', createAudioContext, false);
     }, [])
 
     const ret: AudioConfigState = {

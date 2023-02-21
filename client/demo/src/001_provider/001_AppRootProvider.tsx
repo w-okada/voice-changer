@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef } from "react";
 import { ReactNode } from "react";
 import { AudioConfigState, useAudioConfig } from "../001_globalHooks/001_useAudioConfig";
 
@@ -8,6 +8,7 @@ type Props = {
 
 type AppRootValue = {
     audioContextState: AudioConfigState
+
 }
 
 const AppRootContext = React.createContext<AppRootValue | null>(null);
@@ -21,9 +22,8 @@ export const useAppRoot = (): AppRootValue => {
 
 export const AppRootProvider = ({ children }: Props) => {
     const audioContextState = useAudioConfig()
-
     const providerValue: AppRootValue = {
-        audioContextState
+        audioContextState,
     };
 
     return <AppRootContext.Provider value={providerValue}>{children}</AppRootContext.Provider>;

@@ -2,7 +2,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Yusei+Magic&display=swap");
 
 @import "./101_RotatedButton.css";
-
+@import "./Error.css";
 :root {
     --text-color: #333;
     --company-color1: rgba(64, 119, 187, 1);
@@ -53,6 +53,12 @@ body {
 #app {
     height: 100%;
     width: 100%;
+}
+.first-gesture {
+    background: rgba(200, 0, 0, 0.2);
+    width: 100%;
+    height: 100%;
+    position: absolute;
 }
 
 /* Main + Section Partition*/

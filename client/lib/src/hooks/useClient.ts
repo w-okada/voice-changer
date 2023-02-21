@@ -11,6 +11,7 @@ export type UseClientProps = {
 }
 
 export type ClientState = {
+    initialized: boolean
     // 各種設定I/Fへの参照
     workletSetting: WorkletSettingState
     clientSetting: ClientSettingState
@@ -43,6 +44,7 @@ const InitialPerformanceData: PerformanceData = {
 
 export const useClient = (props: UseClientProps): ClientState => {
 
+    const [initialized, setInitialized] = useState<boolean>(false)
     // (1-1) クライアント    
     const voiceChangerClientRef = useRef<VoiceChangerClient | null>(null)
     const [voiceChangerClient, setVoiceChangerClient] = useState<VoiceChangerClient | null>(voiceChangerClientRef.current)
@@ -110,6 +112,7 @@ export const useClient = (props: UseClientProps): ClientState => {
             audio.srcObject = voiceChangerClientRef.current.stream
             audio.play()
             initializedResolveRef.current!()
+            setInitialized(true)
         }
         initialized()
     }, [props.audioContext])
@@ -133,6 +136,7 @@ export const useClient = (props: UseClientProps): ClientState => {
     }
 
     return {
+        initialized,
         // 各種設定I/Fへの参照
         clientSetting,
         workletNodeSetting,

@@ -1,5 +1,5 @@
 import { ClientState } from "@dannadori/voice-changer-client-js";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { ReactNode } from "react";
 import { useVCClient, VCClientState } from "../001_globalHooks/001_useVCClient";
 import { FrontendManagerStateAndMethod, useFrontendManager } from "../001_globalHooks/010_useFrontendManager";
@@ -12,6 +12,7 @@ type Props = {
 type AppStateValue = ClientState & {
     audioContext: AudioContext
     frontendManagerState: FrontendManagerStateAndMethod;
+    initializedRef: React.MutableRefObject<boolean>
 }
 
 const AppStateContext = React.createContext<AppStateValue | null>(null);
@@ -28,10 +29,21 @@ export const AppStateProvider = ({ children }: Props) => {
     const clientState = useVCClient({ audioContext: appRoot.audioContextState.audioContext })
     const frontendManagerState = useFrontendManager();
 
+    const initializedRef = useRef<boolean>(false)
+    useEffect(() => {
+        if (clientState.clientState.initialized) {
+            initializedRef.current = true
+        }
+    }, [clientState.clientState.initialized])
+
+
     const providerValue: AppStateValue = {
         audioContext: appRoot.audioContextState.audioContext!,
         ...clientState.clientState,
-        frontendManagerState
+        frontendManagerState,
+        initializedRef
+
+
     };
 
     return <AppStateContext.Provider value={providerValue}>{children}</AppStateContext.Provider>;

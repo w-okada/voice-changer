@@ -121,6 +121,9 @@ export const useModelSettingArea = (): ServerSettingState => {
         const pyTorchFilenameText = appState.serverSetting.fileUploadSetting.pyTorchModel?.filename || appState.serverSetting.fileUploadSetting.pyTorchModel?.file?.name || ""
         const correspondenceFileText = appState.clientSetting.clientSetting.correspondences ? JSON.stringify(appState.clientSetting.clientSetting.correspondences.map(x => { return x.dirname })) : ""
 
+        const uploadingStatus = appState.serverSetting.isUploading ?
+            appState.serverSetting.uploadProgress == 0 ? `loading model...(wait about 20sec)` : `uploading.... ${appState.serverSetting.uploadProgress}%` : ""
+
         return (
             <>
                 <div className="body-row split-3-3-4 left-padding-1 guided">
@@ -190,7 +193,7 @@ export const useModelSettingArea = (): ServerSettingState => {
                 <div className="body-row split-3-3-4 left-padding-1 guided">
                     <div className="body-item-title left-padding-2"></div>
                     <div className="body-item-text">
-                        {appState.serverSetting.isUploading ? `uploading.... ${appState.serverSetting.uploadProgress}%` : ""}
+                        {uploadingStatus}
                     </div>
                     <div className="body-button-container">
                         <div className={uploadButtonClassName} onClick={uploadButtonAction}>{uploadButtonLabel}</div>
