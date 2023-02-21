@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-DOCKER_IMAGE=dannadori/trainer:20230210_153105
+DOCKER_IMAGE=dannadori/trainer:20230221_085208
 # DOCKER_IMAGE=trainer
 
 docker run --gpus all --rm -ti \

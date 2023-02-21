@@ -63,3 +63,7 @@ $ python3 train_ms.py -c configs/train_config.json -m 20220306_24000
 ```
 $ python3 MMVC_Client/python/conver_test.py -m logs/G_40000.pth -c configs/train_config.json -s 0 -t 101 --input dataset/00_myvoice/wav/emotion011.wav --output dataset/test.wav --f0_scale 3
 ```
+
+
+(X) onnx
+python3 onnx_export.py  --config_file logs/train_config.json  --convert_pth logs/G_220000.pth

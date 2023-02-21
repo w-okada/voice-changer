@@ -367,7 +367,10 @@ class VoiceChanger():
             print("[Voice Changer] No ONNX session.")
             return np.zeros(1).astype(np.int16)
 
-        x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [x for x in data]
+        # x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [x for x in data]
+        # sid_tgt1 = torch.LongTensor([self.settings.dstId])
+
+        spec, spec_lengths, sid_src, sin, d = data
         sid_tgt1 = torch.LongTensor([self.settings.dstId])
         # if spec.size()[2] >= 8:
         audio1 = self.onnx_session.run(
@@ -375,9 +378,15 @@ class VoiceChanger():
             {
                 "specs": spec.numpy(),
                 "lengths": spec_lengths.numpy(),
+                "sin": sin.numpy(),
+                "d0": d[0][:1].numpy(),
+                "d1": d[1][:1].numpy(),
+                "d2": d[2][:1].numpy(),
+                "d3": d[3][:1].numpy(),
                 "sid_src": sid_src.numpy(),
                 "sid_tgt": sid_tgt1.numpy()
             })[0][0, 0] * self.hps.data.max_wav_value
+
         if hasattr(self, 'np_prev_audio1') == True:
             overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
             prev_overlap = self.np_prev_audio1[-1 * overlapSize:]
