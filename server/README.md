@@ -16,3 +16,15 @@ $ cd MMVC_Trainer && git checkout c242d3d1cf7f768af70d9735082ca2bdd90c45f3 && cd
 $ python3 MMVCServerSIO.py -p 18888 --https true 
 ```
 
+# Dev
+```
+# for 1.3
+cd MMVC_Client
+git checkout 04f3fec4fd82dea6657026ec4e1cd80fb29a415c
+cd ..
+
+# for 1.5
+cd MMVC_Client
+git checkout 1424609e53c79e2d629add10ae4bfb16fc0c3c82
+cd ..
+```
