@@ -4,7 +4,6 @@
     "declaration": true,
     "outDir": "./dist",
 
-
     /* ファイル名の大文字小文字を区別 */
     "forceConsistentCasingInFileNames": true,
 

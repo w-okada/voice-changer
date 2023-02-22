@@ -4,6 +4,9 @@ module.exports = {
     entry: "./src/index.ts",
     resolve: {
         extensions: [".ts", ".js"],
+        fallback: {
+            // "buffer": false
+        }
     },
     module: {
         rules: [
@@ -26,12 +29,6 @@ module.exports = {
         libraryTarget: "umd",
         globalObject: "typeof self !== 'undefined' ? self : this",
     },
-    plugins: [
-        new webpack.ProvidePlugin({
-            Buffer: ["buffer", "Buffer"],
-            process: "process/browser",
-        }),
-    ],
     externals: {
         react: "react",
         "react-dom": "reactDOM",

@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.css": "postcss"
+    },
+    "workbench.colorCustomizations": {
+        "tab.activeBackground": "#65952acc"
+    }
+}

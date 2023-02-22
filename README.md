@@ -71,7 +71,7 @@ Windows版とMac版を提供しています。事前準備は必要ありませ�
 
 ### アルファ版(for v.1.5.x)
 - [MMVCServerSIO_mac_onnxcpu_v.1.5.0.8a.zip](https://drive.google.com/file/d/1HhgrPMQwgjVgJJngsyZ4JJiieQQAI-zC/view?usp=sharing) 509MB
-- [MMVCServerSIO_win_onnxgpu_cuda_v.1.5.0.8a.zip](https://drive.google.com/file/d/182q30PeI7ULgdtn-wg5VEGb0mUfHsCi5/view?usp=sharing) 2.55GB
+- [MMVCServerSIO_win_onnxgpu_cuda_v.1.5.0.8a.zip](https://drive.google.com/file/d/182q30PeI7ULgdtn-wg5VEGb0mUfHsCi5/view?usp=sharing)2.55GB
 ### 最新バージョン(for v.1.3.x)
 - [MMVCServerSIO_mac_onnxcpu_v.1.3.7.2.zip](https://drive.google.com/file/d/1AcJaQXH8ZtlCSrifvRBWdat19HD_A2fr/view?usp=sharing) 365MB
 - [MMVCServerSIO_win_onnxdirectML_cuda_v.1.3.7.2.zip](https://drive.google.com/file/d/1WKW3uqmIi9D13Jzao8jWVqx2KANmmQji/view?usp=sharing) 2050MB

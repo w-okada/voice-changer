@@ -36,4 +36,4 @@ class VoiceChangerManager():
             return self.voiceChanger.on_request(unpackedData)
         else:
             print("Voice Change is not loaded. Did you load a correct model?")
-            return np.zeros(1).astype(np.int16)
+            return np.zeros(1).astype(np.int16), []

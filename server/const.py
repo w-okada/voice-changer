@@ -16,6 +16,9 @@ NATIVE_CLIENT_FILE_MAC = os.path.join(sys._MEIPASS, "voice-changer-native-client
                                       "voice-changer-native-client") if hasattr(sys, "_MEIPASS") else "voice-changer-native-client"
 
 
+TMP_DIR = os.path.join(tmpdir.name, "tmp_dir") if hasattr(sys, "_MEIPASS") else "tmp_dir"
+os.makedirs(TMP_DIR, exist_ok=True)
+
 # SSL_KEY_DIR  = os.path.join(sys._MEIPASS, "keys") if hasattr(sys, "_MEIPASS") else "keys"
 # MODEL_DIR = os.path.join(sys._MEIPASS, "logs") if hasattr(sys, "_MEIPASS") else "logs"
 # UPLOAD_DIR = os.path.join(sys._MEIPASS, "upload_dir") if hasattr(sys, "_MEIPASS") else "upload_dir"
