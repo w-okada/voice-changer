@@ -1,3 +1,4 @@
+tmp
 dummy
 node_modules
 __pycache__
@@ -7,6 +8,12 @@ server/MMVC_Trainer/
 server/MMVC_Client/
 server/keys
 server/info
+server/in.wav
+server/out.wav
+server/G_*.pth
+server/train_config.json
+
+server/v13
 
 server/memo.md
 
@@ -15,3 +22,4 @@ client/lib/worklet/dist
 # client/demo/dist/ # demo用に残す
 
 docker/cudnn/
+
