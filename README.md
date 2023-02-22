@@ -70,8 +70,8 @@ Windows版とMac版を提供しています。事前準備は必要ありませ�
 ・リモートからアクセスできるようにする方法など、より詳しくは[こちら](https://zenn.dev/wok/books/0002_vc-helper-v_1_3)をご覧ください。
 
 ### アルファ版(for v.1.5.x)
-- [MMVCServerSIO_mac_onnxcpu_v.1.5.0.6a.zip](https://drive.google.com/file/d/1x2NOPqe9dOOjLtzsElgNs60vUWzdPd5f/view?usp=sharing)
-- [MMVCServerSIO_win_onnxgpu_cuda_v.1.5.0.6a.zip](https://drive.google.com/file/d/1K9Q5QPzTZJRHsY1KXNc8JeY2K6jFF0hs/view?usp=sharing)
+- [MMVCServerSIO_mac_onnxcpu_v.1.5.0.8a.zip](https://drive.google.com/file/d/1HhgrPMQwgjVgJJngsyZ4JJiieQQAI-zC/view?usp=sharing) 509MB
+- [MMVCServerSIO_win_onnxgpu_cuda_v.1.5.0.8a.zip](https://drive.google.com/file/d/182q30PeI7ULgdtn-wg5VEGb0mUfHsCi5/view?usp=sharing)2.55GB
 ### 最新バージョン(for v.1.3.x)
 - [MMVCServerSIO_mac_onnxcpu_v.1.3.7.2.zip](https://drive.google.com/file/d/1AcJaQXH8ZtlCSrifvRBWdat19HD_A2fr/view?usp=sharing) 365MB
 - [MMVCServerSIO_win_onnxdirectML_cuda_v.1.3.7.2.zip](https://drive.google.com/file/d/1WKW3uqmIi9D13Jzao8jWVqx2KANmmQji/view?usp=sharing) 2050MB
@@ -119,6 +119,8 @@ https://twitter.com/DannadoriYellow/status/1613553862773997569?s=20&t=7CLD79h1F3
 
 
 ### 過去バージョン(for v.1.5.x)
+- [MMVCServerSIO_mac_onnxcpu_v.1.5.0.6a.zip](https://drive.google.com/file/d/1x2NOPqe9dOOjLtzsElgNs60vUWzdPd5f/view?usp=sharing)
+- [MMVCServerSIO_win_onnxgpu_cuda_v.1.5.0.6a.zip](https://drive.google.com/file/d/1K9Q5QPzTZJRHsY1KXNc8JeY2K6jFF0hs/view?usp=sharing)
 - [MMVCServerSIO_win_cuda_v.1.5.0.5a.zip](https://drive.google.com/file/d/1FdvkRfSevcPrig2A_BBZ70AamDVHXbpa/view?usp=sharing) 2.5GB
 - [MMVCServerSIO_mac_cpu_v.1.5.0.5a.zip](https://drive.google.com/file/d/18DY4aXhLqaCcPIfGZqPFCsIt30jEZw24/view?usp=sharing) 509MB
 - [MMVCServerSIO_win_cuda_v.1.5.0.4a.zip](https://drive.google.com/file/d/1FIOds2TuNjdw2XNNWNdN1OSwCK9svS6b/view?usp=sharing) 2.5GB
