@@ -1,0 +1,28 @@
+{
+    "app_title": "voice-recorder",
+    "storage_type":"local",
+    "use_mel_spectrogram":true,
+    "current_text":"ITA-emotion",
+    "current_text_index":0,
+    "sample_rate":48000,
+    "text": [
+        {
+            "title": "ITA-emotion",
+            "wavPrefix": "emotion",
+            "file": "./assets/text/ITA_emotion_all.txt",
+            "file_hira": "./assets/text/ITA_emotion_all_hira.txt"
+        },
+        {
+            "title": "ITA-recitation",
+            "wavPrefix": "recitation",
+            "file": "./assets/text/ITA_recitation_all.txt",
+            "file_hira": "./assets/text/ITA_recitation_all_hira.txt"
+        },
+        {
+            "title": "wagahaiwa",
+            "wavPrefix": "wagahaiwa",
+            "file": "./assets/text/wagahaiwa.txt",
+            "file_hira": "./assets/text/wagahaiwa_hira.txt"
+        }
+    ]
+}
