@@ -155,7 +155,10 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
             }
             this.port.postMessage(volumeResponse);
             outputs[0][0].set(voice)
-            outputs[0][1].set(voice)
+            if (outputs[0].length == 2) {
+                outputs[0][1].set(voice)
+            }
+
         }
 
         return true;

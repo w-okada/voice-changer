@@ -14,7 +14,7 @@ import signal
 import sys
 import numpy as np
 
-BUFFER_SIZE = 2048
+BUFFER_SIZE = 2048 * 2
 
 
 def setupArgParser():
