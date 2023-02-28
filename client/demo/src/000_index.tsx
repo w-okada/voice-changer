@@ -12,7 +12,8 @@ import { far } from "@fortawesome/free-regular-svg-icons";
 import { fab } from "@fortawesome/free-brands-svg-icons";
 import { AppRootProvider } from "./001_provider/001_AppRootProvider";
 import ErrorBoundary from "./001_provider/900_ErrorBoundary";
-import { INDEXEDDB_KEY_CLIENT, INDEXEDDB_KEY_MODEL_DATA, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_WORKLET, INDEXEDDB_KEY_WORKLETNODE } from "@dannadori/voice-changer-client-js";
+import { INDEXEDDB_KEY_CLIENT, INDEXEDDB_KEY_MODEL_DATA, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_WORKLET, INDEXEDDB_KEY_WORKLETNODE, useIndexedDB } from "@dannadori/voice-changer-client-js";
+import { INDEXEDDB_KEY_AUDIO_OUTPUT } from "./const";
 
 library.add(fas, far, fab);
 
@@ -22,6 +23,7 @@ const root = createRoot(container);
 
 const App = () => {
     const appState = useAppState()
+    const { removeItem } = useIndexedDB()
     const { voiceChangerSetting } = useMicrophoneOptions()
     const titleRow = useMemo(() => {
         return (
@@ -53,6 +55,7 @@ const App = () => {
     const clearRow = useMemo(() => {
         const onClearSettingClicked = async () => {
             await appState.clearSetting()
+            await removeItem(INDEXEDDB_KEY_AUDIO_OUTPUT)
             location.reload()
         }
         return (
