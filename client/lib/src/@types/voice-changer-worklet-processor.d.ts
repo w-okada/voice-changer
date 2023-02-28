@@ -3,6 +3,7 @@ export declare const RequestType: {
     readonly config: "config";
     readonly start: "start";
     readonly stop: "stop";
+    readonly trancateBuffer: "trancateBuffer";
 };
 export type RequestType = typeof RequestType[keyof typeof RequestType];
 export declare const ResponseType: {
@@ -12,7 +13,7 @@ export declare const ResponseType: {
 export type ResponseType = typeof ResponseType[keyof typeof ResponseType];
 export type VoiceChangerWorkletProcessorRequest = {
     requestType: RequestType;
-    voice: ArrayBuffer;
+    voice: Float32Array;
     numTrancateTreshold: number;
     volTrancateThreshold: number;
     volTrancateLength: number;

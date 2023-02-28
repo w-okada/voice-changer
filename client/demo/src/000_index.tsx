@@ -93,7 +93,7 @@ const App = () => {
 const AppStateWrapper = () => {
     // エラーバウンダリー設定
     const [error, setError] = useState<{ error: Error, errorInfo: ErrorInfo }>()
-
+    const { removeItem } = useIndexedDB()
     // localForage.config({
     //     driver: localForage.INDEXEDDB,
     //     name: INDEXEDDB_DB_APP_NAME,
@@ -107,7 +107,7 @@ const AppStateWrapper = () => {
         const errorMessage = error?.error.message || "no error message"
         const errorInfos = (error?.errorInfo.componentStack || "no error stack").split("\n")
 
-        const onClearCacheClicked = () => {
+        const onClearCacheClicked = async () => {
             [
                 INDEXEDDB_KEY_CLIENT,
                 INDEXEDDB_KEY_SERVER,
@@ -117,6 +117,7 @@ const AppStateWrapper = () => {
             ].forEach((x) => {
                 localForage.removeItem(x)
             })
+            await removeItem(INDEXEDDB_KEY_AUDIO_OUTPUT)
             location.reload();
         }
         return (

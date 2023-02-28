@@ -2,7 +2,8 @@ export const RequestType = {
     "voice": "voice",
     "config": "config",
     "start": "start",
-    "stop": "stop"
+    "stop": "stop",
+    "trancateBuffer": "trancateBuffer",
 } as const
 export type RequestType = typeof RequestType[keyof typeof RequestType]
 
@@ -59,6 +60,12 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
         return Math.max(rms, prevVol * 0.95)
     }
 
+    trancateBuffer = () => {
+        console.log("[worklet] Buffer truncated")
+        while (this.playBuffer.length > 2) {
+            this.playBuffer.shift()
+        }
+    }
     handleMessage(event: any) {
         const request = event.data as VoiceChangerWorkletProcessorRequest
         if (request.requestType === "config") {
@@ -81,13 +88,13 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
             }
             this.isRecording = false
             return
+        } else if (request.requestType === "trancateBuffer") {
+            this.trancateBuffer()
+            return
         }
 
         if (this.playBuffer.length > this.numTrancateTreshold) {
-            console.log("[worklet] Buffer truncated")
-            while (this.playBuffer.length > 2) {
-                this.playBuffer.shift()
-            }
+            this.trancateBuffer()
         }
 
         const f32Data = request.voice

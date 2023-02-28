@@ -14,7 +14,7 @@ export type WorkletNodeSettingState = {
     updateWorkletNodeSetting: (setting: WorkletNodeSetting) => void
     startOutputRecording: () => void
     stopOutputRecording: () => Promise<Float32Array>
-
+    trancateBuffer: () => Promise<void>
 }
 
 export const useWorkletNodeSetting = (props: UseWorkletNodeSettingProps): WorkletNodeSettingState => {
@@ -79,12 +79,19 @@ export const useWorkletNodeSetting = (props: UseWorkletNodeSettingProps): Workle
         }
     }, [props.voiceChangerClient])
 
+    const trancateBuffer = useMemo(() => {
+        return async () => {
+            if (!props.voiceChangerClient) return
+            props.voiceChangerClient.trancateBuffer()
+        }
+    }, [props.voiceChangerClient])
 
     return {
         workletNodeSetting,
         clearSetting,
         updateWorkletNodeSetting,
         startOutputRecording,
-        stopOutputRecording
+        stopOutputRecording,
+        trancateBuffer
     }
 }

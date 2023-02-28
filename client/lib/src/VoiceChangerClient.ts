@@ -257,8 +257,9 @@ export class VoiceChangerClient {
     stopOutputRecording = () => {
         return this.vcNode.stopOutputRecording()
     }
-
-
+    trancateBuffer = () => {
+        this.vcNode.trancateBuffer()
+    }
     //##  Worklet Node ##//
     updateWorkletNodeSetting = (setting: WorkletNodeSetting) => {
         this.vcNode.updateSetting(setting)

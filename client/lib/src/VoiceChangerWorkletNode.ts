@@ -248,7 +248,7 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
     configure = (setting: WorkletSetting) => {
         const req: VoiceChangerWorkletProcessorRequest = {
             requestType: "config",
-            voice: new ArrayBuffer(1),
+            voice: new Float32Array(1),
             numTrancateTreshold: setting.numTrancateTreshold,
             volTrancateThreshold: setting.volTrancateThreshold,
             volTrancateLength: setting.volTrancateLength
@@ -259,7 +259,7 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
     start = () => {
         const req: VoiceChangerWorkletProcessorRequest = {
             requestType: "start",
-            voice: new ArrayBuffer(1),
+            voice: new Float32Array(1),
             numTrancateTreshold: 0,
             volTrancateThreshold: 0,
             volTrancateLength: 0
@@ -270,7 +270,17 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
     stop = () => {
         const req: VoiceChangerWorkletProcessorRequest = {
             requestType: "stop",
-            voice: new ArrayBuffer(1),
+            voice: new Float32Array(1),
+            numTrancateTreshold: 0,
+            volTrancateThreshold: 0,
+            volTrancateLength: 0
+        }
+        this.port.postMessage(req)
+    }
+    trancateBuffer = () => {
+        const req: VoiceChangerWorkletProcessorRequest = {
+            requestType: "trancateBuffer",
+            voice: new Float32Array(1),
             numTrancateTreshold: 0,
             volTrancateThreshold: 0,
             volTrancateLength: 0

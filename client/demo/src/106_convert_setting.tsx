@@ -27,6 +27,7 @@ export const useConvertSetting = (): ConvertSettingState => {
                 <div className="body-input-container">
                     <input type="number" min={1} max={256} step={1} value={appState.workletNodeSetting.workletNodeSetting.inputChunkNum} onChange={(e) => {
                         appState.workletNodeSetting.updateWorkletNodeSetting({ ...appState.workletNodeSetting.workletNodeSetting, inputChunkNum: Number(e.target.value) })
+                        appState.workletNodeSetting.trancateBuffer()
                     }} />
                 </div>
                 <div className="body-item-text">
