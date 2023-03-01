@@ -61,7 +61,7 @@ Windows版とMac版を提供しています。事前準備は必要ありませ�
 
 ・Mac版はダウンロードファイルを解凍したのちに、MMVCServerSIOをダブルクリックしてください。開発元を検証できない旨が示される場合は、再度コントロールキーを押してクリックして実行してください(or 右クリックから実行してください)。（詳細下記 *1）
 
-・Windows版は、directML版とGPU版を提供しています。環境に応じたzipファイルをダウンロードしてください。ダンロードしたzipファイルを解凍して、MMVCServerSIO.exeを実行してください。
+・Windows版は、directML版とGPU版を提供しています。環境に応じたzipファイルをダウンロードしてください。ダウンロードファイルしたzipファイルを解凍して、MMVCServerSIO.exeを実行してください。
 
 ・NvidiaのGPUをお持ちの方はonnxgpuがファイル名に含まれるファイルをご利用ください。多くの場合はonnxgpu_nocudaの方で動きます。環境によって極まれにgpuが認識されない場合があります。その場合はonnxgpu_cudaの方をご利用ください。（サイズが大きく違います。）
 
@@ -70,11 +70,11 @@ Windows版とMac版を提供しています。事前準備は必要ありませ�
 ・リモートからアクセスできるようにする方法など、より詳しくは[こちら](https://zenn.dev/wok/books/0002_vc-helper-v_1_3)をご覧ください。
 
 ### アルファ版(for v.1.5.x)
-- [MMVCServerSIO_mac_onnxcpu_v.1.5.1.3a.zip](https://drive.google.com/file/d/16XymqDcoKCxWFANSh-0trxKcYrjpX4et/view?usp=sharing) 433MB
-- [MMVCServerSIO_win_onnxdirectML_cuda_v.1.5.1.3a.zip](https://drive.google.com/file/d/1G0axdK4YmqFcfqP6TDaYHiEfQh6OBVTG/view?usp=sharing) 2129MB
-- [MMVCServerSIO_win_onnxdirectML_nocuda_v.1.5.1.3a.zip](https://drive.google.com/file/d/1IFZ9uRigXqthMGRov0Gi2zX9VmWtXSs3/view?usp=sharing) 365MB
-- [MMVCServerSIO_win_onnxgpu_cuda_v.1.5.1.3a.zip](https://drive.google.com/file/d/1-PivzMnGi7HxLO5CAQL3eVK0KvwSiISV/view?usp=sharing) 2224MB
-- [MMVCServerSIO_win_onnxgpu_nocuda_v.1.5.1.3a.zip](https://drive.google.com/file/d/10euOv1BeixKC0w0ttDYyCG9uDCQNutBF/view?usp=sharing) 460MB
+- [MMVCServerSIO_mac_onnxcpu_v.1.5.1.3a.zip](https://drive.google.com/file/d/1Irt2p9QwvxEE_DAhXC_p3qXeOyfklqQ6/view?usp=sharing) 433MB
+- [MMVCServerSIO_win_onnxdirectML_cuda_v.1.5.1.3a.zip](https://drive.google.com/file/d/1lAb2A-GcogL49b4iZx6mrazE_iCo7iAs/view?usp=sharing) 2129MB
+- [MMVCServerSIO_win_onnxdirectML_nocuda_v.1.5.1.3a.zip](https://drive.google.com/file/d/1dVMXadq9ELMYpV3_Go3nG-zeY15fB7cL/view?usp=sharing) 365MB
+- [MMVCServerSIO_win_onnxgpu_cuda_v.1.5.1.3a.zip](https://drive.google.com/file/d/1IonRAcxplPECDV11Tz6u7whv5kuILW7t/view?usp=sharing) 2224MB
+- [MMVCServerSIO_win_onnxgpu_nocuda_v.1.5.1.3a.zip](https://drive.google.com/file/d/1JLknURz_Fms58Id9uEPL9tEXkAERyz9j/view?usp=sharing) 460MB
 
 ### 最新バージョン(for v.1.3.x)
 - [MMVCServerSIO_mac_onnxcpu_v.1.3.9.3.zip](https://drive.google.com/file/d/1WBbtgzoS-tCFkoJ7ruP_x5tBSaA2MTKi/view?usp=sharing) 433MB
