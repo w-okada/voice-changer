@@ -520,7 +520,7 @@ class VoiceChanger():
                     del self.np_prev_audio1
                 if hasattr(self, "prev_audio1"):
                     del self.prev_audio1
-                return np.zeros(1).astype(np.int16)
+                return np.zeros(1).astype(np.int16), [0, 0, 0]
         mainprocess_time = t.secs
 
         with Timer("post-process") as t:
