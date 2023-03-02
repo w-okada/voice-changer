@@ -117,7 +117,6 @@ const AppStateWrapper = () => {
                 INDEXEDDB_KEY_AUDIO_OUTPUT
             ]
             for (const k of indexedDBKeys) {
-                console.log("remove2", k)
                 await removeItem(k)
             }
 
