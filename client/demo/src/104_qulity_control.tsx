@@ -38,7 +38,7 @@ export const useQualityControl = (): QualityControlState => {
 
     const [recording, setRecording] = useState<boolean>(false)
     const [outputAudioDeviceInfo, setOutputAudioDeviceInfo] = useState<MediaDeviceInfo[]>([])
-    const [audioOutputForGUI, setAudioOutputForGUI] = useState<string>("none")
+    const [audioOutputForGUI, setAudioOutputForGUI] = useState<string>("default")
     useEffect(() => {
         const initialize = async () => {
             const audioInfo = await reloadDevices()

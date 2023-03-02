@@ -108,16 +108,19 @@ const AppStateWrapper = () => {
         const errorInfos = (error?.errorInfo.componentStack || "no error stack").split("\n")
 
         const onClearCacheClicked = async () => {
-            [
+            const indexedDBKeys = [
                 INDEXEDDB_KEY_CLIENT,
                 INDEXEDDB_KEY_SERVER,
                 INDEXEDDB_KEY_WORKLETNODE,
                 INDEXEDDB_KEY_MODEL_DATA,
-                INDEXEDDB_KEY_WORKLET
-            ].forEach((x) => {
-                localForage.removeItem(x)
-            })
-            await removeItem(INDEXEDDB_KEY_AUDIO_OUTPUT)
+                INDEXEDDB_KEY_WORKLET,
+                INDEXEDDB_KEY_AUDIO_OUTPUT
+            ]
+            for (const k of indexedDBKeys) {
+                console.log("remove2", k)
+                await removeItem(k)
+            }
+
             location.reload();
         }
         return (
