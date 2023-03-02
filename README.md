@@ -70,18 +70,18 @@ Windows版とMac版を提供しています。事前準備は必要ありませ�
 ・リモートからアクセスできるようにする方法など、より詳しくは[こちら](https://zenn.dev/wok/books/0002_vc-helper-v_1_3)をご覧ください。
 
 ### アルファ版(for v.1.5.x)
-- [MMVCServerSIO_mac_onnxcpu_v.1.5.1.3a.zip](https://drive.google.com/file/d/1Irt2p9QwvxEE_DAhXC_p3qXeOyfklqQ6/view?usp=sharing) 433MB
-- [MMVCServerSIO_win_onnxdirectML_cuda_v.1.5.1.3a.zip](https://drive.google.com/file/d/1lAb2A-GcogL49b4iZx6mrazE_iCo7iAs/view?usp=sharing) 2129MB
-- [MMVCServerSIO_win_onnxdirectML_nocuda_v.1.5.1.3a.zip](https://drive.google.com/file/d/1dVMXadq9ELMYpV3_Go3nG-zeY15fB7cL/view?usp=sharing) 365MB
-- [MMVCServerSIO_win_onnxgpu_cuda_v.1.5.1.3a.zip](https://drive.google.com/file/d/1IonRAcxplPECDV11Tz6u7whv5kuILW7t/view?usp=sharing) 2224MB
-- [MMVCServerSIO_win_onnxgpu_nocuda_v.1.5.1.3a.zip](https://drive.google.com/file/d/1JLknURz_Fms58Id9uEPL9tEXkAERyz9j/view?usp=sharing) 460MB
+- [MMVCServerSIO_mac_onnxcpu_v.1.5.1.4a.zip](https://drive.google.com/file/d/1urqcB_S4lqbrxL4osKIlQ6MLhsh__W7t/view?usp=sharing) 510MB
+- [MMVCServerSIO_win_onnxdirectML_cuda_v.1.5.1.4a.zip](https://drive.google.com/file/d/1KSmmu5A29f3wXc_ZreycuuCyLltgNg5h/view?usp=sharing) 2.45GB
+- [MMVCServerSIO_win_onnxdirectML_nocuda_v.1.5.1.4a.zip](https://drive.google.com/file/d/1B_dPZMIf39Of7olTVzR0h6fNP5u0lx8P/view?usp=sharing) 430MB
+- [MMVCServerSIO_win_onnxgpu_cuda_v.1.5.1.4a.zip](https://drive.google.com/file/d/1sUa42la2vjTkIMcLKRSBf8icvfB6fqM0/view?usp=sharing) 2.55GB
+- [MMVCServerSIO_win_onnxgpu_nocuda_v.1.5.1.4a.zip](https://drive.google.com/file/d/1cQVnwenJD0vXzyThZ3iiMBUVLRXoDPBJ/view?usp=sharing) 541MB
 
 ### 最新バージョン(for v.1.3.x)
-- [MMVCServerSIO_mac_onnxcpu_v.1.3.9.3.zip](https://drive.google.com/file/d/1WBbtgzoS-tCFkoJ7ruP_x5tBSaA2MTKi/view?usp=sharing) 433MB
-- [MMVCServerSIO_win_onnxdirectML_cuda_v.1.3.9.3.zip](https://drive.google.com/file/d/1bTg2tIiRDPuByHnYdtjyG98OmfAvAewU/view?usp=sharing) 2129MB
-- [MMVCServerSIO_win_onnxdirectML_nocuda_v.1.3.9.3.zip](https://drive.google.com/file/d/1y-bj2M-MYtJU-C4hdjlt1ncviOp0BpF5/view?usp=sharing) 365MB
-- [MMVCServerSIO_win_onnxgpu_cuda_v.1.3.9.3.zip](https://drive.google.com/file/d/12eZoGE3RycJj_yQ71FAymSIA3JphpVAt/view?usp=sharing) 2224MB
-- [MMVCServerSIO_win_onnxgpu_nocuda_v.1.3.9.3.zip](https://drive.google.com/file/d/11f8Nyo7MF5JDnSpDFzCQwMk8LjzD7IPN/view?usp=sharing) 460MB
+- [MMVCServerSIO_mac_onnxcpu_v.1.3.9.4.zip](https://drive.google.com/file/d/1dliqQE7Kn5vhycrDUZQ6pgwLfP_znAyp/view?usp=sharing) 510MB
+- [MMVCServerSIO_win_onnxdirectML_cuda_v.1.3.9.4.zip](https://drive.google.com/file/d/1vfZc52f0BVD8nGjsuaAhl0jb4djHBBYe/view?usp=sharing) 2.45GB
+- [MMVCServerSIO_win_onnxdirectML_nocuda_v.1.3.9.4.zip](https://drive.google.com/file/d/14DaEPJnio-Ne50e2t1wFRgwQYnWwkh6n/view?usp=sharing) 430MB
+- [MMVCServerSIO_win_onnxgpu_cuda_v.1.3.9.4.zip](https://drive.google.com/file/d/1wBgjNHf0Kz3BPp-73KCbCEnPTW4FnuEE/view?usp=sharing) 2.55GB
+- [MMVCServerSIO_win_onnxgpu_nocuda_v.1.3.9.4.zip](https://drive.google.com/file/d/16R44mbi4AlkynVzhROrmA6u9MRSegpwd/view?usp=sharing) 541MB
 
 
 ### 過去バージョン
