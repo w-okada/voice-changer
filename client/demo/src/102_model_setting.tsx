@@ -206,7 +206,7 @@ export const useModelSettingArea = (): ServerSettingState => {
         appState.serverSetting.loadModel,
         appState.serverSetting.isUploading,
         appState.serverSetting.uploadProgress,
-        appState.clientSetting.clientSetting.correspondences,
+        appState.clientSetting.clientSetting,
         appState.serverSetting.updateServerSettings,
         appState.serverSetting.setFileUploadSetting,
         showPyTorch])
