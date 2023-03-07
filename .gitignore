@@ -13,7 +13,14 @@ server/out.wav
 server/G_*.pth
 server/train_config.json
 
+# v.1.3.xテスト用モデルフォルダ
 server/v13
+
+server/hubert
+server/so-vits-svc
+# sovitsテスト用モデルフォルダ
+server/sovits 
+server/test 
 
 server/memo.md
 

@@ -1,3 +1,6 @@
+import sys
+sys.path.append("MMVC_Client/python")
+
 from const import ERROR_NO_ONNX_SESSION, TMP_DIR
 import torch
 import os
@@ -13,6 +16,8 @@ from models import SynthesizerTrn
 
 import pyworld as pw
 from voice_changer.client_modules import convert_continuos_f0, spectrogram_torch, TextAudioSpeakerCollate, get_hparams_from_file, load_checkpoint
+
+from voice_changer.MMVCv15 import MMVCv15
 
 import time
 
@@ -120,6 +125,8 @@ class VoiceChanger():
         self.currentCrossFadeOffsetRate = 0
         self.currentCrossFadeEndRate = 0
         self.currentCrossFadeOverlapSize = 0
+
+        self.voiceChanger = MMVCv15()
 
         self.gpu_num = torch.cuda.device_count()
         self.text_norm = torch.LongTensor([0, 6, 0])
@@ -285,14 +292,14 @@ class VoiceChanger():
 
         return self.get_info()
 
-    def _generate_strength(self, unpackedData):
+    def _generate_strength(self, dataLength):
 
-        if self.unpackedData_length != unpackedData.shape[0] or \
+        if self.unpackedData_length != dataLength or \
                 self.currentCrossFadeOffsetRate != self.settings.crossFadeOffsetRate or \
                 self.currentCrossFadeEndRate != self.settings.crossFadeEndRate or \
                 self.currentCrossFadeOverlapSize != self.settings.crossFadeOverlapSize:
 
-            self.unpackedData_length = unpackedData.shape[0]
+            self.unpackedData_length = dataLength
             self.currentCrossFadeOffsetRate = self.settings.crossFadeOffsetRate
             self.currentCrossFadeEndRate = self.settings.crossFadeEndRate
             self.currentCrossFadeOverlapSize = self.settings.crossFadeOverlapSize
@@ -502,7 +509,7 @@ class VoiceChanger():
                 convertSize = 8192
             if convertSize % 128 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
                 convertSize = convertSize + (128 - (convertSize % 128))
-            self._generate_strength(unpackedData)
+            self._generate_strength(unpackedData.shape[0])
             data = self._generate_input(unpackedData, convertSize)
         preprocess_time = t.secs
 
@@ -510,8 +517,10 @@ class VoiceChanger():
             try:
                 if self.settings.framework == "ONNX":
                     result = self._onnx_inference(data, unpackedData.shape[0])
+                    # result = self.voiceChanger._onnx_inference(data, unpackedData.shape[0])
                 else:
                     result = self._pyTorch_inference(data, unpackedData.shape[0])
+                    # result = self.voiceChanger._pyTorch_inference(data, unpackedData.shape[0])
 
             except Exception as e:
                 print("VC PROCESSING!!!! EXCEPTION!!!", e)

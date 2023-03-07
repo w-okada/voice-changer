@@ -1,5 +1,4 @@
 import sys
-sys.path.append("MMVC_Client/python")
 
 from distutils.util import strtobool
 from datetime import datetime
