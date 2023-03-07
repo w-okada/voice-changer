@@ -8,11 +8,11 @@ import resampy
 
 import onnxruntime
 
-from symbols import symbols
-from models import SynthesizerTrn
+# from symbols import symbols
+# from models import SynthesizerTrn
 
 import pyworld as pw
-from voice_changer.client_modules import convert_continuos_f0, spectrogram_torch, TextAudioSpeakerCollate, get_hparams_from_file, load_checkpoint
+# from voice_changer.client_modules import convert_continuos_f0, spectrogram_torch, TextAudioSpeakerCollate, get_hparams_from_file, load_checkpoint
 
 import time
 
@@ -27,6 +27,13 @@ import pylab
 import librosa
 import librosa.display
 SAMPLING_RATE = 24000
+
+from inference.infer_tool import Svc
+
+import soundfile
+from scipy.io.wavfile import write
+import io
+import torchaudio
 
 
 class MockStream:
@@ -123,11 +130,16 @@ class VoiceChanger():
 
         self.gpu_num = torch.cuda.device_count()
         self.text_norm = torch.LongTensor([0, 6, 0])
-        self.audio_buffer = torch.zeros(1, 0)
+        self.audio_buffer = torch.zeros(0)
         self.prev_audio = np.zeros(1)
         self.mps_enabled = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
 
         print(f"VoiceChanger Initialized (GPU_NUM:{self.gpu_num}, mps_enabled:{self.mps_enabled})")
+
+        ###############################################
+        ###############################################
+        # self.raw_path2 = "test/test.wav"
+        self.raw_path = io.BytesIO()
 
     def _setupRecordIO(self):
         # IO Recorder Setup
@@ -158,7 +170,7 @@ class VoiceChanger():
 
     def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None):
         self.settings.configFile = config
-        self.hps = get_hparams_from_file(config)
+        # self.hps = get_hparams_from_file(config)
         if pyTorch_model_file != None:
             self.settings.pyTorchModelFile = pyTorch_model_file
         if onnx_model_file:
@@ -166,27 +178,28 @@ class VoiceChanger():
 
         # PyTorchモデル生成
         if pyTorch_model_file != None:
-            self.net_g = SynthesizerTrn(
-                spec_channels=self.hps.data.filter_length // 2 + 1,
-                segment_size=self.hps.train.segment_size // self.hps.data.hop_length,
-                inter_channels=self.hps.model.inter_channels,
-                hidden_channels=self.hps.model.hidden_channels,
-                upsample_rates=self.hps.model.upsample_rates,
-                upsample_initial_channel=self.hps.model.upsample_initial_channel,
-                upsample_kernel_sizes=self.hps.model.upsample_kernel_sizes,
-                n_flow=self.hps.model.n_flow,
-                dec_out_channels=1,
-                dec_kernel_size=7,
-                n_speakers=self.hps.data.n_speakers,
-                gin_channels=self.hps.model.gin_channels,
-                requires_grad_pe=self.hps.requires_grad.pe,
-                requires_grad_flow=self.hps.requires_grad.flow,
-                requires_grad_text_enc=self.hps.requires_grad.text_enc,
-                requires_grad_dec=self.hps.requires_grad.dec
-            )
-            self.net_g.eval()
-            load_checkpoint(pyTorch_model_file, self.net_g, None)
-            # utils.load_checkpoint(pyTorch_model_file, self.net_g, None)
+            # self.net_g = SynthesizerTrn(
+            #     spec_channels=self.hps.data.filter_length // 2 + 1,
+            #     segment_size=self.hps.train.segment_size // self.hps.data.hop_length,
+            #     inter_channels=self.hps.model.inter_channels,
+            #     hidden_channels=self.hps.model.hidden_channels,
+            #     upsample_rates=self.hps.model.upsample_rates,
+            #     upsample_initial_channel=self.hps.model.upsample_initial_channel,
+            #     upsample_kernel_sizes=self.hps.model.upsample_kernel_sizes,
+            #     n_flow=self.hps.model.n_flow,
+            #     dec_out_channels=1,
+            #     dec_kernel_size=7,
+            #     n_speakers=self.hps.data.n_speakers,
+            #     gin_channels=self.hps.model.gin_channels,
+            #     requires_grad_pe=self.hps.requires_grad.pe,
+            #     requires_grad_flow=self.hps.requires_grad.flow,
+            #     requires_grad_text_enc=self.hps.requires_grad.text_enc,
+            #     requires_grad_dec=self.hps.requires_grad.dec
+            # )
+            # self.net_g.eval()
+            # load_checkpoint(pyTorch_model_file, self.net_g, None)
+
+            self.net_g = Svc(pyTorch_model_file, config)
 
         # ONNXモデル生成
         if onnx_model_file != None:
@@ -325,42 +338,11 @@ class VoiceChanger():
 
     def _generate_input(self, unpackedData: any, convertSize: int):
         # 今回変換するデータをテンソルとして整形する
-        audio = torch.FloatTensor(unpackedData.astype(np.float32))  # float32でtensorfを作成
-        audio_norm = audio / self.hps.data.max_wav_value  # normalize
-        audio_norm = audio_norm.unsqueeze(0)  # unsqueeze
-        self.audio_buffer = torch.cat([self.audio_buffer, audio_norm], axis=1)  # 過去のデータに連結
-        # audio_norm = self.audio_buffer[:, -(convertSize + 1280 * 2):]  # 変換対象の部分だけ抽出
-        audio_norm = self.audio_buffer[:, -(convertSize):]  # 変換対象の部分だけ抽出
-        self.audio_buffer = audio_norm
-
-        # TBD: numpy <--> pytorch変換が行ったり来たりしているが、まずは動かすことを最優先。
-        audio_norm_np = audio_norm.squeeze().numpy().astype(np.float64)
-        if self.settings.f0Detector == "dio":
-            _f0, _time = pw.dio(audio_norm_np, self.hps.data.sampling_rate, frame_period=5.5)
-            f0 = pw.stonemask(audio_norm_np, _f0, _time, self.hps.data.sampling_rate)
-        else:
-            f0, t = pw.harvest(audio_norm_np, self.hps.data.sampling_rate, frame_period=5.5, f0_floor=71.0, f0_ceil=1000.0)
-        f0 = convert_continuos_f0(f0, int(audio_norm_np.shape[0] / self.hps.data.hop_length))
-        f0 = torch.from_numpy(f0.astype(np.float32))
-
-        spec = spectrogram_torch(audio_norm, self.hps.data.filter_length,
-                                 self.hps.data.sampling_rate, self.hps.data.hop_length, self.hps.data.win_length,
-                                 center=False)
-        # dispose_stft_specs = 2
-        # spec = spec[:, dispose_stft_specs:-dispose_stft_specs]
-        # f0 = f0[dispose_stft_specs:-dispose_stft_specs]
-        spec = torch.squeeze(spec, 0)
-        sid = torch.LongTensor([int(self.settings.srcId)])
-
-        # data = (self.text_norm, spec, audio_norm, sid)
-        # data = TextAudioSpeakerCollate()([data])
-        data = TextAudioSpeakerCollate(
-            sample_rate=self.hps.data.sampling_rate,
-            hop_size=self.hps.data.hop_length,
-            f0_factor=self.settings.f0Factor
-        )([(spec, sid, f0)])
-
-        return data
+        # unpackedData = unpackedData / self.hps.data.max_wav_value  # normalize
+        self.audio_buffer = np.concatenate([self.audio_buffer, unpackedData], 0)  # 過去のデータに連結
+        self.audio_buffer = self.audio_buffer[-(convertSize):]  # 変換対象の部分だけ抽出
+        # print("convert size", self.audio_buffer.shape)
+        return
 
     def _onnx_inference(self, data, inputSize):
         if hasattr(self, "onnx_session") == False or self.onnx_session == None:
@@ -404,114 +386,154 @@ class VoiceChanger():
         self.np_prev_audio1 = audio1
         return result
 
-    def _pyTorch_inference(self, data, inputSize):
+    def _pyTorch_inference(self, inputSize):
         if hasattr(self, "net_g") == False or self.net_g == None:
             print("[Voice Changer] No pyTorch session.")
             return np.zeros(1).astype(np.int16)
 
-        if self.settings.gpu < 0 or self.gpu_num == 0:
-            with torch.no_grad():
-                spec, spec_lengths, sid_src, sin, d = data
-                spec = spec.cpu()
-                spec_lengths = spec_lengths.cpu()
-                sid_src = sid_src.cpu()
-                sin = sin.cpu()
-                d = tuple([d[:1].cpu() for d in d])
-                sid_target = torch.LongTensor([self.settings.dstId]).cpu()
+        self.raw_path.seek(0)
+        soundfile.write(self.raw_path, self.audio_buffer.astype(np.int16), 32000, format="wav")
+        write("test/received_data.wav", 32000, self.audio_buffer.astype(np.int16))
 
-                audio1 = self.net_g.cpu().voice_conversion(spec, spec_lengths, sin, d, sid_src, sid_target)[0, 0].data * self.hps.data.max_wav_value
+        self.raw_path.seek(0)
+        out_audio, out_sr = self.net_g.infer('speaker1', 20, self.raw_path)
+        audio1 = out_audio * 32768.0
+        print("audio1.shape1", self.audio_buffer.shape, audio1.shape)
 
-                if self.prev_strength.device != torch.device('cpu'):
-                    print(f"prev_strength move from {self.prev_strength.device} to cpu")
-                    self.prev_strength = self.prev_strength.cpu()
-                if self.cur_strength.device != torch.device('cpu'):
-                    print(f"cur_strength move from {self.cur_strength.device} to cpu")
-                    self.cur_strength = self.cur_strength.cpu()
+        if self.prev_strength.device != torch.device('cuda', self.settings.gpu):
+            print(f"prev_strength move from {self.prev_strength.device} to gpu{self.settings.gpu}")
+            self.prev_strength = self.prev_strength.cuda(self.settings.gpu)
+        if self.cur_strength.device != torch.device('cuda', self.settings.gpu):
+            print(f"cur_strength move from {self.cur_strength.device} to gpu{self.settings.gpu}")
+            self.cur_strength = self.cur_strength.cuda(self.settings.gpu)
 
-                if hasattr(self, 'prev_audio1') == True and self.prev_audio1.device == torch.device('cpu'):  # prev_audio1が所望のデバイスに無い場合は一回休み。
-                    overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
-                    prev_overlap = self.prev_audio1[-1 * overlapSize:]
-                    cur_overlap = audio1[-1 * (inputSize + overlapSize):-1 * inputSize]
-                    powered_prev = prev_overlap * self.prev_strength
-                    powered_cur = cur_overlap * self.cur_strength
-                    powered_result = powered_prev + powered_cur
+        if hasattr(self, 'prev_audio1') == True and self.prev_audio1.device == torch.device('cuda', self.settings.gpu):
+            print("crossfade")
+            overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
+            prev_overlap = self.prev_audio1[-1 * overlapSize:]
+            cur_overlap = audio1[-1 * (inputSize + overlapSize):-1 * inputSize]
+            powered_prev = prev_overlap * self.prev_strength
+            powered_cur = cur_overlap * self.cur_strength
+            powered_result = powered_prev + powered_cur
 
-                    cur = audio1[-1 * inputSize:-1 * overlapSize]  # 今回のインプットの生部分。(インプット - 次回のCrossfade部分)。
-                    result = torch.cat([powered_result, cur], axis=0)  # Crossfadeと今回のインプットの生部分を結合
+            # print(overlapSize, prev_overlap.shape, cur_overlap.shape, self.prev_strength.shape, self.cur_strength.shape)
+            # print(self.prev_audio1.shape, audio1.shape, inputSize, overlapSize)
 
-                else:
-                    cur = audio1[-2 * inputSize:-1 * inputSize]
-                    result = cur
-
-                self.prev_audio1 = audio1
-                result = result.cpu().float().numpy()
+            cur = audio1[-1 * inputSize:-1 * overlapSize]  # 今回のインプットの生部分。(インプット - 次回のCrossfade部分)。
+            result = torch.cat([powered_result, cur], axis=0)  # Crossfadeと今回のインプットの生部分を結合
 
         else:
-            with torch.no_grad():
-                spec, spec_lengths, sid_src, sin, d = data
-                spec = spec.cuda(self.settings.gpu)
-                spec_lengths = spec_lengths.cuda(self.settings.gpu)
-                sid_src = sid_src.cuda(self.settings.gpu)
-                sin = sin.cuda(self.settings.gpu)
-                d = tuple([d[:1].cuda(self.settings.gpu) for d in d])
-                sid_target = torch.LongTensor([self.settings.dstId]).cuda(self.settings.gpu)
+            print("no crossfade")
+            cur = audio1[-2 * inputSize:-1 * inputSize]
+            result = cur
+        self.prev_audio1 = audio1
 
-                # audio1 = self.net_g.cuda(self.settings.gpu).voice_conversion(spec, spec_lengths, sid_src=sid_src,
-                #  sid_tgt=sid_tgt1)[0, 0].data * self.hps.data.max_wav_value
+        result = result.cpu().float().numpy()
 
-                audio1 = self.net_g.cuda(self.settings.gpu).voice_conversion(spec, spec_lengths, sin, d,
-                                                                             sid_src, sid_target)[0, 0].data * self.hps.data.max_wav_value
+        # if self.settings.gpu < 0 or self.gpu_num == 0:
+        #     with torch.no_grad():
+        #         spec, spec_lengths, sid_src, sin, d = data
+        #         spec = spec.cpu()
+        #         spec_lengths = spec_lengths.cpu()
+        #         sid_src = sid_src.cpu()
+        #         sin = sin.cpu()
+        #         d = tuple([d[:1].cpu() for d in d])
+        #         sid_target = torch.LongTensor([self.settings.dstId]).cpu()
 
-                if self.prev_strength.device != torch.device('cuda', self.settings.gpu):
-                    print(f"prev_strength move from {self.prev_strength.device} to gpu{self.settings.gpu}")
-                    self.prev_strength = self.prev_strength.cuda(self.settings.gpu)
-                if self.cur_strength.device != torch.device('cuda', self.settings.gpu):
-                    print(f"cur_strength move from {self.cur_strength.device} to gpu{self.settings.gpu}")
-                    self.cur_strength = self.cur_strength.cuda(self.settings.gpu)
+        #         audio1 = self.net_g.cpu().voice_conversion(spec, spec_lengths, sin, d, sid_src, sid_target)[0, 0].data * self.hps.data.max_wav_value
 
-                if hasattr(self, 'prev_audio1') == True and self.prev_audio1.device == torch.device('cuda', self.settings.gpu):
-                    overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
-                    prev_overlap = self.prev_audio1[-1 * overlapSize:]
-                    cur_overlap = audio1[-1 * (inputSize + overlapSize):-1 * inputSize]
-                    powered_prev = prev_overlap * self.prev_strength
-                    powered_cur = cur_overlap * self.cur_strength
-                    powered_result = powered_prev + powered_cur
+        #         if self.prev_strength.device != torch.device('cpu'):
+        #             print(f"prev_strength move from {self.prev_strength.device} to cpu")
+        #             self.prev_strength = self.prev_strength.cpu()
+        #         if self.cur_strength.device != torch.device('cpu'):
+        #             print(f"cur_strength move from {self.cur_strength.device} to cpu")
+        #             self.cur_strength = self.cur_strength.cpu()
 
-                    # print(overlapSize, prev_overlap.shape, cur_overlap.shape, self.prev_strength.shape, self.cur_strength.shape)
-                    # print(self.prev_audio1.shape, audio1.shape, inputSize, overlapSize)
+        #         if hasattr(self, 'prev_audio1') == True and self.prev_audio1.device == torch.device('cpu'):  # prev_audio1が所望のデバイスに無い場合は一回休み。
+        #             overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
+        #             prev_overlap = self.prev_audio1[-1 * overlapSize:]
+        #             cur_overlap = audio1[-1 * (inputSize + overlapSize):-1 * inputSize]
+        #             powered_prev = prev_overlap * self.prev_strength
+        #             powered_cur = cur_overlap * self.cur_strength
+        #             powered_result = powered_prev + powered_cur
 
-                    cur = audio1[-1 * inputSize:-1 * overlapSize]  # 今回のインプットの生部分。(インプット - 次回のCrossfade部分)。
-                    result = torch.cat([powered_result, cur], axis=0)  # Crossfadeと今回のインプットの生部分を結合
+        #             cur = audio1[-1 * inputSize:-1 * overlapSize]  # 今回のインプットの生部分。(インプット - 次回のCrossfade部分)。
+        #             result = torch.cat([powered_result, cur], axis=0)  # Crossfadeと今回のインプットの生部分を結合
 
-                else:
-                    cur = audio1[-2 * inputSize:-1 * inputSize]
-                    result = cur
-                self.prev_audio1 = audio1
+        #         else:
+        #             cur = audio1[-2 * inputSize:-1 * inputSize]
+        #             result = cur
 
-                result = result.cpu().float().numpy()
+        #         self.prev_audio1 = audio1
+        #         result = result.cpu().float().numpy()
+
+        # else:
+        #     with torch.no_grad():
+        #         spec, spec_lengths, sid_src, sin, d = data
+        #         spec = spec.cuda(self.settings.gpu)
+        #         spec_lengths = spec_lengths.cuda(self.settings.gpu)
+        #         sid_src = sid_src.cuda(self.settings.gpu)
+        #         sin = sin.cuda(self.settings.gpu)
+        #         d = tuple([d[:1].cuda(self.settings.gpu) for d in d])
+        #         sid_target = torch.LongTensor([self.settings.dstId]).cuda(self.settings.gpu)
+
+        #         # audio1 = self.net_g.cuda(self.settings.gpu).voice_conversion(spec, spec_lengths, sid_src=sid_src,
+        #         #  sid_tgt=sid_tgt1)[0, 0].data * self.hps.data.max_wav_value
+
+        #         audio1 = self.net_g.cuda(self.settings.gpu).voice_conversion(spec, spec_lengths, sin, d,
+        #                                                                      sid_src, sid_target)[0, 0].data * self.hps.data.max_wav_value
+
+        #         if self.prev_strength.device != torch.device('cuda', self.settings.gpu):
+        #             print(f"prev_strength move from {self.prev_strength.device} to gpu{self.settings.gpu}")
+        #             self.prev_strength = self.prev_strength.cuda(self.settings.gpu)
+        #         if self.cur_strength.device != torch.device('cuda', self.settings.gpu):
+        #             print(f"cur_strength move from {self.cur_strength.device} to gpu{self.settings.gpu}")
+        #             self.cur_strength = self.cur_strength.cuda(self.settings.gpu)
+
+        #         if hasattr(self, 'prev_audio1') == True and self.prev_audio1.device == torch.device('cuda', self.settings.gpu):
+        #             overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
+        #             prev_overlap = self.prev_audio1[-1 * overlapSize:]
+        #             cur_overlap = audio1[-1 * (inputSize + overlapSize):-1 * inputSize]
+        #             powered_prev = prev_overlap * self.prev_strength
+        #             powered_cur = cur_overlap * self.cur_strength
+        #             powered_result = powered_prev + powered_cur
+
+        #             # print(overlapSize, prev_overlap.shape, cur_overlap.shape, self.prev_strength.shape, self.cur_strength.shape)
+        #             # print(self.prev_audio1.shape, audio1.shape, inputSize, overlapSize)
+
+        #             cur = audio1[-1 * inputSize:-1 * overlapSize]  # 今回のインプットの生部分。(インプット - 次回のCrossfade部分)。
+        #             result = torch.cat([powered_result, cur], axis=0)  # Crossfadeと今回のインプットの生部分を結合
+
+        #         else:
+        #             cur = audio1[-2 * inputSize:-1 * inputSize]
+        #             result = cur
+        #         self.prev_audio1 = audio1
+
+        #         result = result.cpu().float().numpy()
         return result
 
     def on_request(self, unpackedData: any):
-
+        print("input size:", unpackedData.shape)
+        unpackedData = resampy.resample(unpackedData, 24000, 32000)
         with Timer("pre-process") as t:
-            if self.settings.inputSampleRate != 24000:
-                unpackedData = resampy.resample(unpackedData, 48000, 24000)
             convertSize = unpackedData.shape[0] + min(self.settings.crossFadeOverlapSize, unpackedData.shape[0])
-            # print(convertSize, unpackedData.shape[0])
             if convertSize < 8192:
                 convertSize = 8192
             if convertSize % 128 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
                 convertSize = convertSize + (128 - (convertSize % 128))
+
             self._generate_strength(unpackedData)
-            data = self._generate_input(unpackedData, convertSize)
+            self._generate_input(unpackedData, convertSize)
+
         preprocess_time = t.secs
 
         with Timer("main-process") as t:
             try:
                 if self.settings.framework == "ONNX":
-                    result = self._onnx_inference(data, unpackedData.shape[0])
+                    result = self._onnx_inference(unpackedData.shape[0])
                 else:
-                    result = self._pyTorch_inference(data, unpackedData.shape[0])
+                    result = self._pyTorch_inference(unpackedData.shape[0])
+                    write("test/out_data.wav", 32000, result.astype(np.int16))
 
             except Exception as e:
                 print("VC PROCESSING!!!! EXCEPTION!!!", e)
@@ -524,18 +546,21 @@ class VoiceChanger():
         mainprocess_time = t.secs
 
         with Timer("post-process") as t:
+            result = resampy.resample(result, 32000, 24000).astype(np.int16)
 
-            result = result.astype(np.int16)
-            # print("on_request result size:",result.shape)
-            if self.settings.recordIO == 1:
-                self.stream_in.write(unpackedData.astype(np.int16).tobytes())
-                self.stream_out.write(result.tobytes())
+            # result = result.astype(np.int16)
+            # # print("on_request result size:",result.shape)
+            # if self.settings.recordIO == 1:
+            #     self.stream_in.write(unpackedData.astype(np.int16).tobytes())
+            #     self.stream_out.write(result.tobytes())
 
-            if self.settings.inputSampleRate != 24000:
-                result = resampy.resample(result, 24000, 48000).astype(np.int16)
+            # if self.settings.inputSampleRate != 24000:
+            #     result = resampy.resample(result, 24000, 48000).astype(np.int16)
         postprocess_time = t.secs
 
         perf = [preprocess_time, mainprocess_time, postprocess_time]
+
+        print("output size:", result.shape)
         return result, perf
 
 

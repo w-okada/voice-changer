@@ -1,5 +1,6 @@
 import sys
-sys.path.append("MMVC_Client/python")
+# sys.path.append("MMVC_Client/python")
+sys.path.append("so-vits-svc")
 
 from distutils.util import strtobool
 from datetime import datetime
