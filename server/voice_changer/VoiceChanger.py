@@ -316,19 +316,11 @@ class VoiceChanger():
             self.np_prev_strength = np.concatenate([np.ones(cf_offset), np_prev_strength, np.zeros(overlapSize - cf_offset - len(np_prev_strength))])
             self.np_cur_strength = np.concatenate([np.zeros(cf_offset), np_cur_strength, np.ones(overlapSize - cf_offset - len(np_cur_strength))])
 
-            self.prev_strength = torch.FloatTensor(self.np_prev_strength)
-            self.cur_strength = torch.FloatTensor(self.np_cur_strength)
-
-            # torch.set_printoptions(edgeitems=2100)
             print("Generated Strengths")
-            # print(f"cross fade: start:{cf_offset} end:{cf_end} range:{cf_range}")
-            # print(f"target_len:{unpackedData.shape[0]}, prev_len:{len(self.prev_strength)} cur_len:{len(self.cur_strength)}")
-            # print("Prev", self.prev_strength)
-            # print("Cur", self.cur_strength)
 
             # ひとつ前の結果とサイズが変わるため、記録は消去する。
-            if hasattr(self, 'prev_audio1') == True:
-                delattr(self, "prev_audio1")
+            if hasattr(self, 'np_prev_audio1') == True:
+                delattr(self, "np_prev_audio1")
 
     def _generate_input(self, unpackedData: any, convertSize: int):
         # 今回変換するデータをテンソルとして整形する
@@ -462,8 +454,6 @@ class VoiceChanger():
                 print(traceback.format_exc())
                 if hasattr(self, "np_prev_audio1"):
                     del self.np_prev_audio1
-                if hasattr(self, "prev_audio1"):
-                    del self.prev_audio1
                 return np.zeros(1).astype(np.int16), [0, 0, 0]
         mainprocess_time = t.secs
 
