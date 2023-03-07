@@ -18,6 +18,9 @@ import pyworld as pw
 from voice_changer.client_modules import convert_continuos_f0, spectrogram_torch, TextAudioSpeakerCollate, get_hparams_from_file, load_checkpoint
 
 from voice_changer.MMVCv15 import MMVCv15
+from voice_changer.IORecorder import IORecorder
+from voice_changer.IOAnalyzer import IOAnalyzer
+
 
 import time
 
@@ -34,53 +37,10 @@ import librosa.display
 SAMPLING_RATE = 24000
 
 
-class MockStream:
-    """gi
-    オーディオストリーミング入出力をファイル入出力にそのまま置き換えるためのモック
-    """
-
-    def __init__(self, sampling_rate):
-        self.sampling_rate = sampling_rate
-        self.start_count = 2
-        self.end_count = 2
-        self.fr = None
-        self.fw = None
-
-    def open_inputfile(self, input_filename):
-        self.fr = wave.open(input_filename, 'rb')
-
-    def open_outputfile(self, output_filename):
-        self.fw = wave.open(output_filename, 'wb')
-        self.fw.setnchannels(1)
-        self.fw.setsampwidth(2)
-        self.fw.setframerate(self.sampling_rate)
-
-    def read(self, length, exception_on_overflow=False):
-        if self.start_count > 0:
-            wav = bytes(length * 2)
-            self.start_count -= 1  # 最初の2回はダミーの空データ送る
-        else:
-            wav = self.fr.readframes(length)
-        if len(wav) <= 0:  # データなくなってから最後の2回はダミーの空データを送る
-            wav = bytes(length * 2)
-            self.end_count -= 1
-            if self.end_count < 0:
-                Hyperparameters.VC_END_FLAG = True
-        return wav
-
-    def write(self, wav):
-        self.fw.writeframes(wav)
-
-    def stop_stream(self):
-        pass
-
-    def close(self):
-        if self.fr != None:
-            self.fr.close()
-            self.fr = None
-        if self.fw != None:
-            self.fw.close()
-            self.fw = None
+STREAM_INPUT_FILE = os.path.join(TMP_DIR, "in.wav")
+STREAM_OUTPUT_FILE = os.path.join(TMP_DIR, "out.wav")
+STREAM_ANALYZE_FILE_DIO = os.path.join(TMP_DIR, "analyze-dio.png")
+STREAM_ANALYZE_FILE_HARVEST = os.path.join(TMP_DIR, "analyze-harvest.png")
 
 
 @dataclass
@@ -135,33 +95,6 @@ class VoiceChanger():
         self.mps_enabled = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
 
         print(f"VoiceChanger Initialized (GPU_NUM:{self.gpu_num}, mps_enabled:{self.mps_enabled})")
-
-    def _setupRecordIO(self):
-        # IO Recorder Setup
-        if hasattr(self, "stream_out"):
-            self.stream_out.close()
-        mock_stream_out = MockStream(24000)
-        stream_output_file = os.path.join(TMP_DIR, "out.wav")
-        if os.path.exists(stream_output_file):
-            print("delete old analyze file.", stream_output_file)
-            os.remove(stream_output_file)
-        else:
-            print("old analyze file not exist.", stream_output_file)
-
-        mock_stream_out.open_outputfile(stream_output_file)
-        self.stream_out = mock_stream_out
-
-        if hasattr(self, "stream_in"):
-            self.stream_in.close()
-        mock_stream_in = MockStream(24000)
-        stream_input_file = os.path.join(TMP_DIR, "in.wav")
-        if os.path.exists(stream_input_file):
-            print("delete old analyze file.", stream_input_file)
-            os.remove(stream_input_file)
-        else:
-            print("old analyze file not exist.", stream_output_file)
-        mock_stream_in.open_outputfile(stream_input_file)
-        self.stream_in = mock_stream_in
 
     def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None):
         self.settings.configFile = config
@@ -222,18 +155,6 @@ class VoiceChanger():
 
         return data
 
-    def _get_f0_dio(self, y, sr=SAMPLING_RATE):
-        _f0, time = pw.dio(y, sr, frame_period=5)
-        f0 = pw.stonemask(y, _f0, time, sr)
-        time = np.linspace(0, y.shape[0] / sr, len(time))
-        return f0, time
-
-    def _get_f0_harvest(self, y, sr=SAMPLING_RATE):
-        _f0, time = pw.harvest(y, sr, frame_period=5)
-        f0 = pw.stonemask(y, _f0, time, sr)
-        time = np.linspace(0, y.shape[0] / sr, len(time))
-        return f0, time
-
     def update_setteings(self, key: str, val: any):
         if key == "onnxExecutionProvider" and self.onnx_session != None:
             if val == "CUDAExecutionProvider":
@@ -254,31 +175,22 @@ class VoiceChanger():
             if key == "crossFadeOffsetRate" or key == "crossFadeEndRate":
                 self.unpackedData_length = 0
             if key == "recordIO" and val == 1:
-                self._setupRecordIO()
+                if hasattr(self, "ioRecorder"):
+                    self.ioRecorder.close()
+                self.ioRecorder = IORecorder(STREAM_INPUT_FILE, STREAM_OUTPUT_FILE, self.settings.inputSampleRate)
             if key == "recordIO" and val == 0:
+                if hasattr(self, "ioRecorder"):
+                    self.ioRecorder.close()
                 pass
             if key == "recordIO" and val == 2:
+                if hasattr(self, "ioRecorder"):
+                    self.ioRecorder.close()
+
+                if hasattr(self, "ioAnalyzer") == False:
+                    self.ioAnalyzer = IOAnalyzer()
+
                 try:
-                    stream_input_file = os.path.join(TMP_DIR, "in.wav")
-                    analyze_file_dio = os.path.join(TMP_DIR, "analyze-dio.png")
-                    analyze_file_harvest = os.path.join(TMP_DIR, "analyze-harvest.png")
-                    y, sr = librosa.load(stream_input_file, SAMPLING_RATE)
-                    y = y.astype(np.float64)
-                    spec = librosa.amplitude_to_db(np.abs(librosa.stft(y, n_fft=2048, win_length=2048, hop_length=128)), ref=np.max)
-                    f0_dio, times = self._get_f0_dio(y)
-                    f0_harvest, times = self._get_f0_harvest(y)
-
-                    pylab.close()
-                    HOP_LENGTH = 128
-                    img = librosa.display.specshow(spec, sr=SAMPLING_RATE, hop_length=HOP_LENGTH, x_axis='time', y_axis='log', )
-                    pylab.plot(times, f0_dio, label='f0', color=(0, 1, 1, 0.6), linewidth=3)
-                    pylab.savefig(analyze_file_dio)
-
-                    pylab.close()
-                    HOP_LENGTH = 128
-                    img = librosa.display.specshow(spec, sr=SAMPLING_RATE, hop_length=HOP_LENGTH, x_axis='time', y_axis='log', )
-                    pylab.plot(times, f0_harvest, label='f0', color=(0, 1, 1, 0.6), linewidth=3)
-                    pylab.savefig(analyze_file_harvest)
+                    self.ioAnalyzer.analyze(STREAM_INPUT_FILE, STREAM_ANALYZE_FILE_DIO, STREAM_ANALYZE_FILE_HARVEST, self.settings.inputSampleRate)
 
                 except Exception as e:
                     print("recordIO exception", e)
@@ -462,8 +374,10 @@ class VoiceChanger():
             result = result.astype(np.int16)
             # print("on_request result size:",result.shape)
             if self.settings.recordIO == 1:
-                self.stream_in.write(unpackedData.astype(np.int16).tobytes())
-                self.stream_out.write(result.tobytes())
+                # self.stream_in.write(unpackedData.astype(np.int16).tobytes())
+                # self.stream_out.write(result.tobytes())
+                self.ioRecorder.writeInput(unpackedData.astype(np.int16).tobytes())
+                self.ioRecorder.writeOutput(result.tobytes())
 
             if self.settings.inputSampleRate != 24000:
                 result = resampy.resample(result, 24000, 48000).astype(np.int16)
