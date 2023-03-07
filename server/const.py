@@ -2,6 +2,10 @@ import os
 import sys
 import tempfile
 
+# MODEL_TYPE = "MMVCv13"
+MODEL_TYPE = "MMVCv15"
+# MODEL_TYPE = "sovt-vits-svc"
+
 frontend_path = os.path.join(sys._MEIPASS, "dist") if hasattr(sys, "_MEIPASS") else "../client/demo/dist"
 ERROR_NO_ONNX_SESSION = "ERROR_NO_ONNX_SESSION"
 
