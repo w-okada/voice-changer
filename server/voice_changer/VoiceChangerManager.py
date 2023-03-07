@@ -31,9 +31,9 @@ class VoiceChangerManager():
         else:
             return {"status": "ERROR", "msg": "no model loaded"}
 
-    def changeVoice(self, unpackedData: any):
+    def changeVoice(self, receivedData: any):
         if hasattr(self, 'voiceChanger') == True:
-            return self.voiceChanger.on_request(unpackedData)
+            return self.voiceChanger.on_request(receivedData)
         else:
             print("Voice Change is not loaded. Did you load a correct model?")
             return np.zeros(1).astype(np.int16), []

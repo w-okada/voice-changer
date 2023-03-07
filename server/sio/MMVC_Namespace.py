@@ -28,7 +28,9 @@ class MMVC_Namespace(socketio.AsyncNamespace):
             print(data)
             await self.emit('response', [timestamp, 0], to=sid)
         else:
-            unpackedData = np.array(struct.unpack('<%sh' % (len(data) // struct.calcsize('<h')), data))
+            # tuple of short
+            unpackedData = struct.unpack('<%sh' % (len(data) // struct.calcsize('<h')), data)
+
             # audio1, perf = self.voiceChangerManager.changeVoice(unpackedData)
             res = self.voiceChangerManager.changeVoice(unpackedData)
             audio1 = res[0]

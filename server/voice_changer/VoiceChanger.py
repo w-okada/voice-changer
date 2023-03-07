@@ -1,3 +1,4 @@
+
 import sys
 sys.path.append("MMVC_Client/python")
 
@@ -90,7 +91,6 @@ class VoiceChanger():
 
         self.gpu_num = torch.cuda.device_count()
         self.text_norm = torch.LongTensor([0, 6, 0])
-        self.audio_buffer = torch.zeros(1, 0)
         self.prev_audio = np.zeros(1)
         self.mps_enabled = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
 
@@ -234,18 +234,9 @@ class VoiceChanger():
             if hasattr(self, 'np_prev_audio1') == True:
                 delattr(self, "np_prev_audio1")
 
-    def _generate_input(self, unpackedData: any, convertSize: int):
-        # 今回変換するデータをテンソルとして整形する
-        audio = torch.FloatTensor(unpackedData.astype(np.float32))  # float32でtensorfを作成
-        audio_norm = audio / self.hps.data.max_wav_value  # normalize
-        audio_norm = audio_norm.unsqueeze(0)  # unsqueeze
-        self.audio_buffer = torch.cat([self.audio_buffer, audio_norm], axis=1)  # 過去のデータに連結
-        # audio_norm = self.audio_buffer[:, -(convertSize + 1280 * 2):]  # 変換対象の部分だけ抽出
-        audio_norm = self.audio_buffer[:, -(convertSize):]  # 変換対象の部分だけ抽出
-        self.audio_buffer = audio_norm
+    def _get_f0(self, newData: any):
 
-        # TBD: numpy <--> pytorch変換が行ったり来たりしているが、まずは動かすことを最優先。
-        audio_norm_np = audio_norm.squeeze().numpy().astype(np.float64)
+        audio_norm_np = newData.astype(np.float64)
         if self.settings.f0Detector == "dio":
             _f0, _time = pw.dio(audio_norm_np, self.hps.data.sampling_rate, frame_period=5.5)
             f0 = pw.stonemask(audio_norm_np, _f0, _time, self.hps.data.sampling_rate)
@@ -253,18 +244,32 @@ class VoiceChanger():
             f0, t = pw.harvest(audio_norm_np, self.hps.data.sampling_rate, frame_period=5.5, f0_floor=71.0, f0_ceil=1000.0)
         f0 = convert_continuos_f0(f0, int(audio_norm_np.shape[0] / self.hps.data.hop_length))
         f0 = torch.from_numpy(f0.astype(np.float32))
+        return f0
 
+    def _get_spec(self, newData: any):
+        audio = torch.FloatTensor(newData)
+        audio_norm = audio / self.hps.data.max_wav_value  # normalize
+        audio_norm = audio_norm.unsqueeze(0)  # unsqueeze
         spec = spectrogram_torch(audio_norm, self.hps.data.filter_length,
                                  self.hps.data.sampling_rate, self.hps.data.hop_length, self.hps.data.win_length,
                                  center=False)
-        # dispose_stft_specs = 2
-        # spec = spec[:, dispose_stft_specs:-dispose_stft_specs]
-        # f0 = f0[dispose_stft_specs:-dispose_stft_specs]
         spec = torch.squeeze(spec, 0)
+        return spec
+
+    def _generate_input(self, newData: any, convertSize: int):
+        newData = np.array(newData).astype(np.float32)
+
+        if hasattr(self, "audio_buffer"):
+            self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)  # 過去のデータに連結
+        else:
+            self.audio_buffer = newData
+
+        self.audio_buffer = self.audio_buffer[-(convertSize):]  # 変換対象の部分だけ抽出
+
+        f0 = self._get_f0(self.audio_buffer)  # f0 生成
+        spec = self._get_spec(self.audio_buffer)
         sid = torch.LongTensor([int(self.settings.srcId)])
 
-        # data = (self.text_norm, spec, audio_norm, sid)
-        # data = TextAudioSpeakerCollate()([data])
         data = TextAudioSpeakerCollate(
             sample_rate=self.hps.data.sampling_rate,
             hop_size=self.hps.data.hop_length,
@@ -318,19 +323,23 @@ class VoiceChanger():
             result = audio1.float().cpu().numpy()
         return result
 
-    def on_request(self, unpackedData: any):
+    #  receivedData: tuple of short
+    def on_request(self, receivedData: any):
 
         with Timer("pre-process") as t:
             if self.settings.inputSampleRate != 24000:
-                unpackedData = resampy.resample(unpackedData, 48000, 24000)
-            convertSize = unpackedData.shape[0] + min(self.settings.crossFadeOverlapSize, unpackedData.shape[0])
+                newData = resampy.resample(receivedData, self.settings.inputSampleRate, 24000)
+            else:
+                newData = receivedData
+            convertSize = len(newData) + min(self.settings.crossFadeOverlapSize, len(newData))
             # print(convertSize, unpackedData.shape[0])
             if convertSize < 8192:
                 convertSize = 8192
             if convertSize % 128 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
                 convertSize = convertSize + (128 - (convertSize % 128))
-            self._generate_strength(unpackedData.shape[0])
-            data = self._generate_input(unpackedData, convertSize)
+
+            self._generate_strength(len(newData))
+            data = self._generate_input(newData, convertSize)
         preprocess_time = t.secs
 
         with Timer("main-process") as t:
@@ -342,7 +351,7 @@ class VoiceChanger():
                     audio = self._pyTorch_inference(data)
                     # result = self.voiceChanger._pyTorch_inference(data, unpackedData.shape[0])
 
-                inputSize = unpackedData.shape[0]
+                inputSize = len(newData)
 
                 if hasattr(self, 'np_prev_audio1') == True:
                     np.set_printoptions(threshold=10000)
@@ -376,11 +385,11 @@ class VoiceChanger():
             if self.settings.recordIO == 1:
                 # self.stream_in.write(unpackedData.astype(np.int16).tobytes())
                 # self.stream_out.write(result.tobytes())
-                self.ioRecorder.writeInput(unpackedData.astype(np.int16).tobytes())
+                self.ioRecorder.writeInput(receivedData.astype(np.int16).tobytes())
                 self.ioRecorder.writeOutput(result.tobytes())
 
             if self.settings.inputSampleRate != 24000:
-                result = resampy.resample(result, 24000, 48000).astype(np.int16)
+                result = resampy.resample(result, 24000, self.settings.inputSampleRate).astype(np.int16)
         postprocess_time = t.secs
 
         perf = [preprocess_time, mainprocess_time, postprocess_time]
