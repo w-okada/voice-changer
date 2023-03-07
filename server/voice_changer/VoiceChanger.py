@@ -292,7 +292,7 @@ class VoiceChanger():
 
         return self.get_info()
 
-    def _generate_strength(self, dataLength):
+    def _generate_strength(self, dataLength: int):
 
         if self.unpackedData_length != dataLength or \
                 self.currentCrossFadeOffsetRate != self.settings.crossFadeOffsetRate or \
@@ -369,17 +369,13 @@ class VoiceChanger():
 
         return data
 
-    def _onnx_inference(self, data, inputSize):
+    def _onnx_inference(self, data):
         if hasattr(self, "onnx_session") == False or self.onnx_session == None:
             print("[Voice Changer] No ONNX session.")
             return np.zeros(1).astype(np.int16)
 
-        # x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [x for x in data]
-        # sid_tgt1 = torch.LongTensor([self.settings.dstId])
-
         spec, spec_lengths, sid_src, sin, d = data
         sid_tgt1 = torch.LongTensor([self.settings.dstId])
-        # if spec.size()[2] >= 8:
         audio1 = self.onnx_session.run(
             ["audio"],
             {
@@ -393,109 +389,29 @@ class VoiceChanger():
                 "sid_src": sid_src.numpy(),
                 "sid_tgt": sid_tgt1.numpy()
             })[0][0, 0] * self.hps.data.max_wav_value
+        return audio1
 
-        if hasattr(self, 'np_prev_audio1') == True:
-            overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
-            prev_overlap = self.np_prev_audio1[-1 * overlapSize:]
-            cur_overlap = audio1[-1 * (inputSize + overlapSize):-1 * inputSize]
-            # print(prev_overlap.shape, self.np_prev_strength.shape, cur_overlap.shape, self.np_cur_strength.shape)
-            # print(">>>>>>>>>>>", -1*(inputSize + overlapSize) , -1*inputSize)
-            powered_prev = prev_overlap * self.np_prev_strength
-            powered_cur = cur_overlap * self.np_cur_strength
-            powered_result = powered_prev + powered_cur
-
-            cur = audio1[-1 * inputSize:-1 * overlapSize]
-            result = np.concatenate([powered_result, cur], axis=0)
-        else:
-            result = np.zeros(1).astype(np.int16)
-        self.np_prev_audio1 = audio1
-        return result
-
-    def _pyTorch_inference(self, data, inputSize):
+    def _pyTorch_inference(self, data):
         if hasattr(self, "net_g") == False or self.net_g == None:
             print("[Voice Changer] No pyTorch session.")
             return np.zeros(1).astype(np.int16)
 
         if self.settings.gpu < 0 or self.gpu_num == 0:
-            with torch.no_grad():
-                spec, spec_lengths, sid_src, sin, d = data
-                spec = spec.cpu()
-                spec_lengths = spec_lengths.cpu()
-                sid_src = sid_src.cpu()
-                sin = sin.cpu()
-                d = tuple([d[:1].cpu() for d in d])
-                sid_target = torch.LongTensor([self.settings.dstId]).cpu()
-
-                audio1 = self.net_g.cpu().voice_conversion(spec, spec_lengths, sin, d, sid_src, sid_target)[0, 0].data * self.hps.data.max_wav_value
-
-                if self.prev_strength.device != torch.device('cpu'):
-                    print(f"prev_strength move from {self.prev_strength.device} to cpu")
-                    self.prev_strength = self.prev_strength.cpu()
-                if self.cur_strength.device != torch.device('cpu'):
-                    print(f"cur_strength move from {self.cur_strength.device} to cpu")
-                    self.cur_strength = self.cur_strength.cpu()
-
-                if hasattr(self, 'prev_audio1') == True and self.prev_audio1.device == torch.device('cpu'):  # prev_audio1が所望のデバイスに無い場合は一回休み。
-                    overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
-                    prev_overlap = self.prev_audio1[-1 * overlapSize:]
-                    cur_overlap = audio1[-1 * (inputSize + overlapSize):-1 * inputSize]
-                    powered_prev = prev_overlap * self.prev_strength
-                    powered_cur = cur_overlap * self.cur_strength
-                    powered_result = powered_prev + powered_cur
-
-                    cur = audio1[-1 * inputSize:-1 * overlapSize]  # 今回のインプットの生部分。(インプット - 次回のCrossfade部分)。
-                    result = torch.cat([powered_result, cur], axis=0)  # Crossfadeと今回のインプットの生部分を結合
-
-                else:
-                    cur = audio1[-2 * inputSize:-1 * inputSize]
-                    result = cur
-
-                self.prev_audio1 = audio1
-                result = result.cpu().float().numpy()
-
+            dev = torch.device("cpu")
         else:
-            with torch.no_grad():
-                spec, spec_lengths, sid_src, sin, d = data
-                spec = spec.cuda(self.settings.gpu)
-                spec_lengths = spec_lengths.cuda(self.settings.gpu)
-                sid_src = sid_src.cuda(self.settings.gpu)
-                sin = sin.cuda(self.settings.gpu)
-                d = tuple([d[:1].cuda(self.settings.gpu) for d in d])
-                sid_target = torch.LongTensor([self.settings.dstId]).cuda(self.settings.gpu)
+            dev = torch.device("cuda", index=self.settings.gpu)
 
-                # audio1 = self.net_g.cuda(self.settings.gpu).voice_conversion(spec, spec_lengths, sid_src=sid_src,
-                #  sid_tgt=sid_tgt1)[0, 0].data * self.hps.data.max_wav_value
+        with torch.no_grad():
+            spec, spec_lengths, sid_src, sin, d = data
+            spec = spec.to(dev)
+            spec_lengths = spec_lengths.to(dev)
+            sid_src = sid_src.to(dev)
+            sin = sin.to(dev)
+            d = tuple([d[:1].to(dev) for d in d])
+            sid_target = torch.LongTensor([self.settings.dstId]).to(dev)
 
-                audio1 = self.net_g.cuda(self.settings.gpu).voice_conversion(spec, spec_lengths, sin, d,
-                                                                             sid_src, sid_target)[0, 0].data * self.hps.data.max_wav_value
-
-                if self.prev_strength.device != torch.device('cuda', self.settings.gpu):
-                    print(f"prev_strength move from {self.prev_strength.device} to gpu{self.settings.gpu}")
-                    self.prev_strength = self.prev_strength.cuda(self.settings.gpu)
-                if self.cur_strength.device != torch.device('cuda', self.settings.gpu):
-                    print(f"cur_strength move from {self.cur_strength.device} to gpu{self.settings.gpu}")
-                    self.cur_strength = self.cur_strength.cuda(self.settings.gpu)
-
-                if hasattr(self, 'prev_audio1') == True and self.prev_audio1.device == torch.device('cuda', self.settings.gpu):
-                    overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
-                    prev_overlap = self.prev_audio1[-1 * overlapSize:]
-                    cur_overlap = audio1[-1 * (inputSize + overlapSize):-1 * inputSize]
-                    powered_prev = prev_overlap * self.prev_strength
-                    powered_cur = cur_overlap * self.cur_strength
-                    powered_result = powered_prev + powered_cur
-
-                    # print(overlapSize, prev_overlap.shape, cur_overlap.shape, self.prev_strength.shape, self.cur_strength.shape)
-                    # print(self.prev_audio1.shape, audio1.shape, inputSize, overlapSize)
-
-                    cur = audio1[-1 * inputSize:-1 * overlapSize]  # 今回のインプットの生部分。(インプット - 次回のCrossfade部分)。
-                    result = torch.cat([powered_result, cur], axis=0)  # Crossfadeと今回のインプットの生部分を結合
-
-                else:
-                    cur = audio1[-2 * inputSize:-1 * inputSize]
-                    result = cur
-                self.prev_audio1 = audio1
-
-                result = result.cpu().float().numpy()
+            audio1 = self.net_g.to(dev).voice_conversion(spec, spec_lengths, sin, d, sid_src, sid_target)[0, 0].data * self.hps.data.max_wav_value
+            result = audio1.float().cpu().numpy()
         return result
 
     def on_request(self, unpackedData: any):
@@ -516,11 +432,30 @@ class VoiceChanger():
         with Timer("main-process") as t:
             try:
                 if self.settings.framework == "ONNX":
-                    result = self._onnx_inference(data, unpackedData.shape[0])
+                    audio = self._onnx_inference(data)
                     # result = self.voiceChanger._onnx_inference(data, unpackedData.shape[0])
                 else:
-                    result = self._pyTorch_inference(data, unpackedData.shape[0])
+                    audio = self._pyTorch_inference(data)
                     # result = self.voiceChanger._pyTorch_inference(data, unpackedData.shape[0])
+
+                inputSize = unpackedData.shape[0]
+
+                if hasattr(self, 'np_prev_audio1') == True:
+                    np.set_printoptions(threshold=10000)
+                    overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
+                    prev_overlap = self.np_prev_audio1[-1 * overlapSize:]
+                    cur_overlap = audio[-1 * (inputSize + overlapSize):-1 * inputSize]
+                    # print(prev_overlap.shape, self.np_prev_strength.shape, cur_overlap.shape, self.np_cur_strength.shape)
+                    # print(">>>>>>>>>>>", -1 * (inputSize + overlapSize), -1 * inputSize, self.np_prev_audio1.shape, overlapSize)
+                    powered_prev = prev_overlap * self.np_prev_strength
+                    powered_cur = cur_overlap * self.np_cur_strength
+                    powered_result = powered_prev + powered_cur
+
+                    cur = audio[-1 * inputSize:-1 * overlapSize]
+                    result = np.concatenate([powered_result, cur], axis=0)
+                else:
+                    result = np.zeros(1).astype(np.int16)
+                self.np_prev_audio1 = audio
 
             except Exception as e:
                 print("VC PROCESSING!!!! EXCEPTION!!!", e)
