@@ -1,6 +1,5 @@
 
 import sys
-sys.path.append("MMVC_Client/python")
 
 from const import TMP_DIR
 import torch
@@ -11,7 +10,8 @@ from dataclasses import dataclass, asdict
 import resampy
 
 
-from voice_changer.MMVCv15 import MMVCv15
+# from voice_changer.MMVCv15.MMVCv15 import MMVCv15
+from voice_changer.MMVCv13.MMVCv13 import MMVCv13
 from voice_changer.IORecorder import IORecorder
 from voice_changer.IOAnalyzer import IOAnalyzer
 
@@ -53,7 +53,8 @@ class VoiceChanger():
         self.currentCrossFadeEndRate = 0
         self.currentCrossFadeOverlapSize = 0
 
-        self.voiceChanger = MMVCv15()
+        # self.voiceChanger = MMVCv15()
+        self.voiceChanger = MMVCv13()
 
         self.gpu_num = torch.cuda.device_count()
         self.prev_audio = np.zeros(1)

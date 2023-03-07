@@ -4,8 +4,8 @@ node_modules
 __pycache__
 
 server/upload_dir/
-server/MMVC_Trainer/
-server/MMVC_Client/
+server/MMVC_Client_v13/
+server/MMVC_Client_v15/
 server/keys
 server/info
 server/in.wav

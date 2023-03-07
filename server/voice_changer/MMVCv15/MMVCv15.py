@@ -1,5 +1,5 @@
 import sys
-sys.path.append("MMVC_Client/python")
+sys.path.append("MMVC_Client_v15/python")
 from dataclasses import dataclass, asdict
 import os
 import numpy as np
@@ -8,7 +8,7 @@ import onnxruntime
 import pyworld as pw
 
 from models import SynthesizerTrn
-from voice_changer.client_modules import convert_continuos_f0, spectrogram_torch, TextAudioSpeakerCollate, get_hparams_from_file, load_checkpoint
+from voice_changer.MMVCv15.client_modules import convert_continuos_f0, spectrogram_torch, TextAudioSpeakerCollate, get_hparams_from_file, load_checkpoint
 
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
