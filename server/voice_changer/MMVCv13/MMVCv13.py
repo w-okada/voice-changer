@@ -1,7 +1,16 @@
 import sys
-sys.path.append("MMVC_Client_v13/python")
-from dataclasses import dataclass, asdict
 import os
+if sys.platform.startswith('darwin'):
+    baseDir = [x for x in sys.path if x.endswith("Contents/MacOS")]
+    if len(baseDir) != 1:
+        print("baseDir should be only one ", baseDir)
+        sys.exit()
+    modulePath = os.path.join(baseDir[0], "MMVC_Client_v13", "python")
+    sys.path.append(modulePath)
+else:
+    sys.path.append("MMVC_Client_v13/python")
+
+from dataclasses import dataclass, asdict
 import numpy as np
 import torch
 import onnxruntime
