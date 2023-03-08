@@ -2,15 +2,6 @@ import os
 import sys
 import tempfile
 
-# MODEL_TYPE = "MMVCv13"
-MODEL_TYPE = "MMVCv15"
-# MODEL_TYPE = "sovt-vits-svc"
-
-if MODEL_TYPE == "MMVCv15":
-    frontend_path = os.path.join(sys._MEIPASS, "dist") if hasattr(sys, "_MEIPASS") else "../client/demo_v15/dist"
-elif MODEL_TYPE == "MMVCv13":
-    frontend_path = os.path.join(sys._MEIPASS, "dist") if hasattr(sys, "_MEIPASS") else "../client/demo_v13/dist"
-
 ERROR_NO_ONNX_SESSION = "ERROR_NO_ONNX_SESSION"
 
 
@@ -30,3 +21,24 @@ os.makedirs(TMP_DIR, exist_ok=True)
 # SSL_KEY_DIR  = os.path.join(sys._MEIPASS, "keys") if hasattr(sys, "_MEIPASS") else "keys"
 # MODEL_DIR = os.path.join(sys._MEIPASS, "logs") if hasattr(sys, "_MEIPASS") else "logs"
 # UPLOAD_DIR = os.path.join(sys._MEIPASS, "upload_dir") if hasattr(sys, "_MEIPASS") else "upload_dir"
+
+
+modelType = "MMVCv15"
+
+
+def getModelType():
+    return modelType
+
+
+def setModelType(_modelType: str):
+    global modelType
+    modelType = _modelType
+
+
+def getFrontendPath():
+    if modelType == "MMVCv15":
+        frontend_path = os.path.join(sys._MEIPASS, "dist") if hasattr(sys, "_MEIPASS") else "../client/demo_v15/dist"
+    elif modelType == "MMVCv13":
+        frontend_path = os.path.join(sys._MEIPASS, "dist") if hasattr(sys, "_MEIPASS") else "../client/demo_v13/dist"
+
+    return frontend_path

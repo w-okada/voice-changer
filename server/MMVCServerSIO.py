@@ -14,7 +14,7 @@ from mods.ssl import create_self_signed_cert
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 from sio.MMVC_SocketIOApp import MMVC_SocketIOApp
 from restapi.MMVC_Rest import MMVC_Rest
-from const import NATIVE_CLIENT_FILE_MAC, NATIVE_CLIENT_FILE_WIN, SSL_KEY_DIR
+from const import NATIVE_CLIENT_FILE_MAC, NATIVE_CLIENT_FILE_WIN, SSL_KEY_DIR, setModelType
 import subprocess
 import multiprocessing as mp
 
@@ -37,6 +37,8 @@ def setupArgParser():
                         default=True, help="generate self-signed certificate")
     parser.add_argument("--colab", type=strtobool,
                         default=False, help="run on colab")
+    parser.add_argument("--modelType", type=str,
+                        default="MMVCv15", help="model type")
 
     return parser
 
@@ -62,12 +64,8 @@ def printMessage(message, level=0):
         else:
             print(f"\033[47m    {message}\033[0m")
 
-# global app_socketio
-# global app_fastapi
-
 
 parser = setupArgParser()
-# args = parser.parse_args()
 args, unknown = parser.parse_known_args()
 
 # printMessage(f"Phase name:{__name__}", level=2)
@@ -75,11 +73,14 @@ args, unknown = parser.parse_known_args()
 
 # if __name__ == thisFilename or args.colab == True:
 # printMessage(f"PHASE3:{__name__}", level=2)
+
 TYPE = args.t
 PORT = args.p
 CONFIG = args.c
 MODEL = args.m if args.m != None else None
 ONNX_MODEL = args.o if args.o != None else None
+MODEL_TYPE = args.modelType
+setModelType(MODEL_TYPE)
 
 
 def localServer():

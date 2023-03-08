@@ -1,4 +1,4 @@
-from const import TMP_DIR, MODEL_TYPE
+from const import TMP_DIR, getModelType
 import torch
 import os
 import traceback
@@ -6,11 +6,6 @@ import numpy as np
 from dataclasses import dataclass, asdict
 import resampy
 
-
-if MODEL_TYPE == "MMVCv15":
-    from voice_changer.MMVCv15.MMVCv15 import MMVCv15
-else:
-    from voice_changer.MMVCv13.MMVCv13 import MMVCv13
 
 from voice_changer.IORecorder import IORecorder
 from voice_changer.IOAnalyzer import IOAnalyzer
@@ -53,9 +48,13 @@ class VoiceChanger():
         self.currentCrossFadeEndRate = 0
         self.currentCrossFadeOverlapSize = 0
 
-        if MODEL_TYPE == "MMVCv15":
+        modelType = getModelType()
+        print("[VoiceChanger] activate model type:", modelType)
+        if modelType == "MMVCv15":
+            from voice_changer.MMVCv15.MMVCv15 import MMVCv15
             self.voiceChanger = MMVCv15()
         else:
+            from voice_changer.MMVCv13.MMVCv13 import MMVCv13
             self.voiceChanger = MMVCv13()
 
         self.gpu_num = torch.cuda.device_count()

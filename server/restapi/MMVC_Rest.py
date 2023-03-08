@@ -9,7 +9,7 @@ from restapi.MMVC_Rest_Hello import MMVC_Rest_Hello
 from restapi.MMVC_Rest_VoiceChanger import MMVC_Rest_VoiceChanger
 from restapi.MMVC_Rest_Fileuploader import MMVC_Rest_Fileuploader
 from restapi.MMVC_Rest_Trainer import MMVC_Rest_Trainer
-from const import frontend_path, TMP_DIR
+from const import getFrontendPath, TMP_DIR
 
 
 class ValidationErrorLoggingRoute(APIRoute):
@@ -44,13 +44,13 @@ class MMVC_Rest:
             )
 
             app_fastapi.mount(
-                "/front", StaticFiles(directory=f'{frontend_path}', html=True), name="static")
+                "/front", StaticFiles(directory=f'{getFrontendPath()}', html=True), name="static")
 
             app_fastapi.mount(
-                "/trainer", StaticFiles(directory=f'{frontend_path}', html=True), name="static")
+                "/trainer", StaticFiles(directory=f'{getFrontendPath()}', html=True), name="static")
 
             app_fastapi.mount(
-                "/recorder", StaticFiles(directory=f'{frontend_path}', html=True), name="static")
+                "/recorder", StaticFiles(directory=f'{getFrontendPath()}', html=True), name="static")
             app_fastapi.mount(
                 "/tmp", StaticFiles(directory=f'{TMP_DIR}'), name="static")
 

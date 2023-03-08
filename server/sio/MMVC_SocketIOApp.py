@@ -2,7 +2,7 @@ import socketio
 
 from sio.MMVC_SocketIOServer import MMVC_SocketIOServer
 from voice_changer.VoiceChangerManager import VoiceChangerManager
-from const import frontend_path
+from const import getFrontendPath
 
 
 class MMVC_SocketIOApp():
@@ -15,19 +15,19 @@ class MMVC_SocketIOApp():
                 other_asgi_app=app_fastapi,
                 static_files={
                     '/assets/icons/github.svg': {
-                        'filename': f'{frontend_path}/assets/icons/github.svg',
+                        'filename': f'{getFrontendPath()}/assets/icons/github.svg',
                         'content_type': 'image/svg+xml'
                     },
                     '/assets/icons/help-circle.svg': {
-                        'filename': f'{frontend_path}/assets/icons/help-circle.svg',
+                        'filename': f'{getFrontendPath()}/assets/icons/help-circle.svg',
                         'content_type': 'image/svg+xml'
                     },
                     '/buymeacoffee.png': {
-                        'filename': f'{frontend_path}/assets/buymeacoffee.png',
+                        'filename': f'{getFrontendPath()}/assets/buymeacoffee.png',
                         'content_type': 'image/png'
                     },
-                    '': f'{frontend_path}',
-                        '/': f'{frontend_path}/index.html',
+                    '': f'{getFrontendPath()}',
+                        '/': f'{getFrontendPath()}/index.html',
                 }
             )
 
