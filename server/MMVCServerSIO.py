@@ -79,7 +79,9 @@ PORT = args.p
 CONFIG = args.c
 MODEL = args.m if args.m != None else None
 ONNX_MODEL = args.o if args.o != None else None
-MODEL_TYPE = args.modelType
+MODEL_TYPE = os.environ.get('MODEL_TYPE', None)
+if MODEL_TYPE == None:
+    MODEL_TYPE = args.modelType
 setModelType(MODEL_TYPE)
 
 
@@ -95,9 +97,6 @@ def localServer():
 
 if args.colab == True:
     os.environ["colab"] = "True"
-# if os.getenv("EX_TB_PORT"):
-#     EX_TB_PORT = os.environ["EX_TB_PORT"]
-#     exApplitionInfo.external_tensorboard_port = int(EX_TB_PORT)
 
 voiceChangerManager = VoiceChangerManager.get_instance()
 if CONFIG and (MODEL or ONNX_MODEL):
@@ -231,7 +230,7 @@ if __name__ == '__main__':
             #     reload = False if hasattr(sys, "_MEIPASS") else True,
             #     log_level="warning"
             # )
-
+            os.environ['MODEL_TYPE'] = MODEL_TYPE
             p = mp.Process(name="p", target=localServer)
             p.start()
             try:
