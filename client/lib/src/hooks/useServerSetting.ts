@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react"
-import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, DefaultServerSetting, ClientType } from "../const"
+import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
@@ -43,7 +43,18 @@ export type ServerSettingState = {
 
 export const useServerSetting = (props: UseServerSettingProps): ServerSettingState => {
     // const settingRef = useRef<VoiceChangerServerSetting>(DefaultVoiceChangerServerSetting)
-    const [serverSetting, setServerSetting] = useState<ServerInfo>(DefaultServerSetting)
+    const defaultServerSetting = useMemo(() => {
+        if (props.clientType == "MMVCv13") {
+            return DefaultServerSetting_MMVCv13
+        } else if (props.clientType == "MMVCv15") {
+            return DefaultServerSetting_MMVCv15
+        } else if (props.clientType == "so-vits-svc") {
+            return DefaultServerSetting_so_vits_svc
+        } else {
+            return DefaultServerSetting_MMVCv15
+        }
+    }, [])
+    const [serverSetting, setServerSetting] = useState<ServerInfo>(defaultServerSetting)
     const [fileUploadSetting, setFileUploadSetting] = useState<FileUploadSetting>(InitialFileUploadSetting)
     const { setItem, getItem, removeItem } = useIndexedDB({ clientType: props.clientType })
 

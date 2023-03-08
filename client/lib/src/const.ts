@@ -98,9 +98,59 @@ export type ServerInfo = VoiceChangerServerSetting & {
     onnxExecutionProviders: OnnxExecutionProvider[]
 }
 
-export const DefaultServerSetting: ServerInfo = {
+export const DefaultServerSetting_MMVCv15: ServerInfo = {
     srcId: 0,
     dstId: 101,
+    gpu: 0,
+
+    crossFadeOffsetRate: 0.0,
+    crossFadeEndRate: 1.0,
+    crossFadeOverlapSize: CrossFadeOverlapSize[1024],
+
+    framework: Framework.PyTorch,
+    f0Factor: 1.0,
+    onnxExecutionProvider: OnnxExecutionProvider.CPUExecutionProvider,
+    f0Detector: F0Detector.dio,
+    recordIO: 0,
+
+    inputSampleRate: 24000,
+
+    // 
+    status: "ok",
+    configFile: "",
+    pyTorchModelFile: "",
+    onnxModelFile: "",
+    onnxExecutionProviders: []
+}
+
+export const DefaultServerSetting_MMVCv13: ServerInfo = {
+    srcId: 107,
+    dstId: 100,
+    gpu: 0,
+
+    crossFadeOffsetRate: 0.0,
+    crossFadeEndRate: 1.0,
+    crossFadeOverlapSize: CrossFadeOverlapSize[1024],
+
+    framework: Framework.ONNX,
+    f0Factor: 1.0,
+    onnxExecutionProvider: OnnxExecutionProvider.CPUExecutionProvider,
+    f0Detector: F0Detector.dio,
+    recordIO: 0,
+
+    inputSampleRate: 24000,
+
+    // 
+    status: "ok",
+    configFile: "",
+    pyTorchModelFile: "",
+    onnxModelFile: "",
+    onnxExecutionProviders: []
+}
+
+export const DefaultServerSetting_so_vits_svc: ServerInfo = {
+    srcId: 0,
+    dstId: 0,
     gpu: 0,
 
     crossFadeOffsetRate: 0.0,
