@@ -1,7 +1,7 @@
 import { ClientState } from "@dannadori/voice-changer-client-js";
 import React, { useContext, useEffect, useRef } from "react";
 import { ReactNode } from "react";
-import { useVCClient, VCClientState } from "../001_globalHooks/001_useVCClient";
+import { useVCClient } from "../001_globalHooks/001_useVCClient";
 import { FrontendManagerStateAndMethod, useFrontendManager } from "../001_globalHooks/010_useFrontendManager";
 import { useAppRoot } from "./001_AppRootProvider";
 

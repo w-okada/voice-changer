@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useMemo, useState } from "react"
 import { useAppState } from "./001_provider/001_AppStateProvider";
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./components/101_HeaderButton";
 

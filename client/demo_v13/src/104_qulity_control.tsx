@@ -1,4 +1,3 @@
-import { F0Detector } from "@dannadori/voice-changer-client-js"
 import React, { useEffect, useMemo, useState } from "react"
 import { useAppState } from "./001_provider/001_AppStateProvider";
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./components/101_HeaderButton";

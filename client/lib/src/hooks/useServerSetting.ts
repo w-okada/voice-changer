@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react"
-import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, DefaultServerSetting } from "../const"
+import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, DefaultServerSetting, ClientType } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
@@ -23,6 +23,7 @@ const InitialFileUploadSetting: FileUploadSetting = {
 }
 
 export type UseServerSettingProps = {
+    clientType: ClientType
     voiceChangerClient: VoiceChangerClient | null
 }
 
@@ -44,7 +45,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
     // const settingRef = useRef<VoiceChangerServerSetting>(DefaultVoiceChangerServerSetting)
     const [serverSetting, setServerSetting] = useState<ServerInfo>(DefaultServerSetting)
     const [fileUploadSetting, setFileUploadSetting] = useState<FileUploadSetting>(InitialFileUploadSetting)
-    const { setItem, getItem, removeItem } = useIndexedDB()
+    const { setItem, getItem, removeItem } = useIndexedDB({ clientType: props.clientType })
 
 
     // DBから設定取得（キャッシュによる初期化）

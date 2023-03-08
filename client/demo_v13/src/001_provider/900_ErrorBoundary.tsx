@@ -1,4 +1,4 @@
-import React, { createRef, ErrorInfo } from 'react';
+import React, { ErrorInfo } from 'react';
 
 type ErrorBoundaryProps = {
     children: React.ReactNode;

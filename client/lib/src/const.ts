@@ -4,6 +4,13 @@
 // 24000sample -> 1sec, 128sample(1chunk) -> 5.333msec
 // 187.5chunk -> 1sec
 
+export const ClientType = {
+    "MMVCv15": "MMVCv15",
+    "MMVCv13": "MMVCv13",
+    "so-vits-svc": "so-vits-svc",
+} as const
+export type ClientType = typeof ClientType[keyof typeof ClientType]
+
 ///////////////////////
 // サーバセッティング
 ///////////////////////

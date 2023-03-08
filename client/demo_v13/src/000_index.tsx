@@ -5,7 +5,6 @@ import { ErrorInfo, useMemo, useState, } from "react";
 import { useMicrophoneOptions } from "./100_options_microphone";
 import { AppStateProvider, useAppState } from "./001_provider/001_AppStateProvider";
 
-import localForage from "localforage";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { far } from "@fortawesome/free-regular-svg-icons";
@@ -13,7 +12,7 @@ import { fab } from "@fortawesome/free-brands-svg-icons";
 import { AppRootProvider } from "./001_provider/001_AppRootProvider";
 import ErrorBoundary from "./001_provider/900_ErrorBoundary";
 import { INDEXEDDB_KEY_CLIENT, INDEXEDDB_KEY_MODEL_DATA, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_WORKLET, INDEXEDDB_KEY_WORKLETNODE, useIndexedDB } from "@dannadori/voice-changer-client-js";
-import { INDEXEDDB_KEY_AUDIO_OUTPUT } from "./const";
+import { CLIENT_TYPE, INDEXEDDB_KEY_AUDIO_OUTPUT } from "./const";
 
 library.add(fas, far, fab);
 
@@ -23,7 +22,7 @@ const root = createRoot(container);
 
 const App = () => {
     const appState = useAppState()
-    const { removeItem } = useIndexedDB()
+    const { removeItem } = useIndexedDB({ clientType: CLIENT_TYPE })
     const { voiceChangerSetting } = useMicrophoneOptions()
     const titleRow = useMemo(() => {
         return (
@@ -93,14 +92,7 @@ const App = () => {
 const AppStateWrapper = () => {
     // エラーバウンダリー設定
     const [error, setError] = useState<{ error: Error, errorInfo: ErrorInfo }>()
-    const { removeItem } = useIndexedDB()
-    // localForage.config({
-    //     driver: localForage.INDEXEDDB,
-    //     name: INDEXEDDB_DB_APP_NAME,
-    //     version: 1.0,
-    //     storeName: INDEXEDDB_DB_NAME,
-    //     description: 'appStorage'
-    // })
+    const { removeItem } = useIndexedDB({ clientType: CLIENT_TYPE })
 
     const errorComponent = useMemo(() => {
         const errorName = error?.error.name || "no error name"

@@ -1,8 +1,10 @@
 import localForage from "localforage";
 import { useMemo } from "react";
-import { INDEXEDDB_DB_APP_NAME, INDEXEDDB_DB_NAME } from "../const";
+import { ClientType, INDEXEDDB_DB_APP_NAME, INDEXEDDB_DB_NAME } from "../const";
 
-
+export type UseIndexedDBProps = {
+    clientType: ClientType
+}
 export type IndexedDBState = {
     dummy: string
 }
@@ -13,12 +15,12 @@ export type IndexedDBStateAndMethod = IndexedDBState & {
     // clearAll: () => Promise<void>
 }
 
-export const useIndexedDB = (): IndexedDBStateAndMethod => {
+export const useIndexedDB = (props: UseIndexedDBProps): IndexedDBStateAndMethod => {
     localForage.config({
         driver: localForage.INDEXEDDB,
         name: INDEXEDDB_DB_APP_NAME,
         version: 1.0,
-        storeName: INDEXEDDB_DB_NAME,
+        storeName: `${INDEXEDDB_DB_NAME}_${props.clientType}`,
         description: 'appStorage'
 
     })

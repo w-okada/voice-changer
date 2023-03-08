@@ -1,6 +1,6 @@
 import { fileSelectorAsDataURL, useIndexedDB } from "@dannadori/voice-changer-client-js"
 import React, { useEffect, useMemo, useRef, useState } from "react"
-import { AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_CONVERTED, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, INDEXEDDB_KEY_AUDIO_OUTPUT } from "./const"
+import { AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_CONVERTED, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, CLIENT_TYPE, INDEXEDDB_KEY_AUDIO_OUTPUT } from "./const"
 import { useAppState } from "./001_provider/001_AppStateProvider";
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./components/101_HeaderButton";
 
@@ -71,7 +71,7 @@ export const useDeviceSetting = (): DeviceSettingState => {
     const [audioInputForGUI, setAudioInputForGUI] = useState<string>("none")
     const [audioOutputForGUI, setAudioOutputForGUI] = useState<string>("none")
     const [fileInputEchoback, setFileInputEchoback] = useState<boolean>()//最初のmuteが有効になるように。undefined
-    const { getItem, setItem } = useIndexedDB()
+    const { getItem, setItem } = useIndexedDB({ clientType: CLIENT_TYPE })
 
     const audioSrcNode = useRef<MediaElementAudioSourceNode>()
 

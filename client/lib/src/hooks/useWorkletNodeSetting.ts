@@ -1,10 +1,11 @@
 import { useState, useMemo, useEffect } from "react"
 
-import { DefaultWorkletNodeSetting, INDEXEDDB_KEY_WORKLETNODE, WorkletNodeSetting } from "../const"
+import { ClientType, DefaultWorkletNodeSetting, INDEXEDDB_KEY_WORKLETNODE, WorkletNodeSetting } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
 export type UseWorkletNodeSettingProps = {
+    clientType: ClientType
     voiceChangerClient: VoiceChangerClient | null
 }
 
@@ -19,7 +20,7 @@ export type WorkletNodeSettingState = {
 
 export const useWorkletNodeSetting = (props: UseWorkletNodeSettingProps): WorkletNodeSettingState => {
     const [workletNodeSetting, _setWorkletNodeSetting] = useState<WorkletNodeSetting>(DefaultWorkletNodeSetting)
-    const { setItem, getItem, removeItem } = useIndexedDB()
+    const { setItem, getItem, removeItem } = useIndexedDB({ clientType: props.clientType })
 
     // 初期化 その１ DBから取得
     useEffect(() => {

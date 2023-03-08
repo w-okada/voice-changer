@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react"
+import { ClientType } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { ClientSettingState, useClientSetting } from "./useClientSetting"
+import { IndexedDBStateAndMethod, useIndexedDB } from "./useIndexedDB"
 import { ServerSettingState, useServerSetting } from "./useServerSetting"
 import { useWorkletNodeSetting, WorkletNodeSettingState } from "./useWorkletNodeSetting"
 import { useWorkletSetting, WorkletSettingState } from "./useWorkletSetting"
@@ -8,6 +10,7 @@ import { useWorkletSetting, WorkletSettingState } from "./useWorkletSetting"
 export type UseClientProps = {
     audioContext: AudioContext | null
     audioOutputElementId: string
+    clientType: ClientType
 }
 
 export type ClientState = {
@@ -17,6 +20,7 @@ export type ClientState = {
     clientSetting: ClientSettingState
     workletNodeSetting: WorkletNodeSettingState
     serverSetting: ServerSettingState
+    indexedDBState: IndexedDBStateAndMethod
 
     // モニタリングデータ
     bufferingTime: number;
@@ -58,10 +62,12 @@ export const useClient = (props: UseClientProps): ClientState => {
 
 
     // (1-2) 各種設定I/F
-    const clientSetting = useClientSetting({ voiceChangerClient, audioContext: props.audioContext })
-    const workletNodeSetting = useWorkletNodeSetting({ voiceChangerClient })
-    const workletSetting = useWorkletSetting({ voiceChangerClient })
-    const serverSetting = useServerSetting({ voiceChangerClient })
+    const clientSetting = useClientSetting({ clientType: props.clientType, voiceChangerClient, audioContext: props.audioContext })
+    const workletNodeSetting = useWorkletNodeSetting({ clientType: props.clientType, voiceChangerClient })
+    const workletSetting = useWorkletSetting({ clientType: props.clientType, voiceChangerClient })
+    const serverSetting = useServerSetting({ clientType: props.clientType, voiceChangerClient })
+    const indexedDBState = useIndexedDB({ clientType: props.clientType })
+
 
     // (1-3) モニタリングデータ
     const [bufferingTime, setBufferingTime] = useState<number>(0)
@@ -142,6 +148,7 @@ export const useClient = (props: UseClientProps): ClientState => {
         workletNodeSetting,
         workletSetting,
         serverSetting,
+        indexedDBState,
 
         // モニタリングデータ
         bufferingTime,

@@ -1,10 +1,11 @@
 import { useState, useMemo, useEffect } from "react"
 
-import { VoiceChangerClientSetting, DefaultVoiceChangerClientSetting, INDEXEDDB_KEY_CLIENT } from "../const"
+import { VoiceChangerClientSetting, DefaultVoiceChangerClientSetting, INDEXEDDB_KEY_CLIENT, ClientType } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
 export type UseClientSettingProps = {
+    clientType: ClientType
     voiceChangerClient: VoiceChangerClient | null
     audioContext: AudioContext | null
 }
@@ -22,7 +23,7 @@ export type ClientSettingState = {
 
 export const useClientSetting = (props: UseClientSettingProps): ClientSettingState => {
     const [clientSetting, setClientSetting] = useState<VoiceChangerClientSetting>(DefaultVoiceChangerClientSetting)
-    const { setItem, getItem, removeItem } = useIndexedDB()
+    const { setItem, getItem, removeItem } = useIndexedDB({ clientType: props.clientType })
 
     // 初期化 その１ DBから取得
     useEffect(() => {
