@@ -147,7 +147,7 @@ class VoiceChanger():
     #  receivedData: tuple of short
     def on_request(self, receivedData: any):
         processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
-        print(f"------------ Convert processing.... ------------")
+        print_convert_processing(f"------------ Convert processing.... ------------")
         # 前処理
         with Timer("pre-process") as t:
 
@@ -158,7 +158,8 @@ class VoiceChanger():
 
             inputSize = newData.shape[0]
             convertSize = inputSize + min(self.settings.crossFadeOverlapSize, inputSize)
-            print(f" Input data size of {receivedData.shape[0]}/{self.settings.inputSampleRate}hz {inputSize}/{processing_sampling_rate}hz")
+            print_convert_processing(
+                f" Input data size of {receivedData.shape[0]}/{self.settings.inputSampleRate}hz {inputSize}/{processing_sampling_rate}hz")
 
             if convertSize < 8192:
                 convertSize = 8192
@@ -170,8 +171,9 @@ class VoiceChanger():
             overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
             cropRange = (-1 * (inputSize + overlapSize), -1 * overlapSize)
 
-            print(f" Convert input data size of {convertSize}")
-            print(f"         overlap:{overlapSize}, cropRange:{cropRange}")
+            print_convert_processing(f" Convert input data size of {convertSize}")
+            print_convert_processing(f"         overlap:{overlapSize}, cropRange:{cropRange}")
+
             self._generate_strength(inputSize)
             data = self.voiceChanger.generate_input(newData, convertSize, cropRange)
         preprocess_time = t.secs
@@ -190,16 +192,18 @@ class VoiceChanger():
                     cur_overlap = audio[cur_overlap_start:cur_overlap_end]
                     # cur_overlap = audio[-1 * (inputSize + overlapSize):-1 * inputSize]
                     powered_prev = prev_overlap * self.np_prev_strength
-                    print(f" ---- ---- ---- audio:{audio.shape}, cur_overlap:{cur_overlap.shape}, self.np_cur_strength:{self.np_cur_strength.shape}")
-                    print(f" ---- ---- ---------------- {cur_overlap_start}, {cur_overlap_end}")
+                    print_convert_processing(
+                        f" audio:{audio.shape}, cur_overlap:{cur_overlap.shape}, self.np_cur_strength:{self.np_cur_strength.shape}")
+                    print_convert_processing(f" cur_overlap_strt:{cur_overlap_start}, cur_overlap_end{cur_overlap_end}")
                     powered_cur = cur_overlap * self.np_cur_strength
                     powered_result = powered_prev + powered_cur
 
                     cur = audio[-1 * inputSize:-1 * overlapSize]
                     result = np.concatenate([powered_result, cur], axis=0)
-                    print(f" overlap:{overlapSize}, current:{cur.shape[0]}, result:{result.shape[0]}... result should be same as input")
-                    # print(prev_overlap.shape, self.np_prev_strength.shape, cur_overlap.shape, self.np_cur_strength.shape)
-                    # print(">>>>>>>>>>>", -1 * (inputSize + overlapSize), -1 * inputSize, self.np_prev_audio1.shape, overlapSize)
+                    print_convert_processing(
+                        f" overlap:{overlapSize}, current:{cur.shape[0]}, result:{result.shape[0]}... result should be same as input")
+                    if cur.shape[0] != result.shape[0]:
+                        print_convert_processing(f" current and result should be same as input")
 
                 else:
                     result = np.zeros(4096).astype(np.int16)
@@ -221,7 +225,8 @@ class VoiceChanger():
             else:
                 outputData = result
 
-            print(f" Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
+            print_convert_processing(
+                f" Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
 
             if self.settings.recordIO == 1:
                 self.ioRecorder.writeInput(receivedData)
@@ -229,14 +234,24 @@ class VoiceChanger():
 
             if receivedData.shape[0] != outputData.shape[0]:
                 outputData = pad_array(outputData, receivedData.shape[0])
-                print(
+                print_convert_processing(
                     f" Padded!, Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
 
         postprocess_time = t.secs
 
-        print(" [fin] Input/Output size:", receivedData.shape[0], outputData.shape[0])
+        print_convert_processing(f" [fin] Input/Output size:{receivedData.shape[0]},{outputData.shape[0]}")
         perf = [preprocess_time, mainprocess_time, postprocess_time]
         return outputData, perf
+
+
+##############
+PRINT_CONVERT_PROCESSING = False
+# PRINT_CONVERT_PROCESSING = True
+
+
+def print_convert_processing(mess: str):
+    if PRINT_CONVERT_PROCESSING == True:
+        print(mess)
 
 
 def pad_array(arr, target_length):
@@ -249,8 +264,6 @@ def pad_array(arr, target_length):
         pad_right = pad_width - pad_left
         padded_arr = np.pad(arr, (pad_left, pad_right), 'constant', constant_values=(0, 0))
         return padded_arr
-
-##############
 
 
 class Timer(object):

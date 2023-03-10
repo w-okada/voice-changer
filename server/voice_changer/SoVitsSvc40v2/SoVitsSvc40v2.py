@@ -141,7 +141,8 @@ class SoVitsSvc40v2:
         wav_44k = audio_buffer
         # f0 = utils.compute_f0_parselmouth(wav, sampling_rate=self.target_sample, hop_length=self.hop_size)
         f0 = utils.compute_f0_dio(wav_44k, sampling_rate=self.hps.data.sampling_rate, hop_length=self.hps.data.hop_length)
-        print(f"--- >>>>> ---- >>>> {wav_44k.shape[0] / self.hps.data.hop_length}")
+        if wav_44k.shape[0] % self.hps.data.hop_length != 0:
+            print(f" !!! !!! !!! wav size not multiple of hopsize: {wav_44k.shape[0] / self.hps.data.hop_length}")
 
         f0, uv = utils.interpolate_f0(f0)
         f0 = torch.FloatTensor(f0)
