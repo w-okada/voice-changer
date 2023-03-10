@@ -147,6 +147,8 @@ class VoiceChanger():
     #  receivedData: tuple of short
     def on_request(self, receivedData: any):
         processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
+        processing_hop_length = self.voiceChanger.get_processing_hop_length()
+
         print_convert_processing(f"------------ Convert processing.... ------------")
         # 前処理
         with Timer("pre-process") as t:
@@ -163,10 +165,9 @@ class VoiceChanger():
 
             if convertSize < 8192:
                 convertSize = 8192
-            # if convertSize % 128 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
-            #     convertSize = convertSize + (128 - (convertSize % 128))
-            if convertSize % 512 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
-                convertSize = convertSize + (512 - (convertSize % 512))
+
+            if convertSize % processing_hop_length != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
+                convertSize = convertSize + (processing_hop_length - (convertSize % processing_hop_length))
 
             overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
             cropRange = (-1 * (inputSize + overlapSize), -1 * overlapSize)

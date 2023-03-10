@@ -137,6 +137,9 @@ class SoVitsSvc40v2:
     def get_processing_sampling_rate(self):
         return self.hps.data.sampling_rate
 
+    def get_processing_hop_length(self):
+        return self.hps.data.hop_length
+
     def get_unit_f0(self, audio_buffer, tran):
         wav_44k = audio_buffer
         # f0 = utils.compute_f0_parselmouth(wav, sampling_rate=self.target_sample, hop_length=self.hop_size)
