@@ -38,7 +38,7 @@ def setupArgParser():
     parser.add_argument("--colab", type=strtobool,
                         default=False, help="run on colab")
     parser.add_argument("--modelType", type=str,
-                        default="MMVCv15", help="model type")
+                        default="MMVCv15", help="model type: MMVCv13, MMVCv15, so-vits-svc-40v2")
 
     return parser
 

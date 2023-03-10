@@ -27,4 +27,10 @@ cd ..
 cd MMVC_Client
 git checkout 6dd4f2451fec701d85f611fa831d7e5f4ddce8da
 cd ..
+
+# for so-vits-svc
+cd so-vits-svc/
+git checkout 016db3de81f6a4034b85ffba120554d07829f132
+cd ..
+
 ```

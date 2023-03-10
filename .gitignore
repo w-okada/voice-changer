@@ -6,6 +6,7 @@ __pycache__
 server/upload_dir/
 server/MMVC_Client_v13/
 server/MMVC_Client_v15/
+server/so-vits-svc-40v2/
 server/keys
 server/info
 server/in.wav

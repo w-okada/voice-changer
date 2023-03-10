@@ -12,7 +12,7 @@ from voice_changer.IOAnalyzer import IOAnalyzer
 
 
 import time
-
+import librosa
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
 STREAM_INPUT_FILE = os.path.join(TMP_DIR, "in.wav")
@@ -53,6 +53,13 @@ class VoiceChanger():
         if modelType == "MMVCv15":
             from voice_changer.MMVCv15.MMVCv15 import MMVCv15
             self.voiceChanger = MMVCv15()
+        elif modelType == "MMVCv13":
+            from voice_changer.MMVCv13.MMVCv13 import MMVCv13
+            self.voiceChanger = MMVCv13()
+        elif modelType == "so-vits-svc-40v2":
+            from voice_changer.SoVitsSvc40v2.SoVitsSvc40v2 import SoVitsSvc40v2
+            self.voiceChanger = SoVitsSvc40v2()
+
         else:
             from voice_changer.MMVCv13.MMVCv13 import MMVCv13
             self.voiceChanger = MMVCv13()
@@ -139,24 +146,32 @@ class VoiceChanger():
 
     #  receivedData: tuple of short
     def on_request(self, receivedData: any):
-
+        processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
+        print(f"------------ Convert processing.... ------------")
         # 前処理
         with Timer("pre-process") as t:
 
-            if self.settings.inputSampleRate != 24000:
-                newData = resampy.resample(receivedData, self.settings.inputSampleRate, 24000)
+            if self.settings.inputSampleRate != processing_sampling_rate:
+                newData = resampy.resample(receivedData, self.settings.inputSampleRate, processing_sampling_rate)
             else:
                 newData = receivedData
 
             inputSize = newData.shape[0]
             convertSize = inputSize + min(self.settings.crossFadeOverlapSize, inputSize)
-            # print(convertSize, unpackedData.shape[0])
+            print(f" Input data size of {receivedData.shape[0]}/{self.settings.inputSampleRate}hz {inputSize}/{processing_sampling_rate}hz")
+
             if convertSize < 8192:
                 convertSize = 8192
             if convertSize % 128 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
                 convertSize = convertSize + (128 - (convertSize % 128))
+
+            overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
+            cropRange = (-1 * (inputSize + overlapSize), -1 * overlapSize)
+
+            print(f" Convert input data size of {convertSize}")
+            print(f"         overlap:{overlapSize}, cropRange:{cropRange}")
             self._generate_strength(inputSize)
-            data = self.voiceChanger.generate_input(newData, convertSize)
+            data = self.voiceChanger.generate_input(newData, convertSize, cropRange)
         preprocess_time = t.secs
 
         # 変換処理
@@ -165,10 +180,8 @@ class VoiceChanger():
                 # Inference
                 audio = self.voiceChanger.inference(data)
 
-                # CrossFade
                 if hasattr(self, 'np_prev_audio1') == True:
                     np.set_printoptions(threshold=10000)
-                    overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
                     prev_overlap = self.np_prev_audio1[-1 * overlapSize:]
                     cur_overlap = audio[-1 * (inputSize + overlapSize):-1 * inputSize]
                     powered_prev = prev_overlap * self.np_prev_strength
@@ -177,6 +190,7 @@ class VoiceChanger():
 
                     cur = audio[-1 * inputSize:-1 * overlapSize]
                     result = np.concatenate([powered_result, cur], axis=0)
+                    print(f" overlap:{overlapSize}, current:{cur.shape[0]}, result:{result.shape[0]}... result should be same as input")
                     # print(prev_overlap.shape, self.np_prev_strength.shape, cur_overlap.shape, self.np_cur_strength.shape)
                     # print(">>>>>>>>>>>", -1 * (inputSize + overlapSize), -1 * inputSize, self.np_prev_audio1.shape, overlapSize)
 
@@ -195,20 +209,43 @@ class VoiceChanger():
         # 後処理
         with Timer("post-process") as t:
             result = result.astype(np.int16)
-            if self.settings.inputSampleRate != 24000:
-                result = resampy.resample(result, 24000, self.settings.inputSampleRate).astype(np.int16)
+            if self.settings.inputSampleRate != processing_sampling_rate:
+                outputData = resampy.resample(result, processing_sampling_rate, self.settings.inputSampleRate).astype(np.int16)
+            else:
+                outputData = result
+
+            print(f" Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
 
             if self.settings.recordIO == 1:
                 self.ioRecorder.writeInput(receivedData)
-                self.ioRecorder.writeOutput(result.tobytes())
+                self.ioRecorder.writeOutput(outputData.tobytes())
+
+            if receivedData.shape[0] != outputData.shape[0]:
+                outputData = pad_array(outputData, receivedData.shape[0])
+                print(
+                    f" Padded!, Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
 
         postprocess_time = t.secs
 
+        print(" [fin] Input/Output size:", receivedData.shape[0], outputData.shape[0])
         perf = [preprocess_time, mainprocess_time, postprocess_time]
-        return result, perf
+        return outputData, perf
 
+
+def pad_array(arr, target_length):
+    current_length = arr.shape[0]
+    if current_length >= target_length:
+        return arr
+    else:
+        pad_width = target_length - current_length
+        pad_left = pad_width // 2
+        pad_right = pad_width - pad_left
+        padded_arr = np.pad(arr, (pad_left, pad_right), 'constant', constant_values=(0, 0))
+        return padded_arr
 
 ##############
+
+
 class Timer(object):
     def __init__(self, title: str):
         self.title = title
