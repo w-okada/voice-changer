@@ -29,11 +29,13 @@ providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecution
 @dataclass
 class SoVitsSvc40v2Settings():
     gpu: int = 0
-    srcId: int = 0
     dstId: int = 101
 
-    f0Factor: float = 1.0
     f0Detector: str = "dio"  # dio or harvest
+    tran: int = 0
+    noiceScale: float = 0.3
+    predictF0: int = 0  # 0:False, 1:True
+    silentThreshold: float = 0.00001
 
     framework: str = "PyTorch"  # PyTorch or ONNX
     pyTorchModelFile: str = ""
@@ -41,8 +43,8 @@ class SoVitsSvc40v2Settings():
     configFile: str = ""
 
     # ↓mutableな物だけ列挙
-    intData = ["gpu", "srcId", "dstId"]
-    floatData = ["f0Factor"]
+    intData = ["gpu", "dstId", "tran", "predictF0"]
+    floatData = ["noiceScale", "silentThreshold"]
     strData = ["framework", "f0Detector"]
 
 
@@ -63,7 +65,6 @@ class SoVitsSvc40v2:
         # hubert model
         print("loading hubert model")
         vec_path = "hubert/checkpoint_best_legacy_500.pt"
-        print("load model(s) from {}".format(vec_path))
         models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(
             [vec_path],
             suffix="",
@@ -177,9 +178,8 @@ class SoVitsSvc40v2:
         rms = np.sqrt(np.square(crop).mean(axis=0))
         vol = max(rms, self.prevVol * 0.1)
         self.prevVol = vol
-        # print(f"         Crop:{crop.shape}, vol{vol}")
 
-        c, f0, uv = self.get_unit_f0(self.audio_buffer, 20)
+        c, f0, uv = self.get_unit_f0(self.audio_buffer, self.settings.tran)
         return (c, f0, uv, convertSize, vol)
 
     def _onnx_inference(self, data):
@@ -199,17 +199,17 @@ class SoVitsSvc40v2:
         vol = data[4]
         data = (data[0], data[1], data[2],)
 
-        # if vol < 0.00001:
-        #     print("silcent")
-        #     return np.zeros(convertSize).astype(np.int16)
-        # print(vol)
+        if vol < self.settings.silentThreshold:
+            return np.zeros(convertSize).astype(np.int16)
 
         with torch.no_grad():
             c, f0, uv = [x.to(dev)for x in data]
-            sid_target = torch.LongTensor([0]).to(dev)
+            sid_target = torch.LongTensor([self.settings.dstId]).to(dev)
             self.net_g.to(dev)
             # audio1 = self.net_g.infer(c, f0=f0, g=sid_target, uv=uv, predict_f0=True, noice_scale=0.1)[0][0, 0].data.float()
-            audio1 = self.net_g.infer(c, f0=f0, g=sid_target, uv=uv, predict_f0=False, noice_scale=0.4)[0][0, 0].data.float()
+            predict_f0_flag = True if self.settings.predictF0 == 1 else False
+            audio1 = self.net_g.infer(c, f0=f0, g=sid_target, uv=uv, predict_f0=predict_f0_flag,
+                                      noice_scale=self.settings.noiceScale)[0][0, 0].data.float()
             audio1 = audio1 * self.hps.data.max_wav_value
 
             result = audio1.float().cpu().numpy()

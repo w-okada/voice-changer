@@ -14,6 +14,19 @@ logger.addFilter(UvicornSuppressFilter())
 logger = logging.getLogger("fairseq.tasks.hubert_pretraining")
 logger.addFilter(UvicornSuppressFilter())
 
+logger = logging.getLogger("fairseq.models.hubert.hubert")
+logger.addFilter(UvicornSuppressFilter())
+
+logger = logging.getLogger("numba.core.ssa")
+logger.addFilter(UvicornSuppressFilter())
+
+logger = logging.getLogger("numba.core.interpreter")
+logger.addFilter(UvicornSuppressFilter())
+
+logger = logging.getLogger("numba.core.byteflow")
+logger.addFilter(UvicornSuppressFilter())
+
+
 # logger.propagate = False
 
 logger = logging.getLogger("multipart.multipart")
