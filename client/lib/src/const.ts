@@ -66,6 +66,11 @@ export const ServerSettingKey = {
     "f0Detector": "f0Detector",
     "recordIO": "recordIO",
 
+    "tran": "tran",
+    "noiceScale": "noiceScale",
+    "predictF0": "predictF0",
+    "silentThreshold": "silentThreshold",
+
     "inputSampleRate": "inputSampleRate",
 } as const
 export type ServerSettingKey = typeof ServerSettingKey[keyof typeof ServerSettingKey]
@@ -86,6 +91,11 @@ export type VoiceChangerServerSetting = {
     f0Factor: number
     f0Detector: F0Detector // dio or harvest
     recordIO: number // 0:off, 1:on
+
+    tran: number // so-vits-svc
+    noiceScale: number // so-vits-svc
+    predictF0: number // so-vits-svc
+    silentThreshold: number // so-vits-svc
 
     inputSampleRate: InputSampleRate
 }
@@ -113,6 +123,11 @@ export const DefaultServerSetting_MMVCv15: ServerInfo = {
     f0Detector: F0Detector.dio,
     recordIO: 0,
 
+    tran: 0,
+    noiceScale: 0,
+    predictF0: 0,
+    silentThreshold: 0,
+
     inputSampleRate: 24000,
 
     // 
@@ -138,6 +153,11 @@ export const DefaultServerSetting_MMVCv13: ServerInfo = {
     f0Detector: F0Detector.dio,
     recordIO: 0,
 
+    tran: 0,
+    noiceScale: 0,
+    predictF0: 0,
+    silentThreshold: 0,
+
     inputSampleRate: 24000,
 
     // 
@@ -162,6 +182,11 @@ export const DefaultServerSetting_so_vits_svc: ServerInfo = {
     onnxExecutionProvider: OnnxExecutionProvider.CPUExecutionProvider,
     f0Detector: F0Detector.dio,
     recordIO: 0,
+
+    tran: 10,
+    noiceScale: 0.3,
+    predictF0: 0,
+    silentThreshold: 0.00001,
 
     inputSampleRate: 24000,
 
