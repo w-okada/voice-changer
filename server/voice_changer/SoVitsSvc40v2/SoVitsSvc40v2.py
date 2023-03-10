@@ -29,7 +29,7 @@ providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecution
 @dataclass
 class SoVitsSvc40v2Settings():
     gpu: int = 0
-    dstId: int = 101
+    dstId: int = 0
 
     f0Detector: str = "dio"  # dio or harvest
     tran: int = 20
