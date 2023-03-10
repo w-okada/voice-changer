@@ -7,7 +7,7 @@
 export const ClientType = {
     "MMVCv15": "MMVCv15",
     "MMVCv13": "MMVCv13",
-    "so-vits-svc": "so-vits-svc",
+    "so_vits_svc_40v2c": "so_vits_svc_40v2c",
 } as const
 export type ClientType = typeof ClientType[keyof typeof ClientType]
 
@@ -168,7 +168,7 @@ export const DefaultServerSetting_MMVCv13: ServerInfo = {
     onnxExecutionProviders: []
 }
 
-export const DefaultServerSetting_so_vits_svc: ServerInfo = {
+export const DefaultServerSetting_so_vits_svc_40v2: ServerInfo = {
     srcId: 0,
     dstId: 0,
     gpu: 0,
