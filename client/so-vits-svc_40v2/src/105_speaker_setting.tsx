@@ -38,7 +38,7 @@ export const useSpeakerSetting = () => {
                 <div className="body-item-text"></div>
             </div>
         )
-    }, [appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId, appState.clientSetting.clientSetting.speakers, appState.serverSetting.updateServerSettings])
+    }, [appState.serverSetting.serverSetting, appState.serverSetting.updateServerSettings])
 
 
     const tranRow = useMemo(() => {
