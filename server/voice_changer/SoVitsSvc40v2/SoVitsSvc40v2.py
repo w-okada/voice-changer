@@ -32,7 +32,7 @@ class SoVitsSvc40v2Settings():
     dstId: int = 101
 
     f0Detector: str = "dio"  # dio or harvest
-    tran: int = 0
+    tran: int = 20
     noiceScale: float = 0.3
     predictF0: int = 0  # 0:False, 1:True
     silentThreshold: float = 0.00001
@@ -63,7 +63,6 @@ class SoVitsSvc40v2:
         self.hps = utils.get_hparams_from_file(config)
 
         # hubert model
-        print("loading hubert model")
         vec_path = "hubert/checkpoint_best_legacy_500.pt"
         models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(
             [vec_path],

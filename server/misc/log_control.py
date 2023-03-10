@@ -17,6 +17,10 @@ logger.addFilter(UvicornSuppressFilter())
 logger = logging.getLogger("fairseq.models.hubert.hubert")
 logger.addFilter(UvicornSuppressFilter())
 
+logger = logging.getLogger("fairseq.tasks.text_to_speech")
+logger.addFilter(UvicornSuppressFilter())
+
+
 logger = logging.getLogger("numba.core.ssa")
 logger.addFilter(UvicornSuppressFilter())
 
