@@ -65,7 +65,7 @@ class VoiceChanger():
             self.voiceChanger = MMVCv13()
 
         self.gpu_num = torch.cuda.device_count()
-        self.prev_audio = np.zeros(1)
+        self.prev_audio = np.zeros(4096)
         self.mps_enabled = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
 
         print(f"VoiceChanger Initialized (GPU_NUM:{self.gpu_num}, mps_enabled:{self.mps_enabled})")
@@ -162,8 +162,10 @@ class VoiceChanger():
 
             if convertSize < 8192:
                 convertSize = 8192
-            if convertSize % 128 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
-                convertSize = convertSize + (128 - (convertSize % 128))
+            # if convertSize % 128 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
+            #     convertSize = convertSize + (128 - (convertSize % 128))
+            if convertSize % 512 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
+                convertSize = convertSize + (512 - (convertSize % 512))
 
             overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
             cropRange = (-1 * (inputSize + overlapSize), -1 * overlapSize)
@@ -183,8 +185,13 @@ class VoiceChanger():
                 if hasattr(self, 'np_prev_audio1') == True:
                     np.set_printoptions(threshold=10000)
                     prev_overlap = self.np_prev_audio1[-1 * overlapSize:]
-                    cur_overlap = audio[-1 * (inputSize + overlapSize):-1 * inputSize]
+                    cur_overlap_start = -1 * (inputSize + overlapSize)
+                    cur_overlap_end = -1 * inputSize
+                    cur_overlap = audio[cur_overlap_start:cur_overlap_end]
+                    # cur_overlap = audio[-1 * (inputSize + overlapSize):-1 * inputSize]
                     powered_prev = prev_overlap * self.np_prev_strength
+                    print(f" ---- ---- ---- audio:{audio.shape}, cur_overlap:{cur_overlap.shape}, self.np_cur_strength:{self.np_cur_strength.shape}")
+                    print(f" ---- ---- ---------------- {cur_overlap_start}, {cur_overlap_end}")
                     powered_cur = cur_overlap * self.np_cur_strength
                     powered_result = powered_prev + powered_cur
 
@@ -195,7 +202,7 @@ class VoiceChanger():
                     # print(">>>>>>>>>>>", -1 * (inputSize + overlapSize), -1 * inputSize, self.np_prev_audio1.shape, overlapSize)
 
                 else:
-                    result = np.zeros(1).astype(np.int16)
+                    result = np.zeros(4096).astype(np.int16)
                 self.np_prev_audio1 = audio
 
             except Exception as e:

@@ -141,6 +141,7 @@ class SoVitsSvc40v2:
         wav_44k = audio_buffer
         # f0 = utils.compute_f0_parselmouth(wav, sampling_rate=self.target_sample, hop_length=self.hop_size)
         f0 = utils.compute_f0_dio(wav_44k, sampling_rate=self.hps.data.sampling_rate, hop_length=self.hps.data.hop_length)
+        print(f"--- >>>>> ---- >>>> {wav_44k.shape[0] / self.hps.data.hop_length}")
 
         f0, uv = utils.interpolate_f0(f0)
         f0 = torch.FloatTensor(f0)
@@ -172,7 +173,7 @@ class SoVitsSvc40v2:
         rms = np.sqrt(np.square(crop).mean(axis=0))
         vol = max(rms, self.prevVol * 0.1)
         self.prevVol = vol
-        print(f"         Crop:{crop.shape}, vol{vol}")
+        # print(f"         Crop:{crop.shape}, vol{vol}")
 
         c, f0, uv = self.get_unit_f0(self.audio_buffer, 20)
         return (c, f0, uv, convertSize, vol)
@@ -194,10 +195,10 @@ class SoVitsSvc40v2:
         vol = data[4]
         data = (data[0], data[1], data[2],)
 
-        if vol < 0.00001:
-            print("silcent")
-            return np.zeros(convertSize).astype(np.int16)
-        print(vol)
+        # if vol < 0.00001:
+        #     print("silcent")
+        #     return np.zeros(convertSize).astype(np.int16)
+        # print(vol)
 
         with torch.no_grad():
             c, f0, uv = [x.to(dev)for x in data]
