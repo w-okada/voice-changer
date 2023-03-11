@@ -175,7 +175,7 @@ class SoVitsSvc40v2:
         crop = self.audio_buffer[cropRange[0]:cropRange[1]]
 
         rms = np.sqrt(np.square(crop).mean(axis=0))
-        vol = max(rms, self.prevVol * 0.1)
+        vol = max(rms, self.prevVol * 0.0)
         self.prevVol = vol
 
         c, f0, uv = self.get_unit_f0(self.audio_buffer, self.settings.tran)

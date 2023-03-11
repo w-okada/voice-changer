@@ -23,7 +23,7 @@ export const useSpeakerSetting = () => {
                 <div className="body-item-title left-padding-1">Destination Speaker Id</div>
                 <div className="body-select-container">
                     <select className="body-select" value={appState.serverSetting.serverSetting.dstId} onChange={(e) => {
-                        // appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, dstId: Number(e.target.value) })
+                        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, dstId: Number(e.target.value) })
 
                     }}>
                         {
@@ -47,14 +47,14 @@ export const useSpeakerSetting = () => {
                 <div className="body-item-title left-padding-1 ">Tuning</div>
                 <div>
                     <span className="body-item-input-slider-label">tran</span>
-                    <input type="range" className="body-item-input-slider" min="-20" max="20" step="1" value={appState.serverSetting.serverSetting.tran} onChange={(e) => {
-                        // appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, tran: Number(e.target.value) })
+                    <input type="range" className="body-item-input-slider" min="-50" max="50" step="1" value={appState.serverSetting.serverSetting.tran} onChange={(e) => {
+                        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, tran: Number(e.target.value) })
                     }}></input>
                     <span className="body-item-input-slider-val">{appState.serverSetting.serverSetting.tran}</span>
                 </div>
                 <div>
                     <input type="checkbox" checked={appState.serverSetting.serverSetting.predictF0 == 1} onChange={(e) => {
-                        // appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, predictF0: e.target.checked ? 1 : 0 })
+                        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, predictF0: e.target.checked ? 1 : 0 })
                     }} /> predict f0
                 </div>
                 <div className="body-button-container">
@@ -74,14 +74,14 @@ export const useSpeakerSetting = () => {
                 <div>
                     <span className="body-item-input-slider-label">n-scale</span>
                     <input type="range" className="body-item-input-slider" min="0" max="1" step="0.1" value={appState.serverSetting.serverSetting.noiceScale} onChange={(e) => {
-                        // appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, noiceScale: Number(e.target.value) })
+                        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, noiceScale: Number(e.target.value) })
                     }}></input>
                     <span className="body-item-input-slider-val">{appState.serverSetting.serverSetting.noiceScale}</span>
                 </div>
                 <div>
                     <span className="body-item-input-slider-label">silent thr</span>
-                    <input type="range" className="body-item-input-slider" min="0.00000" max="0.00009" step="0.00001" value={appState.serverSetting.serverSetting.silentThreshold} onChange={(e) => {
-                        // appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, silentThreshold: Number(e.target.value) })
+                    <input type="range" className="body-item-input-slider" min="0.00000" max="0.001" step="0.00001" value={appState.serverSetting.serverSetting.silentThreshold} onChange={(e) => {
+                        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, silentThreshold: Number(e.target.value) })
                     }}></input>
                     <span className="body-item-input-slider-val">{appState.serverSetting.serverSetting.silentThreshold}</span>
                 </div>
