@@ -183,10 +183,14 @@ export const DefaultServerSetting_so_vits_svc_40v2: ServerInfo = {
     f0Detector: F0Detector.dio,
     recordIO: 0,
 
-    tran: 10,
-    noiceScale: 0.3,
+    tran: 0,
+    noiceScale: 0,
     predictF0: 0,
-    silentThreshold: 0.00001,
+    silentThreshold: 0,
+    // tran: 10,
+    // noiceScale: 0.3,
+    // predictF0: 0,
+    // silentThreshold: 0.00001,
 
     inputSampleRate: 24000,
 
