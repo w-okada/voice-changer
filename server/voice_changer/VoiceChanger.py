@@ -158,9 +158,8 @@ class VoiceChanger():
                 newData = receivedData
 
             inputSize = newData.shape[0]
-            crossfadeSize = self.settings.crossFadeOverlapSize if self.settings.crossFadeOverlapSize > 0 else inputSize
+            crossfadeSize = min(self.settings.crossFadeOverlapSize, inputSize)
 
-            # convertSize = inputSize + min(self.settings.crossFadeOverlapSize, inputSize)
             print_convert_processing(
                 f" Input data size: {receivedData.shape[0]}/{self.settings.inputSampleRate}hz {inputSize}/{processing_sampling_rate}hz")
             print_convert_processing(

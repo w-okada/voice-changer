@@ -28,7 +28,7 @@ const App = () => {
         return (
             <div className="top-title">
                 <span className="title">Voice Changer Setting</span>
-                <span className="top-title-version">for v.1.5.x</span>
+                <span className="top-title-version">for MMVC v.1.5.x</span>
                 <span className="belongings">
                     <a className="link" href="https://github.com/w-okada/voice-changer" target="_blank" rel="noopener noreferrer">
                         <img src="./assets/icons/github.svg" />

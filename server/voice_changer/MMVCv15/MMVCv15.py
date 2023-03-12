@@ -132,6 +132,9 @@ class MMVCv15:
 
         return data
 
+    def get_processing_sampling_rate(self):
+        return self.hps.data.sampling_rate
+
     def _get_f0(self, detector: str, newData: any):
 
         audio_norm_np = newData.astype(np.float64)
@@ -146,7 +149,8 @@ class MMVCv15:
 
     def _get_spec(self, newData: any):
         audio = torch.FloatTensor(newData)
-        audio_norm = audio / self.hps.data.max_wav_value  # normalize
+        # audio_norm = audio / self.hps.data.max_wav_value  # normalize
+        audio_norm = audio
         audio_norm = audio_norm.unsqueeze(0)  # unsqueeze
         spec = spectrogram_torch(audio_norm, self.hps.data.filter_length,
                                  self.hps.data.sampling_rate, self.hps.data.hop_length, self.hps.data.win_length,
@@ -154,15 +158,21 @@ class MMVCv15:
         spec = torch.squeeze(spec, 0)
         return spec
 
-    def generate_input(self, newData: any, convertSize: int):
-        newData = newData.astype(np.float32)
+    def generate_input(self, newData: any, inputSize: int, crossfadeSize: int):
+        newData = newData.astype(np.float32) / self.hps.data.max_wav_value
 
         if hasattr(self, "audio_buffer"):
             self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)  # 過去のデータに連結
         else:
             self.audio_buffer = newData
 
-        self.audio_buffer = self.audio_buffer[-(convertSize):]  # 変換対象の部分だけ抽出
+        convertSize = inputSize + crossfadeSize
+        if convertSize < 8192:
+            convertSize = 8192
+        if convertSize % self.hps.data.hop_length != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
+            convertSize = convertSize + (self.hps.data.hop_length - (convertSize % self.hps.data.hop_length))
+
+        self.audio_buffer = self.audio_buffer[-1 * convertSize:]  # 変換対象の部分だけ抽出
 
         f0 = self._get_f0(self.settings.f0Detector, self.audio_buffer)  # f0 生成
         spec = self._get_spec(self.audio_buffer)
