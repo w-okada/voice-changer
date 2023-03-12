@@ -246,7 +246,7 @@ class VoiceChanger():
 
         postprocess_time = t.secs
 
-        print(f" [fin] Input/Output size:{receivedData.shape[0]},{outputData.shape[0]}")
+        print_convert_processing(f" [fin] Input/Output size:{receivedData.shape[0]},{outputData.shape[0]}")
         perf = [preprocess_time, mainprocess_time, postprocess_time]
         return outputData, perf
 
