@@ -163,7 +163,7 @@ class SoVitsSvc40v2:
         c = c.unsqueeze(0)
         return c, f0, uv
 
-    def generate_input(self, newData: any, convertSize: int, cropRange):
+    def generate_input(self, newData: any, inputSize: int, crossfadeSize: int):
         newData = newData.astype(np.float32) / self.hps.data.max_wav_value
 
         if hasattr(self, "audio_buffer"):
@@ -171,13 +171,14 @@ class SoVitsSvc40v2:
         else:
             self.audio_buffer = newData
 
-        # self.audio_buffer = self.audio_buffer[-(convertSize):]  # 変換対象の部分だけ抽出
-        # self.audio_buffer = self.audio_buffer[-1024 * 32:]  # 変換対象の部分だけ抽出
-        # self.audio_buffer = self.audio_buffer[-1024 * 128:]  # 変換対象の部分だけ抽出
-        # self.audio_buffer = self.audio_buffer[(-1 * 1024 * 32) + (-1 * convertSize):]  # 変換対象の部分だけ抽出
-        self.audio_buffer = self.audio_buffer[-1 * self.settings.processingLength + (-1 * convertSize):]  # 変換対象の部分だけ抽出
+        convertSize = inputSize + crossfadeSize + self.settings.processingLength
 
-        crop = self.audio_buffer[cropRange[0]:cropRange[1]]
+        if convertSize % self.hps.data.hop_length != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
+            convertSize = convertSize + (self.hps.data.hop_length - (convertSize % self.hps.data.hop_length))
+
+        self.audio_buffer = self.audio_buffer[-1 * convertSize:]  # 変換対象の部分だけ抽出
+
+        crop = self.audio_buffer[-1 * (inputSize + crossfadeSize):-1 * (crossfadeSize)]
 
         rms = np.sqrt(np.square(crop).mean(axis=0))
         vol = max(rms, self.prevVol * 0.0)

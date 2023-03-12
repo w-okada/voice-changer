@@ -159,24 +159,28 @@ class VoiceChanger():
                 newData = receivedData
 
             inputSize = newData.shape[0]
-            convertSize = inputSize + min(self.settings.crossFadeOverlapSize, inputSize)
+            crossfadeSize = self.settings.crossFadeOverlapSize if self.settings.crossFadeOverlapSize > 0 else inputSize
+
+            # convertSize = inputSize + min(self.settings.crossFadeOverlapSize, inputSize)
             print_convert_processing(
-                f" Input data size of {receivedData.shape[0]}/{self.settings.inputSampleRate}hz {inputSize}/{processing_sampling_rate}hz")
+                f" Input data size: {receivedData.shape[0]}/{self.settings.inputSampleRate}hz {inputSize}/{processing_sampling_rate}hz")
+            print_convert_processing(
+                f" Crossfade data size: crossfade:{crossfadeSize}, crossfade setting:{self.settings.crossFadeOverlapSize}, input size:{inputSize}")
 
-            if convertSize < 8192:
-                convertSize = 8192
+            # if convertSize < 8192:
+            #     convertSize = 8192
 
-            if convertSize % processing_hop_length != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
-                convertSize = convertSize + (processing_hop_length - (convertSize % processing_hop_length))
+            # if convertSize % processing_hop_length != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
+            #     convertSize = convertSize + (processing_hop_length - (convertSize % processing_hop_length))
 
-            overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
-            cropRange = (-1 * (inputSize + overlapSize), -1 * overlapSize)
+            # overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
+            # cropRange = (-1 * (inputSize + overlapSize), -1 * overlapSize)
 
-            print_convert_processing(f" Convert input data size of {convertSize}")
-            print_convert_processing(f"         overlap:{overlapSize}, cropRange:{cropRange}")
+            print_convert_processing(f" Convert data size of {inputSize + crossfadeSize} (+ extra size)")
+            print_convert_processing(f"         will be cropped:{-1 * (inputSize + crossfadeSize)}, {-1 * (crossfadeSize)}")
 
             self._generate_strength(inputSize)
-            data = self.voiceChanger.generate_input(newData, convertSize, cropRange)
+            data = self.voiceChanger.generate_input(newData, inputSize, crossfadeSize)
         preprocess_time = t.secs
 
         # 変換処理
@@ -187,8 +191,9 @@ class VoiceChanger():
 
                 if hasattr(self, 'np_prev_audio1') == True:
                     np.set_printoptions(threshold=10000)
-                    prev_overlap = self.np_prev_audio1[-1 * overlapSize:]
-                    cur_overlap_start = -1 * (inputSize + overlapSize)
+                    prev_overlap_start = -1 * crossfadeSize
+                    prev_overlap = self.np_prev_audio1[prev_overlap_start:]
+                    cur_overlap_start = -1 * (inputSize + crossfadeSize)
                     cur_overlap_end = -1 * inputSize
                     cur_overlap = audio[cur_overlap_start:cur_overlap_end]
                     # cur_overlap = audio[-1 * (inputSize + overlapSize):-1 * inputSize]
@@ -199,10 +204,10 @@ class VoiceChanger():
                     powered_cur = cur_overlap * self.np_cur_strength
                     powered_result = powered_prev + powered_cur
 
-                    cur = audio[-1 * inputSize:-1 * overlapSize]
+                    cur = audio[-1 * inputSize:-1 * crossfadeSize]
                     result = np.concatenate([powered_result, cur], axis=0)
                     print_convert_processing(
-                        f" overlap:{overlapSize}, current:{cur.shape[0]}, result:{result.shape[0]}... result should be same as input")
+                        f" overlap:{crossfadeSize}, current:{cur.shape[0]}, result:{result.shape[0]}... result should be same as input")
                     if cur.shape[0] != result.shape[0]:
                         print_convert_processing(f" current and result should be same as input")
 
