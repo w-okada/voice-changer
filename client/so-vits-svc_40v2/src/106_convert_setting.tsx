@@ -47,10 +47,10 @@ export const useConvertSetting = (): ConvertSettingState => {
     const processingLengthRow = useMemo(() => {
         return (
             <div className="body-row split-3-2-1-4 left-padding-1 guided">
-                <div className="body-item-title left-padding-1">Processing Length</div>
+                <div className="body-item-title left-padding-1">Extra Data Length</div>
                 <div className="body-input-container">
-                    <select className="body-select" value={appState.serverSetting.serverSetting.processingLength} onChange={(e) => {
-                        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, processingLength: Number(e.target.value) })
+                    <select className="body-select" value={appState.serverSetting.serverSetting.extraConvertSize} onChange={(e) => {
+                        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, extraConvertSize: Number(e.target.value) })
                         appState.workletNodeSetting.trancateBuffer()
                     }}>
                         {

@@ -36,7 +36,7 @@ class SoVitsSvc40v2Settings():
     noiceScale: float = 0.3
     predictF0: int = 0  # 0:False, 1:True
     silentThreshold: float = 0.00001
-    processingLength: int = 1024 * 32
+    extraConvertSize: int = 1024 * 32
 
     framework: str = "PyTorch"  # PyTorch or ONNX
     pyTorchModelFile: str = ""
@@ -44,7 +44,7 @@ class SoVitsSvc40v2Settings():
     configFile: str = ""
 
     # ↓mutableな物だけ列挙
-    intData = ["gpu", "dstId", "tran", "predictF0", "processingLength"]
+    intData = ["gpu", "dstId", "tran", "predictF0", "extraConvertSize"]
     floatData = ["noiceScale", "silentThreshold"]
     strData = ["framework", "f0Detector"]
 
@@ -171,7 +171,7 @@ class SoVitsSvc40v2:
         else:
             self.audio_buffer = newData
 
-        convertSize = inputSize + crossfadeSize + self.settings.processingLength
+        convertSize = inputSize + crossfadeSize + self.settings.extraConvertSize
 
         if convertSize % self.hps.data.hop_length != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
             convertSize = convertSize + (self.hps.data.hop_length - (convertSize % self.hps.data.hop_length))

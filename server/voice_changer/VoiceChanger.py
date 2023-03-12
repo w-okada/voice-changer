@@ -42,11 +42,11 @@ class VoiceChanger():
     def __init__(self):
         # 初期化
         self.settings = VocieChangerSettings()
-        self.unpackedData_length = 0
         self.onnx_session = None
         self.currentCrossFadeOffsetRate = 0
         self.currentCrossFadeEndRate = 0
-        self.currentCrossFadeOverlapSize = 0
+        self.currentCrossFadeOverlapSize = 0  # setting
+        self.crossfadeSize = 0  # calculated
 
         modelType = getModelType()
         print("[VoiceChanger] activate model type:", modelType)
@@ -82,7 +82,7 @@ class VoiceChanger():
         if key in self.settings.intData:
             setattr(self.settings, key, int(val))
             if key == "crossFadeOffsetRate" or key == "crossFadeEndRate":
-                self.unpackedData_length = 0
+                self.crossfadeSize = 0
             if key == "recordIO" and val == 1:
                 if hasattr(self, "ioRecorder"):
                     self.ioRecorder.close()
@@ -114,31 +114,31 @@ class VoiceChanger():
 
         return self.get_info()
 
-    def _generate_strength(self, dataLength: int):
+    def _generate_strength(self, crossfadeSize: int):
 
-        if self.unpackedData_length != dataLength or \
+        if self.crossfadeSize != crossfadeSize or \
                 self.currentCrossFadeOffsetRate != self.settings.crossFadeOffsetRate or \
                 self.currentCrossFadeEndRate != self.settings.crossFadeEndRate or \
                 self.currentCrossFadeOverlapSize != self.settings.crossFadeOverlapSize:
 
-            self.unpackedData_length = dataLength
+            self.crossfadeSize = crossfadeSize
             self.currentCrossFadeOffsetRate = self.settings.crossFadeOffsetRate
             self.currentCrossFadeEndRate = self.settings.crossFadeEndRate
             self.currentCrossFadeOverlapSize = self.settings.crossFadeOverlapSize
 
-            overlapSize = min(self.settings.crossFadeOverlapSize, self.unpackedData_length)
-            cf_offset = int(overlapSize * self.settings.crossFadeOffsetRate)
-            cf_end = int(overlapSize * self.settings.crossFadeEndRate)
+            cf_offset = int(crossfadeSize * self.settings.crossFadeOffsetRate)
+            cf_end = int(crossfadeSize * self.settings.crossFadeEndRate)
             cf_range = cf_end - cf_offset
             percent = np.arange(cf_range) / cf_range
 
             np_prev_strength = np.cos(percent * 0.5 * np.pi) ** 2
             np_cur_strength = np.cos((1 - percent) * 0.5 * np.pi) ** 2
 
-            self.np_prev_strength = np.concatenate([np.ones(cf_offset), np_prev_strength, np.zeros(overlapSize - cf_offset - len(np_prev_strength))])
-            self.np_cur_strength = np.concatenate([np.zeros(cf_offset), np_cur_strength, np.ones(overlapSize - cf_offset - len(np_cur_strength))])
+            self.np_prev_strength = np.concatenate([np.ones(cf_offset), np_prev_strength,
+                                                   np.zeros(crossfadeSize - cf_offset - len(np_prev_strength))])
+            self.np_cur_strength = np.concatenate([np.zeros(cf_offset), np_cur_strength, np.ones(crossfadeSize - cf_offset - len(np_cur_strength))])
 
-            print("Generated Strengths")
+            print(f"Generated Strengths: for prev:{self.np_prev_strength.shape}, for cur:{self.np_cur_strength.shape}")
 
             # ひとつ前の結果とサイズが変わるため、記録は消去する。
             if hasattr(self, 'np_prev_audio1') == True:
@@ -179,7 +179,7 @@ class VoiceChanger():
             print_convert_processing(f" Convert data size of {inputSize + crossfadeSize} (+ extra size)")
             print_convert_processing(f"         will be cropped:{-1 * (inputSize + crossfadeSize)}, {-1 * (crossfadeSize)}")
 
-            self._generate_strength(inputSize)
+            self._generate_strength(crossfadeSize)
             data = self.voiceChanger.generate_input(newData, inputSize, crossfadeSize)
         preprocess_time = t.secs
 
@@ -196,7 +196,8 @@ class VoiceChanger():
                     cur_overlap_start = -1 * (inputSize + crossfadeSize)
                     cur_overlap_end = -1 * inputSize
                     cur_overlap = audio[cur_overlap_start:cur_overlap_end]
-                    # cur_overlap = audio[-1 * (inputSize + overlapSize):-1 * inputSize]
+                    print_convert_processing(
+                        f" audio:{audio.shape}, prev_overlap:{prev_overlap.shape}, self.np_prev_strength:{self.np_prev_strength.shape}")
                     powered_prev = prev_overlap * self.np_prev_strength
                     print_convert_processing(
                         f" audio:{audio.shape}, cur_overlap:{cur_overlap.shape}, self.np_cur_strength:{self.np_cur_strength.shape}")
