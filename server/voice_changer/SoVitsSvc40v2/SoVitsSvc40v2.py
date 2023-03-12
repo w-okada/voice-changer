@@ -22,7 +22,6 @@ from models import SynthesizerTrn
 import utils
 from fairseq import checkpoint_utils
 import librosa
-from inference import infer_tool
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
 
