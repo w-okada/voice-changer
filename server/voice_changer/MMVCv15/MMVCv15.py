@@ -149,9 +149,7 @@ class MMVCv15:
 
     def _get_spec(self, newData: any):
         audio = torch.FloatTensor(newData)
-        # audio_norm = audio / self.hps.data.max_wav_value  # normalize
-        audio_norm = audio
-        audio_norm = audio_norm.unsqueeze(0)  # unsqueeze
+        audio_norm = audio.unsqueeze(0)  # unsqueeze
         spec = spectrogram_torch(audio_norm, self.hps.data.filter_length,
                                  self.hps.data.sampling_rate, self.hps.data.hop_length, self.hps.data.win_length,
                                  center=False)
