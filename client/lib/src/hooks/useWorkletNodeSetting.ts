@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react"
 
-import { ClientType, DefaultWorkletNodeSetting, INDEXEDDB_KEY_WORKLETNODE, WorkletNodeSetting } from "../const"
+import { ClientType, DefaultWorkletNodeSetting, DefaultWorkletNodeSetting_so_vits_svc_40v2, INDEXEDDB_KEY_WORKLETNODE, WorkletNodeSetting } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
@@ -19,7 +19,19 @@ export type WorkletNodeSettingState = {
 }
 
 export const useWorkletNodeSetting = (props: UseWorkletNodeSettingProps): WorkletNodeSettingState => {
-    const [workletNodeSetting, _setWorkletNodeSetting] = useState<WorkletNodeSetting>(DefaultWorkletNodeSetting)
+    const defaultWorkletNodeSetting = useMemo(() => {
+        if (props.clientType == "MMVCv13") {
+            return DefaultWorkletNodeSetting
+        } else if (props.clientType == "MMVCv15") {
+            return DefaultWorkletNodeSetting
+        } else if (props.clientType == "so_vits_svc_40v2c") {
+            return DefaultWorkletNodeSetting_so_vits_svc_40v2
+        } else {
+            return DefaultWorkletNodeSetting
+        }
+    }, [])
+
+    const [workletNodeSetting, _setWorkletNodeSetting] = useState<WorkletNodeSetting>(defaultWorkletNodeSetting)
     const { setItem, getItem, removeItem } = useIndexedDB({ clientType: props.clientType })
 
     // 初期化 その１ DBから取得

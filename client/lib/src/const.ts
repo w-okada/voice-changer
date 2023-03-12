@@ -70,6 +70,7 @@ export const ServerSettingKey = {
     "noiceScale": "noiceScale",
     "predictF0": "predictF0",
     "silentThreshold": "silentThreshold",
+    "processingLength": "processingLength",
 
     "inputSampleRate": "inputSampleRate",
 } as const
@@ -96,6 +97,7 @@ export type VoiceChangerServerSetting = {
     noiceScale: number // so-vits-svc
     predictF0: number // so-vits-svc
     silentThreshold: number // so-vits-svc
+    processingLength: number// so-vits-svc
 
     inputSampleRate: InputSampleRate
 }
@@ -127,6 +129,7 @@ export const DefaultServerSetting_MMVCv15: ServerInfo = {
     noiceScale: 0,
     predictF0: 0,
     silentThreshold: 0,
+    processingLength: 0,
 
     inputSampleRate: 24000,
 
@@ -157,6 +160,7 @@ export const DefaultServerSetting_MMVCv13: ServerInfo = {
     noiceScale: 0,
     predictF0: 0,
     silentThreshold: 0,
+    processingLength: 0,
 
     inputSampleRate: 24000,
 
@@ -183,14 +187,15 @@ export const DefaultServerSetting_so_vits_svc_40v2: ServerInfo = {
     f0Detector: F0Detector.dio,
     recordIO: 0,
 
-    tran: 0,
-    noiceScale: 0,
-    predictF0: 0,
-    silentThreshold: 0,
-    // tran: 10,
-    // noiceScale: 0.3,
+    // tran: 0,
+    // noiceScale: 0,
     // predictF0: 0,
-    // silentThreshold: 0.00001,
+    // silentThreshold: 0,
+    tran: 10,
+    noiceScale: 0.3,
+    predictF0: 0,
+    silentThreshold: 0.00001,
+    processingLength: 1024 * 32,
 
     inputSampleRate: 24000,
 
@@ -251,6 +256,14 @@ export const DefaultWorkletNodeSetting: WorkletNodeSetting = {
     protocol: "sio",
     sendingSampleRate: 24000,
     inputChunkNum: 48,
+    downSamplingMode: "average"
+}
+
+export const DefaultWorkletNodeSetting_so_vits_svc_40v2: WorkletNodeSetting = {
+    serverUrl: "",
+    protocol: "sio",
+    sendingSampleRate: 24000,
+    inputChunkNum: 128,
     downSamplingMode: "average"
 }
 

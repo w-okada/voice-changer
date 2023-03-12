@@ -25,19 +25,47 @@ export const useConvertSetting = (): ConvertSettingState => {
             <div className="body-row split-3-2-1-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Input Chunk Num(128sample/chunk)</div>
                 <div className="body-input-container">
-                    <input type="number" min={1} max={256} step={1} value={appState.workletNodeSetting.workletNodeSetting.inputChunkNum} onChange={(e) => {
+                    <select className="body-select" value={appState.workletNodeSetting.workletNodeSetting.inputChunkNum} onChange={(e) => {
                         appState.workletNodeSetting.updateWorkletNodeSetting({ ...appState.workletNodeSetting.workletNodeSetting, inputChunkNum: Number(e.target.value) })
                         appState.workletNodeSetting.trancateBuffer()
-                    }} />
+                    }}>
+                        {
+                            [32, 64, 96, 128, 160, 192, 256, 384, 512].map(x => {
+                                return <option key={x} value={x}>{x}</option>
+                            })
+                        }
+                    </select>
                 </div>
                 <div className="body-item-text">
                     <div>buff: {(appState.workletNodeSetting.workletNodeSetting.inputChunkNum * 128 * 1000 / 48000).toFixed(1)}ms</div>
                 </div>
                 <div className="body-item-text"></div>
-
             </div>
         )
     }, [appState.workletNodeSetting.workletNodeSetting.inputChunkNum, appState.workletNodeSetting.updateWorkletNodeSetting])
+
+    const processingLengthRow = useMemo(() => {
+        return (
+            <div className="body-row split-3-2-1-4 left-padding-1 guided">
+                <div className="body-item-title left-padding-1">Processing Length</div>
+                <div className="body-input-container">
+                    <select className="body-select" value={appState.serverSetting.serverSetting.processingLength} onChange={(e) => {
+                        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, processingLength: Number(e.target.value) })
+                        appState.workletNodeSetting.trancateBuffer()
+                    }}>
+                        {
+                            [1024 * 4, 1024 * 8, 1024 * 16, 1024 * 32, 1024 * 64, 1024 * 128].map(x => {
+                                return <option key={x} value={x}>{x}</option>
+                            })
+                        }
+                    </select>
+                </div>
+                <div className="body-item-text">
+                </div>
+                <div className="body-item-text"></div>
+            </div>
+        )
+    }, [appState.serverSetting.serverSetting, appState.serverSetting.updateServerSettings])
 
     const gpuRow = useMemo(() => {
         return (
@@ -69,12 +97,13 @@ export const useConvertSetting = (): ConvertSettingState => {
 
                     <div className="partition-content">
                         {inputChunkNumRow}
+                        {processingLengthRow}
                         {gpuRow}
                     </div>
                 </div>
             </>
         )
-    }, [inputChunkNumRow, gpuRow])
+    }, [inputChunkNumRow, processingLengthRow, gpuRow])
 
     return {
         convertSetting,

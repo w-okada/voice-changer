@@ -36,6 +36,7 @@ class SoVitsSvc40v2Settings():
     noiceScale: float = 0.3
     predictF0: int = 0  # 0:False, 1:True
     silentThreshold: float = 0.00001
+    processingLength: int = 1024 * 32
 
     framework: str = "PyTorch"  # PyTorch or ONNX
     pyTorchModelFile: str = ""
@@ -43,7 +44,7 @@ class SoVitsSvc40v2Settings():
     configFile: str = ""
 
     # ↓mutableな物だけ列挙
-    intData = ["gpu", "dstId", "tran", "predictF0"]
+    intData = ["gpu", "dstId", "tran", "predictF0", "processingLength"]
     floatData = ["noiceScale", "silentThreshold"]
     strData = ["framework", "f0Detector"]
 
@@ -170,7 +171,11 @@ class SoVitsSvc40v2:
         else:
             self.audio_buffer = newData
 
-        self.audio_buffer = self.audio_buffer[-(convertSize):]  # 変換対象の部分だけ抽出
+        # self.audio_buffer = self.audio_buffer[-(convertSize):]  # 変換対象の部分だけ抽出
+        # self.audio_buffer = self.audio_buffer[-1024 * 32:]  # 変換対象の部分だけ抽出
+        # self.audio_buffer = self.audio_buffer[-1024 * 128:]  # 変換対象の部分だけ抽出
+        # self.audio_buffer = self.audio_buffer[(-1 * 1024 * 32) + (-1 * convertSize):]  # 変換対象の部分だけ抽出
+        self.audio_buffer = self.audio_buffer[-1 * self.settings.processingLength + (-1 * convertSize):]  # 変換対象の部分だけ抽出
 
         crop = self.audio_buffer[cropRange[0]:cropRange[1]]
 
