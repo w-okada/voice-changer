@@ -237,14 +237,16 @@ class VoiceChanger():
                 self.ioRecorder.writeInput(receivedData)
                 self.ioRecorder.writeOutput(outputData.tobytes())
 
-            if receivedData.shape[0] != outputData.shape[0]:
-                outputData = pad_array(outputData, receivedData.shape[0])
-                print_convert_processing(
-                    f" Padded!, Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
+            # if receivedData.shape[0] != outputData.shape[0]:
+            #     outputData = pad_array(outputData, receivedData.shape[0])
+            #     # print_convert_processing(
+            #     #     f" Padded!, Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
+            #     print(
+            #         f" Padded!, Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
 
         postprocess_time = t.secs
 
-        print_convert_processing(f" [fin] Input/Output size:{receivedData.shape[0]},{outputData.shape[0]}")
+        print(f" [fin] Input/Output size:{receivedData.shape[0]},{outputData.shape[0]}")
         perf = [preprocess_time, mainprocess_time, postprocess_time]
         return outputData, perf
 

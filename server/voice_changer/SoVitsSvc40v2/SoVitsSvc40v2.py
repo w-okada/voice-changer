@@ -214,6 +214,8 @@ class SoVitsSvc40v2:
                                       noice_scale=self.settings.noiceScale)[0][0, 0].data.float()
             audio1 = audio1 * self.hps.data.max_wav_value
 
+            audio1 = audio1 * vol
+
             result = audio1.float().cpu().numpy()
 
             # result = infer_tool.pad_array(result, length)
