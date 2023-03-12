@@ -147,7 +147,6 @@ class VoiceChanger():
     #  receivedData: tuple of short
     def on_request(self, receivedData: any):
         processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
-        processing_hop_length = self.voiceChanger.get_processing_hop_length()
 
         print_convert_processing(f"------------ Convert processing.... ------------")
         # 前処理
