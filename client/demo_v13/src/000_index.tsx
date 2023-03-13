@@ -12,7 +12,7 @@ import { fab } from "@fortawesome/free-brands-svg-icons";
 import { AppRootProvider } from "./001_provider/001_AppRootProvider";
 import ErrorBoundary from "./001_provider/900_ErrorBoundary";
 import { INDEXEDDB_KEY_CLIENT, INDEXEDDB_KEY_MODEL_DATA, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_WORKLET, INDEXEDDB_KEY_WORKLETNODE, useIndexedDB } from "@dannadori/voice-changer-client-js";
-import { CLIENT_TYPE, INDEXEDDB_KEY_AUDIO_OUTPUT } from "./const";
+import { CLIENT_TYPE, INDEXEDDB_KEY_AUDIO_OUTPUT, isDesktopApp } from "./const";
 
 library.add(fas, far, fab);
 
@@ -25,24 +25,62 @@ const App = () => {
     const { removeItem } = useIndexedDB({ clientType: CLIENT_TYPE })
     const { voiceChangerSetting } = useMicrophoneOptions()
     const titleRow = useMemo(() => {
+        const githubLink = isDesktopApp() ?
+            (
+                // @ts-ignore
+                <span className="link" onClick={() => { window.electronAPI.openBrowser("https://github.com/w-okada/voice-changer") }}>
+                    <img src="./assets/icons/github.svg" />
+                    <span>github</span>
+                </span>
+            )
+            :
+            (
+                <a className="link" href="https://github.com/w-okada/voice-changer" target="_blank" rel="noopener noreferrer">
+                    <img src="./assets/icons/github.svg" />
+                    <span>github</span>
+                </a>
+            )
+
+        const manualLink = isDesktopApp() ?
+            (
+                // @ts-ignore
+                <span className="link" onClick={() => { window.electronAPI.openBrowser("https://zenn.dev/wok/books/0003_vc-helper-v_1_5") }}>
+                    <img src="./assets/icons/help-circle.svg" />
+                    <span>manual</span>
+                </span>
+            )
+            :
+            (
+                <a className="link" href="https://zenn.dev/wok/books/0003_vc-helper-v_1_5" target="_blank" rel="noopener noreferrer">
+                    <img src="./assets/icons/help-circle.svg" />
+                    <span>manual</span>
+                </a>
+            )
+
+        const coffeeLink = isDesktopApp() ?
+            (
+                // @ts-ignore
+                <span className="link" onClick={() => { window.electronAPI.openBrowser("https://www.buymeacoffee.com/wokad") }}>
+                    <img className="donate-img" src="./assets/buymeacoffee.png" />
+                    <span>donate(寄付)</span>
+                </span>
+            )
+            :
+            (
+                <a className="link" href="https://www.buymeacoffee.com/wokad" target="_blank" rel="noopener noreferrer">
+                    <img className="donate-img" src="./assets/buymeacoffee.png" />
+                    <span>donate(寄付)</span>
+                </a>
+            )
+
         return (
             <div className="top-title">
                 <span className="title">Voice Changer Setting</span>
-                <span className="top-title-version">for MMVC v.1.3.x</span>
+                <span className="top-title-version">for so-vits-svc 40v2</span>
                 <span className="belongings">
-                    <a className="link" href="https://github.com/w-okada/voice-changer" target="_blank" rel="noopener noreferrer">
-                        <img src="./assets/icons/github.svg" />
-                        <span>github</span>
-                    </a>
-                    <a className="link" href="https://zenn.dev/wok/books/0002_vc-helper-v_1_3" target="_blank" rel="noopener noreferrer">
-                        <img src="./assets/icons/help-circle.svg" />
-                        <span>manual</span>
-                    </a>
-                    <a className="link" href="https://www.buymeacoffee.com/wokad" target="_blank" rel="noopener noreferrer">
-                        <img className="donate-img" src="./assets/buymeacoffee.png" />
-                        <span>コーヒーを寄付</span>
-                    </a>
-
+                    {githubLink}
+                    {manualLink}
+                    {coffeeLink}
                 </span>
                 <span className="belongings">
 

@@ -20,7 +20,10 @@ export const OpenSpeakerSettingCheckbox = "open-speaker-setting-checkbox"
 export const OpenConverterSettingCheckbox = "open-converter-setting-checkbox"
 export const OpenAdvancedSettingCheckbox = "open-advanced-setting-checkbox"
 
-
-
-
-
+export const isDesktopApp = () => {
+    if (navigator.userAgent.indexOf('Electron') >= 0) {
+        return true;
+    } else {
+        return false;
+    }
+};
