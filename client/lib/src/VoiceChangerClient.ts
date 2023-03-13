@@ -243,8 +243,8 @@ export class VoiceChangerClient {
     concatUploadedFile = (filename: string, chunkNum: number) => {
         return this.configurator.concatUploadedFile(filename, chunkNum)
     }
-    loadModel = (configFilename: string, pyTorchModelFilename: string | null, onnxModelFilename: string | null) => {
-        return this.configurator.loadModel(configFilename, pyTorchModelFilename, onnxModelFilename)
+    loadModel = (configFilename: string, pyTorchModelFilename: string | null, onnxModelFilename: string | null, hubertTorchModelFilename: string | null) => {
+        return this.configurator.loadModel(configFilename, pyTorchModelFilename, onnxModelFilename, hubertTorchModelFilename)
     }
 
     //##  Worklet ##//

@@ -48,15 +48,15 @@ class VoiceChanger():
         self.currentCrossFadeOverlapSize = 0  # setting
         self.crossfadeSize = 0  # calculated
 
-        modelType = getModelType()
-        print("[VoiceChanger] activate model type:", modelType)
-        if modelType == "MMVCv15":
+        self.modelType = getModelType()
+        print("[VoiceChanger] activate model type:", self.modelType)
+        if self.modelType == "MMVCv15":
             from voice_changer.MMVCv15.MMVCv15 import MMVCv15
             self.voiceChanger = MMVCv15()
-        elif modelType == "MMVCv13":
+        elif self.modelType == "MMVCv13":
             from voice_changer.MMVCv13.MMVCv13 import MMVCv13
             self.voiceChanger = MMVCv13()
-        elif modelType == "so-vits-svc-40v2":
+        elif self.modelType == "so-vits-svc-40v2":
             from voice_changer.SoVitsSvc40v2.SoVitsSvc40v2 import SoVitsSvc40v2
             self.voiceChanger = SoVitsSvc40v2()
 
@@ -70,8 +70,11 @@ class VoiceChanger():
 
         print(f"VoiceChanger Initialized (GPU_NUM:{self.gpu_num}, mps_enabled:{self.mps_enabled})")
 
-    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None):
-        return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file)
+    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, hubertTorchModel: str = None):
+        if self.modelType == "MMVCv15" or self.modelType == "MMVCv13":
+            return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file)
+        else:  # so-vits-svc-40v2
+            return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, hubertTorchModel)
 
     def get_info(self):
         data = asdict(self.settings)
@@ -164,15 +167,6 @@ class VoiceChanger():
                 f" Input data size: {receivedData.shape[0]}/{self.settings.inputSampleRate}hz {inputSize}/{processing_sampling_rate}hz")
             print_convert_processing(
                 f" Crossfade data size: crossfade:{crossfadeSize}, crossfade setting:{self.settings.crossFadeOverlapSize}, input size:{inputSize}")
-
-            # if convertSize < 8192:
-            #     convertSize = 8192
-
-            # if convertSize % processing_hop_length != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
-            #     convertSize = convertSize + (processing_hop_length - (convertSize % processing_hop_length))
-
-            # overlapSize = min(self.settings.crossFadeOverlapSize, inputSize)
-            # cropRange = (-1 * (inputSize + overlapSize), -1 * overlapSize)
 
             print_convert_processing(f" Convert data size of {inputSize + crossfadeSize} (+ extra size)")
             print_convert_processing(f"         will be cropped:{-1 * (inputSize + crossfadeSize)}, {-1 * (crossfadeSize)}")

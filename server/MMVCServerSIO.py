@@ -39,6 +39,7 @@ def setupArgParser():
                         default=False, help="run on colab")
     parser.add_argument("--modelType", type=str,
                         default="MMVCv15", help="model type: MMVCv13, MMVCv15, so-vits-svc-40v2")
+    parser.add_argument("--hubert", type=str, help="path to hubert model")
 
     return parser
 
@@ -79,6 +80,7 @@ PORT = args.p
 CONFIG = args.c
 MODEL = args.m if args.m != None else None
 ONNX_MODEL = args.o if args.o != None else None
+HUBERT_MODEL = args.hubert if args.hubert != None else None
 MODEL_TYPE = os.environ.get('MODEL_TYPE', None)
 if MODEL_TYPE == None:
     MODEL_TYPE = args.modelType
@@ -100,7 +102,11 @@ if args.colab == True:
 
 voiceChangerManager = VoiceChangerManager.get_instance()
 if CONFIG and (MODEL or ONNX_MODEL):
-    voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL)
+    if MODEL_TYPE == "MMVCv15" or MODEL_TYPE == "MMVCv13":
+        voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL, None)
+    else:
+        voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL, HUBERT_MODEL)
+
 app_fastapi = MMVC_Rest.get_instance(voiceChangerManager)
 app_socketio = MMVC_SocketIOApp.get_instance(app_fastapi, voiceChangerManager)
 
