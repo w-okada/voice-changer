@@ -70,11 +70,11 @@ class VoiceChanger():
 
         print(f"VoiceChanger Initialized (GPU_NUM:{self.gpu_num}, mps_enabled:{self.mps_enabled})")
 
-    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, hubertTorchModel: str = None):
+    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, hubertTorchModel: str = None, clusterTorchModel: str = None):
         if self.modelType == "MMVCv15" or self.modelType == "MMVCv13":
             return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file)
         else:  # so-vits-svc-40v2
-            return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, hubertTorchModel)
+            return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, hubertTorchModel, clusterTorchModel)
 
     def get_info(self):
         data = asdict(self.settings)

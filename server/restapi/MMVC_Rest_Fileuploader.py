@@ -54,15 +54,18 @@ class MMVC_Rest_Fileuploader:
         pyTorchModelFilename: str = Form(...),
         onnxModelFilename: str = Form(...),
         configFilename: str = Form(...),
-        hubertTorchModelFilename: str = Form(...)
+        hubertTorchModelFilename: str = Form(...),
+        clusterTorchModelFilename: str = Form(...)
     ):
         print("Hubert:", hubertTorchModelFilename)
         pyTorchModelFilePath = os.path.join(UPLOAD_DIR, pyTorchModelFilename) if pyTorchModelFilename != "-" else None
         onnxModelFilePath = os.path.join(UPLOAD_DIR, onnxModelFilename) if onnxModelFilename != "-" else None
         configFilePath = os.path.join(UPLOAD_DIR, configFilename)
         hubertTorchModelFilePath = os.path.join(UPLOAD_DIR, hubertTorchModelFilename) if hubertTorchModelFilename != "-" else None
+        clusterTorchModelFilePath = os.path.join(UPLOAD_DIR, clusterTorchModelFilename) if clusterTorchModelFilename != "-" else None
 
-        info = self.voiceChangerManager.loadModel(configFilePath, pyTorchModelFilePath, onnxModelFilePath, hubertTorchModelFilePath)
+        info = self.voiceChangerManager.loadModel(configFilePath, pyTorchModelFilePath, onnxModelFilePath,
+                                                  hubertTorchModelFilePath, clusterTorchModelFilePath)
         json_compatible_item_data = jsonable_encoder(info)
         return JSONResponse(content=json_compatible_item_data)
         # return {"load": f"{configFilePath}, {pyTorchModelFilePath}, {onnxModelFilePath}"}

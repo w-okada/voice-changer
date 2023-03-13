@@ -71,6 +71,7 @@ export const ServerSettingKey = {
     "predictF0": "predictF0",
     "silentThreshold": "silentThreshold",
     "extraConvertSize": "extraConvertSize",
+    "clusterInferRatio": "clusterInferRatio",
 
     "inputSampleRate": "inputSampleRate",
 } as const
@@ -98,6 +99,7 @@ export type VoiceChangerServerSetting = {
     predictF0: number // so-vits-svc
     silentThreshold: number // so-vits-svc
     extraConvertSize: number// so-vits-svc
+    clusterInferRatio: number // so-vits-svc
 
     inputSampleRate: InputSampleRate
 }
@@ -130,6 +132,7 @@ export const DefaultServerSetting_MMVCv15: ServerInfo = {
     predictF0: 0,
     silentThreshold: 0,
     extraConvertSize: 0,
+    clusterInferRatio: 0,
 
     inputSampleRate: 24000,
 
@@ -161,6 +164,7 @@ export const DefaultServerSetting_MMVCv13: ServerInfo = {
     predictF0: 0,
     silentThreshold: 0,
     extraConvertSize: 0,
+    clusterInferRatio: 0,
 
     inputSampleRate: 24000,
 
@@ -196,6 +200,7 @@ export const DefaultServerSetting_so_vits_svc_40v2: ServerInfo = {
     predictF0: 0,
     silentThreshold: 0.00001,
     extraConvertSize: 1024 * 32,
+    clusterInferRatio: 0.1,
 
     inputSampleRate: 24000,
 

@@ -19,6 +19,7 @@ import onnxruntime
 import pyworld as pw
 
 from models import SynthesizerTrn
+import cluster
 import utils
 from fairseq import checkpoint_utils
 import librosa
@@ -36,6 +37,7 @@ class SoVitsSvc40v2Settings():
     predictF0: int = 0  # 0:False, 1:True
     silentThreshold: float = 0.00001
     extraConvertSize: int = 1024 * 32
+    clusterInferRatio: float = 0.1
 
     framework: str = "PyTorch"  # PyTorch or ONNX
     pyTorchModelFile: str = ""
@@ -44,7 +46,7 @@ class SoVitsSvc40v2Settings():
 
     # ↓mutableな物だけ列挙
     intData = ["gpu", "dstId", "tran", "predictF0", "extraConvertSize"]
-    floatData = ["noiceScale", "silentThreshold"]
+    floatData = ["noiceScale", "silentThreshold", "clusterInferRatio"]
     strData = ["framework", "f0Detector"]
 
 
@@ -58,20 +60,40 @@ class SoVitsSvc40v2:
         self.gpu_num = torch.cuda.device_count()
         self.prevVol = 0
 
-    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, hubertTorchModel: str = None):
+    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, hubertTorchModel: str = None, clusterTorchModel: str = None):
         self.settings.configFile = config
         self.hps = utils.get_hparams_from_file(config)
 
         # hubert model
-        # vec_path = "hubert/checkpoint_best_legacy_500.pt"
-        vec_path = hubertTorchModel
-        models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(
-            [vec_path],
-            suffix="",
-        )
-        model = models[0]
-        model.eval()
-        self.hubert_model = utils.get_hubert_model().cpu()
+        try:
+            vec_path = hubertTorchModel
+            print("hubert 1 ", hubertTorchModel)
+            models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(
+                [vec_path],
+                suffix="",
+            )
+            print("hubert 2 ", hubertTorchModel)
+            model = models[0]
+            print("hubert 3 ", hubertTorchModel)
+            model.eval()
+            print("hubert 4 ", hubertTorchModel)
+            self.hubert_model = model.cpu()
+            print("hubert 5 ", hubertTorchModel)
+        except Exception as e:
+            print("EXCEPTION1", e)
+
+        # cluster
+        try:
+            if os.path.exists(clusterTorchModel):
+                print("load kmean11", clusterTorchModel)
+                self.cluster_model = cluster.get_cluster_model(clusterTorchModel)
+                print("load kmean12", clusterTorchModel)
+            else:
+                print("load kmean21", clusterTorchModel)
+                self.cluster_model = None
+                print("load kmean22", clusterTorchModel)
+        except Exception as e:
+            print("EXCEPTION2", e)
 
         if pyTorch_model_file != None:
             self.settings.pyTorchModelFile = pyTorch_model_file
@@ -157,6 +179,14 @@ class SoVitsSvc40v2:
         wav16k = torch.from_numpy(wav16k)
         c = utils.get_hubert_content(self.hubert_model, wav_16k_tensor=wav16k)
         c = utils.repeat_expand_2d(c.squeeze(0), f0.shape[1])
+
+        if self.settings.clusterInferRatio != 0 and self.cluster_model != None:
+            # self.hsp.spk.tsukuyomi
+            cluster_c = cluster.get_cluster_center_result(self.cluster_model, c.cpu().numpy().T, "tsukuyomi").T
+            # cluster_c = cluster.get_cluster_center_result(self.cluster_model, c.cpu().numpy().T, self.settings.dstId).T
+            cluster_c = torch.FloatTensor(cluster_c).cpu()
+            c = self.settings.clusterInferRatio * cluster_c + (1 - self.settings.clusterInferRatio) * c
+
         c = c.unsqueeze(0)
         return c, f0, uv
 

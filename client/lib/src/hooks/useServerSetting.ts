@@ -15,13 +15,15 @@ export type FileUploadSetting = {
     onnxModel: ModelData | null
     configFile: ModelData | null
     hubertTorchModel: ModelData | null
+    clusterTorchModel: ModelData | null
 }
 
 const InitialFileUploadSetting: FileUploadSetting = {
     pyTorchModel: null,
     configFile: null,
     onnxModel: null,
-    hubertTorchModel: null
+    hubertTorchModel: null,
+    clusterTorchModel: null
 }
 
 export type UseServerSettingProps = {
@@ -172,9 +174,12 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 fileUploadSetting.hubertTorchModel!.data = await fileUploadSetting.hubertTorchModel!.file!.arrayBuffer()
                 fileUploadSetting.hubertTorchModel!.filename = await fileUploadSetting.hubertTorchModel!.file!.name
             }
-
+            if (props.clientType == "so_vits_svc_40v2c" && !fileUploadSetting.clusterTorchModel!.data) {
+                fileUploadSetting.clusterTorchModel!.data = await fileUploadSetting.clusterTorchModel!.file!.arrayBuffer()
+                fileUploadSetting.clusterTorchModel!.filename = await fileUploadSetting.clusterTorchModel!.file!.name
+            }
             // ファイルをサーバにアップロード
-            const models = [fileUploadSetting.onnxModel, fileUploadSetting.pyTorchModel, fileUploadSetting.hubertTorchModel].filter(x => { return x != null }) as ModelData[]
+            const models = [fileUploadSetting.onnxModel, fileUploadSetting.pyTorchModel, fileUploadSetting.hubertTorchModel, fileUploadSetting.clusterTorchModel].filter(x => { return x != null }) as ModelData[]
             for (let i = 0; i < models.length; i++) {
                 const progRate = 1 / models.length
                 const progOffset = 100 * i * progRate
@@ -188,19 +193,26 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 console.log(progress, end)
             })
 
-            const loadPromise = props.voiceChangerClient.loadModel(fileUploadSetting.configFile.filename!, fileUploadSetting.pyTorchModel?.filename || null, fileUploadSetting.onnxModel?.filename || null, fileUploadSetting.hubertTorchModel?.filename || null)
+            const loadPromise = props.voiceChangerClient.loadModel(fileUploadSetting.configFile.filename!, fileUploadSetting.pyTorchModel?.filename || null, fileUploadSetting.onnxModel?.filename || null, fileUploadSetting.hubertTorchModel?.filename || null, fileUploadSetting.clusterTorchModel?.filename || null)
 
             // サーバでロード中にキャッシュにセーブ
-            const saveData: FileUploadSetting = {
-                pyTorchModel: fileUploadSetting.pyTorchModel ? { data: fileUploadSetting.pyTorchModel.data, filename: fileUploadSetting.pyTorchModel.filename } : null,
-                onnxModel: fileUploadSetting.onnxModel ? { data: fileUploadSetting.onnxModel.data, filename: fileUploadSetting.onnxModel.filename } : null,
-                configFile: { data: fileUploadSetting.configFile.data, filename: fileUploadSetting.configFile.filename },
-                hubertTorchModel: fileUploadSetting.hubertTorchModel ? {
-                    data: fileUploadSetting.hubertTorchModel.data, filename: fileUploadSetting.hubertTorchModel.filename
-                } : null
+            try {
+                const saveData: FileUploadSetting = {
+                    pyTorchModel: fileUploadSetting.pyTorchModel ? { data: fileUploadSetting.pyTorchModel.data, filename: fileUploadSetting.pyTorchModel.filename } : null,
+                    onnxModel: fileUploadSetting.onnxModel ? { data: fileUploadSetting.onnxModel.data, filename: fileUploadSetting.onnxModel.filename } : null,
+                    configFile: { data: fileUploadSetting.configFile.data, filename: fileUploadSetting.configFile.filename },
+                    hubertTorchModel: fileUploadSetting.hubertTorchModel ? {
+                        data: fileUploadSetting.hubertTorchModel.data, filename: fileUploadSetting.hubertTorchModel.filename
+                    } : null,
+                    clusterTorchModel: fileUploadSetting.clusterTorchModel ? {
+                        data: fileUploadSetting.clusterTorchModel.data, filename: fileUploadSetting.clusterTorchModel.filename
+                    } : null
+                }
+                setItem(INDEXEDDB_KEY_MODEL_DATA, saveData)
 
+            } catch (e) {
+                console.log("Excpetion:::::::::", e)
             }
-            setItem(INDEXEDDB_KEY_MODEL_DATA, saveData)
 
             await loadPromise
             setUploadProgress(0)

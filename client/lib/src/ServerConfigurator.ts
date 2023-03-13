@@ -109,7 +109,7 @@ export class ServerConfigurator {
         })
     }
 
-    loadModel = async (configFilename: string, pyTorchModelFilename: string | null, onnxModelFilename: string | null, hubertTorchModelFilename: string | null) => {
+    loadModel = async (configFilename: string, pyTorchModelFilename: string | null, onnxModelFilename: string | null, hubertTorchModelFilename: string | null, clusterTorchModelFilename: string | null) => {
         const url = this.serverUrl + "/load_model"
         const info = new Promise<ServerInfo>(async (resolve) => {
             const formData = new FormData();
@@ -117,6 +117,8 @@ export class ServerConfigurator {
             formData.append("onnxModelFilename", onnxModelFilename || "-");
             formData.append("configFilename", configFilename);
             formData.append("hubertTorchModelFilename", hubertTorchModelFilename || "-");
+            formData.append("clusterTorchModelFilename", clusterTorchModelFilename || "-");
+
 
             const request = new Request(url, {
                 method: 'POST',
