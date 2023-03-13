@@ -44,9 +44,8 @@ export const useSpeakerSetting = () => {
     const tranRow = useMemo(() => {
         return (
             <div className="body-row split-3-2-2-3 left-padding-1 guided">
-                <div className="body-item-title left-padding-1 ">Tuning</div>
+                <div className="body-item-title left-padding-1 ">Tran</div>
                 <div>
-                    <span className="body-item-input-slider-label">tran</span>
                     <input type="range" className="body-item-input-slider" min="-50" max="50" step="1" value={appState.serverSetting.serverSetting.tran} onChange={(e) => {
                         appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, tran: Number(e.target.value) })
                     }}></input>
@@ -67,19 +66,30 @@ export const useSpeakerSetting = () => {
     ])
 
 
-    const noiseControlRow = useMemo(() => {
+    const noiceScaleRow = useMemo(() => {
         return (
-            <div className="body-row split-3-2-2-3 left-padding-1 guided">
-                <div className="body-item-title left-padding-1 ">Noise Control</div>
+            <div className="body-row split-3-3-4 left-padding-1 guided">
+                <div className="body-item-title left-padding-1 ">Noice Scale</div>
                 <div>
-                    <span className="body-item-input-slider-label">n-scale</span>
                     <input type="range" className="body-item-input-slider" min="0" max="1" step="0.1" value={appState.serverSetting.serverSetting.noiceScale} onChange={(e) => {
                         appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, noiceScale: Number(e.target.value) })
                     }}></input>
                     <span className="body-item-input-slider-val">{appState.serverSetting.serverSetting.noiceScale}</span>
                 </div>
+                <div className="body-button-container">
+                </div>
+            </div>
+        )
+    }, [
+        appState.serverSetting.serverSetting,
+        appState.serverSetting.updateServerSettings
+    ])
+
+    const silentThresholdRow = useMemo(() => {
+        return (
+            <div className="body-row split-3-3-4 left-padding-1 guided">
+                <div className="body-item-title left-padding-1 ">Silent Threshold</div>
                 <div>
-                    <span className="body-item-input-slider-label">silent thr</span>
                     <input type="range" className="body-item-input-slider" min="0.00000" max="0.001" step="0.00001" value={appState.serverSetting.serverSetting.silentThreshold} onChange={(e) => {
                         appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, silentThreshold: Number(e.target.value) })
                     }}></input>
@@ -94,7 +104,6 @@ export const useSpeakerSetting = () => {
         appState.serverSetting.serverSetting,
         appState.serverSetting.updateServerSettings
     ])
-
 
     const speakerSetting = useMemo(() => {
         return (
@@ -113,12 +122,13 @@ export const useSpeakerSetting = () => {
                     <div className="partition-content">
                         {dstIdRow}
                         {tranRow}
-                        {noiseControlRow}
+                        {noiceScaleRow}
+                        {silentThresholdRow}
                     </div>
                 </div>
             </>
         )
-    }, [dstIdRow, tranRow, noiseControlRow])
+    }, [dstIdRow, tranRow, noiceScaleRow, silentThresholdRow])
 
     return {
         speakerSetting,

@@ -10,7 +10,8 @@ export type ServerSettingState = {
 
 export const useModelSettingArea = (): ServerSettingState => {
     const appState = useAppState()
-    const [showPyTorch, setShowPyTorch] = useState<boolean>(false)
+    // const [showPyTorch, setShowPyTorch] = useState<boolean>(false)
+    const [showPyTorch, setShowPyTorch] = useState<boolean>(true)
 
     const accodionButton = useMemo(() => {
         const accodionButtonProps: HeaderButtonProps = {
@@ -107,9 +108,9 @@ export const useModelSettingArea = (): ServerSettingState => {
                     </div>
                     <div className="body-item-text">
                         <div>
-                            <input type="checkbox" checked={showPyTorch} onChange={(e) => {
+                            {/* <input type="checkbox" checked={showPyTorch} onChange={(e) => {
                                 setShowPyTorch(e.target.checked)
-                            }} /> enable PyTorch
+                            }} /> enable PyTorch */}
                         </div>
                     </div>
                 </div>
@@ -124,7 +125,7 @@ export const useModelSettingArea = (): ServerSettingState => {
                         <div className="body-button left-margin-1" onClick={onConfigFileClearClicked}>clear</div>
                     </div>
                 </div>
-                <div className="body-row split-3-3-4 left-padding-1 guided">
+                {/* <div className="body-row split-3-3-4 left-padding-1 guided">
                     <div className="body-item-title left-padding-2">Onnx(.onnx)</div>
                     <div className="body-item-text">
                         <div>{onnxModelFilenameText}</div>
@@ -133,7 +134,7 @@ export const useModelSettingArea = (): ServerSettingState => {
                         <div className="body-button" onClick={onOnnxFileLoadClicked}>select</div>
                         <div className="body-button left-margin-1" onClick={onOnnxFileClearClicked}>clear</div>
                     </div>
-                </div>
+                </div> */}
                 {showPyTorch ?
                     (
                         <div className="body-row split-3-3-4 left-padding-1 guided">
@@ -175,26 +176,27 @@ export const useModelSettingArea = (): ServerSettingState => {
         showPyTorch])
 
     const frameworkRow = useMemo(() => {
-        const onFrameworkChanged = async (val: Framework) => {
-            appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, framework: val })
-        }
-        return (
-            <div className="body-row split-3-7 left-padding-1 guided">
-                <div className="body-item-title left-padding-1">Framework</div>
-                <div className="body-select-container">
-                    <select className="body-select" value={appState.serverSetting.serverSetting.framework} onChange={(e) => {
-                        onFrameworkChanged(e.target.value as
-                            Framework)
-                    }}>
-                        {
-                            Object.values(Framework).map(x => {
-                                return <option key={x} value={x}>{x}</option>
-                            })
-                        }
-                    </select>
-                </div>
-            </div>
-        )
+        return <></>
+        // const onFrameworkChanged = async (val: Framework) => {
+        //     appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, framework: val })
+        // }
+        // return (
+        //     <div className="body-row split-3-7 left-padding-1 guided">
+        //         <div className="body-item-title left-padding-1">Framework</div>
+        //         <div className="body-select-container">
+        //             <select className="body-select" value={appState.serverSetting.serverSetting.framework} onChange={(e) => {
+        //                 onFrameworkChanged(e.target.value as
+        //                     Framework)
+        //             }}>
+        //                 {
+        //                     Object.values(Framework).map(x => {
+        //                         return <option key={x} value={x}>{x}</option>
+        //                     })
+        //                 }
+        //             </select>
+        //         </div>
+        //     </div>
+        // )
     }, [appState.serverSetting.serverSetting.framework, appState.serverSetting.updateServerSettings])
 
     const onnxExecutionProviderRow = useMemo(() => {
