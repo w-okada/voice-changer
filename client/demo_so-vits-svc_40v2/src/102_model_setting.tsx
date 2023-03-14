@@ -89,8 +89,8 @@ export const useModelSettingArea = (): ServerSettingState => {
 
         const onClusterFileLoadClicked = async () => {
             const file = await fileSelector("")
-            if (file.name.endsWith(".pth") == false) {
-                alert("モデルファイルの拡張子はpthである必要があります。")
+            if (file.name.endsWith(".pt") == false) {
+                alert("モデルファイルの拡張子はptである必要があります。")
                 return
             }
             appState.serverSetting.setFileUploadSetting({
@@ -171,36 +171,6 @@ export const useModelSettingArea = (): ServerSettingState => {
                         <div className="body-button left-margin-1" onClick={onConfigFileClearClicked}>clear</div>
                     </div>
                 </div>
-                {/* <div className="body-row split-3-3-4 left-padding-1 guided">
-                    <div className="body-item-title left-padding-2">hubert(.pth)</div>
-                    <div className="body-item-text">
-                        <div>{hubertModelFilenameText}</div>
-                    </div>
-                    <div className="body-button-container">
-                        <div className="body-button" onClick={onHubertFileLoadClicked}>select</div>
-                        <div className="body-button left-margin-1" onClick={onHubertFileClearClicked}>clear</div>
-                    </div>
-                </div> */}
-                <div className="body-row split-3-3-4 left-padding-1 guided">
-                    <div className="body-item-title left-padding-2">cluster(.pth)</div>
-                    <div className="body-item-text">
-                        <div>{clusterModelFilenameText}</div>
-                    </div>
-                    <div className="body-button-container">
-                        <div className="body-button" onClick={onClusterFileLoadClicked}>select</div>
-                        <div className="body-button left-margin-1" onClick={onClusterFileClearClicked}>clear</div>
-                    </div>
-                </div>
-                {/* <div className="body-row split-3-3-4 left-padding-1 guided">
-                    <div className="body-item-title left-padding-2">Onnx(.onnx)</div>
-                    <div className="body-item-text">
-                        <div>{onnxModelFilenameText}</div>
-                    </div>
-                    <div className="body-button-container">
-                        <div className="body-button" onClick={onOnnxFileLoadClicked}>select</div>
-                        <div className="body-button left-margin-1" onClick={onOnnxFileClearClicked}>clear</div>
-                    </div>
-                </div> */}
                 {showPyTorch ?
                     (
                         <div className="body-row split-3-3-4 left-padding-1 guided">
@@ -220,6 +190,37 @@ export const useModelSettingArea = (): ServerSettingState => {
                         <></>
                     )
                 }
+
+                {/* <div className="body-row split-3-3-4 left-padding-1 guided">
+                    <div className="body-item-title left-padding-2">hubert(.pth)</div>
+                    <div className="body-item-text">
+                        <div>{hubertModelFilenameText}</div>
+                    </div>
+                    <div className="body-button-container">
+                        <div className="body-button" onClick={onHubertFileLoadClicked}>select</div>
+                        <div className="body-button left-margin-1" onClick={onHubertFileClearClicked}>clear</div>
+                    </div>
+                </div> */}
+                <div className="body-row split-3-3-4 left-padding-1 guided">
+                    <div className="body-item-title left-padding-2">cluster(.pt)</div>
+                    <div className="body-item-text">
+                        <div>{clusterModelFilenameText}</div>
+                    </div>
+                    <div className="body-button-container">
+                        <div className="body-button" onClick={onClusterFileLoadClicked}>select</div>
+                        <div className="body-button left-margin-1" onClick={onClusterFileClearClicked}>clear</div>
+                    </div>
+                </div>
+                {/* <div className="body-row split-3-3-4 left-padding-1 guided">
+                    <div className="body-item-title left-padding-2">Onnx(.onnx)</div>
+                    <div className="body-item-text">
+                        <div>{onnxModelFilenameText}</div>
+                    </div>
+                    <div className="body-button-container">
+                        <div className="body-button" onClick={onOnnxFileLoadClicked}>select</div>
+                        <div className="body-button left-margin-1" onClick={onOnnxFileClearClicked}>clear</div>
+                    </div>
+                </div> */}
                 <div className="body-row split-3-3-4 left-padding-1 guided">
                     <div className="body-item-title left-padding-2"></div>
                     <div className="body-item-text">
