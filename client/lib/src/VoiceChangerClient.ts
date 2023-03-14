@@ -23,7 +23,8 @@ export class VoiceChangerClient {
     private currentMediaStreamAudioSourceNode: MediaStreamAudioSourceNode | null = null
     private inputGainNode: GainNode | null = null
     private outputGainNode: GainNode | null = null
-    private vcNode!: VoiceChangerWorkletNode
+    private vcInNode!: VoiceChangerWorkletNode
+    private vcOutNode!: VoiceChangerWorkletNode
     private currentMediaStreamAudioDestinationNode!: MediaStreamAudioDestinationNode
 
 
@@ -45,11 +46,17 @@ export class VoiceChangerClient {
             const scriptUrl = URL.createObjectURL(new Blob([workerjs], { type: "text/javascript" }));
             await this.ctx.audioWorklet.addModule(scriptUrl)
 
-            this.vcNode = new VoiceChangerWorkletNode(this.ctx, voiceChangerWorkletListener); // vc node 
-            this.currentMediaStreamAudioDestinationNode = this.ctx.createMediaStreamDestination() // output node
-            this.outputGainNode = this.ctx.createGain()
+            this.vcInNode = new VoiceChangerWorkletNode(this.ctx, voiceChangerWorkletListener); // vc node 
+
+            // const ctx44k = new AudioContext({ sampleRate: 44100 }) // これでもプチプチが残る
+            const ctx44k = new AudioContext({ sampleRate: 48000 }) // 結局これが一番まし。
+            console.log("audio out:", ctx44k)
+            await ctx44k.audioWorklet.addModule(scriptUrl)
+            this.vcOutNode = new VoiceChangerWorkletNode(ctx44k, voiceChangerWorkletListener); // vc node 
+            this.currentMediaStreamAudioDestinationNode = ctx44k.createMediaStreamDestination() // output node
+            this.outputGainNode = ctx44k.createGain()
             this.outputGainNode.gain.value = this.setting.outputGain
-            this.vcNode.connect(this.outputGainNode) // vc node -> output node
+            this.vcOutNode.connect(this.outputGainNode) // vc node -> output node
             this.outputGainNode.connect(this.currentMediaStreamAudioDestinationNode)
 
             if (this.vfEnable) {
@@ -85,7 +92,7 @@ export class VoiceChangerClient {
 
         console.log(`Input Setup=> echo: ${this.setting.echoCancel}, noise1: ${this.setting.noiseSuppression}, noise2: ${this.setting.noiseSuppression2}`)
         // condition check
-        if (!this.vcNode) {
+        if (!this.vcInNode) {
             console.warn("vc node is not initialized.")
             throw "vc node is not initialized."
         }
@@ -100,7 +107,7 @@ export class VoiceChangerClient {
         //// Input デバイスがnullの時はmicStreamを止めてリターン
         if (!this.setting.audioInput) {
             console.log(`Input Setup=> client mic is disabled.`)
-            this.vcNode.stop()
+            this.vcInNode.stop()
             await this.unlock(lockNum)
             return
         }
@@ -135,7 +142,7 @@ export class VoiceChangerClient {
             this.currentDevice.chooseNewInnerDevice(this.currentMediaStream)
             const voiceFocusNode = await this.currentDevice.createAudioNode(this.ctx); // vf node
             this.inputGainNode.connect(voiceFocusNode.start) // input node -> vf node
-            voiceFocusNode.end.connect(this.vcNode)
+            voiceFocusNode.end.connect(this.vcInNode)
         } else {
             // console.log("input___ media stream", this.currentMediaStream)
             // this.currentMediaStream.getTracks().forEach(x => {
@@ -145,8 +152,9 @@ export class VoiceChangerClient {
             // })
             // console.log("input___ media node", this.currentMediaStreamAudioSourceNode)
             // console.log("input___ gain node", this.inputGainNode.channelCount, this.inputGainNode)
-            this.inputGainNode.connect(this.vcNode)
+            this.inputGainNode.connect(this.vcInNode)
         }
+        this.vcInNode.setOutputNode(this.vcOutNode)
         console.log("Input Setup=> success")
         await this.unlock(lockNum)
     }
@@ -155,11 +163,11 @@ export class VoiceChangerClient {
     }
 
     start = () => {
-        this.vcNode.start()
+        this.vcInNode.start()
         this._isVoiceChanging = true
     }
     stop = () => {
-        this.vcNode.stop()
+        this.vcInNode.stop()
         this._isVoiceChanging = false
     }
 
@@ -185,7 +193,7 @@ export class VoiceChangerClient {
                 }
             }
         }
-        this.vcNode.updateSetting({ ...this.vcNode.getSettings(), serverUrl: url })
+        this.vcInNode.updateSetting({ ...this.vcInNode.getSettings(), serverUrl: url })
         this.configurator.setServerUrl(url)
     }
 
@@ -250,20 +258,22 @@ export class VoiceChangerClient {
 
     //##  Worklet ##//
     configureWorklet = (setting: WorkletSetting) => {
-        this.vcNode.configure(setting)
+        this.vcInNode.configure(setting)
+        this.vcOutNode.configure(setting)
     }
     startOutputRecording = () => {
-        this.vcNode.startOutputRecording()
+        this.vcOutNode.startOutputRecording()
     }
     stopOutputRecording = () => {
-        return this.vcNode.stopOutputRecording()
+        return this.vcOutNode.stopOutputRecording()
     }
     trancateBuffer = () => {
-        this.vcNode.trancateBuffer()
+        this.vcOutNode.trancateBuffer()
     }
     //##  Worklet Node ##//
     updateWorkletNodeSetting = (setting: WorkletNodeSetting) => {
-        this.vcNode.updateSetting(setting)
+        this.vcInNode.updateSetting(setting)
+        this.vcOutNode.updateSetting(setting)
     }
 
 
@@ -272,14 +282,14 @@ export class VoiceChangerClient {
     /////////////////////////////////////////////////////
     // Information
     getClientSettings = () => {
-        return this.vcNode.getSettings()
+        return this.vcInNode.getSettings()
     }
     getServerSettings = () => {
         return this.configurator.getSettings()
     }
 
     getSocketId = () => {
-        return this.vcNode.getSocketId()
+        return this.vcInNode.getSocketId()
     }
 
 }

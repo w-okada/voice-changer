@@ -5,7 +5,7 @@ module.exports = {
     resolve: {
         extensions: [".ts", ".js"],
         fallback: {
-            // "buffer": false
+            "buffer": require.resolve("buffer/")
         }
     },
     module: {
@@ -29,6 +29,12 @@ module.exports = {
         libraryTarget: "umd",
         globalObject: "typeof self !== 'undefined' ? self : this",
     },
+
+    plugins: [
+        new webpack.ProvidePlugin({
+            Buffer: ['buffer', 'Buffer'],
+        }),
+    ],
     externals: {
         react: "react",
         "react-dom": "reactDOM",

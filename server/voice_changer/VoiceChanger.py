@@ -224,6 +224,7 @@ class VoiceChanger():
                 outputData = resampy.resample(result, processing_sampling_rate, self.settings.inputSampleRate).astype(np.int16)
             else:
                 outputData = result
+            # outputData = result
 
             print_convert_processing(
                 f" Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")

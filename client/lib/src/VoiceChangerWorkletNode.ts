@@ -21,6 +21,7 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
 
     private isOutputRecording = false;
     private recordingOutputChunk: Float32Array[] = []
+    private outputNode: VoiceChangerWorkletNode | null = null
 
     constructor(context: AudioContext, listener: VoiceChangerWorkletListener) {
         super(context, "voice-changer-worklet-processor");
@@ -29,6 +30,11 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
         this.createSocketIO()
         console.log(`[worklet_node][voice-changer-worklet-processor] created.`);
     }
+
+    setOutputNode = (outputNode: VoiceChangerWorkletNode | null) => {
+        this.outputNode = outputNode
+    }
+
 
     // 設定
     updateSetting = (setting: WorkletNodeSetting) => {
@@ -73,14 +79,18 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
                 if (result.byteLength < 128 * 2) {
                     this.listener.notifyException(VOICE_CHANGER_CLIENT_EXCEPTION.ERR_SIO_INVALID_RESPONSE, `[SIO] recevied data is too short ${result.byteLength}`)
                 } else {
-                    this.postReceivedVoice(response[1])
+                    if (this.outputNode != null) {
+                        this.outputNode.postReceivedVoice(response[1])
+                    } else {
+                        this.postReceivedVoice(response[1])
+                    }
                     this.listener.notifyResponseTime(responseTime, perf)
                 }
             });
         }
     }
 
-    private postReceivedVoice = (data: ArrayBuffer) => {
+    postReceivedVoice = (data: ArrayBuffer) => {
         // Int16 to Float
         const i16Data = new Int16Array(data)
         const f32Data = new Float32Array(i16Data.length)
@@ -238,7 +248,11 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
             if (res.byteLength < 128 * 2) {
                 this.listener.notifyException(VOICE_CHANGER_CLIENT_EXCEPTION.ERR_REST_INVALID_RESPONSE, `[REST] recevied data is too short ${res.byteLength}`)
             } else {
-                this.postReceivedVoice(res)
+                if (this.outputNode != null) {
+                    this.outputNode.postReceivedVoice(res)
+                } else {
+                    this.postReceivedVoice(res)
+                }
                 this.listener.notifyResponseTime(Date.now() - timestamp)
             }
         }
