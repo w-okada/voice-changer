@@ -175,9 +175,11 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             //     fileUploadSetting.hubertTorchModel!.data = await fileUploadSetting.hubertTorchModel!.file!.arrayBuffer()
             //     fileUploadSetting.hubertTorchModel!.filename = await fileUploadSetting.hubertTorchModel!.file!.name
             // }
-            if (props.clientType == "so_vits_svc_40v2c" && !fileUploadSetting.clusterTorchModel!.data) {
-                fileUploadSetting.clusterTorchModel!.data = await fileUploadSetting.clusterTorchModel!.file!.arrayBuffer()
-                fileUploadSetting.clusterTorchModel!.filename = await fileUploadSetting.clusterTorchModel!.file!.name
+            if (fileUploadSetting.clusterTorchModel) {
+                if (props.clientType == "so_vits_svc_40v2c" && !fileUploadSetting.clusterTorchModel!.data) {
+                    fileUploadSetting.clusterTorchModel!.data = await fileUploadSetting.clusterTorchModel!.file!.arrayBuffer()
+                    fileUploadSetting.clusterTorchModel!.filename = await fileUploadSetting.clusterTorchModel!.file!.name
+                }
             }
             // ファイルをサーバにアップロード
             const models = [fileUploadSetting.onnxModel, fileUploadSetting.pyTorchModel, fileUploadSetting.clusterTorchModel /*, fileUploadSetting.hubertTorchModel*/].filter(x => { return x != null }) as ModelData[]
