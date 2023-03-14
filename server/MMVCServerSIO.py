@@ -76,6 +76,8 @@ args, unknown = parser.parse_known_args()
 # if __name__ == thisFilename or args.colab == True:
 # printMessage(f"PHASE3:{__name__}", level=2)
 
+printMessage(f"Booting PHASE :{__name__}", level=2)
+
 TYPE = args.t
 PORT = args.p
 CONFIG = args.c
@@ -102,16 +104,17 @@ def localServer():
 if args.colab == True:
     os.environ["colab"] = "True"
 
-voiceChangerManager = VoiceChangerManager.get_instance()
-if CONFIG and (MODEL or ONNX_MODEL):
-    if MODEL_TYPE == "MMVCv15" or MODEL_TYPE == "MMVCv13":
-        voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL, None, None)
-    else:
-        # !! 注意 !! hubertTorchModelは固定値で上書きされるため、設定しても効果ない。
-        voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL, CLUSTER_MODEL, HUBERT_MODEL)
+if __name__ == 'MMVCServerSIO':
+    voiceChangerManager = VoiceChangerManager.get_instance()
+    if CONFIG and (MODEL or ONNX_MODEL):
+        if MODEL_TYPE == "MMVCv15" or MODEL_TYPE == "MMVCv13":
+            voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL, None, None)
+        else:
+            # !! 注意 !! hubertTorchModelは固定値で上書きされるため、設定しても効果ない。
+            voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL, CLUSTER_MODEL, HUBERT_MODEL)
 
-app_fastapi = MMVC_Rest.get_instance(voiceChangerManager)
-app_socketio = MMVC_SocketIOApp.get_instance(app_fastapi, voiceChangerManager)
+    app_fastapi = MMVC_Rest.get_instance(voiceChangerManager)
+    app_socketio = MMVC_SocketIOApp.get_instance(app_fastapi, voiceChangerManager)
 
 
 if __name__ == '__mp_main__':
