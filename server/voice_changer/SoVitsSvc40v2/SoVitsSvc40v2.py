@@ -87,7 +87,7 @@ class SoVitsSvc40v2:
 
         # cluster
         try:
-            if os.path.exists(clusterTorchModel):
+            if clusterTorchModel != None and os.path.exists(clusterTorchModel):
                 self.cluster_model = cluster.get_cluster_model(clusterTorchModel)
             else:
                 self.cluster_model = None
@@ -179,7 +179,8 @@ class SoVitsSvc40v2:
         c = utils.get_hubert_content(self.hubert_model, wav_16k_tensor=wav16k)
         c = utils.repeat_expand_2d(c.squeeze(0), f0.shape[1])
 
-        if self.settings.clusterInferRatio != 0 and self.cluster_model != None:
+        if self.settings.clusterInferRatio != 0 and hasattr(self, "cluster_model") and self.cluster_model != None:
+            print("use cluster")
             # self.hsp.spk.tsukuyomi
             cluster_c = cluster.get_cluster_center_result(self.cluster_model, c.cpu().numpy().T, "tsukuyomi").T
             # cluster_c = cluster.get_cluster_center_result(self.cluster_model, c.cpu().numpy().T, self.settings.dstId).T
