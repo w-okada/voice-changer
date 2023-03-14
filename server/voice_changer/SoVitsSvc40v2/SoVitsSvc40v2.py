@@ -180,12 +180,14 @@ class SoVitsSvc40v2:
         c = utils.repeat_expand_2d(c.squeeze(0), f0.shape[1])
 
         if self.settings.clusterInferRatio != 0 and hasattr(self, "cluster_model") and self.cluster_model != None:
-            print("use cluster")
-            # self.hsp.spk.tsukuyomi
-            cluster_c = cluster.get_cluster_center_result(self.cluster_model, c.cpu().numpy().T, "tsukuyomi").T
-            # cluster_c = cluster.get_cluster_center_result(self.cluster_model, c.cpu().numpy().T, self.settings.dstId).T
-            cluster_c = torch.FloatTensor(cluster_c).cpu()
-            c = self.settings.clusterInferRatio * cluster_c + (1 - self.settings.clusterInferRatio) * c
+            speaker = [key for key, value in self.settings.speakers.items() if value == self.settings.dstId]
+            if len(speaker) != 1:
+                print("not only one speaker found.", speaker)
+            else:
+                cluster_c = cluster.get_cluster_center_result(self.cluster_model, c.cpu().numpy().T, speaker[0]).T
+                # cluster_c = cluster.get_cluster_center_result(self.cluster_model, c.cpu().numpy().T, self.settings.dstId).T
+                cluster_c = torch.FloatTensor(cluster_c).cpu()
+                c = self.settings.clusterInferRatio * cluster_c + (1 - self.settings.clusterInferRatio) * c
 
         c = c.unsqueeze(0)
         return c, f0, uv

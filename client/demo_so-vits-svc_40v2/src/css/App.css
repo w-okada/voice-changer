@@ -216,6 +216,24 @@ body {
     }
 }
 
+.split-3-4-3 {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 30%;
+    }
+    & > div:nth-child(2) {
+        left: 30%;
+        width: 40%;
+    }
+    & > div:nth-child(3) {
+        left: 70%;
+        width: 30%;
+    }
+}
 .split-2-5-3 {
     display: flex;
     width: 100%;
@@ -465,6 +483,9 @@ body {
     margin-left: 1rem;
 }
 
+.body-button-container-space-around {
+    justify-content: space-around;
+}
 .body-button-container {
     display: flex;
     flex-direction: row;
@@ -537,4 +558,93 @@ body {
 .donate-img {
     border-radius: 35px;
     height: 1.5rem;
+}
+
+/* Dialog */
+.dialog-container {
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    display: none;
+    .dialog-frame {
+        color: var(--company-color2);
+        width: 40rem;
+        border: 2px solid var(--dialog-border-color);
+        border-radius: 20px;
+        flex-direction: column;
+        align-items: center;
+        box-shadow: 5px 5px 5px var(--dialog-shadow-color);
+        background: var(--dialog-background-color);
+        overflow: hidden;
+        display: flex;
+        .dialog-title {
+            margin-top: 20px;
+            background: var(--company-color2);
+            color: #fff;
+            width: 100%;
+            text-align: center;
+        }
+        .dialog-content {
+            width: 90%;
+            .dialog-application-title {
+                font-family: "Chicle", cursive;
+                font-size: 3rem;
+                text-align: center;
+            }
+        }
+    }
+}
+.dialog-container-show {
+    display: flex;
+}
+
+.state-control-checkbox:checked ~ .dialog-container {
+    background: rgba(200, 200, 200, 0.4);
+    animation-name: dialog-show;
+    animation-duration: 0.4s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+    animation-direction: normal;
+}
+.state-control-checkbox ~ .dialog-container {
+    background: rgba(100, 100, 100, 0.4);
+    animation-name: dialog-hide;
+    animation-duration: 0.4s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+    animation-direction: normal;
+}
+
+@keyframes dialog-hide {
+    from {
+        opacity: 1;
+        z-index: 200;
+    }
+    90% {
+        opacity: 0;
+        z-index: -1;
+    }
+    to {
+        opacity: 0;
+        z-index: -1;
+    }
+}
+
+@keyframes dialog-show {
+    from {
+        opacity: 0;
+        z-index: -1;
+    }
+    10% {
+        z-index: 200;
+    }
+    to {
+        opacity: 1;
+        z-index: 200;
+    }
 }

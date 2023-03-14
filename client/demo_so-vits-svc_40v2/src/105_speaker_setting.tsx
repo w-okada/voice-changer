@@ -36,7 +36,7 @@ export const useSpeakerSetting = () => {
                         appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, dstId: Number(e.target.value) })
 
                     }}>
-                        <option key="unknown" value={-1}>unknwon(-1)</option>
+                        <option key="unknown" value={0}>default(0)</option>
                         {
                             Object.keys(speakers).map(x => {
                                 return <option key={x} value={speakers[x]}>{x}({speakers[x]})</option>

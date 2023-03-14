@@ -10,6 +10,8 @@ export type StateControls = {
     openSpeakerSettingCheckbox: StateControlCheckbox
     openConverterSettingCheckbox: StateControlCheckbox
     openAdvancedSettingCheckbox: StateControlCheckbox
+
+    showLicenseCheckbox: StateControlCheckbox
 }
 
 type FrontendManagerState = {
@@ -36,6 +38,8 @@ export const useFrontendManager = (): FrontendManagerStateAndMethod => {
     const openConverterSettingCheckbox = useStateControlCheckbox(OpenConverterSettingCheckbox);
     const openAdvancedSettingCheckbox = useStateControlCheckbox(OpenAdvancedSettingCheckbox);
 
+    const showLicenseCheckbox = useStateControlCheckbox("leave-checkbox");
+
     useEffect(() => {
         openServerControlCheckbox.updateState(true)
         openModelSettingCheckbox.updateState(true)
@@ -56,7 +60,9 @@ export const useFrontendManager = (): FrontendManagerStateAndMethod => {
             openQualityControlCheckbox,
             openSpeakerSettingCheckbox,
             openConverterSettingCheckbox,
-            openAdvancedSettingCheckbox
+            openAdvancedSettingCheckbox,
+
+            showLicenseCheckbox
         },
         isConverting,
         setIsConverting,

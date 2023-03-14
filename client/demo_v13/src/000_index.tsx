@@ -13,6 +13,7 @@ import { AppRootProvider } from "./001_provider/001_AppRootProvider";
 import ErrorBoundary from "./001_provider/900_ErrorBoundary";
 import { INDEXEDDB_KEY_CLIENT, INDEXEDDB_KEY_MODEL_DATA, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_WORKLET, INDEXEDDB_KEY_WORKLETNODE, useIndexedDB } from "@dannadori/voice-changer-client-js";
 import { CLIENT_TYPE, INDEXEDDB_KEY_AUDIO_OUTPUT, isDesktopApp } from "./const";
+import { Dialog } from "./components/201_Dialog";
 
 library.add(fas, far, fab);
 
@@ -73,14 +74,25 @@ const App = () => {
                 </a>
             )
 
+
+        const licenseButton = (
+            <span className="link" onClick={() => {
+                document.getElementById("dialog")?.classList.add("dialog-container-show")
+                appState.frontendManagerState.stateControls.showLicenseCheckbox.updateState(true)
+            }}>
+                <span>License</span>
+            </span>
+        )
+
         return (
             <div className="top-title">
                 <span className="title">Voice Changer Setting</span>
-                <span className="top-title-version">for so-vits-svc 40v2</span>
+                <span className="top-title-version">for MMVC v.1.3.x</span>
                 <span className="belongings">
                     {githubLink}
                     {manualLink}
                     {coffeeLink}
+                    {licenseButton}
                 </span>
                 <span className="belongings">
 
@@ -112,6 +124,7 @@ const App = () => {
         return (
             <>
                 <div className="main-body">
+                    <Dialog />
                     {titleRow}
                     {clearRow}
                     {voiceChangerSetting}
