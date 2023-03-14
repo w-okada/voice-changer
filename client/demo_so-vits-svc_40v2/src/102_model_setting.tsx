@@ -57,6 +57,7 @@ export const useModelSettingArea = (): ServerSettingState => {
                     file: file
                 }
             })
+
         }
         const onConfigFileClearClicked = () => {
             appState.serverSetting.setFileUploadSetting({

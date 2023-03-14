@@ -112,6 +112,9 @@ export type ServerInfo = VoiceChangerServerSetting & {
     onnxExecutionProviders: OnnxExecutionProvider[]
 }
 
+export type ServerInfoSoVitsSVC = ServerInfo & {
+    speakers: { [key: string]: number }
+}
 export const DefaultServerSetting_MMVCv15: ServerInfo = {
     srcId: 0,
     dstId: 101,

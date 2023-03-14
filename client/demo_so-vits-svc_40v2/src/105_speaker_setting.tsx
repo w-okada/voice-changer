@@ -1,9 +1,11 @@
+import { ServerInfoSoVitsSVC } from "@dannadori/voice-changer-client-js";
 import React, { useMemo, useState } from "react"
 import { useAppState } from "./001_provider/001_AppStateProvider";
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./components/101_HeaderButton";
 
 export const useSpeakerSetting = () => {
     const appState = useAppState()
+
 
     const accodionButton = useMemo(() => {
         const accodionButtonProps: HeaderButtonProps = {
@@ -18,17 +20,26 @@ export const useSpeakerSetting = () => {
     }, []);
 
     const dstIdRow = useMemo(() => {
+        const settings = appState.serverSetting.serverSetting as ServerInfoSoVitsSVC
+        const speakers = settings.speakers
+        if (!speakers) {
+            return <></>
+        }
+
+        const currentValue = Object.values(speakers).includes(appState.serverSetting.serverSetting.dstId) ? appState.serverSetting.serverSetting.dstId : -1
+
         return (
             <div className="body-row split-3-2-1-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Destination Speaker Id</div>
                 <div className="body-select-container">
-                    <select className="body-select" value={appState.serverSetting.serverSetting.dstId} onChange={(e) => {
+                    <select className="body-select" value={currentValue} onChange={(e) => {
                         appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, dstId: Number(e.target.value) })
 
                     }}>
+                        <option key="unknown" value={-1}>unknwon(-1)</option>
                         {
-                            [0, 1, 2, 3, 4].map(x => {
-                                return <option key={x} value={x}>{x}</option>
+                            Object.keys(speakers).map(x => {
+                                return <option key={x} value={speakers[x]}>{x}({speakers[x]})</option>
                             })
                         }
                     </select>

@@ -11,7 +11,7 @@ else:
     sys.path.append("so-vits-svc-40v2")
 
 import io
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from functools import reduce
 import numpy as np
 import torch
@@ -29,7 +29,7 @@ providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecution
 @dataclass
 class SoVitsSvc40v2Settings():
     gpu: int = 0
-    dstId: int = 0
+    dstId: int = -1
 
     f0Detector: str = "dio"  # dio or harvest
     tran: int = 20
@@ -43,6 +43,10 @@ class SoVitsSvc40v2Settings():
     pyTorchModelFile: str = ""
     onnxModelFile: str = ""
     configFile: str = ""
+
+    speakers: dict[str, int] = field(
+        default_factory=lambda: {}
+    )
 
     # ↓mutableな物だけ列挙
     intData = ["gpu", "dstId", "tran", "predictF0", "extraConvertSize"]
@@ -65,38 +69,30 @@ class SoVitsSvc40v2:
 
         self.settings.configFile = config
         self.hps = utils.get_hparams_from_file(config)
+        self.settings.speakers = self.hps.spk
 
         # hubert model
         try:
             # vec_path = hubertTorchModel
             vec_path = "hubert/checkpoint_best_legacy_500.pt"
-            print("hubert 1 ", hubertTorchModel)
             models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(
                 [vec_path],
                 suffix="",
             )
-            print("hubert 2 ", hubertTorchModel)
             model = models[0]
-            print("hubert 3 ", hubertTorchModel)
             model.eval()
-            print("hubert 4 ", hubertTorchModel)
             self.hubert_model = model.cpu()
-            print("hubert 5 ", hubertTorchModel)
         except Exception as e:
-            print("EXCEPTION1", e)
+            print("EXCEPTION during loading hubert/contentvec model", e)
 
         # cluster
         try:
             if os.path.exists(clusterTorchModel):
-                print("load kmean11", clusterTorchModel)
                 self.cluster_model = cluster.get_cluster_model(clusterTorchModel)
-                print("load kmean12", clusterTorchModel)
             else:
-                print("load kmean21", clusterTorchModel)
                 self.cluster_model = None
-                print("load kmean22", clusterTorchModel)
         except Exception as e:
-            print("EXCEPTION2", e)
+            print("EXCEPTION during loading cluster model ", e)
 
         if pyTorch_model_file != None:
             self.settings.pyTorchModelFile = pyTorch_model_file
