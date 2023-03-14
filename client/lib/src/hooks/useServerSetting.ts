@@ -52,7 +52,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             return DefaultServerSetting_MMVCv13
         } else if (props.clientType == "MMVCv15") {
             return DefaultServerSetting_MMVCv15
-        } else if (props.clientType == "so_vits_svc_40v2c") {
+        } else if (props.clientType == "so_vits_svc_40v2" || props.clientType == "so_vits_svc_40v2c_tsukuyomi") {
             return DefaultServerSetting_so_vits_svc_40v2
         } else {
             return DefaultServerSetting_MMVCv15
@@ -176,7 +176,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             //     fileUploadSetting.hubertTorchModel!.filename = await fileUploadSetting.hubertTorchModel!.file!.name
             // }
             if (fileUploadSetting.clusterTorchModel) {
-                if (props.clientType == "so_vits_svc_40v2c" && !fileUploadSetting.clusterTorchModel!.data) {
+                if (props.clientType == "so_vits_svc_40v2" && !fileUploadSetting.clusterTorchModel!.data) {
                     fileUploadSetting.clusterTorchModel!.data = await fileUploadSetting.clusterTorchModel!.file!.arrayBuffer()
                     fileUploadSetting.clusterTorchModel!.filename = await fileUploadSetting.clusterTorchModel!.file!.name
                 }

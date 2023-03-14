@@ -56,7 +56,7 @@ class VoiceChanger():
         elif self.modelType == "MMVCv13":
             from voice_changer.MMVCv13.MMVCv13 import MMVCv13
             self.voiceChanger = MMVCv13()
-        elif self.modelType == "so-vits-svc-40v2":
+        elif self.modelType == "so-vits-svc-40v2" or self.modelType == "so-vits-svc-40v2_tsukuyomi":
             from voice_changer.SoVitsSvc40v2.SoVitsSvc40v2 import SoVitsSvc40v2
             self.voiceChanger = SoVitsSvc40v2()
 

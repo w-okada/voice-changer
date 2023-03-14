@@ -17,10 +17,9 @@ server/train_config.json
 # v.1.3.xテスト用モデルフォルダ
 server/v13
 
-server/hubert
-server/so-vits-svc
-# sovitsテスト用モデルフォルダ
-server/sovits 
+server/model_hubert
+server/model_so-vits-svc-40v2_tsukuyomi/
+server/model_sovits
 server/test 
 
 server/memo.md
