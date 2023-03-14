@@ -60,13 +60,16 @@ class SoVitsSvc40v2:
         self.gpu_num = torch.cuda.device_count()
         self.prevVol = 0
 
-    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, hubertTorchModel: str = None, clusterTorchModel: str = None):
+    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, clusterTorchModel: str = None, hubertTorchModel: str = None):
+        # !! 注意 !! hubertTorchModelは固定値で上書きされるため、設定しても効果ない。
+
         self.settings.configFile = config
         self.hps = utils.get_hparams_from_file(config)
 
         # hubert model
         try:
-            vec_path = hubertTorchModel
+            # vec_path = hubertTorchModel
+            vec_path = "hubert/checkpoint_best_legacy_500.pt"
             print("hubert 1 ", hubertTorchModel)
             models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(
                 [vec_path],

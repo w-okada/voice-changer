@@ -109,16 +109,16 @@ export class ServerConfigurator {
         })
     }
 
-    loadModel = async (configFilename: string, pyTorchModelFilename: string | null, onnxModelFilename: string | null, hubertTorchModelFilename: string | null, clusterTorchModelFilename: string | null) => {
+    // !! 注意!! hubertTorchModelは固定値で上書きされるため、設定しても効果ない。
+    loadModel = async (configFilename: string, pyTorchModelFilename: string | null, onnxModelFilename: string | null, clusterTorchModelFilename: string | null, hubertTorchModelFilename: string | null) => {
         const url = this.serverUrl + "/load_model"
         const info = new Promise<ServerInfo>(async (resolve) => {
             const formData = new FormData();
             formData.append("pyTorchModelFilename", pyTorchModelFilename || "-");
             formData.append("onnxModelFilename", onnxModelFilename || "-");
             formData.append("configFilename", configFilename);
-            formData.append("hubertTorchModelFilename", hubertTorchModelFilename || "-");
             formData.append("clusterTorchModelFilename", clusterTorchModelFilename || "-");
-
+            formData.append("hubertTorchModelFilename", hubertTorchModelFilename || "-");
 
             const request = new Request(url, {
                 method: 'POST',

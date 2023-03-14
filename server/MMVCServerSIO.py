@@ -39,8 +39,8 @@ def setupArgParser():
                         default=False, help="run on colab")
     parser.add_argument("--modelType", type=str,
                         default="MMVCv15", help="model type: MMVCv13, MMVCv15, so-vits-svc-40v2")
-    parser.add_argument("--hubert", type=str, help="path to hubert model")
     parser.add_argument("--cluster", type=str, help="path to cluster model")
+    parser.add_argument("--hubert", type=str, help="path to hubert model, 現バージョンではhubertTorchModelは固定値で上書きされるため、設定しても効果ない。")
 
     return parser
 
@@ -107,7 +107,8 @@ if CONFIG and (MODEL or ONNX_MODEL):
     if MODEL_TYPE == "MMVCv15" or MODEL_TYPE == "MMVCv13":
         voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL, None, None)
     else:
-        voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL, HUBERT_MODEL, CLUSTER_MODEL)
+        # !! 注意 !! hubertTorchModelは固定値で上書きされるため、設定しても効果ない。
+        voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL, CLUSTER_MODEL, HUBERT_MODEL)
 
 app_fastapi = MMVC_Rest.get_instance(voiceChangerManager)
 app_socketio = MMVC_SocketIOApp.get_instance(app_fastapi, voiceChangerManager)

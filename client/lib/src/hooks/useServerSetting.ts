@@ -14,16 +14,16 @@ export type FileUploadSetting = {
     pyTorchModel: ModelData | null
     onnxModel: ModelData | null
     configFile: ModelData | null
-    hubertTorchModel: ModelData | null
     clusterTorchModel: ModelData | null
+    hubertTorchModel: ModelData | null // !! 注意!! hubertTorchModelは固定値で上書きされるため、設定しても効果ない。
 }
 
 const InitialFileUploadSetting: FileUploadSetting = {
     pyTorchModel: null,
     configFile: null,
     onnxModel: null,
+    clusterTorchModel: null,
     hubertTorchModel: null,
-    clusterTorchModel: null
 }
 
 export type UseServerSettingProps = {
@@ -148,10 +148,11 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 alert("Configファイルを指定する必要があります。")
                 return
             }
-            if (props.clientType == "so_vits_svc_40v2c" && !fileUploadSetting.hubertTorchModel) {
-                alert("content vecのファイルを指定する必要があります。")
-                return
-            }
+
+            // if (props.clientType == "so_vits_svc_40v2c" && !fileUploadSetting.hubertTorchModel) {
+            //     alert("content vecのファイルを指定する必要があります。")
+            //     return
+            // }
             if (!props.voiceChangerClient) return
 
             setUploadProgress(0)
@@ -170,16 +171,16 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 fileUploadSetting.configFile.data = await fileUploadSetting.configFile.file!.arrayBuffer()
                 fileUploadSetting.configFile.filename = await fileUploadSetting.configFile.file!.name
             }
-            if (props.clientType == "so_vits_svc_40v2c" && !fileUploadSetting.hubertTorchModel!.data) {
-                fileUploadSetting.hubertTorchModel!.data = await fileUploadSetting.hubertTorchModel!.file!.arrayBuffer()
-                fileUploadSetting.hubertTorchModel!.filename = await fileUploadSetting.hubertTorchModel!.file!.name
-            }
+            // if (props.clientType == "so_vits_svc_40v2c" && !fileUploadSetting.hubertTorchModel!.data) {
+            //     fileUploadSetting.hubertTorchModel!.data = await fileUploadSetting.hubertTorchModel!.file!.arrayBuffer()
+            //     fileUploadSetting.hubertTorchModel!.filename = await fileUploadSetting.hubertTorchModel!.file!.name
+            // }
             if (props.clientType == "so_vits_svc_40v2c" && !fileUploadSetting.clusterTorchModel!.data) {
                 fileUploadSetting.clusterTorchModel!.data = await fileUploadSetting.clusterTorchModel!.file!.arrayBuffer()
                 fileUploadSetting.clusterTorchModel!.filename = await fileUploadSetting.clusterTorchModel!.file!.name
             }
             // ファイルをサーバにアップロード
-            const models = [fileUploadSetting.onnxModel, fileUploadSetting.pyTorchModel, fileUploadSetting.hubertTorchModel, fileUploadSetting.clusterTorchModel].filter(x => { return x != null }) as ModelData[]
+            const models = [fileUploadSetting.onnxModel, fileUploadSetting.pyTorchModel, fileUploadSetting.clusterTorchModel /*, fileUploadSetting.hubertTorchModel*/].filter(x => { return x != null }) as ModelData[]
             for (let i = 0; i < models.length; i++) {
                 const progRate = 1 / models.length
                 const progOffset = 100 * i * progRate
@@ -193,7 +194,8 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 console.log(progress, end)
             })
 
-            const loadPromise = props.voiceChangerClient.loadModel(fileUploadSetting.configFile.filename!, fileUploadSetting.pyTorchModel?.filename || null, fileUploadSetting.onnxModel?.filename || null, fileUploadSetting.hubertTorchModel?.filename || null, fileUploadSetting.clusterTorchModel?.filename || null)
+            // !! 注意!! hubertTorchModelは固定値で上書きされるため、設定しても効果ない。
+            const loadPromise = props.voiceChangerClient.loadModel(fileUploadSetting.configFile.filename!, fileUploadSetting.pyTorchModel?.filename || null, fileUploadSetting.onnxModel?.filename || null, fileUploadSetting.clusterTorchModel?.filename || null, fileUploadSetting.hubertTorchModel?.filename || null)
 
             // サーバでロード中にキャッシュにセーブ
             try {
