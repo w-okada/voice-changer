@@ -483,9 +483,6 @@ body {
     margin-left: 1rem;
 }
 
-.body-button-container-space-around {
-    justify-content: space-around;
-}
 .body-button-container {
     display: flex;
     flex-direction: row;
@@ -530,6 +527,11 @@ body {
         }
     }
 }
+
+.body-button-container-space-around {
+    justify-content: space-around;
+}
+
 .body-select {
     color: rgb(30, 30, 30);
     max-width: 100%;

@@ -14,7 +14,9 @@ import signal
 import sys
 import numpy as np
 
-BUFFER_SIZE = 2048 * 2
+BUFFER_SIZE = 2048 * 2 * 10
+SAMPLING_RATE = 44100
+GAIN = 10
 
 
 def setupArgParser():
@@ -91,7 +93,10 @@ class MyCustomNamespace(socketio.ClientNamespace):
         data = msg[1]
         perf = msg[2]
         print(f"RT:{responseTime}msec", perf)
-        # unpackedData = struct.unpack('<%sh' % (len(data) // struct.calcsize('<h')), data)
+        unpackedData = struct.unpack('<%sh' % (len(data) // struct.calcsize('<h')), data)
+        data = np.array(unpackedData)
+        data = data * GAIN
+        data = struct.pack('<%sh' % len(data), *data)
 
         if self.file_output_stream != None:
             self.file_output_stream.write(data)
@@ -112,7 +117,7 @@ if __name__ == '__main__':
     audio_input_stream = audio.open(
         format=pyaudio.paInt16,
         channels=1,
-        rate=24000,
+        rate=SAMPLING_RATE,
         frames_per_buffer=BUFFER_SIZE,
         input_device_index=inputDevice,
         input=True)
@@ -122,7 +127,7 @@ if __name__ == '__main__':
         audio_output_stream = audio.open(
             format=pyaudio.paInt16,
             channels=1,
-            rate=24000,
+            rate=SAMPLING_RATE,
             frames_per_buffer=BUFFER_SIZE,
             output_device_index=outputDevice,
             output=True)

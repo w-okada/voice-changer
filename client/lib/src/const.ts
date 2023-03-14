@@ -16,6 +16,7 @@ export type ClientType = typeof ClientType[keyof typeof ClientType]
 ///////////////////////
 export const InputSampleRate = {
     "48000": 48000,
+    "44100": 44100,
     "24000": 24000
 } as const
 export type InputSampleRate = typeof InputSampleRate[keyof typeof InputSampleRate]
@@ -241,6 +242,7 @@ export type Protocol = typeof Protocol[keyof typeof Protocol]
 
 export const SendingSampleRate = {
     "48000": 48000,
+    "44100": 44100,
     "24000": 24000
 } as const
 export type SendingSampleRate = typeof SendingSampleRate[keyof typeof SendingSampleRate]
