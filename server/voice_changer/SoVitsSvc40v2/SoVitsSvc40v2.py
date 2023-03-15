@@ -73,8 +73,11 @@ class SoVitsSvc40v2:
 
         # hubert model
         try:
-            # vec_path = hubertTorchModel
-            vec_path = "hubert/checkpoint_best_legacy_500.pt"
+            if sys.platform.startswith('darwin'):
+                vec_path = os.path.join(sys._MEIPASS, "hubert/checkpoint_best_legacy_500.pt")
+            else:
+                vec_path = "hubert/checkpoint_best_legacy_500.pt"
+
             models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(
                 [vec_path],
                 suffix="",
