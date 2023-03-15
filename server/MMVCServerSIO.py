@@ -41,6 +41,7 @@ def setupArgParser():
                         default="MMVCv15", help="model type: MMVCv13, MMVCv15, so-vits-svc-40v2")
     parser.add_argument("--cluster", type=str, help="path to cluster model")
     parser.add_argument("--hubert", type=str, help="path to hubert model, 現バージョンではhubertTorchModelは固定値で上書きされるため、設定しても効果ない。")
+    parser.add_argument("--internal", type=strtobool, default=False, help="各種パスをmac appの中身に変換")
 
     return parser
 
@@ -80,11 +81,27 @@ printMessage(f"Booting PHASE :{__name__}", level=2)
 
 TYPE = args.t
 PORT = args.p
-CONFIG = args.c
+CONFIG = args.c if args.c != None else None
 MODEL = args.m if args.m != None else None
 ONNX_MODEL = args.o if args.o != None else None
 HUBERT_MODEL = args.hubert if args.hubert != None else None
 CLUSTER_MODEL = args.cluster if args.cluster != None else None
+if args.internal and hasattr(sys, "_MEIPASS"):
+    print("use internal path")
+    if CONFIG != None:
+        CONFIG = os.path.join(sys._MEIPASS, CONFIG)
+    if MODEL != None:
+        MODEL = os.path.join(sys._MEIPASS, MODEL)
+    if ONNX_MODEL:
+        ONNX_MODEL = os.path.join(sys._MEIPASS, ONNX_MODEL)
+    if CLUSTER_MODEL:
+        CLUSTER_MODEL = os.path.join(sys._MEIPASS, CLUSTER_MODEL)
+    print(" config path:", CONFIG)
+    print(" model path:", MODEL)
+    print(" onnx model path:", ONNX_MODEL)
+    print(" cluster model path:", CLUSTER_MODEL)
+
+
 MODEL_TYPE = os.environ.get('MODEL_TYPE', None)
 if MODEL_TYPE == None:
     MODEL_TYPE = args.modelType
