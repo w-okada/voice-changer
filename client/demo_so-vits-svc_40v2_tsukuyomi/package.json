@@ -52,7 +52,7 @@
     },
     "dependencies": {
         "@dannadori/psdanimator": "^1.0.13",
-        "@dannadori/voice-changer-client-js": "^1.0.93",
+        "@dannadori/voice-changer-client-js": "^1.0.94",
         "@fortawesome/fontawesome-svg-core": "^6.3.0",
         "@fortawesome/free-brands-svg-icons": "^6.3.0",
         "@fortawesome/free-regular-svg-icons": "^6.3.0",

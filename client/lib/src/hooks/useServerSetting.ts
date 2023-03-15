@@ -52,7 +52,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             return DefaultServerSetting_MMVCv13
         } else if (props.clientType == "MMVCv15") {
             return DefaultServerSetting_MMVCv15
-        } else if (props.clientType == "so_vits_svc_40v2" || props.clientType == "so_vits_svc_40v2c_tsukuyomi") {
+        } else if (props.clientType == "so_vits_svc_40v2" || props.clientType == "so_vits_svc_40v2_tsukuyomi") {
             return DefaultServerSetting_so_vits_svc_40v2
         } else {
             return DefaultServerSetting_MMVCv15
@@ -181,6 +181,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                     fileUploadSetting.clusterTorchModel!.filename = await fileUploadSetting.clusterTorchModel!.file!.name
                 }
             }
+
             // ファイルをサーバにアップロード
             const models = [fileUploadSetting.onnxModel, fileUploadSetting.pyTorchModel, fileUploadSetting.clusterTorchModel /*, fileUploadSetting.hubertTorchModel*/].filter(x => { return x != null }) as ModelData[]
             for (let i = 0; i < models.length; i++) {

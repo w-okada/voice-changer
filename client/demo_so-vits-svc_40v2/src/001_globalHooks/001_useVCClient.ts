@@ -10,7 +10,6 @@ export type VCClientState = {
 }
 
 export const useVCClient = (props: UseVCClientProps) => {
-
     const clientState = useClient({
         clientType: CLIENT_TYPE,
         audioContext: props.audioContext,
