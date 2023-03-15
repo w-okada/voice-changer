@@ -64,9 +64,8 @@ class MMVC_Rest_Fileuploader:
         clusterTorchModelFilePath = os.path.join(UPLOAD_DIR, clusterTorchModelFilename) if clusterTorchModelFilename != "-" else None
         hubertTorchModelFilePath = os.path.join(UPLOAD_DIR, hubertTorchModelFilename) if hubertTorchModelFilename != "-" else None
 
-        # !! 注意 !! hubertTorchModelは固定値で上書きされるため、設定しても効果ない。
         info = self.voiceChangerManager.loadModel(configFilePath, pyTorchModelFilePath, onnxModelFilePath,
-                                                  clusterTorchModelFilePath, hubertTorchModelFilePath)
+                                                  clusterTorchModelFilePath)
         json_compatible_item_data = jsonable_encoder(info)
         return JSONResponse(content=json_compatible_item_data)
         # return {"load": f"{configFilePath}, {pyTorchModelFilePath}, {onnxModelFilePath}"}

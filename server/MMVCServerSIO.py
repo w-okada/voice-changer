@@ -40,7 +40,7 @@ def setupArgParser():
     parser.add_argument("--modelType", type=str,
                         default="MMVCv15", help="model type: MMVCv13, MMVCv15, so-vits-svc-40v2")
     parser.add_argument("--cluster", type=str, help="path to cluster model")
-    parser.add_argument("--hubert", type=str, help="path to hubert model, 現バージョンではhubertTorchModelは固定値で上書きされるため、設定しても効果ない。")
+    parser.add_argument("--hubert", type=str, help="path to hubert model")
     parser.add_argument("--internal", type=strtobool, default=False, help="各種パスをmac appの中身に変換")
 
     return parser
@@ -84,7 +84,7 @@ PORT = args.p
 CONFIG = args.c if args.c != None else None
 MODEL = args.m if args.m != None else None
 ONNX_MODEL = args.o if args.o != None else None
-HUBERT_MODEL = args.hubert if args.hubert != None else None
+HUBERT_MODEL = args.hubert if args.hubert != None else None  # hubertはユーザがダウンロードして解凍フォルダに格納する運用。
 CLUSTER_MODEL = args.cluster if args.cluster != None else None
 if args.internal and hasattr(sys, "_MEIPASS"):
     print("use internal path")
@@ -122,13 +122,12 @@ if args.colab == True:
     os.environ["colab"] = "True"
 
 if __name__ == 'MMVCServerSIO':
-    voiceChangerManager = VoiceChangerManager.get_instance()
+    voiceChangerManager = VoiceChangerManager.get_instance({"hubert": HUBERT_MODEL})
     if CONFIG and (MODEL or ONNX_MODEL):
         if MODEL_TYPE == "MMVCv15" or MODEL_TYPE == "MMVCv13":
-            voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL, None, None)
+            voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL, None)
         else:
-            # !! 注意 !! hubertTorchModelは固定値で上書きされるため、設定しても効果ない。
-            voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL, CLUSTER_MODEL, HUBERT_MODEL)
+            voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL, CLUSTER_MODEL)
 
     app_fastapi = MMVC_Rest.get_instance(voiceChangerManager)
     app_socketio = MMVC_SocketIOApp.get_instance(app_fastapi, voiceChangerManager)

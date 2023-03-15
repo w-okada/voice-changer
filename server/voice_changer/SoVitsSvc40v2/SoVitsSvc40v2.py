@@ -55,7 +55,7 @@ class SoVitsSvc40v2Settings():
 
 
 class SoVitsSvc40v2:
-    def __init__(self):
+    def __init__(self, params):
         self.settings = SoVitsSvc40v2Settings()
         self.net_g = None
         self.onnx_session = None
@@ -63,9 +63,10 @@ class SoVitsSvc40v2:
         self.raw_path = io.BytesIO()
         self.gpu_num = torch.cuda.device_count()
         self.prevVol = 0
+        self.params = params
+        print("so-vits-initialization:", params)
 
-    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, clusterTorchModel: str = None, hubertTorchModel: str = None):
-        # !! 注意 !! hubertTorchModelは固定値で上書きされるため、設定しても効果ない。
+    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, clusterTorchModel: str = None):
 
         self.settings.configFile = config
         self.hps = utils.get_hparams_from_file(config)
@@ -73,10 +74,11 @@ class SoVitsSvc40v2:
 
         # hubert model
         try:
-            if sys.platform.startswith('darwin'):
-                vec_path = os.path.join(sys._MEIPASS, "hubert/checkpoint_best_legacy_500.pt")
-            else:
-                vec_path = "hubert/checkpoint_best_legacy_500.pt"
+            # if sys.platform.startswith('darwin'):
+            #     vec_path = os.path.join(sys._MEIPASS, "hubert/checkpoint_best_legacy_500.pt")
+            # else:
+            #     vec_path = "hubert/checkpoint_best_legacy_500.pt"
+            vec_path = self.params["hubert"]
 
             models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(
                 [vec_path],

@@ -4,15 +4,14 @@ from voice_changer.VoiceChanger import VoiceChanger
 
 class VoiceChangerManager():
     @classmethod
-    def get_instance(cls):
+    def get_instance(cls, params):
         if not hasattr(cls, "_instance"):
             cls._instance = cls()
-            cls._instance.voiceChanger = VoiceChanger()
+            cls._instance.voiceChanger = VoiceChanger(params)
         return cls._instance
 
-    def loadModel(self, config, model, onnx_model, clusterTorchModel, hubertTorchModel):
-        # !! 注意 !! hubertTorchModelは固定値で上書きされるため、設定しても効果ない。
-        info = self.voiceChanger.loadModel(config, model, onnx_model, clusterTorchModel, hubertTorchModel)
+    def loadModel(self, config, model, onnx_model, clusterTorchModel):
+        info = self.voiceChanger.loadModel(config, model, onnx_model, clusterTorchModel)
         info["status"] = "OK"
         return info
 
