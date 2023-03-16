@@ -142,7 +142,9 @@ https://twitter.com/DannadoriYellow/status/1613553862773997569?s=20&t=7CLD79h1F3
 - 立ちずんだもん素材：https://seiga.nicovideo.jp/seiga/im10792934
 - いらすとや：https://www.irasutoya.com/
 - つくよみちゃん
+ 
 ![image](https://user-images.githubusercontent.com/48346627/225490925-63eadd50-497c-45ec-bf95-58eeb4d84a81.png)
+
 
 リアルタイムボイスチェンジャーつくよみちゃんについては、次のつくよみちゃんコーパスの利用規約に準じる規約を利用規約として定めます。
 
