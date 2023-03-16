@@ -1,7 +1,7 @@
 VC Helper
 ----
 # VC Helperとは
-[VC Helper](https://github.com/w-okada/voice-changer)は[MMVC](https://github.com/isletennos/MMVC_Trainer), [so-vits-svc](https://github.com/auspicious3000/contentvec)などのAIを使ったリアルタイムボイスチェンジャーのヘルパーアプリケーションです。リアルタイムボイスチェンジャーで必要となるトレーニング用の音声の録音(MMVC向け)とボイスチェンジャを各種プラットフォームでお手軽に実行できます。
+[VC Helper](https://github.com/w-okada/voice-changer)は[MMVC](https://github.com/isletennos/MMVC_Trainer), [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc)などのAIを使ったリアルタイムボイスチェンジャーのヘルパーアプリケーションです。リアルタイムボイスチェンジャーで必要となるトレーニング用の音声の録音(MMVC向け)とボイスチェンジャを各種プラットフォームでお手軽に実行できます。
 
 [解説動画](https://www.nicovideo.jp/watch/sm41507891)
 
