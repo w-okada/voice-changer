@@ -1,10 +1,12 @@
 VC Helper
 ----
 # VC Helperとは
-[VC Helper](https://github.com/w-okada/voice-changer)はAIを使ったリアルタイムボイスチェンジャー[MMVC](https://github.com/isletennos/MMVC_Trainer)のヘルパーアプリケーションです。MMVCで必要となるトレーニング用の音声の録音とボイスチェンジャを各種プラットフォームでお手軽に実行できます。
+[VC Helper](https://github.com/w-okada/voice-changer)は[MMVC](https://github.com/isletennos/MMVC_Trainer), [so-vits-svc](https://github.com/auspicious3000/contentvec)などのAIを使ったリアルタイムボイスチェンジャーのヘルパーアプリケーションです。リアルタイムボイスチェンジャーで必要となるトレーニング用の音声の録音(MMVC向け)とボイスチェンジャを各種プラットフォームでお手軽に実行できます。
+
 [解説動画](https://www.nicovideo.jp/watch/sm41507891)
 
-※ トレーニングについては[公式ノートブック](https://github.com/isletennos/MMVC_Trainer)をご利用ください。
+※ MMVCのトレーニングについては[公式ノートブック](https://github.com/isletennos/MMVC_Trainer)をご利用ください。
+※ so-vits-svcのトレーニングについては[公式](https://github.com/svc-develop-team/so-vits-svc)を参考に実施してください。
 
 ![image](https://user-images.githubusercontent.com/48346627/201169523-836e0f9e-2aca-4023-887c-52ecc219bcca.png)
 
@@ -36,16 +38,16 @@ Github Pages上で実行できるため、ブラウザのみあれば様々な�
 
 
 # (2) プレイヤー（ボイスチェンジャーアプリ）
-MMVCでボイチェンを行うためのアプリです。
+MMVCやso-vits-svcでボイチェンを行うためのアプリです。
 
 大きく3つの方法でご利用できます。難易度順に次の通りです。
-- Google Colaboratoryでの利用
+- Google Colaboratoryでの利用(MMVCのみ)
 - 事前ビルド済みのBinaryでの利用
 - DockerやAnacondaなど環境構築を行った上での利用
 
 本ソフトウェアやMMVCになじみの薄い方は上から徐々に慣れていくとよいと思います。
 
-## (2-1) Google Colaboratoryでの利用
+## (2-1) Google Colaboratoryでの利用(MMVCのみ)
 Googleが提供している機械学習プラットフォームColaboratory上で実行できます。
 MMVCのモデルをトレーニングが完了している場合、既にColaboratoryを利用していると思いますので、事前準備は必要ありません。ただし、ネットワーク環境やColaboratoryの状況によってボイスチェンジャのタイムラグが大きくなる傾向があります。
 
@@ -56,32 +58,39 @@ MMVCのモデルをトレーニングが完了している場合、既にColabor
 
 ## (2-2) 事前ビルド済みのBinaryでの利用
 実行形式のバイナリをダウンロードして実行することができます。
-Windows版とMac版を提供しています。事前準備は必要ありません。
+Windows版とMac版を提供しています。
 
+・Mac版はダウンロードファイルを解凍したのちに、使用するVCに応じた`startHttp_xxx.command`をダブルクリックしてください。開発元を検証できない旨が示される場合は、再度コントロールキーを押してクリックして実行してください(or 右クリックから実行してください)。（詳細下記 *1）
 
-・Mac版はダウンロードファイルを解凍したのちに、MMVCServerSIOをダブルクリックしてください。開発元を検証できない旨が示される場合は、再度コントロールキーを押してクリックして実行してください(or 右クリックから実行してください)。（詳細下記 *1）
+・Windows版は、ONNX版とONNX+PyTorch版を提供しています。環境に応じたzipファイルをダウンロードしてください。ダウンロードしたzipファイルを解凍して、使用するVCに応じたVCに応じた`start_http_xxx.bat`を実行してください。
 
-・Windows版は、directML版とGPU版を提供しています。環境に応じたzipファイルをダウンロードしてください。ダウンロードファイルしたzipファイルを解凍して、MMVCServerSIO.exeを実行してください。
+・NvidiaのGPUをお持ちの方は多くの場合はONNX版で動きます。環境によって極まれにgpuが認識されない場合があります。その場合はONNX+PyTorch(cuda)版の方をご利用ください。（サイズが大きく違います。）
 
-・NvidiaのGPUをお持ちの方はonnxgpuがファイル名に含まれるファイルをご利用ください。多くの場合はonnxgpu_nocudaの方で動きます。環境によって極まれにgpuが認識されない場合があります。その場合はonnxgpu_cudaの方をご利用ください。（サイズが大きく違います。）
-
-・NvidiaのGPUをお持ちでない方はonnxdirectMLが含まれるファイルをご利用ください。多くの場合は、onnxdirectML_nocudaの方で動きます。環境によって極まれにgpuが認識されない場合があります。その場合はonnxgpu_cudaの方をご利用ください。（サイズが大きく違います。）
+・NvidiaのGPUをお持ちでない方は多くの場合はONNX(DirectML)版で動きます。
 
 ・リモートからアクセスできるようにする方法など、より詳しくは[こちら](https://zenn.dev/wok/books/0002_vc-helper-v_1_3)をご覧ください。
 
-### アルファ版(for v.1.5.x)
-- [MMVCServerSIO_mac_onnxcpu_v.1.5.1.4a.zip](https://drive.google.com/file/d/1urqcB_S4lqbrxL4osKIlQ6MLhsh__W7t/view?usp=sharing) 510MB
-- [MMVCServerSIO_win_onnxdirectML_cuda_v.1.5.1.4a.zip](https://drive.google.com/file/d/1KSmmu5A29f3wXc_ZreycuuCyLltgNg5h/view?usp=sharing) 2.45GB
-- [MMVCServerSIO_win_onnxdirectML_nocuda_v.1.5.1.4a.zip](https://drive.google.com/file/d/1B_dPZMIf39Of7olTVzR0h6fNP5u0lx8P/view?usp=sharing) 430MB
-- [MMVCServerSIO_win_onnxgpu_cuda_v.1.5.1.4a.zip](https://drive.google.com/file/d/1sUa42la2vjTkIMcLKRSBf8icvfB6fqM0/view?usp=sharing) 2.55GB
-- [MMVCServerSIO_win_onnxgpu_nocuda_v.1.5.1.4a.zip](https://drive.google.com/file/d/1cQVnwenJD0vXzyThZ3iiMBUVLRXoDPBJ/view?usp=sharing) 541MB
+・so-vits-svcは[4.0-v2](https://github.com/svc-develop-team/so-vits-svc/tree/4.0-v2)に対応しています。
 
-### 最新バージョン(for v.1.3.x)
-- [MMVCServerSIO_mac_onnxcpu_v.1.3.9.4.zip](https://drive.google.com/file/d/1dliqQE7Kn5vhycrDUZQ6pgwLfP_znAyp/view?usp=sharing) 510MB
-- [MMVCServerSIO_win_onnxdirectML_cuda_v.1.3.9.4.zip](https://drive.google.com/file/d/1vfZc52f0BVD8nGjsuaAhl0jb4djHBBYe/view?usp=sharing) 2.45GB
-- [MMVCServerSIO_win_onnxdirectML_nocuda_v.1.3.9.4.zip](https://drive.google.com/file/d/14DaEPJnio-Ne50e2t1wFRgwQYnWwkh6n/view?usp=sharing) 430MB
-- [MMVCServerSIO_win_onnxgpu_cuda_v.1.3.9.4.zip](https://drive.google.com/file/d/1wBgjNHf0Kz3BPp-73KCbCEnPTW4FnuEE/view?usp=sharing) 2.55GB
-- [MMVCServerSIO_win_onnxgpu_nocuda_v.1.3.9.4.zip](https://drive.google.com/file/d/16R44mbi4AlkynVzhROrmA6u9MRSegpwd/view?usp=sharing) 541MB
+・so-vits-svcやつくよみちゃんの動作にはcontent vecのモデルが必要となります。こちらの[リポジトリ](https://github.com/auspicious3000/contentvec)から、ContentVec_legacy	500のモデルをダウンロードして、実行する`startHttp_xxx.command`や`start_http_xxx.bat`と同じフォルダに配置してください。
+
+
+| Version            | OS      | フレームワーク               | link                                                                                                 | サポートVC                                    | サイズ |
+| ------------------ | ------- | ---------------------------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------- | ------ |
+| v.1.5.1.6(current) | mac(M1) | ONNX                         | [通常](https://drive.google.com/file/d/1espnNjLnSr4BYWL6ilb34bkvcVAbByTu/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0v2 | 571MB  |
+|                    |         |                              | [つくよみちゃん](https://drive.google.com/file/d/1iXDowAEKudvIsyeDDrqxEEawm3IJr-Cb/view?usp=sharing) | so-vits-svc 4.0v2                             | 949MB  |
+|                    | windows | ONNX                         | [通常](https://drive.google.com/file/d/1rHUCo-URl13TdE3v8Vb_DD4jUG_yGTuu/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x                    | 564MB  |
+|                    |         | ONNX+PyTorch(cuda)           | [通常](https://drive.google.com/file/d/1K2jkUHEDkLzbYligyVJcuVnOX1KQAQiR/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0v2 | 2.6GB  |
+|                    |         |                              | [つくよみちゃん](https://drive.google.com/file/d/1hPxPFGNVfrK5E-K18xrSH9gPJRYztG9d/view?usp=sharing) | so-vits-svc 4.0v2                             | 2.97GB |
+|                    |         | ONNX(DirectML)               | [通常](https://drive.google.com/file/d/1mjhmB2plYGuw6G4qTT3IoWFDU5e8yOTR/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x                    | 452MB  |
+|                    |         | ONNX(DirectML)+PyTorch(cuda) | [通常](https://drive.google.com/file/d/1KlNRQaD-hnPTo1e6sZi-9jDOq1TNI4E6/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x                    | 2.47GB |
+
+※ MMVC v.1.5.xはExperimentalです。
+
+※ つくよみちゃんはフリー素材キャラクター「つくよみちゃん」が無料公開している音声データを使用しています。（詳細は文末）
+
+
+
 
 
 ### 過去バージョン
@@ -122,29 +131,20 @@ https://twitter.com/DannadoriYellow/status/1613553862773997569?s=20&t=7CLD79h1F3
 本ソフトウェアの使用または使用不能により生じたいかなる直接損害・間接損害・波及的損害・結果的損害 または特別損害についても、一切責任を負いません。
 
 
-### 過去バージョン(for v.1.5.x)
-- [MMVCServerSIO_mac_onnxcpu_v.1.5.0.8a.zip](https://drive.google.com/file/d/1HhgrPMQwgjVgJJngsyZ4JJiieQQAI-zC/view?usp=sharing) 509MB
-- [MMVCServerSIO_win_onnxgpu_cuda_v.1.5.0.8a.zip](https://drive.google.com/file/d/182q30PeI7ULgdtn-wg5VEGb0mUfHsCi5/view?usp=sharing)2.55GB
-- [MMVCServerSIO_mac_onnxcpu_v.1.5.0.6a.zip](https://drive.google.com/file/d/1x2NOPqe9dOOjLtzsElgNs60vUWzdPd5f/view?usp=sharing)
-- [MMVCServerSIO_win_onnxgpu_cuda_v.1.5.0.6a.zip](https://drive.google.com/file/d/1K9Q5QPzTZJRHsY1KXNc8JeY2K6jFF0hs/view?usp=sharing)
-- [MMVCServerSIO_win_cuda_v.1.5.0.5a.zip](https://drive.google.com/file/d/1FdvkRfSevcPrig2A_BBZ70AamDVHXbpa/view?usp=sharing) 2.5GB
-- [MMVCServerSIO_mac_cpu_v.1.5.0.5a.zip](https://drive.google.com/file/d/18DY4aXhLqaCcPIfGZqPFCsIt30jEZw24/view?usp=sharing) 509MB
-- [MMVCServerSIO_win_cuda_v.1.5.0.4a.zip](https://drive.google.com/file/d/1FIOds2TuNjdw2XNNWNdN1OSwCK9svS6b/view?usp=sharing) 2.5GB
-- [MMVCServerSIO_mac_cpu_v.1.5.0.4a.zip](https://drive.google.com/file/d/10JHbED9Vj5Y-zJIBtag_XXMHE9-MhAyF/view?usp=sharing) 509MB
-- [MMVCServerSIO_win_cuda_v.1.5.0.3a.zip](https://drive.google.com/file/d/1WxUyZ69Hbuu6p6TBvW0DX0Qt2a-2NQlw/view?usp=sharing) 2.5GB
-- [MMVCServerSIO_mac_cpu_v.1.5.0.3a.zip](https://drive.google.com/file/d/1u9sc0so1w5kkf_g8UBTVJ61gAQ84W2oF/view?usp=sharing) 509MB
-- [MMVCServerSIO_win_cuda_v.1.5.0.1a.zip](https://drive.google.com/file/d/1Am0awpHS7NAotITdbnEPg4gl4lxvgWhX/view?usp=sharing) 2.5GB
-- [MMVCServerSIO_mac_cpu_v.1.5.0.1a.zip](https://drive.google.com/file/d/19yREPKWe88ycAFPXCPVVYnUatlYfYjTS/view?usp=sharing) 449MB
+### 過去バージョン
+| Version    | OS      | フレームワーク          | link                                                                                       | サポートVC   | サイズ |
+| ---------- | ------- | ----------------------- | ------------------------------------------------------------------------------------------ | ------------ | ------ |
+| v.1.5.1.4a | mac(M1) | onnx(cpu)               | [通常](https://drive.google.com/file/d/1urqcB_S4lqbrxL4osKIlQ6MLhsh__W7t/view?usp=sharing) | MMVC v.1.5.x | 510MB  |
+|            | windows | onnx(cpu)               | [通常](https://drive.google.com/file/d/1cQVnwenJD0vXzyThZ3iiMBUVLRXoDPBJ/view?usp=sharing) | MMVC v.1.5.x | 541MB  |
+|            |         | onnx(cpu+cuda)          | [通常](https://drive.google.com/file/d/1sUa42la2vjTkIMcLKRSBf8icvfB6fqM0/view?usp=sharing) | MMVC v.1.5.x | 2.55GB |
+|            |         | onnx(cpu+DirectML)      | [通常](https://drive.google.com/file/d/1B_dPZMIf39Of7olTVzR0h6fNP5u0lx8P/view?usp=sharing) | MMVC v.1.5.x | 430MB  |
+|            |         | onnx(cpu+DirectML+cuda) | [通常](https://drive.google.com/file/d/1KSmmu5A29f3wXc_ZreycuuCyLltgNg5h/view?usp=sharing) | MMVC v.1.5.x | 2.45GB |
+| ---        | ---     | ---                     | ---                                                                                        | ---          | ---    |
+| v.1.3.1.4a | mac(M1) | onnx(cpu)               | [通常](https://drive.google.com/file/d/1dliqQE7Kn5vhycrDUZQ6pgwLfP_znAyp/view?usp=sharing) | MMVC v.1.3.x | 510MB  |
+|            | windows | onnx(cpu)               | [通常](https://drive.google.com/file/d/16R44mbi4AlkynVzhROrmA6u9MRSegpwd/view?usp=sharing) | MMVC v.1.3.x | 541MB  |
+|            |         | onnx(cpu+cuda)          | [通常](https://drive.google.com/file/d/1wBgjNHf0Kz3BPp-73KCbCEnPTW4FnuEE/view?usp=sharing) | MMVC v.1.3.x | 2.55GB |
+|            |         | onnx(cpu+DirectML)      | [通常](https://drive.google.com/file/d/14DaEPJnio-Ne50e2t1wFRgwQYnWwkh6n/view?usp=sharing) | MMVC v.1.3.x | 430MB  |
+|            |         | onnx(cpu+DirectML+cuda) | [通常](https://drive.google.com/file/d/1vfZc52f0BVD8nGjsuaAhl0jb4djHBBYe/view?usp=sharing) | MMVC v.1.3.x | 2.45GB |
 
-### 過去バージョン(for v.1.3.x)
-- [MMVCServerSIO_mac_onnxcpu_v.1.3.7.2.zip](https://drive.google.com/file/d/1AcJaQXH8ZtlCSrifvRBWdat19HD_A2fr/view?usp=sharing) 365MB
-- [MMVCServerSIO_win_onnxdirectML_cuda_v.1.3.7.2.zip](https://drive.google.com/file/d/1WKW3uqmIi9D13Jzao8jWVqx2KANmmQji/view?usp=sharing) 2050MB
-- [MMVCServerSIO_win_onnxdirectML_nocuda_v.1.3.7.2.zip](https://drive.google.com/file/d/1b8Lqwb7emvd85NwRANPglKWzceJYcgBg/view?usp=sharing) 286MB
-- [MMVCServerSIO_win_onnxgpu_cuda_v.1.3.7.2.zip](https://drive.google.com/file/d/1XcEslgeyo_SsjeFozyWl0zc4izFVGXHE/view?usp=sharing) 2144MB
-- [MMVCServerSIO_win_onnxgpu_nocuda_v.1.3.7.2.zip](https://drive.google.com/file/d/1ST7g6jCNm_xe_Q6bj_O-50RMFTDNt_u0/view?usp=sharing) 380MB
-
-- [MMVCServerSIO_mac_onnxcpu_v.1.3.7.0.zip](https://drive.google.com/file/d/1K_ihZ8hxbQq10qrxM1WUfUaj_vY6zwrW/view?usp=sharing) 154MB
-- [MMVCServerSIO_win_onnxdirectML_cuda_v.1.3.7.0.zip](https://drive.google.com/file/d/1IJHazaV60ophM6fbmzugZEjulLpBVJUi/view?usp=sharing) 1962MB
-- [MMVCServerSIO_win_onnxdirectML_nocuda_v.1.3.7.0.zip](https://drive.google.com/file/d/1_VzdUpiWb8lbIKNppwsFM5pYCAnixOap/view?usp=sharing) 198MB
-- [MMVCServerSIO_win_onnxgpu_cuda_v.1.3.7.0.zip](https://drive.google.com/file/d/1uRZHnDq2nVx4oRlXXiqZeE-ZjJlAFx5C/view?usp=sharing) 2057MB
-- [MMVCServerSIO_win_onnxgpu_nocuda_v.1.3.7.0.zip](https://drive.google.com/file/d/1DjSCsc_jKaH-TY6qqFbXz7Ya6tS58odb/view?usp=sharing) 293MB
+# クレジット
+![image](https://user-images.githubusercontent.com/48346627/225490925-63eadd50-497c-45ec-bf95-58eeb4d84a81.png)
