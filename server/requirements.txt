@@ -1,9 +1,15 @@
-torch==1.13.1
-numpy==1.24.1
-python-socketio==5.7.2
-fastapi==0.89.1
-python-multipart==0.0.5
-uvicorn==0.20.0
-websockets==10.4
+
+### いらない？ websockets==10.4
+uvicorn==0.21.1
 pyOpenSSL==23.0.0
-onnxruntime-gpu==1.13.1
+numpy==1.24.2
+torch==2.0.0
+resampy==0.4.2
+matplotlib==3.7.1
+librosa==0.10.0.post1
+pyworld==0.3.2
+python-socketio==5.7.2
+fastapi==0.94.1
+onnxruntime-gpu==1.14.1
+python-multipart==0.0.6
+# apt-get install g++
