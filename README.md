@@ -134,9 +134,6 @@ https://twitter.com/DannadoriYellow/status/1613553862773997569?s=20&t=7CLD79h1F3
 |            |         | onnx(cpu+DirectML)      | [通常](https://drive.google.com/file/d/14DaEPJnio-Ne50e2t1wFRgwQYnWwkh6n/view?usp=sharing) | MMVC v.1.3.x | 430MB  |
 |            |         | onnx(cpu+DirectML+cuda) | [通常](https://drive.google.com/file/d/1vfZc52f0BVD8nGjsuaAhl0jb4djHBBYe/view?usp=sharing) | MMVC v.1.3.x | 2.45GB |
 
-# クレジット
-
-
 
 # Acknowledgments
 - 立ちずんだもん素材：https://seiga.nicovideo.jp/seiga/im10792934
