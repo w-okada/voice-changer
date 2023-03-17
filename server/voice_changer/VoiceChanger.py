@@ -155,11 +155,13 @@ class VoiceChanger():
         # 前処理
         with Timer("pre-process") as t:
 
-            if self.settings.inputSampleRate != processing_sampling_rate:
-                newData = resampy.resample(receivedData, self.settings.inputSampleRate, processing_sampling_rate)
-            else:
-                newData = receivedData
+            with Timer("pre-process") as t1:
 
+                if self.settings.inputSampleRate != processing_sampling_rate:
+                    newData = resampy.resample(receivedData, self.settings.inputSampleRate, processing_sampling_rate)
+                else:
+                    newData = receivedData
+            # print("t1::::", t1.secs)
             inputSize = newData.shape[0]
             crossfadeSize = min(self.settings.crossFadeOverlapSize, inputSize)
 
@@ -172,7 +174,9 @@ class VoiceChanger():
             print_convert_processing(f"         will be cropped:{-1 * (inputSize + crossfadeSize)}, {-1 * (crossfadeSize)}")
 
             self._generate_strength(crossfadeSize)
-            data = self.voiceChanger.generate_input(newData, inputSize, crossfadeSize)
+            with Timer("pre-process") as t2:
+                data = self.voiceChanger.generate_input(newData, inputSize, crossfadeSize)
+            # print("t2::::", t2.secs)
         preprocess_time = t.secs
 
         # 変換処理

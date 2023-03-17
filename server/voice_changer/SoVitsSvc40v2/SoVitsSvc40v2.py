@@ -112,14 +112,15 @@ class SoVitsSvc40v2:
             self.net_g.eval()
             utils.load_checkpoint(pyTorch_model_file, self.net_g, None)
 
-        # # ONNXモデル生成
-        # if onnx_model_file != None:
-        #     ort_options = onnxruntime.SessionOptions()
-        #     ort_options.intra_op_num_threads = 8
-        #     self.onnx_session = onnxruntime.InferenceSession(
-        #         onnx_model_file,
-        #         providers=providers
-        #     )
+        # ONNXモデル生成
+        if onnx_model_file != None:
+            ort_options = onnxruntime.SessionOptions()
+            ort_options.intra_op_num_threads = 8
+            self.onnx_session = onnxruntime.InferenceSession(
+                onnx_model_file,
+                providers=providers
+            )
+            input_info = self.onnx_session.get_inputs()
         return self.get_info()
 
     def update_setteings(self, key: str, val: any):
@@ -181,6 +182,17 @@ class SoVitsSvc40v2:
         # wav16k = librosa.resample(audio_buffer, orig_sr=24000, target_sr=16000)
         wav16k = librosa.resample(audio_buffer, orig_sr=self.hps.data.sampling_rate, target_sr=16000)
         wav16k = torch.from_numpy(wav16k)
+
+        if (self.settings.gpu < 0 or self.gpu_num == 0) or self.settings.framework == "ONNX":
+            dev = torch.device("cpu")
+        else:
+            dev = torch.device("cuda", index=self.settings.gpu)
+
+        self.hubert_model = self.hubert_model.to(dev)
+        wav16k = wav16k.to(dev)
+        uv = uv.to(dev)
+        f0 = f0.to(dev)
+
         c = utils.get_hubert_content(self.hubert_model, wav_16k_tensor=wav16k)
         c = utils.repeat_expand_2d(c.squeeze(0), f0.shape[1])
 
@@ -222,6 +234,37 @@ class SoVitsSvc40v2:
         return (c, f0, uv, convertSize, vol)
 
     def _onnx_inference(self, data):
+        if hasattr(self, "onnx_session") == False or self.onnx_session == None:
+            print("[Voice Changer] No onnx session.")
+            return np.zeros(1).astype(np.int16)
+
+        convertSize = data[3]
+        vol = data[4]
+        data = (data[0], data[1], data[2],)
+
+        if vol < self.settings.silentThreshold:
+            return np.zeros(convertSize).astype(np.int16)
+
+        c, f0, uv = [x.numpy() for x in data]
+        audio1 = self.onnx_session.run(
+            ["audio"],
+            {
+                "c": c,
+                "f0": f0,
+                "g": np.array([self.settings.dstId]),
+                "uv": np.array([self.settings.dstId]),
+                "predict_f0": np.array([self.settings.dstId]),
+                "noice_scale": np.array([self.settings.dstId]),
+
+
+            })[0][0, 0] * self.hps.data.max_wav_value
+
+        audio1 = audio1 * vol
+
+        result = audio1
+
+        return result
+
         pass
 
     def _pyTorch_inference(self, data):
