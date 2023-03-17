@@ -243,27 +243,27 @@ export const useModelSettingArea = (): ServerSettingState => {
         showPyTorch])
 
     const frameworkRow = useMemo(() => {
-        return <></>
-        // const onFrameworkChanged = async (val: Framework) => {
-        //     appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, framework: val })
-        // }
-        // return (
-        //     <div className="body-row split-3-7 left-padding-1 guided">
-        //         <div className="body-item-title left-padding-1">Framework</div>
-        //         <div className="body-select-container">
-        //             <select className="body-select" value={appState.serverSetting.serverSetting.framework} onChange={(e) => {
-        //                 onFrameworkChanged(e.target.value as
-        //                     Framework)
-        //             }}>
-        //                 {
-        //                     Object.values(Framework).map(x => {
-        //                         return <option key={x} value={x}>{x}</option>
-        //                     })
-        //                 }
-        //             </select>
-        //         </div>
-        //     </div>
-        // )
+        // return <></>
+        const onFrameworkChanged = async (val: Framework) => {
+            appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, framework: val })
+        }
+        return (
+            <div className="body-row split-3-7 left-padding-1 guided">
+                <div className="body-item-title left-padding-1">Framework</div>
+                <div className="body-select-container">
+                    <select className="body-select" value={appState.serverSetting.serverSetting.framework} onChange={(e) => {
+                        onFrameworkChanged(e.target.value as
+                            Framework)
+                    }}>
+                        {
+                            Object.values(Framework).map(x => {
+                                return <option key={x} value={x}>{x}</option>
+                            })
+                        }
+                    </select>
+                </div>
+            </div>
+        )
     }, [appState.serverSetting.serverSetting.framework, appState.serverSetting.updateServerSettings])
 
     const onnxExecutionProviderRow = useMemo(() => {

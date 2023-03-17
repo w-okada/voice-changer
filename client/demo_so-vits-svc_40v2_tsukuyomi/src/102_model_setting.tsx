@@ -1,5 +1,5 @@
 import { OnnxExecutionProvider, Framework, fileSelector, Correspondence } from "@dannadori/voice-changer-client-js"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useMemo } from "react"
 import { useAppState } from "./001_provider/001_AppStateProvider";
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "./components/101_HeaderButton";
@@ -266,6 +266,12 @@ export const useModelSettingArea = (): ServerSettingState => {
         // )
     }, [appState.serverSetting.serverSetting.framework, appState.serverSetting.updateServerSettings])
 
+
+    useEffect(() => {
+        if (appState.serverSetting.serverSetting.framework == "PyTorch")
+            appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, framework: "ONNX" })
+    }, [appState.serverSetting.serverSetting])
+
     const onnxExecutionProviderRow = useMemo(() => {
         if (appState.serverSetting.serverSetting.framework != "ONNX") {
             return
@@ -309,7 +315,7 @@ export const useModelSettingArea = (): ServerSettingState => {
                     </div>
 
                     <div className="partition-content">
-                        {uploadeModelRow}
+                        {/* {uploadeModelRow} */}
                         {frameworkRow}
                         {onnxExecutionProviderRow}
                     </div>

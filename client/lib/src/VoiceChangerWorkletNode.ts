@@ -344,13 +344,18 @@ export const postVoice = async (
         body: body
     })
 
-    const receivedJson = await res.json()
-    const changedVoiceBase64 = receivedJson["changedVoiceBase64"]
-    const buf = Buffer.from(changedVoiceBase64, "base64")
-    const ab = new ArrayBuffer(buf.length);
-    const view = new Uint8Array(ab);
-    for (let i = 0; i < buf.length; ++i) {
-        view[i] = buf[i];
+    try {
+        const receivedJson = await res.json()
+        const changedVoiceBase64 = receivedJson["changedVoiceBase64"]
+        const buf = Buffer.from(changedVoiceBase64, "base64")
+        const ab = new ArrayBuffer(buf.length);
+        const view = new Uint8Array(ab);
+        for (let i = 0; i < buf.length; ++i) {
+            view[i] = buf[i];
+        }
+        return ab
+    } catch (e) {
+        console.log("Exception:", e)
+        return new ArrayBuffer(10);
     }
-    return ab
 }

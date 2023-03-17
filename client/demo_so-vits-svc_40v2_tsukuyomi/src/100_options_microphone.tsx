@@ -22,7 +22,7 @@ export const useMicrophoneOptions = () => {
         return (
             <>
                 {serverControl.serverControl}
-                {/* {modelSetting.modelSetting} */}
+                {modelSetting.modelSetting}
                 {deviceSetting.deviceSetting}
                 {qualityControl.qualityControl}
                 {speakerSetting.speakerSetting}
