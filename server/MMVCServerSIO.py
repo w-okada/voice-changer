@@ -38,7 +38,7 @@ def setupArgParser():
     parser.add_argument("--colab", type=strtobool,
                         default=False, help="run on colab")
     parser.add_argument("--modelType", type=str,
-                        default="MMVCv15", help="model type: MMVCv13, MMVCv15, so-vits-svc-40v2")
+                        default="MMVCv15", help="model type: MMVCv13, MMVCv15, so-vits-svc-40v2, so-vits-svc-40v2_tsukuyomi")
     parser.add_argument("--cluster", type=str, help="path to cluster model")
     parser.add_argument("--hubert", type=str, help="path to hubert model")
     parser.add_argument("--internal", type=strtobool, default=False, help="各種パスをmac appの中身に変換")
