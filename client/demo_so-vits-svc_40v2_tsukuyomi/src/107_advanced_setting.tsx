@@ -216,9 +216,9 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
         return (
             <>
                 <div className="body-row divider"></div>
-                {mmvcServerUrlRow}
+                {/* {mmvcServerUrlRow} */}
                 {protocolRow}
-                <div className="body-row divider"></div>
+                {/* <div className="body-row divider"></div>
                 {sampleRateRow}
                 {sendingSampleRateRow}
                 <div className="body-row divider"></div>
@@ -229,7 +229,7 @@ export const useAdvancedSetting = (): AdvancedSettingState => {
                 {workletSettingRow}
                 <div className="body-row divider"></div>
                 {downSamplingModeRow}
-
+ */}
             </>
         )
     }, [mmvcServerUrlRow, protocolRow, sampleRateRow, sendingSampleRateRow, crossFadeOverlapSizeRow, crossFadeOffsetRateRow, crossFadeEndRateRow, workletSettingRow, downSamplingModeRow])

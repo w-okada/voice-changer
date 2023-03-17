@@ -27,7 +27,7 @@ export const useMicrophoneOptions = () => {
                 {qualityControl.qualityControl}
                 {speakerSetting.speakerSetting}
                 {convertSetting.convertSetting}
-                {/* {advancedSetting.advancedSetting} */}
+                {advancedSetting.advancedSetting}
             </>
         )
     }, [serverControl.serverControl,
