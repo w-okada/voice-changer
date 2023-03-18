@@ -203,7 +203,7 @@ class SoVitsSvc40v2:
             else:
                 cluster_c = cluster.get_cluster_center_result(self.cluster_model, c.cpu().numpy().T, speaker[0]).T
                 # cluster_c = cluster.get_cluster_center_result(self.cluster_model, c.cpu().numpy().T, self.settings.dstId).T
-                cluster_c = torch.FloatTensor(cluster_c).cpu()
+                cluster_c = torch.FloatTensor(cluster_c).to(dev)
                 c = self.settings.clusterInferRatio * cluster_c + (1 - self.settings.clusterInferRatio) * c
 
         c = c.unsqueeze(0)
