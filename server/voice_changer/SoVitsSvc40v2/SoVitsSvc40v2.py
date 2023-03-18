@@ -64,7 +64,7 @@ class SoVitsSvc40v2:
         self.gpu_num = torch.cuda.device_count()
         self.prevVol = 0
         self.params = params
-        print("so-vits-initialization:", params)
+        print("so-vits-svc 40v2 initialization:", params)
 
     def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, clusterTorchModel: str = None):
 

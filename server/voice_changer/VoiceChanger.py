@@ -59,6 +59,9 @@ class VoiceChanger():
         elif self.modelType == "so-vits-svc-40v2" or self.modelType == "so-vits-svc-40v2_tsukuyomi":
             from voice_changer.SoVitsSvc40v2.SoVitsSvc40v2 import SoVitsSvc40v2
             self.voiceChanger = SoVitsSvc40v2(params)
+        elif self.modelType == "so-vits-svc-40":
+            from voice_changer.SoVitsSvc40.SoVitsSvc40 import SoVitsSvc40
+            self.voiceChanger = SoVitsSvc40(params)
 
         else:
             from voice_changer.MMVCv13.MMVCv13 import MMVCv13
@@ -73,7 +76,9 @@ class VoiceChanger():
     def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, clusterTorchModel: str = None):
         if self.modelType == "MMVCv15" or self.modelType == "MMVCv13":
             return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file)
-        else:  # so-vits-svc-40v2
+        elif self.modelType == "so-vits-svc-40" or self.modelType == "so-vits-svc-40v2" or self.modelType == "so-vits-svc-40v2_tsukuyomi":
+            return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, clusterTorchModel)
+        else:
             return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, clusterTorchModel)
 
     def get_info(self):

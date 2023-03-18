@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react"
-import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc_40v2 } from "../const"
+import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc_40v2, DefaultServerSetting_so_vits_svc_40 } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
@@ -52,6 +52,8 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             return DefaultServerSetting_MMVCv13
         } else if (props.clientType == "MMVCv15") {
             return DefaultServerSetting_MMVCv15
+        } else if (props.clientType == "so_vits_svc_40") {
+            return DefaultServerSetting_so_vits_svc_40
         } else if (props.clientType == "so_vits_svc_40v2" || props.clientType == "so_vits_svc_40v2_tsukuyomi") {
             return DefaultServerSetting_so_vits_svc_40v2
         } else {
@@ -176,7 +178,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             //     fileUploadSetting.hubertTorchModel!.filename = await fileUploadSetting.hubertTorchModel!.file!.name
             // }
             if (fileUploadSetting.clusterTorchModel) {
-                if (props.clientType == "so_vits_svc_40v2" && !fileUploadSetting.clusterTorchModel!.data) {
+                if ((props.clientType == "so_vits_svc_40v2" || props.clientType == "so_vits_svc_40") && !fileUploadSetting.clusterTorchModel!.data) {
                     fileUploadSetting.clusterTorchModel!.data = await fileUploadSetting.clusterTorchModel!.file!.arrayBuffer()
                     fileUploadSetting.clusterTorchModel!.filename = await fileUploadSetting.clusterTorchModel!.file!.name
                 }

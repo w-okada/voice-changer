@@ -6,6 +6,7 @@ __pycache__
 server/upload_dir/
 server/MMVC_Client_v13/
 server/MMVC_Client_v15/
+server/so-vits-svc-40/
 server/so-vits-svc-40v2/
 server/keys
 server/info
@@ -19,6 +20,7 @@ server/v13
 
 server/model_hubert
 server/model_so-vits-svc-40v2_tsukuyomi/
+server/model_so-vits-svc-40/
 server/model_sovits
 server/test 
 
