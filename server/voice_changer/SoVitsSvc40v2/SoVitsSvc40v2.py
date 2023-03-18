@@ -251,10 +251,10 @@ class SoVitsSvc40v2:
             {
                 "c": c,
                 "f0": f0,
-                "g": np.array([self.settings.dstId]),
-                "uv": np.array([self.settings.dstId]),
-                "predict_f0": np.array([self.settings.dstId]),
-                "noice_scale": np.array([self.settings.dstId]),
+                "g": np.array([self.settings.dstId]).astype(np.int64),
+                "uv": np.array([self.settings.dstId]).astype(np.int64),
+                "predict_f0": np.array([self.settings.dstId]).astype(np.int64),
+                "noice_scale": np.array([self.settings.dstId]).astype(np.int64),
 
 
             })[0][0, 0] * self.hps.data.max_wav_value
