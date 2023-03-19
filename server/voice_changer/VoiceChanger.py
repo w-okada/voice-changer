@@ -8,11 +8,10 @@ import resampy
 
 
 from voice_changer.IORecorder import IORecorder
-from voice_changer.IOAnalyzer import IOAnalyzer
+# from voice_changer.IOAnalyzer import IOAnalyzer
 
 
 import time
-import librosa
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
 STREAM_INPUT_FILE = os.path.join(TMP_DIR, "in.wav")
@@ -103,14 +102,14 @@ class VoiceChanger():
                 if hasattr(self, "ioRecorder"):
                     self.ioRecorder.close()
 
-                if hasattr(self, "ioAnalyzer") == False:
-                    self.ioAnalyzer = IOAnalyzer()
+                # if hasattr(self, "ioAnalyzer") == False:
+                #     self.ioAnalyzer = IOAnalyzer()
 
-                try:
-                    self.ioAnalyzer.analyze(STREAM_INPUT_FILE, STREAM_ANALYZE_FILE_DIO, STREAM_ANALYZE_FILE_HARVEST, self.settings.inputSampleRate)
+                # try:
+                #     self.ioAnalyzer.analyze(STREAM_INPUT_FILE, STREAM_ANALYZE_FILE_DIO, STREAM_ANALYZE_FILE_HARVEST, self.settings.inputSampleRate)
 
-                except Exception as e:
-                    print("recordIO exception", e)
+                # except Exception as e:
+                #     print("recordIO exception", e)
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
