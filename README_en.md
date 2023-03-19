@@ -55,49 +55,54 @@ You can run it on Google's machine learning platform, Colaboratory. If you have 
 
 ## (2-2) Usage with pre-built binaries
 
-You can download and run the executable binary file.
-Both Windows and Mac versions are available.
+You can download and run executable binaries.
+We offer Windows and Mac versions.
 
-- For Mac version, after extracting the downloaded file, double-click on `startHttp_xxx.command` corresponding to the VC you want to use. If you are prompted with a message saying that the developer cannot be verified, press the Control key and click again to execute (or right-click to execute). (See details below \*1)
+- For Mac version, after unzipping the downloaded file, double-click the `startHttp_xxx.command` file corresponding to your VC. If a message indicating that the developer cannot be verified is displayed, please press the control key and click to run it again (or right-click to run it). (Details below \* 1)
 
-- For Windows version, ONNX version and ONNX+PyTorch version are provided. Download the zip file corresponding to your environment, extract it, and then execute `start_http_xxx.bat` corresponding to the VC you want to use.
+- For Windows version, we offer `ONNX(cpu, cuda), PyTorch(cpu)` version, `ONNX(cpu, cuda), PyTorch(cpu, cuda)` version, and `ONNX(cpu, DirectML), PyTorch(cpu)` version. Please download the zip file corresponding to your environment. After unzipping the downloaded zip file, please run the `start_http_xxx.bat` file corresponding to your VC.
 
-・The following voice changers can be started using the various `startHttp_xxx.command` files (Mac) and `start_http_xxx.bat` files (Windows):
+- The following voice changers can be launched with each `startHttp_xxx.command` file (Mac) and `start_http_xxx.bat` file (Windows).
 
-| #   | Batch File                                | Description                                 |
-| --- | ----------------------------------------- | ------------------------------------------- |
-| 1   | start_http_v13.bat                        | Can use MMVC v.1.3.x models.                |
-| 2   | start_http_v15.bat                        | Can use MMVC v.1.5.x models.                |
-| 3   | start_http_so-vits-svc_40.bat             | Can use so-vits-svc 4.0 models.             |
-| 4   | start_http_so-vits-svc_40v2.bat           | Can use so-vits-svc 4.0v2 models.           |
-| 5   | start_http_so-vits-svc_40v2_tsukuyomi.bat | Use Tsukuyomi-chan's model. (cannot change) |
+| #   | Batch file                                | Description                                     |
+| --- | ----------------------------------------- | ----------------------------------------------- |
+| 1   | start_http_v13.bat                        | MMVC v.1.3.x series models can be used.         |
+| 2   | start_http_v15.bat                        | MMVC v.1.5.x series models can be used.         |
+| 3   | start_http_so-vits-svc_40.bat             | so-vits-svc 4.0 series models can be used.      |
+| 4   | start_http_so-vits-svc_40v2.bat           | so-vits-svc 4.0v2 series models can be used.    |
+| 5   | start_http_so-vits-svc_40v2_tsukuyomi.bat | Use Tsukuyomi-chan's model. (Cannot be changed) |
 
-・If connecting remotely, use the files with https instead of http in their names for Mac (.command) and Windows (.bat).
+- If you are connecting remotely, please use the `.command` file (Mac) or `.bat` file (Windows) with https instead of http.
 
-・If you have an Nvidia GPU, it will usually work with the ONNX version. However, in rare cases, the GPU may not be recognized. In that case, please use the ONNX+PyTorch(cuda) version (the size is significantly different).
+- If you have an Nvidia GPU on Windows, it will usually work with the `ONNX(cpu,cuda),PyTorch(cpu)` version. In rare cases, the GPU may not be recognized, in which case please use the `ONNX(cpu,cuda), PyTorch(cpu,cuda)` version (which is much larger in size).
 
-・If you do not have an Nvidia GPU, the ONNX(DirectML) version will usually work.
+- If you do not have an Nvidia GPU on Windows, it will usually work with the `ONNX(cpu,DirectML), PyTorch(cpu)` version.
 
-・For the operation of so-vits-svc and Tsukuyomi-chan, a content vec model is required. Download the ContentVec_legacy 500 model from this [repository](https://github.com/auspicious3000/contentvec) and place it in the same folder as the `startHttp_xxx.command` or `start_http_xxx.bat` that you will execute.
-| Version | OS | Framework | Link | VC Support | Size |
-| --------- | ------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------ | ------ |
-| v.1.5.1.7 | mac(M1) | ONNX(cpu) | [Normal](https://drive.google.com/file/d/1SVTwIHYoniYYAGU6Kw6NnS1IE07NgSMd/view?usp=sharing) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0v2 | 571MB |
-| | | | [Tsukuyo Michan](https://drive.google.com/file/d/1s2IYsGST_TqGiOBkVWE5e7wLPfWQf1sY/view?usp=sharing) | so-vits-svc 4.0v2 | 949MB |
-| | windows | ONNX(cpu,cuda),PyTorch(cpu) | [Normal](https://drive.google.com/file/d/191vw7_9wF2sba4SofOaNov3f9QmMkjIb/view?usp=sharing) | MMVC v.1.5.x, MMVC v.1.3.x | 597MB |
-| | | | [Tsukuyo Michan](https://drive.google.com/file/d/19kNfGk9j3z15IuEZZn9_lmxyDd1_UjoI/view?usp=sharing) | so-vits-svc 4.0v2 | 703MB |
-| | | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [Normal](https://drive.google.com/file/d/1_fK-U5odfk9MukMmjwWCsnBNicQcshJv/view?usp=sharing) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0v2| 2.6GB |
-| | | ONNX(cpu,DirectML), PyTorch(cpu) | [Normal](https://drive.google.com/file/d/1iHEC-p6mVLgDCMnWaFg3-dZfuO8njRci/view?usp=sharing) | MMVC v.1.5.x, MMVC v.1.3.x | 462MB |
-| | | ONNX(cpu,DirectML), PyTorch(cpu,cuda)| [Normal](https://drive.google.com/file/d/1a9ChdXb7e-LVIuiDDMyVU0oKDhxhZhIT/view?usp=sharing) | MMVC v.1.5.x, MMVC v.1.3.x | 2.48GB |
+- If you are using `so-vits-svc 4.0`/`so-vits-svc 4.0v2` on Windows, please use the `ONNX(cpu,cuda), PyTorch(cpu,cuda)` version.
+
+- To use `so-vits-svc 4.0`/`so-vits-svc 4.0v2` or `tsukuyomi-chan`, you need the content vec model. Please download the ContentVec_legacy 500 model from [this repository](https://github.com/auspicious3000/contentvec), and place it in the same folder as `startHttp_xxx.command` or `start_http_xxx.bat` to run.
+
+| Version   | OS      | Framework                             | Link                                                                                                 | VC Support                                                     | Size   |
+| --------- | ------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ------ |
+| v.1.5.1.7 | mac(M1) | ONNX(cpu)                             | [Normal](https://drive.google.com/file/d/1SVTwIHYoniYYAGU6Kw6NnS1IE07NgSMd/view?usp=sharing)         | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 571MB  |
+|           |         |                                       | [Tsukuyomi-chan](https://drive.google.com/file/d/1s2IYsGST_TqGiOBkVWE5e7wLPfWQf1sY/view?usp=sharing) | so-vits-svc 4.0v2                                              | 949MB  |
+|           | windows | ONNX(cpu,cuda),PyTorch(cpu)           | [Normal](https://drive.google.com/file/d/191vw7_9wF2sba4SofOaNov3f9QmMkjIb/view?usp=sharing)         | MMVC v.1.5.x, MMVC v.1.3.x                                     | 597MB  |
+|           |         |                                       | [Tsukuyomi-chan](https://drive.google.com/file/d/19kNfGk9j3z15IuEZZn9_lmxyDd1_UjoI/view?usp=sharing) | so-vits-svc 4.0v2                                              | 703MB  |
+|           |         | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [Normal](https://drive.google.com/file/d/1_fK-U5odfk9MukMmjwWCsnBNicQcshJv/view?usp=sharing)         | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 2.6GB  |
+|           |         | ONNX(cpu,DirectML), PyTorch(cpu)      | [Normal](https://drive.google.com/file/d/1iHEC-p6mVLgDCMnWaFg3-dZfuO8njRci/view?usp=sharing)         | MMVC v.1.5.x, MMVC v.1.3.x                                     | 462MB  |
+|           |         | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [Normal](https://drive.google.com/file/d/1a9ChdXb7e-LVIuiDDMyVU0oKDhxhZhIT/view?usp=sharing)         | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 2.48GB |
 
 \*1 MMVC v.1.5.x is Experimental.
 
 \*2 Tsukuyo Michan uses free character "Tsukuyo Michan" voice data that is publicly available for free. (Details such as terms of use are at the end of the document)
 
-https://user-images.githubusercontent.com/48346627/212569645-e30b7f4e-079d-4504-8cf8-7816c5f40b00.mp4
+\*3 If unpacking or starting is slow, there is a possibility that virus checking is running on your antivirus software. Please try running it with the file or folder excluded from the target. (At your own risk)
 
-\*3 This software is not signed by the developer. A warning message will appear, but you can run the software by clicking the icon while holding down the control key. This is due to Apple's security policy. Running the software is at your own risk.
+\*4 This software is not signed by the developer. A warning message will appear, but you can run the software by clicking the icon while holding down the control key. This is due to Apple's security policy. Running the software is at your own risk.
 
 ![image](https://user-images.githubusercontent.com/48346627/212567711-c4a8d599-e24c-4fa3-8145-a5df7211f023.png)
+
+https://user-images.githubusercontent.com/48346627/212569645-e30b7f4e-079d-4504-8cf8-7816c5f40b00.mp4
 
 ## (2-3) Usage after setting up the environment such as Docker or Anaconda
 

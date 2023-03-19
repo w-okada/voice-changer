@@ -67,7 +67,7 @@ Windows 版と Mac 版を提供しています。
 
 ・Mac 版はダウンロードファイルを解凍したのちに、使用する VC に応じた`startHttp_xxx.command`をダブルクリックしてください。開発元を検証できない旨が示される場合は、再度コントロールキーを押してクリックして実行してください(or 右クリックから実行してください)。（詳細下記 \*1）
 
-・Windows 版は、ONNX 版と ONNX+PyTorch 版を提供しています。環境に応じた zip ファイルをダウンロードしてください。ダウンロードした zip ファイルを解凍して、使用する VC に応じた VC に応じた`start_http_xxx.bat`を実行してください。
+・Windows 版は、`ONNX(cpu,cuda),PyTorch(cpu)`版と `ONNX(cpu,cuda), PyTorch(cpu,cuda)`版と`ONNX(cpu,DirectML), PyTorch(cpu)`版を提供しています。環境に応じた zip ファイルをダウンロードしてください。ダウンロードした zip ファイルを解凍して、使用する VC に応じた VC に応じた`start_http_xxx.bat`を実行してください。
 
 ・各種`startHttp_xxx.command`ファイル(mac)、`start_http_xxx.bat`ファイル(win)で起動できるボイスチェンジャは次の通りです。
 
@@ -81,35 +81,35 @@ Windows 版と Mac 版を提供しています。
 
 ・リモートから接続する場合は、各種`.command`ファイル(mac)、`.bat`ファイル(win)の http が https に置き換わっているものを使用してください。
 
-・Nvidia の GPU をお持ちの方は多くの場合は ONNX 版で動きます。環境によって極まれに gpu が認識されない場合があります。その場合は ONNX+PyTorch(cuda)版の方をご利用ください。（サイズが大きく違います。）
+・Windows 環境で Nvidia の GPU をお持ちの方は多くの場合は `ONNX(cpu,cuda),PyTorch(cpu)`版で動きます。環境によって極まれに gpu が認識されない場合があります。その場合は `ONNX(cpu,cuda), PyTorch(cpu,cuda)`版の方をご利用ください。（サイズが大きく違います。）
 
-・Nvidia の GPU をお持ちでない方は多くの場合は ONNX(DirectML)版で動きます。
+・Windows 環境で Nvidia の GPU をお持ちでない方は多くの場合は `ONNX(cpu,DirectML), PyTorch(cpu) `版で動きます。
 
-・so-vits-svc やつくよみちゃんの動作には content vec のモデルが必要となります。こちらの[リポジトリ](https://github.com/auspicious3000/contentvec)から、ContentVec_legacy 500 のモデルをダウンロードして、実行する`startHttp_xxx.command`や`start_http_xxx.bat`と同じフォルダに配置してください。
+・Windows 環境で so-vits-svc 4.0/so-vits-svc 4.0v2 をお使いの場合は`ONNX(cpu,cuda), PyTorch(cpu,cuda)`版をご利用ください
 
-| Version   | OS      | フレームワーク                        | link                                                                                                 | サポート VC                                   | サイズ |
-| --------- | ------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------- | ------ |
-| v.1.5.1.7 | mac(M1) | ONNX(cpu)                             | [通常](https://drive.google.com/file/d/1SVTwIHYoniYYAGU6Kw6NnS1IE07NgSMd/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0v2 | 571MB  |
-|           |         |                                       | [つくよみちゃん](https://drive.google.com/file/d/1s2IYsGST_TqGiOBkVWE5e7wLPfWQf1sY/view?usp=sharing) | so-vits-svc 4.0v2                             | 949MB  |
-|           | windows | ONNX(cpu,cuda),PyTorch(cpu)           | [通常](https://drive.google.com/file/d/191vw7_9wF2sba4SofOaNov3f9QmMkjIb/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x                    | 597MB  |
-|           |         |                                       | [つくよみちゃん](https://drive.google.com/file/d/19kNfGk9j3z15IuEZZn9_lmxyDd1_UjoI/view?usp=sharing) | so-vits-svc 4.0v2                             | 703MB  |
-|           |         | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [通常](https://drive.google.com/file/d/1_fK-U5odfk9MukMmjwWCsnBNicQcshJv/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0v2 | 2.6GB  |
-|           |         | ONNX(cpu,DirectML), PyTorch(cpu)      | [通常](https://drive.google.com/file/d/1iHEC-p6mVLgDCMnWaFg3-dZfuO8njRci/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x                    | 462MB  |
-|           |         | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [通常](https://drive.google.com/file/d/1a9ChdXb7e-LVIuiDDMyVU0oKDhxhZhIT/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x                    | 2.48GB |
+・so-vits-svc 4.0/so-vits-svc 4.0v2 やつくよみちゃんの動作には content vec のモデルが必要となります。こちらの[リポジトリ](https://github.com/auspicious3000/contentvec)から、ContentVec_legacy 500 のモデルをダウンロードして、実行する`startHttp_xxx.command`や`start_http_xxx.bat`と同じフォルダに配置してください。
 
-※ MMVC v.1.5.x は Experimental です。
+| Version   | OS      | フレームワーク                        | link                                                                                                 | サポート VC                                                    | サイズ |
+| --------- | ------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ------ |
+| v.1.5.1.7 | mac(M1) | ONNX(cpu)                             | [通常](https://drive.google.com/file/d/1SVTwIHYoniYYAGU6Kw6NnS1IE07NgSMd/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x,so-vits-svc 4.0, so-vits-svc 4.0v2  | 571MB  |
+|           |         |                                       | [つくよみちゃん](https://drive.google.com/file/d/1s2IYsGST_TqGiOBkVWE5e7wLPfWQf1sY/view?usp=sharing) | so-vits-svc 4.0v2                                              | 949MB  |
+|           | windows | ONNX(cpu,cuda),PyTorch(cpu)           | [通常](https://drive.google.com/file/d/191vw7_9wF2sba4SofOaNov3f9QmMkjIb/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x                                     | 597MB  |
+|           |         |                                       | [つくよみちゃん](https://drive.google.com/file/d/19kNfGk9j3z15IuEZZn9_lmxyDd1_UjoI/view?usp=sharing) | so-vits-svc 4.0v2                                              | 703MB  |
+|           |         | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [通常](https://drive.google.com/file/d/1_fK-U5odfk9MukMmjwWCsnBNicQcshJv/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 2.6GB  |
+|           |         | ONNX(cpu,DirectML), PyTorch(cpu)      | [通常](https://drive.google.com/file/d/1iHEC-p6mVLgDCMnWaFg3-dZfuO8njRci/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x                                     | 462MB  |
+|           |         | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [通常](https://drive.google.com/file/d/1a9ChdXb7e-LVIuiDDMyVU0oKDhxhZhIT/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x、so-vits-svc 4.0, so-vits-svc 4.0v2 | 2.48GB |
 
-※ つくよみちゃんはフリー素材キャラクター「つくよみちゃん」が無料公開している音声データを使用しています。（利用規約など、詳細は文末）
+\*1 MMVC v.1.5.x は Experimental です。
 
-### 過去バージョン
+\*2 つくよみちゃんはフリー素材キャラクター「つくよみちゃん」が無料公開している音声データを使用しています。（利用規約など、詳細は文末）
 
-ページの一番下にまとめてあります。
+\*3 解凍や起動が遅い場合、ウィルス対策ソフトのチェックが走っている可能性があります。ファイルやフォルダを対象外にして実行してみてください。（自己責任です）
 
-https://user-images.githubusercontent.com/48346627/212569645-e30b7f4e-079d-4504-8cf8-7816c5f40b00.mp4
-
-\*1 本ソフトウェアは開発元の署名しておりません。下記のように警告が出ますが、コントロールキーを押しながらアイコンをクリックすると実行できるようになります。これは Apple のセキュリティポリシーによるものです。実行は自己責任となります。
+\*4 本ソフトウェアは開発元の署名しておりません。下記のように警告が出ますが、コントロールキーを押しながらアイコンをクリックすると実行できるようになります。これは Apple のセキュリティポリシーによるものです。実行は自己責任となります。
 
 ![image](https://user-images.githubusercontent.com/48346627/212567711-c4a8d599-e24c-4fa3-8145-a5df7211f023.png)
+
+https://user-images.githubusercontent.com/48346627/212569645-e30b7f4e-079d-4504-8cf8-7816c5f40b00.mp4
 
 ## (2-3) Docker や Anaconda など環境構築を行った上での利用
 
