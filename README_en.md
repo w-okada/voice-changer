@@ -1,8 +1,8 @@
-## VC Helper
+## VC Client
 
-# What is VC Helper
+# What is VC Client
 
-[VC Helper](https://github.com/w-okada/voice-changer) is a client software for real-time voice changers that uses AI such as [MMVC](https://github.com/isletennos/MMVC_Trainer) and [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc). It also provides an app for recording training audio for real-time voice changers, specifically for MMVC.
+[VC Client](https://github.com/w-okada/voice-changer) is a client software for real-time voice changers that uses AI such as [MMVC](https://github.com/isletennos/MMVC_Trainer) and [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc). It also provides an app for recording training audio for real-time voice changers, specifically for MMVC.
 
 - Please use the [official notebook](https://github.com/isletennos/MMVC_Trainer) for MMVC training.
 - Please use the [official notebook](https://github.com/isletennos/MMVC_Trainer) for so-vits-svc training.
@@ -22,7 +22,7 @@
 
 # usage
 
-Details are summarized [here](https://zenn.dev/wok/books/0004_vc-helper-v_1_5_1_x).
+Details are summarized [here](https://zenn.dev/wok/books/0004_vc-client-v_1_5_1_x).
 
 # (1) Recorder (Voice Recording App for Training)
 
