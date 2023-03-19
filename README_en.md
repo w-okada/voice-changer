@@ -89,13 +89,13 @@ Both Windows and Mac versions are available.
 | | | ONNX(cpu,DirectML), PyTorch(cpu) | [Normal](https://drive.google.com/file/d/1iHEC-p6mVLgDCMnWaFg3-dZfuO8njRci/view?usp=sharing) | MMVC v.1.5.x, MMVC v.1.3.x | 462MB |
 | | | ONNX(cpu,DirectML), PyTorch(cpu,cuda)| [Normal](https://drive.google.com/file/d/1a9ChdXb7e-LVIuiDDMyVU0oKDhxhZhIT/view?usp=sharing) | MMVC v.1.5.x, MMVC v.1.3.x | 2.48GB |
 
-※ MMVC v.1.5.x is Experimental.
+\*1 MMVC v.1.5.x is Experimental.
 
-※ Tsukuyo Michan uses free character "Tsukuyo Michan" voice data that is publicly available for free. (Details such as terms of use are at the end of the document)
+\*2 Tsukuyo Michan uses free character "Tsukuyo Michan" voice data that is publicly available for free. (Details such as terms of use are at the end of the document)
 
 https://user-images.githubusercontent.com/48346627/212569645-e30b7f4e-079d-4504-8cf8-7816c5f40b00.mp4
 
-\*1 This software is not signed by the developer. A warning message will appear, but you can run the software by clicking the icon while holding down the control key. This is due to Apple's security policy. Running the software is at your own risk.
+\*3 This software is not signed by the developer. A warning message will appear, but you can run the software by clicking the icon while holding down the control key. This is due to Apple's security policy. Running the software is at your own risk.
 
 ![image](https://user-images.githubusercontent.com/48346627/212567711-c4a8d599-e24c-4fa3-8145-a5df7211f023.png)
 
@@ -106,18 +106,6 @@ Clone this repository and use it. Setting up WSL2 is essential for Windows. Addi
 [Explanation video on installing WSL2 and Docker](https://youtu.be/POo_Cg0eFMU)
 
 [Explanation video on installing WSL2 and Anaconda](https://youtu.be/fba9Zhsukqw)
-
-## リアルタイム性
-
-GPU を使用するとほとんどタイムラグなく変換可能です。
-
-https://twitter.com/DannadoriYellow/status/1613483372579545088?s=20&t=7CLD79h1F3dfKiTb7M8RUQ
-
-CPU でも最近のであればそれなりの速度で変換可能。
-
-https://twitter.com/DannadoriYellow/status/1613553862773997569?s=20&t=7CLD79h1F3dfKiTb7M8RUQ
-
-古い CPU( i7-4770)だと、1000msec くらいかかってしまう。
 
 ## Real-time performance
 
@@ -139,24 +127,24 @@ With an old CPU (i7-4770), it takes about 1000 msec for conversion.
 
 > This software uses the voice data of the free material character "Tsukuyomi-chan," which is provided for free by CV. Yumesaki Rei.
 >
-> ■ Tsukuyomi-chan Corpus (CV. Yumesaki Rei)
+> - Tsukuyomi-chan Corpus (CV. Yumesaki Rei)
 >
 > https://tyc.rei-yumesaki.net/material/corpus/
 >
-> © Rei Yumesaki
+> Copyright. Rei Yumesaki
 
 # Terms of Use
 
 Regarding the Real-time Voice Changer Tsukuyomi-chan, we prohibit the following uses in accordance with the terms of use of the Tsukuyomi-chan Corpus.
 
-■ Criticizing or attacking individuals (the definition of "criticizing or attacking" is based on the Tsukuyomi-chan character license).
+- Criticizing or attacking individuals (the definition of "criticizing or attacking" is based on the Tsukuyomi-chan character license).
 
-■ Advocating for or opposing specific political positions, religions, or ideologies.
+- Advocating for or opposing specific political positions, religions, or ideologies.
 
-■ Publicly displaying strongly stimulating expressions without proper zoning.
+- Publicly displaying strongly stimulating expressions without proper zoning.
 
-■ Publicly disclosing secondary use (use as materials) for others.
-(Distributing or selling as a work for viewing is not a problem.)
+- Publicly disclosing secondary use (use as materials) for others.
+  (Distributing or selling as a work for viewing is not a problem.)
 
 # Disclaimer
 
