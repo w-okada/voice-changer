@@ -73,13 +73,13 @@ Windows 版と Mac 版を提供しています。
 
 ・各種`startHttp_xxx.command`ファイル(mac)、`start_http_xxx.bat`ファイル(win)で起動できるボイスチェンジャは次の通りです。
 
-| #   | バッチファイル                            | 説明                                           |
-| --- | ----------------------------------------- | ---------------------------------------------- |
-| 1   | start_http_v13.bat                        | MMVC v.1.3.x 系のモデルが使用できます。        |
-| 2   | start_http_v15.bat                        | MMVC v.1.5.x 系のモデルが使用できます。        |
-| 3   | start_http_so-vits-svc_40.bat             | so-vits-svc 4.0 系のモデルが使用できます。     |
-| 4   | start_http_so-vits-svc_40v2.bat           | so-vits-svc 4.0v2 系のモデルが使用できます。   |
-| 5   | start_http_so-vits-svc_40v2_tsukuyomi.bat | つくよみちゃんのモデルを使用します。(変更不可) |
+| #   | バッチファイル(mac の場合は`.bat`を`.command`に読み替え) | 説明                                           |
+| --- | -------------------------------------------------------- | ---------------------------------------------- |
+| 1   | start_http_v13.bat                                       | MMVC v.1.3.x 系のモデルが使用できます。        |
+| 2   | start_http_v15.bat                                       | MMVC v.1.5.x 系のモデルが使用できます。        |
+| 3   | start_http_so-vits-svc_40.bat                            | so-vits-svc 4.0 系のモデルが使用できます。     |
+| 4   | start_http_so-vits-svc_40v2.bat                          | so-vits-svc 4.0v2 系のモデルが使用できます。   |
+| 5   | start_http_so-vits-svc_40v2_tsukuyomi.bat                | つくよみちゃんのモデルを使用します。(変更不可) |
 
 ・リモートから接続する場合は、各種`.command`ファイル(mac)、`.bat`ファイル(win)の http が https に置き換わっているものを使用してください。
 
@@ -93,13 +93,13 @@ Windows 版と Mac 版を提供しています。
 
 | Version   | OS      | フレームワーク                        | link                                                                                                 | サポート VC                                                    | サイズ |
 | --------- | ------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ------ |
-| v.1.5.1.7 | mac(M1) | ONNX(cpu)                             | [通常](https://drive.google.com/file/d/1SVTwIHYoniYYAGU6Kw6NnS1IE07NgSMd/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x,so-vits-svc 4.0, so-vits-svc 4.0v2  | 571MB  |
-|           |         |                                       | [つくよみちゃん](https://drive.google.com/file/d/1s2IYsGST_TqGiOBkVWE5e7wLPfWQf1sY/view?usp=sharing) | so-vits-svc 4.0v2                                              | 949MB  |
-|           | windows | ONNX(cpu,cuda),PyTorch(cpu)           | [通常](https://drive.google.com/file/d/191vw7_9wF2sba4SofOaNov3f9QmMkjIb/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x                                     | 597MB  |
-|           |         |                                       | [つくよみちゃん](https://drive.google.com/file/d/19kNfGk9j3z15IuEZZn9_lmxyDd1_UjoI/view?usp=sharing) | so-vits-svc 4.0v2                                              | 703MB  |
-|           |         | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [通常](https://drive.google.com/file/d/1_fK-U5odfk9MukMmjwWCsnBNicQcshJv/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 2.6GB  |
-|           |         | ONNX(cpu,DirectML), PyTorch(cpu)      | [通常](https://drive.google.com/file/d/1iHEC-p6mVLgDCMnWaFg3-dZfuO8njRci/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x                                     | 462MB  |
-|           |         | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [通常](https://drive.google.com/file/d/1a9ChdXb7e-LVIuiDDMyVU0oKDhxhZhIT/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x、so-vits-svc 4.0, so-vits-svc 4.0v2 | 2.48GB |
+| v.1.5.1.7 | mac(M1) | ONNX(cpu)                             | [通常](https://drive.google.com/file/d/163IPqKCPb4KR_UZjlYbM_Sk11ORSRlzt/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x,so-vits-svc 4.0, so-vits-svc 4.0v2  | 571MB  |
+|           |         |                                       | [つくよみちゃん](https://drive.google.com/file/d/1m1BZESIlT66-1pvicU9YrHwDeayNrfaU/view?usp=sharing) | so-vits-svc 4.0v2                                              | 949MB  |
+|           | windows | ONNX(cpu,cuda),PyTorch(cpu)           | [通常](https://drive.google.com/file/d/1hwWpXrO1Jndqy1YgQfOyJ2vxJDSIaPIo/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x                                     | 597MB  |
+|           |         |                                       | [つくよみちゃん](https://drive.google.com/file/d/1WOloHrHyjE614h6RiRbcZVJZ6El64yQC/view?usp=sharing) | so-vits-svc 4.0v2                                              | 703MB  |
+|           |         | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [通常](https://drive.google.com/file/d/1QlQ6ieuCI5cSbklk_-zJXbatH6ZLfIF5/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 2.6GB  |
+|           |         | ONNX(cpu,DirectML), PyTorch(cpu)      | [通常](https://drive.google.com/file/d/1UH_fVmgTl1QnOQgVjQpz6GNqvAIbCaLP/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x                                     | 462MB  |
+|           |         | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [通常](https://drive.google.com/file/d/1hq8WAAp871bQw7YNmzqkOSOAmtdXRrtv/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x、so-vits-svc 4.0, so-vits-svc 4.0v2 | 2.48GB |
 
 \*1 MMVC v.1.5.x は Experimental です。
 
