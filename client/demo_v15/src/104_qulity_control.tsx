@@ -190,7 +190,7 @@ export const useQualityControl = (): QualityControlState => {
                     <div className="body-button-container">
                         <div onClick={onRecordStartClicked} className={startClassName}>Start</div>
                         <div onClick={onRecordStopClicked} className={stopClassName}>Stop</div>
-                        <div onClick={onRecordAnalizeClicked} className={analyzeClassName}>{analyzeLabel}</div>
+                        {/* <div onClick={onRecordAnalizeClicked} className={analyzeClassName}>{analyzeLabel}</div> */}
                     </div>
                 </div>
 
@@ -244,7 +244,7 @@ export const useQualityControl = (): QualityControlState => {
                     <div></div>
                 </div>
 
-                <div className="body-row split-3-7 left-padding-1 guided">
+                {/* <div className="body-row split-3-7 left-padding-1 guided">
                     <div className="body-item-title left-padding-2 ">
                         Spectrogram
                     </div>
@@ -263,7 +263,7 @@ export const useQualityControl = (): QualityControlState => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
             </>
         )

@@ -320,11 +320,11 @@ export const useDeviceSetting = (): DeviceSettingState => {
                         <span className="title" onClick={() => { appState.frontendManagerState.stateControls.openDeviceSettingCheckbox.updateState(!appState.frontendManagerState.stateControls.openDeviceSettingCheckbox.checked()) }}>
                             Device Setting
                         </span>
-                        <span className="belongings">
+                        {/* <span className="belongings">
                             <input className="belongings-checkbox" type="checkbox" checked={useServerMicrophone} onChange={(e) => {
                                 setUseServerMicrophone(e.target.checked)
                             }} /> use server mic (Experimental)
-                        </span>
+                        </span> */}
                     </div>
 
                     <div className="partition-content">
