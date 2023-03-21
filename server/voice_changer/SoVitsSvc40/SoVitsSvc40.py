@@ -170,7 +170,13 @@ class SoVitsSvc40:
     def get_unit_f0(self, audio_buffer, tran):
         wav_44k = audio_buffer
         # f0 = utils.compute_f0_parselmouth(wav, sampling_rate=self.target_sample, hop_length=self.hop_size)
-        f0 = utils.compute_f0_dio(wav_44k, sampling_rate=self.hps.data.sampling_rate, hop_length=self.hps.data.hop_length)
+        # f0 = utils.compute_f0_dio(wav_44k, sampling_rate=self.hps.data.sampling_rate, hop_length=self.hps.data.hop_length)
+
+        if self.settings.f0Detector == "dio":
+            f0 = compute_f0_dio(wav_44k, sampling_rate=self.hps.data.sampling_rate, hop_length=self.hps.data.hop_length)
+        else:
+            f0 = compute_f0_harvest(wav_44k, sampling_rate=self.hps.data.sampling_rate, hop_length=self.hps.data.hop_length)
+
         if wav_44k.shape[0] % self.hps.data.hop_length != 0:
             print(f" !!! !!! !!! wav size not multiple of hopsize: {wav_44k.shape[0] / self.hps.data.hop_length}")
 
@@ -315,3 +321,36 @@ class SoVitsSvc40:
     def destroy(self):
         del self.net_g
         del self.onnx_session
+
+
+def resize_f0(x, target_len):
+    source = np.array(x)
+    source[source < 0.001] = np.nan
+    target = np.interp(np.arange(0, len(source) * target_len, len(source)) / target_len, np.arange(0, len(source)), source)
+    res = np.nan_to_num(target)
+    return res
+
+
+def compute_f0_dio(wav_numpy, p_len=None, sampling_rate=44100, hop_length=512):
+    if p_len is None:
+        p_len = wav_numpy.shape[0] // hop_length
+    f0, t = pw.dio(
+        wav_numpy.astype(np.double),
+        fs=sampling_rate,
+        f0_ceil=800,
+        frame_period=1000 * hop_length / sampling_rate,
+    )
+    f0 = pw.stonemask(wav_numpy.astype(np.double), f0, t, sampling_rate)
+    for index, pitch in enumerate(f0):
+        f0[index] = round(pitch, 1)
+    return resize_f0(f0, p_len)
+
+
+def compute_f0_harvest(wav_numpy, p_len=None, sampling_rate=44100, hop_length=512):
+    if p_len is None:
+        p_len = wav_numpy.shape[0] // hop_length
+    f0, t = pw.harvest(wav_numpy.astype(np.double), fs=sampling_rate, frame_period=5.5, f0_floor=71.0, f0_ceil=1000.0)
+
+    for index, pitch in enumerate(f0):
+        f0[index] = round(pitch, 1)
+    return resize_f0(f0, p_len)

@@ -91,15 +91,17 @@ Windows 版と Mac 版を提供しています。
 
 ・so-vits-svc 4.0/so-vits-svc 4.0v2 やつくよみちゃんの動作には content vec のモデルが必要となります。こちらの[リポジトリ](https://github.com/auspicious3000/contentvec)から、ContentVec_legacy 500 のモデルをダウンロードして、実行する`startHttp_xxx.command`や`start_http_xxx.bat`と同じフォルダに配置してください。
 
-| Version   | OS      | フレームワーク                        | link                                                                                                 | サポート VC                                                    | サイズ |
-| --------- | ------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ------ |
-| v.1.5.1.8 | mac(M1) | ONNX(cpu)                             | [通常](https://drive.google.com/file/d/163IPqKCPb4KR_UZjlYbM_Sk11ORSRlzt/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x,so-vits-svc 4.0, so-vits-svc 4.0v2  | 571MB  |
-|           |         |                                       | [つくよみちゃん](https://drive.google.com/file/d/1m1BZESIlT66-1pvicU9YrHwDeayNrfaU/view?usp=sharing) | so-vits-svc 4.0v2                                              | 949MB  |
-|           | windows | ONNX(cpu,cuda),PyTorch(cpu)           | [通常](https://drive.google.com/file/d/1hwWpXrO1Jndqy1YgQfOyJ2vxJDSIaPIo/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x                                     | 597MB  |
-|           |         |                                       | [つくよみちゃん](https://drive.google.com/file/d/1WOloHrHyjE614h6RiRbcZVJZ6El64yQC/view?usp=sharing) | so-vits-svc 4.0v2                                              | 703MB  |
-|           |         | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [通常](https://drive.google.com/file/d/1QlQ6ieuCI5cSbklk_-zJXbatH6ZLfIF5/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 2.6GB  |
-|           |         | ONNX(cpu,DirectML), PyTorch(cpu)      | [通常](https://drive.google.com/file/d/1UH_fVmgTl1QnOQgVjQpz6GNqvAIbCaLP/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x                                     | 462MB  |
-|           |         | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [通常](https://drive.google.com/file/d/1hq8WAAp871bQw7YNmzqkOSOAmtdXRrtv/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x、so-vits-svc 4.0, so-vits-svc 4.0v2 | 2.48GB |
+| Version   | OS      | フレームワーク                        | link                                                                                                           | サポート VC                                                    | サイズ |
+| --------- | ------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ------ |
+| v.1.5.1.8 | mac(M1) | ONNX(cpu)                             | [通常](https://drive.google.com/file/d/163IPqKCPb4KR_UZjlYbM_Sk11ORSRlzt/view?usp=sharing)                     | MMVC v.1.5.x, MMVC v.1.3.x,so-vits-svc 4.0, so-vits-svc 4.0v2  | 571MB  |
+|           |         |                                       | [つくよみちゃん](https://drive.google.com/file/d/1m1BZESIlT66-1pvicU9YrHwDeayNrfaU/view?usp=sharing)           | so-vits-svc 4.0v2                                              | 949MB  |
+|           |         |                                       | [つくよみちゃん(model up)](https://drive.google.com/file/d/1e3VpmJScuuqOXTKVlEkge2Q-QGxf3Rdm/view?usp=sharing) | so-vits-svc 4.0v2                                              | 949MB  |
+|           | windows | ONNX(cpu,cuda),PyTorch(cpu)           | [通常](https://drive.google.com/file/d/1hwWpXrO1Jndqy1YgQfOyJ2vxJDSIaPIo/view?usp=sharing)                     | MMVC v.1.5.x, MMVC v.1.3.x                                     | 597MB  |
+|           |         |                                       | [つくよみちゃん](https://drive.google.com/file/d/1WOloHrHyjE614h6RiRbcZVJZ6El64yQC/view?usp=sharing)           | so-vits-svc 4.0v2                                              | 703MB  |
+|           |         |                                       | [つくよみちゃん(model up)](https://drive.google.com/file/d/1Be22eUwxPIfHfHkC9pedyXmb5oNF7nPL/view?usp=sharing) | so-vits-svc 4.0v2                                              | 703MB  |
+|           |         | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [通常](https://drive.google.com/file/d/1QlQ6ieuCI5cSbklk_-zJXbatH6ZLfIF5/view?usp=sharing)                     | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 2.6GB  |
+|           |         | ONNX(cpu,DirectML), PyTorch(cpu)      | [通常](https://drive.google.com/file/d/1UH_fVmgTl1QnOQgVjQpz6GNqvAIbCaLP/view?usp=sharing)                     | MMVC v.1.5.x, MMVC v.1.3.x                                     | 462MB  |
+|           |         | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [通常](https://drive.google.com/file/d/1hq8WAAp871bQw7YNmzqkOSOAmtdXRrtv/view?usp=sharing)                     | MMVC v.1.5.x, MMVC v.1.3.x、so-vits-svc 4.0, so-vits-svc 4.0v2 | 2.48GB |
 
 \*1 MMVC v.1.5.x は Experimental です。
 
