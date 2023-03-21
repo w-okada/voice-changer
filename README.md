@@ -2,7 +2,9 @@
 
 [English](/README_en.md)
 
-\*1 旧名は VC Helper でしたが VC Client に変更しました。以前は VC を行うために音声録音、トレーニング、再生などの各種プロセスが必要でしたが、昨今の VC 用 AI の発展により簡易化されそれらをサポートする役割を終えました。今後は Client に注力するソフトウェアとして開発を進めていきます。
+https://youtu.be/yvPWtq7isfI
+
+https://youtu.be/6U7ZM2ZSwCU
 
 # VC Client とは
 

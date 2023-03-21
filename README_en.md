@@ -1,5 +1,9 @@
 ## VC Client
 
+https://youtu.be/yvPWtq7isfI
+
+https://youtu.be/6U7ZM2ZSwCU
+
 # What is VC Client
 
 [VC Client](https://github.com/w-okada/voice-changer) is a client software for real-time voice changers that uses AI such as [MMVC](https://github.com/isletennos/MMVC_Trainer) and [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc). It also provides an app for recording training audio for real-time voice changers, specifically for MMVC.
