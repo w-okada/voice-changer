@@ -1,0 +1,25 @@
+[
+    { "mode": "normal", "z_index": 0, "number": 10, "layer_path": "ROOT_!体_!体　※選択肢なし" },
+    { "mode": "normal", "z_index": 1, "number": 200, "layer_path": "ROOT_!右腕_*右手を下げる" },
+    { "mode": "normal", "z_index": 1, "number": 40, "layer_path": "ROOT_!右腕_*右手を口に当てる" },
+    { "mode": "normal", "z_index": 2, "number": 10, "layer_path": "ROOT_!左腕_*左手を下げる" },
+    { "mode": "normal", "z_index": 3, "number": 10, "layer_path": "ROOT_!髪（おさげ）_!髪（おさげ）　※選択肢なし" },
+    { "mode": "normal", "z_index": 4, "number": 10, "layer_path": "ROOT_!口 _*口を閉じて微笑む" },
+    { "mode": "normal", "z_index": 5, "number": 10, "layer_path": "ROOT_!頬　_*通常" },
+    { "mode": "normal", "z_index": 6, "number": 10, "layer_path": "ROOT_!目_*目を少し細める ★デフォルト" },
+    { "mode": "normal", "z_index": 7, "number": 100, "layer_path": "ROOT_!眉　_*通常眉" },
+    { "mode": "normal", "z_index": 7, "number": 10, "layer_path": "ROOT_!眉　_*通常眉：少し下げ" },
+
+    { "mode": "talking", "z_index": 0, "number": 10, "layer_path": "ROOT_!体_!体　※選択肢なし" },
+    { "mode": "talking", "z_index": 1, "number": 200, "layer_path": "ROOT_!右腕_*右手を下げる" },
+    { "mode": "talking", "z_index": 1, "number": 40, "layer_path": "ROOT_!右腕_*右手を口に当てる" },
+    { "mode": "talking", "z_index": 2, "number": 10, "layer_path": "ROOT_!左腕_*左手を下げる" },
+    { "mode": "talking", "z_index": 3, "number": 10, "layer_path": "ROOT_!髪（おさげ）_!髪（おさげ）　※選択肢なし" },
+    { "mode": "talking", "z_index": 4, "number": 3, "layer_path": "ROOT_!口 _*口を閉じて微笑む" },
+    { "mode": "talking", "z_index": 4, "number": 3, "layer_path": "ROOT_!口 _*小さく笑う" },
+    { "mode": "talking", "z_index": 4, "number": 3, "layer_path": "ROOT_!口 _*大きく笑う" },
+    { "mode": "talking", "z_index": 5, "number": 10, "layer_path": "ROOT_!頬　_*通常" },
+    { "mode": "talking", "z_index": 6, "number": 10, "layer_path": "ROOT_!目_*目を少し細める ★デフォルト" },
+    { "mode": "talking", "z_index": 7, "number": 100, "layer_path": "ROOT_!眉　_*通常眉" },
+    { "mode": "talking", "z_index": 7, "number": 10, "layer_path": "ROOT_!眉　_*通常眉：少し下げ" }
+]
