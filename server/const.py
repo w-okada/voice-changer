@@ -40,8 +40,13 @@ def getFrontendPath():
         frontend_path = os.path.join(sys._MEIPASS, "dist_so-vits-svc_40") if hasattr(sys, "_MEIPASS") else "../client/demo_so-vits-svc_40/dist"
     elif modelType == "so-vits-svc-40v2":
         frontend_path = os.path.join(sys._MEIPASS, "dist_so-vits-svc_40v2") if hasattr(sys, "_MEIPASS") else "../client/demo_so-vits-svc_40v2/dist"
+    elif modelType == "DDSP-SVC":
+        frontend_path = os.path.join(sys._MEIPASS, "dist_DDSP-SVC") if hasattr(sys, "_MEIPASS") else "../client/demo_DDSP-SVC/dist"
 
-    elif modelType == "so-vits-svc-40v2_tsukuyomi":
-        frontend_path = os.path.join(sys._MEIPASS, "dist_so-vits-svc_40v2_tsukuyomi") if hasattr(sys, "_MEIPASS") \
-            else "../client/demo_so-vits-svc_40v2_tsukuyomi/dist"
+    # elif modelType == "so-vits-svc-40v2_tsukuyomi":
+    #     frontend_path = os.path.join(sys._MEIPASS, "dist_so-vits-svc_40v2_tsukuyomi") if hasattr(sys, "_MEIPASS") \
+    #         else "../client/demo_so-vits-svc_40v2_tsukuyomi/dist"
+    elif modelType == "so-vits-svc-40v2_c":
+        frontend_path = os.path.join(sys._MEIPASS, "dist_so-vits-svc_40v2_c") if hasattr(sys, "_MEIPASS") \
+            else "../client/demo_so-vits-svc_40v2_c/dist"
     return frontend_path
