@@ -19,6 +19,7 @@ import onnxruntime
 import pyworld as pw
 import ddsp.vocoder as vo
 from ddsp.core import upsample
+from enhancer import Enhancer
 from slicer import Slicer
 import librosa
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
@@ -95,7 +96,7 @@ class DDSP_SVC:
             float(1100))
 
         self.volume_extractor = vo.Volume_Extractor(self.hop_size)
-
+        self.enhancer = Enhancer(self.args.enhancer.type, "./model_DDSP-SVC/enhancer/model", "cpu")
         return self.get_info()
 
     def update_setteings(self, key: str, val: any):
@@ -155,7 +156,7 @@ class DDSP_SVC:
         self.audio_buffer = self.audio_buffer[-1 * convertSize:]  # 変換対象の部分だけ抽出
 
         # f0
-        f0 = self.f0_detector.extract(self.audio_buffer, uv_interp=True)
+        f0 = self.f0_detector.extract(self.audio_buffer * 32768.0, uv_interp=True)
         f0 = torch.from_numpy(f0).float().unsqueeze(-1).unsqueeze(0)
         f0 = f0 * 2 ** (float(self.settings.tran) / 12)
 
@@ -233,10 +234,18 @@ class DDSP_SVC:
             return np.zeros(convertSize).astype(np.int16)
 
         with torch.no_grad():
-            spk_id = torch.LongTensor(np.array([[int(1)]]))
+            spk_id = torch.LongTensor(np.array([[int(2)]]))
             seg_output, _, (s_h, s_n) = self.model(c, f0, volume, spk_id=spk_id, spk_mix_dict=None)
             seg_output *= mask
+
+            seg_output, output_sample_rate = self.enhancer.enhance(
+                seg_output,
+                self.args.data.sampling_rate,
+                f0,
+                self.args.data.block_size,
+                adaptive_key=float(0))
             result = seg_output.squeeze().cpu().numpy() * 32768.0
+
         return np.array(result).astype(np.int16)
 
     def inference(self, data):
