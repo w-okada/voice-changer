@@ -24,7 +24,7 @@ from slicer import Slicer
 import librosa
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
-
+import resampy
 from scipy.io import wavfile
 SAMPLING_RATE = 44100
 
@@ -234,7 +234,7 @@ class DDSP_SVC:
             return np.zeros(convertSize).astype(np.int16)
 
         with torch.no_grad():
-            spk_id = torch.LongTensor(np.array([[int(2)]]))
+            spk_id = torch.LongTensor(np.array([[int(1)]]))
             seg_output, _, (s_h, s_n) = self.model(c, f0, volume, spk_id=spk_id, spk_mix_dict=None)
             seg_output *= mask
 
@@ -245,7 +245,6 @@ class DDSP_SVC:
                 self.args.data.block_size,
                 adaptive_key=float(0))
             result = seg_output.squeeze().cpu().numpy() * 32768.0
-
         return np.array(result).astype(np.int16)
 
     def inference(self, data):
