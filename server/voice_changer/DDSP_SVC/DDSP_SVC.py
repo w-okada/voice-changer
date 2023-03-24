@@ -285,13 +285,15 @@ class DDSP_SVC:
 
             seg_output = seg_output.squeeze().cpu().numpy()
 
-            silent_length = round(start_frame * self.args.data.block_size * output_sample_rate / self.args.data.sampling_rate) - current_length
-            if silent_length >= 0:
-                result = np.append(result, np.zeros(silent_length))
-                result = np.append(result, seg_output)
-            else:
-                result = cross_fade(result, seg_output, current_length + silent_length)
-            current_length = current_length + silent_length + len(seg_output)
+            result = seg_output
+
+            # silent_length = round(start_frame * self.args.data.block_size * output_sample_rate / self.args.data.sampling_rate) - current_length
+            # if silent_length >= 0:
+            #     result = np.append(result, np.zeros(silent_length))
+            #     result = np.append(result, seg_output)
+            # else:
+            #     result = cross_fade(result, seg_output, current_length + silent_length)
+            # current_length = current_length + silent_length + len(seg_output)
             # sf.write("out.wav", result, output_sample_rate)
             wavfile.write("out.wav", 44100, result)
 
