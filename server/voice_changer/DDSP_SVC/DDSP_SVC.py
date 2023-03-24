@@ -271,34 +271,61 @@ class DDSP_SVC:
         current_length = 0
         segments = split(audio, sample_rate, hop_size)
 
-        from tqdm import tqdm
         with torch.no_grad():
-            for segment in tqdm(segments):
-                start_frame = segment[0]
-                seg_input = torch.from_numpy(segment[1]).float().unsqueeze(0)
-                seg_units = self.encoder.encode(seg_input, sample_rate, hop_size)
+            start_frame = 0
+            seg_input = torch.from_numpy(audio).float().unsqueeze(0)
+            seg_units = self.encoder.encode(seg_input, sample_rate, hop_size)
 
-                seg_f0 = f0[:, start_frame: start_frame + seg_units.size(1), :]
-                seg_volume = volume[:, start_frame: start_frame + seg_units.size(1), :]
+            seg_f0 = f0[:, start_frame: start_frame + seg_units.size(1), :]
+            seg_volume = volume[:, start_frame: start_frame + seg_units.size(1), :]
 
-                seg_output, _, (s_h, s_n) = self.model(seg_units, seg_f0, seg_volume, spk_id=spk_id, spk_mix_dict=None)
-                seg_output *= mask[:, start_frame * self.args.data.block_size: (start_frame + seg_units.size(1)) * self.args.data.block_size]
+            seg_output, _, (s_h, s_n) = self.model(seg_units, seg_f0, seg_volume, spk_id=spk_id, spk_mix_dict=None)
+            seg_output *= mask[:, start_frame * self.args.data.block_size: (start_frame + seg_units.size(1)) * self.args.data.block_size]
 
-                output_sample_rate = self.args.data.sampling_rate
+            output_sample_rate = self.args.data.sampling_rate
 
-                seg_output = seg_output.squeeze().cpu().numpy()
+            seg_output = seg_output.squeeze().cpu().numpy()
 
-                silent_length = round(start_frame * self.args.data.block_size * output_sample_rate / self.args.data.sampling_rate) - current_length
-                if silent_length >= 0:
-                    result = np.append(result, np.zeros(silent_length))
-                    result = np.append(result, seg_output)
-                else:
-                    result = cross_fade(result, seg_output, current_length + silent_length)
-                current_length = current_length + silent_length + len(seg_output)
+            silent_length = round(start_frame * self.args.data.block_size * output_sample_rate / self.args.data.sampling_rate) - current_length
+            if silent_length >= 0:
+                result = np.append(result, np.zeros(silent_length))
+                result = np.append(result, seg_output)
+            else:
+                result = cross_fade(result, seg_output, current_length + silent_length)
+            current_length = current_length + silent_length + len(seg_output)
             # sf.write("out.wav", result, output_sample_rate)
             wavfile.write("out.wav", 44100, result)
-            print("result:::", result)
-            return np.array(result * 32768.0).astype(np.int16)
+
+        # from tqdm import tqdm
+        # with torch.no_grad():
+        #     for segment in tqdm(segments):
+        #         # start_frame = segment[0]
+        #         start_frame = 0
+        #         # seg_input = torch.from_numpy(segment[1]).float().unsqueeze(0)
+        #         seg_input = torch.from_numpy(audio).float().unsqueeze(0)
+        #         seg_units = self.encoder.encode(seg_input, sample_rate, hop_size)
+
+        #         seg_f0 = f0[:, start_frame: start_frame + seg_units.size(1), :]
+        #         seg_volume = volume[:, start_frame: start_frame + seg_units.size(1), :]
+
+        #         seg_output, _, (s_h, s_n) = self.model(seg_units, seg_f0, seg_volume, spk_id=spk_id, spk_mix_dict=None)
+        #         seg_output *= mask[:, start_frame * self.args.data.block_size: (start_frame + seg_units.size(1)) * self.args.data.block_size]
+
+        #         output_sample_rate = self.args.data.sampling_rate
+
+        #         seg_output = seg_output.squeeze().cpu().numpy()
+
+        #         silent_length = round(start_frame * self.args.data.block_size * output_sample_rate / self.args.data.sampling_rate) - current_length
+        #         if silent_length >= 0:
+        #             result = np.append(result, np.zeros(silent_length))
+        #             result = np.append(result, seg_output)
+        #         else:
+        #             result = cross_fade(result, seg_output, current_length + silent_length)
+        #         current_length = current_length + silent_length + len(seg_output)
+        #     # sf.write("out.wav", result, output_sample_rate)
+        #     wavfile.write("out.wav", 44100, result)
+        print("result:::", result)
+        return np.array(result * 32768.0).astype(np.int16)
         return np.array(result).astype(np.int16)
 
         # return np.zeros(1).astype(np.int16)
