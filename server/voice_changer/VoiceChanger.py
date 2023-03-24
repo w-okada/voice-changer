@@ -191,7 +191,6 @@ class VoiceChanger():
             try:
                 # Inference
                 audio = self.voiceChanger.inference(data)
-                print("audio", audio)
 
                 if hasattr(self, 'np_prev_audio1') == True:
                     np.set_printoptions(threshold=10000)

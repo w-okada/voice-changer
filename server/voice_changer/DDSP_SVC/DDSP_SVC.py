@@ -25,6 +25,7 @@ providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecution
 
 
 from scipy.io import wavfile
+SAMPLING_RATE = 44100
 
 
 @dataclass
@@ -74,7 +75,7 @@ class DDSP_SVC:
         model, args = vo.load_model(pyTorch_model_file)
         self.model = model
         self.args = args
-        self.hop_size = int(self.args.data.block_size * 44100 / self.args.data.sampling_rate)
+        self.hop_size = int(self.args.data.block_size * SAMPLING_RATE / self.args.data.sampling_rate)
 
         # hubert
         vec_path = self.params["hubert"]
@@ -86,9 +87,10 @@ class DDSP_SVC:
             device="cpu")
         # f0dec
         self.f0_detector = vo.F0_Extractor(
+            # "crepe",
             self.settings.f0Detector,
-            44100,
-            512,
+            SAMPLING_RATE,
+            self.hop_size,
             float(50),
             float(1100))
 
@@ -136,29 +138,10 @@ class DDSP_SVC:
         return data
 
     def get_processing_sampling_rate(self):
-        return 44100
-
-    # def get_unit_f0(self, audio_buffer, tran):
-    #     if (self.settings.gpu < 0 or self.gpu_num == 0) or self.settings.framework == "ONNX":
-    #         dev = torch.device("cpu")
-    #     else:
-    #         dev = torch.device("cpu")
-    #         # dev = torch.device("cuda", index=self.settings.gpu)
-
-    #     wav_44k = audio_buffer
-    #     f0 = self.f0_detector.extract(wav_44k, uv_interp=True, device=dev)
-    #     f0 = torch.from_numpy(f0).float().to(dev).unsqueeze(-1).unsqueeze(0)
-    #     f0 = f0 * 2 ** (float(10) / 12)
-    #     # print("f0:", f0)
-
-    #     print("wav_44k:::", wav_44k)
-    #     c = self.encoder.encode(torch.from_numpy(audio_buffer).float().unsqueeze(0).to(dev), 44100, 512)
-    #     # print("c:", c)
-    #     return c, f0
+        return SAMPLING_RATE
 
     def generate_input(self, newData: any, inputSize: int, crossfadeSize: int):
         newData = newData.astype(np.float32) / 32768.0
-        # newData = newData.astype(np.float32) / self.hps.data.max_wav_value
 
         if hasattr(self, "audio_buffer"):
             self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)  # 過去のデータに連結
@@ -166,32 +149,36 @@ class DDSP_SVC:
             self.audio_buffer = newData
 
         convertSize = inputSize + crossfadeSize + self.settings.extraConvertSize
-        print("hopsize", self.hop_size)
         if convertSize % self.hop_size != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
             convertSize = convertSize + (self.hop_size - (convertSize % self.hop_size))
 
-        print("convsize", convertSize)
         self.audio_buffer = self.audio_buffer[-1 * convertSize:]  # 変換対象の部分だけ抽出
 
+        # f0
         f0 = self.f0_detector.extract(self.audio_buffer, uv_interp=True)
         f0 = torch.from_numpy(f0).float().unsqueeze(-1).unsqueeze(0)
-        f0 = f0 * 2 ** (float(20) / 12)
+        f0 = f0 * 2 ** (float(self.settings.tran) / 12)
 
+        # volume, mask
         volume = self.volume_extractor.extract(self.audio_buffer)
+        mask = (volume > 10 ** (float(-60) / 20)).astype('float')
+        mask = np.pad(mask, (4, 4), constant_values=(mask[0], mask[-1]))
+        mask = np.array([np.max(mask[n: n + 9]) for n in range(len(mask) - 8)])
+        mask = torch.from_numpy(mask).float().unsqueeze(-1).unsqueeze(0)
+        mask = upsample(mask, self.args.data.block_size).squeeze(-1)
+        volume = torch.from_numpy(volume).float().unsqueeze(-1).unsqueeze(0)
 
+        # embed
         audio = torch.from_numpy(self.audio_buffer).float().unsqueeze(0)
-        seg_units = self.encoder.encode(audio, 44100, self.hop_size)
-        print("audio1", audio)
-        # crop = self.audio_buffer[-1 * (inputSize + crossfadeSize):-1 * (crossfadeSize)]
+        seg_units = self.encoder.encode(audio, SAMPLING_RATE, self.hop_size)
 
-        # rms = np.sqrt(np.square(crop).mean(axis=0))
-        # vol = max(rms, self.prevVol * 0.0)
-        # self.prevVol = vol
+        crop = self.audio_buffer[-1 * (inputSize + crossfadeSize):-1 * (crossfadeSize)]
 
-        # c, f0 = self.get_unit_f0(self.audio_buffer, self.settings.tran)
-        # return (c, f0, convertSize, vol)
-        wavfile.write("tmp2.wav", 44100, (self.audio_buffer * 32768.0).astype(np.int16))
-        return (seg_units, f0, volume)
+        rms = np.sqrt(np.square(crop).mean(axis=0))
+        vol = max(rms, self.prevVol * 0.0)
+        self.prevVol = vol
+
+        return (seg_units, f0, volume, mask, convertSize, vol)
 
     def _onnx_inference(self, data):
         if hasattr(self, "onnx_session") == False or self.onnx_session == None:
@@ -234,71 +221,23 @@ class DDSP_SVC:
             print("[Voice Changer] No pyTorch session.")
             return np.zeros(1).astype(np.int16)
 
-        # if self.settings.gpu < 0 or self.gpu_num == 0:
-        #     dev = torch.device("cpu")
-        # else:
-        #     dev = torch.device("cpu")
-        #     # dev = torch.device("cuda", index=self.settings.gpu)
-
-        # c = data[0]
-        # f0 = data[1]
-        # convertSize = data[2]
-        # vol = data[3]
-        # if vol < self.settings.silentThreshold:
-        #     return np.zeros(convertSize).astype(np.int16)
-
-        # with torch.no_grad():
-        #     c.to(dev)
-        #     f0.to(dev)
-        #     vol = torch.from_numpy(np.array([vol] * c.shape[1])).float().to(dev).unsqueeze(-1).unsqueeze(0)
-        #     spk_id = torch.LongTensor(np.array([[1]])).to(dev)
-        #     # print("vol", vol)
-        #     print("input", c.shape, f0.shape)
-        #     seg_output, _, (s_h, s_n) = self.model(c, f0, vol, spk_id=spk_id)
-
-        #     seg_output = seg_output.squeeze().cpu().numpy()
-        #     print("SEG:", seg_output)
-
         c = data[0]
         f0 = data[1]
         volume = data[2]
+        mask = data[3]
 
-        mask = (volume > 10 ** (float(-60) / 20)).astype('float')
-        mask = np.pad(mask, (4, 4), constant_values=(mask[0], mask[-1]))
-        mask = np.array([np.max(mask[n: n + 9]) for n in range(len(mask) - 8)])
-        mask = torch.from_numpy(mask).float().unsqueeze(-1).unsqueeze(0)
-        mask = upsample(mask, self.args.data.block_size).squeeze(-1)
-        volume = torch.from_numpy(volume).float().unsqueeze(-1).unsqueeze(0)
+        convertSize = data[4]
+        vol = data[4]
 
-        spk_id = torch.LongTensor(np.array([[int(1)]]))
-        result = np.zeros(0)
-        current_length = 0
+        if vol < self.settings.silentThreshold:
+            return np.zeros(convertSize).astype(np.int16)
 
         with torch.no_grad():
-            start_frame = 0
-            seg_volume = volume
-
-            seg_output, _, (s_h, s_n) = self.model(c, f0, seg_volume, spk_id=spk_id, spk_mix_dict=None)
-            seg_output *= mask[:, start_frame * self.args.data.block_size: (start_frame + c.size(1)) * self.args.data.block_size]
-
-            output_sample_rate = self.args.data.sampling_rate
-
-            seg_output = seg_output.squeeze().cpu().numpy()
-
-            result = seg_output
-
-            # silent_length = round(start_frame * self.args.data.block_size * output_sample_rate / self.args.data.sampling_rate) - current_length
-            # if silent_length >= 0:
-            #     result = np.append(result, np.zeros(silent_length))
-            #     result = np.append(result, seg_output)
-            # else:
-            #     result = cross_fade(result, seg_output, current_length + silent_length)
-            # current_length = current_length + silent_length + len(seg_output)
-            # sf.write("out.wav", result, output_sample_rate)
-            wavfile.write("out.wav", 44100, result)
-
-        print("result:::", result)
-        return np.array(result * 32768.0).astype(np.int16)
+            spk_id = torch.LongTensor(np.array([[int(1)]]))
+            seg_output, _, (s_h, s_n) = self.model(c, f0, volume, spk_id=spk_id, spk_mix_dict=None)
+            seg_output *= mask
+            result = seg_output.squeeze().cpu().numpy() * 32768.0
+        return np.array(result).astype(np.int16)
 
     def inference(self, data):
         if self.settings.framework == "ONNX":
