@@ -175,7 +175,7 @@ class DDSP_SVC:
 
         f0 = self.f0_detector.extract(self.audio_buffer, uv_interp=True)
         f0 = torch.from_numpy(f0).float().unsqueeze(-1).unsqueeze(0)
-        f0 = f0 * 2 ** (float(10) / 12)
+        f0 = f0 * 2 ** (float(20) / 12)
 
         volume = self.volume_extractor.extract(self.audio_buffer)
 
@@ -259,18 +259,9 @@ class DDSP_SVC:
         #     seg_output = seg_output.squeeze().cpu().numpy()
         #     print("SEG:", seg_output)
 
-        audio, sample_rate = librosa.load("tmp2.wav", sr=None)
-        print("SR:", sample_rate)
-
         c = data[0]
         f0 = data[1]
         volume = data[2]
-
-        if len(audio.shape) > 1:
-            audio = librosa.to_mono(audio)
-        hop_size = self.args.data.block_size * sample_rate / self.args.data.sampling_rate
-
-        print("hop_size", hop_size)
 
         mask = (volume > 10 ** (float(-60) / 20)).astype('float')
         mask = np.pad(mask, (4, 4), constant_values=(mask[0], mask[-1]))
@@ -317,25 +308,6 @@ class DDSP_SVC:
     def destroy(self):
         del self.net_g
         del self.onnx_session
-
-
-def split(audio, sample_rate, hop_size, db_thresh=-40, min_len=5000):
-    slicer = Slicer(
-        sr=sample_rate,
-        threshold=db_thresh,
-        min_length=min_len)
-    chunks = dict(slicer.slice(audio))
-    result = []
-    for k, v in chunks.items():
-        tag = v["split_time"].split(",")
-        if tag[0] != tag[1]:
-            start_frame = int(int(tag[0]) // hop_size)
-            end_frame = int(int(tag[1]) // hop_size)
-            if end_frame > start_frame:
-                result.append((
-                    start_frame,
-                    audio[int(start_frame * hop_size): int(end_frame * hop_size)]))
-    return result
 
 
 def cross_fade(a: np.ndarray, b: np.ndarray, idx: int):
