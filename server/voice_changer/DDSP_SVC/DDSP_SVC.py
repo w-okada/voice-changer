@@ -172,6 +172,10 @@ class DDSP_SVC:
         print("convsize", convertSize)
         self.audio_buffer = self.audio_buffer[-1 * convertSize:]  # 変換対象の部分だけ抽出
 
+        f0 = self.f0_detector.extract(self.audio_buffer, uv_interp=True)
+        f0 = torch.from_numpy(f0).float().unsqueeze(-1).unsqueeze(0)
+        f0 = f0 * 2 ** (float(10) / 12)
+
         audio = torch.from_numpy(self.audio_buffer).float().unsqueeze(0)
         seg_units = self.encoder.encode(audio, 44100, hop_size)
         print("audio1", audio)
@@ -184,7 +188,7 @@ class DDSP_SVC:
         # c, f0 = self.get_unit_f0(self.audio_buffer, self.settings.tran)
         # return (c, f0, convertSize, vol)
         wavfile.write("tmp2.wav", 44100, (self.audio_buffer * 32768.0).astype(np.int16))
-        return (seg_units, )
+        return (seg_units, f0)
 
     def _onnx_inference(self, data):
         if hasattr(self, "onnx_session") == False or self.onnx_session == None:
@@ -256,15 +260,14 @@ class DDSP_SVC:
         print("SR:", sample_rate)
 
         seg_units = data[0]
+        f0 = data[1]
 
         if len(audio.shape) > 1:
             audio = librosa.to_mono(audio)
         hop_size = self.args.data.block_size * sample_rate / self.args.data.sampling_rate
 
         print("hop_size", hop_size)
-        f0 = self.f0_detector.extract(audio, uv_interp=True)
-        f0 = torch.from_numpy(f0).float().unsqueeze(-1).unsqueeze(0)
-        f0 = f0 * 2 ** (float(10) / 12)
+
         volume_extractor = vo.Volume_Extractor(hop_size)
         volume = volume_extractor.extract(audio)
         mask = (volume > 10 ** (float(-60) / 20)).astype('float')
