@@ -277,13 +277,12 @@ class DDSP_SVC:
         spk_id = torch.LongTensor(np.array([[int(1)]]))
         result = np.zeros(0)
         current_length = 0
-        segments = split(audio, sample_rate, hop_size)
 
         with torch.no_grad():
             start_frame = 0
 
-            seg_f0 = f0[:, start_frame: start_frame + seg_units.size(1), :]
-            seg_volume = volume[:, start_frame: start_frame + seg_units.size(1), :]
+            seg_f0 = f0
+            seg_volume = volume
 
             seg_output, _, (s_h, s_n) = self.model(seg_units, seg_f0, seg_volume, spk_id=spk_id, spk_mix_dict=None)
             seg_output *= mask[:, start_frame * self.args.data.block_size: (start_frame + seg_units.size(1)) * self.args.data.block_size]
