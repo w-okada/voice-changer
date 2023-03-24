@@ -72,11 +72,11 @@ class DDSP_SVC:
         self.settings.configFile = config
         # model
         model, args = vo.load_model(pyTorch_model_file)
-
-        # hubert
         self.model = model
         self.args = args
+        self.hop_size = int(self.args.data.block_size * 44100 / self.args.data.sampling_rate)
 
+        # hubert
         vec_path = self.params["hubert"]
         self.encoder = vo.Units_Encoder(
             args.data.encoder,
@@ -91,6 +91,8 @@ class DDSP_SVC:
             512,
             float(50),
             float(1100))
+
+        self.volume_extractor = vo.Volume_Extractor(self.hop_size)
 
         return self.get_info()
 
@@ -157,7 +159,6 @@ class DDSP_SVC:
     def generate_input(self, newData: any, inputSize: int, crossfadeSize: int):
         newData = newData.astype(np.float32) / 32768.0
         # newData = newData.astype(np.float32) / self.hps.data.max_wav_value
-        hop_size = int(self.args.data.block_size * 44100 / self.args.data.sampling_rate)
 
         if hasattr(self, "audio_buffer"):
             self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)  # 過去のデータに連結
@@ -165,9 +166,9 @@ class DDSP_SVC:
             self.audio_buffer = newData
 
         convertSize = inputSize + crossfadeSize + self.settings.extraConvertSize
-        print("hopsize", hop_size)
-        if convertSize % hop_size != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
-            convertSize = convertSize + (hop_size - (convertSize % hop_size))
+        print("hopsize", self.hop_size)
+        if convertSize % self.hop_size != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
+            convertSize = convertSize + (self.hop_size - (convertSize % self.hop_size))
 
         print("convsize", convertSize)
         self.audio_buffer = self.audio_buffer[-1 * convertSize:]  # 変換対象の部分だけ抽出
@@ -176,8 +177,10 @@ class DDSP_SVC:
         f0 = torch.from_numpy(f0).float().unsqueeze(-1).unsqueeze(0)
         f0 = f0 * 2 ** (float(10) / 12)
 
+        volume = self.volume_extractor.extract(self.audio_buffer)
+
         audio = torch.from_numpy(self.audio_buffer).float().unsqueeze(0)
-        seg_units = self.encoder.encode(audio, 44100, hop_size)
+        seg_units = self.encoder.encode(audio, 44100, self.hop_size)
         print("audio1", audio)
         # crop = self.audio_buffer[-1 * (inputSize + crossfadeSize):-1 * (crossfadeSize)]
 
@@ -188,7 +191,7 @@ class DDSP_SVC:
         # c, f0 = self.get_unit_f0(self.audio_buffer, self.settings.tran)
         # return (c, f0, convertSize, vol)
         wavfile.write("tmp2.wav", 44100, (self.audio_buffer * 32768.0).astype(np.int16))
-        return (seg_units, f0)
+        return (seg_units, f0, volume)
 
     def _onnx_inference(self, data):
         if hasattr(self, "onnx_session") == False or self.onnx_session == None:
@@ -259,8 +262,9 @@ class DDSP_SVC:
         audio, sample_rate = librosa.load("tmp2.wav", sr=None)
         print("SR:", sample_rate)
 
-        seg_units = data[0]
+        c = data[0]
         f0 = data[1]
+        volume = data[2]
 
         if len(audio.shape) > 1:
             audio = librosa.to_mono(audio)
@@ -268,8 +272,6 @@ class DDSP_SVC:
 
         print("hop_size", hop_size)
 
-        volume_extractor = vo.Volume_Extractor(hop_size)
-        volume = volume_extractor.extract(audio)
         mask = (volume > 10 ** (float(-60) / 20)).astype('float')
         mask = np.pad(mask, (4, 4), constant_values=(mask[0], mask[-1]))
         mask = np.array([np.max(mask[n: n + 9]) for n in range(len(mask) - 8)])
@@ -283,12 +285,10 @@ class DDSP_SVC:
 
         with torch.no_grad():
             start_frame = 0
-
-            seg_f0 = f0
             seg_volume = volume
 
-            seg_output, _, (s_h, s_n) = self.model(seg_units, seg_f0, seg_volume, spk_id=spk_id, spk_mix_dict=None)
-            seg_output *= mask[:, start_frame * self.args.data.block_size: (start_frame + seg_units.size(1)) * self.args.data.block_size]
+            seg_output, _, (s_h, s_n) = self.model(c, f0, seg_volume, spk_id=spk_id, spk_mix_dict=None)
+            seg_output *= mask[:, start_frame * self.args.data.block_size: (start_frame + c.size(1)) * self.args.data.block_size]
 
             output_sample_rate = self.args.data.sampling_rate
 
