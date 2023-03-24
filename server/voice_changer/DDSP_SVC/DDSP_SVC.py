@@ -155,8 +155,9 @@ class DDSP_SVC:
     #     return c, f0
 
     def generate_input(self, newData: any, inputSize: int, crossfadeSize: int):
-        # newData = newData.astype(np.float32) / 32768.0
+        newData = newData.astype(np.float32) / 32768.0
         # newData = newData.astype(np.float32) / self.hps.data.max_wav_value
+        hop_size = int(self.args.data.block_size * 44100 / self.args.data.sampling_rate)
 
         if hasattr(self, "audio_buffer"):
             self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)  # 過去のデータに連結
@@ -164,7 +165,6 @@ class DDSP_SVC:
             self.audio_buffer = newData
 
         convertSize = inputSize + crossfadeSize + self.settings.extraConvertSize
-        hop_size = int(self.args.data.block_size * 44100 / self.args.data.sampling_rate)
         print("hopsize", hop_size)
         if convertSize % hop_size != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
             convertSize = convertSize + (hop_size - (convertSize % hop_size))
@@ -172,6 +172,9 @@ class DDSP_SVC:
         print("convsize", convertSize)
         self.audio_buffer = self.audio_buffer[-1 * convertSize:]  # 変換対象の部分だけ抽出
 
+        audio = torch.from_numpy(self.audio_buffer).float().unsqueeze(0)
+        seg_units = self.encoder.encode(audio, 44100, hop_size)
+        print("audio1", audio)
         # crop = self.audio_buffer[-1 * (inputSize + crossfadeSize):-1 * (crossfadeSize)]
 
         # rms = np.sqrt(np.square(crop).mean(axis=0))
@@ -180,17 +183,18 @@ class DDSP_SVC:
 
         # c, f0 = self.get_unit_f0(self.audio_buffer, self.settings.tran)
         # return (c, f0, convertSize, vol)
-        wavfile.write("tmp2.wav", 44100, self.audio_buffer.astype(np.int16))
+        wavfile.write("tmp2.wav", 44100, (self.audio_buffer * 32768.0).astype(np.int16))
+        return (seg_units, )
 
     def _onnx_inference(self, data):
         if hasattr(self, "onnx_session") == False or self.onnx_session == None:
             print("[Voice Changer] No onnx session.")
             return np.zeros(1).astype(np.int16)
 
-        c = data[0]
-        f0 = data[1]
-        convertSize = data[2]
-        vol = data[3]
+        seg_units = data[0]
+        # f0 = data[1]
+        # convertSize = data[2]
+        # vol = data[3]
 
         if vol < self.settings.silentThreshold:
             return np.zeros(convertSize).astype(np.int16)
@@ -249,6 +253,10 @@ class DDSP_SVC:
         #     print("SEG:", seg_output)
 
         audio, sample_rate = librosa.load("tmp2.wav", sr=None)
+        print("SR:", sample_rate)
+
+        seg_units = data[0]
+
         if len(audio.shape) > 1:
             audio = librosa.to_mono(audio)
         hop_size = self.args.data.block_size * sample_rate / self.args.data.sampling_rate
@@ -273,8 +281,6 @@ class DDSP_SVC:
 
         with torch.no_grad():
             start_frame = 0
-            seg_input = torch.from_numpy(audio).float().unsqueeze(0)
-            seg_units = self.encoder.encode(seg_input, sample_rate, hop_size)
 
             seg_f0 = f0[:, start_frame: start_frame + seg_units.size(1), :]
             seg_volume = volume[:, start_frame: start_frame + seg_units.size(1), :]
@@ -296,41 +302,8 @@ class DDSP_SVC:
             # sf.write("out.wav", result, output_sample_rate)
             wavfile.write("out.wav", 44100, result)
 
-        # from tqdm import tqdm
-        # with torch.no_grad():
-        #     for segment in tqdm(segments):
-        #         # start_frame = segment[0]
-        #         start_frame = 0
-        #         # seg_input = torch.from_numpy(segment[1]).float().unsqueeze(0)
-        #         seg_input = torch.from_numpy(audio).float().unsqueeze(0)
-        #         seg_units = self.encoder.encode(seg_input, sample_rate, hop_size)
-
-        #         seg_f0 = f0[:, start_frame: start_frame + seg_units.size(1), :]
-        #         seg_volume = volume[:, start_frame: start_frame + seg_units.size(1), :]
-
-        #         seg_output, _, (s_h, s_n) = self.model(seg_units, seg_f0, seg_volume, spk_id=spk_id, spk_mix_dict=None)
-        #         seg_output *= mask[:, start_frame * self.args.data.block_size: (start_frame + seg_units.size(1)) * self.args.data.block_size]
-
-        #         output_sample_rate = self.args.data.sampling_rate
-
-        #         seg_output = seg_output.squeeze().cpu().numpy()
-
-        #         silent_length = round(start_frame * self.args.data.block_size * output_sample_rate / self.args.data.sampling_rate) - current_length
-        #         if silent_length >= 0:
-        #             result = np.append(result, np.zeros(silent_length))
-        #             result = np.append(result, seg_output)
-        #         else:
-        #             result = cross_fade(result, seg_output, current_length + silent_length)
-        #         current_length = current_length + silent_length + len(seg_output)
-        #     # sf.write("out.wav", result, output_sample_rate)
-        #     wavfile.write("out.wav", 44100, result)
         print("result:::", result)
         return np.array(result * 32768.0).astype(np.int16)
-        return np.array(result).astype(np.int16)
-
-        # return np.zeros(1).astype(np.int16)
-
-        # return seg_output
 
     def inference(self, data):
         if self.settings.framework == "ONNX":
