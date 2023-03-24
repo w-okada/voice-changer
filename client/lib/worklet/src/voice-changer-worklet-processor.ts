@@ -36,9 +36,9 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
     private initialized = false;
     private volume = 0
     private numTrancateTreshold = 150
-    private volTrancateThreshold = 0.0005
-    private volTrancateLength = 32
-    private volTrancateCount = 0
+    // private volTrancateThreshold = 0.0005
+    // private volTrancateLength = 32
+    // private volTrancateCount = 0
 
     private isRecording = false
 
@@ -70,8 +70,8 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
         const request = event.data as VoiceChangerWorkletProcessorRequest
         if (request.requestType === "config") {
             this.numTrancateTreshold = request.numTrancateTreshold
-            this.volTrancateLength = request.volTrancateLength
-            this.volTrancateThreshold = request.volTrancateThreshold
+            // this.volTrancateLength = request.volTrancateLength
+            // this.volTrancateThreshold = request.volTrancateThreshold
             console.log("[worklet] worklet configured", request)
             return
         } else if (request.requestType === "start") {
@@ -132,28 +132,31 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
         }
 
         //// 一定期間無音状態が続いている場合はスキップ。
-        let voice: Float32Array | undefined
-        while (true) {
-            voice = this.playBuffer.shift()
-            if (!voice) {
-                break
-            }
-            this.volume = this.calcVol(voice, this.volume)
-            if (this.volume < this.volTrancateThreshold) {
-                this.volTrancateCount += 1
-            } else {
-                this.volTrancateCount = 0
-            }
+        // let voice: Float32Array | undefined
+        // while (true) {
+        //     voice = this.playBuffer.shift()
+        //     if (!voice) {
+        //         break
+        //     }
+        //     this.volume = this.calcVol(voice, this.volume)
+        //     if (this.volume < this.volTrancateThreshold) {
+        //         this.volTrancateCount += 1
+        //     } else {
+        //         this.volTrancateCount = 0
+        //     }
 
 
-            // V.1.5.0よりsilent skipで音飛びするようになったので無効化
-            if (this.volTrancateCount < this.volTrancateLength || this.volTrancateLength < 0) {
-                break
-            } else {
-                break
-                // console.log("silent...skip")
-            }
-        }
+        //     // V.1.5.0よりsilent skipで音飛びするようになったので無効化
+        //     if (this.volTrancateCount < this.volTrancateLength || this.volTrancateLength < 0) {
+        //         break
+        //     } else {
+        //         break
+        //         // console.log("silent...skip")
+        //     }
+        // }
+        let voice = this.playBuffer.shift()
+
+
 
         if (voice) {
             const volumeResponse: VoiceChangerWorkletProcessorResponse = {
