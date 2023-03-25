@@ -113,17 +113,23 @@ export class VoiceChangerClient {
         }
 
         if (typeof this.setting.audioInput == "string") {
-            this.currentMediaStream = await navigator.mediaDevices.getUserMedia({
-                audio: {
-                    deviceId: this.setting.audioInput,
-                    channelCount: 1,
-                    sampleRate: this.setting.sampleRate,
-                    sampleSize: 16,
-                    autoGainControl: false,
-                    echoCancellation: this.setting.echoCancel,
-                    noiseSuppression: this.setting.noiseSuppression
-                }
-            })
+            try {
+                this.currentMediaStream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        deviceId: this.setting.audioInput,
+                        channelCount: 1,
+                        sampleRate: this.setting.sampleRate,
+                        sampleSize: 16,
+                        autoGainControl: false,
+                        echoCancellation: this.setting.echoCancel,
+                        noiseSuppression: this.setting.noiseSuppression
+                    }
+                })
+
+            } catch (e) {
+                console.warn(e)
+                throw e
+            }
             // this.currentMediaStream.getAudioTracks().forEach((x) => {
             //     console.log("MIC Setting(cap)", x.getCapabilities())
             //     console.log("MIC Setting(const)", x.getConstraints())

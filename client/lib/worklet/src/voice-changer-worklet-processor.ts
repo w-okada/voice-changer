@@ -159,6 +159,7 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
 
 
         if (voice) {
+            this.volume = this.calcVol(voice, this.volume)
             const volumeResponse: VoiceChangerWorkletProcessorResponse = {
                 responseType: ResponseType.volume,
                 volume: this.volume

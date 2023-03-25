@@ -51,8 +51,8 @@
         "webpack-dev-server": "^4.13.1"
     },
     "dependencies": {
-        "@dannadori/psdanimator": "^1.0.16",
-        "@dannadori/voice-changer-client-js": "^1.0.96",
+        "@dannadori/psdanimator": "^1.0.17",
+        "@dannadori/voice-changer-client-js": "^1.0.98",
         "@fortawesome/fontawesome-svg-core": "^6.3.0",
         "@fortawesome/free-brands-svg-icons": "^6.3.0",
         "@fortawesome/free-regular-svg-icons": "^6.3.0",

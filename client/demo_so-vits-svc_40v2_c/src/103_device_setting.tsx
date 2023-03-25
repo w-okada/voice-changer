@@ -262,28 +262,39 @@ export const useDeviceSetting = (): DeviceSettingState => {
     }, [audioOutputForGUI, outputRecordingStarted, appState.workletNodeSetting.startOutputRecording, appState.workletNodeSetting.stopOutputRecording])
 
     useEffect(() => {
-        [AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK].forEach(x => {
-            const audio = document.getElementById(x) as HTMLAudioElement
-            if (audio) {
-                if (audioOutputForGUI == "none") {
-                    // @ts-ignore
-                    audio.setSinkId("")
-                    if (x == AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK) {
-                        audio.volume = 0
+        const setAudioOutput = async () => {
+            const mediaDeviceInfos = await navigator.mediaDevices.enumerateDevices();
+
+            [AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK].forEach(x => {
+                const audio = document.getElementById(x) as HTMLAudioElement
+                if (audio) {
+                    if (audioOutputForGUI == "none") {
+                        // @ts-ignore
+                        audio.setSinkId("")
+                        if (x == AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK) {
+                            audio.volume = 0
+                        } else {
+                            audio.volume = 0
+                        }
                     } else {
-                        audio.volume = 0
-                    }
-                } else {
-                    // @ts-ignore
-                    audio.setSinkId(audioOutputForGUI)
-                    if (x == AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK) {
-                        audio.volume = fileInputEchoback ? 1 : 0
-                    } else {
-                        audio.volume = 1
+                        const audioOutputs = mediaDeviceInfos.filter(x => { return x.kind == "audiooutput" })
+                        const found = audioOutputs.some(x => { return x.deviceId == audioOutputForGUI })
+                        if (found) {
+                            // @ts-ignore // 例外キャッチできないので事前にIDチェックが必要らしい。！？
+                            audio.setSinkId(audioOutputForGUI)
+                        } else {
+                            console.warn("No audio output device. use default")
+                        }
+                        if (x == AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK) {
+                            audio.volume = fileInputEchoback ? 1 : 0
+                        } else {
+                            audio.volume = 1
+                        }
                     }
                 }
-            }
-        })
+            })
+        }
+        setAudioOutput()
     }, [audioOutputForGUI])
 
 
