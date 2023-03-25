@@ -1,6 +1,6 @@
 {
     "charaName": "つくよみちゃん",
-    "psdFile": "/assets/settings/tsukuyomi/tsukuyomi.psd",
-    "motionFile": "/assets/settings/tsukuyomi/motion.json",
+    "psdFile": "/assets/settings/image.psd",
+    "motionFile": "/assets/settings/motion.json",
     "motionSpeedRate": 1
 }
