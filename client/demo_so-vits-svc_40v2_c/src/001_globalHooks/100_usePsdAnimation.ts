@@ -25,7 +25,7 @@ export const usePsdAnimation = (): PsdAnimationStateAndMethod => {
         const motion = await (await fetch(motionFile)).json() as AnimationFrameInfo[]
         const canvas = document.getElementById(TSUKUYOMI_CANVAS) as HTMLCanvasElement
         // const c = generateConfig(psdFile, canvas, 640, 480, true)
-        const c = generateConfig(psd, canvas, 640, 480, false)
+        const c = generateConfig(psd, canvas, 640, 640, false)
         c.processorURL = "https://cdn.jsdelivr.net/npm/@dannadori/psdanimator@1.0.17/dist/process.js"
         c.transfer = [c.canvas]
         await w.init(c)
