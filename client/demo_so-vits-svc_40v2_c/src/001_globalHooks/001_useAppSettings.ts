@@ -4,12 +4,14 @@ export type AppSettings = {
     charaName: string,
     psdFile: string,
     motionFile: string,
+    motionSpeedRate: number
 }
 
 const InitialAppSettings: AppSettings = {
     charaName: "",
     psdFile: "",
     motionFile: "",
+    motionSpeedRate: 1
 }
 
 export type AppSettingStates = {

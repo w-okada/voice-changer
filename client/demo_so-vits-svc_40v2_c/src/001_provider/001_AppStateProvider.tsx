@@ -44,7 +44,7 @@ export const AppStateProvider = ({ children }: Props) => {
 
     useEffect(() => {
         if (appSettings.appSettings.charaName.length > 0) {
-            psdAnimationState.loadPsd(appSettings.appSettings.psdFile, appSettings.appSettings.motionFile)
+            psdAnimationState.loadPsd(appSettings.appSettings.psdFile, appSettings.appSettings.motionFile, appSettings.appSettings.motionSpeedRate)
         }
     }, [appSettings.appSettings])
 

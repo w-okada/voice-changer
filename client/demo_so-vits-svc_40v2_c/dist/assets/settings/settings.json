@@ -1,5 +1,6 @@
 {
-    "charaName": "つくよみちゃん",
-    "psdFile": "/assets/settings/tsukuyomi/tsukuyomi.psd",
-    "motionFile": "/assets/settings/tsukuyomi/motion.json"
+    "charaName": "あみたろ",
+    "psdFile": "/assets/settings/amitaro/amitaro.psd",
+    "motionFile": "/assets/settings/amitaro/motion.json",
+    "motionSpeedRate": 0.5
 }

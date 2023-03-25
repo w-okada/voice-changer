@@ -89,7 +89,7 @@ const App = () => {
                     <span className="title">リアルタイムボイスチェンジャー</span>
                 </div>
                 <div className="top-title">
-                    <span className="top-title-version">つくよみちゃん ver.0.0α</span>
+                    <span className="top-title-version">{appState.appSettings.appSettings.charaName} ver.0.1</span>
                     <span className="belongings">
                         {githubLink}
                         {manualLink}
