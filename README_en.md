@@ -75,6 +75,7 @@ We offer Windows and Mac versions.
 | 3   | start_http_so-vits-svc_40.bat             | so-vits-svc 4.0 series models can be used.      |
 | 4   | start_http_so-vits-svc_40v2.bat           | so-vits-svc 4.0v2 series models can be used.    |
 | 5   | start_http_so-vits-svc_40v2_tsukuyomi.bat | Use Tsukuyomi-chan's model. (Cannot be changed) |
+| 6   | start_http_so-vits-svc_40v2_amitaro.bat   | Use Amitaro's model. (Cannot be changed)        |
 
 - If you are connecting remotely, please use the `.command` file (Mac) or `.bat` file (Windows) with https instead of http.
 
@@ -86,15 +87,17 @@ We offer Windows and Mac versions.
 
 - To use `so-vits-svc 4.0`/`so-vits-svc 4.0v2` or `tsukuyomi-chan`, you need the content vec model. Please download the ContentVec_legacy 500 model from [this repository](https://github.com/auspicious3000/contentvec), and place it in the same folder as `startHttp_xxx.command` or `start_http_xxx.bat` to run.
 
-| Version   | OS      | Framework                             | link                                                                                                           | VC Support                                                     | Size   |
-| --------- | ------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ------ |
-| v.1.5.1.8 | mac(M1) | ONNX(cpu)                             | [通常](https://drive.google.com/file/d/163IPqKCPb4KR_UZjlYbM_Sk11ORSRlzt/view?usp=sharing)                     | MMVC v.1.5.x, MMVC v.1.3.x,so-vits-svc 4.0, so-vits-svc 4.0v2  | 571MB  |
-|           |         |                                       | [つくよみちゃん(model up)](https://drive.google.com/file/d/1e3VpmJScuuqOXTKVlEkge2Q-QGxf3Rdm/view?usp=sharing) | so-vits-svc 4.0v2                                              | 949MB  |
-|           | windows | ONNX(cpu,cuda),PyTorch(cpu)           | [通常](https://drive.google.com/file/d/1hwWpXrO1Jndqy1YgQfOyJ2vxJDSIaPIo/view?usp=sharing)                     | MMVC v.1.5.x, MMVC v.1.3.x                                     | 597MB  |
-|           |         |                                       | [つくよみちゃん(model up)](https://drive.google.com/file/d/1Be22eUwxPIfHfHkC9pedyXmb5oNF7nPL/view?usp=sharing) | so-vits-svc 4.0v2                                              | 703MB  |
-|           |         | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [通常](https://drive.google.com/file/d/1QlQ6ieuCI5cSbklk_-zJXbatH6ZLfIF5/view?usp=sharing)                     | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 2.6GB  |
-|           |         | ONNX(cpu,DirectML), PyTorch(cpu)      | [通常](https://drive.google.com/file/d/1UH_fVmgTl1QnOQgVjQpz6GNqvAIbCaLP/view?usp=sharing)                     | MMVC v.1.5.x, MMVC v.1.3.x                                     | 462MB  |
-|           |         | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [通常](https://drive.google.com/file/d/1hq8WAAp871bQw7YNmzqkOSOAmtdXRrtv/view?usp=sharing)                     | MMVC v.1.5.x, MMVC v.1.3.x、so-vits-svc 4.0, so-vits-svc 4.0v2 | 2.48GB |
+| Version   | OS      | Framework                             | link                                                                                            | VC Support                                                     | Size   |
+| --------- | ------- | ------------------------------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ------ |
+| v.1.5.1.9 | mac(M1) | ONNX(cpu)                             | [normal](https://drive.google.com/file/d/1dBnkV5Me-JnS855EYghMjki7VOusg6mu/view?usp=sharing)    | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 549MB  |
+|           |         |                                       | [tuskuyomi](https://drive.google.com/file/d/1HNq7gMldASmHPxZ83QKyN3vrAq9pEve8/view?usp=sharing) | so-vits-svc 4.0v2                                              | 646MB  |
+|           |         |                                       | [amitaro](https://drive.google.com/file/d/1zJ9GXJwOO2JnqszM1dfttKG3ZFYCh6RQ/view?usp=sharing)   | so-vits-svc 4.0v2                                              | 646MB  |
+|           | windows | ONNX(cpu,cuda),PyTorch(cpu)           | [normal](https://drive.google.com/file/d/1CifVq4b8umQh-oMK14eMd68expDqAEdd/view?usp=sharing)    | MMVC v.1.5.x, MMVC v.1.3.x                                     | 564MB  |
+|           |         |                                       | [tuskuyomi](https://drive.google.com/file/d/1VPVplDuywhCvhS9LVXDHJ90LocdHT4gB/view?usp=sharing) | so-vits-svc 4.0v2                                              | 661MB  |
+|           |         |                                       | [amitaro](https://drive.google.com/file/d/1HzXTWmchY7jFKU0ALbqPLaVIeJdpro0k/view?usp=sharing)   | so-vits-svc 4.0v2                                              | 659MB  |
+|           |         | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [normal](https://drive.google.com/file/d/12FBZfky_J2YLNbfSn3ynrWCmBk6yeC09/view?usp=sharing)    | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 2.6GB  |
+|           |         | ONNX(cpu,DirectML), PyTorch(cpu)      | [normal](https://drive.google.com/file/d/1ACU8190JBxYMUNF53b1Y31OMXONSKjpn/view?usp=sharing)    | MMVC v.1.5.x, MMVC v.1.3.x                                     | 461MB  |
+|           |         | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [normal](https://drive.google.com/file/d/1BIEvDwi14zg5JG8DTtc72oDpdr2fx89V/view?usp=sharing)    | MMVC v.1.5.x, MMVC v.1.3.x、so-vits-svc 4.0, so-vits-svc 4.0v2 | 2.48GB |
 
 \*1 MMVC v.1.5.x is Experimental.
 
@@ -130,9 +133,9 @@ With an old CPU (i7-4770), it takes about 1000 msec for conversion.
 
 # Acknowledgments
 
-- Tachizunda-mon materials: https://seiga.nicovideo.jp/seiga/im10792934
-- Irasutoya: https://www.irasutoya.com/
-- Tsukuyomi-chan
+- [Tachizunda-mon materials](https://seiga.nicovideo.jp/seiga/im10792934)
+- [Irasutoya](https://www.irasutoya.com/)
+- [Tsukuyomi-chan](https://tyc.rei-yumesaki.net)
 
 > This software uses the voice data of the free material character "Tsukuyomi-chan," which is provided for free by CV. Yumesaki Rei.
 >
@@ -141,6 +144,9 @@ With an old CPU (i7-4770), it takes about 1000 msec for conversion.
 > https://tyc.rei-yumesaki.net/material/corpus/
 >
 > Copyright. Rei Yumesaki
+
+- [Amitaro's Onsozai kobo](https://amitaro.net/)
+-
 
 # Terms of Use
 
