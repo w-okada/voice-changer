@@ -99,7 +99,7 @@ const App = () => {
                 </div>
             </>
         )
-    }, [])
+    }, [appState.appSettings.appSettings])
 
     const clearRow = useMemo(() => {
         const onClearSettingClicked = async () => {
