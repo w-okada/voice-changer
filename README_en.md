@@ -150,7 +150,7 @@ With an old CPU (i7-4770), it takes about 1000 msec for conversion.
 
 # Terms of Use
 
-Regarding the Real-time Voice Changer Tsukuyomi-chan, we prohibit the following uses in accordance with the terms of use of the Tsukuyomi-chan Corpus.
+In accordance with the Tsukuyomi-chan Corpus Terms of Use for the Tsukuyomi-chan Real-time Voice Changer, the use of the converted voice for the following purposes is prohibited.
 
 - Criticizing or attacking individuals (the definition of "criticizing or attacking" is based on the Tsukuyomi-chan character license).
 
