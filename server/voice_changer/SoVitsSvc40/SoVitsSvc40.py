@@ -134,6 +134,9 @@ class SoVitsSvc40:
                 self.onnx_session.set_providers(providers=[val], provider_options=provider_options)
             else:
                 self.onnx_session.set_providers(providers=[val])
+        elif key == "onnxExecutionProvider" and self.onnx_session == None:
+            print("Onnx is not enabled. Please load model.")
+            return False
         elif key in self.settings.intData:
             setattr(self.settings, key, int(val))
             if key == "gpu" and val >= 0 and val < self.gpu_num and self.onnx_session != None:
@@ -259,7 +262,7 @@ class SoVitsSvc40:
                 "c": c,
                 "f0": f0,
                 "g": np.array([self.settings.dstId]).astype(np.int64),
-                "uv": np.array([self.settings.dstId]).astype(np.int64),
+                "uv": uv,
                 "predict_f0": np.array([self.settings.dstId]).astype(np.int64),
                 "noice_scale": np.array([self.settings.dstId]).astype(np.int64),
 

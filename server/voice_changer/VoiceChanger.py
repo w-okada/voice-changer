@@ -120,7 +120,7 @@ class VoiceChanger():
         else:
             ret = self.voiceChanger.update_setteings(key, val)
             if ret == False:
-                print(f"{key} is not mutalbe variable or unknown variable!")
+                print(f"{key} is not mutable variable or unknown variable!")
 
         return self.get_info()
 
