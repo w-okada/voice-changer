@@ -161,6 +161,8 @@ Regarding the Real-time Voice Changer Tsukuyomi-chan, we prohibit the following 
 - Publicly disclosing secondary use (use as materials) for others.
   (Distributing or selling as a work for viewing is not a problem.)
 
+Regarding the Real-time Voice Changer Amitaro, we prohibit the following uses in accordance with the terms of use of the Amitaro's koe-sozai kobo.[detail](https://amitaro.net/voice/faq/#index_id6)
+
 # Disclaimer
 
 We are not liable for any direct, indirect, consequential, incidental, or special damages arising out of or in any way connected with the use or inability to use this software.
