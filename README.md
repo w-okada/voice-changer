@@ -90,7 +90,7 @@ Windows 版と Mac 版を提供しています。
 
 ・Windows 環境で Nvidia の GPU をお持ちでない方は多くの場合は `ONNX(cpu,DirectML), PyTorch(cpu) `版で動きます。
 
-・Windows 環境で so-vits-svc 4.0/so-vits-svc 4.0v2 をお使いの場合は`ONNX(cpu,cuda), PyTorch(cpu,cuda)`版をご利用ください
+・Windows 環境で so-vits-svc 4.0/so-vits-svc 4.0v2 をお使いの場合は`ONNX(cpu,cuda), PyTorch(cpu,cuda)`版をご利用ください。
 
 ・so-vits-svc 4.0/so-vits-svc 4.0v2 やつくよみちゃんの動作には content vec のモデルが必要となります。こちらの[リポジトリ](https://github.com/auspicious3000/contentvec)から、ContentVec_legacy 500 のモデルをダウンロードして、実行する`startHttp_xxx.command`や`start_http_xxx.bat`と同じフォルダに配置してください。
 
@@ -99,9 +99,11 @@ Windows 版と Mac 版を提供しています。
 | v.1.5.1.9 | mac(M1) | ONNX(cpu)                             | [通常](https://drive.google.com/file/d/1dBnkV5Me-JnS855EYghMjki7VOusg6mu/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 549MB  |
 |           |         |                                       | [つくよみちゃん](https://drive.google.com/file/d/1HNq7gMldASmHPxZ83QKyN3vrAq9pEve8/view?usp=sharing) | so-vits-svc 4.0v2                                              | 646MB  |
 |           |         |                                       | [あみたろ](https://drive.google.com/file/d/1zJ9GXJwOO2JnqszM1dfttKG3ZFYCh6RQ/view?usp=sharing)       | so-vits-svc 4.0v2                                              | 646MB  |
+|           |         |                                       | [あみたろ+](https://drive.google.com/file/d/1NztaX5mQK88YXfhE3qDnRVlZDQRIZZ9w/view?usp=sharing)      | so-vits-svc 4.0v2                                              | 646MB  |
 |           | windows | ONNX(cpu,cuda),PyTorch(cpu)           | [通常](https://drive.google.com/file/d/1CifVq4b8umQh-oMK14eMd68expDqAEdd/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x                                     | 564MB  |
 |           |         |                                       | [つくよみちゃん](https://drive.google.com/file/d/1VPVplDuywhCvhS9LVXDHJ90LocdHT4gB/view?usp=sharing) | so-vits-svc 4.0v2                                              | 661MB  |
 |           |         |                                       | [あみたろ](https://drive.google.com/file/d/1HzXTWmchY7jFKU0ALbqPLaVIeJdpro0k/view?usp=sharing)       | so-vits-svc 4.0v2                                              | 659MB  |
+|           |         |                                       | [あみたろ+](https://drive.google.com/file/d/1IEHBggEbzuasN_Nc02V0I5epDsPSgFUx/view?usp=sharing)      | so-vits-svc 4.0v2                                              | 659MB  |
 |           |         | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [通常](https://drive.google.com/file/d/12FBZfky_J2YLNbfSn3ynrWCmBk6yeC09/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 2.6GB  |
 |           |         | ONNX(cpu,DirectML), PyTorch(cpu)      | [通常](https://drive.google.com/file/d/1ACU8190JBxYMUNF53b1Y31OMXONSKjpn/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x                                     | 461MB  |
 |           |         | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [通常](https://drive.google.com/file/d/1BIEvDwi14zg5JG8DTtc72oDpdr2fx89V/view?usp=sharing)           | MMVC v.1.5.x, MMVC v.1.3.x、so-vits-svc 4.0, so-vits-svc 4.0v2 | 2.48GB |
@@ -171,7 +173,7 @@ https://twitter.com/DannadoriYellow/status/1613553862773997569?s=20&t=7CLD79h1F3
 
 # 利用規約
 
-- リアルタイムボイスチェンジャーつくよみちゃんについては、つくよみちゃんコーパスの利用規約に準じ、次の目的で変換後の音声を使用することを禁止します
+- リアルタイムボイスチェンジャーつくよみちゃんについては、つくよみちゃんコーパスの利用規約に準じ、次の目的で変換後の音声を使用することを禁止します。
 
 ```
 
