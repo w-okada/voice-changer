@@ -122,7 +122,12 @@ class SoVitsSvc40:
                 onnx_model_file,
                 providers=providers
             )
-            input_info = self.onnx_session.get_inputs()
+            # input_info = self.onnx_session.get_inputs()
+            # for i in input_info:
+            #     print("input", i)
+            # output_info = self.onnx_session.get_outputs()
+            # for i in output_info:
+            #     print("output", i)
         return self.get_info()
 
     def update_setteings(self, key: str, val: any):
@@ -191,8 +196,8 @@ class SoVitsSvc40:
         uv = uv.unsqueeze(0)
 
         # wav16k = librosa.resample(audio_buffer, orig_sr=24000, target_sr=16000)
-        wav16k = librosa.resample(audio_buffer, orig_sr=self.hps.data.sampling_rate, target_sr=16000)
-        wav16k = torch.from_numpy(wav16k)
+        wav16k_numpy = librosa.resample(audio_buffer, orig_sr=self.hps.data.sampling_rate, target_sr=16000)
+        wav16k_tensor = torch.from_numpy(wav16k_numpy)
 
         if (self.settings.gpu < 0 or self.gpu_num == 0) or self.settings.framework == "ONNX":
             dev = torch.device("cpu")
@@ -200,11 +205,38 @@ class SoVitsSvc40:
             dev = torch.device("cuda", index=self.settings.gpu)
 
         self.hubert_model = self.hubert_model.to(dev)
-        wav16k = wav16k.to(dev)
+        wav16k_tensor = wav16k_tensor.to(dev)
         uv = uv.to(dev)
         f0 = f0.to(dev)
 
-        c = utils.get_hubert_content(self.hubert_model, wav_16k_tensor=wav16k)
+        import time
+        start = time.time()
+        for i in range(10):
+            c = utils.get_hubert_content(self.hubert_model, wav_16k_tensor=wav16k_tensor)
+        end = time.time()
+        elapse = end - start
+        print("torch time", elapse, elapse / 10)
+
+        import onnxruntime
+        ort_options = onnxruntime.SessionOptions()
+        ort_options.intra_op_num_threads = 8
+        if not hasattr(self, "hubert_onnx"):
+            self.hubert_onnx = onnxruntime.InferenceSession(
+                "model_hubert/hubert_simple.onnx",
+                # providers=['TensorrtExecutionProvider', 'CUDAExecutionProvider', 'CPUExecutionProvider']
+                providers=['CPUExecutionProvider']
+            )
+
+        start = time.time()
+        for i in range(10):
+            c_onnx = utils.get_hubert_content2(self.hubert_onnx, wav16k_numpy)
+        end = time.time()
+        elapse = end - start
+        print("onnx time", elapse, elapse / 10)
+
+        print("torch units:", c)
+        print("onnx  units:", c_onnx)
+
         c = utils.repeat_expand_2d(c.squeeze(0), f0.shape[1])
 
         if self.settings.clusterInferRatio != 0 and hasattr(self, "cluster_model") and self.cluster_model != None:
@@ -256,23 +288,22 @@ class SoVitsSvc40:
             return np.zeros(convertSize).astype(np.int16)
 
         c, f0, uv = [x.numpy() for x in data]
+        sid_target = torch.LongTensor([self.settings.dstId]).unsqueeze(0).numpy()
         audio1 = self.onnx_session.run(
             ["audio"],
             {
-                "c": c,
-                "f0": f0,
-                "g": np.array([self.settings.dstId]).astype(np.int64),
-                "uv": uv,
-                "predict_f0": np.array([self.settings.dstId]).astype(np.int64),
-                "noice_scale": np.array([self.settings.dstId]).astype(np.int64),
+                "c": c.astype(np.float32),
+                "f0": f0.astype(np.float32),
+                "uv": uv.astype(np.float32),
+                "g": sid_target.astype(np.int64),
+                "noice_scale": np.array([self.settings.noiceScale]).astype(np.float32),
+                # "predict_f0": np.array([self.settings.dstId]).astype(np.int64),
 
 
             })[0][0, 0] * self.hps.data.max_wav_value
 
         audio1 = audio1 * vol
-
         result = audio1
-
         return result
 
         pass
@@ -296,6 +327,7 @@ class SoVitsSvc40:
 
         with torch.no_grad():
             c, f0, uv = [x.to(dev)for x in data]
+            print("Sahape", c.shape, f0.shape, uv.shape)
             sid_target = torch.LongTensor([self.settings.dstId]).to(dev).unsqueeze(0)
             self.net_g.to(dev)
             # audio1 = self.net_g.infer(c, f0=f0, g=sid_target, uv=uv, predict_f0=True, noice_scale=0.1)[0][0, 0].data.float()
