@@ -42,6 +42,7 @@ def setupArgParser():
     parser.add_argument("--cluster", type=str, help="path to cluster model")
     parser.add_argument("--hubert", type=str, help="path to hubert model")
     parser.add_argument("--internal", type=strtobool, default=False, help="各種パスをmac appの中身に変換")
+    parser.add_argument("--useHubertOnnx", type=strtobool, default=False, help="use hubert onnx")
 
     return parser
 
@@ -86,6 +87,8 @@ MODEL = args.m if args.m != None else None
 ONNX_MODEL = args.o if args.o != None else None
 HUBERT_MODEL = args.hubert if args.hubert != None else None  # hubertはユーザがダウンロードして解凍フォルダに格納する運用。
 CLUSTER_MODEL = args.cluster if args.cluster != None else None
+USE_HUBERT_ONNX = args.useHubertOnnx
+
 if args.internal and hasattr(sys, "_MEIPASS"):
     print("use internal path")
     if CONFIG != None:
@@ -122,7 +125,7 @@ if args.colab == True:
     os.environ["colab"] = "True"
 
 if __name__ == 'MMVCServerSIO':
-    voiceChangerManager = VoiceChangerManager.get_instance({"hubert": HUBERT_MODEL})
+    voiceChangerManager = VoiceChangerManager.get_instance({"hubert": HUBERT_MODEL, "useHubertOnnx": USE_HUBERT_ONNX})
     if CONFIG and (MODEL or ONNX_MODEL):
         if MODEL_TYPE == "MMVCv15" or MODEL_TYPE == "MMVCv13":
             voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL, None)

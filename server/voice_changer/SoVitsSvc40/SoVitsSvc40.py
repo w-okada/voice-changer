@@ -74,19 +74,25 @@ class SoVitsSvc40:
 
         # hubert model
         try:
-            # if sys.platform.startswith('darwin'):
-            #     vec_path = os.path.join(sys._MEIPASS, "hubert/checkpoint_best_legacy_500.pt")
-            # else:
-            #     vec_path = "hubert/checkpoint_best_legacy_500.pt"
-            vec_path = self.params["hubert"]
+            hubert_path = self.params["hubert"]
+            useHubertOnnx = self.params["useHubertOnnx"]
+            self.useHubertOnnx = useHubertOnnx
 
-            models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(
-                [vec_path],
-                suffix="",
-            )
-            model = models[0]
-            model.eval()
-            self.hubert_model = model.cpu()
+            if useHubertOnnx == True:
+                ort_options = onnxruntime.SessionOptions()
+                ort_options.intra_op_num_threads = 8
+                self.hubert_onnx = onnxruntime.InferenceSession(
+                    "model_hubert/hubert_simple.onnx",
+                    providers=['TensorrtExecutionProvider', 'CUDAExecutionProvider', 'CPUExecutionProvider']
+                )
+            else:
+                models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(
+                    [hubert_path],
+                    suffix="",
+                )
+                model = models[0]
+                model.eval()
+                self.hubert_model = model.cpu()
         except Exception as e:
             print("EXCEPTION during loading hubert/contentvec model", e)
 
@@ -204,38 +210,20 @@ class SoVitsSvc40:
         else:
             dev = torch.device("cuda", index=self.settings.gpu)
 
-        self.hubert_model = self.hubert_model.to(dev)
-        wav16k_tensor = wav16k_tensor.to(dev)
+        if hasattr(self, "hubert_onnx"):
+            c = self.hubert_onnx.run(
+                ["units"],
+                {
+                    "audio": wav16k_numpy.reshape(1, -1),
+                })
+            c = torch.from_numpy(np.array(c)).squeeze(0).transpose(1, 2)
+        else:
+            self.hubert_model = self.hubert_model.to(dev)
+            wav16k_tensor = wav16k_tensor.to(dev)
+            c = utils.get_hubert_content(self.hubert_model, wav_16k_tensor=wav16k_tensor)
+
         uv = uv.to(dev)
         f0 = f0.to(dev)
-
-        import time
-        start = time.time()
-        for i in range(10):
-            c = utils.get_hubert_content(self.hubert_model, wav_16k_tensor=wav16k_tensor)
-        end = time.time()
-        elapse = end - start
-        print("torch time", elapse, elapse / 10)
-
-        import onnxruntime
-        ort_options = onnxruntime.SessionOptions()
-        ort_options.intra_op_num_threads = 8
-        if not hasattr(self, "hubert_onnx"):
-            self.hubert_onnx = onnxruntime.InferenceSession(
-                "model_hubert/hubert_simple.onnx",
-                # providers=['TensorrtExecutionProvider', 'CUDAExecutionProvider', 'CPUExecutionProvider']
-                providers=['CPUExecutionProvider']
-            )
-
-        start = time.time()
-        for i in range(10):
-            c_onnx = utils.get_hubert_content2(self.hubert_onnx, wav16k_numpy)
-        end = time.time()
-        elapse = end - start
-        print("onnx time", elapse, elapse / 10)
-
-        print("torch units:", c)
-        print("onnx  units:", c_onnx)
 
         c = utils.repeat_expand_2d(c.squeeze(0), f0.shape[1])
 
