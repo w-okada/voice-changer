@@ -86,6 +86,20 @@ class DDSP_SVC:
             args.data.encoder_sample_rate,
             args.data.encoder_hop_size,
             device="cpu")
+
+        # ort_options = onnxruntime.SessionOptions()
+        # ort_options.intra_op_num_threads = 8
+        # self.onnx_session = onnxruntime.InferenceSession(
+        #     "model_DDSP-SVC/hubert4.0.onnx",
+        #     providers=providers
+        # )
+        # inputs = self.onnx_session.get_inputs()
+        # outputs = self.onnx_session.get_outputs()
+        # for input in inputs:
+        #     print("input::::", input)
+        # for output in outputs:
+        #     print("output::::", output)
+
         # f0dec
         self.f0_detector = vo.F0_Extractor(
             # "crepe",
@@ -228,10 +242,11 @@ class DDSP_SVC:
         mask = data[3]
 
         convertSize = data[4]
-        vol = data[4]
+        vol = data[5]
 
-        if vol < self.settings.silentThreshold:
-            return np.zeros(convertSize).astype(np.int16)
+        # if vol < self.settings.silentThreshold:
+        #     print("threshold")
+        #     return np.zeros(convertSize).astype(np.int16)
 
         with torch.no_grad():
             spk_id = torch.LongTensor(np.array([[int(1)]]))
@@ -243,7 +258,7 @@ class DDSP_SVC:
                 self.args.data.sampling_rate,
                 f0,
                 self.args.data.block_size,
-                adaptive_key=float(0))
+                adaptive_key=float(3))
             result = seg_output.squeeze().cpu().numpy() * 32768.0
         return np.array(result).astype(np.int16)
 
