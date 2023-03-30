@@ -17,7 +17,7 @@ import numpy as np
 import torch
 import onnxruntime
 # onnxruntime.set_default_logger_severity(3)
-
+from const import HUBERT_ONNX_MODEL_PATH
 
 import pyworld as pw
 
@@ -85,7 +85,7 @@ class SoVitsSvc40:
                 ort_options = onnxruntime.SessionOptions()
                 ort_options.intra_op_num_threads = 8
                 self.hubert_onnx = onnxruntime.InferenceSession(
-                    "model_hubert/hubert_simple.onnx",
+                    HUBERT_ONNX_MODEL_PATH,
                     providers=providers
                 )
             else:

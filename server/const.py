@@ -14,6 +14,9 @@ NATIVE_CLIENT_FILE_WIN = os.path.join(sys._MEIPASS, "voice-changer-native-client
 NATIVE_CLIENT_FILE_MAC = os.path.join(sys._MEIPASS, "voice-changer-native-client.app", "Contents", "MacOS",
                                       "voice-changer-native-client") if hasattr(sys, "_MEIPASS") else "voice-changer-native-client"
 
+HUBERT_ONNX_MODEL_PATH = os.path.join(sys._MEIPASS, "model_hubert/hubert_simple.onnx") if hasattr(sys,
+                                                                                                  "_MEIPASS") else "model_hubert/hubert_simple.onnx"
+
 
 TMP_DIR = os.path.join(tmpdir.name, "tmp_dir") if hasattr(sys, "_MEIPASS") else "tmp_dir"
 os.makedirs(TMP_DIR, exist_ok=True)
