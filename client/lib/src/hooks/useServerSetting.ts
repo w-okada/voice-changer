@@ -52,7 +52,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             return DefaultServerSetting_MMVCv13
         } else if (props.clientType == "MMVCv15") {
             return DefaultServerSetting_MMVCv15
-        } else if (props.clientType == "so_vits_svc_40") {
+        } else if (props.clientType == "so_vits_svc_40" || props.clientType == "so_vits_svc_40_c") {
             return DefaultServerSetting_so_vits_svc_40
         } else if (props.clientType == "so_vits_svc_40v2" || props.clientType == "so_vits_svc_40v2_c") {
             return DefaultServerSetting_so_vits_svc_40v2

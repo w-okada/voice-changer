@@ -16,6 +16,9 @@ from functools import reduce
 import numpy as np
 import torch
 import onnxruntime
+# onnxruntime.set_default_logger_severity(3)
+
+
 import pyworld as pw
 
 from models import SynthesizerTrn
@@ -320,7 +323,6 @@ class SoVitsSvc40:
 
         with torch.no_grad():
             c, f0, uv = [x.to(dev)for x in data]
-            print("Sahape", c.shape, f0.shape, uv.shape)
             sid_target = torch.LongTensor([self.settings.dstId]).to(dev).unsqueeze(0)
             self.net_g.to(dev)
             # audio1 = self.net_g.infer(c, f0=f0, g=sid_target, uv=uv, predict_f0=True, noice_scale=0.1)[0][0, 0].data.float()
