@@ -89,17 +89,17 @@ We offer Windows and Mac versions.
 
 | Version    | OS  | Framework                             | link                                                                                               | VC Support                                                     | Size   |
 | ---------- | --- | ------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ------ |
-| v.1.5.1.10 | mac | ONNX(cpu), PyTorch(cpu)               | [通常](https://drive.google.com/uc?id=1pYUOVN5EE1FbEIYhfcCY14TOF6MXadKP&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 590MB  |
-|            | mac | -                                     | [Tsukuyomi-chan](https://drive.google.com/uc?id=1JH2mvevNdM8Xtd47UZ8uz_50Cj39dL7-&export=download) | -                                                              | 883MB  |
-|            | mac | -                                     | [Amitaro](https://drive.google.com/uc?id=17xMj9EXEJJL1Zo9AFndzYgzkSpeUebx0&export=download)        | -                                                              | 881MB  |
-|            | mac | -                                     | [Kikoto Mahiro](https://drive.google.com/uc?id=1eC_NcKiWnn1lofU0cp-7vgAvOnstBljh&export=download)  | -                                                              | 881MB  |
-|            | win | ONNX(cpu,cuda), PyTorch(cpu)          | [通常](https://drive.google.com/uc?id=1Spp-LUvgpOWOQd6WitxNi81jApTALhZ9&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 539MB  |
-|            | win | -                                     | [Tsukuyomi-chan](https://drive.google.com/uc?id=10ZqlRYHVauW5rumKo1vLCFmqyndDZiRY&export=download) | -                                                              | 833MB  |
-|            | win | -                                     | [Amitaro](https://drive.google.com/uc?id=16YRmm5GCQsSnNd5R0iDtzwV6M_3YG2gy&export=download)        | -                                                              | 831MB  |
-|            | win | -                                     | [Kikoto Mahiro](https://drive.google.com/uc?id=1gQ121xX3qGGKfo9pV2LAlL_t3fk3iHdl&export=download)  | -                                                              | 831MB  |
-|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [通常](https://drive.google.com/uc?id=1fv-szJejBuxpBNKjkrKxcwXWxVN9qu_m&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x                                     | 2637MB |
-|            | win | ONNX(cpu,DirectML), PyTorch(cpu)      | [通常](https://drive.google.com/uc?id=1Rxobd93zP2XjAeG1Vo7fOS1NTwv-0GyS&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x                                     | 2637MB |
-|            | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [通常](https://drive.google.com/uc?id=1BCNlcvMADNhlH0oyF4pp8mnmjhYvwIDZ&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 2523MB |
+| v.1.5.1.11 | mac | ONNX(cpu), PyTorch(cpu)               | [通常](https://drive.google.com/uc?id=1M5xECs0_LZh4I5ezfH2i99rifQjVBPg8&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 590MB  |
+|            | mac | -                                     | [Kikoto Mahiro](https://drive.google.com/uc?id=1uIMeSdSKs7HClQrNQ77uKSVaAOk4SHjy&export=download)  | -                                                              | 881MB  |
+|            | mac | -                                     | [Amitaro](https://drive.google.com/uc?id=1Uo4of1EOgwOAy9K9bk9Wf02DshHaqxol&export=download)        | -                                                              | 881MB  |
+|            | mac | -                                     | [Tsukuyomi-chan](https://drive.google.com/uc?id=1b9NmlhF_it5IsW5-y3bVSqRNIAnMbWKv&export=download) | -                                                              | 883MB  |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu)          | [通常](https://drive.google.com/uc?id=1J7LQZIffJEy0OktkuEHk2CX7cwSKO1ZE&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x                                     | 539MB  |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [通常](https://drive.google.com/uc?id=1miAhbAFtR5ZpyK49YYWP13uZyXLgZk0U&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 2637MB |
+|            | win | ONNX(cpu,DirectML), PyTorch(cpu)      | [通常](https://drive.google.com/uc?id=1JPA7LdT-AElxky-VKo8-j2EVz6L9aVmn&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x                                     | 431MB  |
+|            | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [通常](https://drive.google.com/uc?id=19D6cKhUpn-5hJh6qP5qr_m5xw12wsGH6&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 2523MB |
+|            | win | -                                     | [Kikoto Mahiro](https://drive.google.com/uc?id=1PLaqKUO_UidZglwF2OTZ1yJEys0bMETC&export=download)  | -                                                              | 831MB  |
+|            | win | -                                     | [Amitaro](https://drive.google.com/uc?id=1ZRGaJKHi2Sh5LWZ-yPzJIyDr4R-Q0QPm&export=download)        | -                                                              | 831MB  |
+|            | win | -                                     | [Tsukuyomi-chan](https://drive.google.com/uc?id=1Ue5DI2jEaVOmMtWSDagLfDKdRJnjw57S&export=download) | -                                                              | 833MB  |
 
 \*1 MMVC v.1.5.x is Experimental.
 
@@ -148,7 +148,7 @@ With an old CPU (i7-4770), it takes about 1000 msec for conversion.
 > Copyright. Rei Yumesaki
 
 - [Amitaro's Onsozai kobo](https://amitaro.net/)
--
+- [Replica doll](https://kikyohiroto1227.wixsite.com/kikoto-utau)
 
 # Terms of Use
 
@@ -164,6 +164,8 @@ In accordance with the Tsukuyomi-chan Corpus Terms of Use for the Tsukuyomi-chan
   (Distributing or selling as a work for viewing is not a problem.)
 
 Regarding the Real-time Voice Changer Amitaro, we prohibit the following uses in accordance with the terms of use of the Amitaro's koe-sozai kobo.[detail](https://amitaro.net/voice/faq/#index_id6)
+
+Regarding the Real-time Voice Changer Kikoto Mahiro, we prohibit the following uses in accordance with the terms of use of Replica doll.[detail](https://kikyohiroto1227.wixsite.com/kikoto-utau/ter%EF%BD%8Ds-of-service)
 
 # Disclaimer
 

@@ -96,17 +96,17 @@ Windows 版と Mac 版を提供しています。
 
 | Version    | OS  | フレームワーク                        | link                                                                                               | サポート VC                                                    | サイズ |
 | ---------- | --- | ------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ------ |
-| v.1.5.1.10 | mac | ONNX(cpu), PyTorch(cpu)               | [通常](https://drive.google.com/uc?id=1pYUOVN5EE1FbEIYhfcCY14TOF6MXadKP&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 590MB  |
-|            |     | -                                     | [つくよみちゃん](https://drive.google.com/uc?id=1JH2mvevNdM8Xtd47UZ8uz_50Cj39dL7-&export=download) | -                                                              | 883MB  |
-|            |     | -                                     | [あみたろ](https://drive.google.com/uc?id=17xMj9EXEJJL1Zo9AFndzYgzkSpeUebx0&export=download)       | -                                                              | 881MB  |
-|            |     | -                                     | [黄琴まひろ](https://drive.google.com/uc?id=1eC_NcKiWnn1lofU0cp-7vgAvOnstBljh&export=download)     | -                                                              | 881MB  |
-|            | win | ONNX(cpu,cuda), PyTorch(cpu)          | [通常](https://drive.google.com/uc?id=1Spp-LUvgpOWOQd6WitxNi81jApTALhZ9&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 539MB  |
-|            |     | -                                     | [つくよみちゃん](https://drive.google.com/uc?id=10ZqlRYHVauW5rumKo1vLCFmqyndDZiRY&export=download) | -                                                              | 833MB  |
-|            |     | -                                     | [あみたろ](https://drive.google.com/uc?id=16YRmm5GCQsSnNd5R0iDtzwV6M_3YG2gy&export=download)       | -                                                              | 831MB  |
-|            |     | -                                     | [黄琴まひろ](https://drive.google.com/uc?id=1gQ121xX3qGGKfo9pV2LAlL_t3fk3iHdl&export=download)     | -                                                              | 831MB  |
-|            |     | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [通常](https://drive.google.com/uc?id=1fv-szJejBuxpBNKjkrKxcwXWxVN9qu_m&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x                                     | 2637MB |
-|            |     | ONNX(cpu,DirectML), PyTorch(cpu)      | [通常](https://drive.google.com/uc?id=1Rxobd93zP2XjAeG1Vo7fOS1NTwv-0GyS&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x                                     | 2637MB |
-|            |     | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [通常](https://drive.google.com/uc?id=1BCNlcvMADNhlH0oyF4pp8mnmjhYvwIDZ&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 2523MB |
+| v.1.5.1.11 | mac | ONNX(cpu), PyTorch(cpu)               | [通常](https://drive.google.com/uc?id=1M5xECs0_LZh4I5ezfH2i99rifQjVBPg8&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 590MB  |
+|            | mac | -                                     | [黄琴まひろ](https://drive.google.com/uc?id=1uIMeSdSKs7HClQrNQ77uKSVaAOk4SHjy&export=download)     | -                                                              | 881MB  |
+|            | mac | -                                     | [あみたろ](https://drive.google.com/uc?id=1Uo4of1EOgwOAy9K9bk9Wf02DshHaqxol&export=download)       | -                                                              | 881MB  |
+|            | mac | -                                     | [つくよみちゃん](https://drive.google.com/uc?id=1b9NmlhF_it5IsW5-y3bVSqRNIAnMbWKv&export=download) | -                                                              | 883MB  |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu)          | [通常](https://drive.google.com/uc?id=1J7LQZIffJEy0OktkuEHk2CX7cwSKO1ZE&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x                                     | 539MB  |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [通常](https://drive.google.com/uc?id=1miAhbAFtR5ZpyK49YYWP13uZyXLgZk0U&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 2637MB |
+|            | win | ONNX(cpu,DirectML), PyTorch(cpu)      | [通常](https://drive.google.com/uc?id=1JPA7LdT-AElxky-VKo8-j2EVz6L9aVmn&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x                                     | 431MB  |
+|            | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [通常](https://drive.google.com/uc?id=19D6cKhUpn-5hJh6qP5qr_m5xw12wsGH6&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 2523MB |
+|            | win | -                                     | [黄琴まひろ](https://drive.google.com/uc?id=1PLaqKUO_UidZglwF2OTZ1yJEys0bMETC&export=download)     | -                                                              | 831MB  |
+|            | win | -                                     | [あみたろ](https://drive.google.com/uc?id=1ZRGaJKHi2Sh5LWZ-yPzJIyDr4R-Q0QPm&export=download)       | -                                                              | 831MB  |
+|            | win | -                                     | [つくよみちゃん](https://drive.google.com/uc?id=1Ue5DI2jEaVOmMtWSDagLfDKdRJnjw57S&export=download) | -                                                              | 833MB  |
 
 \*1 MMVC v.1.5.x は Experimental です。
 
@@ -140,22 +140,6 @@ https://twitter.com/DannadoriYellow/status/1613553862773997569?s=20&t=7CLD79h1F3
 
 古い CPU( i7-4770)だと、1000msec くらいかかってしまう。
 
-### 過去バージョン
-
-| Version    | OS      | フレームワーク          | link                                                                                       | サポート VC  | サイズ |
-| ---------- | ------- | ----------------------- | ------------------------------------------------------------------------------------------ | ------------ | ------ |
-| v.1.5.1.4a | mac(M1) | onnx(cpu)               | [通常](https://drive.google.com/file/d/1urqcB_S4lqbrxL4osKIlQ6MLhsh__W7t/view?usp=sharing) | MMVC v.1.5.x | 510MB  |
-|            | windows | onnx(cpu)               | [通常](https://drive.google.com/file/d/1cQVnwenJD0vXzyThZ3iiMBUVLRXoDPBJ/view?usp=sharing) | MMVC v.1.5.x | 541MB  |
-|            |         | onnx(cpu+cuda)          | [通常](https://drive.google.com/file/d/1sUa42la2vjTkIMcLKRSBf8icvfB6fqM0/view?usp=sharing) | MMVC v.1.5.x | 2.55GB |
-|            |         | onnx(cpu+DirectML)      | [通常](https://drive.google.com/file/d/1B_dPZMIf39Of7olTVzR0h6fNP5u0lx8P/view?usp=sharing) | MMVC v.1.5.x | 430MB  |
-|            |         | onnx(cpu+DirectML+cuda) | [通常](https://drive.google.com/file/d/1KSmmu5A29f3wXc_ZreycuuCyLltgNg5h/view?usp=sharing) | MMVC v.1.5.x | 2.45GB |
-| ---        | ---     | ---                     | ---                                                                                        | ---          | ---    |
-| v.1.3.1.4a | mac(M1) | onnx(cpu)               | [通常](https://drive.google.com/file/d/1dliqQE7Kn5vhycrDUZQ6pgwLfP_znAyp/view?usp=sharing) | MMVC v.1.3.x | 510MB  |
-|            | windows | onnx(cpu)               | [通常](https://drive.google.com/file/d/16R44mbi4AlkynVzhROrmA6u9MRSegpwd/view?usp=sharing) | MMVC v.1.3.x | 541MB  |
-|            |         | onnx(cpu+cuda)          | [通常](https://drive.google.com/file/d/1wBgjNHf0Kz3BPp-73KCbCEnPTW4FnuEE/view?usp=sharing) | MMVC v.1.3.x | 2.55GB |
-|            |         | onnx(cpu+DirectML)      | [通常](https://drive.google.com/file/d/14DaEPJnio-Ne50e2t1wFRgwQYnWwkh6n/view?usp=sharing) | MMVC v.1.3.x | 430MB  |
-|            |         | onnx(cpu+DirectML+cuda) | [通常](https://drive.google.com/file/d/1vfZc52f0BVD8nGjsuaAhl0jb4djHBBYe/view?usp=sharing) | MMVC v.1.3.x | 2.45GB |
-
 # Acknowledgments
 
 - [立ちずんだもん素材](https://seiga.nicovideo.jp/seiga/im10792934)
@@ -170,6 +154,7 @@ https://twitter.com/DannadoriYellow/status/1613553862773997569?s=20&t=7CLD79h1F3
 ```
 
 - [あみたろの声素材工房](https://amitaro.net/)
+- [れぷりかどーる](https://kikyohiroto1227.wixsite.com/kikoto-utau)
 
 # 利用規約
 
@@ -195,6 +180,8 @@ https://twitter.com/DannadoriYellow/status/1613553862773997569?s=20&t=7CLD79h1F3
 ただしその場合は絶対に、あみたろ（もしくは小春音アミ）の声に声質変換していることを明記し、あみたろ（および小春音アミ）が話しているわけではないことが誰でもわかるようにしてください。
 また、あみたろの声で話す内容は声素材の利用規約の範囲内のみとし、センシティブな発言などはしないでください。
 ```
+
+- リアルタイムボイスチェンジャー黄琴まひろについては、れぷりかどーるの利用規約に準じます。詳細は[こちら](https://kikyohiroto1227.wixsite.com/kikoto-utau/ter%EF%BD%8Ds-of-service)です。
 
 # 免責事項
 
