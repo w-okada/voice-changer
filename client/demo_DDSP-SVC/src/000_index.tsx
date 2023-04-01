@@ -29,51 +29,80 @@ const App = () => {
         const githubLink = isDesktopApp() ?
             (
                 // @ts-ignore
-                <span className="link" onClick={() => { window.electronAPI.openBrowser("https://github.com/w-okada/voice-changer") }}>
+                <span className="link tooltip" onClick={() => { window.electronAPI.openBrowser("https://github.com/w-okada/voice-changer") }}>
                     <img src="./assets/icons/github.svg" />
-                    <span>github</span>
+                    <div className="tooltip-text">github</div>
                 </span>
             )
             :
             (
-                <a className="link" href="https://github.com/w-okada/voice-changer" target="_blank" rel="noopener noreferrer">
+                <a className="link tooltip" href="https://github.com/w-okada/voice-changer" target="_blank" rel="noopener noreferrer">
                     <img src="./assets/icons/github.svg" />
-                    <span>github</span>
+                    <div className="tooltip-text">github</div>
                 </a>
             )
 
         const manualLink = isDesktopApp() ?
             (
                 // @ts-ignore
-                <span className="link" onClick={() => { window.electronAPI.openBrowser("https://zenn.dev/wok/books/0003_vc-helper-v_1_5") }}>
+                <span className="link tooltip" onClick={() => { window.electronAPI.openBrowser("https://zenn.dev/wok/books/0003_vc-helper-v_1_5") }}>
                     <img src="./assets/icons/help-circle.svg" />
-                    <span>manual</span>
+                    <div className="tooltip-text">manual</div>
                 </span>
             )
             :
             (
-                <a className="link" href="https://zenn.dev/wok/books/0003_vc-helper-v_1_5" target="_blank" rel="noopener noreferrer">
+                <a className="link tooltip" href="https://zenn.dev/wok/books/0003_vc-helper-v_1_5" target="_blank" rel="noopener noreferrer">
                     <img src="./assets/icons/help-circle.svg" />
-                    <span>manual</span>
+                    <div className="tooltip-text">manual</div>
                 </a>
+            )
+
+        const toolLink = isDesktopApp() ?
+            (
+                <div className="link tooltip">
+                    <img src="./assets/icons/tool.svg" />
+                    <div className="tooltip-text tooltip-text-100px">
+                        <p onClick={() => {
+                            // @ts-ignore
+                            window.electronAPI.openBrowser("https://w-okada.github.io/screen-recorder-ts/")
+                        }}>
+                            screen capture
+                        </p>
+                    </div>
+                </div>
+            )
+            :
+            (
+                <div className="link tooltip">
+                    <img src="./assets/icons/tool.svg" />
+                    <div className="tooltip-text tooltip-text-100px">
+                        <p onClick={() => {
+                            window.open("https://w-okada.github.io/screen-recorder-ts/", '_blank', "noreferrer")
+                        }}>
+                            screen capture
+                        </p>
+                    </div>
+                </div>
             )
 
         const coffeeLink = isDesktopApp() ?
             (
                 // @ts-ignore
-                <span className="link" onClick={() => { window.electronAPI.openBrowser("https://www.buymeacoffee.com/wokad") }}>
+                <span className="link tooltip" onClick={() => { window.electronAPI.openBrowser("https://www.buymeacoffee.com/wokad") }}>
                     <img className="donate-img" src="./assets/buymeacoffee.png" />
-                    <span>donate(寄付)</span>
+                    <div className="tooltip-text tooltip-text-100px">donate(寄付)</div>
                 </span>
             )
             :
             (
-                <a className="link" href="https://www.buymeacoffee.com/wokad" target="_blank" rel="noopener noreferrer">
+                <a className="link tooltip" href="https://www.buymeacoffee.com/wokad" target="_blank" rel="noopener noreferrer">
                     <img className="donate-img" src="./assets/buymeacoffee.png" />
-                    <span>donate(寄付)</span>
+                    <div className="tooltip-text tooltip-text-100px">
+                        donate(寄付)
+                    </div>
                 </a>
             )
-
 
         const licenseButton = (
             <span className="link" onClick={() => {
@@ -83,6 +112,7 @@ const App = () => {
                 <span>License</span>
             </span>
         )
+
         return (
             <div className="top-title">
                 <span className="title">Voice Changer Setting</span>
@@ -90,6 +120,7 @@ const App = () => {
                 <span className="belongings">
                     {githubLink}
                     {manualLink}
+                    {toolLink}
                     {coffeeLink}
                     {licenseButton}
                 </span>

@@ -650,3 +650,39 @@ body {
         z-index: 200;
     }
 }
+
+.tooltip-text {
+    display: none;
+    position: absolute;
+    padding: 4px;
+    font-size: 0.7rem;
+    line-height: 2rem;
+    color: #ddd;
+    border-radius: 5px;
+    background: #444;
+    /* width: 100px; */
+}
+.tooltip-text-100px {
+    width: 100px;
+}
+
+.tooltip-text:before {
+    content: "";
+    position: absolute;
+    top: -1.4rem;
+    border: 12px solid transparent;
+    border-top: 16px solid #444;
+    margin-left: 0rem;
+    transform: rotateZ(180deg);
+}
+.tooltip:hover .tooltip-text {
+    display: inline-block;
+    top: 30px;
+    left: 0px;
+}
+
+.tooltip {
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+}
