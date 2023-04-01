@@ -52,7 +52,4 @@ def getFrontendPath():
     elif modelType == "so-vits-svc-40_c":
         frontend_path = os.path.join(sys._MEIPASS, "dist_so-vits-svc_40_c") if hasattr(sys, "_MEIPASS") \
             else "../client/demo_so-vits-svc_40_c/dist"
-    elif modelType == "so-vits-svc-40v2_c":
-        frontend_path = os.path.join(sys._MEIPASS, "dist_so-vits-svc_40v2_c") if hasattr(sys, "_MEIPASS") \
-            else "../client/demo_so-vits-svc_40v2_c/dist"
     return frontend_path
