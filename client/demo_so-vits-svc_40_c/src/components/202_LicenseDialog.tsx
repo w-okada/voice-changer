@@ -93,13 +93,30 @@ export const LicenseDialog = () => {
                         </a>
                     </div>
                 </div>
+
+
+                <div className="body-row split-3-4-3 left-padding-1">
+                    <div className="body-item-text">
+                        <a href="https://kikyohiroto1227.wixsite.com/kikoto-utau" target="_blank" rel="noopener noreferrer">
+                            黄琴まひろ, ​黄琴海月
+                        </a>
+                    </div>
+                    <div className="body-item-text">
+                        コーパス, イラスト
+                    </div>
+                    <div className="body-item-text">
+                        <a href="https://kikyohiroto1227.wixsite.com/kikoto-utau" target="_blank" rel="noopener noreferrer">
+                            れぷりかどーる
+                        </a>
+                    </div>
+                </div>
             </>
         )
 
 
         return (
             <div className="dialog-frame">
-                <div className="dialog-title">License</div>
+                <div className="dialog-title">Licenseあああ</div>
                 <div className="dialog-content">
                     <div className={"dialog-application-title"}>Voice Changer Demo</div>
                     {records}
