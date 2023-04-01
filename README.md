@@ -6,6 +6,8 @@ https://youtu.be/yvPWtq7isfI
 
 https://youtu.be/6U7ZM2ZSwCU
 
+https://user-images.githubusercontent.com/48346627/229270332-68756cde-4fbb-46c2-ac3b-f44b9a988641.mp4
+
 # VC Client とは
 
 [VC Client](https://github.com/w-okada/voice-changer)は[MMVC](https://github.com/isletennos/MMVC_Trainer), [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc)などの AI を使ったリアルタイムボイスチェンジャーのクライアントソフトウェアです。また、リアルタイムボイスチェンジャーで必要となるトレーニング用の音声の録音(MMVC 向け)アプリも提供しています。

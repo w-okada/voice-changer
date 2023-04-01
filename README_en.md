@@ -4,6 +4,8 @@ https://youtu.be/yvPWtq7isfI
 
 https://youtu.be/6U7ZM2ZSwCU
 
+https://user-images.githubusercontent.com/48346627/229270332-68756cde-4fbb-46c2-ac3b-f44b9a988641.mp4
+
 # What is VC Client
 
 [VC Client](https://github.com/w-okada/voice-changer) is a client software for real-time voice changers that uses AI such as [MMVC](https://github.com/isletennos/MMVC_Trainer) and [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc). It also provides an app for recording training audio for real-time voice changers, specifically for MMVC.
@@ -86,20 +88,6 @@ We offer Windows and Mac versions.
 - If you are using `so-vits-svc 4.0`/`so-vits-svc 4.0v2` on Windows, please use the `ONNX(cpu,cuda), PyTorch(cpu,cuda)` version.
 
 - To use `so-vits-svc 4.0`/`so-vits-svc 4.0v2` or `tsukuyomi-chan`, you need the content vec model. Please download the ContentVec_legacy 500 model from [this repository](https://github.com/auspicious3000/contentvec), and place it in the same folder as `startHttp_xxx.command` or `start_http_xxx.bat` to run.
-
-| Version    | OS  | Framework                             | link                                                                                               | VC Support                                                     | Size   |
-| ---------- | --- | ------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ------ |
-| v.1.5.1.11 | mac | ONNX(cpu), PyTorch(cpu)               | [通常](https://drive.google.com/uc?id=1M5xECs0_LZh4I5ezfH2i99rifQjVBPg8&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 590MB  |
-|            | mac | -                                     | [Kikoto Mahiro](https://drive.google.com/uc?id=1uIMeSdSKs7HClQrNQ77uKSVaAOk4SHjy&export=download)  | -                                                              | 881MB  |
-|            | mac | -                                     | [Amitaro](https://drive.google.com/uc?id=1Uo4of1EOgwOAy9K9bk9Wf02DshHaqxol&export=download)        | -                                                              | 881MB  |
-|            | mac | -                                     | [Tsukuyomi-chan](https://drive.google.com/uc?id=1b9NmlhF_it5IsW5-y3bVSqRNIAnMbWKv&export=download) | -                                                              | 883MB  |
-|            | win | ONNX(cpu,cuda), PyTorch(cpu)          | [通常](https://drive.google.com/uc?id=1J7LQZIffJEy0OktkuEHk2CX7cwSKO1ZE&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x                                     | 539MB  |
-|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [通常](https://drive.google.com/uc?id=1miAhbAFtR5ZpyK49YYWP13uZyXLgZk0U&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 2637MB |
-|            | win | ONNX(cpu,DirectML), PyTorch(cpu)      | [通常](https://drive.google.com/uc?id=1JPA7LdT-AElxky-VKo8-j2EVz6L9aVmn&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x                                     | 431MB  |
-|            | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [通常](https://drive.google.com/uc?id=19D6cKhUpn-5hJh6qP5qr_m5xw12wsGH6&export=download)           | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2 | 2523MB |
-|            | win | -                                     | [Kikoto Mahiro](https://drive.google.com/uc?id=1PLaqKUO_UidZglwF2OTZ1yJEys0bMETC&export=download)  | -                                                              | 831MB  |
-|            | win | -                                     | [Amitaro](https://drive.google.com/uc?id=1ZRGaJKHi2Sh5LWZ-yPzJIyDr4R-Q0QPm&export=download)        | -                                                              | 831MB  |
-|            | win | -                                     | [Tsukuyomi-chan](https://drive.google.com/uc?id=1Ue5DI2jEaVOmMtWSDagLfDKdRJnjw57S&export=download) | -                                                              | 833MB  |
 
 | Version    | OS                                    | Framework                             | link                                                                                               | VC Support                                                     | Size          |
 | ---------- | ------------------------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ------------- |
