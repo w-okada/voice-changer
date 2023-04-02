@@ -1,4 +1,14 @@
 [
-    { "mode": "normal", "z_index": 0, "number": 10, "layer_path": "ROOT_レイヤー2" },
-    { "mode": "talking", "z_index": 0, "number": 10, "layer_path": "ROOT_レイヤー1" }
+    { "mode": "normal", "z_index": 0, "number": 40, "layer_path": "ROOT_normal2" },
+    { "mode": "normal", "z_index": 0, "number": 100, "layer_path": "ROOT_normal3" },
+
+    { "mode": "talking", "z_index": 0, "number": 40, "layer_path": "ROOT_normal1" },
+    { "mode": "talking", "z_index": 0, "number": 50, "layer_path": "ROOT_talk2" },
+    { "mode": "talking", "z_index": 0, "number": 100, "layer_path": "ROOT_talk1" },
+    { "mode": "talking", "z_index": 0, "number": 110, "layer_path": "ROOT_normal2" },
+    { "mode": "talking", "z_index": 0, "number": 110, "layer_path": "ROOT_talk-u1" },
+    { "mode": "talking", "z_index": 0, "number": 110, "layer_path": "ROOT_talk-u2" },
+    { "mode": "talking", "z_index": 0, "number": 110, "layer_path": "ROOT_talk-u3" },
+    { "mode": "talking", "z_index": 0, "number": 40, "layer_path": "ROOT_talk-u4" },
+    { "mode": "talking", "z_index": 0, "number": 100, "layer_path": "ROOT_normal1" }
 ]
