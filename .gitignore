@@ -26,6 +26,7 @@ server/model_so-vits-svc-40/
 server/model_so-vits-svc-40_mahiro/
 server/model_so-vits-svc-40_amitaro/
 server/model_so-vits-svc-40_tsukuyomi/
+server/model_so-vits-svc-40_kikotokurage
 model_DDSP-SVC/
 server/model_sovits
 server/test 

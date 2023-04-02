@@ -34,16 +34,12 @@ ADD dummy /
 
 RUN git clone -b v1.5.0.0_SiFiGAN https://github.com/isletennos/MMVC_Trainer.git 
 WORKDIR /MMVC_Trainer/
-#RUN git checkout c242d3d1cf7f768af70d9735082ca2bdd90c45f3
-RUN git checkout 8cca023f5f709c70c2c2fc3e880cb1a119e18f44
+RUN git checkout 0fa4662a8741a127cc0bdb6ccdecfc17bdcba709
+
 
 RUN git clone https://github.com/isletennos/MMVC_Client.git
 WORKDIR /MMVC_Trainer/MMVC_Client
-#RUN git checkout 3374a1177b73e3f6d600e5dbe93af033c36ee120
-RUN git checkout 1424609e53c79e2d629add10ae4bfb16fc0c3c82
-
-
-
+RUN git checkout 461cb231b57cbb17243110eaac8435d9cca24a26
 
 WORKDIR /
 # ↓ テストスクリプトはTrainerのrootに置くとmodelsがconflictする。

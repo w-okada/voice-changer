@@ -1,6 +1,5 @@
 
 
-from features import SignalGenerator, dilated_factor
 from scipy.interpolate import interp1d
 import torch
 import numpy as np
@@ -9,90 +8,8 @@ import os
 hann_window = {}
 
 
-class TextAudioSpeakerCollate():
-    """ Zero-pads model inputs and targets
-    """
-
-    def __init__(
-        self,
-        sample_rate,
-        hop_size,
-        f0_factor=1.0,
-        dense_factors=[0.5, 1, 4, 8],
-        upsample_scales=[8, 4, 2, 2],
-        sine_amp=0.1,
-        noise_amp=0.003,
-        signal_types=["sine"],
-    ):
-        self.dense_factors = dense_factors
-        self.prod_upsample_scales = np.cumprod(upsample_scales)
-        self.sample_rate = sample_rate
-        self.signal_generator = SignalGenerator(
-            sample_rate=sample_rate,
-            hop_size=hop_size,
-            sine_amp=sine_amp,
-            noise_amp=noise_amp,
-            signal_types=signal_types,
-        )
-        self.f0_factor = f0_factor
-
-    def __call__(self, batch):
-        """Collate's training batch from normalized text, audio and speaker identities
-        PARAMS
-        ------
-        batch: [text_normalized, spec_normalized, wav_normalized, sid, note]
-        """
-
-        spec_lengths = torch.LongTensor(len(batch))
-        sid = torch.LongTensor(len(batch))
-        spec_padded = torch.FloatTensor(len(batch), batch[0][0].size(0), batch[0][0].size(1))
-        f0_padded = torch.FloatTensor(len(batch), 1, batch[0][2].size(0))
-        # 返り値の初期化
-        spec_padded.zero_()
-        f0_padded.zero_()
-
-        # dfs
-        dfs_batch = [[] for _ in range(len(self.dense_factors))]
-
-        # row spec, sid, f0
-        for i in range(len(batch)):
-            row = batch[i]
-
-            spec = row[0]
-            spec_padded[i, :, :spec.size(1)] = spec
-            spec_lengths[i] = spec.size(1)
-
-            sid[i] = row[1]
-            # 推論時 f0/cf0にf0の倍率を乗算してf0/cf0を求める
-            f0 = row[2] * self.f0_factor
-            f0_padded[i, :, :f0.size(0)] = f0
-
-            # dfs
-            dfs = []
-            # dilated_factor の入力はnumpy!!
-            for df, us in zip(self.dense_factors, self.prod_upsample_scales):
-                dfs += [
-                    np.repeat(dilated_factor(torch.unsqueeze(f0, dim=1).to('cpu').detach().numpy(), self.sample_rate, df), us)
-                ]
-
-            # よくわからないけど、後で論文ちゃんと読む
-            for i in range(len(self.dense_factors)):
-                dfs_batch[i] += [
-                    dfs[i].astype(np.float32).reshape(-1, 1)
-                ]  # [(T', 1), ...]
-        # よくわからないdfsを転置
-        for i in range(len(self.dense_factors)):
-            dfs_batch[i] = torch.FloatTensor(np.array(dfs_batch[i])).transpose(
-                2, 1
-            )  # (B, 1, T')
-
-        # f0/cf0を実際に使うSignalに変換する
-        in_batch = self.signal_generator(f0_padded)
-
-        return spec_padded, spec_lengths, sid, in_batch, dfs_batch
-
-
 def convert_continuos_f0(f0, f0_size):
+    # 正式版チェックOK
     # get start and end of f0
     if (f0 == 0).all():
         return np.zeros((f0_size,))
@@ -108,13 +25,13 @@ def convert_continuos_f0(f0, f0_size):
     nz_frames = np.where(cf0 != 0)[0]
     # perform linear interpolation
     f = interp1d(nz_frames, cf0[nz_frames], bounds_error=False, fill_value=0.0)
-    cf0_ = f(np.arange(0, f0_size))
     # print(cf0.shape, cf0_.shape, f0.shape, f0_size)
     # print(cf0_)
     return f(np.arange(0, f0_size))
 
 
 def spectrogram_torch(y, n_fft, sampling_rate, hop_size, win_size, center=False):
+    # 正式版チェックOK
     if torch.min(y) < -1.:
         print('min value is ', torch.min(y))
     if torch.max(y) > 1.:
@@ -137,6 +54,7 @@ def spectrogram_torch(y, n_fft, sampling_rate, hop_size, win_size, center=False)
 
 
 def get_hparams_from_file(config_path):
+    # 正式版チェックOK
     with open(config_path, "r", encoding="utf-8") as f:
         data = f.read()
     config = json.loads(data)
@@ -146,6 +64,7 @@ def get_hparams_from_file(config_path):
 
 
 class HParams():
+    # 正式版チェックOK
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             if type(v) == dict:
@@ -178,6 +97,7 @@ class HParams():
 
 
 def load_checkpoint(checkpoint_path, model, optimizer=None):
+    # 正式版チェックOK
     assert os.path.isfile(checkpoint_path), f"No such file or directory: {checkpoint_path}"
     checkpoint_dict = torch.load(checkpoint_path, map_location='cpu')
     iteration = checkpoint_dict['iteration']

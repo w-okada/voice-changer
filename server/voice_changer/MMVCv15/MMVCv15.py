@@ -17,7 +17,7 @@ import onnxruntime
 import pyworld as pw
 
 from models import SynthesizerTrn
-from voice_changer.MMVCv15.client_modules import convert_continuos_f0, spectrogram_torch, TextAudioSpeakerCollate, get_hparams_from_file, load_checkpoint
+from voice_changer.MMVCv15.client_modules import convert_continuos_f0, spectrogram_torch, get_hparams_from_file, load_checkpoint
 
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
@@ -56,34 +56,39 @@ class MMVCv15:
 
         if pyTorch_model_file != None:
             self.settings.pyTorchModelFile = pyTorch_model_file
+        else:
+            self.settings.pyTorchModelFile = ""
         if onnx_model_file:
             self.settings.onnxModelFile = onnx_model_file
+        else:
+            self.settings.onnxModelFile = ""
 
+        print("self.settings.onnxModelFile::", self.settings.onnxModelFile)
         # PyTorchモデル生成
+        self.net_g = SynthesizerTrn(
+            spec_channels=self.hps.data.filter_length // 2 + 1,
+            segment_size=self.hps.train.segment_size // self.hps.data.hop_length,
+            inter_channels=self.hps.model.inter_channels,
+            hidden_channels=self.hps.model.hidden_channels,
+            upsample_rates=self.hps.model.upsample_rates,
+            upsample_initial_channel=self.hps.model.upsample_initial_channel,
+            upsample_kernel_sizes=self.hps.model.upsample_kernel_sizes,
+            n_flow=self.hps.model.n_flow,
+            dec_out_channels=1,
+            dec_kernel_size=7,
+            n_speakers=self.hps.data.n_speakers,
+            gin_channels=self.hps.model.gin_channels,
+            requires_grad_pe=self.hps.requires_grad.pe,
+            requires_grad_flow=self.hps.requires_grad.flow,
+            requires_grad_text_enc=self.hps.requires_grad.text_enc,
+            requires_grad_dec=self.hps.requires_grad.dec
+        )
         if pyTorch_model_file != None:
-            self.net_g = SynthesizerTrn(
-                spec_channels=self.hps.data.filter_length // 2 + 1,
-                segment_size=self.hps.train.segment_size // self.hps.data.hop_length,
-                inter_channels=self.hps.model.inter_channels,
-                hidden_channels=self.hps.model.hidden_channels,
-                upsample_rates=self.hps.model.upsample_rates,
-                upsample_initial_channel=self.hps.model.upsample_initial_channel,
-                upsample_kernel_sizes=self.hps.model.upsample_kernel_sizes,
-                n_flow=self.hps.model.n_flow,
-                dec_out_channels=1,
-                dec_kernel_size=7,
-                n_speakers=self.hps.data.n_speakers,
-                gin_channels=self.hps.model.gin_channels,
-                requires_grad_pe=self.hps.requires_grad.pe,
-                requires_grad_flow=self.hps.requires_grad.flow,
-                requires_grad_text_enc=self.hps.requires_grad.text_enc,
-                requires_grad_dec=self.hps.requires_grad.dec
-            )
             self.net_g.eval()
             load_checkpoint(pyTorch_model_file, self.net_g, None)
-            # utils.load_checkpoint(pyTorch_model_file, self.net_g, None)
 
         # ONNXモデル生成
+        self.onxx_input_length = 8192
         if onnx_model_file != None:
             ort_options = onnxruntime.SessionOptions()
             ort_options.intra_op_num_threads = 8
@@ -91,10 +96,15 @@ class MMVCv15:
                 onnx_model_file,
                 providers=providers
             )
+            inputs_info = self.onnx_session.get_inputs()
+            for i in inputs_info:
+                # print("ONNX INPUT SHAPE", i.name, i.shape)
+                if i.name == "sin":
+                    self.onxx_input_length = i.shape[2]
         return self.get_info()
 
     def update_setteings(self, key: str, val: any):
-        if key == "onnxExecutionProvider" and self.onnx_session != None:
+        if key == "onnxExecutionProvider" and self.settings.onnxModelFile != "":  # self.onnx_session != None:
             if val == "CUDAExecutionProvider":
                 if self.settings.gpu < 0 or self.settings.gpu >= self.gpu_num:
                     self.settings.gpu = 0
@@ -104,7 +114,7 @@ class MMVCv15:
                 self.onnx_session.set_providers(providers=[val])
         elif key in self.settings.intData:
             setattr(self.settings, key, int(val))
-            if key == "gpu" and val >= 0 and val < self.gpu_num and self.onnx_session != None:
+            if key == "gpu" and val >= 0 and val < self.gpu_num and self.settings.onnxModelFile != "":  # self.onnx_session != None:
                 providers = self.onnx_session.get_providers()
                 print("Providers:", providers)
                 if "CUDAExecutionProvider" in providers:
@@ -122,7 +132,7 @@ class MMVCv15:
     def get_info(self):
         data = asdict(self.settings)
 
-        data["onnxExecutionProviders"] = self.onnx_session.get_providers() if self.onnx_session != None else []
+        data["onnxExecutionProviders"] = self.onnx_session.get_providers() if self.settings.onnxModelFile != "" else []
         files = ["configFile", "pyTorchModelFile", "onnxModelFile"]
         for f in files:
             if data[f] != None and os.path.exists(data[f]):
@@ -170,44 +180,46 @@ class MMVCv15:
         if convertSize % self.hps.data.hop_length != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
             convertSize = convertSize + (self.hps.data.hop_length - (convertSize % self.hps.data.hop_length))
 
+        # ONNX は固定長
+        if self.settings.framework == "ONNX":
+            convertSize = self.onxx_input_length
+
         self.audio_buffer = self.audio_buffer[-1 * convertSize:]  # 変換対象の部分だけ抽出
 
-        f0 = self._get_f0(self.settings.f0Detector, self.audio_buffer)  # f0 生成
-        spec = self._get_spec(self.audio_buffer)
+        f0 = self._get_f0(self.settings.f0Detector, self.audio_buffer)  # torch
+        f0 = (f0 * self.settings.f0Factor).unsqueeze(0).unsqueeze(0)
+        spec = self._get_spec(self.audio_buffer)  # torch
         sid = torch.LongTensor([int(self.settings.srcId)])
-
-        data = TextAudioSpeakerCollate(
-            sample_rate=self.hps.data.sampling_rate,
-            hop_size=self.hps.data.hop_length,
-            f0_factor=self.settings.f0Factor
-        )([(spec, sid, f0)])
-
-        return data
+        return [spec, f0, sid]
 
     def _onnx_inference(self, data):
-        if hasattr(self, "onnx_session") == False or self.onnx_session == None:
+        if self.settings.onnxModelFile == "":
             print("[Voice Changer] No ONNX session.")
             return np.zeros(1).astype(np.int16)
 
-        spec, spec_lengths, sid_src, sin, d = data
+        spec, f0, sid_src = data
+        spec = spec.unsqueeze(0)
+        spec_lengths = torch.tensor([spec.size(2)])
         sid_tgt1 = torch.LongTensor([self.settings.dstId])
+        sin, d = self.net_g.make_sin_d(f0)
+        (d0, d1, d2, d3) = d
         audio1 = self.onnx_session.run(
             ["audio"],
             {
                 "specs": spec.numpy(),
                 "lengths": spec_lengths.numpy(),
                 "sin": sin.numpy(),
-                "d0": d[0][:1].numpy(),
-                "d1": d[1][:1].numpy(),
-                "d2": d[2][:1].numpy(),
-                "d3": d[3][:1].numpy(),
+                "d0": d0.numpy(),
+                "d1": d1.numpy(),
+                "d2": d2.numpy(),
+                "d3": d3.numpy(),
                 "sid_src": sid_src.numpy(),
                 "sid_tgt": sid_tgt1.numpy()
             })[0][0, 0] * self.hps.data.max_wav_value
         return audio1
 
     def _pyTorch_inference(self, data):
-        if hasattr(self, "net_g") == False or self.net_g == None:
+        if self.settings.pyTorchModelFile == "":
             print("[Voice Changer] No pyTorch session.")
             return np.zeros(1).astype(np.int16)
 
@@ -217,15 +229,14 @@ class MMVCv15:
             dev = torch.device("cuda", index=self.settings.gpu)
 
         with torch.no_grad():
-            spec, spec_lengths, sid_src, sin, d = data
-            spec = spec.to(dev)
-            spec_lengths = spec_lengths.to(dev)
+            spec, f0, sid_src = data
+            spec = spec.unsqueeze(0).to(dev)
+            spec_lengths = torch.tensor([spec.size(2)]).to(dev)
+            f0 = f0.to(dev)
             sid_src = sid_src.to(dev)
-            sin = sin.to(dev)
-            d = tuple([d[:1].to(dev) for d in d])
             sid_target = torch.LongTensor([self.settings.dstId]).to(dev)
 
-            audio1 = self.net_g.to(dev).voice_conversion(spec, spec_lengths, sin, d, sid_src, sid_target)[0, 0].data * self.hps.data.max_wav_value
+            audio1 = self.net_g.to(dev).voice_conversion(spec, spec_lengths, f0, sid_src, sid_target)[0, 0].data * self.hps.data.max_wav_value
             result = audio1.float().cpu().numpy()
         return result
 

@@ -24,7 +24,7 @@
         "@babel/preset-react": "^7.18.6",
         "@babel/preset-typescript": "^7.21.4",
         "@types/node": "^18.15.11",
-        "@types/react": "^18.0.31",
+        "@types/react": "^18.0.32",
         "@types/react-dom": "^18.0.11",
         "autoprefixer": "^10.4.14",
         "babel-loader": "^9.1.2",
@@ -51,7 +51,7 @@
         "webpack-dev-server": "^4.13.2"
     },
     "dependencies": {
-        "@dannadori/voice-changer-client-js": "^1.0.99",
+        "@dannadori/voice-changer-client-js": "^1.0.101",
         "@fortawesome/fontawesome-svg-core": "^6.4.0",
         "@fortawesome/free-brands-svg-icons": "^6.4.0",
         "@fortawesome/free-regular-svg-icons": "^6.4.0",
