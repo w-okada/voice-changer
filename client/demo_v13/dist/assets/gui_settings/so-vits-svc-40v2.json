@@ -20,7 +20,6 @@
             "F0DetectorEnable": true
         },
         "speakerSetting": {
-            "showSpeakerF0": false,
             "srcIdEnable": false,
             "editSpeakerIdMappingEnable": false,
             "f0FactorEnable": false,
