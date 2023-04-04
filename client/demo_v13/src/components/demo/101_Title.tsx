@@ -1,11 +1,11 @@
 import React, { useMemo } from "react";
-import { useAppState } from "../../001_provider/001_AppStateProvider";
+import { useAppRoot } from "../../001_provider/001_AppRootProvider";
 import { isDesktopApp } from "../../const";
 import { useGuiState } from "./001_GuiStateProvider";
 
 
 export const Title = () => {
-    const { appGuiSettingState } = useAppState()
+    const { appGuiSettingState } = useAppRoot()
     const guiState = useGuiState()
     const titleSetting = appGuiSettingState.appGuiSetting.front.title
 

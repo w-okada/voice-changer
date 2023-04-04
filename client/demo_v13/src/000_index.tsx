@@ -2,13 +2,13 @@ import * as React from "react";
 import { createRoot } from "react-dom/client";
 import "./css/App.css"
 import { ErrorInfo, useMemo, useState, } from "react";
-import { AppStateProvider, useAppState } from "./001_provider/001_AppStateProvider";
+import { AppStateProvider } from "./001_provider/001_AppStateProvider";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { far } from "@fortawesome/free-regular-svg-icons";
 import { fab } from "@fortawesome/free-brands-svg-icons";
-import { AppRootProvider } from "./001_provider/001_AppRootProvider";
+import { AppRootProvider, useAppRoot } from "./001_provider/001_AppRootProvider";
 import ErrorBoundary from "./001_provider/900_ErrorBoundary";
 import { INDEXEDDB_KEY_CLIENT, INDEXEDDB_KEY_MODEL_DATA, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_WORKLET, INDEXEDDB_KEY_WORKLETNODE, useIndexedDB } from "@dannadori/voice-changer-client-js";
 import { CLIENT_TYPE, INDEXEDDB_KEY_AUDIO_OUTPUT } from "./const";
@@ -21,14 +21,14 @@ const container = document.getElementById("app")!;
 const root = createRoot(container);
 
 const App = () => {
-    const appState = useAppState()
+    const { appGuiSettingState } = useAppRoot()
     const front = useMemo(() => {
-        if (appState.appGuiSettingState.appGuiSetting.type == "demo") {
+        if (appGuiSettingState.appGuiSetting.type == "demo") {
             return <Demo></Demo>
         } else {
-            return <>unknown gui type. {appState.appGuiSettingState.appGuiSetting.type}</>
+            return <>unknown gui type. {appGuiSettingState.appGuiSetting.type}</>
         }
-    }, [appState.appGuiSettingState.appGuiSetting.type])
+    }, [appGuiSettingState.appGuiSetting.type])
 
     return (
         <>
@@ -38,6 +38,7 @@ const App = () => {
 }
 
 const AppStateWrapper = () => {
+    const { appGuiSettingState } = useAppRoot()
     // エラーバウンダリー設定
     const [error, setError] = useState<{ error: Error, errorInfo: ErrorInfo }>()
     const { removeItem } = useIndexedDB({ clientType: CLIENT_TYPE })
@@ -95,13 +96,18 @@ const AppStateWrapper = () => {
         setError({ error, errorInfo })
     }
 
-    return (
-        <ErrorBoundary fallback={errorComponent} onError={updateError}>
-            <AppStateProvider>
-                <App></App>
-            </AppStateProvider>
-        </ErrorBoundary>
-    )
+    if (!appGuiSettingState.guiSettingLoaded) {
+        return <></>
+    } else {
+        return (
+            <ErrorBoundary fallback={errorComponent} onError={updateError}>
+                <AppStateProvider>
+                    <App></App>
+                </AppStateProvider>
+            </ErrorBoundary>
+        )
+    }
+
 }
 
 root.render(

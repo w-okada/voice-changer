@@ -1,10 +1,13 @@
 import React, { useMemo } from "react"
 import { useAppState } from "../../001_provider/001_AppStateProvider"
 import { CrossFadeOverlapSize } from "@dannadori/voice-changer-client-js"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 
 export const CrossFadeOverlapSizeRow = () => {
     const appState = useAppState()
-    const advancedSetting = appState.appGuiSettingState.appGuiSetting.front.advancedSetting
+    const { appGuiSettingState } = useAppRoot()
+
+    const advancedSetting = appGuiSettingState.appGuiSetting.front.advancedSetting
 
     const crossFadeOverlapSizeRow = useMemo(() => {
         if (!advancedSetting.crossFadeOverlapSizeEnable) {

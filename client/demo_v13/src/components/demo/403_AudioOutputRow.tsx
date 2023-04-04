@@ -1,13 +1,13 @@
 import React, { useMemo, useEffect } from "react"
 import { useGuiState } from "./001_GuiStateProvider"
 import { useIndexedDB } from "@dannadori/voice-changer-client-js"
-import { useAppState } from "../../001_provider/001_AppStateProvider"
 import { AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, INDEXEDDB_KEY_AUDIO_OUTPUT } from "../../const"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 
 export const AudioOutputRow = () => {
     const guiState = useGuiState()
-    const appState = useAppState()
-    const clientType = appState.appGuiSettingState.appGuiSetting.id
+    const { appGuiSettingState } = useAppRoot()
+    const clientType = appGuiSettingState.appGuiSetting.id
     const { getItem, setItem } = useIndexedDB({ clientType: clientType })
 
 

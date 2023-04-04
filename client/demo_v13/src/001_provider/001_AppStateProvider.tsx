@@ -1,7 +1,6 @@
 import { ClientState } from "@dannadori/voice-changer-client-js";
 import React, { useContext, useEffect, useRef } from "react";
 import { ReactNode } from "react";
-import { AppGuiSettingStateAndMethod, userAppGuiSetting } from "../001_globalHooks/001_useAppGuiSetting";
 import { useVCClient } from "../001_globalHooks/001_useVCClient";
 import { useAppRoot } from "./001_AppRootProvider";
 
@@ -12,7 +11,6 @@ type Props = {
 type AppStateValue = ClientState & {
     audioContext: AudioContext
     initializedRef: React.MutableRefObject<boolean>
-    appGuiSettingState: AppGuiSettingStateAndMethod
 }
 
 const AppStateContext = React.createContext<AppStateValue | null>(null);
@@ -26,8 +24,8 @@ export const useAppState = (): AppStateValue => {
 
 export const AppStateProvider = ({ children }: Props) => {
     const appRoot = useAppRoot()
-    const clientState = useVCClient({ audioContext: appRoot.audioContextState.audioContext })
-    const appGuiSettingState = userAppGuiSetting()
+    const clientState = useVCClient({ audioContext: appRoot.audioContextState.audioContext, clientType: appRoot.appGuiSettingState.appGuiSetting.id })
+
 
     const initializedRef = useRef<boolean>(false)
     useEffect(() => {
@@ -61,17 +59,12 @@ export const AppStateProvider = ({ children }: Props) => {
         }
     }, [clientState.clientState.initialized])
 
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const modelType = params.get("modelType") || ""
-        appGuiSettingState.getAppSetting(`/assets/gui_settings/${modelType}.json`)
-    }, [])
+
 
     const providerValue: AppStateValue = {
         audioContext: appRoot.audioContextState.audioContext!,
         ...clientState.clientState,
         initializedRef,
-        appGuiSettingState
     };
 
     return <AppStateContext.Provider value={providerValue}>{children}</AppStateContext.Provider>;

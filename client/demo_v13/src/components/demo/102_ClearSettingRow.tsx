@@ -2,10 +2,12 @@ import React, { useMemo } from "react";
 import { useAppState } from "../../001_provider/001_AppStateProvider";
 import { useIndexedDB } from "@dannadori/voice-changer-client-js";
 import { INDEXEDDB_KEY_AUDIO_OUTPUT } from "../../const";
+import { useAppRoot } from "../../001_provider/001_AppRootProvider";
 
 export const ClearSettingRow = () => {
     const appState = useAppState()
-    const clientType = appState.appGuiSettingState.appGuiSetting.id
+    const { appGuiSettingState } = useAppRoot()
+    const clientType = appGuiSettingState.appGuiSetting.id
     const { removeItem } = useIndexedDB({ clientType: clientType })
 
 

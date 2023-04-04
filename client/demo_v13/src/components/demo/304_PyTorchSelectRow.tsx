@@ -3,10 +3,12 @@ import { fileSelector } from "@dannadori/voice-changer-client-js"
 
 import { useAppState } from "../../001_provider/001_AppStateProvider"
 import { useGuiState } from "./001_GuiStateProvider"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 
 export const PyTorchSelectRow = () => {
     const appState = useAppState()
-    const modelSetting = appState.appGuiSettingState.appGuiSetting.front.modelSetting
+    const { appGuiSettingState } = useAppRoot()
+    const modelSetting = appGuiSettingState.appGuiSetting.front.modelSetting
     const guiState = useGuiState()
 
     const pyTorchSelectRow = useMemo(() => {

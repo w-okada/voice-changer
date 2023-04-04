@@ -1,8 +1,9 @@
-import { ClientState, useClient } from "@dannadori/voice-changer-client-js"
-import { AUDIO_ELEMENT_FOR_PLAY_RESULT, CLIENT_TYPE } from "../const"
+import { ClientState, useClient, ClientType } from "@dannadori/voice-changer-client-js"
+import { AUDIO_ELEMENT_FOR_PLAY_RESULT } from "../const"
 
 export type UseVCClientProps = {
     audioContext: AudioContext | null
+    clientType: ClientType
 }
 
 export type VCClientState = {
@@ -10,9 +11,8 @@ export type VCClientState = {
 }
 
 export const useVCClient = (props: UseVCClientProps) => {
-
     const clientState = useClient({
-        clientType: CLIENT_TYPE,
+        clientType: props.clientType,
         audioContext: props.audioContext,
         audioOutputElementId: AUDIO_ELEMENT_FOR_PLAY_RESULT
     })

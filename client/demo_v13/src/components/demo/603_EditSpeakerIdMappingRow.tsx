@@ -1,9 +1,11 @@
 import React, { useMemo, useState } from "react"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 import { useAppState } from "../../001_provider/001_AppStateProvider"
 
 export const EditSpeakerIdMappingRow = () => {
     const appState = useAppState()
-    const speakerSetting = appState.appGuiSettingState.appGuiSetting.front.speakerSetting
+    const { appGuiSettingState } = useAppRoot()
+    const speakerSetting = appGuiSettingState.appGuiSetting.front.speakerSetting
     const [editSpeakerTargetId, setEditSpeakerTargetId] = useState<number>(0)
     const [editSpeakerTargetName, setEditSpeakerTargetName] = useState<string>("")
 

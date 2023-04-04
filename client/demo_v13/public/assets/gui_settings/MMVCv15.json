@@ -1,29 +1,29 @@
 {
     "type": "demo",
-    "id": "MMVCv13",
+    "id": "MMVCv15",
     "front": {
         "title": {
             "mainTitle": "VC Client",
-            "subTitle": "for MMVC v.1.3",
+            "subTitle": "for MMVC v.1.5",
             "lineNum": 1
         },
         "serverControl": {},
         "modelSetting": {
             "ONNXEnable": true,
             "pyTorchEnable": true,
-            "MMVCCorrespondense": false,
+            "MMVCCorrespondense": true,
             "pyTorchClusterEnable": false,
             "showPyTorchDefault": false
         },
         "deviceSetting": {},
         "qualityControl": {
-            "F0DetectorEnable": false
+            "F0DetectorEnable": true
         },
         "speakerSetting": {
-            "showSpeakerF0": false,
+            "showSpeakerF0": true,
             "srcIdEnable": true,
-            "editSpeakerIdMappingEnable": true,
-            "f0FactorEnable": false,
+            "editSpeakerIdMappingEnable": false,
+            "f0FactorEnable": true,
             "tuningEnable": false,
             "clusterInferRationEnable": false,
             "noiseScaleEnable": false,

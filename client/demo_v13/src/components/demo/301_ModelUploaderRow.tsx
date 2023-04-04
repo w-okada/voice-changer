@@ -1,8 +1,15 @@
-import React, { useMemo } from "react"
+import React, { useMemo, useEffect } from "react"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 import { useGuiState } from "./001_GuiStateProvider"
 
 export const ModelUploaderRow = () => {
     const guiState = useGuiState()
+    const { appGuiSettingState } = useAppRoot()
+    useEffect(() => {
+        if (appGuiSettingState.appGuiSetting.front.modelSetting.showPyTorchDefault) {
+            guiState.setShowPyTorchModelUpload(true)
+        }
+    }, [])
 
     const modelUploaderRow = useMemo(() => {
         return (

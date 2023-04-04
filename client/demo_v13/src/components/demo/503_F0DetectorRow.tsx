@@ -1,10 +1,12 @@
 import React, { useMemo } from "react"
 import { useAppState } from "../../001_provider/001_AppStateProvider"
 import { F0Detector } from "@dannadori/voice-changer-client-js";
+import { useAppRoot } from "../../001_provider/001_AppRootProvider";
 
 export const F0DetectorRow = () => {
     const appState = useAppState()
-    const qualityControlSetting = appState.appGuiSettingState.appGuiSetting.front.qualityControl
+    const { appGuiSettingState } = useAppRoot()
+    const qualityControlSetting = appGuiSettingState.appGuiSetting.front.qualityControl
     const f0DetectorRow = useMemo(() => {
         if (!qualityControlSetting.F0DetectorEnable) {
             return <></>

@@ -1,9 +1,11 @@
 import React, { useMemo } from "react"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 import { useAppState } from "../../001_provider/001_AppStateProvider"
 
 export const F0FactorRow = () => {
     const appState = useAppState()
-    const speakerSetting = appState.appGuiSettingState.appGuiSetting.front.speakerSetting
+    const { appGuiSettingState } = useAppRoot()
+    const speakerSetting = appGuiSettingState.appGuiSetting.front.speakerSetting
 
     const f0FactorRow = useMemo(() => {
         if (!speakerSetting.f0FactorEnable) {

@@ -2,10 +2,13 @@ import React, { useMemo } from "react"
 import { fileSelector } from "@dannadori/voice-changer-client-js"
 
 import { useAppState } from "../../001_provider/001_AppStateProvider"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 
 export const ONNXSelectRow = () => {
     const appState = useAppState()
-    const modelSetting = appState.appGuiSettingState.appGuiSetting.front.modelSetting
+    const { appGuiSettingState } = useAppRoot()
+
+    const modelSetting = appGuiSettingState.appGuiSetting.front.modelSetting
 
     const onnxSelectRow = useMemo(() => {
         if (!modelSetting.ONNXEnable) {

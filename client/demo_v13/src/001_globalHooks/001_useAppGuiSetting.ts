@@ -19,6 +19,7 @@ export type AppGuiDemoSetting = {
             "pyTorchEnable": boolean,
             "MMVCCorrespondense": boolean,
             "pyTorchClusterEnable": boolean,
+            "showPyTorchDefault": boolean
         },
         "deviceSetting": {},
         "qualityControl": {
@@ -73,6 +74,7 @@ const InitialAppGuiDemoSetting: AppGuiDemoSetting = {
             "pyTorchEnable": false,
             "MMVCCorrespondense": false,
             "pyTorchClusterEnable": false,
+            "showPyTorchDefault": false
         },
         "deviceSetting": {},
         "qualityControl": {
@@ -112,6 +114,7 @@ const InitialAppGuiDemoSetting: AppGuiDemoSetting = {
 
 export type AppGuiSettingState = {
     appGuiSetting: AppGuiSetting
+    guiSettingLoaded: boolean
 }
 
 export type AppGuiSettingStateAndMethod = AppGuiSettingState & {
@@ -119,6 +122,7 @@ export type AppGuiSettingStateAndMethod = AppGuiSettingState & {
 }
 
 export const userAppGuiSetting = (): AppGuiSettingStateAndMethod => {
+    const [guiSettingLoaded, setGuiSettingLoaded] = useState<boolean>(false)
     const [appGuiSetting, setAppGuiSetting] = useState<AppGuiSetting>(InitialAppGuiDemoSetting)
     const getAppSetting = async (url: string) => {
         const res = await fetch(`${url}`, {
@@ -126,9 +130,11 @@ export const userAppGuiSetting = (): AppGuiSettingStateAndMethod => {
         })
         const appSetting = await res.json() as AppGuiSetting
         setAppGuiSetting(appSetting)
+        setGuiSettingLoaded(true)
     }
     return {
         appGuiSetting,
+        guiSettingLoaded,
         getAppSetting,
     }
 }

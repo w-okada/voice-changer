@@ -1,36 +1,36 @@
 {
     "type": "demo",
-    "id": "MMVCv13",
+    "id": "so-vits-svc-40v2",
     "front": {
         "title": {
             "mainTitle": "VC Client",
-            "subTitle": "for MMVC v.1.3",
+            "subTitle": "for so-vits-svc-40v2",
             "lineNum": 1
         },
         "serverControl": {},
         "modelSetting": {
-            "ONNXEnable": true,
+            "ONNXEnable": false,
             "pyTorchEnable": true,
             "MMVCCorrespondense": false,
-            "pyTorchClusterEnable": false,
-            "showPyTorchDefault": false
+            "pyTorchClusterEnable": true,
+            "showPyTorchDefault": true
         },
         "deviceSetting": {},
         "qualityControl": {
-            "F0DetectorEnable": false
+            "F0DetectorEnable": true
         },
         "speakerSetting": {
             "showSpeakerF0": false,
-            "srcIdEnable": true,
-            "editSpeakerIdMappingEnable": true,
+            "srcIdEnable": false,
+            "editSpeakerIdMappingEnable": false,
             "f0FactorEnable": false,
-            "tuningEnable": false,
-            "clusterInferRationEnable": false,
-            "noiseScaleEnable": false,
-            "silentThresholdEnable": false
+            "tuningEnable": true,
+            "clusterInferRationEnable": true,
+            "noiseScaleEnable": true,
+            "silentThresholdEnable": true
         },
         "converterSetting": {
-            "extraDataLengthEnable": false
+            "extraDataLengthEnable": true
         },
         "advancedSetting": {
             "serverURLEnable": true,

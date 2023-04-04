@@ -1,9 +1,11 @@
 import React, { useMemo } from "react"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 import { useAppState } from "../../001_provider/001_AppStateProvider"
 
 export const ExtraDataLengthRow = () => {
     const appState = useAppState()
-    const converterSetting = appState.appGuiSettingState.appGuiSetting.front.converterSetting
+    const { appGuiSettingState } = useAppRoot()
+    const converterSetting = appGuiSettingState.appGuiSetting.front.converterSetting
 
 
     const extraDataLengthRow = useMemo(() => {

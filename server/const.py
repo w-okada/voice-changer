@@ -36,6 +36,23 @@ def setModelType(_modelType: str):
 
 def getFrontendPath():
     if modelType == "MMVCv15":
+        frontend_path = os.path.join(sys._MEIPASS, "dist_v13") if hasattr(sys, "_MEIPASS") else "../client/demo_v13/dist"
+    elif modelType == "MMVCv13":
+        frontend_path = os.path.join(sys._MEIPASS, "dist_v13") if hasattr(sys, "_MEIPASS") else "../client/demo_v13/dist"
+    elif modelType == "so-vits-svc-40":
+        frontend_path = os.path.join(sys._MEIPASS, "dist_v13") if hasattr(sys, "_MEIPASS") else "../client/demo_v13/dist"
+    elif modelType == "so-vits-svc-40v2":
+        frontend_path = os.path.join(sys._MEIPASS, "dist_v13") if hasattr(sys, "_MEIPASS") else "../client/demo_v13/dist"
+    elif modelType == "DDSP-SVC":
+        frontend_path = os.path.join(sys._MEIPASS, "dist_v13") if hasattr(sys, "_MEIPASS") else "../client/demo_v13/dist"
+    elif modelType == "so-vits-svc-40_c":
+        frontend_path = os.path.join(sys._MEIPASS, "dist_v13") if hasattr(sys, "_MEIPASS") \
+            else "../client/demo_v13/dist"
+    return frontend_path
+
+
+def getFrontendPath2():
+    if modelType == "MMVCv15":
         frontend_path = os.path.join(sys._MEIPASS, "dist_v15") if hasattr(sys, "_MEIPASS") else "../client/demo_v15/dist"
     elif modelType == "MMVCv13":
         frontend_path = os.path.join(sys._MEIPASS, "dist_v13") if hasattr(sys, "_MEIPASS") else "../client/demo_v13/dist"

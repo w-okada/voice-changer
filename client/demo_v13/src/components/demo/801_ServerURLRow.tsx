@@ -1,9 +1,11 @@
 import React, { useMemo } from "react"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 import { useAppState } from "../../001_provider/001_AppStateProvider"
 
 export const ServerURLRow = () => {
     const appState = useAppState()
-    const advancedSetting = appState.appGuiSettingState.appGuiSetting.front.advancedSetting
+    const { appGuiSettingState } = useAppRoot()
+    const advancedSetting = appGuiSettingState.appGuiSetting.front.advancedSetting
 
     const serverUrlRow = useMemo(() => {
         if (!advancedSetting.serverURLEnable) {
