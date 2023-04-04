@@ -1,0 +1,37 @@
+{
+    "type": "demo",
+    "id": "MMVCv13",
+    "front": {
+        "title": {
+            "mainTitle": "VC Client",
+            "subTitle": "MMVC for v.1.3",
+            "lineNum": 1
+        },
+        "serverControl": {},
+        "modelSetting": {
+            "ONNXEnable": true,
+            "pyTorchEnable": true,
+            "MMVCCorrespondense": false,
+            "pyTorchClusterEnable": false
+        },
+        "deviceSetting": {},
+        "qualityControl": {
+            "F0DetectorEnable": false
+        },
+        "speakerSetting": [],
+        "converterSetting": [],
+        "advancedSetting": []
+    },
+
+    "dialogs": {
+        "license": [
+            {
+                "title": "c",
+                "auther": "c",
+                "contact": "b",
+                "url": "a",
+                "license": "MIT"
+            }
+        ]
+    }
+}

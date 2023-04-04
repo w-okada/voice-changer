@@ -2,7 +2,6 @@ import * as React from "react";
 import { createRoot } from "react-dom/client";
 import "./css/App.css"
 import { ErrorInfo, useMemo, useState, } from "react";
-import { useMicrophoneOptions } from "./100_options_microphone";
 import { AppStateProvider, useAppState } from "./001_provider/001_AppStateProvider";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -12,8 +11,8 @@ import { fab } from "@fortawesome/free-brands-svg-icons";
 import { AppRootProvider } from "./001_provider/001_AppRootProvider";
 import ErrorBoundary from "./001_provider/900_ErrorBoundary";
 import { INDEXEDDB_KEY_CLIENT, INDEXEDDB_KEY_MODEL_DATA, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_WORKLET, INDEXEDDB_KEY_WORKLETNODE, useIndexedDB } from "@dannadori/voice-changer-client-js";
-import { CLIENT_TYPE, INDEXEDDB_KEY_AUDIO_OUTPUT, isDesktopApp } from "./const";
-import { Dialog } from "./components/201_Dialog";
+import { CLIENT_TYPE, INDEXEDDB_KEY_AUDIO_OUTPUT } from "./const";
+import { Demo } from "./components/demo/010_Demo";
 
 library.add(fas, far, fab);
 
@@ -23,149 +22,17 @@ const root = createRoot(container);
 
 const App = () => {
     const appState = useAppState()
-    const { removeItem } = useIndexedDB({ clientType: CLIENT_TYPE })
-    const { voiceChangerSetting } = useMicrophoneOptions()
-    const titleRow = useMemo(() => {
-        const githubLink = isDesktopApp() ?
-            (
-                // @ts-ignore
-                <span className="link tooltip" onClick={() => { window.electronAPI.openBrowser("https://github.com/w-okada/voice-changer") }}>
-                    <img src="./assets/icons/github.svg" />
-                    <div className="tooltip-text">github</div>
-                </span>
-            )
-            :
-            (
-                <a className="link tooltip" href="https://github.com/w-okada/voice-changer" target="_blank" rel="noopener noreferrer">
-                    <img src="./assets/icons/github.svg" />
-                    <div className="tooltip-text">github</div>
-                </a>
-            )
-
-        const manualLink = isDesktopApp() ?
-            (
-                // @ts-ignore
-                <span className="link tooltip" onClick={() => { window.electronAPI.openBrowser("https://zenn.dev/wok/books/0003_vc-helper-v_1_5") }}>
-                    <img src="./assets/icons/help-circle.svg" />
-                    <div className="tooltip-text">manual</div>
-                </span>
-            )
-            :
-            (
-                <a className="link tooltip" href="https://zenn.dev/wok/books/0003_vc-helper-v_1_5" target="_blank" rel="noopener noreferrer">
-                    <img src="./assets/icons/help-circle.svg" />
-                    <div className="tooltip-text">manual</div>
-                </a>
-            )
-
-        const toolLink = isDesktopApp() ?
-            (
-                <div className="link tooltip">
-                    <img src="./assets/icons/tool.svg" />
-                    <div className="tooltip-text tooltip-text-100px">
-                        <p onClick={() => {
-                            // @ts-ignore
-                            window.electronAPI.openBrowser("https://w-okada.github.io/screen-recorder-ts/")
-                        }}>
-                            screen capture
-                        </p>
-                    </div>
-                </div>
-            )
-            :
-            (
-                <div className="link tooltip">
-                    <img src="./assets/icons/tool.svg" />
-                    <div className="tooltip-text tooltip-text-100px">
-                        <p onClick={() => {
-                            window.open("https://w-okada.github.io/screen-recorder-ts/", '_blank', "noreferrer")
-                        }}>
-                            screen capture
-                        </p>
-                    </div>
-                </div>
-            )
-
-        const coffeeLink = isDesktopApp() ?
-            (
-                // @ts-ignore
-                <span className="link tooltip" onClick={() => { window.electronAPI.openBrowser("https://www.buymeacoffee.com/wokad") }}>
-                    <img className="donate-img" src="./assets/buymeacoffee.png" />
-                    <div className="tooltip-text tooltip-text-100px">donate(寄付)</div>
-                </span>
-            )
-            :
-            (
-                <a className="link tooltip" href="https://www.buymeacoffee.com/wokad" target="_blank" rel="noopener noreferrer">
-                    <img className="donate-img" src="./assets/buymeacoffee.png" />
-                    <div className="tooltip-text tooltip-text-100px">
-                        donate(寄付)
-                    </div>
-                </a>
-            )
-
-        const licenseButton = (
-            <span className="link" onClick={() => {
-                document.getElementById("dialog")?.classList.add("dialog-container-show")
-                appState.frontendManagerState.stateControls.showLicenseCheckbox.updateState(true)
-            }}>
-                <span>License</span>
-            </span>
-        )
-
-        return (
-            <div className="top-title">
-                <span className="title">Voice Changer Setting</span>
-                <span className="top-title-version">for MMVC v.1.3.x</span>
-                <span className="belongings">
-                    {githubLink}
-                    {manualLink}
-                    {toolLink}
-                    {coffeeLink}
-                    {licenseButton}
-                </span>
-                <span className="belongings">
-
-                </span>
-            </div>
-        )
-    }, [])
-
-    const clearRow = useMemo(() => {
-        const onClearSettingClicked = async () => {
-            await appState.clearSetting()
-            await removeItem(INDEXEDDB_KEY_AUDIO_OUTPUT)
-            location.reload()
+    const front = useMemo(() => {
+        if (appState.appGuiSettingState.appGuiSetting.type == "demo") {
+            return <Demo></Demo>
+        } else {
+            return <>unknown gui type. {appState.appGuiSettingState.appGuiSetting.type}</>
         }
-        return (
-            <>
-                <div className="body-row split-3-3-4 left-padding-1">
-                    <div className="body-button-container">
-                        <div className="body-button" onClick={onClearSettingClicked}>clear setting</div>
-                    </div>
-                    <div className="body-item-text"></div>
-                    <div className="body-item-text"></div>
-                </div>
-            </>
-        )
-    }, [])
+    }, [appState.appGuiSettingState.appGuiSetting.type])
 
-    const mainSetting = useMemo(() => {
-        return (
-            <>
-                <div className="main-body">
-                    <Dialog />
-                    {titleRow}
-                    {clearRow}
-                    {voiceChangerSetting}
-                </div>
-            </>
-
-        )
-    }, [voiceChangerSetting])
     return (
         <>
-            {mainSetting}
+            {front}
         </>
     )
 }
