@@ -26,7 +26,6 @@ export type AppGuiDemoSetting = {
             "F0DetectorEnable": boolean
         },
         "speakerSetting": {
-            "showSpeakerF0": boolean
             "srcIdEnable": boolean
             "editSpeakerIdMappingEnable": boolean
             "f0FactorEnable": boolean
@@ -81,7 +80,6 @@ const InitialAppGuiDemoSetting: AppGuiDemoSetting = {
             "F0DetectorEnable": false
         },
         "speakerSetting": {
-            "showSpeakerF0": false,
             "srcIdEnable": false,
             "editSpeakerIdMappingEnable": false,
             "f0FactorEnable": false,

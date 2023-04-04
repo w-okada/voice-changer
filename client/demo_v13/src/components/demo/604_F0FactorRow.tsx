@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"
+import React, { useMemo, useEffect } from "react"
 import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 import { useAppState } from "../../001_provider/001_AppStateProvider"
 
@@ -36,5 +36,23 @@ export const F0FactorRow = () => {
         )
     }, [appState.serverSetting.serverSetting.f0Factor, appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId, appState.clientSetting.clientSetting.correspondences, appState.serverSetting.updateServerSettings])
 
+
+    useEffect(() => {
+        if (!speakerSetting.f0FactorEnable) {
+            return
+        }
+
+        const src = appState.clientSetting.clientSetting.correspondences?.find(x => {
+            return x.sid == appState.serverSetting.serverSetting.srcId
+        })
+        const dst = appState.clientSetting.clientSetting.correspondences?.find(x => {
+            return x.sid == appState.serverSetting.serverSetting.dstId
+        })
+        const recommendedF0Factor = dst && src ? dst.correspondence / src.correspondence : 0
+
+        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, f0Factor: recommendedF0Factor })
+    }, [appState.serverSetting.serverSetting.srcId, appState.serverSetting.serverSetting.dstId])
+
     return f0FactorRow
 }
+

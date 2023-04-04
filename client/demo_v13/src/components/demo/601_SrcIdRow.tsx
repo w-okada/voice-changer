@@ -6,12 +6,13 @@ export const SrcIdRow = () => {
     const appState = useAppState()
     const { appGuiSettingState } = useAppRoot()
     const speakerSetting = appGuiSettingState.appGuiSetting.front.speakerSetting
+    const clientId = appGuiSettingState.appGuiSetting.id
 
     const srcIdRow = useMemo(() => {
         if (!speakerSetting.srcIdEnable) {
             return <></>
         }
-        if (speakerSetting.showSpeakerF0) {
+        if (clientId != "MMVCv13") {
             return <></>
         }
         return (
@@ -40,7 +41,7 @@ export const SrcIdRow = () => {
         if (!speakerSetting.srcIdEnable) {
             return <></>
         }
-        if (!speakerSetting.showSpeakerF0) {
+        if (clientId != "MMVCv15") {
             return <></>
         }
         const selected = appState.clientSetting.clientSetting.correspondences?.find(x => {
