@@ -119,7 +119,6 @@ export const GuiStateProvider = ({ children }: Props) => {
     useEffect(() => {
         const audioInitialize = async () => {
             const audioInfo = await reloadDeviceInfo()
-            console.log("AUDIO", audioInfo)
             setInputAudioDeviceInfo(audioInfo[0])
             setOutputAudioDeviceInfo(audioInfo[1])
         }

@@ -212,7 +212,7 @@ if __name__ == '__main__':
                 f"http://<IP>:<PORT>/", level=1)
 
         if TYPE == "MMVC":
-            path = ""
+            path = f"?modelType={MODEL_TYPE}"
         else:
             path = "trainer"
 

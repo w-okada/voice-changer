@@ -18,9 +18,30 @@
         "qualityControl": {
             "F0DetectorEnable": false
         },
-        "speakerSetting": [],
-        "converterSetting": [],
-        "advancedSetting": []
+        "speakerSetting": {
+            "showSpeakerF0": false,
+            "srcIdEnable": true,
+            "editSpeakerIdMappingEnable": true,
+            "f0FactorEnable": false,
+            "tuningEnable": false,
+            "clusterInferRationEnable": false,
+            "noiseScaleEnable": false,
+            "silentThresholdEnable": false
+        },
+        "converterSetting": {
+            "extraDataLengthEnable": false
+        },
+        "advancedSetting": {
+            "serverURLEnable": true,
+            "protocolEnable": true,
+            "sampleRateEnable": true,
+            "sendingSampleRateEnable": true,
+            "crossFadeOverlapSizeEnable": true,
+            "crossFadeOffsetRateEnable": true,
+            "crossFadeEndRateEnable": true,
+            "downSamplingModeEnable": true,
+            "trancateNumTresholdEnable": true
+        }
     },
 
     "dialogs": {

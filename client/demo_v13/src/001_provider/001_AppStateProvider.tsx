@@ -62,10 +62,11 @@ export const AppStateProvider = ({ children }: Props) => {
     }, [clientState.clientState.initialized])
 
     useEffect(() => {
-        appGuiSettingState.getAppSetting("/assets/gui_settings/MMVCv13.json")
+        const params = new URLSearchParams(window.location.search);
+        const modelType = params.get("modelType") || ""
+        appGuiSettingState.getAppSetting(`/assets/gui_settings/${modelType}.json`)
     }, [])
 
-    console.log("appSettingState", appGuiSettingState)
     const providerValue: AppStateValue = {
         audioContext: appRoot.audioContextState.audioContext!,
         ...clientState.clientState,

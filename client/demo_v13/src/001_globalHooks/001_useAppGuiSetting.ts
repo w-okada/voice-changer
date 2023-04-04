@@ -1,6 +1,4 @@
 import { useState } from "react"
-import { AppGuiDemoClearSetting } from "../components/demo/102_ClearSettingRow"
-import { AppGuiDemoDialogLicenseSetting } from "../components/demo/901_LicenseDialog"
 import { ClientType } from "@dannadori/voice-changer-client-js"
 
 export type AppGuiSetting = AppGuiDemoSetting
@@ -26,17 +24,35 @@ export type AppGuiDemoSetting = {
         "qualityControl": {
             "F0DetectorEnable": boolean
         },
-        "speakerSetting": AppGuiDemoComponents[],
-        "converterSetting": AppGuiDemoComponents[],
-        "advancedSetting": AppGuiDemoComponents[]
+        "speakerSetting": {
+            "showSpeakerF0": boolean
+            "srcIdEnable": boolean
+            "editSpeakerIdMappingEnable": boolean
+            "f0FactorEnable": boolean
+            "tuningEnable": boolean
+            "clusterInferRationEnable": boolean
+            "noiseScaleEnable": boolean
+            "silentThresholdEnable": boolean
+        },
+        "converterSetting": {
+            "extraDataLengthEnable": boolean
+        },
+        "advancedSetting": {
+            "serverURLEnable": boolean,
+            "protocolEnable": boolean,
+            "sampleRateEnable": boolean,
+            "sendingSampleRateEnable": boolean,
+            "crossFadeOverlapSizeEnable": boolean,
+            "crossFadeOffsetRateEnable": boolean,
+            "crossFadeEndRateEnable": boolean,
+            "downSamplingModeEnable": boolean,
+            "trancateNumTresholdEnable": boolean,
+        }
     },
     dialogs: {
         "license": { title: string, auther: string, contact: string, url: string, license: string }[]
     }
 }
-
-export type AppGuiDemoComponents = AppGuiDemoClearSetting
-export type AppGuiDemoDialogComponents = AppGuiDemoDialogLicenseSetting
 
 
 
@@ -62,9 +78,31 @@ const InitialAppGuiDemoSetting: AppGuiDemoSetting = {
         "qualityControl": {
             "F0DetectorEnable": false
         },
-        "speakerSetting": [],
-        "converterSetting": [],
-        "advancedSetting": []
+        "speakerSetting": {
+            "showSpeakerF0": false,
+            "srcIdEnable": false,
+            "editSpeakerIdMappingEnable": false,
+            "f0FactorEnable": false,
+            "tuningEnable": false,
+            "clusterInferRationEnable": false,
+            "noiseScaleEnable": false,
+            "silentThresholdEnable": false
+
+        },
+        "converterSetting": {
+            "extraDataLengthEnable": false
+        },
+        "advancedSetting": {
+            "serverURLEnable": false,
+            "protocolEnable": false,
+            "sampleRateEnable": false,
+            "sendingSampleRateEnable": false,
+            "crossFadeOverlapSizeEnable": false,
+            "crossFadeOffsetRateEnable": false,
+            "crossFadeEndRateEnable": false,
+            "downSamplingModeEnable": false,
+            "trancateNumTresholdEnable": false,
+        }
     },
     dialogs: {
         "license": [{ title: "", auther: "", contact: "", url: "", license: "MIT" }]
