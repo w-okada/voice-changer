@@ -292,6 +292,42 @@ export const DefaultServerSetting_so_vits_svc_40v2: ServerInfo = {
 }
 
 
+export const DefaultServerSetting_RVC: ServerInfo = {
+    srcId: 0,
+    dstId: 0,
+    gpu: 0,
+
+    crossFadeOffsetRate: 0.1,
+    crossFadeEndRate: 0.8,
+    crossFadeOverlapSize: CrossFadeOverlapSize[1024],
+
+    framework: Framework.PyTorch,
+    f0Factor: 1.0,
+    onnxExecutionProvider: OnnxExecutionProvider.CPUExecutionProvider,
+    f0Detector: F0Detector.harvest,
+    recordIO: 0,
+
+    // tran: 0,
+    // noiceScale: 0,
+    // predictF0: 0,
+    // silentThreshold: 0,
+    tran: 10,
+    noiceScale: 0.3,
+    predictF0: 0,
+    silentThreshold: 0.00001,
+    extraConvertSize: 1024 * 32,
+    clusterInferRatio: 0.1,
+
+    inputSampleRate: 24000,
+
+    // 
+    status: "ok",
+    configFile: "",
+    pyTorchModelFile: "",
+    onnxModelFile: "",
+    onnxExecutionProviders: []
+}
+
 ///////////////////////
 // Workletセッティング
 ///////////////////////
@@ -357,6 +393,15 @@ export const DefaultWorkletNodeSetting_so_vits_svc_40v2: WorkletNodeSetting = {
     protocol: "sio",
     sendingSampleRate: 24000,
     inputChunkNum: 128,
+    downSamplingMode: "average"
+}
+
+
+export const DefaultWorkletNodeSetting_RVC: WorkletNodeSetting = {
+    serverUrl: "",
+    protocol: "sio",
+    sendingSampleRate: 24000,
+    inputChunkNum: 256,
     downSamplingMode: "average"
 }
 

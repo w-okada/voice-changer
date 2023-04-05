@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react"
-import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc_40v2, DefaultServerSetting_so_vits_svc_40, DefaultServerSetting_so_vits_svc_40_c } from "../const"
+import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc_40v2, DefaultServerSetting_so_vits_svc_40, DefaultServerSetting_so_vits_svc_40_c, DefaultServerSetting_RVC } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
@@ -59,6 +59,8 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             return DefaultServerSetting_so_vits_svc_40_c
         } else if (props.clientType == "so-vits-svc-40v2") {
             return DefaultServerSetting_so_vits_svc_40v2
+        } else if (props.clientType == "RVC") {
+            return DefaultServerSetting_RVC
         } else {
             return DefaultServerSetting_MMVCv15
         }
