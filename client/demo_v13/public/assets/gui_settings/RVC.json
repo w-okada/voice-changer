@@ -18,7 +18,7 @@
             "showPyTorchDefault": true,
             "frameworkEnable": true,
             "modelUploaderEnable": true,
-            "configRow": true,
+            "configRow": false,
             "uploadRow": true
         },
         "deviceSetting": {},
@@ -57,10 +57,10 @@
     "dialogs": {
         "license": [
             {
-                "title": "c",
-                "auther": "c",
-                "contact": "b",
-                "url": "a",
+                "title": "Retrieval-based-Voice-Conversion-WebUI",
+                "auther": "liujing04",
+                "contact": "",
+                "url": "https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI",
                 "license": "MIT"
             }
         ]

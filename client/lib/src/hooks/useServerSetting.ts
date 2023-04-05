@@ -152,7 +152,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 alert("PyTorchモデルとONNXモデルのどちらか一つ以上指定する必要があります。")
                 return
             }
-            if (!fileUploadSetting.configFile) {
+            if (!fileUploadSetting.configFile && props.clientType != "RVC") {
                 alert("Configファイルを指定する必要があります。")
                 return
             }
@@ -175,7 +175,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 fileUploadSetting.pyTorchModel.data = await fileUploadSetting.pyTorchModel.file!.arrayBuffer()
                 fileUploadSetting.pyTorchModel.filename = await fileUploadSetting.pyTorchModel.file!.name
             }
-            if (!fileUploadSetting.configFile.data) {
+            if (fileUploadSetting.configFile && !fileUploadSetting.configFile.data) {
                 fileUploadSetting.configFile.data = await fileUploadSetting.configFile.file!.arrayBuffer()
                 fileUploadSetting.configFile.filename = await fileUploadSetting.configFile.file!.name
             }
@@ -201,19 +201,22 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 })
             }
 
-            await _uploadFile(fileUploadSetting.configFile, (progress: number, end: boolean) => {
-                console.log(progress, end)
-            })
+            if (fileUploadSetting.configFile) {
+                await _uploadFile(fileUploadSetting.configFile, (progress: number, end: boolean) => {
+                    console.log(progress, end)
+                })
+            }
 
             // !! 注意!! hubertTorchModelは固定値で上書きされるため、設定しても効果ない。
-            const loadPromise = props.voiceChangerClient.loadModel(fileUploadSetting.configFile.filename!, fileUploadSetting.pyTorchModel?.filename || null, fileUploadSetting.onnxModel?.filename || null, fileUploadSetting.clusterTorchModel?.filename || null, fileUploadSetting.hubertTorchModel?.filename || null)
+            const configFileName = fileUploadSetting.configFile ? fileUploadSetting.configFile.filename || "-" : "-"
+            const loadPromise = props.voiceChangerClient.loadModel(configFileName, fileUploadSetting.pyTorchModel?.filename || null, fileUploadSetting.onnxModel?.filename || null, fileUploadSetting.clusterTorchModel?.filename || null, fileUploadSetting.hubertTorchModel?.filename || null)
 
             // サーバでロード中にキャッシュにセーブ
             try {
                 const saveData: FileUploadSetting = {
                     pyTorchModel: fileUploadSetting.pyTorchModel ? { data: fileUploadSetting.pyTorchModel.data, filename: fileUploadSetting.pyTorchModel.filename } : null,
                     onnxModel: fileUploadSetting.onnxModel ? { data: fileUploadSetting.onnxModel.data, filename: fileUploadSetting.onnxModel.filename } : null,
-                    configFile: { data: fileUploadSetting.configFile.data, filename: fileUploadSetting.configFile.filename },
+                    configFile: fileUploadSetting.configFile ? { data: fileUploadSetting.configFile.data, filename: fileUploadSetting.configFile.filename } : null,
                     hubertTorchModel: fileUploadSetting.hubertTorchModel ? {
                         data: fileUploadSetting.hubertTorchModel.data, filename: fileUploadSetting.hubertTorchModel.filename
                     } : null,
