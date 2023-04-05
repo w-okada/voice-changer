@@ -168,9 +168,7 @@ class VoiceChanger():
 
                 if self.settings.inputSampleRate != processing_sampling_rate:
                     newData = resampy.resample(receivedData, self.settings.inputSampleRate, processing_sampling_rate)
-                    print("resample", self.settings.inputSampleRate, processing_sampling_rate)
                 else:
-                    print("not resample")
                     newData = receivedData
             # print("t1::::", t1.secs)
             inputSize = newData.shape[0]

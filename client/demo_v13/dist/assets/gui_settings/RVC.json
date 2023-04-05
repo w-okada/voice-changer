@@ -11,11 +11,11 @@
             "modelInfoEnable": true
         },
         "modelSetting": {
-            "ONNXEnable": true,
+            "ONNXEnable": false,
             "pyTorchEnable": true,
             "MMVCCorrespondense": false,
             "pyTorchClusterEnable": false,
-            "showPyTorchDefault": false,
+            "showPyTorchDefault": true,
             "frameworkEnable": true,
             "modelUploaderEnable": true,
             "configRow": true,
@@ -29,17 +29,17 @@
             "playRow": true
         },
         "speakerSetting": {
-            "srcIdEnable": true,
+            "srcIdEnable": false,
             "dstIdEnable": true,
-            "editSpeakerIdMappingEnable": true,
+            "editSpeakerIdMappingEnable": false,
             "f0FactorEnable": false,
-            "tuningEnable": false,
+            "tuningEnable": true,
             "clusterInferRationEnable": false,
             "noiseScaleEnable": false,
-            "silentThresholdEnable": false
+            "silentThresholdEnable": true
         },
         "converterSetting": {
-            "extraDataLengthEnable": false
+            "extraDataLengthEnable": true
         },
         "advancedSetting": {
             "serverURLEnable": true,

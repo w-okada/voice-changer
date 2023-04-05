@@ -221,7 +221,7 @@ class RVC:
             vc = VC(self.tgt_sr, dev, is_half)
             sid = 0
             times = [0, 0, 0]
-            f0_up_key = 10
+            f0_up_key = self.settings.tran
             f0_method = "pm"
             file_index = ""
             file_big_npy = ""
@@ -231,7 +231,7 @@ class RVC:
 
             audio_out = vc.pipeline(self.hubert_model, self.net_g, sid, audio, times, f0_up_key, f0_method,
                                     file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file)
-            result = audio_out
+            result = audio_out * np.sqrt(vol)
 
         return result
 
@@ -245,6 +245,3 @@ class RVC:
     def destroy(self):
         del self.net_g
         del self.onnx_session
-
-
-import ffmpeg
