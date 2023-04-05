@@ -6,7 +6,7 @@
 
 - v.1.5.1.15a
 
-  - RVC(Retrieval-based-Voice-Conversion)に対応しました。
+  - [RVC(Retrieval-based-Voice-Conversion)に対応しました。](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI.git)
 
     hubert のモデルが必要になります。[このリポジトリ](https://huggingface.co/lj1995/VoiceConversionWebUI/tree/main)から`hubert_base.pt`をダウンロードして、バッチファイルがあるフォルダに格納してください。
 

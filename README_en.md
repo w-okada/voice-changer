@@ -4,7 +4,7 @@
 
 - v.1.5.1.15a
 
-  - Support RVC(Retrieval-based-Voice-Conversion)
+  - Support [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI.git)
 
     You need to have the hubert model to use it. Please download `hubert_base.pt` from [this repository](https://huggingface.co/lj1995/VoiceConversionWebUI/tree/main) and store it in the folder where the batch file is located.
 
