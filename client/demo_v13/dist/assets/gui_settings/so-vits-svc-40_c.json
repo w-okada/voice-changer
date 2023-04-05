@@ -30,6 +30,7 @@
         },
         "speakerSetting": {
             "srcIdEnable": false,
+            "dstIdEnable": false,
             "editSpeakerIdMappingEnable": false,
             "f0FactorEnable": false,
             "tuningEnable": true,

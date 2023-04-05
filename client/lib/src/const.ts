@@ -9,7 +9,8 @@ export const ClientType = {
     "MMVCv13": "MMVCv13",
     "so-vits-svc-40": "so-vits-svc-40",
     "so-vits-svc-40_c": "so-vits-svc-40_c",
-    "so-vits-svc-40v2": "so-vits-svc-40v2"
+    "so-vits-svc-40v2": "so-vits-svc-40v2",
+    "RVC": "RVC"
 
 } as const
 export type ClientType = typeof ClientType[keyof typeof ClientType]

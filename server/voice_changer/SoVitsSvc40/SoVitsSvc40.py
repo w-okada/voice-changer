@@ -307,8 +307,6 @@ class SoVitsSvc40:
         result = audio1
         return result
 
-        pass
-
     def _pyTorch_inference(self, data):
         if hasattr(self, "net_g") == False or self.net_g == None:
             print("[Voice Changer] No pyTorch session.")

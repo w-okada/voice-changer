@@ -1,21 +1,21 @@
 {
     "type": "demo",
-    "id": "so-vits-svc-40",
+    "id": "RVC",
     "front": {
         "title": {
             "mainTitle": "VC Client",
-            "subTitle": "for so-vits-svc-40",
+            "subTitle": "for RVC",
             "lineNum": 1
         },
         "serverControl": {
             "modelInfoEnable": true
         },
         "modelSetting": {
-            "ONNXEnable": false,
+            "ONNXEnable": true,
             "pyTorchEnable": true,
             "MMVCCorrespondense": false,
-            "pyTorchClusterEnable": true,
-            "showPyTorchDefault": true,
+            "pyTorchClusterEnable": false,
+            "showPyTorchDefault": false,
             "frameworkEnable": true,
             "modelUploaderEnable": true,
             "configRow": true,
@@ -23,23 +23,23 @@
         },
         "deviceSetting": {},
         "qualityControl": {
-            "F0DetectorEnable": true,
+            "F0DetectorEnable": false,
             "analyzerRow": true,
             "samplingRow": true,
             "playRow": true
         },
         "speakerSetting": {
-            "srcIdEnable": false,
+            "srcIdEnable": true,
             "dstIdEnable": true,
-            "editSpeakerIdMappingEnable": false,
+            "editSpeakerIdMappingEnable": true,
             "f0FactorEnable": false,
-            "tuningEnable": true,
-            "clusterInferRationEnable": true,
-            "noiseScaleEnable": true,
-            "silentThresholdEnable": true
+            "tuningEnable": false,
+            "clusterInferRationEnable": false,
+            "noiseScaleEnable": false,
+            "silentThresholdEnable": false
         },
         "converterSetting": {
-            "extraDataLengthEnable": true
+            "extraDataLengthEnable": false
         },
         "advancedSetting": {
             "serverURLEnable": true,
