@@ -1,6 +1,7 @@
 import sys
 import os
 
+# avoiding parse arg error in RVC
 sys.argv = ["MMVCServerSIO.py"]
 
 if sys.platform.startswith('darwin'):
@@ -13,7 +14,6 @@ if sys.platform.startswith('darwin'):
 else:
     sys.path.append("RVC")
 
-print("RVC 3")
 import io
 from dataclasses import dataclass, asdict, field
 from functools import reduce
@@ -74,30 +74,8 @@ class RVC:
     def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, clusterTorchModel: str = None):
         self.device = torch.device("cuda", index=self.settings.gpu)
         self.settings.configFile = config
-        # self.hps = utils.get_hparams_from_file(config)
-        # self.settings.speakers = self.hps.spk
 
-        # hubert model
         try:
-            # hubert_path = self.params["hubert"]
-            # useHubertOnnx = self.params["useHubertOnnx"]
-            # self.useHubertOnnx = useHubertOnnx
-
-            # if useHubertOnnx == True:
-            #     ort_options = onnxruntime.SessionOptions()
-            #     ort_options.intra_op_num_threads = 8
-            #     self.hubert_onnx = onnxruntime.InferenceSession(
-            #         HUBERT_ONNX_MODEL_PATH,
-            #         providers=providers
-            #     )
-            # else:
-            #     models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(
-            #         [hubert_path],
-            #         suffix="",
-            #     )
-            #     model = models[0]
-            #     model.eval()
-            #     self.hubert_model = model.cpu()
             models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(["hubert_base.pt"], suffix="",)
             model = models[0]
             model.eval()
@@ -117,7 +95,6 @@ class RVC:
         if pyTorch_model_file != None:
             cpt = torch.load(pyTorch_model_file, map_location="cpu")
             self.tgt_sr = cpt["config"][-1]
-            # n_spk = cpt["config"][-3]
             is_half = False
             net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=is_half)
             net_g.eval()
@@ -125,14 +102,6 @@ class RVC:
             # net_g = net_g.half()
             self.net_g = net_g
             self.net_g = self.net_g.to(self.device)
-
-            # self.net_g = SynthesizerTrn(
-            #     self.hps.data.filter_length // 2 + 1,
-            #     self.hps.train.segment_size // self.hps.data.hop_length,
-            #     **self.hps.model
-            # )
-            # self.net_g.eval()
-            # utils.load_checkpoint(pyTorch_model_file, self.net_g, None)
 
         # ONNXモデル生成
         if onnx_model_file != None:
@@ -201,20 +170,6 @@ class RVC:
         # return 24000
 
     def generate_input(self, newData: any, inputSize: int, crossfadeSize: int):
-        # import wave
-        # filename = "testc2.wav"
-        # if os.path.exists(filename):
-        #     print("[IORecorder] delete old analyze file.", filename)
-        #     os.remove(filename)
-        # fo = wave.open(filename, 'wb')
-        # fo.setnchannels(1)
-        # fo.setsampwidth(2)
-        # # fo.setframerate(24000)
-        # fo.setframerate(self.tgt_sr)
-        # fo.writeframes(newData.astype(np.int16))
-        # fo.close()
-
-        # newData = newData.astype(np.float32) / self.hps.data.max_wav_value
         newData = newData.astype(np.float32) / 32768.0
 
         if hasattr(self, "audio_buffer"):
@@ -267,9 +222,6 @@ class RVC:
         audio = data[0]
         convertSize = data[1]
         vol = data[2]
-        # from scipy.io import wavfile
-        # # wavfile.write("testa.wav", self.tgt_sr, audio * 32768.0)
-        # wavfile.write("testa.wav", 24000, audio * 32768.0)
 
         filename = "testc2.wav"
         audio = load_audio(filename, 16000)
@@ -307,57 +259,6 @@ class RVC:
     def destroy(self):
         del self.net_g
         del self.onnx_session
-
-
-# def resize_f0(x, target_len):
-#     source = np.array(x)
-#     source[source < 0.001] = np.nan
-#     target = np.interp(np.arange(0, len(source) * target_len, len(source)) / target_len, np.arange(0, len(source)), source)
-#     res = np.nan_to_num(target)
-#     return res
-
-
-# def compute_f0_dio(wav_numpy, p_len=None, sampling_rate=44100, hop_length=512):
-#     if p_len is None:
-#         p_len = wav_numpy.shape[0] // hop_length
-#     f0, t = pw.dio(
-#         wav_numpy.astype(np.double),
-#         fs=sampling_rate,
-#         f0_ceil=800,
-#         frame_period=1000 * hop_length / sampling_rate,
-#     )
-#     f0 = pw.stonemask(wav_numpy.astype(np.double), f0, t, sampling_rate)
-#     for index, pitch in enumerate(f0):
-#         f0[index] = round(pitch, 1)
-#     return resize_f0(f0, p_len)
-
-
-# def compute_f0_harvest(wav_numpy, p_len=None, sampling_rate=44100, hop_length=512):
-#     if p_len is None:
-#         p_len = wav_numpy.shape[0] // hop_length
-#     f0, t = pw.harvest(wav_numpy.astype(np.double), fs=sampling_rate, frame_period=5.5, f0_floor=71.0, f0_ceil=1000.0)
-
-#     for index, pitch in enumerate(f0):
-#         f0[index] = round(pitch, 1)
-#     return resize_f0(f0, p_len)
-
-
-# def get_hubert_content_layer9(hmodel, wav_16k_tensor):
-#     feats = wav_16k_tensor
-#     if feats.dim() == 2:  # double channels
-#         feats = feats.mean(-1)
-#     assert feats.dim() == 1, feats.dim()
-#     feats = feats.view(1, -1)
-#     padding_mask = torch.BoolTensor(feats.shape).fill_(False)
-#     inputs = {
-#         "source": feats.to(wav_16k_tensor.device),
-#         "padding_mask": padding_mask.to(wav_16k_tensor.device),
-#         "output_layer": 9,  # layer 9
-#     }
-#     with torch.no_grad():
-#         logits = hmodel.extract_features(**inputs)
-
-#     return logits[0].transpose(1, 2)
 
 
 import ffmpeg

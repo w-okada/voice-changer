@@ -49,35 +49,25 @@ class VoiceChanger():
 
         self.modelType = getModelType()
         print("[VoiceChanger] activate model type:", self.modelType)
-        print("RVC!!! 1")
         if self.modelType == "MMVCv15":
-            print("RVC!!! 2")
             from voice_changer.MMVCv15.MMVCv15 import MMVCv15
             self.voiceChanger = MMVCv15()
         elif self.modelType == "MMVCv13":
-            print("RVC!!! 2")
             from voice_changer.MMVCv13.MMVCv13 import MMVCv13
             self.voiceChanger = MMVCv13()
         elif self.modelType == "so-vits-svc-40v2":
-            print("RVC!!! 2")
             from voice_changer.SoVitsSvc40v2.SoVitsSvc40v2 import SoVitsSvc40v2
             self.voiceChanger = SoVitsSvc40v2(params)
         elif self.modelType == "so-vits-svc-40" or self.modelType == "so-vits-svc-40_c":
-            print("RVC!!! 2")
             from voice_changer.SoVitsSvc40.SoVitsSvc40 import SoVitsSvc40
             self.voiceChanger = SoVitsSvc40(params)
         elif self.modelType == "DDSP-SVC":
-            print("RVC!!! 2")
             from voice_changer.DDSP_SVC.DDSP_SVC import DDSP_SVC
             self.voiceChanger = DDSP_SVC(params)
         elif self.modelType == "RVC":
-            print("RVC!!! 22222222222")
             from voice_changer.RVC.RVC import RVC
-            print("RVC!!! 2")
             self.voiceChanger = RVC(params)
-
         else:
-            print("RVC!!! 3")
             from voice_changer.MMVCv13.MMVCv13 import MMVCv13
             self.voiceChanger = MMVCv13()
 
@@ -219,10 +209,6 @@ class VoiceChanger():
                     print_convert_processing(
                         f" audio:{audio.shape}, cur_overlap:{cur_overlap.shape}, self.np_cur_strength:{self.np_cur_strength.shape}")
                     print_convert_processing(f" cur_overlap_strt:{cur_overlap_start}, cur_overlap_end{cur_overlap_end}")
-
-                    print(
-                        f" audio:{audio.shape}, cur_overlap:{cur_overlap.shape}, self.np_cur_strength:{self.np_cur_strength.shape}")
-                    print(f" cur_overlap_strt:{cur_overlap_start}, cur_overlap_end{cur_overlap_end}")
 
                     powered_cur = cur_overlap * self.np_cur_strength
                     powered_result = powered_prev + powered_cur
