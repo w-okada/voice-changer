@@ -10,6 +10,8 @@
 
     hubert のモデルが必要になります。[このリポジトリ](https://huggingface.co/lj1995/VoiceConversionWebUI/tree/main)から`hubert_base.pt`をダウンロードして、バッチファイルがあるフォルダに格納してください。
 
+https://user-images.githubusercontent.com/48346627/230225563-b403e827-bc07-4b1f-9405-fd884bfa19a9.mp4
+
 https://youtu.be/yvPWtq7isfI
 
 https://youtu.be/6U7ZM2ZSwCU

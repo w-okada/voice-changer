@@ -8,6 +8,8 @@
 
     You need to have the hubert model to use it. Please download `hubert_base.pt` from [this repository](https://huggingface.co/lj1995/VoiceConversionWebUI/tree/main) and store it in the folder where the batch file is located.
 
+https://user-images.githubusercontent.com/48346627/230225563-b403e827-bc07-4b1f-9405-fd884bfa19a9.mp4
+
 https://youtu.be/yvPWtq7isfI
 
 https://youtu.be/6U7ZM2ZSwCU
