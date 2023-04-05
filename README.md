@@ -2,6 +2,14 @@
 
 [English](/README_en.md)
 
+## What's New!
+
+- v.1.5.1.15a
+
+  - RVC(Retrieval-based-Voice-Conversion)に対応しました。
+
+    hubert のモデルが必要になります。[このリポジトリ](https://huggingface.co/lj1995/VoiceConversionWebUI/tree/main)から`hubert_base.pt`をダウンロードして、バッチファイルがあるフォルダに格納してください。
+
 https://youtu.be/yvPWtq7isfI
 
 https://youtu.be/6U7ZM2ZSwCU
@@ -71,11 +79,11 @@ MMVC のモデルをトレーニングが完了している場合、既に Colab
 実行形式のバイナリをダウンロードして実行することができます。
 Windows 版と Mac 版を提供しています。
 
-・Mac 版はダウンロードファイルを解凍したのちに、使用する VC に応じた`startHttp_xxx.command`をダブルクリックしてください。開発元を検証できない旨が示される場合は、再度コントロールキーを押してクリックして実行してください(or 右クリックから実行してください)。（詳細下記 \*1）
+- Mac 版はダウンロードファイルを解凍したのちに、使用する VC に応じた`startHttp_xxx.command`をダブルクリックしてください。開発元を検証できない旨が示される場合は、再度コントロールキーを押してクリックして実行してください(or 右クリックから実行してください)。（詳細下記 \*1）
 
-・Windows 版は、`ONNX(cpu,cuda),PyTorch(cpu)`版と `ONNX(cpu,cuda), PyTorch(cpu,cuda)`版と`ONNX(cpu,DirectML), PyTorch(cpu)`版を提供しています。環境に応じた zip ファイルをダウンロードしてください。ダウンロードした zip ファイルを解凍して、使用する VC に応じた VC に応じた`start_http_xxx.bat`を実行してください。
+- Windows 版は、`ONNX(cpu,cuda),PyTorch(cpu)`版と `ONNX(cpu,cuda), PyTorch(cpu,cuda)`版と`ONNX(cpu,DirectML), PyTorch(cpu)`版を提供しています。環境に応じた zip ファイルをダウンロードしてください。ダウンロードした zip ファイルを解凍して、使用する VC に応じた VC に応じた`start_http_xxx.bat`を実行してください。
 
-・各種`startHttp_xxx.command`ファイル(mac)、`start_http_xxx.bat`ファイル(win)で起動できるボイスチェンジャは次の通りです。
+- 各種`startHttp_xxx.command`ファイル(mac)、`start_http_xxx.bat`ファイル(win)で起動できるボイスチェンジャは次の通りです。
 
 | #   | バッチファイル(mac の場合は`.bat`を`.command`に読み替え) | 説明                                           |
 | --- | -------------------------------------------------------- | ---------------------------------------------- |
@@ -85,16 +93,23 @@ Windows 版と Mac 版を提供しています。
 | 4   | start_http_so-vits-svc_40v2.bat                          | so-vits-svc 4.0v2 系のモデルが使用できます。   |
 | 5   | start_http_so-vits-svc_40v2_tsukuyomi.bat                | つくよみちゃんのモデルを使用します。(変更不可) |
 | 6   | start_http_so-vits-svc_40v2_amitaro.bat                  | あみたろのモデルを使用します。(変更不可)       |
+| 7   | start_http_RVC.bat                                       | RVC のモデルが使用できます。                   |
 
-・リモートから接続する場合は、各種`.command`ファイル(mac)、`.bat`ファイル(win)の http が https に置き換わっているものを使用してください。
+- リモートから接続する場合は、各種`.command`ファイル(mac)、`.bat`ファイル(win)の http が https に置き換わっているものを使用してください。
 
-・Windows 環境で Nvidia の GPU をお持ちの方は多くの場合は `ONNX(cpu,cuda),PyTorch(cpu)`版で動きます。環境によって極まれに gpu が認識されない場合があります。その場合は `ONNX(cpu,cuda), PyTorch(cpu,cuda)`版の方をご利用ください。（サイズが大きく違います。）
+- Windows 環境で Nvidia の GPU をお持ちの方は多くの場合は `ONNX(cpu,cuda),PyTorch(cpu)`版で動きます。環境によって極まれに gpu が認識されない場合があります。その場合は `ONNX(cpu,cuda), PyTorch(cpu,cuda)`版の方をご利用ください。（サイズが大きく違います。）
 
-・Windows 環境で Nvidia の GPU をお持ちでない方は多くの場合は `ONNX(cpu,DirectML), PyTorch(cpu) `版で動きます。
+- Windows 環境で Nvidia の GPU をお持ちでない方は多くの場合は `ONNX(cpu,DirectML), PyTorch(cpu) `版で動きます。
 
-・Windows 環境で so-vits-svc 4.0/so-vits-svc 4.0v2 をお使いの場合は`ONNX(cpu,cuda), PyTorch(cpu,cuda)`版をご利用ください。
+- Windows 環境で so-vits-svc 4.0/so-vits-svc 4.0v2 をお使いの場合は`ONNX(cpu,cuda), PyTorch(cpu,cuda)`版をご利用ください。
 
-・so-vits-svc 4.0/so-vits-svc 4.0v2 やつくよみちゃんの動作には content vec のモデルが必要となります。こちらの[リポジトリ](https://github.com/auspicious3000/contentvec)から、ContentVec_legacy 500 のモデルをダウンロードして、実行する`startHttp_xxx.command`や`start_http_xxx.bat`と同じフォルダに配置してください。
+- so-vits-svc 4.0/so-vits-svc 4.0v2 やつくよみちゃんの動作には content vec のモデルが必要となります。こちらの[リポジトリ](https://github.com/auspicious3000/contentvec)から、ContentVec_legacy 500 のモデルをダウンロードして、実行する`startHttp_xxx.command`や`start_http_xxx.bat`と同じフォルダに配置してください。
+
+- RVC(Retrieval-based-Voice-Conversion)の動作には hubert のモデルが必要になります。[このリポジトリ](https://huggingface.co/lj1995/VoiceConversionWebUI/tree/main)から`hubert_base.pt`をダウンロードして、バッチファイルがあるフォルダに格納してください。
+
+| Version     | OS                                    | フレームワーク                    | link                                                                                     | サポート VC                                                         | サイズ |
+| ----------- | ------------------------------------- | --------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------ |
+| v.1.5.1.15a | <span style="color: blue;">win</span> | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [通常](https://drive.google.com/uc?id=1lCo4P3D3QVvrl-0DRh305e34d_YmsI10&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC | 2641MB |
 
 | Version    | OS                                    | フレームワーク                        | link                                                                                               | サポート VC                                                    | サイズ |
 | ---------- | ------------------------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ------ |

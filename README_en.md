@@ -1,5 +1,13 @@
 ## VC Client
 
+## What's New!
+
+- v.1.5.1.15a
+
+  - Support RVC(Retrieval-based-Voice-Conversion)
+
+    You need to have the hubert model to use it. Please download `hubert_base.pt` from [this repository](https://huggingface.co/lj1995/VoiceConversionWebUI/tree/main) and store it in the folder where the batch file is located.
+
 https://youtu.be/yvPWtq7isfI
 
 https://youtu.be/6U7ZM2ZSwCU
@@ -78,6 +86,7 @@ We offer Windows and Mac versions.
 | 4   | start_http_so-vits-svc_40v2.bat           | so-vits-svc 4.0v2 series models can be used.    |
 | 5   | start_http_so-vits-svc_40v2_tsukuyomi.bat | Use Tsukuyomi-chan's model. (Cannot be changed) |
 | 6   | start_http_so-vits-svc_40v2_amitaro.bat   | Use Amitaro's model. (Cannot be changed)        |
+| 7   | start_http_RVC.bat                        | RVC series models can be used.                  |
 
 - If you are connecting remotely, please use the `.command` file (Mac) or `.bat` file (Windows) with https instead of http.
 
@@ -88,6 +97,11 @@ We offer Windows and Mac versions.
 - If you are using `so-vits-svc 4.0`/`so-vits-svc 4.0v2` on Windows, please use the `ONNX(cpu,cuda), PyTorch(cpu,cuda)` version.
 
 - To use `so-vits-svc 4.0`/`so-vits-svc 4.0v2` or `tsukuyomi-chan`, you need the content vec model. Please download the ContentVec_legacy 500 model from [this repository](https://github.com/auspicious3000/contentvec), and place it in the same folder as `startHttp_xxx.command` or `start_http_xxx.bat` to run.
+
+- You need to have the hubert model to use RVC(Retrieval-based-Voice-Conversion). Please download `hubert_base.pt` from [this repository](https://huggingface.co/lj1995/VoiceConversionWebUI/tree/main) and store it in the folder where the batch file is located.
+- | Version     | OS                                    | Framework                         | link                                                                                     | VC Support                                                          | Size   |
+  | ----------- | ------------------------------------- | --------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------ |
+  | v.1.5.1.15a | <span style="color: blue;">win</span> | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [通常](https://drive.google.com/uc?id=1lCo4P3D3QVvrl-0DRh305e34d_YmsI10&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC | 2641MB |
 
 | Version    | OS                                    | Framework                             | link                                                                                               | VC Support                                                     | Size   |
 | ---------- | ------------------------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ------ |
