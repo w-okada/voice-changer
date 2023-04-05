@@ -1,5 +1,6 @@
 import sys
 import os
+import resampy
 
 # avoiding parse arg error in RVC
 sys.argv = ["MMVCServerSIO.py"]
@@ -191,19 +192,6 @@ class RVC:
         vol = max(rms, self.prevVol * 0.0)
         self.prevVol = vol
 
-        import wave
-        filename = "testc2.wav"
-        if os.path.exists(filename):
-            print("[IORecorder] delete old analyze file.", filename)
-            os.remove(filename)
-        fo = wave.open(filename, 'wb')
-        fo.setnchannels(1)
-        fo.setsampwidth(2)
-        # fo.setframerate(24000)
-        fo.setframerate(self.tgt_sr)
-        fo.writeframes((self.audio_buffer * 32768.0).astype(np.int16))
-        fo.close()
-
         return (self.audio_buffer, convertSize, vol)
 
     def _onnx_inference(self, data):
@@ -223,8 +211,7 @@ class RVC:
         convertSize = data[1]
         vol = data[2]
 
-        filename = "testc2.wav"
-        audio = load_audio(filename, 16000)
+        audio = resampy.resample(audio, self.tgt_sr, 16000)
 
         if vol < self.settings.silentThreshold:
             return np.zeros(convertSize).astype(np.int16)
@@ -234,7 +221,7 @@ class RVC:
             vc = VC(self.tgt_sr, dev, is_half)
             sid = 0
             times = [0, 0, 0]
-            f0_up_key = 0
+            f0_up_key = 10
             f0_method = "pm"
             file_index = ""
             file_big_npy = ""
@@ -245,8 +232,7 @@ class RVC:
             audio_out = vc.pipeline(self.hubert_model, self.net_g, sid, audio, times, f0_up_key, f0_method,
                                     file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file)
             result = audio_out
-        from scipy.io import wavfile
-        wavfile.write("testaaaaa.wav", self.tgt_sr, result)
+
         return result
 
     def inference(self, data):
@@ -262,19 +248,3 @@ class RVC:
 
 
 import ffmpeg
-
-
-def load_audio(file, sr):
-    try:
-        # https://github.com/openai/whisper/blob/main/whisper/audio.py#L26
-        # This launches a subprocess to decode audio while down-mixing and resampling as necessary.
-        # Requires the ffmpeg CLI and `ffmpeg-python` package to be installed.
-        out, _ = (
-            ffmpeg.input(file, threads=0)
-            .output("-", format="s16le", acodec="pcm_s16le", ac=1, ar=sr)
-            .run(cmd=["ffmpeg", "-nostdin"], capture_stdout=True, capture_stderr=True)
-        )
-    except Exception as e:
-        raise RuntimeError(f"Failed to load audio: {e}")
-
-    return np.frombuffer(out, np.int16).flatten().astype(np.float32) / 32768.0
