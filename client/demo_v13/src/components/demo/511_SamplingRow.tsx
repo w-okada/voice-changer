@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 import { useAppState } from "../../001_provider/001_AppStateProvider"
 import { AUDIO_ELEMENT_FOR_SAMPLING_INPUT, AUDIO_ELEMENT_FOR_SAMPLING_OUTPUT } from "../../const"
 import { useGuiState } from "./001_GuiStateProvider"
@@ -7,9 +8,15 @@ export const SamplingRow = () => {
     const [recording, setRecording] = useState<boolean>(false)
     const appState = useAppState()
     const guiState = useGuiState()
+    const { appGuiSettingState } = useAppRoot()
+    const qualityControlSetting = appGuiSettingState.appGuiSetting.front.qualityControl
 
 
     const samplingRow = useMemo(() => {
+        if (!qualityControlSetting.samplingRow) {
+            return <></>
+        }
+
         const onRecordStartClicked = async () => {
             setRecording(true)
             await appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, recordIO: 1 })

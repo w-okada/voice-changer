@@ -7,10 +7,9 @@
 export const ClientType = {
     "MMVCv15": "MMVCv15",
     "MMVCv13": "MMVCv13",
-    "so_vits_svc_40": "so_vits_svc_40",
-    "so_vits_svc_40_c": "so_vits_svc_40_c",
-    "so_vits_svc_40v2": "so_vits_svc_40v2",
-    "so_vits_svc_40v2_c": "so_vits_svc_40v2_c",
+    "so-vits-svc-40": "so-vits-svc-40",
+    "so-vits-svc-40_c": "so-vits-svc-40_c",
+    "so-vits-svc-40v2": "so-vits-svc-40v2"
 
 } as const
 export type ClientType = typeof ClientType[keyof typeof ClientType]
@@ -220,6 +219,41 @@ export const DefaultServerSetting_so_vits_svc_40: ServerInfo = {
     onnxExecutionProviders: []
 }
 
+export const DefaultServerSetting_so_vits_svc_40_c: ServerInfo = {
+    srcId: 0,
+    dstId: 0,
+    gpu: 0,
+
+    crossFadeOffsetRate: 0.0,
+    crossFadeEndRate: 1.0,
+    crossFadeOverlapSize: CrossFadeOverlapSize[1024],
+
+    framework: Framework.ONNX,
+    f0Factor: 1.0,
+    onnxExecutionProvider: OnnxExecutionProvider.CPUExecutionProvider,
+    f0Detector: F0Detector.dio,
+    recordIO: 0,
+
+    // tran: 0,
+    // noiceScale: 0,
+    // predictF0: 0,
+    // silentThreshold: 0,
+    tran: 10,
+    noiceScale: 0.3,
+    predictF0: 0,
+    silentThreshold: 0.00001,
+    extraConvertSize: 1024 * 32,
+    clusterInferRatio: 0.1,
+
+    inputSampleRate: 24000,
+
+    // 
+    status: "ok",
+    configFile: "",
+    pyTorchModelFile: "",
+    onnxModelFile: "",
+    onnxExecutionProviders: []
+}
 export const DefaultServerSetting_so_vits_svc_40v2: ServerInfo = {
     srcId: 0,
     dstId: 0,

@@ -7,20 +7,30 @@
             "subTitle": "for MMVC v.1.5",
             "lineNum": 1
         },
-        "serverControl": {},
+        "serverControl": {
+            "modelInfoEnable": true
+        },
         "modelSetting": {
             "ONNXEnable": true,
             "pyTorchEnable": true,
             "MMVCCorrespondense": true,
             "pyTorchClusterEnable": false,
-            "showPyTorchDefault": false
+            "showPyTorchDefault": false,
+            "frameworkEnable": true,
+            "modelUploaderEnable": true,
+            "configRow": true,
+            "uploadRow": true
         },
         "deviceSetting": {},
         "qualityControl": {
-            "F0DetectorEnable": true
+            "F0DetectorEnable": true,
+            "analyzerRow": true,
+            "samplingRow": true,
+            "playRow": true
         },
         "speakerSetting": {
             "srcIdEnable": true,
+            "dstIdEnable": true,
             "editSpeakerIdMappingEnable": false,
             "f0FactorEnable": true,
             "tuningEnable": false,

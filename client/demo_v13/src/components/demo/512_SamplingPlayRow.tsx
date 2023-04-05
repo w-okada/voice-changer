@@ -1,11 +1,17 @@
 import React, { useMemo } from "react"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 import { AUDIO_ELEMENT_FOR_SAMPLING_INPUT, AUDIO_ELEMENT_FOR_SAMPLING_OUTPUT } from "../../const"
 import { useGuiState } from "./001_GuiStateProvider"
 
 export const SamplingPlayRow = () => {
     const guiState = useGuiState()
+    const { appGuiSettingState } = useAppRoot()
+    const qualityControlSetting = appGuiSettingState.appGuiSetting.front.qualityControl
 
     const samplingPlayRow = useMemo(() => {
+        if (!qualityControlSetting.playRow) {
+            return <></>
+        }
         return (
             <div className="body-row split-3-2-2-3 left-padding-1 guided">
                 <div className="body-item-title left-padding-2 ">

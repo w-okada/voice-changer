@@ -1,10 +1,16 @@
 import React, { useMemo } from "react"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 import { useAppState } from "../../001_provider/001_AppStateProvider"
 
 export const ServerInfoRow = () => {
     const appState = useAppState()
+    const { appGuiSettingState } = useAppRoot()
+    const serverControlSetting = appGuiSettingState.appGuiSetting.front.serverControl
 
     const serverInfoRow = useMemo(() => {
+        if (!serverControlSetting.modelInfoEnable) {
+            return <></>
+        }
         const onReloadClicked = async () => {
             const info = await appState.getInfo()
             console.log("info", info)

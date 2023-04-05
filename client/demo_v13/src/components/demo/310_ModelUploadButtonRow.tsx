@@ -1,11 +1,18 @@
 import React, { useMemo } from "react"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 
 import { useAppState } from "../../001_provider/001_AppStateProvider"
 
 export const ModelUploadButtonRow = () => {
     const appState = useAppState()
+    const { appGuiSettingState } = useAppRoot()
+
+    const modelSetting = appGuiSettingState.appGuiSetting.front.modelSetting
 
     const modelUploadButtonRow = useMemo(() => {
+        if (!modelSetting.uploadRow) {
+            return <></>
+        }
         const onModelUploadClicked = async () => {
             appState.serverSetting.loadModel()
         }

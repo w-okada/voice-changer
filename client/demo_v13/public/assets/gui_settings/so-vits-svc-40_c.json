@@ -1,0 +1,68 @@
+{
+    "type": "demo",
+    "id": "so-vits-svc-40_c",
+    "front": {
+        "title": {
+            "mainTitle": "VC Client",
+            "subTitle": "for so-vits-svc-40_c",
+            "lineNum": 1
+        },
+        "serverControl": {
+            "modelInfoEnable": false
+        },
+        "modelSetting": {
+            "ONNXEnable": false,
+            "pyTorchEnable": false,
+            "MMVCCorrespondense": false,
+            "pyTorchClusterEnable": false,
+            "showPyTorchDefault": false,
+            "frameworkEnable": false,
+            "modelUploaderEnable": false,
+            "configRow": false,
+            "uploadRow": false
+        },
+        "deviceSetting": {},
+        "qualityControl": {
+            "F0DetectorEnable": true,
+            "analyzerRow": false,
+            "samplingRow": false,
+            "playRow": false
+        },
+        "speakerSetting": {
+            "srcIdEnable": false,
+            "dstIdEnable": false,
+            "editSpeakerIdMappingEnable": false,
+            "f0FactorEnable": false,
+            "tuningEnable": true,
+            "clusterInferRationEnable": true,
+            "noiseScaleEnable": true,
+            "silentThresholdEnable": true
+        },
+        "converterSetting": {
+            "extraDataLengthEnable": true
+        },
+        "advancedSetting": {
+            "serverURLEnable": false,
+            "protocolEnable": true,
+            "sampleRateEnable": false,
+            "sendingSampleRateEnable": false,
+            "crossFadeOverlapSizeEnable": false,
+            "crossFadeOffsetRateEnable": false,
+            "crossFadeEndRateEnable": false,
+            "downSamplingModeEnable": false,
+            "trancateNumTresholdEnable": false
+        }
+    },
+
+    "dialogs": {
+        "license": [
+            {
+                "title": "c",
+                "auther": "c",
+                "contact": "b",
+                "url": "a",
+                "license": "MIT"
+            }
+        ]
+    }
+}

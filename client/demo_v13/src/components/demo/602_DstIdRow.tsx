@@ -5,10 +5,18 @@ import { ServerInfoSoVitsSVC } from "@dannadori/voice-changer-client-js";
 export const DstIdRow = () => {
     const appState = useAppState()
     const { appGuiSettingState } = useAppRoot()
+    const speakerSetting = appGuiSettingState.appGuiSetting.front.speakerSetting
     const clientId = appGuiSettingState.appGuiSetting.id
 
+
     const dstIdRow = useMemo(() => {
+        if (!speakerSetting.dstIdEnable) {
+            return <></>
+        }
         if (clientId != "MMVCv13") {
+            return <></>
+        }
+        if (!speakerSetting.dstIdEnable) {
             return <></>
         }
 
@@ -35,6 +43,10 @@ export const DstIdRow = () => {
     }, [appState.serverSetting.serverSetting, appState.clientSetting.clientSetting.speakers, appState.serverSetting.updateServerSettings])
 
     const dstIdRowWithF0 = useMemo(() => {
+        if (!speakerSetting.dstIdEnable) {
+            return <></>
+        }
+
         if (clientId != "MMVCv15") {
             return <></>
         }
@@ -67,6 +79,10 @@ export const DstIdRow = () => {
     }, [appState.serverSetting.serverSetting, appState.serverSetting.updateServerSettings, appState.clientSetting.clientSetting.correspondences])
 
     const dstIdRowFromServer = useMemo(() => {
+        if (!speakerSetting.dstIdEnable) {
+            return <></>
+        }
+
         const settings = appState.serverSetting.serverSetting as ServerInfoSoVitsSVC
         const speakers = settings.speakers
         if (!speakers) {

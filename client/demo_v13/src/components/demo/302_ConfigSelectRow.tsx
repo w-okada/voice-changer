@@ -2,11 +2,17 @@ import React, { useMemo } from "react"
 import { fileSelector } from "@dannadori/voice-changer-client-js"
 
 import { useAppState } from "../../001_provider/001_AppStateProvider"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 
 export const ConfigSelectRow = () => {
     const appState = useAppState()
+    const { appGuiSettingState } = useAppRoot()
+    const modelSetting = appGuiSettingState.appGuiSetting.front.modelSetting
 
     const configSelectRow = useMemo(() => {
+        if (!modelSetting.configRow) {
+            return <></>
+        }
         const configFilenameText = appState.serverSetting.fileUploadSetting.configFile?.filename || appState.serverSetting.fileUploadSetting.configFile?.file?.name || ""
         const onConfigFileLoadClicked = async () => {
             const file = await fileSelector("")

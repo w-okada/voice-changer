@@ -7,13 +7,19 @@
             "subTitle": "for so-vits-svc-40v2",
             "lineNum": 1
         },
-        "serverControl": {},
+        "serverControl": {
+            "modelInfoEnable": true
+        },
         "modelSetting": {
             "ONNXEnable": false,
             "pyTorchEnable": true,
             "MMVCCorrespondense": false,
             "pyTorchClusterEnable": true,
-            "showPyTorchDefault": true
+            "showPyTorchDefault": true,
+            "frameworkEnable": true,
+            "modelUploaderEnable": true,
+            "configRow": true,
+            "uploadRow": true
         },
         "deviceSetting": {},
         "qualityControl": {
@@ -21,6 +27,7 @@
         },
         "speakerSetting": {
             "srcIdEnable": false,
+            "dstIdEnable": true,
             "editSpeakerIdMappingEnable": false,
             "f0FactorEnable": false,
             "tuningEnable": true,

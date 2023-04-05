@@ -38,7 +38,7 @@ def setupArgParser():
     parser.add_argument("--colab", type=strtobool,
                         default=False, help="run on colab")
     parser.add_argument("--modelType", type=str,
-                        default="MMVCv15", help="model type: MMVCv13, MMVCv15, so-vits-svc-40, so-vits-svc-40v2, so-vits-svc-40v2_tsukuyomi")
+                        default="MMVCv15", help="model type: MMVCv13, MMVCv15, so-vits-svc-40, so-vits-svc-40v2")
     parser.add_argument("--cluster", type=str, help="path to cluster model")
     parser.add_argument("--hubert", type=str, help="path to hubert model")
     parser.add_argument("--internal", type=strtobool, default=False, help="各種パスをmac appの中身に変換")
@@ -129,7 +129,7 @@ if __name__ == 'MMVCServerSIO':
     if CONFIG and (MODEL or ONNX_MODEL):
         if MODEL_TYPE == "MMVCv15" or MODEL_TYPE == "MMVCv13":
             voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL, None)
-        elif MODEL_TYPE == "so-vits-svc-40" or MODEL_TYPE == "so-vits-svc-40v2" or MODEL_TYPE == "so-vits-svc-40v2_tsukuyomi":
+        elif MODEL_TYPE == "so-vits-svc-40" or MODEL_TYPE == "so-vits-svc-40v2" or MODEL_TYPE == "so-vits-svc-40_c":
             voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL, CLUSTER_MODEL)
         else:
             voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL, CLUSTER_MODEL)

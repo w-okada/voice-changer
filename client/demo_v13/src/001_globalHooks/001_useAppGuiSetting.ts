@@ -13,20 +13,30 @@ export type AppGuiDemoSetting = {
             "lineNum": number
         },
         "serverControl": {
+            "modelInfoEnable": boolean
         },
         "modelSetting": {
             "ONNXEnable": boolean,
             "pyTorchEnable": boolean,
             "MMVCCorrespondense": boolean,
             "pyTorchClusterEnable": boolean,
-            "showPyTorchDefault": boolean
+            "showPyTorchDefault": boolean,
+            "frameworkEnable": boolean,
+            "modelUploaderEnable": boolean,
+            "configRow": boolean,
+            "uploadRow": boolean
+
         },
         "deviceSetting": {},
         "qualityControl": {
-            "F0DetectorEnable": boolean
+            "F0DetectorEnable": boolean,
+            "analyzerRow": boolean,
+            "samplingRow": boolean,
+            "playRow": boolean
         },
         "speakerSetting": {
             "srcIdEnable": boolean
+            "dstIdEnable": boolean
             "editSpeakerIdMappingEnable": boolean
             "f0FactorEnable": boolean
             "tuningEnable": boolean
@@ -66,21 +76,29 @@ const InitialAppGuiDemoSetting: AppGuiDemoSetting = {
             "lineNum": 1
         },
         "serverControl": {
-
+            "modelInfoEnable": true
         },
         "modelSetting": {
             "ONNXEnable": false,
             "pyTorchEnable": false,
             "MMVCCorrespondense": false,
             "pyTorchClusterEnable": false,
-            "showPyTorchDefault": false
+            "showPyTorchDefault": false,
+            "frameworkEnable": false,
+            "modelUploaderEnable": false,
+            "configRow": false,
+            "uploadRow": false
         },
         "deviceSetting": {},
         "qualityControl": {
-            "F0DetectorEnable": false
+            "F0DetectorEnable": false,
+            "analyzerRow": true,
+            "samplingRow": true,
+            "playRow": true
         },
         "speakerSetting": {
             "srcIdEnable": false,
+            "dstIdEnable": false,
             "editSpeakerIdMappingEnable": false,
             "f0FactorEnable": false,
             "tuningEnable": false,

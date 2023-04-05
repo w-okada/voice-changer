@@ -24,9 +24,9 @@ export const useWorkletNodeSetting = (props: UseWorkletNodeSettingProps): Workle
             return DefaultWorkletNodeSetting
         } else if (props.clientType == "MMVCv15") {
             return DefaultWorkletNodeSetting
-        } else if (props.clientType == "so_vits_svc_40" || props.clientType == "so_vits_svc_40_c") {
+        } else if (props.clientType == "so-vits-svc-40" || props.clientType == "so-vits-svc-40_c") {
             return DefaultWorkletNodeSetting_so_vits_svc_40
-        } else if (props.clientType == "so_vits_svc_40v2" || props.clientType == "so_vits_svc_40v2_c") {
+        } else if (props.clientType == "so-vits-svc-40v2") {
             return DefaultWorkletNodeSetting_so_vits_svc_40v2
         } else {
             return DefaultWorkletNodeSetting

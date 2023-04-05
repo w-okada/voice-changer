@@ -1,11 +1,17 @@
 import React, { useMemo } from "react"
 import { Framework } from "@dannadori/voice-changer-client-js"
 import { useAppState } from "../../001_provider/001_AppStateProvider"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 
 export const FrameworkRow = () => {
     const appState = useAppState()
+    const { appGuiSettingState } = useAppRoot()
+    const modelSetting = appGuiSettingState.appGuiSetting.front.modelSetting
 
     const frameworkRow = useMemo(() => {
+        if (!modelSetting.frameworkEnable) {
+            return <></>
+        }
         const onFrameworkChanged = async (val: Framework) => {
             appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, framework: val })
         }

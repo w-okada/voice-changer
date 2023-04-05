@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react"
-import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc_40v2, DefaultServerSetting_so_vits_svc_40 } from "../const"
+import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc_40v2, DefaultServerSetting_so_vits_svc_40, DefaultServerSetting_so_vits_svc_40_c } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
@@ -52,14 +52,18 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             return DefaultServerSetting_MMVCv13
         } else if (props.clientType == "MMVCv15") {
             return DefaultServerSetting_MMVCv15
-        } else if (props.clientType == "so_vits_svc_40" || props.clientType == "so_vits_svc_40_c") {
+        } else if (props.clientType == "so-vits-svc-40") {
             return DefaultServerSetting_so_vits_svc_40
-        } else if (props.clientType == "so_vits_svc_40v2" || props.clientType == "so_vits_svc_40v2_c") {
+        } else if (props.clientType == "so-vits-svc-40_c") {
+            console.log("default so_vits_svc_40_c")
+            return DefaultServerSetting_so_vits_svc_40_c
+        } else if (props.clientType == "so-vits-svc-40v2") {
             return DefaultServerSetting_so_vits_svc_40v2
         } else {
             return DefaultServerSetting_MMVCv15
         }
     }, [])
+    console.log("default sss", defaultServerSetting)
     const [serverSetting, setServerSetting] = useState<ServerInfo>(defaultServerSetting)
     const [fileUploadSetting, setFileUploadSetting] = useState<FileUploadSetting>(InitialFileUploadSetting)
     const { setItem, getItem, removeItem } = useIndexedDB({ clientType: props.clientType })
@@ -178,7 +182,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             //     fileUploadSetting.hubertTorchModel!.filename = await fileUploadSetting.hubertTorchModel!.file!.name
             // }
             if (fileUploadSetting.clusterTorchModel) {
-                if ((props.clientType == "so_vits_svc_40v2" || props.clientType == "so_vits_svc_40") && !fileUploadSetting.clusterTorchModel!.data) {
+                if ((props.clientType == "so-vits-svc-40v2" || props.clientType == "so-vits-svc-40") && !fileUploadSetting.clusterTorchModel!.data) {
                     fileUploadSetting.clusterTorchModel!.data = await fileUploadSetting.clusterTorchModel!.file!.arrayBuffer()
                     fileUploadSetting.clusterTorchModel!.filename = await fileUploadSetting.clusterTorchModel!.file!.name
                 }
