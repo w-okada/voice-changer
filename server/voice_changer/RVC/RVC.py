@@ -77,7 +77,8 @@ class RVC:
         self.settings.configFile = config
 
         try:
-            models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(["hubert_base.pt"], suffix="",)
+            hubert_path = self.params["hubert"]
+            models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task([hubert_path], suffix="",)
             model = models[0]
             model.eval()
             # model = model.half()
