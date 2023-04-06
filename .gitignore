@@ -40,3 +40,5 @@ client/lib/worklet/dist
 
 docker/cudnn/
 
+server/hubert_base.pt
+start_trainer.sh
