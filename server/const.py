@@ -35,7 +35,7 @@ def setModelType(_modelType: str):
 
 
 def getFrontendPath():
-    frontend_path = os.path.join(sys._MEIPASS, "dist_v13") if hasattr(sys, "_MEIPASS") else "../client/demo_v13/dist"
+    frontend_path = os.path.join(sys._MEIPASS, "dist") if hasattr(sys, "_MEIPASS") else "../client/demo/dist"
     # if modelType == "MMVCv15":
 
     # elif modelType == "MMVCv13":
