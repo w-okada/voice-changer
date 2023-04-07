@@ -13,7 +13,7 @@ export const ModelUploadButtonRow = () => {
         const uploadButtonAction = appState.serverSetting.isUploading ? () => { } : onModelUploadClicked
         const uploadButtonLabel = appState.serverSetting.isUploading ? "wait..." : "upload"
         const uploadingStatus = appState.serverSetting.isUploading ?
-            appState.serverSetting.uploadProgress == 0 ? `loading model...(wait about 20sec)` : `uploading.... ${appState.serverSetting.uploadProgress}%` : ""
+            appState.serverSetting.uploadProgress == 0 ? `loading model...(wait about 20sec)` : `uploading.... ${appState.serverSetting.uploadProgress.toFixed(1)}%` : ""
 
 
         return (

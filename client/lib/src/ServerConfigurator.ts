@@ -110,7 +110,7 @@ export class ServerConfigurator {
     }
 
     // !! 注意!! hubertTorchModelは固定値で上書きされるため、設定しても効果ない。
-    loadModel = async (configFilename: string, pyTorchModelFilename: string | null, onnxModelFilename: string | null, clusterTorchModelFilename: string | null, hubertTorchModelFilename: string | null) => {
+    loadModel = async (configFilename: string, pyTorchModelFilename: string | null, onnxModelFilename: string | null, clusterTorchModelFilename: string | null, featureFilename: string | null, indexFilename: string | null) => {
         const url = this.serverUrl + "/load_model"
         const info = new Promise<ServerInfo>(async (resolve) => {
             const formData = new FormData();
@@ -118,7 +118,8 @@ export class ServerConfigurator {
             formData.append("onnxModelFilename", onnxModelFilename || "-");
             formData.append("configFilename", configFilename);
             formData.append("clusterTorchModelFilename", clusterTorchModelFilename || "-");
-            formData.append("hubertTorchModelFilename", hubertTorchModelFilename || "-");
+            formData.append("featureFilename", featureFilename || "-");
+            formData.append("indexFilename", indexFilename || "-");
 
             const request = new Request(url, {
                 method: 'POST',

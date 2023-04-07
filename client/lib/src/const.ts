@@ -78,6 +78,8 @@ export const ServerSettingKey = {
     "extraConvertSize": "extraConvertSize",
     "clusterInferRatio": "clusterInferRatio",
 
+    "indexRatio": "indexRatio",
+
     "inputSampleRate": "inputSampleRate",
 } as const
 export type ServerSettingKey = typeof ServerSettingKey[keyof typeof ServerSettingKey]
@@ -105,6 +107,8 @@ export type VoiceChangerServerSetting = {
     silentThreshold: number // so-vits-svc
     extraConvertSize: number// so-vits-svc
     clusterInferRatio: number // so-vits-svc
+
+    indexRatio: number // RVC
 
     inputSampleRate: InputSampleRate
 }
@@ -142,6 +146,8 @@ export const DefaultServerSetting_MMVCv15: ServerInfo = {
     extraConvertSize: 0,
     clusterInferRatio: 0,
 
+    indexRatio: 0,
+
     inputSampleRate: 24000,
 
     // 
@@ -173,6 +179,8 @@ export const DefaultServerSetting_MMVCv13: ServerInfo = {
     silentThreshold: 0,
     extraConvertSize: 0,
     clusterInferRatio: 0,
+
+    indexRatio: 0,
 
     inputSampleRate: 24000,
 
@@ -210,6 +218,8 @@ export const DefaultServerSetting_so_vits_svc_40: ServerInfo = {
     extraConvertSize: 1024 * 32,
     clusterInferRatio: 0.1,
 
+    indexRatio: 0,
+
     inputSampleRate: 24000,
 
     // 
@@ -246,6 +256,8 @@ export const DefaultServerSetting_so_vits_svc_40_c: ServerInfo = {
     extraConvertSize: 1024 * 32,
     clusterInferRatio: 0.1,
 
+    indexRatio: 0,
+
     inputSampleRate: 24000,
 
     // 
@@ -280,6 +292,8 @@ export const DefaultServerSetting_so_vits_svc_40v2: ServerInfo = {
     silentThreshold: 0.00001,
     extraConvertSize: 1024 * 32,
     clusterInferRatio: 0.1,
+
+    indexRatio: 0,
 
     inputSampleRate: 24000,
 
@@ -317,6 +331,8 @@ export const DefaultServerSetting_RVC: ServerInfo = {
     silentThreshold: 0.00001,
     extraConvertSize: 1024 * 32,
     clusterInferRatio: 0.1,
+
+    indexRatio: 0,
 
     inputSampleRate: 24000,
 

@@ -257,9 +257,16 @@ export class VoiceChangerClient {
     concatUploadedFile = (filename: string, chunkNum: number) => {
         return this.configurator.concatUploadedFile(filename, chunkNum)
     }
-    loadModel = (configFilename: string, pyTorchModelFilename: string | null, onnxModelFilename: string | null, clusterTorchModelFilename: string | null, hubertTorchModelFilename: string | null) => {
+    loadModel = (
+        configFilename: string,
+        pyTorchModelFilename: string | null,
+        onnxModelFilename: string | null,
+        clusterTorchModelFilename: string | null,
+        featureFilename: string | null,
+        indexFilename: string | null,
+    ) => {
         // !! 注意!! hubertTorchModelは固定値で上書きされるため、設定しても効果ない。
-        return this.configurator.loadModel(configFilename, pyTorchModelFilename, onnxModelFilename, clusterTorchModelFilename, hubertTorchModelFilename)
+        return this.configurator.loadModel(configFilename, pyTorchModelFilename, onnxModelFilename, clusterTorchModelFilename, featureFilename, indexFilename)
     }
 
     //##  Worklet ##//

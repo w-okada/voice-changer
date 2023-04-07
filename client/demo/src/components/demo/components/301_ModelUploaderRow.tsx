@@ -5,6 +5,8 @@ import { ONNXSelectRow } from "./301-2_ONNXSelectRow"
 import { PyTorchSelectRow } from "./301-3_PyTorchSelectRow"
 import { CorrespondenceSelectRow } from "./301-4_CorrespondenceSelectRow"
 import { PyTorchClusterSelectRow } from "./301-5_PyTorchClusterSelectRow"
+import { FeatureSelectRow } from "./301-6_FeatureSelectRow"
+import { IndexSelectRow } from "./301-7_IndexSelectRow"
 import { ModelUploadButtonRow } from "./301-9_ModelUploadButtonRow"
 
 export type ModelUploaderRowProps = {
@@ -13,6 +15,9 @@ export type ModelUploaderRowProps = {
     showPyTorch: boolean
     showCorrespondence: boolean
     showPyTorchCluster: boolean
+
+    showFeature: boolean
+    showIndex: boolean
 
     defaultEnablePyTorch: boolean
 }
@@ -44,6 +49,8 @@ export const ModelUploaderRow = (props: ModelUploaderRowProps) => {
                 {props.showPyTorch && guiState.showPyTorchModelUpload ? <PyTorchSelectRow /> : <></>}
                 {props.showCorrespondence ? <CorrespondenceSelectRow /> : <></>}
                 {props.showPyTorchCluster ? <PyTorchClusterSelectRow /> : <></>}
+                {props.showFeature ? <FeatureSelectRow /> : <></>}
+                {props.showIndex ? <IndexSelectRow /> : <></>}
                 <ModelUploadButtonRow />
             </>
         )

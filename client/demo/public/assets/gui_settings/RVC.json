@@ -34,11 +34,14 @@
             {
                 "name": "modelUploader",
                 "options": {
-                    "showConfig": true,
+                    "showConfig": false,
                     "showOnnx": true,
                     "showPyTorch": true,
                     "showCorrespondence": false,
                     "showPyTorchCluster": false,
+
+                    "showFeature": true,
+                    "showIndex": true,
 
                     "defaultEnablePyTorch": true
                 }
@@ -84,12 +87,6 @@
         ],
         "speakerSetting": [
             {
-                "name": "srcId",
-                "options": {
-                    "showF0": true
-                }
-            },
-            {
                 "name": "dstId",
                 "options": {
                     "showF0": true,
@@ -97,19 +94,11 @@
                 }
             },
             {
-                "name": "editSpeakerIdMapping",
-                "options": {}
-            },
-            {
-                "name": "f0Factor",
-                "options": {}
-            },
-            {
                 "name": "tune",
                 "options": {}
             },
             {
-                "name": "clusterInferRatio",
+                "name": "indexRatio",
                 "options": {}
             },
             {

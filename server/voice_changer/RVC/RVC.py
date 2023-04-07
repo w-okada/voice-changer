@@ -1,6 +1,7 @@
 import sys
 import os
 import resampy
+from voice_changer.RVC.ModelWrapper import ModelWrapper
 
 # avoiding parse arg error in RVC
 sys.argv = ["MMVCServerSIO.py"]
@@ -50,13 +51,16 @@ class RVCSettings():
     onnxModelFile: str = ""
     configFile: str = ""
 
+    indexRatio: float = 0
+    isHalf: int = 0
+
     speakers: dict[str, int] = field(
         default_factory=lambda: {}
     )
 
     # ↓mutableな物だけ列挙
     intData = ["gpu", "dstId", "tran", "predictF0", "extraConvertSize"]
-    floatData = ["noiceScale", "silentThreshold", "clusterInferRatio"]
+    floatData = ["noiceScale", "silentThreshold", "indexRatio"]
     strData = ["framework", "f0Detector"]
 
 
@@ -72,18 +76,22 @@ class RVC:
         self.params = params
         print("RVC initialization: ", params)
 
-    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, clusterTorchModel: str = None):
-        self.device = torch.device("cuda", index=self.settings.gpu)
+    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, feature_file: str = None, index_file: str = None):
         self.settings.configFile = config
+        self.feature_file = feature_file
+        self.index_file = index_file
 
+        print("featurefile", feature_file, index_file)
+
+        self.tgt_sr = 40000
         try:
             hubert_path = self.params["hubert"]
             models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task([hubert_path], suffix="",)
             model = models[0]
             model.eval()
-            # model = model.half()
+            if self.settings.isHalf:
+                model = model.half()
             self.hubert_model = model
-            self.hubert_model = self.hubert_model.to(self.device)
 
         except Exception as e:
             print("EXCEPTION during loading hubert/contentvec model", e)
@@ -97,22 +105,17 @@ class RVC:
         if pyTorch_model_file != None:
             cpt = torch.load(pyTorch_model_file, map_location="cpu")
             self.tgt_sr = cpt["config"][-1]
-            is_half = False
-            net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=is_half)
+            net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=self.settings.isHalf)
             net_g.eval()
             net_g.load_state_dict(cpt["weight"], strict=False)
-            # net_g = net_g.half()
+            if self.settings.isHalf:
+                net_g = net_g.half()
             self.net_g = net_g
-            self.net_g = self.net_g.to(self.device)
 
         # ONNXモデル生成
         if onnx_model_file != None:
-            ort_options = onnxruntime.SessionOptions()
-            ort_options.intra_op_num_threads = 8
-            self.onnx_session = onnxruntime.InferenceSession(
-                onnx_model_file,
-                providers=providers
-            )
+            # self.onnx_session = ModelWrapper(onnx_model_file, is_half=True)
+            self.onnx_session = ModelWrapper(onnx_model_file, is_half=self.settings.isHalf)
             # input_info = self.onnx_session.get_inputs()
             # for i in input_info:
             #     print("input", i)
@@ -187,16 +190,54 @@ class RVC:
             convertSize = convertSize + (128 - (convertSize % 128))
 
         self.audio_buffer = self.audio_buffer[-1 * convertSize:]  # 変換対象の部分だけ抽出
+        print("convert size", convertSize, self.audio_buffer.shape)
 
         crop = self.audio_buffer[-1 * (inputSize + crossfadeSize):-1 * (crossfadeSize)]
         rms = np.sqrt(np.square(crop).mean(axis=0))
         vol = max(rms, self.prevVol * 0.0)
         self.prevVol = vol
 
+        print("audio len 01,", len(self.audio_buffer))
         return (self.audio_buffer, convertSize, vol)
 
     def _onnx_inference(self, data):
-        pass
+        if hasattr(self, "onnx_session") == False or self.onnx_session == None:
+            print("[Voice Changer] No onnx session.")
+            return np.zeros(1).astype(np.int16)
+
+        if self.settings.gpu < 0 or self.gpu_num == 0:
+            dev = torch.device("cpu")
+        else:
+            dev = torch.device("cuda", index=self.settings.gpu)
+
+        self.hubert_model = self.hubert_model.to(dev)
+
+        audio = data[0]
+        convertSize = data[1]
+        vol = data[2]
+
+        audio = resampy.resample(audio, self.tgt_sr, 16000)
+
+        if vol < self.settings.silentThreshold:
+            return np.zeros(convertSize).astype(np.int16)
+
+        with torch.no_grad():
+            vc = VC(self.tgt_sr, dev, self.settings.isHalf)
+            sid = 0
+            times = [0, 0, 0]
+            f0_up_key = self.settings.tran
+            f0_method = "pm" if self.settings.f0Detector == "dio" else "harvest"
+            file_index = self.index_file if self.index_file != None else ""
+            file_big_npy = self.feature_file if self.feature_file != None else ""
+            index_rate = self.settings.indexRatio
+            if_f0 = 1
+            f0_file = None
+
+            audio_out = vc.pipeline(self.hubert_model, self.onnx_session, sid, audio, times, f0_up_key, f0_method,
+                                    file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file)
+            result = audio_out * np.sqrt(vol)
+
+        return result
 
     def _pyTorch_inference(self, data):
         if hasattr(self, "net_g") == False or self.net_g == None:
@@ -208,28 +249,32 @@ class RVC:
         else:
             dev = torch.device("cuda", index=self.settings.gpu)
 
+        self.hubert_model = self.hubert_model.to(dev)
+        self.net_g = self.net_g.to(dev)
+
         audio = data[0]
         convertSize = data[1]
         vol = data[2]
-
+        print("audio len 02,", len(audio))
         audio = resampy.resample(audio, self.tgt_sr, 16000)
+        print("audio len 03,", len(audio))
 
         if vol < self.settings.silentThreshold:
             return np.zeros(convertSize).astype(np.int16)
 
-        is_half = False
         with torch.no_grad():
-            vc = VC(self.tgt_sr, dev, is_half)
+            vc = VC(self.tgt_sr, dev, self.settings.isHalf)
             sid = 0
             times = [0, 0, 0]
             f0_up_key = self.settings.tran
-            f0_method = "pm"
-            file_index = ""
-            file_big_npy = ""
-            index_rate = 1
+            f0_method = "pm" if self.settings.f0Detector == "dio" else "harvest"
+            file_index = self.index_file if self.index_file != None else ""
+            file_big_npy = self.feature_file if self.feature_file != None else ""
+            index_rate = self.settings.indexRatio
             if_f0 = 1
             f0_file = None
 
+            print("audio len 0,", len(audio))
             audio_out = vc.pipeline(self.hubert_model, self.net_g, sid, audio, times, f0_up_key, f0_method,
                                     file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file)
             result = audio_out * np.sqrt(vol)

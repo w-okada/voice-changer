@@ -33,6 +33,7 @@ import { CrossFadeOffsetRateRow, CrossFadeOffsetRateRowProps } from "./component
 import { CrossFadeEndRateRow, CrossFadeEndRateRowProps } from "./components/807_CrossFadeEndRateRow"
 import { DownSamplingModeRow, DownSamplingModeRowProps } from "./components/808_DownSamplingModeRow"
 import { TrancateNumTresholdRow, TrancateNumTresholdRowProps } from "./components/809_TrancateNumTresholdRow"
+import { IndexRatioRow, IndexRatioRowProps } from "./components/609_IndexRatioRow"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
 
@@ -78,6 +79,9 @@ const initialize = () => {
     addToCatalog("clusterInferRatio", (props: ClusterInferRatioRowProps) => { return <ClusterInferRatioRow {...props} /> })
     addToCatalog("noiseScale", (props: NoiseScaleRowProps) => { return <NoiseScaleRow {...props} /> })
     addToCatalog("silentThreshold", (props: SilentThresholdRowProps) => { return <SilentThresholdRow {...props} /> })
+    addToCatalog("indexRatio", (props: IndexRatioRowProps) => { return <IndexRatioRow {...props} /> })
+
+
 
     addToCatalog("inputChunkNum", (props: InputChunkNumRowProps) => { return <InputChunkNumRow {...props} /> })
     addToCatalog("extraDataLength", (props: ExtraDataLengthRowProps) => { return <ExtraDataLengthRow {...props} /> })
