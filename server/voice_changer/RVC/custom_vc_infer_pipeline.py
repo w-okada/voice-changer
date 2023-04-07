@@ -17,7 +17,6 @@ class VC(object):
         self.sr = 16000  # hubert输入采样率
         self.window = 160  # 每帧点数
         self.t_pad = self.sr * x_pad  # 每条前后pad时间
-        print("INITIALIZE", self.sr, x_pad, self.t_pad)
         self.t_pad_tgt = tgt_sr * x_pad
         self.t_pad2 = self.t_pad * 2
         self.t_query = self.sr * x_query  # 查询切点前后查询时间
@@ -28,10 +27,8 @@ class VC(object):
 
     def get_f0(self, x, p_len, f0_up_key, f0_method, inp_f0=None):
         time_step = self.window / self.sr * 1000
-        # f0_min = 50
-        # f0_max = 1100
-        f0_min = 70
-        f0_max = 1000
+        f0_min = 50
+        f0_max = 1100
         f0_mel_min = 1127 * np.log(1 + f0_min / 700)
         f0_mel_max = 1127 * np.log(1 + f0_max / 700)
         if (f0_method == "pm"):
@@ -69,7 +66,6 @@ class VC(object):
         return f0_coarse, f0bak  # 1-0
 
     def vc(self, model, net_g, sid, audio0, pitch, pitchf, times, index, big_npy, index_rate):  # ,file_index,file_big_npy
-        print("vc audio len 1,", len(audio0))
         feats = torch.from_numpy(audio0)
         if (self.is_half == True):
             feats = feats.half()
@@ -142,13 +138,6 @@ class VC(object):
         audio_pad = np.pad(audio, (self.window // 2, self.window // 2), mode='reflect')
         print("audio_pad len 1,", len(audio_pad))
         opt_ts = []
-        # if (audio_pad.shape[0] > self.t_max):
-        #     audio_sum = np.zeros_like(audio)
-        #     for i in range(self.window):
-        #         audio_sum += audio_pad[i:i - self.window]
-        #     for t in range(self.t_center, audio.shape[0], self.t_center):
-        #         opt_ts.append(t - self.t_query + np.where(np.abs(audio_sum[t - self.t_query:t + self.t_query])
-        #                       == np.abs(audio_sum[t - self.t_query:t + self.t_query]).min())[0][0])
 
         print("audio_pad len 2,", len(audio_pad), opt_ts)
 
@@ -159,19 +148,7 @@ class VC(object):
         audio_pad = np.pad(audio, (self.t_pad, self.t_pad), mode='reflect')
         p_len = audio_pad.shape[0] // self.window
         inp_f0 = None
-        print("audio_pad len 3,", len(audio_pad), self.t_pad, len(audio))
 
-        # if (hasattr(f0_file, 'name') == True):
-        #     print("load pitch !!!!!!!!!!!!", f0_file.name)
-        #     try:
-        #         with open(f0_file.name, "r")as f:
-        #             lines = f.read().strip("\n").split("\n")
-        #         inp_f0 = []
-        #         for line in lines:
-        #             inp_f0.append([float(i)for i in line.split(",")])
-        #         inp_f0 = np.array(inp_f0, dtype="float32")
-        #     except:
-        #         traceback.print_exc()
         sid = torch.tensor(sid, device=self.device).unsqueeze(0).long()
         pitch, pitchf = None, None
         if (if_f0 == 1):
@@ -183,26 +160,13 @@ class VC(object):
             pitchf = torch.tensor(pitchf, device=self.device).unsqueeze(0).float()
         t2 = ttime()
         times[1] += (t2 - t1)
-        print("opt start")
-        # for t in opt_ts:
-        #     print("opt exec")
-        #     t = t // self.window * self.window
-        #     if (if_f0 == 1):
-        #         audio_opt.append(self.vc(model, net_g, sid, audio_pad[s:t + self.t_pad2 + self.window], pitch[:, s // self.window:(
-        #             t + self.t_pad2) // self.window], pitchf[:, s // self.window:(t + self.t_pad2) // self.window], times, index, big_npy, index_rate)[self.t_pad_tgt:-self.t_pad_tgt])
-        #     else:
-        #         audio_opt.append(self.vc(model, net_g, sid, audio_pad[s:t + self.t_pad2 + self.window],
-        #                          None, None, times, index, big_npy, index_rate)[self.t_pad_tgt:-self.t_pad_tgt])
-        # s = t
-        print("opt end")
-        if (if_f0 == 1):
-            print("TTTTT", t, self.t_pad_tgt)
-            # audio_opt.append(self.vc(model, net_g, sid, audio_pad[t:], pitch[:, t // self.window:]if t is not None else pitch, pitchf[:,
-            #                  t // self.window:]if t is not None else pitchf, times, index, big_npy, index_rate)[self.t_pad_tgt:-self.t_pad_tgt])
+        if self.t_pad_tgt == 0:
             audio_opt.append(self.vc(model, net_g, sid, audio_pad[t:], pitch[:, t // self.window:]if t is not None else pitch, pitchf[:,
-                             t // self.window:]if t is not None else pitchf, times, index, big_npy, index_rate))
+                                                                                                                                      t // self.window:]if t is not None else pitchf, times, index, big_npy, index_rate))
         else:
-            audio_opt.append(self.vc(model, net_g, sid, audio_pad[t:], None, None, times, index, big_npy, index_rate)[self.t_pad_tgt:-self.t_pad_tgt])
+            audio_opt.append(self.vc(model, net_g, sid, audio_pad[t:], pitch[:, t // self.window:]if t is not None else pitch, pitchf[:,
+                                                                                                                                      t // self.window:]if t is not None else pitchf, times, index, big_npy, index_rate)[self.t_pad_tgt:-self.t_pad_tgt])
+
         audio_opt = np.concatenate(audio_opt)
         del pitch, pitchf, sid
         torch.cuda.empty_cache()
