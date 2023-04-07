@@ -9,7 +9,8 @@ export const F0DetectorRow = (_props: F0DetectorRowProps) => {
     const appState = useAppState()
 
     const f0DetectorRow = useMemo(() => {
-        const desc = { "harvest": "High Quality", "dio": "Light Weight" }
+        const desc = { "harvest": "harvest(High Quality)", "dio": "dio/pm(Light Weight)" }
+
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1 ">F0 Detector</div>
@@ -20,7 +21,7 @@ export const F0DetectorRow = (_props: F0DetectorRowProps) => {
                         {
                             Object.values(F0Detector).map(x => {
                                 //@ts-ignore
-                                return <option key={x} value={x}>{x}({desc[x]})</option>
+                                return <option key={x} value={x}>{desc[x]}</option>
                             })
                         }
                     </select>
