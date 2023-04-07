@@ -363,7 +363,7 @@ export const DefaultServerSetting_RVC: ServerInfo = {
     rvcQuality: 0,
     modelSamplingRate: 48000,
 
-    inputSampleRate: 24000,
+    inputSampleRate: 48000,
 
     // 
     status: "ok",
