@@ -180,14 +180,12 @@ class RVC:
             convertSize = convertSize + (128 - (convertSize % 128))
 
         self.audio_buffer = self.audio_buffer[-1 * convertSize:]  # 変換対象の部分だけ抽出
-        print("convert size", convertSize, self.audio_buffer.shape)
 
         crop = self.audio_buffer[-1 * (inputSize + crossfadeSize):-1 * (crossfadeSize)]
         rms = np.sqrt(np.square(crop).mean(axis=0))
         vol = max(rms, self.prevVol * 0.0)
         self.prevVol = vol
 
-        print("audio len 01,", len(self.audio_buffer))
         return (self.audio_buffer, convertSize, vol)
 
     def _onnx_inference(self, data):
@@ -212,7 +210,9 @@ class RVC:
             return np.zeros(convertSize).astype(np.int16)
 
         with torch.no_grad():
-            vc = VC(self.settings.modelSamplingRate, dev, self.is_half)
+            repeat = 3 if self.is_half else 1
+            repeat *= self.settings.rvcQuality  # 0 or 3
+            vc = VC(self.settings.modelSamplingRate, dev, self.is_half, repeat)
             sid = 0
             times = [0, 0, 0]
             f0_up_key = self.settings.tran
@@ -245,9 +245,7 @@ class RVC:
         audio = data[0]
         convertSize = data[1]
         vol = data[2]
-        print("audio len 02,", len(audio))
         audio = resampy.resample(audio, self.settings.modelSamplingRate, 16000)
-        print("audio len 03,", len(audio))
 
         if vol < self.settings.silentThreshold:
             return np.zeros(convertSize).astype(np.int16)
@@ -266,7 +264,6 @@ class RVC:
             if_f0 = 1
             f0_file = None
 
-            print("audio len 0,", len(audio))
             audio_out = vc.pipeline(self.hubert_model, self.net_g, sid, audio, times, f0_up_key, f0_method,
                                     file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file)
             result = audio_out * np.sqrt(vol)

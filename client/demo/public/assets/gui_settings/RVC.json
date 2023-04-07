@@ -106,10 +106,6 @@
                 "options": {}
             },
             {
-                "name": "noiseScale",
-                "options": {}
-            },
-            {
                 "name": "silentThreshold",
                 "options": {}
             }

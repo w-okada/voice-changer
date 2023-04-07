@@ -76,7 +76,6 @@ class VC(object):
         assert feats.dim() == 1, feats.dim()
         feats = feats.view(1, -1)
         padding_mask = torch.BoolTensor(feats.shape).to(self.device).fill_(False)
-        print("padding_mask", padding_mask)
 
         inputs = {
             "source": feats.to(self.device),
@@ -98,9 +97,8 @@ class VC(object):
                 npy = npy.astype("float16")
             feats = torch.from_numpy(npy).unsqueeze(0).to(self.device) * index_rate + (1 - index_rate) * feats
 
-        print("feats shape1", feats.shape)
         feats = F.interpolate(feats.permute(0, 2, 1), scale_factor=2).permute(0, 2, 1)
-        print("feats shape2", feats.shape)
+
         t1 = ttime()
         p_len = audio0.shape[0] // self.window
         if (feats.shape[1] < p_len):
@@ -109,23 +107,18 @@ class VC(object):
                 pitch = pitch[:, :p_len]
                 pitchf = pitchf[:, :p_len]
         p_len = torch.tensor([p_len], device=self.device).long()
+
         with torch.no_grad():
-            print("vc audio len feat 1,", feats.shape)
-            if (pitch != None and pitchf != None):
-                print("vc audio len feat use pitch!!!!!!!,", feats.shape)
-                audio1 = (net_g.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0] * 32768).data.cpu().float().numpy().astype(np.int16)
-            else:
-                audio1 = (net_g.infer(feats, p_len, sid)[0][0, 0] * 32768).data.cpu().float().numpy().astype(np.int16)
+            audio1 = (net_g.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0] * 32768).data.cpu().float().numpy().astype(np.int16)
+
         del feats, p_len, padding_mask
         torch.cuda.empty_cache()
         t2 = ttime()
         times[0] += (t1 - t0)
         times[2] += (t2 - t1)
-        print("vc audio return", len(audio1), audio1)
         return audio1
 
     def pipeline(self, model, net_g, sid, audio, times, f0_up_key, f0_method, file_index, file_big_npy, index_rate, if_f0, f0_file=None):
-        print("audio len 1,", len(audio))
         if (file_big_npy != "" and file_index != "" and os.path.exists(file_big_npy) == True and os.path.exists(file_index) == True and index_rate != 0):
             try:
                 index = faiss.read_index(file_index)
@@ -135,13 +128,7 @@ class VC(object):
                 index = big_npy = None
         else:
             index = big_npy = None
-        audio_pad = np.pad(audio, (self.window // 2, self.window // 2), mode='reflect')
-        print("audio_pad len 1,", len(audio_pad))
-        opt_ts = []
 
-        print("audio_pad len 2,", len(audio_pad), opt_ts)
-
-        s = 0
         audio_opt = []
         t = None
         t1 = ttime()
@@ -153,7 +140,6 @@ class VC(object):
         pitch, pitchf = None, None
         if (if_f0 == 1):
             pitch, pitchf = self.get_f0(audio_pad, p_len, f0_up_key, f0_method, inp_f0)
-            print("pitch!", pitch)
             pitch = pitch[:p_len]
             pitchf = pitchf[:p_len]
             pitch = torch.tensor(pitch, device=self.device).unsqueeze(0).long()
@@ -170,5 +156,4 @@ class VC(object):
         audio_opt = np.concatenate(audio_opt)
         del pitch, pitchf, sid
         torch.cuda.empty_cache()
-        print("result", audio_opt)
         return audio_opt
