@@ -2,65 +2,172 @@
     "type": "demo",
     "id": "so-vits-svc-40",
     "front": {
-        "title": {
-            "mainTitle": "Realtime Voice Changer Client",
-            "subTitle": "for so-vits-svc-40",
-            "lineNum": 1
-        },
-        "serverControl": {
-            "modelInfoEnable": true
-        },
-        "modelSetting": {
-            "ONNXEnable": false,
-            "pyTorchEnable": true,
-            "MMVCCorrespondense": false,
-            "pyTorchClusterEnable": true,
-            "showPyTorchDefault": true,
-            "frameworkEnable": true,
-            "modelUploaderEnable": true,
-            "configRow": true,
-            "uploadRow": true
-        },
-        "deviceSetting": {},
-        "qualityControl": {
-            "F0DetectorEnable": true,
-            "analyzerRow": true,
-            "samplingRow": true,
-            "playRow": true
-        },
-        "speakerSetting": {
-            "srcIdEnable": false,
-            "dstIdEnable": true,
-            "editSpeakerIdMappingEnable": false,
-            "f0FactorEnable": false,
-            "tuningEnable": true,
-            "clusterInferRationEnable": true,
-            "noiseScaleEnable": true,
-            "silentThresholdEnable": true
-        },
-        "converterSetting": {
-            "extraDataLengthEnable": true
-        },
-        "advancedSetting": {
-            "serverURLEnable": true,
-            "protocolEnable": true,
-            "sampleRateEnable": true,
-            "sendingSampleRateEnable": true,
-            "crossFadeOverlapSizeEnable": true,
-            "crossFadeOffsetRateEnable": true,
-            "crossFadeEndRateEnable": true,
-            "downSamplingModeEnable": true,
-            "trancateNumTresholdEnable": true
-        }
+        "title": [
+            {
+                "name": "title",
+                "options": {
+                    "mainTitle": "Realtime Voice Changer Client",
+                    "subTitle": "for so-vits-svc-40",
+                    "lineNum": 1
+                }
+            },
+            {
+                "name": "clearSetting",
+                "options": {}
+            }
+        ],
+        "serverControl": [
+            {
+                "name": "startButton",
+                "options": {}
+            },
+            {
+                "name": "performance",
+                "options": {}
+            },
+            {
+                "name": "serverInfo",
+                "options": {}
+            }
+        ],
+        "modelSetting": [
+            {
+                "name": "modelUploader",
+                "options": {
+                    "showConfig": true,
+                    "showOnnx": false,
+                    "showPyTorch": true,
+                    "showCorrespondence": false,
+                    "showPyTorchCluster": true,
+
+                    "defaultEnablePyTorch": true
+                }
+            },
+            {
+                "name": "framework",
+                "options": {
+                    "showFramework": true
+                }
+            }
+        ],
+        "deviceSetting": [
+            {
+                "name": "audioInput",
+                "options": {}
+            },
+            {
+                "name": "audioOutput",
+                "options": {}
+            }
+        ],
+        "qualityControl": [
+            {
+                "name": "noiseControl",
+                "options": {}
+            },
+            {
+                "name": "gainControl",
+                "options": {}
+            },
+            {
+                "name": "f0Detector",
+                "options": {}
+            },
+            {
+                "name": "divider",
+                "options": {}
+            },
+            {
+                "name": "analyzer",
+                "options": {}
+            }
+        ],
+        "speakerSetting": [
+            {
+                "name": "dstId",
+                "options": {
+                    "showF0": false,
+                    "useServerInfo": true
+                }
+            },
+            {
+                "name": "tune",
+                "options": {}
+            },
+            {
+                "name": "clusterInferRatio",
+                "options": {}
+            },
+            {
+                "name": "noiseScale",
+                "options": {}
+            },
+            {
+                "name": "silentThreshold",
+                "options": {}
+            }
+        ],
+        "converterSetting": [
+            {
+                "name": "inputChunkNum",
+                "options": {}
+            },
+            {
+                "name": "extraDataLength",
+                "options": {}
+            },
+            {
+                "name": "gpu",
+                "options": {}
+            }
+        ],
+        "advancedSetting": [
+            {
+                "name": "serverURL",
+                "options": {}
+            },
+            {
+                "name": "protocol",
+                "options": {}
+            },
+            {
+                "name": "sampleRate",
+                "options": {}
+            },
+            {
+                "name": "sendingSampleRate",
+                "options": {}
+            },
+            {
+                "name": "crossFadeOverlapSize",
+                "options": {}
+            },
+            {
+                "name": "crossFadeOffsetRate",
+                "options": {}
+            },
+            {
+                "name": "crossFadeEndRate",
+                "options": {}
+            },
+            {
+                "name": "downSamplingMode",
+                "options": {}
+            },
+            {
+                "name": "trancateNumThreshold",
+                "options": {}
+            }
+        ]
     },
 
     "dialogs": {
         "license": [
             {
-                "title": "c",
-                "auther": "c",
-                "contact": "b",
-                "url": "a",
+                "title": "svc-develop-team",
+                "auther": "",
+                "contact": "",
+                "url": "https://github.com/svc-develop-team/so-vits-svc",
                 "license": "MIT"
             }
         ]

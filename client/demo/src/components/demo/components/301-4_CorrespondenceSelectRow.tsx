@@ -25,7 +25,7 @@ export const CorrespondenceSelectRow = () => {
                     return cor
                 }
             }).filter(x => { return x != null }) as Correspondence[]
-            console.log(cors)
+            console.log("recogninzed corresponding lines:", cors)
             appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, correspondences: cors })
 
         }
@@ -47,7 +47,7 @@ export const CorrespondenceSelectRow = () => {
                 </div>
             </div>
         )
-    }, [appState.clientSetting.clientSetting.correspondences])
+    }, [appState.clientSetting.clientSetting, appState.clientSetting.updateClientSetting])
 
     return CorrespondenceSelectRow
 }

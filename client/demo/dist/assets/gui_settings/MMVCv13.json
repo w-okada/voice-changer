@@ -2,65 +2,158 @@
     "type": "demo",
     "id": "MMVCv13",
     "front": {
-        "title": {
-            "mainTitle": "Realtime Voice Changer Client",
-            "subTitle": "for MMVC v.1.3",
-            "lineNum": 1
-        },
-        "serverControl": {
-            "modelInfoEnable": true
-        },
-        "modelSetting": {
-            "ONNXEnable": true,
-            "pyTorchEnable": true,
-            "MMVCCorrespondense": false,
-            "pyTorchClusterEnable": false,
-            "showPyTorchDefault": false,
-            "frameworkEnable": true,
-            "modelUploaderEnable": true,
-            "configRow": true,
-            "uploadRow": true
-        },
-        "deviceSetting": {},
-        "qualityControl": {
-            "F0DetectorEnable": false,
-            "analyzerRow": true,
-            "samplingRow": true,
-            "playRow": true
-        },
-        "speakerSetting": {
-            "srcIdEnable": true,
-            "dstIdEnable": true,
-            "editSpeakerIdMappingEnable": true,
-            "f0FactorEnable": false,
-            "tuningEnable": false,
-            "clusterInferRationEnable": false,
-            "noiseScaleEnable": false,
-            "silentThresholdEnable": false
-        },
-        "converterSetting": {
-            "extraDataLengthEnable": false
-        },
-        "advancedSetting": {
-            "serverURLEnable": true,
-            "protocolEnable": true,
-            "sampleRateEnable": true,
-            "sendingSampleRateEnable": true,
-            "crossFadeOverlapSizeEnable": true,
-            "crossFadeOffsetRateEnable": true,
-            "crossFadeEndRateEnable": true,
-            "downSamplingModeEnable": true,
-            "trancateNumTresholdEnable": true
-        }
+        "title": [
+            {
+                "name": "title",
+                "options": {
+                    "mainTitle": "Realtime Voice Changer Client",
+                    "subTitle": "for MMVC v.1.3",
+                    "lineNum": 1
+                }
+            },
+            {
+                "name": "clearSetting",
+                "options": {}
+            }
+        ],
+        "serverControl": [
+            {
+                "name": "startButton",
+                "options": {}
+            },
+            {
+                "name": "performance",
+                "options": {}
+            },
+            {
+                "name": "serverInfo",
+                "options": {}
+            }
+        ],
+        "modelSetting": [
+            {
+                "name": "modelUploader",
+                "options": {
+                    "showConfig": true,
+                    "showOnnx": true,
+                    "showPyTorch": true,
+                    "showCorrespondence": false,
+                    "showPyTorchCluster": false,
+
+                    "defaultEnablePyTorch": false
+                }
+            },
+            {
+                "name": "framework",
+                "options": {
+                    "showFramework": true
+                }
+            }
+        ],
+        "deviceSetting": [
+            {
+                "name": "audioInput",
+                "options": {}
+            },
+            {
+                "name": "audioOutput",
+                "options": {}
+            }
+        ],
+        "qualityControl": [
+            {
+                "name": "noiseControl",
+                "options": {}
+            },
+            {
+                "name": "gainControl",
+                "options": {}
+            },
+            {
+                "name": "divider",
+                "options": {}
+            },
+            {
+                "name": "analyzer",
+                "options": {}
+            }
+        ],
+        "speakerSetting": [
+            {
+                "name": "srcId",
+                "options": {
+                    "showF0": false
+                }
+            },
+            {
+                "name": "dstId",
+                "options": {
+                    "showF0": false,
+                    "useServerInfo": false
+                }
+            },
+            {
+                "name": "editSpeakerIdMapping",
+                "options": {}
+            }
+        ],
+        "converterSetting": [
+            {
+                "name": "inputChunkNum",
+                "options": {}
+            },
+            {
+                "name": "gpu",
+                "options": {}
+            }
+        ],
+        "advancedSetting": [
+            {
+                "name": "serverURL",
+                "options": {}
+            },
+            {
+                "name": "protocol",
+                "options": {}
+            },
+            {
+                "name": "sampleRate",
+                "options": {}
+            },
+            {
+                "name": "sendingSampleRate",
+                "options": {}
+            },
+            {
+                "name": "crossFadeOverlapSize",
+                "options": {}
+            },
+            {
+                "name": "crossFadeOffsetRate",
+                "options": {}
+            },
+            {
+                "name": "crossFadeEndRate",
+                "options": {}
+            },
+            {
+                "name": "downSamplingMode",
+                "options": {}
+            },
+            {
+                "name": "trancateNumThreshold",
+                "options": {}
+            }
+        ]
     },
 
     "dialogs": {
         "license": [
             {
-                "title": "c",
-                "auther": "c",
-                "contact": "b",
-                "url": "a",
+                "title": "MMVC",
+                "auther": "isletennos",
+                "contact": "",
+                "url": "https://github.com/isletennos/MMVC_Trainer",
                 "license": "MIT"
             }
         ]
