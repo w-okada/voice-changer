@@ -1,14 +1,13 @@
 import React, { useMemo } from "react"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "../101_HeaderButton"
 import { useGuiState } from "./001_GuiStateProvider"
-import { AudioInputRow } from "./401_AudioInputRow"
-import { AudioInputMediaRow } from "./402_AudioInputMediaRow"
-import { AudioOutputRow } from "./403_AudioOutputRow"
-import { AudioOutputRecordRow } from "./404_AudioOutputRecordRow"
-
+import { generateComponent } from "./002_ComponentGenerator"
 
 export const DeviceSetting = () => {
     const guiState = useGuiState()
+    const { appGuiSettingState } = useAppRoot()
+    const componentSettings = appGuiSettingState.appGuiSetting.front.deviceSetting
 
     const accodionButton = useMemo(() => {
         const accodionButtonProps: HeaderButtonProps = {
@@ -23,6 +22,10 @@ export const DeviceSetting = () => {
     }, []);
 
     const deviceSetting = useMemo(() => {
+        const components = componentSettings.map((x, index) => {
+            const c = generateComponent(x.name, x.options)
+            return <div key={`${x.name}_${index}`}>{c}</div>
+        })
 
         return (
             <>
@@ -39,10 +42,7 @@ export const DeviceSetting = () => {
                     </div>
 
                     <div className="partition-content">
-                        <AudioInputRow />
-                        <AudioInputMediaRow />
-                        <AudioOutputRow />
-                        <AudioOutputRecordRow />
+                        {components}
                     </div>
                 </div>
             </>

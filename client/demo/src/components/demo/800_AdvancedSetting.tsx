@@ -1,19 +1,13 @@
 import React, { useMemo } from "react"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "../101_HeaderButton"
 import { useGuiState } from "./001_GuiStateProvider"
-import { ServerURLRow } from "./801_ServerURLRow"
-import { ProtocolRow } from "./802_ProtocolRow"
-import { SampleRateRow } from "./803_SampleRateRow"
-import { SendingSampleRateRow } from "./804_SendingSampleRateRow"
-import { CrossFadeOverlapSizeRow } from "./805_CrossFadeOverlapSizeRow"
-import { CrossFadeOffsetRateRow } from "./806_CrossFadeOffsetRateRow"
-import { CrossFadeEndRateRow } from "./807_CrossFadeEndRateRow"
-import { DownSamplingModeRow } from "./808_DownSamplingModeRow"
-import { TrancateNumTresholdRow } from "./809_TrancateNumTresholdRow"
+import { generateComponent } from "./002_ComponentGenerator"
 
 export const AdvancedSetting = () => {
     const guiState = useGuiState()
-
+    const { appGuiSettingState } = useAppRoot()
+    const componentSettings = appGuiSettingState.appGuiSetting.front.advancedSetting
     const accodionButton = useMemo(() => {
         const accodionButtonProps: HeaderButtonProps = {
             stateControlCheckbox: guiState.stateControls.openAdvancedSettingCheckbox,
@@ -27,7 +21,10 @@ export const AdvancedSetting = () => {
     }, []);
 
     const deviceSetting = useMemo(() => {
-
+        const components = componentSettings.map((x, index) => {
+            const c = generateComponent(x.name, x.options)
+            return <div key={`${x.name}_${index}`}>{c}</div>
+        })
         return (
             <>
                 {guiState.stateControls.openAdvancedSettingCheckbox.trigger}
@@ -43,20 +40,7 @@ export const AdvancedSetting = () => {
                     </div>
 
                     <div className="partition-content">
-                        <div className="body-row divider"></div>
-                        <ServerURLRow />
-                        <ProtocolRow />
-                        <div className="body-row divider"></div>
-                        <SampleRateRow />
-                        <SendingSampleRateRow />
-                        <div className="body-row divider"></div>
-                        <CrossFadeOverlapSizeRow />
-                        <CrossFadeOffsetRateRow />
-                        <CrossFadeEndRateRow />
-                        <div className="body-row divider"></div>
-                        <DownSamplingModeRow />
-                        <div className="body-row divider"></div>
-                        <TrancateNumTresholdRow />
+                        {components}
                     </div>
                 </div>
             </>

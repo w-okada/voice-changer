@@ -9,7 +9,6 @@ import { useWorkletSetting, WorkletSettingState } from "./useWorkletSetting"
 
 export type UseClientProps = {
     audioContext: AudioContext | null
-    audioOutputElementId: string
     clientType: ClientType
 }
 
@@ -31,6 +30,8 @@ export type ClientState = {
     getInfo: () => Promise<void>
     // 設定クリア
     clearSetting: () => Promise<void>
+    // AudioOutputElement  設定
+    setAudioOutputElementId: (elemId: string) => void
 }
 
 export type PerformanceData = {
@@ -114,15 +115,24 @@ export const useClient = (props: UseClientProps): ClientState => {
             setVoiceChangerClient(voiceChangerClientRef.current)
             console.log("[useClient] client initialized")
 
-            const audio = document.getElementById(props.audioOutputElementId) as HTMLAudioElement
-            audio.srcObject = voiceChangerClientRef.current.stream
-            audio.play()
+            // const audio = document.getElementById(props.audioOutputElementId) as HTMLAudioElement
+            // audio.srcObject = voiceChangerClientRef.current.stream
+            // audio.play()
             initializedResolveRef.current!()
             setInitialized(true)
         }
         initialized()
     }, [props.audioContext])
 
+    const setAudioOutputElementId = (elemId: string) => {
+        if (!voiceChangerClientRef.current) {
+            console.warn("[voiceChangerClient] is not ready for set audio output.")
+            return
+        }
+        const audio = document.getElementById(elemId) as HTMLAudioElement
+        audio.srcObject = voiceChangerClientRef.current.stream
+        audio.play()
+    }
 
     // (2-2) 情報リロード
     const getInfo = useMemo(() => {
@@ -160,5 +170,8 @@ export const useClient = (props: UseClientProps): ClientState => {
 
         // 設定クリア
         clearSetting,
+
+        // AudioOutputElement  設定
+        setAudioOutputElementId,
     }
 }

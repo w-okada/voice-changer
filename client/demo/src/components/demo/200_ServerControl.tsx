@@ -1,12 +1,13 @@
 import React, { useMemo } from "react"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "../101_HeaderButton"
 import { useGuiState } from "./001_GuiStateProvider"
-import { StartButtonRow } from "./201_StartButtonRow"
-import { PerformanceRow } from "./202_PerformanceRow"
-import { ServerInfoRow } from "./203_ServerInfoRow"
+import { generateComponent } from "./002_ComponentGenerator"
 
 export const ServerControl = () => {
     const guiState = useGuiState()
+    const { appGuiSettingState } = useAppRoot()
+    const componentSettings = appGuiSettingState.appGuiSetting.front.serverControl
 
     const accodionButton = useMemo(() => {
         const accodionButtonProps: HeaderButtonProps = {
@@ -20,7 +21,12 @@ export const ServerControl = () => {
         return <HeaderButton {...accodionButtonProps}></HeaderButton>;
     }, []);
 
+
     const serverControl = useMemo(() => {
+        const components = componentSettings.map((x, index) => {
+            const c = generateComponent(x.name, x.options)
+            return <div key={`${x.name}_${index}`}>{c}</div>
+        })
         return (
             <>
                 {guiState.stateControls.openServerControlCheckbox.trigger}
@@ -35,9 +41,7 @@ export const ServerControl = () => {
                     </div>
 
                     <div className="partition-content">
-                        <StartButtonRow />
-                        <PerformanceRow />
-                        <ServerInfoRow />
+                        {components}
                     </div>
                 </div>
             </>

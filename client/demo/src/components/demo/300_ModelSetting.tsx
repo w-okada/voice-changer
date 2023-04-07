@@ -1,20 +1,14 @@
 import React, { useMemo } from "react"
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "../101_HeaderButton"
 import { useGuiState } from "./001_GuiStateProvider"
-import { ModelUploaderRow } from "./301_ModelUploaderRow"
-import { ConfigSelectRow } from "./302_ConfigSelectRow"
-import { ONNXSelectRow } from "./303_ONNXSelectRow"
-import { PyTorchSelectRow } from "./304_PyTorchSelectRow"
-import { CorrespondenceSelectRow } from "./305_CorrespondenceSelectRow"
-import { PyTorchClusterSelectRow } from "./306_PyTorchClusterSelectRow"
-import { ModelUploadButtonRow } from "./310_ModelUploadButtonRow"
-import { FrameworkRow } from "./320_FrameworkRow"
-import { ONNXExecutorRow } from "./321_ONNXExecutorRow"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
+import { generateComponent } from "./002_ComponentGenerator"
 
 
 export const ModelSetting = () => {
     const guiState = useGuiState()
-
+    const { appGuiSettingState } = useAppRoot()
+    const componentSettings = appGuiSettingState.appGuiSetting.front.modelSetting
     const accodionButton = useMemo(() => {
         const accodionButtonProps: HeaderButtonProps = {
             stateControlCheckbox: guiState.stateControls.openModelSettingCheckbox,
@@ -28,7 +22,10 @@ export const ModelSetting = () => {
     }, []);
 
     const modelSetting = useMemo(() => {
-
+        const components = componentSettings.map((x, index) => {
+            const c = generateComponent(x.name, x.options)
+            return <div key={`${x.name}_${index}`}>{c}</div>
+        })
         return (
             <>
                 {guiState.stateControls.openModelSettingCheckbox.trigger}
@@ -44,15 +41,7 @@ export const ModelSetting = () => {
                     </div>
 
                     <div className="partition-content">
-                        <ModelUploaderRow />
-                        <ConfigSelectRow />
-                        <ONNXSelectRow />
-                        <PyTorchSelectRow />
-                        <CorrespondenceSelectRow />
-                        <PyTorchClusterSelectRow />
-                        <ModelUploadButtonRow />
-                        <FrameworkRow />
-                        <ONNXExecutorRow />
+                        {components}
                     </div>
                 </div>
             </>

@@ -1,16 +1,13 @@
 import React, { useMemo } from "react"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "../101_HeaderButton"
 import { useGuiState } from "./001_GuiStateProvider"
-import { NoiseControlRow } from "./501_NoiseControlRow"
-import { GainControlRow } from "./502_GainControlRow"
-import { F0DetectorRow } from "./503_F0DetectorRow"
-import { AnalyzerRow } from "./510_AnalyzerRow"
-import { SamplingRow } from "./511_SamplingRow"
-import { SamplingPlayRow } from "./512_SamplingPlayRow"
-
+import { generateComponent } from "./002_ComponentGenerator"
 
 export const QualityControl = () => {
     const guiState = useGuiState()
+    const { appGuiSettingState } = useAppRoot()
+    const componentSettings = appGuiSettingState.appGuiSetting.front.qualityControl
 
     const accodionButton = useMemo(() => {
         const accodionButtonProps: HeaderButtonProps = {
@@ -25,7 +22,10 @@ export const QualityControl = () => {
     }, []);
 
     const deviceSetting = useMemo(() => {
-
+        const components = componentSettings.map((x, index) => {
+            const c = generateComponent(x.name, x.options)
+            return <div key={`${x.name}_${index}`}>{c}</div>
+        })
         return (
             <>
                 {guiState.stateControls.openQualityControlCheckbox.trigger}
@@ -41,13 +41,14 @@ export const QualityControl = () => {
                     </div>
 
                     <div className="partition-content">
-                        <NoiseControlRow />
+                        {components}
+                        {/* <NoiseControlRow />
                         <GainControlRow />
                         <F0DetectorRow />
                         <div className="body-row divider"></div>
                         <AnalyzerRow />
                         <SamplingRow />
-                        <SamplingPlayRow />
+                        <SamplingPlayRow /> */}
                     </div>
                 </div>
             </>

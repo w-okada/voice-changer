@@ -1,18 +1,13 @@
 import React, { useMemo } from "react"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "../101_HeaderButton"
 import { useGuiState } from "./001_GuiStateProvider"
-import { SrcIdRow } from "./601_SrcIdRow"
-import { DstIdRow } from "./602_DstIdRow"
-import { EditSpeakerIdMappingRow } from "./603_EditSpeakerIdMappingRow"
-import { F0FactorRow } from "./604_F0FactorRow"
-import { TuneRow } from "./605_TuneRow"
-import { ClusterInferRatioRow } from "./606_ClusterInferRatioRow"
-import { NoiseScaleRow } from "./607_NoiseScaleRow"
-import { SilentThresholdRow } from "./608_SilentThresholdRow"
-
+import { generateComponent } from "./002_ComponentGenerator"
 
 export const SpeakerSetting = () => {
     const guiState = useGuiState()
+    const { appGuiSettingState } = useAppRoot()
+    const componentSettings = appGuiSettingState.appGuiSetting.front.speakerSetting
 
     const accodionButton = useMemo(() => {
         const accodionButtonProps: HeaderButtonProps = {
@@ -27,7 +22,10 @@ export const SpeakerSetting = () => {
     }, []);
 
     const deviceSetting = useMemo(() => {
-
+        const components = componentSettings.map((x, index) => {
+            const c = generateComponent(x.name, x.options)
+            return <div key={`${x.name}_${index}`}>{c}</div>
+        })
         return (
             <>
                 {guiState.stateControls.openSpeakerSettingCheckbox.trigger}
@@ -43,14 +41,7 @@ export const SpeakerSetting = () => {
                     </div>
 
                     <div className="partition-content">
-                        <SrcIdRow />
-                        <DstIdRow />
-                        <EditSpeakerIdMappingRow />
-                        <F0FactorRow />
-                        <TuneRow />
-                        <ClusterInferRatioRow />
-                        <NoiseScaleRow />
-                        <SilentThresholdRow />
+                        {components}
                     </div>
                 </div>
             </>

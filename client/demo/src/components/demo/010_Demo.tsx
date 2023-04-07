@@ -10,8 +10,6 @@ import { SpeakerSetting } from "./600_SpeakerSetting";
 import { ConverterSetting } from "./700_ConverterSetting";
 import { AdvancedSetting } from "./800_AdvancedSetting";
 
-
-
 export const Demo = () => {
     return (
         <GuiStateProvider>
@@ -26,12 +24,6 @@ export const Demo = () => {
                 <SpeakerSetting />
                 <ConverterSetting />
                 <AdvancedSetting />
-
-                {/* <audio hidden id={AUDIO_ELEMENT_FOR_PLAY_RESULT}></audio>
-
-                org:<audio id={AUDIO_ELEMENT_FOR_TEST_ORIGINAL} controls></audio>
-                <audio id={AUDIO_ELEMENT_FOR_TEST_CONVERTED} controls></audio>
-                <audio id={AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK} controls hidden></audio> */}
             </div>
         </GuiStateProvider>
 

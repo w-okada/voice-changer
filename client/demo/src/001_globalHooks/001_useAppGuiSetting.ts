@@ -7,120 +7,37 @@ export type AppGuiDemoSetting = {
     type: "demo",
     id: ClientType,
     front: {
-        "title": {
-            "mainTitle": string,
-            "subTitle": string,
-            "lineNum": number
-        },
-        "serverControl": {
-            "modelInfoEnable": boolean
-        },
-        "modelSetting": {
-            "ONNXEnable": boolean,
-            "pyTorchEnable": boolean,
-            "MMVCCorrespondense": boolean,
-            "pyTorchClusterEnable": boolean,
-            "showPyTorchDefault": boolean,
-            "frameworkEnable": boolean,
-            "modelUploaderEnable": boolean,
-            "configRow": boolean,
-            "uploadRow": boolean
-
-        },
-        "deviceSetting": {},
-        "qualityControl": {
-            "F0DetectorEnable": boolean,
-            "analyzerRow": boolean,
-            "samplingRow": boolean,
-            "playRow": boolean
-        },
-        "speakerSetting": {
-            "srcIdEnable": boolean
-            "dstIdEnable": boolean
-            "editSpeakerIdMappingEnable": boolean
-            "f0FactorEnable": boolean
-            "tuningEnable": boolean
-            "clusterInferRationEnable": boolean
-            "noiseScaleEnable": boolean
-            "silentThresholdEnable": boolean
-        },
-        "converterSetting": {
-            "extraDataLengthEnable": boolean
-        },
-        "advancedSetting": {
-            "serverURLEnable": boolean,
-            "protocolEnable": boolean,
-            "sampleRateEnable": boolean,
-            "sendingSampleRateEnable": boolean,
-            "crossFadeOverlapSizeEnable": boolean,
-            "crossFadeOffsetRateEnable": boolean,
-            "crossFadeEndRateEnable": boolean,
-            "downSamplingModeEnable": boolean,
-            "trancateNumTresholdEnable": boolean,
-        }
+        "title": GuiComponentSetting[],
+        "serverControl": GuiComponentSetting[],
+        "modelSetting": GuiComponentSetting[],
+        "deviceSetting": GuiComponentSetting[],
+        "qualityControl": GuiComponentSetting[],
+        "speakerSetting": GuiComponentSetting[],
+        "converterSetting": GuiComponentSetting[],
+        "advancedSetting": GuiComponentSetting[],
     },
     dialogs: {
         "license": { title: string, auther: string, contact: string, url: string, license: string }[]
     }
 }
 
-
+export type GuiComponentSetting = {
+    "name": string,
+    "options": any
+}
 
 const InitialAppGuiDemoSetting: AppGuiDemoSetting = {
     type: "demo",
     id: ClientType.MMVCv13,
     front: {
-        "title": {
-            "mainTitle": "",
-            "subTitle": "",
-            "lineNum": 1
-        },
-        "serverControl": {
-            "modelInfoEnable": true
-        },
-        "modelSetting": {
-            "ONNXEnable": false,
-            "pyTorchEnable": false,
-            "MMVCCorrespondense": false,
-            "pyTorchClusterEnable": false,
-            "showPyTorchDefault": false,
-            "frameworkEnable": false,
-            "modelUploaderEnable": false,
-            "configRow": false,
-            "uploadRow": false
-        },
-        "deviceSetting": {},
-        "qualityControl": {
-            "F0DetectorEnable": false,
-            "analyzerRow": true,
-            "samplingRow": true,
-            "playRow": true
-        },
-        "speakerSetting": {
-            "srcIdEnable": false,
-            "dstIdEnable": false,
-            "editSpeakerIdMappingEnable": false,
-            "f0FactorEnable": false,
-            "tuningEnable": false,
-            "clusterInferRationEnable": false,
-            "noiseScaleEnable": false,
-            "silentThresholdEnable": false
-
-        },
-        "converterSetting": {
-            "extraDataLengthEnable": false
-        },
-        "advancedSetting": {
-            "serverURLEnable": false,
-            "protocolEnable": false,
-            "sampleRateEnable": false,
-            "sendingSampleRateEnable": false,
-            "crossFadeOverlapSizeEnable": false,
-            "crossFadeOffsetRateEnable": false,
-            "crossFadeEndRateEnable": false,
-            "downSamplingModeEnable": false,
-            "trancateNumTresholdEnable": false,
-        }
+        "title": [],
+        "serverControl": [],
+        "modelSetting": [],
+        "deviceSetting": [],
+        "qualityControl": [],
+        "speakerSetting": [],
+        "converterSetting": [],
+        "advancedSetting": []
     },
     dialogs: {
         "license": [{ title: "", auther: "", contact: "", url: "", license: "MIT" }]

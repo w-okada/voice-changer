@@ -1,12 +1,13 @@
 import React, { useMemo } from "react"
+import { useAppRoot } from "../../001_provider/001_AppRootProvider"
 import { AnimationTypes, HeaderButton, HeaderButtonProps } from "../101_HeaderButton"
 import { useGuiState } from "./001_GuiStateProvider"
-import { InputChunkNumRow } from "./701_InputChunkNumRow"
-import { ExtraDataLengthRow } from "./702_ExtraDataLengthRow"
-import { GPURow } from "./703_GPURow"
+import { generateComponent } from "./002_ComponentGenerator"
 
 export const ConverterSetting = () => {
     const guiState = useGuiState()
+    const { appGuiSettingState } = useAppRoot()
+    const componentSettings = appGuiSettingState.appGuiSetting.front.converterSetting
 
     const accodionButton = useMemo(() => {
         const accodionButtonProps: HeaderButtonProps = {
@@ -21,7 +22,10 @@ export const ConverterSetting = () => {
     }, []);
 
     const deviceSetting = useMemo(() => {
-
+        const components = componentSettings.map((x, index) => {
+            const c = generateComponent(x.name, x.options)
+            return <div key={`${x.name}_${index}`}>{c}</div>
+        })
         return (
             <>
                 {guiState.stateControls.openConverterSettingCheckbox.trigger}
@@ -37,9 +41,7 @@ export const ConverterSetting = () => {
                     </div>
 
                     <div className="partition-content">
-                        <InputChunkNumRow />
-                        <ExtraDataLengthRow />
-                        <GPURow />
+                        {components}
                     </div>
                 </div>
             </>

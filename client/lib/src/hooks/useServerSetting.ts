@@ -65,7 +65,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             return DefaultServerSetting_MMVCv15
         }
     }, [])
-    console.log("default sss", defaultServerSetting)
     const [serverSetting, setServerSetting] = useState<ServerInfo>(defaultServerSetting)
     const [fileUploadSetting, setFileUploadSetting] = useState<FileUploadSetting>(InitialFileUploadSetting)
     const { setItem, getItem, removeItem } = useIndexedDB({ clientType: props.clientType })
