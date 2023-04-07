@@ -52,14 +52,14 @@ class RVCSettings():
     configFile: str = ""
 
     indexRatio: float = 0
-    isHalf: int = 0
+    quality: int = 0
 
     speakers: dict[str, int] = field(
         default_factory=lambda: {}
     )
 
     # ↓mutableな物だけ列挙
-    intData = ["gpu", "dstId", "tran", "predictF0", "extraConvertSize"]
+    intData = ["gpu", "dstId", "tran", "predictF0", "extraConvertSize", "quality"]
     floatData = ["noiceScale", "silentThreshold", "indexRatio"]
     strData = ["framework", "f0Detector"]
 
@@ -76,12 +76,11 @@ class RVC:
         self.params = params
         print("RVC initialization: ", params)
 
-    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, feature_file: str = None, index_file: str = None):
+    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, feature_file: str = None, index_file: str = None, is_half: bool = True):
         self.settings.configFile = config
         self.feature_file = feature_file
         self.index_file = index_file
-
-        print("featurefile", feature_file, index_file)
+        self.is_half = is_half
 
         self.tgt_sr = 40000
         try:
@@ -89,7 +88,7 @@ class RVC:
             models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task([hubert_path], suffix="",)
             model = models[0]
             model.eval()
-            if self.settings.isHalf:
+            if self.is_half:
                 model = model.half()
             self.hubert_model = model
 
@@ -105,17 +104,17 @@ class RVC:
         if pyTorch_model_file != None:
             cpt = torch.load(pyTorch_model_file, map_location="cpu")
             self.tgt_sr = cpt["config"][-1]
-            net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=self.settings.isHalf)
+            net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=self.is_half)
             net_g.eval()
             net_g.load_state_dict(cpt["weight"], strict=False)
-            if self.settings.isHalf:
+            if self.is_half:
                 net_g = net_g.half()
             self.net_g = net_g
 
         # ONNXモデル生成
         if onnx_model_file != None:
             # self.onnx_session = ModelWrapper(onnx_model_file, is_half=True)
-            self.onnx_session = ModelWrapper(onnx_model_file, is_half=self.settings.isHalf)
+            self.onnx_session = ModelWrapper(onnx_model_file, is_half=self.is_half)
             # input_info = self.onnx_session.get_inputs()
             # for i in input_info:
             #     print("input", i)
@@ -222,7 +221,7 @@ class RVC:
             return np.zeros(convertSize).astype(np.int16)
 
         with torch.no_grad():
-            vc = VC(self.tgt_sr, dev, self.settings.isHalf)
+            vc = VC(self.tgt_sr, dev, self.is_half)
             sid = 0
             times = [0, 0, 0]
             f0_up_key = self.settings.tran
@@ -263,7 +262,7 @@ class RVC:
             return np.zeros(convertSize).astype(np.int16)
 
         with torch.no_grad():
-            vc = VC(self.tgt_sr, dev, self.settings.isHalf)
+            vc = VC(self.tgt_sr, dev, self.is_half)
             sid = 0
             times = [0, 0, 0]
             f0_up_key = self.settings.tran

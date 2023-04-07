@@ -57,6 +57,7 @@ class MMVC_Rest_Fileuploader:
         clusterTorchModelFilename: str = Form(...),
         featureFilename: str = Form(...),
         indexFilename: str = Form(...),
+        isHalf: bool = Form(...),
     ):
         pyTorchModelFilePath = os.path.join(UPLOAD_DIR, pyTorchModelFilename) if pyTorchModelFilename != "-" else None
         onnxModelFilePath = os.path.join(UPLOAD_DIR, onnxModelFilename) if onnxModelFilename != "-" else None
@@ -66,7 +67,8 @@ class MMVC_Rest_Fileuploader:
         indexFilePath = os.path.join(UPLOAD_DIR, indexFilename) if indexFilename != "-" else None
 
         info = self.voiceChangerManager.loadModel(configFilePath, pyTorchModelFilePath, onnxModelFilePath,
-                                                  clusterTorchModelFilePath, featureFilePath, indexFilePath)
+                                                  clusterTorchModelFilePath, featureFilePath, indexFilePath,
+                                                  isHalf)
         json_compatible_item_data = jsonable_encoder(info)
         return JSONResponse(content=json_compatible_item_data)
         # return {"load": f"{configFilePath}, {pyTorchModelFilePath}, {onnxModelFilePath}"}

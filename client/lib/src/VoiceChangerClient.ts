@@ -264,9 +264,10 @@ export class VoiceChangerClient {
         clusterTorchModelFilename: string | null,
         featureFilename: string | null,
         indexFilename: string | null,
+        isHalf: boolean
     ) => {
         // !! 注意!! hubertTorchModelは固定値で上書きされるため、設定しても効果ない。
-        return this.configurator.loadModel(configFilename, pyTorchModelFilename, onnxModelFilename, clusterTorchModelFilename, featureFilename, indexFilename)
+        return this.configurator.loadModel(configFilename, pyTorchModelFilename, onnxModelFilename, clusterTorchModelFilename, featureFilename, indexFilename, isHalf)
     }
 
     //##  Worklet ##//

@@ -77,13 +77,13 @@ class VoiceChanger():
 
         print(f"VoiceChanger Initialized (GPU_NUM:{self.gpu_num}, mps_enabled:{self.mps_enabled})")
 
-    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, clusterTorchModel: str = None, feature_file: str = None, index_file: str = None):
+    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, clusterTorchModel: str = None, feature_file: str = None, index_file: str = None, is_half: bool = True):
         if self.modelType == "MMVCv15" or self.modelType == "MMVCv13":
             return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file)
         elif self.modelType == "so-vits-svc-40" or self.modelType == "so-vits-svc-40_c" or self.modelType == "so-vits-svc-40v2":
             return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, clusterTorchModel)
         elif self.modelType == "RVC":
-            return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, feature_file, index_file)
+            return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, feature_file, index_file, is_half)
         else:
             return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, clusterTorchModel)
 

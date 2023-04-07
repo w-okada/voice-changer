@@ -42,7 +42,7 @@
 
                     "showFeature": true,
                     "showIndex": true,
-
+                    "showHalfPrecision": true,
                     "defaultEnablePyTorch": true
                 }
             },

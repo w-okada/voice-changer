@@ -7,6 +7,7 @@ import { CorrespondenceSelectRow } from "./301-4_CorrespondenceSelectRow"
 import { PyTorchClusterSelectRow } from "./301-5_PyTorchClusterSelectRow"
 import { FeatureSelectRow } from "./301-6_FeatureSelectRow"
 import { IndexSelectRow } from "./301-7_IndexSelectRow"
+import { HalfPrecisionRow } from "./301-8_HalfPrescisionRow"
 import { ModelUploadButtonRow } from "./301-9_ModelUploadButtonRow"
 
 export type ModelUploaderRowProps = {
@@ -18,6 +19,7 @@ export type ModelUploaderRowProps = {
 
     showFeature: boolean
     showIndex: boolean
+    showHalfPrecision: boolean
 
     defaultEnablePyTorch: boolean
 }
@@ -47,6 +49,7 @@ export const ModelUploaderRow = (props: ModelUploaderRowProps) => {
                 {props.showConfig ? <ConfigSelectRow /> : <></>}
                 {props.showOnnx ? <ONNXSelectRow /> : <></>}
                 {props.showPyTorch && guiState.showPyTorchModelUpload ? <PyTorchSelectRow /> : <></>}
+                {props.showHalfPrecision ? <HalfPrecisionRow /> : <></>}
                 {props.showCorrespondence ? <CorrespondenceSelectRow /> : <></>}
                 {props.showPyTorchCluster ? <PyTorchClusterSelectRow /> : <></>}
                 {props.showFeature ? <FeatureSelectRow /> : <></>}

@@ -20,6 +20,8 @@ export type FileUploadSetting = {
     feature: ModelData | null //RVC
     index: ModelData | null   //RVC
 
+    isHalf: boolean
+
 }
 
 const InitialFileUploadSetting: FileUploadSetting = {
@@ -30,7 +32,9 @@ const InitialFileUploadSetting: FileUploadSetting = {
     hubertTorchModel: null,
 
     feature: null,
-    index: null
+    index: null,
+
+    isHalf: true
 }
 
 export type UseServerSettingProps = {
@@ -234,13 +238,16 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
 
             // !! 注意!! hubertTorchModelは固定値で上書きされるため、設定しても効果ない。
             const configFileName = fileUploadSetting.configFile ? fileUploadSetting.configFile.filename || "-" : "-"
+            console.log("IS HALF", fileUploadSetting.isHalf)
             const loadPromise = props.voiceChangerClient.loadModel(
                 configFileName,
                 fileUploadSetting.pyTorchModel?.filename || null,
                 fileUploadSetting.onnxModel?.filename || null,
                 fileUploadSetting.clusterTorchModel?.filename || null,
                 fileUploadSetting.feature?.filename || null,
-                fileUploadSetting.index?.filename || null
+                fileUploadSetting.index?.filename || null,
+                fileUploadSetting.isHalf
+
             )
 
             // サーバでロード中にキャッシュにセーブ
@@ -260,7 +267,8 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                     } : null,
                     index: fileUploadSetting.index ? {
                         data: fileUploadSetting.index.data, filename: fileUploadSetting.index.filename
-                    } : null
+                    } : null,
+                    isHalf: fileUploadSetting.isHalf
                 }
                 setItem(INDEXEDDB_KEY_MODEL_DATA, saveData)
 

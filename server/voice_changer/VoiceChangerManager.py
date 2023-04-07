@@ -10,8 +10,8 @@ class VoiceChangerManager():
             cls._instance.voiceChanger = VoiceChanger(params)
         return cls._instance
 
-    def loadModel(self, config, model, onnx_model, clusterTorchModel, feature_file, index_file):
-        info = self.voiceChanger.loadModel(config, model, onnx_model, clusterTorchModel, feature_file, index_file)
+    def loadModel(self, config, model, onnx_model, clusterTorchModel, feature_file, index_file, is_half: bool = True):
+        info = self.voiceChanger.loadModel(config, model, onnx_model, clusterTorchModel, feature_file, index_file, is_half)
         info["status"] = "OK"
         return info
 
