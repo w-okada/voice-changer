@@ -45,7 +45,7 @@ class ModelWrapper:
             audio1 = self.onnx_session.run(
                 ["audio"],
                 {
-                    "feats": feats.cpu().numpy().astype(np.float32),
+                    "feats": feats.cpu().numpy().astype(np.float16),
                     "p_len": p_len.cpu().numpy(),
                     "pitch": pitch.cpu().numpy(),
                     "pitchf": pitchf.cpu().numpy(),
