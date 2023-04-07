@@ -28,7 +28,7 @@ from const import HUBERT_ONNX_MODEL_PATH
 import pyworld as pw
 
 from vc_infer_pipeline import VC
-from infer_pack.models import SynthesizerTrnMs256NSFsid, SynthesizerTrnMs256NSFsid_nono
+from infer_pack.models import SynthesizerTrnMs256NSFsid
 from fairseq import checkpoint_utils
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
@@ -52,14 +52,15 @@ class RVCSettings():
     configFile: str = ""
 
     indexRatio: float = 0
-    quality: int = 0
+    rvcQuality: int = 0
+    modelSamplingRate: int = 48000
 
     speakers: dict[str, int] = field(
         default_factory=lambda: {}
     )
 
     # ↓mutableな物だけ列挙
-    intData = ["gpu", "dstId", "tran", "predictF0", "extraConvertSize", "quality"]
+    intData = ["gpu", "dstId", "tran", "predictF0", "extraConvertSize", "rvcQuality", "modelSamplingRate"]
     floatData = ["noiceScale", "silentThreshold", "indexRatio"]
     strData = ["framework", "f0Detector"]
 
@@ -82,7 +83,6 @@ class RVC:
         self.index_file = index_file
         self.is_half = is_half
 
-        self.tgt_sr = 40000
         try:
             hubert_path = self.params["hubert"]
             models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task([hubert_path], suffix="",)
@@ -103,7 +103,7 @@ class RVC:
         # PyTorchモデル生成
         if pyTorch_model_file != None:
             cpt = torch.load(pyTorch_model_file, map_location="cpu")
-            self.tgt_sr = cpt["config"][-1]
+            self.settings.tgt_sr = cpt["config"][-1]
             net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=self.is_half)
             net_g.eval()
             net_g.load_state_dict(cpt["weight"], strict=False)
@@ -113,14 +113,7 @@ class RVC:
 
         # ONNXモデル生成
         if onnx_model_file != None:
-            # self.onnx_session = ModelWrapper(onnx_model_file, is_half=True)
             self.onnx_session = ModelWrapper(onnx_model_file, is_half=self.is_half)
-            # input_info = self.onnx_session.get_inputs()
-            # for i in input_info:
-            #     print("input", i)
-            # output_info = self.onnx_session.get_outputs()
-            # for i in output_info:
-            #     print("output", i)
         return self.get_info()
 
     def update_setteings(self, key: str, val: any):
@@ -170,7 +163,7 @@ class RVC:
         return data
 
     def get_processing_sampling_rate(self):
-        return self.tgt_sr
+        return self.settings.tgt_sr
         # return 24000
 
     def generate_input(self, newData: any, inputSize: int, crossfadeSize: int):
@@ -215,13 +208,13 @@ class RVC:
         convertSize = data[1]
         vol = data[2]
 
-        audio = resampy.resample(audio, self.tgt_sr, 16000)
+        audio = resampy.resample(audio, self.settings.tgt_sr, 16000)
 
         if vol < self.settings.silentThreshold:
             return np.zeros(convertSize).astype(np.int16)
 
         with torch.no_grad():
-            vc = VC(self.tgt_sr, dev, self.is_half)
+            vc = VC(self.settings.tgt_sr, dev, self.is_half)
             sid = 0
             times = [0, 0, 0]
             f0_up_key = self.settings.tran
@@ -255,14 +248,14 @@ class RVC:
         convertSize = data[1]
         vol = data[2]
         print("audio len 02,", len(audio))
-        audio = resampy.resample(audio, self.tgt_sr, 16000)
+        audio = resampy.resample(audio, self.settings.tgt_sr, 16000)
         print("audio len 03,", len(audio))
 
         if vol < self.settings.silentThreshold:
             return np.zeros(convertSize).astype(np.int16)
 
         with torch.no_grad():
-            vc = VC(self.tgt_sr, dev, self.is_half)
+            vc = VC(self.settings.tgt_sr, dev, self.is_half)
             sid = 0
             times = [0, 0, 0]
             f0_up_key = self.settings.tran

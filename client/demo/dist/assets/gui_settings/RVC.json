@@ -51,6 +51,10 @@
                 "options": {
                     "showFramework": true
                 }
+            },
+            {
+                "name": "modelSamplingRate",
+                "options": {}
             }
         ],
         "deviceSetting": [
@@ -159,6 +163,10 @@
             },
             {
                 "name": "trancateNumThreshold",
+                "options": {}
+            },
+            {
+                "name": "rvcQuality",
                 "options": {}
             }
         ]

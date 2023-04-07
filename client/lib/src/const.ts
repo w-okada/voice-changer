@@ -25,6 +25,14 @@ export const InputSampleRate = {
 } as const
 export type InputSampleRate = typeof InputSampleRate[keyof typeof InputSampleRate]
 
+export const ModelSamplingRate = {
+    "48000": 48000,
+    "40000": 40000,
+    "32000": 32000
+} as const
+export type ModelSamplingRate = typeof InputSampleRate[keyof typeof InputSampleRate]
+
+
 export const CrossFadeOverlapSize = {
     "1024": 1024,
     "2048": 2048,
@@ -79,6 +87,9 @@ export const ServerSettingKey = {
     "clusterInferRatio": "clusterInferRatio",
 
     "indexRatio": "indexRatio",
+    "rvcQuality": "rvcQuality",
+    "modelSamplingRate": "modelSamplingRate",
+
 
     "inputSampleRate": "inputSampleRate",
 } as const
@@ -109,6 +120,8 @@ export type VoiceChangerServerSetting = {
     clusterInferRatio: number // so-vits-svc
 
     indexRatio: number // RVC
+    rvcQuality: number // 0:low, 1:high
+    modelSamplingRate: ModelSamplingRate // 32000,40000,48000
 
     inputSampleRate: InputSampleRate
 }
@@ -147,6 +160,8 @@ export const DefaultServerSetting_MMVCv15: ServerInfo = {
     clusterInferRatio: 0,
 
     indexRatio: 0,
+    rvcQuality: 0,
+    modelSamplingRate: 48000,
 
     inputSampleRate: 24000,
 
@@ -181,6 +196,9 @@ export const DefaultServerSetting_MMVCv13: ServerInfo = {
     clusterInferRatio: 0,
 
     indexRatio: 0,
+    rvcQuality: 0,
+    modelSamplingRate: 48000,
+
 
     inputSampleRate: 24000,
 
@@ -219,6 +237,9 @@ export const DefaultServerSetting_so_vits_svc_40: ServerInfo = {
     clusterInferRatio: 0.1,
 
     indexRatio: 0,
+    rvcQuality: 0,
+    modelSamplingRate: 48000,
+
 
     inputSampleRate: 24000,
 
@@ -257,6 +278,9 @@ export const DefaultServerSetting_so_vits_svc_40_c: ServerInfo = {
     clusterInferRatio: 0.1,
 
     indexRatio: 0,
+    rvcQuality: 0,
+    modelSamplingRate: 48000,
+
 
     inputSampleRate: 24000,
 
@@ -294,6 +318,9 @@ export const DefaultServerSetting_so_vits_svc_40v2: ServerInfo = {
     clusterInferRatio: 0.1,
 
     indexRatio: 0,
+    rvcQuality: 0,
+    modelSamplingRate: 48000,
+
 
     inputSampleRate: 24000,
 
@@ -333,6 +360,8 @@ export const DefaultServerSetting_RVC: ServerInfo = {
     clusterInferRatio: 0.1,
 
     indexRatio: 0,
+    rvcQuality: 0,
+    modelSamplingRate: 48000,
 
     inputSampleRate: 24000,
 

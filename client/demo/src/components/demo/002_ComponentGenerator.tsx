@@ -34,6 +34,8 @@ import { CrossFadeEndRateRow, CrossFadeEndRateRowProps } from "./components/807_
 import { DownSamplingModeRow, DownSamplingModeRowProps } from "./components/808_DownSamplingModeRow"
 import { TrancateNumTresholdRow, TrancateNumTresholdRowProps } from "./components/809_TrancateNumTresholdRow"
 import { IndexRatioRow, IndexRatioRowProps } from "./components/609_IndexRatioRow"
+import { RVCQualityRow, RVCQualityRowProps } from "./components/810_RVCQuality"
+import { ModelSamplingRateRow, ModelSamplingRateRowProps } from "./components/303_ModelSamplingRateRow"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
 
@@ -61,6 +63,7 @@ const initialize = () => {
 
     addToCatalog("modelUploader", (props: ModelUploaderRowProps) => { return <ModelUploaderRow {...props} /> })
     addToCatalog("framework", (props: FrameworkRowProps) => { return <FrameworkRow {...props} /> })
+    addToCatalog("modelSamplingRate", (props: ModelSamplingRateRowProps) => { return <ModelSamplingRateRow {...props} /> })
 
 
     addToCatalog("audioInput", (props: AudioInputRowProps) => { return <AudioInputRow {...props} /> })
@@ -96,6 +99,8 @@ const initialize = () => {
     addToCatalog("crossFadeEndRate", (props: CrossFadeEndRateRowProps) => { return <CrossFadeEndRateRow {...props} /> })
     addToCatalog("downSamplingMode", (props: DownSamplingModeRowProps) => { return <DownSamplingModeRow {...props} /> })
     addToCatalog("trancateNumThreshold", (props: TrancateNumTresholdRowProps) => { return <TrancateNumTresholdRow {...props} /> })
+    addToCatalog("rvcQuality", (props: RVCQualityRowProps) => { return <RVCQualityRow {...props} /> })
+
 
 
 }
