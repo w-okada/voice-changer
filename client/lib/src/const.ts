@@ -445,7 +445,7 @@ export const DefaultWorkletNodeSetting_so_vits_svc_40v2: WorkletNodeSetting = {
 export const DefaultWorkletNodeSetting_RVC: WorkletNodeSetting = {
     serverUrl: "",
     protocol: "sio",
-    sendingSampleRate: 24000,
+    sendingSampleRate: 48000,
     inputChunkNum: 256,
     downSamplingMode: "average"
 }

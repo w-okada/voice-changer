@@ -27,7 +27,7 @@ from const import HUBERT_ONNX_MODEL_PATH
 
 import pyworld as pw
 
-from vc_infer_pipeline import VC
+from voice_changer.RVC.custom_vc_infer_pipeline import VC
 from infer_pack.models import SynthesizerTrnMs256NSFsid
 from fairseq import checkpoint_utils
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
@@ -71,7 +71,6 @@ class RVC:
         self.net_g = None
         self.onnx_session = None
 
-        self.raw_path = io.BytesIO()
         self.gpu_num = torch.cuda.device_count()
         self.prevVol = 0
         self.params = params
@@ -103,7 +102,7 @@ class RVC:
         # PyTorchモデル生成
         if pyTorch_model_file != None:
             cpt = torch.load(pyTorch_model_file, map_location="cpu")
-            self.settings.tgt_sr = cpt["config"][-1]
+            self.settings.modelSamplingRate = cpt["config"][-1]
             net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=self.is_half)
             net_g.eval()
             net_g.load_state_dict(cpt["weight"], strict=False)
@@ -163,8 +162,7 @@ class RVC:
         return data
 
     def get_processing_sampling_rate(self):
-        return self.settings.tgt_sr
-        # return 24000
+        return self.settings.modelSamplingRate
 
     def generate_input(self, newData: any, inputSize: int, crossfadeSize: int):
         newData = newData.astype(np.float32) / 32768.0
@@ -208,13 +206,13 @@ class RVC:
         convertSize = data[1]
         vol = data[2]
 
-        audio = resampy.resample(audio, self.settings.tgt_sr, 16000)
+        audio = resampy.resample(audio, self.settings.modelSamplingRate, 16000)
 
         if vol < self.settings.silentThreshold:
             return np.zeros(convertSize).astype(np.int16)
 
         with torch.no_grad():
-            vc = VC(self.settings.tgt_sr, dev, self.is_half)
+            vc = VC(self.settings.modelSamplingRate, dev, self.is_half)
             sid = 0
             times = [0, 0, 0]
             f0_up_key = self.settings.tran
@@ -248,14 +246,16 @@ class RVC:
         convertSize = data[1]
         vol = data[2]
         print("audio len 02,", len(audio))
-        audio = resampy.resample(audio, self.settings.tgt_sr, 16000)
+        audio = resampy.resample(audio, self.settings.modelSamplingRate, 16000)
         print("audio len 03,", len(audio))
 
         if vol < self.settings.silentThreshold:
             return np.zeros(convertSize).astype(np.int16)
 
         with torch.no_grad():
-            vc = VC(self.settings.tgt_sr, dev, self.is_half)
+            repeat = 3 if self.is_half else 1
+            repeat *= self.settings.rvcQuality  # 0 or 3
+            vc = VC(self.settings.modelSamplingRate, dev, self.is_half, repeat)
             sid = 0
             times = [0, 0, 0]
             f0_up_key = self.settings.tran
