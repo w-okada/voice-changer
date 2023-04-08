@@ -39,7 +39,6 @@ class VC(object):
             if (pad_size > 0 or p_len - len(f0) - pad_size > 0):
                 f0 = np.pad(f0, [[pad_size, p_len - len(f0) - pad_size]], mode='constant')
         elif (f0_method == "harvest"):
-            print("xlen", len(x))
             f0, t = pyworld.harvest(
                 x.astype(np.double),
                 fs=self.sr,
