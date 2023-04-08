@@ -4,23 +4,19 @@
 
 ## What's New!
 
+- v.1.5.1.15b
+
+  - [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI.git)の軽量化を行いました。精度や応答速度をわずかに落とすことでより低スペックな PC での稼働も可能になりました。
+
 - v.1.5.1.15a
 
   - [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI.git)に対応しました。
 
     hubert のモデルが必要になります。[このリポジトリ](https://huggingface.co/lj1995/VoiceConversionWebUI/tree/main)から`hubert_base.pt`をダウンロードして、バッチファイルがあるフォルダに格納してください。
 
-https://user-images.githubusercontent.com/48346627/230225563-b403e827-bc07-4b1f-9405-fd884bfa19a9.mp4
-
-https://youtu.be/yvPWtq7isfI
-
-https://youtu.be/6U7ZM2ZSwCU
-
-https://user-images.githubusercontent.com/48346627/229270332-68756cde-4fbb-46c2-ac3b-f44b9a988641.mp4
-
 # VC Client とは
 
-[VC Client](https://github.com/w-okada/voice-changer)は[MMVC](https://github.com/isletennos/MMVC_Trainer), [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc)などの AI を使ったリアルタイムボイスチェンジャーのクライアントソフトウェアです。また、リアルタイムボイスチェンジャーで必要となるトレーニング用の音声の録音(MMVC 向け)アプリも提供しています。
+[VC Client](https://github.com/w-okada/voice-changer)は[MMVC](https://github.com/isletennos/MMVC_Trainer), [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc), [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI)などの AI を使ったリアルタイムボイスチェンジャーのクライアントソフトウェアです。また、リアルタイムボイスチェンジャーで必要となるトレーニング用の音声の録音(MMVC 向け)アプリも提供しています。
 
 [解説動画](https://www.nicovideo.jp/watch/sm41507891)
 
@@ -108,6 +104,13 @@ Windows 版と Mac 版を提供しています。
 - so-vits-svc 4.0/so-vits-svc 4.0v2 やつくよみちゃんの動作には content vec のモデルが必要となります。こちらの[リポジトリ](https://github.com/auspicious3000/contentvec)から、ContentVec_legacy 500 のモデルをダウンロードして、実行する`startHttp_xxx.command`や`start_http_xxx.bat`と同じフォルダに配置してください。
 
 - RVC(Retrieval-based-Voice-Conversion)の動作には hubert のモデルが必要になります。[このリポジトリ](https://huggingface.co/lj1995/VoiceConversionWebUI/tree/main)から`hubert_base.pt`をダウンロードして、バッチファイルがあるフォルダに格納してください。
+
+| Version     | OS                                    | フレームワーク                        | link                                                                                     | サポート VC                                                         | サイズ |
+| ----------- | ------------------------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------ |
+| v.1.5.1.15b | <span style="color: blue;">win</span> | ONNX(cpu,cuda), PyTorch(cpu)          | [通常](https://drive.google.com/uc?id=1nb5DxHQJqnYgzWFTBNxCDOx64__uQqyR&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, RVC                                     | 773MB  |
+|             | <span style="color: blue;">win</span> | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [通常](https://drive.google.com/uc?id=197U6ip9ypBSyxhIf3oGnkWfBP-M3Gc12&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC | 2794MB |
+|             | <span style="color: blue;">win</span> | ONNX(cpu,DirectML), PyTorch(cpu)      | [通常](https://drive.google.com/uc?id=18Q9CDBnjgTHwOeklVLWAVMFZI-kk9j3l&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, RVC                                     | 488MB  |
+|             | <span style="color: blue;">win</span> | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [通常](https://drive.google.com/uc?id=1rlGewdhvenv1Yn3WFOLcsWQeuo8ecIQ1&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC | 2665MB |
 
 | Version     | OS                                    | フレームワーク                    | link                                                                                     | サポート VC                                                         | サイズ |
 | ----------- | ------------------------------------- | --------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------ |

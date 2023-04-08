@@ -2,23 +2,19 @@
 
 ## What's New!
 
+- v.1.5.1.15b
+
+  - We lightened [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI.git). By slightly reducing the accuracy and response speed, it is now possible to operate on a lower-spec PC..
+
 - v.1.5.1.15a
 
   - Support [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI.git)
 
     You need to have the hubert model to use it. Please download `hubert_base.pt` from [this repository](https://huggingface.co/lj1995/VoiceConversionWebUI/tree/main) and store it in the folder where the batch file is located.
 
-https://user-images.githubusercontent.com/48346627/230225563-b403e827-bc07-4b1f-9405-fd884bfa19a9.mp4
-
-https://youtu.be/yvPWtq7isfI
-
-https://youtu.be/6U7ZM2ZSwCU
-
-https://user-images.githubusercontent.com/48346627/229270332-68756cde-4fbb-46c2-ac3b-f44b9a988641.mp4
-
 # What is VC Client
 
-[VC Client](https://github.com/w-okada/voice-changer) is a client software for real-time voice changers that uses AI such as [MMVC](https://github.com/isletennos/MMVC_Trainer) and [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc). It also provides an app for recording training audio for real-time voice changers, specifically for MMVC.
+[VC Client](https://github.com/w-okada/voice-changer) is a client software for real-time voice changers that uses AI such as [MMVC](https://github.com/isletennos/MMVC_Trainer) and [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc), [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI). It also provides an app for recording training audio for real-time voice changers, specifically for MMVC.
 
 - Please use the [official notebook](https://github.com/isletennos/MMVC_Trainer) for MMVC training.
 - Please use the [official notebook](https://github.com/isletennos/MMVC_Trainer) for so-vits-svc training.
@@ -101,6 +97,13 @@ We offer Windows and Mac versions.
 - To use `so-vits-svc 4.0`/`so-vits-svc 4.0v2` or `tsukuyomi-chan`, you need the content vec model. Please download the ContentVec_legacy 500 model from [this repository](https://github.com/auspicious3000/contentvec), and place it in the same folder as `startHttp_xxx.command` or `start_http_xxx.bat` to run.
 
 - You need to have the hubert model to use RVC(Retrieval-based-Voice-Conversion). Please download `hubert_base.pt` from [this repository](https://huggingface.co/lj1995/VoiceConversionWebUI/tree/main) and store it in the folder where the batch file is located.
+
+| Version     | OS                                    | フレームワーク                        | link                                                                                       | サポート VC                                                         | サイズ |
+| ----------- | ------------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- | ------ |
+| v.1.5.1.15b | <span style="color: blue;">win</span> | ONNX(cpu,cuda), PyTorch(cpu)          | [normal](https://drive.google.com/uc?id=1nb5DxHQJqnYgzWFTBNxCDOx64__uQqyR&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, RVC                                     | 773MB  |
+|             | <span style="color: blue;">win</span> | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [normal](https://drive.google.com/uc?id=197U6ip9ypBSyxhIf3oGnkWfBP-M3Gc12&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC | 2794MB |
+|             | <span style="color: blue;">win</span> | ONNX(cpu,DirectML), PyTorch(cpu)      | [normal](https://drive.google.com/uc?id=18Q9CDBnjgTHwOeklVLWAVMFZI-kk9j3l&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, RVC                                     | 488MB  |
+|             | <span style="color: blue;">win</span> | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1rlGewdhvenv1Yn3WFOLcsWQeuo8ecIQ1&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC | 2665MB |
 
 | Version     | OS                                    | Framework                         | link                                                                                       | VC Support                                                          | Size   |
 | ----------- | ------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- | ------ |
