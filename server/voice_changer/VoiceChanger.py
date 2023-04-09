@@ -28,7 +28,7 @@ class VoiceChangerModel(Protocol):
 
 
 @dataclass
-class VocieChangerSettings():
+class VoiceChangerSettings():
     inputSampleRate: int = 24000  # 48000 or 24000
 
     crossFadeOffsetRate: float = 0.1
