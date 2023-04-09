@@ -26,11 +26,11 @@ class ModelWrapper:
 
     def infer(self, feats, p_len, pitch, pitchf, sid):
         if self.is_half:
-            print("feats", feats.cpu().numpy().dtype)
-            print("p_len", p_len.cpu().numpy().dtype)
-            print("pitch", pitch.cpu().numpy().dtype)
-            print("pitchf", pitchf.cpu().numpy().dtype)
-            print("sid", sid.cpu().numpy().dtype)
+            # print("feats", feats.cpu().numpy().dtype)
+            # print("p_len", p_len.cpu().numpy().dtype)
+            # print("pitch", pitch.cpu().numpy().dtype)
+            # print("pitchf", pitchf.cpu().numpy().dtype)
+            # print("sid", sid.cpu().numpy().dtype)
 
             audio1 = self.onnx_session.run(
                 ["audio"],
