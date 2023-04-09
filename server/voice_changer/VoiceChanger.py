@@ -1,3 +1,4 @@
+from typing import Protocol
 from const import TMP_DIR, getModelType
 import torch
 import os
@@ -5,6 +6,8 @@ import traceback
 import numpy as np
 from dataclasses import dataclass, asdict
 import resampy
+import multiprocessing as mp
+import ctypes as cty
 
 
 from voice_changer.IORecorder import IORecorder
@@ -18,6 +21,10 @@ STREAM_INPUT_FILE = os.path.join(TMP_DIR, "in.wav")
 STREAM_OUTPUT_FILE = os.path.join(TMP_DIR, "out.wav")
 STREAM_ANALYZE_FILE_DIO = os.path.join(TMP_DIR, "analyze-dio.png")
 STREAM_ANALYZE_FILE_HARVEST = os.path.join(TMP_DIR, "analyze-harvest.png")
+
+
+class VoiceChangerModel(Protocol):
+    def get_processing_sampling_rate(self) -> int: ...
 
 
 @dataclass
@@ -37,6 +44,8 @@ class VocieChangerSettings():
 
 
 class VoiceChanger():
+    settings: VocieChangerSettings
+    voiceChanger: VoiceChangerModel
 
     def __init__(self, params):
         # 初期化
@@ -92,7 +101,7 @@ class VoiceChanger():
         data.update(self.voiceChanger.get_info())
         return data
 
-    def update_setteings(self, key: str, val: any):
+    def update_settings(self, key: str, val: any):
         if key in self.settings.intData:
             setattr(self.settings, key, int(val))
             if key == "crossFadeOffsetRate" or key == "crossFadeEndRate":
@@ -122,7 +131,7 @@ class VoiceChanger():
         elif key in self.settings.strData:
             setattr(self.settings, key, str(val))
         else:
-            ret = self.voiceChanger.update_setteings(key, val)
+            ret = self.voiceChanger.update_settings(key, val)
             if ret == False:
                 print(f"{key} is not mutable variable or unknown variable!")
 

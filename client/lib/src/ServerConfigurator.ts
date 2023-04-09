@@ -28,7 +28,7 @@ export class ServerConfigurator {
     }
 
     updateSettings = async (key: ServerSettingKey, val: string) => {
-        const url = this.serverUrl + "/update_setteings"
+        const url = this.serverUrl + "/update_settings"
         const info = await new Promise<ServerInfo>(async (resolve) => {
             const formData = new FormData();
             formData.append("key", key);

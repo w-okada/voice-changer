@@ -21,7 +21,7 @@ class MMVC_Rest_Fileuploader:
         self.router.add_api_route("/info", self.get_info, methods=["GET"])
         self.router.add_api_route("/upload_file", self.post_upload_file, methods=["POST"])
         self.router.add_api_route("/concat_uploaded_file", self.post_concat_uploaded_file, methods=["POST"])
-        self.router.add_api_route("/update_setteings", self.post_update_setteings, methods=["POST"])
+        self.router.add_api_route("/update_settings", self.post_update_settings, methods=["POST"])
         self.router.add_api_route("/load_model", self.post_load_model, methods=["POST"])
         self.router.add_api_route("/load_model_for_train", self.post_load_model_for_train, methods=["POST"])
         self.router.add_api_route("/extract_voices", self.post_extract_voices, methods=["POST"])
@@ -43,9 +43,9 @@ class MMVC_Rest_Fileuploader:
         json_compatible_item_data = jsonable_encoder(info)
         return JSONResponse(content=json_compatible_item_data)
 
-    def post_update_setteings(self, key: str = Form(...), val: Union[int, str, float] = Form(...)):
-        print("post_update_setteings", key, val)
-        info = self.voiceChangerManager.update_setteings(key, val)
+    def post_update_settings(self, key: str = Form(...), val: Union[int, str, float] = Form(...)):
+        print("post_update_settings", key, val)
+        info = self.voiceChangerManager.update_settings(key, val)
         json_compatible_item_data = jsonable_encoder(info)
         return JSONResponse(content=json_compatible_item_data)
 
