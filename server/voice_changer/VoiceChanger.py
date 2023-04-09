@@ -44,12 +44,12 @@ class VocieChangerSettings():
 
 
 class VoiceChanger():
-    settings: VocieChangerSettings
+    settings: VoiceChangerSettings
     voiceChanger: VoiceChangerModel
 
     def __init__(self, params):
         # 初期化
-        self.settings = VocieChangerSettings()
+        self.settings = VoiceChangerSettings()
         self.onnx_session = None
         self.currentCrossFadeOffsetRate = 0
         self.currentCrossFadeEndRate = 0
