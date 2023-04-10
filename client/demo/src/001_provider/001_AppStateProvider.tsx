@@ -24,7 +24,7 @@ export const useAppState = (): AppStateValue => {
 
 export const AppStateProvider = ({ children }: Props) => {
     const appRoot = useAppRoot()
-    const clientState = useVCClient({ audioContext: appRoot.audioContextState.audioContext, clientType: appRoot.appGuiSettingState.appGuiSetting.id })
+    const clientState = useVCClient({ audioContext: appRoot.audioContextState.audioContext, clientType: appRoot.clientType })
 
 
     const initializedRef = useRef<boolean>(false)

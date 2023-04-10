@@ -10,9 +10,10 @@ import { far } from "@fortawesome/free-regular-svg-icons";
 import { fab } from "@fortawesome/free-brands-svg-icons";
 import { AppRootProvider, useAppRoot } from "./001_provider/001_AppRootProvider";
 import ErrorBoundary from "./001_provider/900_ErrorBoundary";
-import { INDEXEDDB_KEY_CLIENT, INDEXEDDB_KEY_MODEL_DATA, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_WORKLET, INDEXEDDB_KEY_WORKLETNODE, useIndexedDB } from "@dannadori/voice-changer-client-js";
+import { ClientType, INDEXEDDB_KEY_CLIENT, INDEXEDDB_KEY_MODEL_DATA, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_WORKLET, INDEXEDDB_KEY_WORKLETNODE, useIndexedDB } from "@dannadori/voice-changer-client-js";
 import { CLIENT_TYPE, INDEXEDDB_KEY_AUDIO_OUTPUT } from "./const";
 import { Demo } from "./components/demo/010_Demo";
+import { ClientSelector } from "./001_ClientSelector";
 
 library.add(fas, far, fab);
 
@@ -21,7 +22,7 @@ const container = document.getElementById("app")!;
 const root = createRoot(container);
 
 const App = () => {
-    const { appGuiSettingState } = useAppRoot()
+    const { appGuiSettingState, clientType } = useAppRoot()
     const front = useMemo(() => {
         if (appGuiSettingState.appGuiSetting.type == "demo") {
             return <Demo></Demo>
@@ -38,7 +39,7 @@ const App = () => {
 }
 
 const AppStateWrapper = () => {
-    const { appGuiSettingState } = useAppRoot()
+    const { appGuiSettingState, clientType } = useAppRoot()
     // エラーバウンダリー設定
     const [error, setError] = useState<{ error: Error, errorInfo: ErrorInfo }>()
     const { removeItem } = useIndexedDB({ clientType: CLIENT_TYPE })
@@ -96,7 +97,11 @@ const AppStateWrapper = () => {
         setError({ error, errorInfo })
     }
 
-    if (!appGuiSettingState.guiSettingLoaded) {
+
+    if (!clientType) {
+        return <ClientSelector></ClientSelector>
+
+    } else if (!appGuiSettingState.guiSettingLoaded) {
         return <></>
     } else {
         return (

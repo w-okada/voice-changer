@@ -1,10 +1,10 @@
 from typing import Any, Callable, Optional, Protocol, TypeAlias, Union, cast
-from const import TMP_DIR, getModelType
+from const import TMP_DIR, ModelType
 import torch
 import os
 import traceback
 import numpy as np
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 import resampy
 
 
@@ -46,9 +46,15 @@ class VoiceChangerSettings():
     recordIO: int = 0  # 0:off, 1:on
 
     # ↓mutableな物だけ列挙
-    intData: list[str] = ["inputSampleRate", "crossFadeOverlapSize", "recordIO"]
-    floatData: list[str] = ["crossFadeOffsetRate", "crossFadeEndRate"]
-    strData: list[str] = []
+    intData: list[str] = field(
+        default_factory=lambda: ["inputSampleRate", "crossFadeOverlapSize", "recordIO"]
+    )
+    floatData: list[str] = field(
+        default_factory=lambda: ["crossFadeOffsetRate", "crossFadeEndRate"]
+    )
+    strData: list[str] = field(
+        default_factory=lambda: []
+    )
 
 
 class VoiceChanger():
@@ -64,8 +70,46 @@ class VoiceChanger():
         self.currentCrossFadeOverlapSize = 0  # setting
         self.crossfadeSize = 0  # calculated
 
-        self.modelType = getModelType()
-        print("[VoiceChanger] activate model type:", self.modelType)
+        # self.modelType = getModelType()
+        # print("[VoiceChanger] activate model type:", self.modelType)
+        # if self.modelType == "MMVCv15":
+        #     from voice_changer.MMVCv15.MMVCv15 import MMVCv15
+        #     self.voiceChanger = MMVCv15()  # type: ignore
+        # elif self.modelType == "MMVCv13":
+        #     from voice_changer.MMVCv13.MMVCv13 import MMVCv13
+        #     self.voiceChanger = MMVCv13()
+        # elif self.modelType == "so-vits-svc-40v2":
+        #     from voice_changer.SoVitsSvc40v2.SoVitsSvc40v2 import SoVitsSvc40v2
+        #     self.voiceChanger = SoVitsSvc40v2(params)
+        # elif self.modelType == "so-vits-svc-40" or self.modelType == "so-vits-svc-40_c":
+        #     from voice_changer.SoVitsSvc40.SoVitsSvc40 import SoVitsSvc40
+        #     self.voiceChanger = SoVitsSvc40(params)
+        # elif self.modelType == "DDSP-SVC":
+        #     from voice_changer.DDSP_SVC.DDSP_SVC import DDSP_SVC
+        #     self.voiceChanger = DDSP_SVC(params)
+        # elif self.modelType == "RVC":
+        #     from voice_changer.RVC.RVC import RVC
+        #     self.voiceChanger = RVC(params)
+        # else:
+        #     from voice_changer.MMVCv13.MMVCv13 import MMVCv13
+        #     self.voiceChanger = MMVCv13()
+
+        self.voiceChanger = None
+        self.modelType = None
+        self.params = params
+        self.gpu_num = torch.cuda.device_count()
+        self.prev_audio = np.zeros(4096)
+        self.mps_enabled: bool = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
+
+        print(f"VoiceChanger Initialized (GPU_NUM:{self.gpu_num}, mps_enabled:{self.mps_enabled})")
+
+    def switchModelType(self, modelType: ModelType):
+        if hasattr(self, "voiceChanger") and self.voiceChanger != None:
+            # return {"status": "ERROR", "msg": "vc is already selected. currently re-select is not implemented"}
+            del self.voiceChanger
+            self.voiceChanger = None
+
+        self.modelType = modelType
         if self.modelType == "MMVCv15":
             from voice_changer.MMVCv15.MMVCv15 import MMVCv15
             self.voiceChanger = MMVCv15()  # type: ignore
@@ -74,25 +118,27 @@ class VoiceChanger():
             self.voiceChanger = MMVCv13()
         elif self.modelType == "so-vits-svc-40v2":
             from voice_changer.SoVitsSvc40v2.SoVitsSvc40v2 import SoVitsSvc40v2
-            self.voiceChanger = SoVitsSvc40v2(params)
+            self.voiceChanger = SoVitsSvc40v2(self.params)
         elif self.modelType == "so-vits-svc-40" or self.modelType == "so-vits-svc-40_c":
             from voice_changer.SoVitsSvc40.SoVitsSvc40 import SoVitsSvc40
-            self.voiceChanger = SoVitsSvc40(params)
+            self.voiceChanger = SoVitsSvc40(self.params)
         elif self.modelType == "DDSP-SVC":
             from voice_changer.DDSP_SVC.DDSP_SVC import DDSP_SVC
-            self.voiceChanger = DDSP_SVC(params)
+            self.voiceChanger = DDSP_SVC(self.params)
         elif self.modelType == "RVC":
             from voice_changer.RVC.RVC import RVC
-            self.voiceChanger = RVC(params)
+            self.voiceChanger = RVC(self.params)
         else:
             from voice_changer.MMVCv13.MMVCv13 import MMVCv13
             self.voiceChanger = MMVCv13()
 
-        self.gpu_num = torch.cuda.device_count()
-        self.prev_audio = np.zeros(4096)
-        self.mps_enabled: bool = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
+        return {"status": "OK", "msg": "vc is switched."}
 
-        print(f"VoiceChanger Initialized (GPU_NUM:{self.gpu_num}, mps_enabled:{self.mps_enabled})")
+    def getModelType(self):
+        if self.modelType != None:
+            return {"status": "OK", "vc": self.modelType}
+        else:
+            return {"status": "OK", "vc": "none"}
 
     def loadModel(
         self,
@@ -115,7 +161,8 @@ class VoiceChanger():
 
     def get_info(self):
         data = asdict(self.settings)
-        data.update(self.voiceChanger.get_info())
+        if hasattr(self, "voiceChanger"):
+            data.update(self.voiceChanger.get_info())
         return data
 
     def update_settings(self, key: str, val: Any):
@@ -148,10 +195,12 @@ class VoiceChanger():
         elif key in self.settings.strData:
             setattr(self.settings, key, str(val))
         else:
-            ret = self.voiceChanger.update_settings(key, val)
-            if ret == False:
-                print(f"{key} is not mutable variable or unknown variable!")
-
+            if hasattr(self, "voiceChanger"):
+                ret = self.voiceChanger.update_settings(key, val)
+                if ret == False:
+                    print(f"{key} is not mutable variable or unknown variable!")
+            else:
+                print(f"voice changer is not initialized!")
         return self.get_info()
 
     def _generate_strength(self, crossfadeSize: int):

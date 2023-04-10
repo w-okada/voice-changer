@@ -4,7 +4,7 @@ import { VoiceChangerClient } from "../VoiceChangerClient";
 import { useIndexedDB } from "./useIndexedDB";
 
 export type UseWorkletSettingProps = {
-    clientType: ClientType
+    clientType: ClientType | null
     voiceChangerClient: VoiceChangerClient | null
 }
 

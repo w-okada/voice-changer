@@ -273,6 +273,10 @@ class DDSP_SVC:
         del self.net_g
         del self.onnx_session
 
+    def __del__(self):
+        del self.net_g
+        del self.onnx_session
+
 
 def cross_fade(a: np.ndarray, b: np.ndarray, idx: int):
     result = np.zeros(idx + b.shape[0])

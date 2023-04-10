@@ -9,7 +9,7 @@ import { useWorkletSetting, WorkletSettingState } from "./useWorkletSetting"
 
 export type UseClientProps = {
     audioContext: AudioContext | null
-    clientType: ClientType
+    clientType: ClientType | null
 }
 
 export type ClientState = {
@@ -25,6 +25,8 @@ export type ClientState = {
     bufferingTime: number;
     volume: number;
     performance: PerformanceData
+
+    // setClientType: (val: ClientType) => void
 
     // 情報取得
     getInfo: () => Promise<void>
@@ -50,6 +52,7 @@ const InitialPerformanceData: PerformanceData = {
 export const useClient = (props: UseClientProps): ClientState => {
 
     const [initialized, setInitialized] = useState<boolean>(false)
+    // const [clientType, setClientType] = useState<ClientType | null>(null)
     // (1-1) クライアント    
     const voiceChangerClientRef = useRef<VoiceChangerClient | null>(null)
     const [voiceChangerClient, setVoiceChangerClient] = useState<VoiceChangerClient | null>(voiceChangerClientRef.current)
@@ -164,6 +167,8 @@ export const useClient = (props: UseClientProps): ClientState => {
         bufferingTime,
         volume,
         performance,
+
+        // setClientType,
 
         // 情報取得
         getInfo,

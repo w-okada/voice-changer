@@ -5,7 +5,7 @@ import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
 export type UseClientSettingProps = {
-    clientType: ClientType
+    clientType: ClientType | null
     voiceChangerClient: VoiceChangerClient | null
     audioContext: AudioContext | null
 }

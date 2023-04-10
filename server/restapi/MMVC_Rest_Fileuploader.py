@@ -9,7 +9,7 @@ from fastapi import HTTPException, FastAPI, UploadFile, File, Form
 from restapi.mods.FileUploader import upload_file, concat_file_chunks
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 
-from const import MODEL_DIR, UPLOAD_DIR
+from const import MODEL_DIR, UPLOAD_DIR, ModelType
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(MODEL_DIR, exist_ok=True)
 
@@ -25,8 +25,8 @@ class MMVC_Rest_Fileuploader:
         self.router.add_api_route("/load_model", self.post_load_model, methods=["POST"])
         self.router.add_api_route("/load_model_for_train", self.post_load_model_for_train, methods=["POST"])
         self.router.add_api_route("/extract_voices", self.post_extract_voices, methods=["POST"])
-
-        self.onnx_provider = ""
+        self.router.add_api_route("/model_type", self.post_model_type, methods=["POST"])
+        self.router.add_api_route("/model_type", self.get_model_type, methods=["GET"])
 
     def post_upload_file(self, file: UploadFile = File(...), filename: str = Form(...)):
         res = upload_file(UPLOAD_DIR, file, filename)
@@ -95,3 +95,18 @@ class MMVC_Rest_Fileuploader:
             UPLOAD_DIR, zipFilename, zipFileChunkNum, UPLOAD_DIR)
         shutil.unpack_archive(zipFilePath, "MMVC_Trainer/dataset/textful/")
         return {"Zip file unpacked": f"{zipFilePath}"}
+
+    def post_model_type(
+        self,
+        modelType: ModelType = Form(...),
+    ):
+        info = self.voiceChangerManager.switchModelType(modelType)
+        json_compatible_item_data = jsonable_encoder(info)
+        return JSONResponse(content=json_compatible_item_data)
+
+    def get_model_type(
+        self,
+    ):
+        info = self.voiceChangerManager.getModelType(modelType)
+        json_compatible_item_data = jsonable_encoder(info)
+        return JSONResponse(content=json_compatible_item_data)

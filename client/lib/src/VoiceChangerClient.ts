@@ -3,7 +3,7 @@ import { VoiceChangerWorkletNode, VoiceChangerWorkletListener } from "./VoiceCha
 import workerjs from "raw-loader!../worklet/dist/index.js";
 import { VoiceFocusDeviceTransformer, VoiceFocusTransformDevice } from "amazon-chime-sdk-js";
 import { createDummyMediaStream, validateUrl } from "./util";
-import { DefaultVoiceChangerClientSetting, ServerSettingKey, VoiceChangerClientSetting, WorkletNodeSetting, WorkletSetting } from "./const";
+import { ClientType, DefaultVoiceChangerClientSetting, ServerSettingKey, VoiceChangerClientSetting, WorkletNodeSetting, WorkletSetting } from "./const";
 import { ServerConfigurator } from "./ServerConfigurator";
 
 // オーディオデータの流れ
@@ -44,15 +44,28 @@ export class VoiceChangerClient {
         this.vfEnable = vfEnable
         this.promiseForInitialize = new Promise<void>(async (resolve) => {
             const scriptUrl = URL.createObjectURL(new Blob([workerjs], { type: "text/javascript" }));
-            await this.ctx.audioWorklet.addModule(scriptUrl)
 
-            this.vcInNode = new VoiceChangerWorkletNode(this.ctx, voiceChangerWorkletListener); // vc node 
+            // await this.ctx.audioWorklet.addModule(scriptUrl)
+            // this.vcInNode = new VoiceChangerWorkletNode(this.ctx, voiceChangerWorkletListener); // vc node 
+
+            try {
+                this.vcInNode = new VoiceChangerWorkletNode(this.ctx, voiceChangerWorkletListener); // vc node 
+            } catch (err) {
+                await this.ctx.audioWorklet.addModule(scriptUrl)
+                this.vcInNode = new VoiceChangerWorkletNode(this.ctx, voiceChangerWorkletListener); // vc node 
+            }
+
+
 
             // const ctx44k = new AudioContext({ sampleRate: 44100 }) // これでもプチプチが残る
             const ctx44k = new AudioContext({ sampleRate: 48000 }) // 結局これが一番まし。
             console.log("audio out:", ctx44k)
-            await ctx44k.audioWorklet.addModule(scriptUrl)
-            this.vcOutNode = new VoiceChangerWorkletNode(ctx44k, voiceChangerWorkletListener); // vc node 
+            try {
+                this.vcOutNode = new VoiceChangerWorkletNode(ctx44k, voiceChangerWorkletListener); // vc node 
+            } catch (err) {
+                await ctx44k.audioWorklet.addModule(scriptUrl)
+                this.vcOutNode = new VoiceChangerWorkletNode(ctx44k, voiceChangerWorkletListener); // vc node 
+            }
             this.currentMediaStreamAudioDestinationNode = ctx44k.createMediaStreamDestination() // output node
             this.outputGainNode = ctx44k.createGain()
             this.outputGainNode.gain.value = this.setting.outputGain
@@ -248,6 +261,14 @@ export class VoiceChangerClient {
     // コンポーネント設定、操作
     /////////////////////////////////////////////////////
     //##  Server ##//
+    switchModelType = (clientType: ClientType) => {
+        return this.configurator.switchModelType(clientType)
+    }
+    getModelType = () => {
+        return this.configurator.getModelType()
+    }
+
+
     updateServerSettings = (key: ServerSettingKey, val: string) => {
         return this.configurator.updateSettings(key, val)
     }

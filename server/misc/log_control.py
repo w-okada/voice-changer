@@ -8,8 +8,8 @@ class UvicornSuppressFilter(logging.Filter):
         return False
 
 
-# logger = logging.getLogger("uvicorn.error")
-# logger.addFilter(UvicornSuppressFilter())
+logger = logging.getLogger("uvicorn.error")
+logger.addFilter(UvicornSuppressFilter())
 
 logger = logging.getLogger("fairseq.tasks.hubert_pretraining")
 logger.addFilter(UvicornSuppressFilter())

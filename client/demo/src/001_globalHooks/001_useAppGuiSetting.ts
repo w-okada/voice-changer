@@ -51,13 +51,14 @@ export type AppGuiSettingState = {
 }
 
 export type AppGuiSettingStateAndMethod = AppGuiSettingState & {
-    getAppSetting: (url: string) => Promise<void>
+    getAppGuiSetting: (url: string) => Promise<void>
+    clearAppGuiSetting: () => void
 }
 
 export const userAppGuiSetting = (): AppGuiSettingStateAndMethod => {
     const [guiSettingLoaded, setGuiSettingLoaded] = useState<boolean>(false)
     const [appGuiSetting, setAppGuiSetting] = useState<AppGuiSetting>(InitialAppGuiDemoSetting)
-    const getAppSetting = async (url: string) => {
+    const getAppGuiSetting = async (url: string) => {
         const res = await fetch(`${url}`, {
             method: "GET",
         })
@@ -65,9 +66,15 @@ export const userAppGuiSetting = (): AppGuiSettingStateAndMethod => {
         setAppGuiSetting(appSetting)
         setGuiSettingLoaded(true)
     }
+    const clearAppGuiSetting = () => {
+        setAppGuiSetting(InitialAppGuiDemoSetting)
+        setGuiSettingLoaded(false)
+    }
     return {
         appGuiSetting,
         guiSettingLoaded,
-        getAppSetting,
+        getAppGuiSetting,
+        clearAppGuiSetting,
+
     }
 }

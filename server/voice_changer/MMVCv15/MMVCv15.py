@@ -247,6 +247,19 @@ class MMVCv15:
             audio = self._pyTorch_inference(data)
         return audio
 
-    def destroy(self):
+    def __del__(self):
         del self.net_g
         del self.onnx_session
+
+        remove_path = os.path.join("MMVC_Client_v15", "python")
+        sys.path = [x for x in sys.path if x.endswith(remove_path) == False]
+
+        for key in list(sys.modules):
+            val = sys.modules.get(key)
+            try:
+                file_path = val.__file__
+                if file_path.find("MMVC_Client_v15/python") >= 0:
+                    print("remove", key, file_path)
+                    sys.modules.pop(key)
+            except Exception as e:
+                pass

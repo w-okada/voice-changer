@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { ClientType, INDEXEDDB_DB_APP_NAME, INDEXEDDB_DB_NAME } from "../const";
 
 export type UseIndexedDBProps = {
-    clientType: ClientType
+    clientType: ClientType | null
 }
 export type IndexedDBState = {
     dummy: string
@@ -16,31 +16,36 @@ export type IndexedDBStateAndMethod = IndexedDBState & {
 }
 
 export const useIndexedDB = (props: UseIndexedDBProps): IndexedDBStateAndMethod => {
+    const clientType = props.clientType || "default"
     localForage.config({
         driver: localForage.INDEXEDDB,
         name: INDEXEDDB_DB_APP_NAME,
         version: 1.0,
-        storeName: `${INDEXEDDB_DB_NAME}_${props.clientType}`,
+        storeName: `${INDEXEDDB_DB_NAME}`,
         description: 'appStorage'
 
     })
 
     const setItem = useMemo(() => {
         return async (key: string, value: unknown) => {
-            await localForage.setItem(key, value)
+            const clientKey = `${clientType}_${key}`
+            await localForage.setItem(clientKey, value)
         }
-    }, [])
+    }, [props.clientType])
+
     const getItem = useMemo(() => {
         return async (key: string) => {
-            return await localForage.getItem(key)
+            const clientKey = `${clientType}_${key}`
+            return await localForage.getItem(clientKey)
         }
-    }, [])
+    }, [props.clientType])
 
     const removeItem = useMemo(() => {
         return async (key: string) => {
-            return await localForage.removeItem(key)
+            const clientKey = `${clientType}_${key}`
+            return await localForage.removeItem(clientKey)
         }
-    }, [])
+    }, [props.clientType])
 
 
     return {

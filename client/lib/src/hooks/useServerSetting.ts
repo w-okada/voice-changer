@@ -38,7 +38,7 @@ const InitialFileUploadSetting: FileUploadSetting = {
 }
 
 export type UseServerSettingProps = {
-    clientType: ClientType
+    clientType: ClientType | null
     voiceChangerClient: VoiceChangerClient | null
 }
 
@@ -58,7 +58,7 @@ export type ServerSettingState = {
 
 export const useServerSetting = (props: UseServerSettingProps): ServerSettingState => {
     // const settingRef = useRef<VoiceChangerServerSetting>(DefaultVoiceChangerServerSetting)
-    const defaultServerSetting = useMemo(() => {
+    const getDefaultServerSetting = () => {
         if (props.clientType == "MMVCv13") {
             return DefaultServerSetting_MMVCv13
         } else if (props.clientType == "MMVCv15") {
@@ -75,43 +75,57 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         } else {
             return DefaultServerSetting_MMVCv15
         }
-    }, [])
-    const [serverSetting, setServerSetting] = useState<ServerInfo>(defaultServerSetting)
+    }
+
+    const [serverSetting, setServerSetting] = useState<ServerInfo>(getDefaultServerSetting())
     const [fileUploadSetting, setFileUploadSetting] = useState<FileUploadSetting>(InitialFileUploadSetting)
     const { setItem, getItem, removeItem } = useIndexedDB({ clientType: props.clientType })
 
 
-    // DBから設定取得（キャッシュによる初期化）
+    // clientTypeが新しく設定されたときに、serverのmodelType動作を変更＋設定反映
     useEffect(() => {
-        const loadCache = async () => {
-            const setting = await getItem(INDEXEDDB_KEY_SERVER)
-            if (!setting) {
+        if (!props.voiceChangerClient) return
+        if (!props.clientType) return
+
+        const setInitialSetting = async () => {
+            // Set Model Type
+            await props.voiceChangerClient!.switchModelType(props.clientType!)
+
+            // Load Default (and Cache) and set
+            const defaultServerSetting = getDefaultServerSetting()
+            const cachedServerSetting = await getItem(INDEXEDDB_KEY_SERVER)
+            let initialSetting: ServerInfo
+            if (cachedServerSetting) {
+                initialSetting = { ...defaultServerSetting, ...cachedServerSetting as ServerInfo }
+                console.log("Initial Setting1:", initialSetting)
             } else {
-                setServerSetting(setting as ServerInfo)
+                initialSetting = { ...defaultServerSetting }
+                console.log("Initial Setting2:", initialSetting)
+            }
+            setServerSetting(initialSetting)
+
+            // upload setting
+            for (let i = 0; i < Object.values(ServerSettingKey).length; i++) {
+                const k = Object.values(ServerSettingKey)[i] as keyof VoiceChangerServerSetting
+                const v = initialSetting[k]
+                if (v) {
+                    props.voiceChangerClient!.updateServerSettings(k, "" + v)
+                }
             }
 
+            // Load file upload cache 
             const fileuploadSetting = await getItem(INDEXEDDB_KEY_MODEL_DATA)
             if (!fileuploadSetting) {
             } else {
                 setFileUploadSetting(fileuploadSetting as FileUploadSetting)
             }
+
+            reloadServerInfo()
         }
 
-        loadCache()
-    }, [])
+        setInitialSetting()
 
-    // サーバへキャッシュの内容を反映 (クライアント初期化した時の一回)
-    useEffect(() => {
-        if (!props.voiceChangerClient) return
-        for (let i = 0; i < Object.values(ServerSettingKey).length; i++) {
-            const k = Object.values(ServerSettingKey)[i] as keyof VoiceChangerServerSetting
-            const v = serverSetting[k]
-            if (v) {
-                props.voiceChangerClient.updateServerSettings(k, "" + v)
-            }
-        }
-        reloadServerInfo()
-    }, [props.voiceChangerClient])
+    }, [props.voiceChangerClient, props.clientType])
 
     //////////////
     // 設定
@@ -125,7 +139,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 const new_v = setting[k]
                 if (cur_v != new_v) {
                     const res = await props.voiceChangerClient.updateServerSettings(k, "" + new_v)
-                    if (res.onnxExecutionProviders.length > 0) {
+                    if (res.onnxExecutionProviders && res.onnxExecutionProviders.length > 0) {
                         res.onnxExecutionProvider = res.onnxExecutionProviders[0]
                     } else {
                         res.onnxExecutionProvider = "CPUExecutionProvider"

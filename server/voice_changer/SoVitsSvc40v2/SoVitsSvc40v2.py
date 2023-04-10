@@ -314,9 +314,22 @@ class SoVitsSvc40v2:
             audio = self._pyTorch_inference(data)
         return audio
 
-    def destroy(self):
+    def __del__(self):
         del self.net_g
         del self.onnx_session
+
+        remove_path = os.path.join("so-vits-svc-40v2")
+        sys.path = [x for x in sys.path if x.endswith(remove_path) == False]
+
+        for key in list(sys.modules):
+            val = sys.modules.get(key)
+            try:
+                file_path = val.__file__
+                if file_path.find("so-vits-svc-40v2/") >= 0:
+                    print("remove", key, file_path)
+                    sys.modules.pop(key)
+            except Exception as e:
+                pass
 
 
 def resize_f0(x, target_len):

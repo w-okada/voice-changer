@@ -1,5 +1,6 @@
 import numpy as np
 from voice_changer.VoiceChanger import VoiceChanger
+from const import ModelType
 
 
 class VoiceChangerManager():
@@ -37,3 +38,9 @@ class VoiceChangerManager():
         else:
             print("Voice Change is not loaded. Did you load a correct model?")
             return np.zeros(1).astype(np.int16), []
+
+    def switchModelType(self, modelType: ModelType):
+        return self.voiceChanger.switchModelType(modelType)
+
+    def getModelType(self):
+        return self.voiceChanger.getModelType()

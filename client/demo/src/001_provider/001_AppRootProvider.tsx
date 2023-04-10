@@ -1,4 +1,5 @@
-import React, { useContext, useEffect } from "react";
+import { ClientType } from "@dannadori/voice-changer-client-js";
+import React, { useContext, useEffect, useState } from "react";
 import { ReactNode } from "react";
 import { AppGuiSettingStateAndMethod, userAppGuiSetting } from "../001_globalHooks/001_useAppGuiSetting";
 import { AudioConfigState, useAudioConfig } from "../001_globalHooks/001_useAudioConfig";
@@ -10,6 +11,8 @@ type Props = {
 type AppRootValue = {
     audioContextState: AudioConfigState
     appGuiSettingState: AppGuiSettingStateAndMethod
+    clientType: ClientType | null
+    setClientType: (val: ClientType | null) => void
 }
 
 const AppRootContext = React.createContext<AppRootValue | null>(null);
@@ -24,16 +27,20 @@ export const useAppRoot = (): AppRootValue => {
 export const AppRootProvider = ({ children }: Props) => {
     const audioContextState = useAudioConfig()
     const appGuiSettingState = userAppGuiSetting()
+    const [clientType, setClientType] = useState<ClientType | null>(null)
 
     useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const modelType = params.get("modelType") || ""
-        appGuiSettingState.getAppSetting(`/assets/gui_settings/${modelType}.json`)
-    }, [])
+        if (!clientType) {
+            return
+        }
+        appGuiSettingState.getAppGuiSetting(`/assets/gui_settings/${clientType}.json`)
+    }, [clientType])
 
     const providerValue: AppRootValue = {
         audioContextState,
-        appGuiSettingState
+        appGuiSettingState,
+        clientType,
+        setClientType
     };
     return <AppRootContext.Provider value={providerValue}>{children}</AppRootContext.Provider>;
 };

@@ -21,7 +21,7 @@ export const TrancateNumTresholdRow = (_props: TrancateNumTresholdRowProps) => {
                 </div>
             </div>
         )
-    }, [appState.workletNodeSetting.workletNodeSetting, appState.workletNodeSetting.updateWorkletNodeSetting])
+    }, [appState.workletSetting.setting, appState.workletSetting.setSetting])
 
     return trancateNumTresholdRow
 }
