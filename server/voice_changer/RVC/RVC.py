@@ -115,7 +115,7 @@ class RVC:
             self.onnx_session = ModelWrapper(onnx_model_file, is_half=self.is_half)
         return self.get_info()
 
-    def update_setteings(self, key: str, val: any):
+    def update_settings(self, key: str, val: any):
         if key == "onnxExecutionProvider" and self.onnx_session != None:
             if val == "CUDAExecutionProvider":
                 if self.settings.gpu < 0 or self.settings.gpu >= self.gpu_num:

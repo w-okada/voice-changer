@@ -23,9 +23,9 @@ class VoiceChangerManager():
         else:
             return {"status": "ERROR", "msg": "no model loaded"}
 
-    def update_setteings(self, key: str, val: any):
+    def update_settings(self, key: str, val: any):
         if hasattr(self, 'voiceChanger'):
-            info = self.voiceChanger.update_setteings(key, val)
+            info = self.voiceChanger.update_settings(key, val)
             info["status"] = "OK"
             return info
         else:

@@ -1,6 +1,10 @@
 import os
 import sys
 import tempfile
+from typing import Literal, TypeAlias
+
+
+ModelType: TypeAlias = Literal['MMVCv15', 'MMVCv13', 'so-vits-svc-40v2', 'so-vits-svc-40', 'so-vits-svc-40_c', 'DDSP-SVC', 'RVC']
 
 ERROR_NO_ONNX_SESSION = "ERROR_NO_ONNX_SESSION"
 
@@ -22,14 +26,14 @@ TMP_DIR = os.path.join(tmpdir.name, "tmp_dir") if hasattr(sys, "_MEIPASS") else 
 os.makedirs(TMP_DIR, exist_ok=True)
 
 
-modelType = "MMVCv15"
+modelType: ModelType = "MMVCv15"
 
 
-def getModelType():
+def getModelType() -> ModelType:
     return modelType
 
 
-def setModelType(_modelType: str):
+def setModelType(_modelType: ModelType):
     global modelType
     modelType = _modelType
 

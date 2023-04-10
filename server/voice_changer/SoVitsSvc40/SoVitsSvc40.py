@@ -139,7 +139,7 @@ class SoVitsSvc40:
             #     print("output", i)
         return self.get_info()
 
-    def update_setteings(self, key: str, val: any):
+    def update_settings(self, key: str, val: any):
         if key == "onnxExecutionProvider" and self.onnx_session != None:
             if val == "CUDAExecutionProvider":
                 if self.settings.gpu < 0 or self.settings.gpu >= self.gpu_num:
