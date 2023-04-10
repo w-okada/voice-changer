@@ -110,17 +110,17 @@ class Worker:
         data.update(self.voiceChanger.get_info())
         return data
 
-    def update_settings(self, key: str, val: Any):
+    def update_settings(self, key: str, value: Any):
         if key in self.settings.intData:
-            setattr(self.settings, key, int(val))
+            setattr(self.settings, key, int(value))
             if key == "crossFadeOffsetRate" or key == "crossFadeEndRate":
                 self.crossfadeSize = 0
         elif key in self.settings.floatData:
-            setattr(self.settings, key, float(val))
+            setattr(self.settings, key, float(value))
         elif key in self.settings.strData:
-            setattr(self.settings, key, str(val))
+            setattr(self.settings, key, str(value))
         else:
-            ret = self.voiceChanger.update_settings(key, val)
+            ret = self.voiceChanger.update_settings(key, value)
             if not ret:
                 print(f"{key} is not mutable variable or unknown variable!")
 
@@ -242,7 +242,7 @@ class Worker:
 
     def dispatch_command(self, name: WorkerCommand, args: dict[str, Any]):
         if name == "load_model":
-            return self.voiceChanger.loadModel(**args)
+            return self.loadModel(**args)
         elif name == "set_options":
             return self.update_settings(**args)
         elif name == "get_info":
@@ -255,7 +255,8 @@ class Worker:
                 try:
                     self.command_recv.put(self.dispatch_command(name, args))
                 except Exception as e:
-                    self.command_recv.put(e)
+                    print(f"ERROR: {e}")
+                    self.command_recv.put({"error": str(e)})
             if self.data.empty():
                 time.sleep(0)
                 continue
