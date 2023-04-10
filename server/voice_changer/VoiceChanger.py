@@ -68,7 +68,7 @@ class VoiceChanger():
         print("[VoiceChanger] activate model type:", self.modelType)
         if self.modelType == "MMVCv15":
             from voice_changer.MMVCv15.MMVCv15 import MMVCv15
-            self.voiceChanger = MMVCv15()
+            self.voiceChanger = MMVCv15()  # type: ignore
         elif self.modelType == "MMVCv13":
             from voice_changer.MMVCv13.MMVCv13 import MMVCv13
             self.voiceChanger = MMVCv13()
