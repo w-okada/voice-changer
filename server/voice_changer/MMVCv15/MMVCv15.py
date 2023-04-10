@@ -63,7 +63,6 @@ class MMVCv15:
         else:
             self.settings.onnxModelFile = ""
 
-        print("self.settings.onnxModelFile::", self.settings.onnxModelFile)
         # PyTorchモデル生成
         self.net_g = SynthesizerTrn(
             spec_channels=self.hps.data.filter_length // 2 + 1,

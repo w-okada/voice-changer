@@ -23,6 +23,12 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
     private recordingOutputChunk: Float32Array[] = []
     private outputNode: VoiceChangerWorkletNode | null = null
 
+    // Promises
+    private startPromiseResolve: ((value: void | PromiseLike<void>) => void) | null = null
+    private stopPromiseResolve: ((value: void | PromiseLike<void>) => void) | null = null
+
+
+
     constructor(context: AudioContext, listener: VoiceChangerWorkletListener) {
         super(context, "voice-changer-worklet-processor");
         this.port.onmessage = this.handleMessage.bind(this);
@@ -157,10 +163,19 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
         }
         return result;
     }
-
     handleMessage(event: any) {
         // console.log(`[Node:handleMessage_] `, event.data.volume);
-        if (event.data.responseType === "volume") {
+        if (event.data.responseType === "start_ok") {
+            if (this.startPromiseResolve) {
+                this.startPromiseResolve()
+                this.startPromiseResolve = null
+            }
+        } else if (event.data.responseType === "stop_ok") {
+            if (this.stopPromiseResolve) {
+                this.stopPromiseResolve()
+                this.stopPromiseResolve = null
+            }
+        } else if (event.data.responseType === "volume") {
             this.listener.notifyVolume(event.data.volume as number)
         } else if (event.data.responseType === "inputData") {
             const inputData = event.data.inputData as Float32Array
@@ -270,7 +285,10 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
         this.port.postMessage(req)
     }
 
-    start = () => {
+    start = async () => {
+        const p = new Promise<void>((resolve) => {
+            this.startPromiseResolve = resolve
+        })
         const req: VoiceChangerWorkletProcessorRequest = {
             requestType: "start",
             voice: new Float32Array(1),
@@ -279,9 +297,13 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
             volTrancateLength: 0
         }
         this.port.postMessage(req)
+        await p
 
     }
-    stop = () => {
+    stop = async () => {
+        const p = new Promise<void>((resolve) => {
+            this.stopPromiseResolve = resolve
+        })
         const req: VoiceChangerWorkletProcessorRequest = {
             requestType: "stop",
             voice: new Float32Array(1),
@@ -290,6 +312,7 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
             volTrancateLength: 0
         }
         this.port.postMessage(req)
+        await p
     }
     trancateBuffer = () => {
         const req: VoiceChangerWorkletProcessorRequest = {

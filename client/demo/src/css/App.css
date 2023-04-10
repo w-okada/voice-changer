@@ -48,7 +48,7 @@ body {
     overflow-x: hidden;
     color: var(--text-color);
     /* background: linear-gradient(45deg, var(--company-color1) 0, 5%, var(--company-color2) 5% 10%, var(--company-color3) 10% 80%, var(--company-color1) 80% 85%, var(--company-color2) 85% 100%); */
-    background: linear-gradient(45deg, var(--company-color1) 0, 1%, var(--company-color2) 1% 5%, var(--company-color3) 5% 80%, var(--company-color1) 80% 85%, var(--company-color2) 85% 100%);
+    background: linear-gradient(45deg, var(--company-color1) 0, 1%, var(--company-color2) 1% 5%, var(--company-color3) 5% 90%, var(--company-color1) 90% 95%, var(--company-color2) 95% 100%);
 }
 #app {
     height: 100%;
@@ -197,6 +197,42 @@ body {
     }
 }
 
+.split-1-8-1 {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 10%;
+    }
+    & > div:nth-child(2) {
+        left: 10%;
+        width: 80%;
+    }
+    & > div:nth-child(3) {
+        left: 90%;
+        width: 10%;
+    }
+}
+.split-2-2-6 {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 20%;
+    }
+    & > div:nth-child(2) {
+        left: 20%;
+        width: 20%;
+    }
+    & > div:nth-child(3) {
+        left: 40%;
+        width: 60%;
+    }
+}
 .split-3-3-4 {
     display: flex;
     width: 100%;
@@ -270,6 +306,29 @@ body {
         width: 20%;
     }
 }
+.split-1-4-4-1 {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 10%;
+    }
+    & > div:nth-child(2) {
+        left: 10%;
+        width: 40%;
+    }
+    & > div:nth-child(3) {
+        left: 50%;
+        width: 40%;
+    }
+    & > div:nth-child(4) {
+        left: 90%;
+        width: 10%;
+    }
+}
+
 .split-3-2-2-3 {
     display: flex;
     width: 100%;
@@ -410,6 +469,16 @@ body {
         width: 40%;
     }
 }
+.w20 {
+    width: 20%;
+}
+.bold {
+    font-weight: 700;
+}
+.w40 {
+    width: 40%;
+}
+
 .underline {
     border-bottom: 3px solid #333;
 }
@@ -499,6 +568,7 @@ body {
         border-radius: 2px;
         cursor: pointer;
         vertical-align: middle;
+        text-align: center;
         &:hover {
             border: solid 1px #000;
         }

@@ -10,7 +10,9 @@ export type RequestType = typeof RequestType[keyof typeof RequestType]
 
 export const ResponseType = {
     "volume": "volume",
-    "inputData": "inputData"
+    "inputData": "inputData",
+    "start_ok": "start_ok",
+    "stop_ok": "stop_ok",
 } as const
 export type ResponseType = typeof ResponseType[keyof typeof ResponseType]
 
@@ -80,6 +82,10 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
                 return
             }
             this.isRecording = true
+            const startResponse: VoiceChangerWorkletProcessorResponse = {
+                responseType: "start_ok",
+            }
+            this.port.postMessage(startResponse);
             return
         } else if (request.requestType === "stop") {
             if (!this.isRecording) {
@@ -87,6 +93,10 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
                 return
             }
             this.isRecording = false
+            const stopResponse: VoiceChangerWorkletProcessorResponse = {
+                responseType: "stop_ok",
+            }
+            this.port.postMessage(stopResponse);
             return
         } else if (request.requestType === "trancateBuffer") {
             this.trancateBuffer()

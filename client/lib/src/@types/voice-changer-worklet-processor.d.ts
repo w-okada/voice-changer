@@ -9,6 +9,8 @@ export type RequestType = typeof RequestType[keyof typeof RequestType];
 export declare const ResponseType: {
     readonly volume: "volume";
     readonly inputData: "inputData";
+    readonly start_ok: "start_ok";
+    readonly stop_ok: "stop_ok";
 };
 export type ResponseType = typeof ResponseType[keyof typeof ResponseType];
 export type VoiceChangerWorkletProcessorRequest = {

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 import "./css/App.css"
-import { ErrorInfo, useMemo, useState, } from "react";
+import { ErrorInfo, useEffect, useMemo, useState, } from "react";
 import { AppStateProvider } from "./001_provider/001_AppStateProvider";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -11,7 +11,7 @@ import { fab } from "@fortawesome/free-brands-svg-icons";
 import { AppRootProvider, useAppRoot } from "./001_provider/001_AppRootProvider";
 import ErrorBoundary from "./001_provider/900_ErrorBoundary";
 import { ClientType, INDEXEDDB_KEY_CLIENT, INDEXEDDB_KEY_MODEL_DATA, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_WORKLET, INDEXEDDB_KEY_WORKLETNODE, useIndexedDB } from "@dannadori/voice-changer-client-js";
-import { CLIENT_TYPE, INDEXEDDB_KEY_AUDIO_OUTPUT } from "./const";
+import { INDEXEDDB_KEY_AUDIO_OUTPUT, INDEXEDDB_KEY_DEFAULT_MODEL_TYPE } from "./const";
 import { Demo } from "./components/demo/010_Demo";
 import { ClientSelector } from "./001_ClientSelector";
 
@@ -22,7 +22,7 @@ const container = document.getElementById("app")!;
 const root = createRoot(container);
 
 const App = () => {
-    const { appGuiSettingState, clientType } = useAppRoot()
+    const { appGuiSettingState } = useAppRoot()
     const front = useMemo(() => {
         if (appGuiSettingState.appGuiSetting.type == "demo") {
             return <Demo></Demo>
@@ -39,11 +39,11 @@ const App = () => {
 }
 
 const AppStateWrapper = () => {
-    const { appGuiSettingState, clientType } = useAppRoot()
+    const { appGuiSettingState, clientType, setClientType } = useAppRoot()
     // エラーバウンダリー設定
     const [error, setError] = useState<{ error: Error, errorInfo: ErrorInfo }>()
-    const { removeItem } = useIndexedDB({ clientType: CLIENT_TYPE })
-
+    const { removeItem } = useIndexedDB({ clientType: clientType })
+    const { getItem } = useIndexedDB({ clientType: null })
     const errorComponent = useMemo(() => {
         const errorName = error?.error.name || "no error name"
         const errorMessage = error?.error.message || "no error message"
@@ -97,6 +97,16 @@ const AppStateWrapper = () => {
         setError({ error, errorInfo })
     }
 
+
+    useEffect(() => {
+        const loadDefaultModelType = async () => {
+            const defaultModelType = await getItem(INDEXEDDB_KEY_DEFAULT_MODEL_TYPE)
+            if (defaultModelType && defaultModelType != "null") {
+                setClientType(defaultModelType as ClientType)
+            }
+        }
+        loadDefaultModelType()
+    }, [])
 
     if (!clientType) {
         return <ClientSelector></ClientSelector>

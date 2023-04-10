@@ -181,12 +181,12 @@ export class VoiceChangerClient {
         return this.currentMediaStreamAudioDestinationNode.stream
     }
 
-    start = () => {
-        this.vcInNode.start()
+    start = async () => {
+        await this.vcInNode.start()
         this._isVoiceChanging = true
     }
-    stop = () => {
-        this.vcInNode.stop()
+    stop = async () => {
+        await this.vcInNode.stop()
         this._isVoiceChanging = false
     }
 

@@ -97,14 +97,14 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
         return async () => {
             if (!props.voiceChangerClient) return
             // props.voiceChangerClient.setServerUrl(setting.mmvcServerUrl, true)
-            props.voiceChangerClient.start()
+            await props.voiceChangerClient.start()
         }
     }, [props.voiceChangerClient])
     // (2) stop
     const stop = useMemo(() => {
         return async () => {
             if (!props.voiceChangerClient) return
-            props.voiceChangerClient.stop()
+            await props.voiceChangerClient.stop()
         }
     }, [props.voiceChangerClient])
     const reloadClientSetting = useMemo(() => {
