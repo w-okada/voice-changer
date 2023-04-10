@@ -288,7 +288,7 @@ class RVC:
             val = sys.modules.get(key)
             try:
                 file_path = val.__file__
-                if file_path.find("RVC/") >= 0:
+                if file_path.find("RVC" + os.path.sep) >= 0:
                     print("remove", key, file_path)
                     sys.modules.pop(key)
             except Exception as e:

@@ -8,7 +8,8 @@ if sys.platform.startswith('darwin'):
     modulePath = os.path.join(baseDir[0], "MMVC_Client_v13", "python")
     sys.path.append(modulePath)
 else:
-    sys.path.append("MMVC_Client_v13/python")
+    modulePath = os.path.join("MMVC_Client_v13", "python")
+    sys.path.append(modulePath)
 
 
 from dataclasses import dataclass, asdict
@@ -210,7 +211,7 @@ class MMVCv13:
             val = sys.modules.get(key)
             try:
                 file_path = val.__file__
-                if file_path.find("MMVC_Client_v13/python") >= 0:
+                if file_path.find(remove_path + os.path.sep) >= 0:
                     print("remove", key, file_path)
                     sys.modules.pop(key)
             except Exception as e:
