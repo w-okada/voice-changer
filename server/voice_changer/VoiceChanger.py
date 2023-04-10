@@ -42,6 +42,8 @@ class VoiceChanger():
         gpu_num = torch.cuda.device_count()
         mps_enabled: bool = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()  # type: ignore
 
+        self.wm.start()
+
         print(f"VoiceChanger Initialized (GPU_NUM:{gpu_num}, mps_enabled:{mps_enabled})")
 
     def loadModel(
@@ -54,7 +56,7 @@ class VoiceChanger():
         index_file: Optional[str] = None,
         is_half: bool = True,
     ):
-        self.wm.loadModel(config, pyTorch_model_file, onnx_model_file, clusterTorchModel, feature_file, index_file, is_half)
+        return self.wm.loadModel(config, pyTorch_model_file, onnx_model_file, clusterTorchModel, feature_file, index_file, is_half)
 
     def get_info(self):
         data = asdict(self.settings)
@@ -79,7 +81,7 @@ class VoiceChanger():
             setattr(self.settings, key, str(val))
             return self.get_info()
 
-        self.wm.update_settings(key, val)
+        return self.wm.update_settings(key, val)
 
     #  receivedData: tuple of short
     def on_request(self, receivedData: AudioInOut) -> tuple[AudioInOut, list[Union[int, float]]]:
