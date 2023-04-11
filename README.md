@@ -47,7 +47,7 @@
 
 本ソフトウェアや MMVC になじみの薄い方は上から徐々に慣れていくとよいと思います。
 
-## (2-1) Google Colaboratory での利用(MMVC のみ)
+## (1) Google Colaboratory での利用(MMVC のみ)
 
 Google が提供している機械学習プラットフォーム Colaboratory 上で実行できます。
 MMVC のモデルをトレーニングが完了している場合、既に Colaboratory を利用していると思いますので、事前準備は必要ありません。ただし、ネットワーク環境や Colaboratory の状況によってボイスチェンジャのタイムラグが大きくなる傾向があります。
@@ -57,7 +57,7 @@ MMVC のモデルをトレーニングが完了している場合、既に Colab
 
 [解説動画](https://youtu.be/TogfMzXH1T0)
 
-## (2-2) 事前ビルド済みの Binary での利用
+## (2) 事前ビルド済みの Binary での利用
 
 実行形式のバイナリをダウンロードして実行することができます。
 Windows 版と Mac 版を提供しています。
@@ -122,7 +122,7 @@ Windows 版と Mac 版を提供しています。
 
 https://user-images.githubusercontent.com/48346627/212569645-e30b7f4e-079d-4504-8cf8-7816c5f40b00.mp4
 
-## (2-3) Docker や Anaconda など環境構築を行った上での利用
+## (3) Docker や Anaconda など環境構築を行った上での利用
 
 本リポジトリをクローンして利用します。Windows では WSL2 の環境構築が必須になります。また、WSL2 上で Docker もしくは Anaconda などの仮想環境の構築が必要となります。Mac では Anaconda などの Python の仮想環境の構築が必要となります。事前準備が必要となりますが、多くの環境においてこの方法が一番高速で動きます。**<font color="red"> GPU が無くてもそこそこ新しい CPU であれば十分動く可能性があります </font>（下記のリアルタイム性の節を参照）**。
 
