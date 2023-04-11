@@ -8,16 +8,6 @@
 
   - 各サポート VC を選択するランチャーを実装しました。これに伴い起動バッチファイルは、`start_http.bat`と`start_https.bat`の二つになります。
 
-- v.1.5.1.15b
-
-  - [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI.git)の軽量化を行いました。精度や応答速度をわずかに落とすことでより低スペックな PC での稼働も可能になりました。
-
-- v.1.5.1.15a
-
-  - [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI.git)に対応しました。
-
-    hubert のモデルが必要になります。[このリポジトリ](https://huggingface.co/lj1995/VoiceConversionWebUI/tree/main)から`hubert_base.pt`をダウンロードして、バッチファイルがあるフォルダに格納してください。
-
 # VC Client とは
 
 1. 各種音声変換 AI(VC, Voice Conversion)を用いてリアルタイム音声変換を行うためのクライアントソフトウェアです。サポートしている音声変換 AI は次のものになります。
