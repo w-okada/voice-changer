@@ -52,7 +52,7 @@ MMVC のモデルをトレーニングが完了している場合、既に Colab
 実行形式のバイナリをダウンロードして実行することができます。
 Windows 版と Mac 版を提供しています。
 
-- Windows 版は、`ONNX(cpu,cuda),PyTorch(cpu)`版と `ONNX(cpu,cuda), PyTorch(cpu,cuda)`版と`ONNX(cpu,DirectML), PyTorch(cpu)`版を提供しています。環境に応じた zip ファイルをダウンロードしてください。ダウンロードした zip ファイルを解凍して、`start_http.bat`を実行してください。
+- Windows 版は、ダウンロードした zip ファイルを解凍して、`start_http.bat`を実行してください。
 
 - Mac 版はダウンロードファイルを解凍したのちに、`startHttp.command`を実行してください。開発元を検証できない旨が示される場合は、再度コントロールキーを押してクリックして実行してください(or 右クリックから実行してください)。（詳細下記 \*1）
 
