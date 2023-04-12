@@ -83,6 +83,18 @@ Windows 版と Mac 版を提供しています。
 |            | <span style="color: blue;">win</span> | -              | [黄琴海月](https://drive.google.com/uc?id=1fiymPcoYzwE1yxyIfC_FTPiFfGEC2jA8&export=download)       | -           | 823MB  |
 |            | <span style="color: blue;">win</span> | -              | [あみたろ](https://drive.google.com/uc?id=1Vt4WBEOAz0EhIWs3ZRFIcg7ELtSHnYfe&export=download)       | -           | 821MB  |
 
+| Version     | OS                                    | フレームワーク                        | link                                                                                       | サポート VC                                                         | サイズ |
+| ----------- | ------------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- | ------ |
+| v.1.5.1.15b | <span style="color: blue;">win</span> | ONNX(cpu,cuda), PyTorch(cpu)          | [通常](https://drive.google.com/uc?id=1nb5DxHQJqnYgzWFTBNxCDOx64__uQqyR&export=download)   | MMVC v.1.5.x, MMVC v.1.3.x, RVC                                     | 773MB  |
+|             | <span style="color: blue;">win</span> | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [通常](https://drive.google.com/uc?id=197U6ip9ypBSyxhIf3oGnkWfBP-M3Gc12&export=download)   | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC | 2794MB |
+|             | <span style="color: blue;">win</span> | ONNX(cpu,DirectML), PyTorch(cpu)      | [通常](https://drive.google.com/uc?id=18Q9CDBnjgTHwOeklVLWAVMFZI-kk9j3l&export=download)   | MMVC v.1.5.x, MMVC v.1.3.x, RVC                                     | 488MB  |
+|             | <span style="color: blue;">win</span> | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [通常](https://drive.google.com/uc?id=1rlGewdhvenv1Yn3WFOLcsWQeuo8ecIQ1&export=download)   | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC | 2665MB |
+|             | <span style="color: red;">mac</span>  | ONNX(cpu), PyTorch(cpu)               | [normal](https://drive.google.com/uc?id=1saAe8vycI4zv0LRbvNmFLfYt0utGRWyZ&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC | 615MB  |
+
+| Version     | OS                                    | フレームワーク                    | link                                                                                     | サポート VC                                                         | サイズ |
+| ----------- | ------------------------------------- | --------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------ |
+| v.1.5.1.15a | <span style="color: blue;">win</span> | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [通常](https://drive.google.com/uc?id=1lCo4P3D3QVvrl-0DRh305e34d_YmsI10&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC | 2641MB |
+
 \*1 つくよみちゃんはフリー素材キャラクター「つくよみちゃん」が無料公開している音声データを使用しています。（利用規約など、詳細は文末）
 
 \*2 解凍や起動が遅い場合、ウィルス対策ソフトのチェックが走っている可能性があります。ファイルやフォルダを対象外にして実行してみてください。（自己責任です）

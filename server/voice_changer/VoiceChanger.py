@@ -11,11 +11,10 @@ import resampy
 from voice_changer.IORecorder import IORecorder
 # from voice_changer.IOAnalyzer import IOAnalyzer
 
+from voice_changer.utils.Timer import Timer
+from voice_changer.utils.VoiceChangerModel import VoiceChangerModel, AudioInOut
 
 import time
-
-
-AudioInput: TypeAlias = np.ndarray[Any, np.dtype[np.int16]]
 
 
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
@@ -24,15 +23,6 @@ STREAM_INPUT_FILE = os.path.join(TMP_DIR, "in.wav")
 STREAM_OUTPUT_FILE = os.path.join(TMP_DIR, "out.wav")
 STREAM_ANALYZE_FILE_DIO = os.path.join(TMP_DIR, "analyze-dio.png")
 STREAM_ANALYZE_FILE_HARVEST = os.path.join(TMP_DIR, "analyze-harvest.png")
-
-
-class VoiceChangerModel(Protocol):
-    loadModel: Callable[..., dict[str, Any]]
-    def get_processing_sampling_rate(self) -> int: ...
-    def get_info(self) -> dict[str, Any]: ...
-    def inference(self, data: tuple[Any, ...]) -> Any: ...
-    def generate_input(self, newData: AudioInput, inputSize: int, crossfadeSize: int) -> tuple[Any, ...]: ...
-    def update_settings(self, key: str, val: Any) -> bool: ...
 
 
 @dataclass
@@ -234,7 +224,7 @@ class VoiceChanger():
                 delattr(self, "np_prev_audio1")
 
     #  receivedData: tuple of short
-    def on_request(self, receivedData: AudioInput) -> tuple[AudioInput, list[Union[int, float]]]:
+    def on_request(self, receivedData: AudioInOut) -> tuple[AudioInOut, list[Union[int, float]]]:
         processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
 
         print_convert_processing(f"------------ Convert processing.... ------------")
@@ -244,7 +234,7 @@ class VoiceChanger():
             with Timer("pre-process") as t1:
 
                 if self.settings.inputSampleRate != processing_sampling_rate:
-                    newData = cast(AudioInput, resampy.resample(receivedData, self.settings.inputSampleRate, processing_sampling_rate))
+                    newData = cast(AudioInOut, resampy.resample(receivedData, self.settings.inputSampleRate, processing_sampling_rate))
                 else:
                     newData = receivedData
             # print("t1::::", t1.secs)
@@ -311,7 +301,7 @@ class VoiceChanger():
         with Timer("post-process") as t:
             result = result.astype(np.int16)
             if self.settings.inputSampleRate != processing_sampling_rate:
-                outputData = cast(AudioInput, resampy.resample(result, processing_sampling_rate, self.settings.inputSampleRate).astype(np.int16))
+                outputData = cast(AudioInOut, resampy.resample(result, processing_sampling_rate, self.settings.inputSampleRate).astype(np.int16))
             else:
                 outputData = result
             # outputData = result
@@ -345,7 +335,7 @@ def print_convert_processing(mess: str):
         print(mess)
 
 
-def pad_array(arr: AudioInput, target_length: int):
+def pad_array(arr: AudioInOut, target_length: int):
     current_length = arr.shape[0]
     if current_length >= target_length:
         return arr
@@ -355,17 +345,3 @@ def pad_array(arr: AudioInput, target_length: int):
         pad_right = pad_width - pad_left
         padded_arr = np.pad(arr, (pad_left, pad_right), 'constant', constant_values=(0, 0))
         return padded_arr
-
-
-class Timer(object):
-    def __init__(self, title: str):
-        self.title = title
-
-    def __enter__(self):
-        self.start = time.time()
-        return self
-
-    def __exit__(self, *_):
-        self.end = time.time()
-        self.secs = self.end - self.start
-        self.msecs = self.secs * 1000  # millisecs
