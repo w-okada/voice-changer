@@ -67,13 +67,10 @@ We offer Windows and Mac versions.
 
 - You need to have the hubert model to use RVC(Retrieval-based-Voice-Conversion). Please download `hubert_base.pt` from [this repository](https://huggingface.co/lj1995/VoiceConversionWebUI/tree/main) and store it in the folder where the batch file is located.
 
-| Version   | OS  | Framework                             | link                                                                                     | VC Support                                                          | Size   |
-| --------- | --- | ------------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------ |
-| v.1.5.2.1 | mac | ONNX(cpu), PyTorch(cpu)               | [通常](https://drive.google.com/uc?id=1jaK1ZBdvFpnMmi0PBV8zETw7OY28cKI2&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC | 635MB  |
-|           | win | ONNX(cpu,cuda), PyTorch(cpu)          | [通常](https://drive.google.com/uc?id=1N5kEF8Cr6x9ucFy8ElFbBQWtVQBIXTS3&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, RVC                                     | 596MB  |
-|           | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [通常](https://drive.google.com/uc?id=1F7WUSO5P7PT77Zw5xD8pK6KMYFJNV9Ip&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC | 2794MB |
-|           | win | ONNX(cpu,DirectML), PyTorch(cpu)      | [通常](https://drive.google.com/uc?id=1WJcJTPA8YeEDU2PIZfcgjjbYjRlQneki&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, RVC                                     | 488MB  |
-|           | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [通常](https://drive.google.com/uc?id=1QW4YbL3RdKVEdrhVgTuQlR49Xau3W42Z&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC | 2664MB |
+| Version   | OS  | Framework                         | link                                                                                     | VC Support                                                          | Size   |
+| --------- | --- | --------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------ |
+| v.1.5.2.1 | mac | ONNX(cpu), PyTorch(cpu)           | [通常](https://drive.google.com/uc?id=1jaK1ZBdvFpnMmi0PBV8zETw7OY28cKI2&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC | 635MB  |
+|           | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [通常](https://drive.google.com/uc?id=1F7WUSO5P7PT77Zw5xD8pK6KMYFJNV9Ip&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC | 2794MB |
 
 | Version    | OS                                    | Framework | link                                                                                               | VC Support | Size  |
 | ---------- | ------------------------------------- | --------- | -------------------------------------------------------------------------------------------------- | ---------- | ----- |
