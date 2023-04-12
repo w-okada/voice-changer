@@ -53,7 +53,7 @@ We offer Windows and Mac versions.
 
 - For Mac version, after unzipping the downloaded file, double-click the `startHttp.command` file corresponding to your VC. If a message indicating that the developer cannot be verified is displayed, please press the control key and click to run it again (or right-click to run it). (Details below \* 1)
 
-- For Windows version, we offer `ONNX(cpu, cuda), PyTorch(cpu)` version, `ONNX(cpu, cuda), PyTorch(cpu, cuda)` version, and `ONNX(cpu, DirectML), PyTorch(cpu)` version. Please download the zip file corresponding to your environment. After unzipping the downloaded zip file, please run the `start_http.bat` file corresponding to your VC.
+- For Windows user, after unzipping the downloaded zip file, please run the `start_http.bat` file corresponding to your VC.
 
 - If you are connecting remotely, please use the `.command` file (Mac) or `.bat` file (Windows) with https instead of http.
 
