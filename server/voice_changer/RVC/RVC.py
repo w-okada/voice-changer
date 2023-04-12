@@ -3,6 +3,7 @@ import os
 import resampy
 from voice_changer.RVC.ModelWrapper import ModelWrapper
 
+
 # avoiding parse arg error in RVC
 sys.argv = ["MMVCServerSIO.py"]
 
@@ -23,7 +24,7 @@ import numpy as np
 import torch
 import onnxruntime
 # onnxruntime.set_default_logger_severity(3)
-from const import HUBERT_ONNX_MODEL_PATH
+from const import HUBERT_ONNX_MODEL_PATH, TMP_DIR
 
 import pyworld as pw
 
@@ -293,3 +294,20 @@ class RVC:
                     sys.modules.pop(key)
             except Exception as e:
                 pass
+
+    def export2onnx(self):
+        if hasattr(self, "net_g") == False or self.net_g == None:
+            print("[Voice Changer] export2onnx, No pyTorch session.")
+            return {"status": "ng", "path": f""}
+        if self.settings.pyTorchModelFile == None:
+            print("[Voice Changer] export2onnx, No pyTorch filepath.")
+            return {"status": "ng", "path": f""}
+        import voice_changer.RVC.export2onnx as onnxExporter
+
+        output_file = os.path.splitext(os.path.basename(self.settings.pyTorchModelFile))[0] + ".onnx"
+        output_file_simple = os.path.splitext(os.path.basename(self.settings.pyTorchModelFile))[0] + "_simple.onnx"
+        output_path = os.path.join(TMP_DIR, output_file)
+        output_path_simple = os.path.join(TMP_DIR, output_file_simple)
+
+        onnxExporter.export2onnx(self.settings.pyTorchModelFile, output_path, output_path_simple, True)
+        return {"status": "ok", "path": f"/tmp/{output_file_simple}", "filename": output_file_simple}

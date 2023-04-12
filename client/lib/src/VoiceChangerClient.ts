@@ -267,6 +267,9 @@ export class VoiceChangerClient {
     getModelType = () => {
         return this.configurator.getModelType()
     }
+    getOnnx = async () => {
+        return this.configurator.export2onnx()
+    }
 
 
     updateServerSettings = (key: ServerSettingKey, val: string) => {

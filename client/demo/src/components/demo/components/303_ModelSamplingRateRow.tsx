@@ -18,7 +18,7 @@ export const ModelSamplingRateRow = (_props: ModelSamplingRateRowProps) => {
 
         return (
             <div className="body-row split-3-3-4 left-padding-1 guided">
-                <div className="body-item-title left-padding-2">Model Sampling Rate</div>
+                <div className="body-item-title left-padding-2">Model Sampling Rate(only for onnx)</div>
                 <div className="body-item-text">
                     <div></div>
                 </div>

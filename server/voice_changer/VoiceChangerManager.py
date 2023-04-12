@@ -44,3 +44,6 @@ class VoiceChangerManager():
 
     def getModelType(self):
         return self.voiceChanger.getModelType()
+
+    def export2onnx(self):
+        return self.voiceChanger.export2onnx()

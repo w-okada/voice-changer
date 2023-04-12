@@ -11,6 +11,7 @@ export const OpenConverterSettingCheckbox = "open-converter-setting-checkbox"
 export const OpenAdvancedSettingCheckbox = "open-advanced-setting-checkbox"
 
 export const OpenLicenseDialogCheckbox = "open-license-dialog-checkbox"
+export const OpenWaitingDialogCheckbox = "open-waiting-dialog-checkbox"
 
 type Props = {
     children: ReactNode;
@@ -26,6 +27,7 @@ export type StateControls = {
     openAdvancedSettingCheckbox: StateControlCheckbox
 
     showLicenseCheckbox: StateControlCheckbox
+    showWaitingCheckbox: StateControlCheckbox
 }
 
 type GuiStateAndMethod = {
@@ -135,6 +137,7 @@ export const GuiStateProvider = ({ children }: Props) => {
     const openAdvancedSettingCheckbox = useStateControlCheckbox(OpenAdvancedSettingCheckbox);
 
     const showLicenseCheckbox = useStateControlCheckbox(OpenLicenseDialogCheckbox);
+    const showWaitingCheckbox = useStateControlCheckbox(OpenWaitingDialogCheckbox);
 
     useEffect(() => {
         openServerControlCheckbox.updateState(true)
@@ -145,6 +148,7 @@ export const GuiStateProvider = ({ children }: Props) => {
         openQualityControlCheckbox.updateState(true)
 
         showLicenseCheckbox.updateState(true)
+        showWaitingCheckbox.updateState(false)
 
     }, [])
 
@@ -159,7 +163,8 @@ export const GuiStateProvider = ({ children }: Props) => {
             openConverterSettingCheckbox,
             openAdvancedSettingCheckbox,
 
-            showLicenseCheckbox
+            showLicenseCheckbox,
+            showWaitingCheckbox
         },
         isConverting,
         setIsConverting,

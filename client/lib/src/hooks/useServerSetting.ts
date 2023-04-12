@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react"
-import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc_40v2, DefaultServerSetting_so_vits_svc_40, DefaultServerSetting_so_vits_svc_40_c, DefaultServerSetting_RVC } from "../const"
+import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc_40v2, DefaultServerSetting_so_vits_svc_40, DefaultServerSetting_so_vits_svc_40_c, DefaultServerSetting_RVC, OnnxExporterInfo } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
@@ -53,6 +53,8 @@ export type ServerSettingState = {
     loadModel: () => Promise<void>
     uploadProgress: number
     isUploading: boolean
+
+    getOnnx: () => Promise<OnnxExporterInfo>
 
 }
 
@@ -315,6 +317,11 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         await removeItem(INDEXEDDB_KEY_MODEL_DATA)
     }
 
+
+    const getOnnx = async () => {
+        return props.voiceChangerClient!.getOnnx()
+    }
+
     return {
         serverSetting,
         updateServerSettings,
@@ -326,5 +333,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         loadModel,
         uploadProgress,
         isUploading,
+        getOnnx,
     }
 }

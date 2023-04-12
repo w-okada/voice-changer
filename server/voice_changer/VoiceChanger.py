@@ -60,30 +60,6 @@ class VoiceChanger():
         self.currentCrossFadeOverlapSize = 0  # setting
         self.crossfadeSize = 0  # calculated
 
-        # self.modelType = getModelType()
-        # print("[VoiceChanger] activate model type:", self.modelType)
-        # if self.modelType == "MMVCv15":
-        #     from voice_changer.MMVCv15.MMVCv15 import MMVCv15
-        #     self.voiceChanger = MMVCv15()  # type: ignore
-        # elif self.modelType == "MMVCv13":
-        #     from voice_changer.MMVCv13.MMVCv13 import MMVCv13
-        #     self.voiceChanger = MMVCv13()
-        # elif self.modelType == "so-vits-svc-40v2":
-        #     from voice_changer.SoVitsSvc40v2.SoVitsSvc40v2 import SoVitsSvc40v2
-        #     self.voiceChanger = SoVitsSvc40v2(params)
-        # elif self.modelType == "so-vits-svc-40" or self.modelType == "so-vits-svc-40_c":
-        #     from voice_changer.SoVitsSvc40.SoVitsSvc40 import SoVitsSvc40
-        #     self.voiceChanger = SoVitsSvc40(params)
-        # elif self.modelType == "DDSP-SVC":
-        #     from voice_changer.DDSP_SVC.DDSP_SVC import DDSP_SVC
-        #     self.voiceChanger = DDSP_SVC(params)
-        # elif self.modelType == "RVC":
-        #     from voice_changer.RVC.RVC import RVC
-        #     self.voiceChanger = RVC(params)
-        # else:
-        #     from voice_changer.MMVCv13.MMVCv13 import MMVCv13
-        #     self.voiceChanger = MMVCv13()
-
         self.voiceChanger = None
         self.modelType = None
         self.params = params
@@ -324,8 +300,10 @@ class VoiceChanger():
         perf = [preprocess_time, mainprocess_time, postprocess_time]
         return outputData, perf
 
+    def export2onnx(self):
+        return self.voiceChanger.export2onnx()
 
-##############
+        ##############
 PRINT_CONVERT_PROCESSING: bool = False
 # PRINT_CONVERT_PROCESSING = True
 

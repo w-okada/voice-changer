@@ -45,5 +45,4 @@ export const LicenseDialog = () => {
     }, [licenses]);
     return dialog;
 
-    return <></>
 };

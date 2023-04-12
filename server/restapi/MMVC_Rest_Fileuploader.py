@@ -27,6 +27,7 @@ class MMVC_Rest_Fileuploader:
         self.router.add_api_route("/extract_voices", self.post_extract_voices, methods=["POST"])
         self.router.add_api_route("/model_type", self.post_model_type, methods=["POST"])
         self.router.add_api_route("/model_type", self.get_model_type, methods=["GET"])
+        self.router.add_api_route("/onnx", self.get_onnx, methods=["GET"])
 
     def post_upload_file(self, file: UploadFile = File(...), filename: str = Form(...)):
         res = upload_file(UPLOAD_DIR, file, filename)
@@ -108,5 +109,10 @@ class MMVC_Rest_Fileuploader:
         self,
     ):
         info = self.voiceChangerManager.getModelType(modelType)
+        json_compatible_item_data = jsonable_encoder(info)
+        return JSONResponse(content=json_compatible_item_data)
+
+    def get_onnx(self):
+        info = self.voiceChangerManager.export2onnx()
         json_compatible_item_data = jsonable_encoder(info)
         return JSONResponse(content=json_compatible_item_data)

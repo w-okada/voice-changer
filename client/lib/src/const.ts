@@ -539,3 +539,9 @@ export const INDEXEDDB_KEY_MODEL_DATA = "INDEXEDDB_KEY_VOICE_CHANGER_LIB_MODEL_D
 export const INDEXEDDB_KEY_WORKLET = "INDEXEDDB_KEY_VOICE_CHANGER_LIB_WORKLET"
 
 
+// ONNX
+export type OnnxExporterInfo = {
+    "status": string
+    "path": string
+    "filename": string
+} 

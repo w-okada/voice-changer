@@ -1,4 +1,4 @@
-import { ClientType, ServerInfo, ServerSettingKey } from "./const";
+import { ClientType, OnnxExporterInfo, ServerInfo, ServerSettingKey } from "./const";
 
 
 type FileChunk = {
@@ -155,6 +155,18 @@ export class ServerConfigurator {
                 method: 'GET',
             });
             const res = await (await fetch(request)).json() as ServerInfo
+            resolve(res)
+        })
+        return await info
+    }
+
+    export2onnx = async () => {
+        const url = this.serverUrl + "/onnx"
+        const info = new Promise<OnnxExporterInfo>(async (resolve) => {
+            const request = new Request(url, {
+                method: 'GET',
+            });
+            const res = await (await fetch(request)).json() as OnnxExporterInfo
             resolve(res)
         })
         return await info
