@@ -7,15 +7,16 @@ export type OnnxExportRowProps = {
 
 export const OnnxExportRow = (_props: OnnxExportRowProps) => {
     const appState = useAppState()
+    const guiState = useGuiState()
 
     const onnxExportRow = useMemo(() => {
-        const guiState = useGuiState()
 
         const onnxExportButtonClassName = "body-button"
         const onnxExportButtonAction = async () => {
 
             if (guiState.isConverting) {
                 alert("cannot export onnx when voice conversion is enabled")
+                return
             }
             document.getElementById("dialog")?.classList.add("dialog-container-show")
             guiState.stateControls.showWaitingCheckbox.updateState(true)
@@ -44,7 +45,7 @@ export const OnnxExportRow = (_props: OnnxExportRowProps) => {
                 </div>
             </div>
         )
-    }, [appState.serverSetting.serverSetting, appState.serverSetting.updateServerSettings])
+    }, [appState.serverSetting.serverSetting, appState.serverSetting.updateServerSettings, guiState.isConverting])
 
     return onnxExportRow
 }
