@@ -106,7 +106,13 @@ def export2onnx(input_model, output_model, output_model_simple, is_half):
         dev = torch.device("cpu")
 
     net_g_onnx = SynthesizerTrnMs256NSFsid_ONNX(*cpt["config"], is_half=is_half)
-    net_g_onnx.eval().to(dev)
+    try:
+        net_g_onnx.eval().to(dev)
+    except:
+        is_half = False
+        dev = torch.device("cpu")
+        net_g_onnx.eval().to(dev)
+
     net_g_onnx.load_state_dict(cpt["weight"], strict=False)
     if is_half:
         net_g_onnx = net_g_onnx.half()
