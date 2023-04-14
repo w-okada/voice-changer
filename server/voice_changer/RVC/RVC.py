@@ -340,5 +340,10 @@ class RVC:
         output_path = os.path.join(TMP_DIR, output_file)
         output_path_simple = os.path.join(TMP_DIR, output_file_simple)
 
-        onnxExporter.export2onnx(self.settings.pyTorchModelFile, output_path, output_path_simple, True)
+        if torch.cuda.device_count() > 0:
+            onnxExporter.export2onnx(self.settings.pyTorchModelFile, output_path, output_path_simple, True)
+        else:
+            print("[Voice Changer] Warning!!! onnx export with float32. maybe size is doubled.")
+            onnxExporter.export2onnx(self.settings.pyTorchModelFile, output_path, output_path_simple, False)
+
         return {"status": "ok", "path": f"/tmp/{output_file_simple}", "filename": output_file_simple}

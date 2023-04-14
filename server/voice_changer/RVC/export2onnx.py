@@ -99,7 +99,6 @@ class SynthesizerTrnMs256NSFsid_ONNX(nn.Module):
 
 
 def export2onnx(input_model, output_model, output_model_simple, is_half):
-    is_half = False
     cpt = torch.load(input_model, map_location="cpu")
     if is_half:
         dev = torch.device("cuda", index=0)
