@@ -113,7 +113,7 @@ class RVC:
 
         # ONNXモデル生成
         if onnx_model_file != None:
-            self.onnx_session = ModelWrapper(onnx_model_file, is_half=self.is_half)
+            self.onnx_session = ModelWrapper(onnx_model_file)
         return self.get_info()
 
     def update_settings(self, key: str, val: any):
