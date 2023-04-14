@@ -208,13 +208,9 @@ class VoiceChanger():
 
     #  receivedData: tuple of short
     def on_request(self, receivedData: AudioInOut) -> tuple[AudioInOut, list[Union[int, float]]]:
-        if self.settings.solaEnabled:
-            return self.on_request_sola(receivedData)
-        else:
-            return self.on_request_legacy(receivedData)
+        return self.on_request_sola(receivedData)
 
     def on_request_sola(self, receivedData: AudioInOut) -> tuple[AudioInOut, list[Union[int, float]]]:
-        print("processing with sola")
         processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
 
         # 前処理
@@ -230,7 +226,7 @@ class VoiceChanger():
             crossfade_frame = min(self.settings.crossFadeOverlapSize, block_frame)
             self._generate_strength(crossfade_frame)
 
-            data = self.voiceChanger.generate_input(newData, block_frame, crossfade_frame, True, sola_search_frame)
+            data = self.voiceChanger.generate_input(newData, block_frame, crossfade_frame, sola_search_frame)
         preprocess_time = t.secs
 
         # 変換処理
@@ -295,109 +291,9 @@ class VoiceChanger():
         perf = [preprocess_time, mainprocess_time, postprocess_time]
         return outputData, perf
 
-    def on_request_legacy(self, receivedData: AudioInOut) -> tuple[AudioInOut, list[Union[int, float]]]:
-        # print("processing with legacy")
-
-        processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
-        print_convert_processing(f"------------ Convert processing.... ------------")
-        # 前処理
-        with Timer("pre-process") as t:
-
-            with Timer("pre-process") as t1:
-
-                if self.settings.inputSampleRate != processing_sampling_rate:
-                    newData = cast(AudioInOut, resampy.resample(receivedData, self.settings.inputSampleRate, processing_sampling_rate))
-                else:
-                    newData = receivedData
-            # print("t1::::", t1.secs)
-            inputSize = newData.shape[0]
-            crossfadeSize = min(self.settings.crossFadeOverlapSize, inputSize)
-
-            print_convert_processing(
-                f" Input data size: {receivedData.shape[0]}/{self.settings.inputSampleRate}hz {inputSize}/{processing_sampling_rate}hz")
-            print_convert_processing(
-                f" Crossfade data size: crossfade:{crossfadeSize}, crossfade setting:{self.settings.crossFadeOverlapSize}, input size:{inputSize}")
-
-            print_convert_processing(f" Convert data size of {inputSize + crossfadeSize} (+ extra size)")
-            print_convert_processing(f"         will be cropped:{-1 * (inputSize + crossfadeSize)}, {-1 * (crossfadeSize)}")
-
-            self._generate_strength(crossfadeSize)
-            with Timer("pre-process") as t2:
-                data = self.voiceChanger.generate_input(newData, inputSize, crossfadeSize)
-            # print("t2::::", t2.secs)
-        preprocess_time = t.secs
-
-        # 変換処理
-        with Timer("main-process") as t:
-            try:
-                # Inference
-                audio = self.voiceChanger.inference(data)
-
-                if hasattr(self, 'np_prev_audio1') == True:
-                    np.set_printoptions(threshold=10000)
-                    prev_overlap_start = -1 * crossfadeSize
-                    prev_overlap = self.np_prev_audio1[prev_overlap_start:]
-                    cur_overlap_start = -1 * (inputSize + crossfadeSize)
-                    cur_overlap_end = -1 * inputSize
-                    cur_overlap = audio[cur_overlap_start:cur_overlap_end]
-                    print_convert_processing(
-                        f" audio:{audio.shape}, prev_overlap:{prev_overlap.shape}, self.np_prev_strength:{self.np_prev_strength.shape}")
-                    powered_prev = prev_overlap * self.np_prev_strength
-                    print_convert_processing(
-                        f" audio:{audio.shape}, cur_overlap:{cur_overlap.shape}, self.np_cur_strength:{self.np_cur_strength.shape}")
-                    print_convert_processing(f" cur_overlap_strt:{cur_overlap_start}, cur_overlap_end{cur_overlap_end}")
-
-                    powered_cur = cur_overlap * self.np_cur_strength
-                    powered_result = powered_prev + powered_cur
-
-                    cur = audio[-1 * inputSize:-1 * crossfadeSize]
-                    result = np.concatenate([powered_result, cur], axis=0)
-                    print_convert_processing(
-                        f" overlap:{crossfadeSize}, current:{cur.shape[0]}, result:{result.shape[0]}... result should be same as input")
-                    if cur.shape[0] != result.shape[0]:
-                        print_convert_processing(f" current and result should be same as input")
-
-                else:
-                    result = np.zeros(4096).astype(np.int16)
-                self.np_prev_audio1 = audio
-
-            except Exception as e:
-                print("VC PROCESSING!!!! EXCEPTION!!!", e)
-                print(traceback.format_exc())
-                if hasattr(self, "np_prev_audio1"):
-                    del self.np_prev_audio1
-                return np.zeros(1).astype(np.int16), [0, 0, 0]
-        mainprocess_time = t.secs
-
-        # 後処理
-        with Timer("post-process") as t:
-            result = result.astype(np.int16)
-            if self.settings.inputSampleRate != processing_sampling_rate:
-                outputData = cast(AudioInOut, resampy.resample(result, processing_sampling_rate, self.settings.inputSampleRate).astype(np.int16))
-            else:
-                outputData = result
-            # outputData = result
-
-            print_convert_processing(
-                f" Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
-
-            if self.settings.recordIO == 1:
-                self.ioRecorder.writeInput(receivedData)
-                self.ioRecorder.writeOutput(outputData.tobytes())
-
-            # if receivedData.shape[0] != outputData.shape[0]:
-            #     print(f"Padding, in:{receivedData.shape[0]} out:{outputData.shape[0]}")
-            #     outputData = pad_array(outputData, receivedData.shape[0])
-            #     # print_convert_processing(
-            #     #     f" Padded!, Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
-        postprocess_time = t.secs
-
-        print_convert_processing(f" [fin] Input/Output size:{receivedData.shape[0]},{outputData.shape[0]}")
-        perf = [preprocess_time, mainprocess_time, postprocess_time]
-        return outputData, perf
-
     def export2onnx(self):
         return self.voiceChanger.export2onnx()
+
 
         ##############
 PRINT_CONVERT_PROCESSING: bool = False

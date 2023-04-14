@@ -166,10 +166,6 @@
             {
                 "name": "rvcQuality",
                 "options": {}
-            },
-            {
-                "name": "solaEnable",
-                "options": {}
             }
         ]
     },

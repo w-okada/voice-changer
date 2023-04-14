@@ -165,7 +165,7 @@ class RVC:
     def get_processing_sampling_rate(self):
         return self.settings.modelSamplingRate
 
-    def generate_input(self, newData: any, inputSize: int, crossfadeSize: int, solaEnabled: bool = False, solaSearchFrame: int = 0):
+    def generate_input(self, newData: any, inputSize: int, crossfadeSize: int, solaSearchFrame: int = 0):
         newData = newData.astype(np.float32) / 32768.0
 
         if hasattr(self, "audio_buffer"):
@@ -173,10 +173,7 @@ class RVC:
         else:
             self.audio_buffer = newData
 
-        if solaEnabled:
-            convertSize = inputSize + crossfadeSize + solaSearchFrame + self.settings.extraConvertSize
-        else:
-            convertSize = inputSize + crossfadeSize + self.settings.extraConvertSize
+        convertSize = inputSize + crossfadeSize + solaSearchFrame + self.settings.extraConvertSize
 
         if convertSize % 128 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
             convertSize = convertSize + (128 - (convertSize % 128))
@@ -184,30 +181,6 @@ class RVC:
         self.audio_buffer = self.audio_buffer[-1 * convertSize:]  # 変換対象の部分だけ抽出
 
         crop = self.audio_buffer[-1 * (inputSize + crossfadeSize):-1 * (crossfadeSize)]  # 出力部分だけ切り出して音量を確認。(solaとの関係性について、現状は無考慮)
-        rms = np.sqrt(np.square(crop).mean(axis=0))
-        vol = max(rms, self.prevVol * 0.0)
-        self.prevVol = vol
-
-        return (self.audio_buffer, convertSize, vol, solaEnabled)
-
-    def generate_input_old(self, newData: any, inputSize: int, crossfadeSize: int):
-        newData = newData.astype(np.float32) / 32768.0
-
-        if hasattr(self, "audio_buffer"):
-            self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)  # 過去のデータに連結
-        else:
-            self.audio_buffer = newData
-
-        convertSize = inputSize + crossfadeSize + self.settings.extraConvertSize
-
-        # if convertSize % self.hps.data.hop_length != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
-        if convertSize % 128 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
-            # convertSize = convertSize + (self.hps.data.hop_length - (convertSize % self.hps.data.hop_length))
-            convertSize = convertSize + (128 - (convertSize % 128))
-
-        self.audio_buffer = self.audio_buffer[-1 * convertSize:]  # 変換対象の部分だけ抽出
-
-        crop = self.audio_buffer[-1 * (inputSize + crossfadeSize):-1 * (crossfadeSize)]
         rms = np.sqrt(np.square(crop).mean(axis=0))
         vol = max(rms, self.prevVol * 0.0)
         self.prevVol = vol
@@ -302,12 +275,7 @@ class RVC:
         else:
             audio = self._pyTorch_inference(data)
 
-        sola_enabled = data[3]
-        if sola_enabled:
-            return audio
-            # return audio[self.settings.extraConvertSize:]
-        else:
-            return audio
+        return audio
 
     def __del__(self):
         del self.net_g

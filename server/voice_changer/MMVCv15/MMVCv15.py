@@ -166,7 +166,7 @@ class MMVCv15:
         spec = torch.squeeze(spec, 0)
         return spec
 
-    def generate_input(self, newData: any, inputSize: int, crossfadeSize: int, solaEnabled: bool = False, solaSearchFrame: int = 0):
+    def generate_input(self, newData: any, inputSize: int, crossfadeSize: int, solaSearchFrame: int = 0):
         newData = newData.astype(np.float32) / self.hps.data.max_wav_value
 
         if hasattr(self, "audio_buffer"):
@@ -174,10 +174,7 @@ class MMVCv15:
         else:
             self.audio_buffer = newData
 
-        if solaEnabled:
-            convertSize = inputSize + crossfadeSize + solaSearchFrame
-        else:
-            convertSize = inputSize + crossfadeSize
+        convertSize = inputSize + crossfadeSize + solaSearchFrame
 
         if convertSize < 8192:
             convertSize = 8192

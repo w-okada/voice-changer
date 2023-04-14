@@ -145,10 +145,6 @@
             {
                 "name": "trancateNumThreshold",
                 "options": {}
-            },
-            {
-                "name": "solaEnable",
-                "options": {}
             }
         ]
     },
