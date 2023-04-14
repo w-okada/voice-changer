@@ -130,7 +130,37 @@ class MMVCv13:
         spec = torch.squeeze(spec, 0)
         return spec
 
-    def generate_input(self, newData: any, inputSize: int, crossfadeSize: int):
+    def generate_input(self, newData: any, inputSize: int, crossfadeSize: int, solaEnabled: bool = False, solaSearchFrame: int = 0):
+        newData = newData.astype(np.float32) / self.hps.data.max_wav_value
+
+        if hasattr(self, "audio_buffer"):
+            self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)  # 過去のデータに連結
+        else:
+            self.audio_buffer = newData
+
+        if solaEnabled:
+            convertSize = inputSize + crossfadeSize + solaSearchFrame
+        else:
+            convertSize = inputSize + crossfadeSize
+
+        if convertSize < 8192:
+            convertSize = 8192
+        if convertSize % self.hps.data.hop_length != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
+            convertSize = convertSize + (self.hps.data.hop_length - (convertSize % self.hps.data.hop_length))
+
+        self.audio_buffer = self.audio_buffer[-1 * convertSize:]  # 変換対象の部分だけ抽出
+
+        audio = torch.FloatTensor(self.audio_buffer)
+        audio_norm = audio.unsqueeze(0)  # unsqueeze
+        spec = self._get_spec(audio_norm)
+        sid = torch.LongTensor([int(self.settings.srcId)])
+
+        data = (self.text_norm, spec, audio_norm, sid)
+        data = TextAudioSpeakerCollate()([data])
+
+        return data
+
+    def generate_input_old(self, newData: any, inputSize: int, crossfadeSize: int):
         newData = newData.astype(np.float32) / self.hps.data.max_wav_value
 
         if hasattr(self, "audio_buffer"):

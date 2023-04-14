@@ -208,13 +208,13 @@ class VoiceChanger():
 
     #  receivedData: tuple of short
     def on_request(self, receivedData: AudioInOut) -> tuple[AudioInOut, list[Union[int, float]]]:
-        if self.settings.solaEnabled and self.modelType == "RVC":
+        if self.settings.solaEnabled and (self.modelType == "RVC" or self.modelType == "MMVCv13"):
             return self.on_request_sola(receivedData)
         else:
             return self.on_request_legacy(receivedData)
 
     def on_request_sola(self, receivedData: AudioInOut) -> tuple[AudioInOut, list[Union[int, float]]]:
-        # print("processing with sola")
+        print("processing with sola")
         processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
 
         # 前処理
