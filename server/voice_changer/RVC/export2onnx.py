@@ -111,7 +111,7 @@ def export2onnx(input_model, output_model, output_model_simple, is_half):
     except:
         is_half = False
         dev = torch.device("cpu")
-        net_g_onnx.eval().to(dev).float()
+        net_g_onnx.eval().to(dev)
 
     net_g_onnx.load_state_dict(cpt["weight"], strict=False)
     if is_half:
@@ -119,7 +119,7 @@ def export2onnx(input_model, output_model, output_model_simple, is_half):
         net_g_onnx = net_g_onnx.half()
     else:
         print("!!!!!!!!!!!!!!!!!! full")
-        net_g_onnx = net_g_onnx.full()
+        net_g_onnx = net_g_onnx.float()
 
     if is_half:
         feats = torch.HalfTensor(1, 2192, 256).to(dev)
