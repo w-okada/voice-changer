@@ -166,7 +166,7 @@ class MMVCv15:
         spec = torch.squeeze(spec, 0)
         return spec
 
-    def generate_input(self, newData: any, inputSize: int, crossfadeSize: int):
+    def generate_input(self, newData: any, inputSize: int, crossfadeSize: int, solaEnabled: bool = False, solaSearchFrame: int = 0):
         newData = newData.astype(np.float32) / self.hps.data.max_wav_value
 
         if hasattr(self, "audio_buffer"):
@@ -174,7 +174,11 @@ class MMVCv15:
         else:
             self.audio_buffer = newData
 
-        convertSize = inputSize + crossfadeSize
+        if solaEnabled:
+            convertSize = inputSize + crossfadeSize + solaSearchFrame
+        else:
+            convertSize = inputSize + crossfadeSize
+
         if convertSize < 8192:
             convertSize = 8192
         if convertSize % self.hps.data.hop_length != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
