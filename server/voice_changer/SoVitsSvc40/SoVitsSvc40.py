@@ -252,7 +252,7 @@ class SoVitsSvc40:
         c = c.unsqueeze(0)
         return c, f0, uv
 
-    def generate_input(self, newData: any, inputSize: int, crossfadeSize: int):
+    def generate_input(self, newData: any, inputSize: int, crossfadeSize: int, solaEnabled: bool = False, solaSearchFrame: int = 0):
         newData = newData.astype(np.float32) / self.hps.data.max_wav_value
 
         if hasattr(self, "audio_buffer"):
@@ -260,7 +260,10 @@ class SoVitsSvc40:
         else:
             self.audio_buffer = newData
 
-        convertSize = inputSize + crossfadeSize + self.settings.extraConvertSize
+        if solaEnabled:
+            convertSize = inputSize + crossfadeSize + solaSearchFrame + self.settings.extraConvertSize
+        else:
+            convertSize = inputSize + crossfadeSize + self.settings.extraConvertSize
 
         if convertSize % self.hps.data.hop_length != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
             convertSize = convertSize + (self.hps.data.hop_length - (convertSize % self.hps.data.hop_length))
@@ -349,6 +352,7 @@ class SoVitsSvc40:
             audio = self._onnx_inference(data)
         else:
             audio = self._pyTorch_inference(data)
+
         return audio
 
     def __del__(self):
