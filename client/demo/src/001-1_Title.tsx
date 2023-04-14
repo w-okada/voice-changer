@@ -34,14 +34,14 @@ export const Title = (props: TitleProps) => {
         return isDesktopApp() ?
             (
                 // @ts-ignore
-                <span className="link tooltip" onClick={() => { window.electronAPI.openBrowser("https://zenn.dev/wok/books/0003_vc-helper-v_1_5") }}>
+                <span className="link tooltip" onClick={() => { window.electronAPI.openBrowser("https://zenn.dev/wok/books/0004_vc-client-v_1_5_1_x") }}>
                     <img src="./assets/icons/help-circle.svg" />
                     <div className="tooltip-text">manual</div>
                 </span>
             )
             :
             (
-                <a className="link tooltip" href="https://zenn.dev/wok/books/0003_vc-helper-v_1_5" target="_blank" rel="noopener noreferrer">
+                <a className="link tooltip" href="https://zenn.dev/wok/books/0004_vc-client-v_1_5_1_x" target="_blank" rel="noopener noreferrer">
                     <img src="./assets/icons/help-circle.svg" />
                     <div className="tooltip-text">manual</div>
                 </a>
