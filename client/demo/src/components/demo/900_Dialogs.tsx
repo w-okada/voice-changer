@@ -8,16 +8,14 @@ export const Dialogs = () => {
     const dialogs = (
         <div>
             {guiState.stateControls.showLicenseCheckbox.trigger}
+            {guiState.stateControls.showWaitingCheckbox.trigger}
             <div className="dialog-container" id="dialog">
                 {guiState.stateControls.showLicenseCheckbox.trigger}
                 <LicenseDialog></LicenseDialog>
-            </div>
-
-            {guiState.stateControls.showWaitingCheckbox.trigger}
-            <div className="dialog-container" id="dialog">
                 {guiState.stateControls.showWaitingCheckbox.trigger}
                 <WaitingDialog></WaitingDialog>
             </div>
+
         </div>
     );
 

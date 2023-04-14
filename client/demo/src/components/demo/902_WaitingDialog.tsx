@@ -32,7 +32,7 @@ export const WaitingDialog = () => {
                 <div className="dialog-title">export onnx file</div>
                 <div className="dialog-content">
                     {content}
-                    {closeButtonRow}
+                    {/* {closeButtonRow} */}
                 </div>
             </div>
         );

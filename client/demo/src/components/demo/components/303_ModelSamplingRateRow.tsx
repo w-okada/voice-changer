@@ -9,6 +9,11 @@ export const ModelSamplingRateRow = (_props: ModelSamplingRateRowProps) => {
     const appState = useAppState()
 
     const modelSamplingRateRow = useMemo(() => {
+        if (appState.serverSetting.serverSetting.framework != "ONNX") {
+            return <></>
+        }
+
+
         const onModelSamplingRateChanged = (val: ModelSamplingRate) => {
             appState.serverSetting.updateServerSettings({
                 ...appState.serverSetting.serverSetting,
@@ -18,10 +23,7 @@ export const ModelSamplingRateRow = (_props: ModelSamplingRateRowProps) => {
 
         return (
             <div className="body-row split-3-3-4 left-padding-1 guided">
-                <div className="body-item-title left-padding-2">Model Sampling Rate(only for onnx)</div>
-                <div className="body-item-text">
-                    <div></div>
-                </div>
+                <div className="body-item-title left-padding-2">Model Sampling Rate</div>
                 <div className="body-button-container">
                     <select className="body-select" value={appState.serverSetting.serverSetting.modelSamplingRate} onChange={(e) => {
                         onModelSamplingRateChanged(e.target.value as unknown as ModelSamplingRate)
@@ -32,8 +34,9 @@ export const ModelSamplingRateRow = (_props: ModelSamplingRateRowProps) => {
                             })
                         }
                     </select>
-
-
+                </div>
+                <div className="body-item-text">
+                    <div></div>
                 </div>
             </div>
         )

@@ -147,7 +147,7 @@ export const GuiStateProvider = ({ children }: Props) => {
         openConverterSettingCheckbox.updateState(true)
         openQualityControlCheckbox.updateState(true)
 
-        showLicenseCheckbox.updateState(true)
+        showLicenseCheckbox.updateState(false)
         showWaitingCheckbox.updateState(false)
 
     }, [])

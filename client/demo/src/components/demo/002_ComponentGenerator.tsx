@@ -36,7 +36,7 @@ import { TrancateNumTresholdRow, TrancateNumTresholdRowProps } from "./component
 import { IndexRatioRow, IndexRatioRowProps } from "./components/609_IndexRatioRow"
 import { RVCQualityRow, RVCQualityRowProps } from "./components/810_RVCQualityRow"
 import { ModelSamplingRateRow, ModelSamplingRateRowProps } from "./components/303_ModelSamplingRateRow"
-import { OnnxExportRow, OnnxExportRowProps } from "./components/304_OnnxExportRow"
+// import { OnnxExportRow, OnnxExportRowProps } from "./components/304_OnnxExportRow"
 import { SolaEnableRow, SolaEnableRowProps } from "./components/811_SolaEnableRow"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
@@ -66,7 +66,7 @@ const initialize = () => {
     addToCatalog("modelUploader", (props: ModelUploaderRowProps) => { return <ModelUploaderRow {...props} /> })
     addToCatalog("framework", (props: FrameworkRowProps) => { return <FrameworkRow {...props} /> })
     addToCatalog("modelSamplingRate", (props: ModelSamplingRateRowProps) => { return <ModelSamplingRateRow {...props} /> })
-    addToCatalog("onnxExport", (props: OnnxExportRowProps) => { return <OnnxExportRow {...props} /> })
+    // addToCatalog("onnxExport", (props: OnnxExportRowProps) => { return <OnnxExportRow {...props} /> })
 
     addToCatalog("audioInput", (props: AudioInputRowProps) => { return <AudioInputRow {...props} /> })
     addToCatalog("audioOutput", (props: AudioOutputRowProps) => { return <AudioOutputRow {...props} /> })

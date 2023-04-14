@@ -43,7 +43,9 @@
                     "showFeature": true,
                     "showIndex": true,
                     "showHalfPrecision": true,
-                    "defaultEnablePyTorch": true
+                    "defaultEnablePyTorch": true,
+
+                    "showOnnxExportButton": true
                 }
             },
             {
@@ -54,10 +56,6 @@
             },
             {
                 "name": "modelSamplingRate",
-                "options": {}
-            },
-            {
-                "name": "onnxExport",
                 "options": {}
             }
         ],

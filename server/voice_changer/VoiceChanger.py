@@ -116,14 +116,19 @@ class VoiceChanger():
         index_file: Optional[str] = None,
         is_half: bool = True,
     ):
-        if self.modelType == "MMVCv15" or self.modelType == "MMVCv13":
-            return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file)
-        elif self.modelType == "so-vits-svc-40" or self.modelType == "so-vits-svc-40_c" or self.modelType == "so-vits-svc-40v2":
-            return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, clusterTorchModel)
-        elif self.modelType == "RVC":
-            return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, feature_file, index_file, is_half)
-        else:
-            return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, clusterTorchModel)
+
+        try:
+            if self.modelType == "MMVCv15" or self.modelType == "MMVCv13":
+                return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file)
+            elif self.modelType == "so-vits-svc-40" or self.modelType == "so-vits-svc-40_c" or self.modelType == "so-vits-svc-40v2":
+                return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, clusterTorchModel)
+            elif self.modelType == "RVC":
+                return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, feature_file, index_file, is_half)
+            else:
+                return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, clusterTorchModel)
+        except Exception as e:
+            print("[Voice Changer] Model Load Error! Check your model is valid.", e)
+            return {"status": "NG"}
 
     def get_info(self):
         data = asdict(self.settings)
@@ -198,8 +203,8 @@ class VoiceChanger():
             # ひとつ前の結果とサイズが変わるため、記録は消去する。
             if hasattr(self, 'np_prev_audio1') == True:
                 delattr(self, "np_prev_audio1")
-
-            del self.sola_buffer
+            if hasattr(self, "sola_buffer"):
+                del self.sola_buffer
 
     #  receivedData: tuple of short
     def on_request(self, receivedData: AudioInOut) -> tuple[AudioInOut, list[Union[int, float]]]:
@@ -241,7 +246,6 @@ class VoiceChanger():
                     cor_nom = np.convolve(audio[: crossfade_frame + sola_search_frame], np.flip(self.sola_buffer), 'valid')
                     cor_den = np.sqrt(np.convolve(audio[: crossfade_frame + sola_search_frame] ** 2, np.ones(crossfade_frame), 'valid') + 1e-3)
                     sola_offset = np.argmax(cor_nom / cor_den)
-                    print("sola_offset", sola_offset, sola_search_frame)
 
                     output_wav = audio[sola_offset: sola_offset + block_frame].astype(np.float64)
                     output_wav[:crossfade_frame] *= self.np_cur_strength

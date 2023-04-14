@@ -22,6 +22,8 @@ export type ModelUploaderRowProps = {
     showHalfPrecision: boolean
 
     defaultEnablePyTorch: boolean
+
+    showOnnxExportButton: boolean
 }
 
 export const ModelUploaderRow = (props: ModelUploaderRowProps) => {
@@ -48,7 +50,7 @@ export const ModelUploaderRow = (props: ModelUploaderRowProps) => {
                 </div>
                 {props.showConfig ? <ConfigSelectRow /> : <></>}
                 {props.showOnnx ? <ONNXSelectRow /> : <></>}
-                {props.showPyTorch && guiState.showPyTorchModelUpload ? <PyTorchSelectRow /> : <></>}
+                {props.showPyTorch && guiState.showPyTorchModelUpload ? <PyTorchSelectRow showOnnxExportButton={props.showOnnxExportButton || false} /> : <></>}
                 {props.showHalfPrecision ? <HalfPrecisionRow /> : <></>}
                 {props.showCorrespondence ? <CorrespondenceSelectRow /> : <></>}
                 {props.showPyTorchCluster ? <PyTorchClusterSelectRow /> : <></>}

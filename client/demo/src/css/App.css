@@ -135,7 +135,6 @@ body {
     background: rgba(233, 233, 255, 0.3);
     transition: all var(--sidebar-transition-time) var(--sidebar-transition-animation);
 }
-
 /* ROW */
 
 .split-6-4 {
@@ -690,6 +689,12 @@ body {
     animation-iteration-count: 1;
     animation-fill-mode: forwards;
     animation-direction: normal;
+}
+.state-control-checkbox:checked + .dialog-frame {
+    display: flex;
+}
+.state-control-checkbox + .dialog-frame {
+    display: none;
 }
 
 @keyframes dialog-hide {
