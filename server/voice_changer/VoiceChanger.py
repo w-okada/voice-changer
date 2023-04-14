@@ -208,7 +208,7 @@ class VoiceChanger():
 
     #  receivedData: tuple of short
     def on_request(self, receivedData: AudioInOut) -> tuple[AudioInOut, list[Union[int, float]]]:
-        if self.settings.solaEnabled and (self.modelType == "RVC" or self.modelType == "MMVCv13" or self.modelType == "MMVCv15"):
+        if self.settings.solaEnabled:
             return self.on_request_sola(receivedData)
         else:
             return self.on_request_legacy(receivedData)
@@ -398,7 +398,6 @@ class VoiceChanger():
 
     def export2onnx(self):
         return self.voiceChanger.export2onnx()
-
 
         ##############
 PRINT_CONVERT_PROCESSING: bool = False
