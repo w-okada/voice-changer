@@ -71,6 +71,7 @@ export const ServerSettingKey = {
     "crossFadeOffsetRate": "crossFadeOffsetRate",
     "crossFadeEndRate": "crossFadeEndRate",
     "crossFadeOverlapSize": "crossFadeOverlapSize",
+    "solaEnabled": "solaEnabled",
 
     "framework": "framework",
     "onnxExecutionProvider": "onnxExecutionProvider",
@@ -104,6 +105,7 @@ export type VoiceChangerServerSetting = {
     crossFadeOffsetRate: number,
     crossFadeEndRate: number,
     crossFadeOverlapSize: CrossFadeOverlapSize,
+    solaEnabled: number,
 
     framework: Framework
     onnxExecutionProvider: OnnxExecutionProvider,
@@ -145,6 +147,7 @@ export const DefaultServerSetting_MMVCv15: ServerInfo = {
     crossFadeOffsetRate: 0.0,
     crossFadeEndRate: 1.0,
     crossFadeOverlapSize: CrossFadeOverlapSize[1024],
+    solaEnabled: 0,
 
     framework: Framework.PyTorch,
     f0Factor: 1.0,
@@ -181,6 +184,7 @@ export const DefaultServerSetting_MMVCv13: ServerInfo = {
     crossFadeOffsetRate: 0.0,
     crossFadeEndRate: 1.0,
     crossFadeOverlapSize: CrossFadeOverlapSize[1024],
+    solaEnabled: 0,
 
     framework: Framework.ONNX,
     f0Factor: 1.0,
@@ -218,6 +222,7 @@ export const DefaultServerSetting_so_vits_svc_40: ServerInfo = {
     crossFadeOffsetRate: 0.0,
     crossFadeEndRate: 1.0,
     crossFadeOverlapSize: CrossFadeOverlapSize[1024],
+    solaEnabled: 0,
 
     framework: Framework.PyTorch,
     f0Factor: 1.0,
@@ -259,6 +264,7 @@ export const DefaultServerSetting_so_vits_svc_40_c: ServerInfo = {
     crossFadeOffsetRate: 0.0,
     crossFadeEndRate: 1.0,
     crossFadeOverlapSize: CrossFadeOverlapSize[1024],
+    solaEnabled: 0,
 
     framework: Framework.ONNX,
     f0Factor: 1.0,
@@ -299,6 +305,7 @@ export const DefaultServerSetting_so_vits_svc_40v2: ServerInfo = {
     crossFadeOffsetRate: 0.0,
     crossFadeEndRate: 1.0,
     crossFadeOverlapSize: CrossFadeOverlapSize[1024],
+    solaEnabled: 0,
 
     framework: Framework.PyTorch,
     f0Factor: 1.0,
@@ -341,6 +348,7 @@ export const DefaultServerSetting_RVC: ServerInfo = {
     crossFadeOffsetRate: 0.1,
     crossFadeEndRate: 0.8,
     crossFadeOverlapSize: CrossFadeOverlapSize[1024],
+    solaEnabled: 1,
 
     framework: Framework.PyTorch,
     f0Factor: 1.0,

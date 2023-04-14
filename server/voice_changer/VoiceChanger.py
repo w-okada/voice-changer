@@ -13,7 +13,6 @@ from voice_changer.IORecorder import IORecorder
 
 from voice_changer.utils.Timer import Timer
 from voice_changer.utils.VoiceChangerModel import VoiceChangerModel, AudioInOut
-
 import time
 
 
@@ -32,12 +31,13 @@ class VoiceChangerSettings():
     crossFadeOffsetRate: float = 0.1
     crossFadeEndRate: float = 0.9
     crossFadeOverlapSize: int = 4096
+    solaEnabled: int = 1  # 0:off, 1:on
 
     recordIO: int = 0  # 0:off, 1:on
 
     # ↓mutableな物だけ列挙
     intData: list[str] = field(
-        default_factory=lambda: ["inputSampleRate", "crossFadeOverlapSize", "recordIO"]
+        default_factory=lambda: ["inputSampleRate", "crossFadeOverlapSize", "recordIO", "solaEnabled"]
     )
     floatData: list[str] = field(
         default_factory=lambda: ["crossFadeOffsetRate", "crossFadeEndRate"]
@@ -199,10 +199,102 @@ class VoiceChanger():
             if hasattr(self, 'np_prev_audio1') == True:
                 delattr(self, "np_prev_audio1")
 
+            del self.sola_buffer
+
     #  receivedData: tuple of short
     def on_request(self, receivedData: AudioInOut) -> tuple[AudioInOut, list[Union[int, float]]]:
+        if self.settings.solaEnabled and self.modelType == "RVC":
+            return self.on_request_sola(receivedData)
+        else:
+            return self.on_request_legacy(receivedData)
+
+    def on_request_sola(self, receivedData: AudioInOut) -> tuple[AudioInOut, list[Union[int, float]]]:
+        # print("processing with sola")
         processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
 
+        # 前処理
+        with Timer("pre-process") as t:
+            if self.settings.inputSampleRate != processing_sampling_rate:
+                newData = cast(AudioInOut, resampy.resample(receivedData, self.settings.inputSampleRate, processing_sampling_rate))
+            else:
+                newData = receivedData
+
+            sola_search_frame = int(0.012 * processing_sampling_rate)
+            # sola_search_frame = 0
+            block_frame = newData.shape[0]
+            crossfade_frame = min(self.settings.crossFadeOverlapSize, block_frame)
+            self._generate_strength(crossfade_frame)
+
+            data = self.voiceChanger.generate_input(newData, block_frame, crossfade_frame, True, sola_search_frame)
+        preprocess_time = t.secs
+
+        # 変換処理
+        with Timer("main-process") as t:
+            try:
+                # Inference
+                audio = self.voiceChanger.inference(data)
+
+                if hasattr(self, 'sola_buffer') == True:
+                    np.set_printoptions(threshold=10000)
+                    audio = audio[-sola_search_frame - crossfade_frame - block_frame:]
+                    # SOLA algorithm from https://github.com/yxlllc/DDSP-SVC, https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI
+                    cor_nom = np.convolve(audio[: crossfade_frame + sola_search_frame], np.flip(self.sola_buffer), 'valid')
+                    cor_den = np.sqrt(np.convolve(audio[: crossfade_frame + sola_search_frame] ** 2, np.ones(crossfade_frame), 'valid') + 1e-3)
+                    sola_offset = np.argmax(cor_nom / cor_den)
+                    print("sola_offset", sola_offset, sola_search_frame)
+
+                    output_wav = audio[sola_offset: sola_offset + block_frame].astype(np.float64)
+                    output_wav[:crossfade_frame] *= self.np_cur_strength
+                    output_wav[:crossfade_frame] += self.sola_buffer[:]
+
+                    result = output_wav
+                else:
+                    print("no sola buffer")
+                    result = np.zeros(4096).astype(np.int16)
+
+                if hasattr(self, 'sola_buffer') == True and sola_offset < sola_search_frame:
+                    sola_buf_org = audio[- sola_search_frame - crossfade_frame + sola_offset: -sola_search_frame + sola_offset]
+                    self.sola_buffer = sola_buf_org * self.np_prev_strength
+                else:
+                    self.sola_buffer = audio[- crossfade_frame:] * self.np_prev_strength
+                    # self.sola_buffer = audio[- crossfade_frame:]
+
+            except Exception as e:
+                print("VC PROCESSING!!!! EXCEPTION!!!", e)
+                print(traceback.format_exc())
+                return np.zeros(1).astype(np.int16), [0, 0, 0]
+        mainprocess_time = t.secs
+
+        # 後処理
+        with Timer("post-process") as t:
+            result = result.astype(np.int16)
+            if self.settings.inputSampleRate != processing_sampling_rate:
+                outputData = cast(AudioInOut, resampy.resample(result, processing_sampling_rate, self.settings.inputSampleRate).astype(np.int16))
+            else:
+                outputData = result
+
+            print_convert_processing(
+                f" Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
+
+            if self.settings.recordIO == 1:
+                self.ioRecorder.writeInput(receivedData)
+                self.ioRecorder.writeOutput(outputData.tobytes())
+
+            # if receivedData.shape[0] != outputData.shape[0]:
+            #     print(f"Padding, in:{receivedData.shape[0]} out:{outputData.shape[0]}")
+            #     outputData = pad_array(outputData, receivedData.shape[0])
+            #     # print_convert_processing(
+            #     #     f" Padded!, Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
+        postprocess_time = t.secs
+
+        print_convert_processing(f" [fin] Input/Output size:{receivedData.shape[0]},{outputData.shape[0]}")
+        perf = [preprocess_time, mainprocess_time, postprocess_time]
+        return outputData, perf
+
+    def on_request_legacy(self, receivedData: AudioInOut) -> tuple[AudioInOut, list[Union[int, float]]]:
+        # print("processing with legacy")
+
+        processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
         print_convert_processing(f"------------ Convert processing.... ------------")
         # 前処理
         with Timer("pre-process") as t:

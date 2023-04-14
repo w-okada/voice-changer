@@ -16,8 +16,11 @@ def upload_file(upload_dirname: str, file: UploadFile, filename: str):
     return {"status": "ERROR", "msg": "uploaded file is not found."}
 
 
-def concat_file_chunks(upload_dirname: str, filename: str, chunkNum: int, dest_dirname: str):
-    target_file_name = os.path.join(dest_dirname, filename)
+def concat_file_chunks(slot: int, upload_dirname: str, filename: str, chunkNum: int, dest_dirname: str):
+    # target_dir = os.path.join(dest_dirname, f"{slot}")
+    target_dir = os.path.join(dest_dirname)
+    os.makedirs(target_dir, exist_ok=True)
+    target_file_name = os.path.join(target_dir, filename)
     if os.path.exists(target_file_name):
         os.remove(target_file_name)
     with open(target_file_name, "ab") as target_file:

@@ -34,8 +34,10 @@ class MMVC_Rest_Fileuploader:
         json_compatible_item_data = jsonable_encoder(res)
         return JSONResponse(content=json_compatible_item_data)
 
+    # def post_concat_uploaded_file(self, slot: int = Form(...), filename: str = Form(...), filenameChunkNum: int = Form(...)):
     def post_concat_uploaded_file(self, filename: str = Form(...), filenameChunkNum: int = Form(...)):
-        res = concat_file_chunks(UPLOAD_DIR, filename, filenameChunkNum, UPLOAD_DIR)
+        slot = 0
+        res = concat_file_chunks(slot, UPLOAD_DIR, filename, filenameChunkNum, UPLOAD_DIR)
         json_compatible_item_data = jsonable_encoder(res)
         return JSONResponse(content=json_compatible_item_data)
 
@@ -52,6 +54,7 @@ class MMVC_Rest_Fileuploader:
 
     def post_load_model(
         self,
+        # slot: int = Form(...),
         pyTorchModelFilename: str = Form(...),
         onnxModelFilename: str = Form(...),
         configFilename: str = Form(...),

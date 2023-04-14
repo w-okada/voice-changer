@@ -15,7 +15,7 @@ export const InputChunkNumRow = (_props: InputChunkNumRowProps) => {
                         appState.workletNodeSetting.trancateBuffer()
                     }}>
                         {
-                            [16, 32, 64, 128, 192, 256, 320, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960, 1024, 2048].map(x => {
+                            [8, 16, 24, 32, 40, 48, 64, 128, 192, 256, 320, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960, 1024, 2048].map(x => {
                                 return <option key={x} value={x}>{x}</option>
                             })
                         }
