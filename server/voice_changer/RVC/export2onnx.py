@@ -99,6 +99,7 @@ class SynthesizerTrnMs256NSFsid_ONNX(nn.Module):
 
 
 def export2onnx(input_model, output_model, output_model_simple, is_half):
+    is_half = False
     cpt = torch.load(input_model, map_location="cpu")
     if is_half:
         dev = torch.device("cuda", index=0)
@@ -106,20 +107,10 @@ def export2onnx(input_model, output_model, output_model_simple, is_half):
         dev = torch.device("cpu")
 
     net_g_onnx = SynthesizerTrnMs256NSFsid_ONNX(*cpt["config"], is_half=is_half)
-    try:
-        net_g_onnx.eval().to(dev)
-    except:
-        is_half = False
-        dev = torch.device("cpu")
-        net_g_onnx.eval().to(dev)
-
+    net_g_onnx.eval().to(dev)
     net_g_onnx.load_state_dict(cpt["weight"], strict=False)
     if is_half:
-        print("!!!!!!!!!!!!!!!!!! half")
         net_g_onnx = net_g_onnx.half()
-    else:
-        print("!!!!!!!!!!!!!!!!!! full")
-        net_g_onnx = net_g_onnx.float()
 
     if is_half:
         feats = torch.HalfTensor(1, 2192, 256).to(dev)
