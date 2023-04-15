@@ -72,6 +72,8 @@ We offer Windows and Mac versions.
 | v.1.5.2.2 | mac | ONNX(cpu), PyTorch(cpu)           | [standard](https://drive.google.com/uc?id=1dbAiGkPtGWWcQDNL0IHXl4OyTRZR8SIQ&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC | 635MB  |
 |           | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [standard](https://drive.google.com/uc?id=1vIGnrhrU6d_HjvD6JqyWZKT0NruISdj3&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC | 2795MB |
 
+\*\*\* [hugging_face](https://huggingface.co/wok000/vcclient/tree/main) (experimental)
+
 | Version    | OS                                    | Framework | link                                                                                               | VC Support | Size  |
 | ---------- | ------------------------------------- | --------- | -------------------------------------------------------------------------------------------------- | ---------- | ----- |
 | v.1.5.1.14 | <span style="color: red;">mac</span>  | -         | [Tsukuyomi-chan](https://drive.google.com/uc?id=1ysTt0xOkWFSxyXfFm2GD7i5o22jce4B8&export=download) | -          | 874MB |
