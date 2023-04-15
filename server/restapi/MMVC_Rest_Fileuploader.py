@@ -34,7 +34,6 @@ class MMVC_Rest_Fileuploader:
         json_compatible_item_data = jsonable_encoder(res)
         return JSONResponse(content=json_compatible_item_data)
 
-    # def post_concat_uploaded_file(self, slot: int = Form(...), filename: str = Form(...), filenameChunkNum: int = Form(...)):
     def post_concat_uploaded_file(self, filename: str = Form(...), filenameChunkNum: int = Form(...)):
         slot = 0
         res = concat_file_chunks(slot, UPLOAD_DIR, filename, filenameChunkNum, UPLOAD_DIR)
@@ -54,7 +53,7 @@ class MMVC_Rest_Fileuploader:
 
     def post_load_model(
         self,
-        # slot: int = Form(...),
+        slot: int = Form(...),
         pyTorchModelFilename: str = Form(...),
         onnxModelFilename: str = Form(...),
         configFilename: str = Form(...),
@@ -63,15 +62,44 @@ class MMVC_Rest_Fileuploader:
         indexFilename: str = Form(...),
         isHalf: bool = Form(...),
     ):
-        pyTorchModelFilePath = os.path.join(UPLOAD_DIR, pyTorchModelFilename) if pyTorchModelFilename != "-" else None
-        onnxModelFilePath = os.path.join(UPLOAD_DIR, onnxModelFilename) if onnxModelFilename != "-" else None
-        configFilePath = os.path.join(UPLOAD_DIR, configFilename)
-        clusterTorchModelFilePath = os.path.join(UPLOAD_DIR, clusterTorchModelFilename) if clusterTorchModelFilename != "-" else None
-        featureFilePath = os.path.join(UPLOAD_DIR, featureFilename) if featureFilename != "-" else None
-        indexFilePath = os.path.join(UPLOAD_DIR, indexFilename) if indexFilename != "-" else None
 
-        info = self.voiceChangerManager.loadModel(configFilePath, pyTorchModelFilePath, onnxModelFilePath,
-                                                  clusterTorchModelFilePath, featureFilePath, indexFilePath,
+        # # Upload File Path
+        # pyTorchModelFilePath = os.path.join(UPLOAD_DIR, pyTorchModelFilename) if pyTorchModelFilename != "-" else None
+        # onnxModelFilePath = os.path.join(UPLOAD_DIR, onnxModelFilename) if onnxModelFilename != "-" else None
+        # configFilePath = os.path.join(UPLOAD_DIR, configFilename)
+        # clusterTorchModelFilePath = os.path.join(UPLOAD_DIR, clusterTorchModelFilename) if clusterTorchModelFilename != "-" else None
+        # featureFilePath = os.path.join(UPLOAD_DIR, featureFilename) if featureFilename != "-" else None
+        # indexFilePath = os.path.join(UPLOAD_DIR, indexFilename) if indexFilename != "-" else None
+
+        # # Stored File Path by Slot
+        # pyTorchModelStoredFilePath = os.path.join(UPLOAD_DIR, f"{slot}", pyTorchModelFilename) if pyTorchModelFilename != "-" else None
+        # onnxModelStoredFilePath = os.path.join(UPLOAD_DIR, f"{slot}", onnxModelFilename) if onnxModelFilename != "-" else None
+        # configStoredFilePath = os.path.join(UPLOAD_DIR, f"{slot}", configFilename)
+        # clusterTorchModelStoredFilePath = os.path.join(UPLOAD_DIR, f"{slot}", clusterTorchModelFilename) if clusterTorchModelFilename != "-" else None
+        # featureStoredFilePath = os.path.join(UPLOAD_DIR, f"{slot}", featureFilename) if featureFilename != "-" else None
+        # indexStoredFilePath = os.path.join(UPLOAD_DIR, f"{slot}", indexFilename) if indexFilename != "-" else None
+
+        # # Store File
+        # if pyTorchModelFilename != "-":
+        #     pyTorchModelFilePath = os.path.join(UPLOAD_DIR, pyTorchModelFilename)
+        #     pyTorchModelStoredFilePath = os.path.join(UPLOAD_DIR, f"{slot}", pyTorchModelFilename)
+        #     shutil.move(pyTorchModelFilePath, pyTorchModelStoredFilePath)
+
+        paths = []
+        for x in [pyTorchModelFilename, onnxModelFilename, configFilename, clusterTorchModelFilename, featureFilename, indexFilename]:
+            if x != "-":
+                uploadPath = os.path.join(UPLOAD_DIR, x)
+                storeDir = os.path.join(UPLOAD_DIR, f"{slot}")
+                os.makedirs(storeDir, exist_ok=True)
+                storePath = os.path.join(storeDir, x)
+                shutil.move(uploadPath, storePath)
+                paths.push(storePath)
+            else:
+                paths.push(None)
+        pyTorchModelStoredFilePath, onnxModelStoredFilePath, configStoredFilePath, clusterTorchModelStoredFilePath, featureStoredFilePath, indexStoredFilePath = paths
+
+        info = self.voiceChangerManager.loadModel(slot, configStoredFilePath, pyTorchModelStoredFilePath, onnxModelStoredFilePath,
+                                                  clusterTorchModelStoredFilePath, featureStoredFilePath, indexStoredFilePath,
                                                   isHalf)
         json_compatible_item_data = jsonable_encoder(info)
         return JSONResponse(content=json_compatible_item_data)

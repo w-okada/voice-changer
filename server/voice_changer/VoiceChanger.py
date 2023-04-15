@@ -108,6 +108,7 @@ class VoiceChanger():
 
     def loadModel(
         self,
+        slot: number,
         config: str,
         pyTorch_model_file: Optional[str] = None,
         onnx_model_file: Optional[str] = None,
@@ -123,7 +124,7 @@ class VoiceChanger():
             elif self.modelType == "so-vits-svc-40" or self.modelType == "so-vits-svc-40_c" or self.modelType == "so-vits-svc-40v2":
                 return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, clusterTorchModel)
             elif self.modelType == "RVC":
-                return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, feature_file, index_file, is_half)
+                return self.voiceChanger.loadModel(slot, config, pyTorch_model_file, onnx_model_file, feature_file, index_file, is_half)
             else:
                 return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, clusterTorchModel)
         except Exception as e:
