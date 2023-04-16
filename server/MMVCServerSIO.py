@@ -40,9 +40,13 @@ def setupArgParser():
     parser.add_argument("--modelType", type=str,
                         default="MMVCv15", help="model type: MMVCv13, MMVCv15, so-vits-svc-40, so-vits-svc-40v2")
     parser.add_argument("--cluster", type=str, help="path to cluster model")
-    parser.add_argument("--hubert", type=str, help="path to hubert model")
     parser.add_argument("--internal", type=strtobool, default=False, help="各種パスをmac appの中身に変換")
+
+    parser.add_argument("--hubert", type=str, help="path to hubert model")
     parser.add_argument("--useHubertOnnx", type=strtobool, default=False, help="use hubert onnx")
+    parser.add_argument("--hubertSoftPt", type=str, help="path to hubert-soft model(pytorch)")
+    parser.add_argument("--enhancerPt", type=str, help="path to enhancer model(pytorch)")
+    parser.add_argument("--enhancerOnnx", type=str, help="path to enhancer model(onnx)")
 
     return parser
 
@@ -82,12 +86,11 @@ printMessage(f"Booting PHASE :{__name__}", level=2)
 
 TYPE = args.t
 PORT = args.p
-CONFIG = args.c if args.c != None else None
-MODEL = args.m if args.m != None else None
-ONNX_MODEL = args.o if args.o != None else None
-HUBERT_MODEL = args.hubert if args.hubert != None else None  # hubertはユーザがダウンロードして解凍フォルダに格納する運用。
+CONFIG = args.c
+MODEL = args.m
+ONNX_MODEL = args.o
 CLUSTER_MODEL = args.cluster if args.cluster != None else None
-USE_HUBERT_ONNX = args.useHubertOnnx
+
 
 if args.internal and hasattr(sys, "_MEIPASS"):
     print("use internal path")
@@ -125,7 +128,13 @@ if args.colab == True:
     os.environ["colab"] = "True"
 
 if __name__ == 'MMVCServerSIO':
-    voiceChangerManager = VoiceChangerManager.get_instance({"hubert": HUBERT_MODEL, "useHubertOnnx": USE_HUBERT_ONNX})
+    voiceChangerManager = VoiceChangerManager.get_instance({
+        "hubert": args.hubert,
+        "useHubertOnnx": args.useHubertOnnx,
+        "hubertSoftPt": args.hubertSoftPt,
+        "enhancerPt": args.enhancerPt,
+        "enhancerOnnx": args.enhancerOnnx
+    })
     if CONFIG and (MODEL or ONNX_MODEL):
         if MODEL_TYPE == "MMVCv15" or MODEL_TYPE == "MMVCv13":
             voiceChangerManager.loadModel(CONFIG, MODEL, ONNX_MODEL, None)

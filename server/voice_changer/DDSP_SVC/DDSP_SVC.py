@@ -20,13 +20,7 @@ import pyworld as pw
 import ddsp.vocoder as vo
 from ddsp.core import upsample
 from enhancer import Enhancer
-from slicer import Slicer
-import librosa
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
-
-import resampy
-from scipy.io import wavfile
-SAMPLING_RATE = 44100
 
 
 @dataclass
@@ -69,25 +63,31 @@ class DDSP_SVC:
         self.params = params
         print("DDSP-SVC initialization:", params)
 
+    def useDevice(self):
+        if self.settings.gpu >= 0 and torch.cuda.is_available():
+            return torch.device("cuda", index=self.settings.gpu)
+        else:
+            return torch.device("cpu")
+
     def loadModel(self, props):
         self.settings.configFile = props["files"]["configFilename"]
         self.settings.pyTorchModelFile = props["files"]["pyTorchModelFilename"]
         # model
-        model, args = vo.load_model(self.settings.pyTorchModelFile)
+        model, args = vo.load_model(self.settings.pyTorchModelFile, device=self.useDevice())
         self.model = model
         self.args = args
-        self.hop_size = int(self.args.data.block_size * SAMPLING_RATE / self.args.data.sampling_rate)
-        # self.sampling_rate = args.data.sampling_rate
+        self.sampling_rate = args.data.sampling_rate
+        self.hop_size = int(self.args.data.block_size * self.sampling_rate / self.args.data.sampling_rate)
+        print("-------------------hopsize", self.hop_size)
 
         # hubert
-        # vec_path = self.params["hubert"]
-        vec_path = "./model_DDSP-SVC/hubert-soft-0d54a1f4.pt"
+        self.vec_path = self.params["hubertSoftPt"]
         self.encoder = vo.Units_Encoder(
-            args.data.encoder,
-            vec_path,
-            args.data.encoder_sample_rate,
-            args.data.encoder_hop_size,
-            device="cpu")
+            self.args.data.encoder,
+            self.vec_path,
+            self.args.data.encoder_sample_rate,
+            self.args.data.encoder_hop_size,
+            device=self.useDevice())
 
         # ort_options = onnxruntime.SessionOptions()
         # ort_options.intra_op_num_threads = 8
@@ -106,13 +106,14 @@ class DDSP_SVC:
         self.f0_detector = vo.F0_Extractor(
             # "crepe",
             self.settings.f0Detector,
-            SAMPLING_RATE,
+            self.sampling_rate,
             self.hop_size,
             float(50),
             float(1100))
 
         self.volume_extractor = vo.Volume_Extractor(self.hop_size)
-        self.enhancer = Enhancer(self.args.enhancer.type, "./model_DDSP-SVC/enhancer/model", "cpu")
+        self.enhancer_path = self.params["enhancerPt"]
+        self.enhancer = Enhancer(self.args.enhancer.type, self.enhancer_path, device=self.useDevice())
         return self.get_info()
 
     def update_settings(self, key: str, val: any):
@@ -132,6 +133,13 @@ class DDSP_SVC:
                 if "CUDAExecutionProvider" in providers:
                     provider_options = [{'device_id': self.settings.gpu}]
                     self.onnx_session.set_providers(providers=["CUDAExecutionProvider"], provider_options=provider_options)
+            if key == "gpu":
+                model, _args = vo.load_model(self.settings.pyTorchModelFile, device=self.useDevice())
+                self.model = model
+                self.enhancer = Enhancer(self.args.enhancer.type, self.enhancer_path, device=self.useDevice())
+                self.encoder = vo.Units_Encoder(self.args.data.encoder, self.vec_path, self.args.data.encoder_sample_rate,
+                                                self.args.data.encoder_hop_size, device=self.useDevice())
+
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
@@ -140,9 +148,14 @@ class DDSP_SVC:
                 print("f0Detector update", val)
                 if val == "dio":
                     val = "parselmouth"
+
+                if hasattr(self, "sampling_rate") == False:
+                    self.sampling_rate = 44100
+                    self.hop_size = 512
+
                 self.f0_detector = vo.F0_Extractor(
                     val,
-                    SAMPLING_RATE,
+                    self.sampling_rate,
                     self.hop_size,
                     float(50),
                     float(1100))
@@ -165,7 +178,7 @@ class DDSP_SVC:
         return data
 
     def get_processing_sampling_rate(self):
-        return SAMPLING_RATE
+        return self.sampling_rate
 
     def generate_input(self, newData: any, inputSize: int, crossfadeSize: int, solaSearchFrame: int = 0):
         newData = newData.astype(np.float32) / 32768.0
@@ -197,8 +210,8 @@ class DDSP_SVC:
         volume = torch.from_numpy(volume).float().unsqueeze(-1).unsqueeze(0)
 
         # embed
-        audio = torch.from_numpy(self.audio_buffer).float().unsqueeze(0)
-        seg_units = self.encoder.encode(audio, SAMPLING_RATE, self.hop_size)
+        audio = torch.from_numpy(self.audio_buffer).float().to(self.useDevice()).unsqueeze(0)
+        seg_units = self.encoder.encode(audio, self.sampling_rate, self.hop_size)
 
         crop = self.audio_buffer[-1 * (inputSize + crossfadeSize):-1 * (crossfadeSize)]
 
@@ -247,22 +260,19 @@ class DDSP_SVC:
             print("[Voice Changer] No pyTorch session.")
             return np.zeros(1).astype(np.int16)
 
-        c = data[0]
-        f0 = data[1]
-        volume = data[2]
-        mask = data[3]
+        c = data[0].to(self.useDevice())
+        f0 = data[1].to(self.useDevice())
+        volume = data[2].to(self.useDevice())
+        mask = data[3].to(self.useDevice())
 
         convertSize = data[4]
         vol = data[5]
-
-        print(volume.device)
-
         # if vol < self.settings.silentThreshold:
         #     print("threshold")
         #     return np.zeros(convertSize).astype(np.int16)
 
         with torch.no_grad():
-            spk_id = torch.LongTensor(np.array([[int(1)]]))
+            spk_id = torch.LongTensor(np.array([[int(1)]])).to(self.useDevice())
             seg_output, _, (s_h, s_n) = self.model(c, f0, volume, spk_id=spk_id, spk_mix_dict=None)
             seg_output *= mask
 
