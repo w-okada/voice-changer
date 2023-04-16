@@ -34,13 +34,14 @@ class DDSP_SVCSettings():
     gpu: int = 0
     dstId: int = 0
 
-    f0Detector: str = "dio"  # dio or harvest
+    f0Detector: str = "dio"  # dio or harvest # parselmouth
     tran: int = 20
-    noiceScale: float = 0.3
     predictF0: int = 0  # 0:False, 1:True
     silentThreshold: float = 0.00001
     extraConvertSize: int = 1024 * 32
-    clusterInferRatio: float = 0.1
+
+    enableEnhancer: int = 0
+    enhancerTune: int = 0
 
     framework: str = "PyTorch"  # PyTorch or ONNX
     pyTorchModelFile: str = ""
@@ -52,7 +53,7 @@ class DDSP_SVCSettings():
     )
 
     # ↓mutableな物だけ列挙
-    intData = ["gpu", "dstId", "tran", "predictF0", "extraConvertSize"]
+    intData = ["gpu", "dstId", "tran", "predictF0", "extraConvertSize", "enableEnhancer", "enhancerTune"]
     floatData = ["noiceScale", "silentThreshold", "clusterInferRatio"]
     strData = ["framework", "f0Detector"]
 
@@ -63,23 +64,24 @@ class DDSP_SVC:
         self.net_g = None
         self.onnx_session = None
 
-        self.raw_path = io.BytesIO()
         self.gpu_num = torch.cuda.device_count()
         self.prevVol = 0
         self.params = params
         print("DDSP-SVC initialization:", params)
 
-    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, clusterTorchModel: str = None):
-
-        self.settings.configFile = config
+    def loadModel(self, props):
+        self.settings.configFile = props["files"]["configFilename"]
+        self.settings.pyTorchModelFile = props["files"]["pyTorchModelFilename"]
         # model
-        model, args = vo.load_model(pyTorch_model_file)
+        model, args = vo.load_model(self.settings.pyTorchModelFile)
         self.model = model
         self.args = args
         self.hop_size = int(self.args.data.block_size * SAMPLING_RATE / self.args.data.sampling_rate)
+        # self.sampling_rate = args.data.sampling_rate
 
         # hubert
-        vec_path = self.params["hubert"]
+        # vec_path = self.params["hubert"]
+        vec_path = "./model_DDSP-SVC/hubert-soft-0d54a1f4.pt"
         self.encoder = vo.Units_Encoder(
             args.data.encoder,
             vec_path,
@@ -134,6 +136,16 @@ class DDSP_SVC:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
             setattr(self.settings, key, str(val))
+            if key == "f0Detector":
+                print("f0Detector update", val)
+                if val == "dio":
+                    val = "parselmouth"
+                self.f0_detector = vo.F0_Extractor(
+                    val,
+                    SAMPLING_RATE,
+                    self.hop_size,
+                    float(50),
+                    float(1100))
         else:
             return False
 
@@ -155,7 +167,7 @@ class DDSP_SVC:
     def get_processing_sampling_rate(self):
         return SAMPLING_RATE
 
-    def generate_input(self, newData: any, inputSize: int, crossfadeSize: int):
+    def generate_input(self, newData: any, inputSize: int, crossfadeSize: int, solaSearchFrame: int = 0):
         newData = newData.astype(np.float32) / 32768.0
 
         if hasattr(self, "audio_buffer"):
@@ -163,7 +175,8 @@ class DDSP_SVC:
         else:
             self.audio_buffer = newData
 
-        convertSize = inputSize + crossfadeSize + self.settings.extraConvertSize
+        convertSize = inputSize + crossfadeSize + solaSearchFrame + self.settings.extraConvertSize
+
         if convertSize % self.hop_size != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
             convertSize = convertSize + (self.hop_size - (convertSize % self.hop_size))
 
@@ -228,8 +241,6 @@ class DDSP_SVC:
 
         return result
 
-        pass
-
     def _pyTorch_inference(self, data):
 
         if hasattr(self, "model") == False or self.model == None:
@@ -244,6 +255,8 @@ class DDSP_SVC:
         convertSize = data[4]
         vol = data[5]
 
+        print(volume.device)
+
         # if vol < self.settings.silentThreshold:
         #     print("threshold")
         #     return np.zeros(convertSize).astype(np.int16)
@@ -253,12 +266,14 @@ class DDSP_SVC:
             seg_output, _, (s_h, s_n) = self.model(c, f0, volume, spk_id=spk_id, spk_mix_dict=None)
             seg_output *= mask
 
-            seg_output, output_sample_rate = self.enhancer.enhance(
-                seg_output,
-                self.args.data.sampling_rate,
-                f0,
-                self.args.data.block_size,
-                adaptive_key=float(3))
+            if self.settings.enableEnhancer:
+                seg_output, output_sample_rate = self.enhancer.enhance(
+                    seg_output,
+                    self.args.data.sampling_rate,
+                    f0,
+                    self.args.data.block_size,
+                    adaptive_key=float(self.settings.enhancerTune))
+
             result = seg_output.squeeze().cpu().numpy() * 32768.0
         return np.array(result).astype(np.int16)
 
@@ -277,12 +292,15 @@ class DDSP_SVC:
         del self.net_g
         del self.onnx_session
 
+        remove_path = os.path.join("DDSP-SVC")
+        sys.path = [x for x in sys.path if x.endswith(remove_path) == False]
 
-def cross_fade(a: np.ndarray, b: np.ndarray, idx: int):
-    result = np.zeros(idx + b.shape[0])
-    fade_len = a.shape[0] - idx
-    np.copyto(dst=result[:idx], src=a[:idx])
-    k = np.linspace(0, 1.0, num=fade_len, endpoint=True)
-    result[idx: a.shape[0]] = (1 - k) * a[idx:] + k * b[: fade_len]
-    np.copyto(dst=result[a.shape[0]:], src=b[fade_len:])
-    return result
+        for key in list(sys.modules):
+            val = sys.modules.get(key)
+            try:
+                file_path = val.__file__
+                if file_path.find("DDSP-SVC" + os.path.sep) >= 0:
+                    print("remove", key, file_path)
+                    sys.modules.pop(key)
+            except Exception as e:
+                pass

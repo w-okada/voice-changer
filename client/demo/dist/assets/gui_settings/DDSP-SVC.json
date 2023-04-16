@@ -1,0 +1,186 @@
+{
+    "type": "demo",
+    "id": "DDSP-SVC",
+    "front": {
+        "title": [
+            {
+                "name": "title",
+                "options": {
+                    "mainTitle": "Realtime Voice Changer Client",
+                    "subTitle": "for DDSP-SVC",
+                    "lineNum": 1
+                }
+            },
+            {
+                "name": "clearSetting",
+                "options": {}
+            }
+        ],
+        "serverControl": [
+            {
+                "name": "startButton",
+                "options": {}
+            },
+            {
+                "name": "performance",
+                "options": {}
+            },
+            {
+                "name": "serverInfo",
+                "options": {}
+            }
+        ],
+        "modelSetting": [
+            {
+                "name": "modelUploader",
+                "options": {
+                    "showConfig": true,
+                    "showOnnx": false,
+                    "showPyTorch": true,
+                    "showCorrespondence": false,
+                    "showPyTorchCluster": false,
+
+                    "showFeature": false,
+                    "showIndex": false,
+                    "showHalfPrecision": false,
+                    "defaultEnablePyTorch": true,
+
+                    "showOnnxExportButton": false
+                }
+            },
+            {
+                "name": "framework",
+                "options": {
+                    "showFramework": true
+                }
+            },
+            {
+                "name": "modelSamplingRate",
+                "options": {}
+            }
+        ],
+        "deviceSetting": [
+            {
+                "name": "audioInput",
+                "options": {}
+            },
+            {
+                "name": "audioOutput",
+                "options": {}
+            }
+        ],
+        "qualityControl": [
+            {
+                "name": "noiseControl",
+                "options": {}
+            },
+            {
+                "name": "gainControl",
+                "options": {}
+            },
+            {
+                "name": "f0Detector",
+                "options": {
+                    "detectors": ["dio", "parselmouth", "harvest", "crepe"]
+                }
+            },
+            {
+                "name": "divider",
+                "options": {}
+            },
+            {
+                "name": "analyzer",
+                "options": {}
+            }
+        ],
+        "speakerSetting": [
+            {
+                "name": "dstId",
+                "options": {
+                    "showF0": true,
+                    "useServerInfo": false
+                }
+            },
+            {
+                "name": "tune",
+                "options": {}
+            },
+            {
+                "name": "indexRatio",
+                "options": {}
+            },
+            {
+                "name": "silentThreshold",
+                "options": {}
+            },
+            {
+                "name": "enableEnhancer",
+                "options": {}
+            }
+        ],
+        "converterSetting": [
+            {
+                "name": "inputChunkNum",
+                "options": {}
+            },
+            {
+                "name": "extraDataLength",
+                "options": {}
+            },
+            {
+                "name": "gpu",
+                "options": {}
+            }
+        ],
+        "advancedSetting": [
+            {
+                "name": "serverURL",
+                "options": {}
+            },
+            {
+                "name": "protocol",
+                "options": {}
+            },
+            {
+                "name": "sampleRate",
+                "options": {}
+            },
+            {
+                "name": "sendingSampleRate",
+                "options": {}
+            },
+            {
+                "name": "crossFadeOverlapSize",
+                "options": {}
+            },
+            {
+                "name": "crossFadeOffsetRate",
+                "options": {}
+            },
+            {
+                "name": "crossFadeEndRate",
+                "options": {}
+            },
+            {
+                "name": "downSamplingMode",
+                "options": {}
+            },
+            {
+                "name": "trancateNumThreshold",
+                "options": {}
+            }
+        ]
+    },
+
+    "dialogs": {
+        "license": [
+            {
+                "title": "Retrieval-based-Voice-Conversion-WebUI",
+                "auther": "liujing04",
+                "contact": "",
+                "url": "https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI",
+                "license": "MIT"
+            }
+        ]
+    }
+}

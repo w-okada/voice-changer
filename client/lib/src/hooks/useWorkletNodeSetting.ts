@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react"
 
-import { ClientType, DefaultWorkletNodeSetting, DefaultWorkletNodeSetting_RVC, DefaultWorkletNodeSetting_so_vits_svc_40, DefaultWorkletNodeSetting_so_vits_svc_40v2, INDEXEDDB_KEY_WORKLETNODE, WorkletNodeSetting } from "../const"
+import { ClientType, DefaultWorkletNodeSetting, DefaultWorkletNodeSetting_DDSP_SVC, DefaultWorkletNodeSetting_RVC, DefaultWorkletNodeSetting_so_vits_svc_40, DefaultWorkletNodeSetting_so_vits_svc_40v2, INDEXEDDB_KEY_WORKLETNODE, WorkletNodeSetting } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
@@ -28,6 +28,8 @@ export const useWorkletNodeSetting = (props: UseWorkletNodeSettingProps): Workle
             return DefaultWorkletNodeSetting_so_vits_svc_40
         } else if (props.clientType == "so-vits-svc-40v2") {
             return DefaultWorkletNodeSetting_so_vits_svc_40v2
+        } else if (props.clientType == "DDSP-SVC") {
+            return DefaultWorkletNodeSetting_DDSP_SVC
         } else if (props.clientType == "RVC") {
             return DefaultWorkletNodeSetting_RVC
         } else {

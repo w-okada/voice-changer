@@ -9,7 +9,7 @@ export const ConfigSelectRow = () => {
         const configFilenameText = appState.serverSetting.fileUploadSetting.configFile?.filename || appState.serverSetting.fileUploadSetting.configFile?.file?.name || ""
         const onConfigFileLoadClicked = async () => {
             const file = await fileSelector("")
-            if (file.name.endsWith(".json") == false) {
+            if (file.name.endsWith(".json") == false && file.name.endsWith(".yaml") == false) {
                 alert("モデルファイルの拡張子はjsonである必要があります。")
                 return
             }

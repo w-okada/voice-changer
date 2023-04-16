@@ -80,7 +80,9 @@
             },
             {
                 "name": "f0Detector",
-                "options": {}
+                "options": {
+                    "detectors": ["pm", "harvest"]
+                }
             },
             {
                 "name": "divider",

@@ -4,12 +4,14 @@ import { F0Detector } from "@dannadori/voice-changer-client-js";
 
 
 export type F0DetectorRowProps = {
+    detectors: string[]
 }
-export const F0DetectorRow = (_props: F0DetectorRowProps) => {
+export const F0DetectorRow = (props: F0DetectorRowProps) => {
     const appState = useAppState()
 
     const f0DetectorRow = useMemo(() => {
         const desc = { "harvest": "harvest(High Quality)", "dio": "dio/pm(Light Weight)" }
+        const detectors = props.detectors || ["dio", "harvest"]
 
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
@@ -19,9 +21,9 @@ export const F0DetectorRow = (_props: F0DetectorRowProps) => {
                         appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, f0Detector: e.target.value as F0Detector })
                     }}>
                         {
-                            Object.values(F0Detector).map(x => {
+                            Object.values(detectors).map(x => {
                                 //@ts-ignore
-                                return <option key={x} value={x}>{desc[x]}</option>
+                                return <option key={x} value={x}>{x}</option>
                             })
                         }
                     </select>

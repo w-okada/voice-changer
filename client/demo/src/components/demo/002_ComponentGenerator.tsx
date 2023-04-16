@@ -38,6 +38,7 @@ import { RVCQualityRow, RVCQualityRowProps } from "./components/810_RVCQualityRo
 import { ModelSamplingRateRow, ModelSamplingRateRowProps } from "./components/303_ModelSamplingRateRow"
 // import { OnnxExportRow, OnnxExportRowProps } from "./components/304_OnnxExportRow"
 import { SolaEnableRow, SolaEnableRowProps } from "./components/811_SolaEnableRow"
+import { EnableEnhancerRow, EnableEnhancerRowProps } from "./components/610_EnableEnhancerRow"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
 
@@ -85,6 +86,7 @@ const initialize = () => {
     addToCatalog("noiseScale", (props: NoiseScaleRowProps) => { return <NoiseScaleRow {...props} /> })
     addToCatalog("silentThreshold", (props: SilentThresholdRowProps) => { return <SilentThresholdRow {...props} /> })
     addToCatalog("indexRatio", (props: IndexRatioRowProps) => { return <IndexRatioRow {...props} /> })
+    addToCatalog("enableEnhancer", (props: EnableEnhancerRowProps) => { return <EnableEnhancerRow {...props} /> })
 
 
 

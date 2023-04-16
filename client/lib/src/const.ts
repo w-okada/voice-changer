@@ -10,6 +10,7 @@ export const ClientType = {
     "so-vits-svc-40": "so-vits-svc-40",
     "so-vits-svc-40_c": "so-vits-svc-40_c",
     "so-vits-svc-40v2": "so-vits-svc-40v2",
+    "DDSP-SVC": "DDSP-SVC",
     "RVC": "RVC"
 
 } as const
@@ -58,6 +59,8 @@ export type Framework = typeof Framework[keyof typeof Framework]
 export const F0Detector = {
     "dio": "dio",
     "harvest": "harvest",
+    "parselmouth": "parselmouth",
+    "crepe": "crepe",
 } as const
 export type F0Detector = typeof F0Detector[keyof typeof F0Detector]
 
@@ -91,6 +94,8 @@ export const ServerSettingKey = {
     "rvcQuality": "rvcQuality",
     "modelSamplingRate": "modelSamplingRate",
 
+    "enableEnhancer": "enableEnhancer",
+    "enhancerTune": "enhancerTune",
 
     "inputSampleRate": "inputSampleRate",
 } as const
@@ -124,6 +129,9 @@ export type VoiceChangerServerSetting = {
     indexRatio: number // RVC
     rvcQuality: number // 0:low, 1:high
     modelSamplingRate: ModelSamplingRate // 32000,40000,48000
+
+    enableEnhancer: number // DDSP-SVC
+    enhancerTune: number // DDSP-SVC
 
     inputSampleRate: InputSampleRate
 }
@@ -166,6 +174,9 @@ export const DefaultServerSetting_MMVCv15: ServerInfo = {
     rvcQuality: 0,
     modelSamplingRate: 48000,
 
+    enableEnhancer: 0,
+    enhancerTune: 0,
+
     inputSampleRate: 24000,
 
     // 
@@ -203,6 +214,8 @@ export const DefaultServerSetting_MMVCv13: ServerInfo = {
     rvcQuality: 0,
     modelSamplingRate: 48000,
 
+    enableEnhancer: 0,
+    enhancerTune: 0,
 
     inputSampleRate: 24000,
 
@@ -245,6 +258,8 @@ export const DefaultServerSetting_so_vits_svc_40: ServerInfo = {
     rvcQuality: 0,
     modelSamplingRate: 48000,
 
+    enableEnhancer: 0,
+    enhancerTune: 0,
 
     inputSampleRate: 24000,
 
@@ -287,6 +302,8 @@ export const DefaultServerSetting_so_vits_svc_40_c: ServerInfo = {
     rvcQuality: 0,
     modelSamplingRate: 48000,
 
+    enableEnhancer: 0,
+    enhancerTune: 0,
 
     inputSampleRate: 24000,
 
@@ -328,6 +345,52 @@ export const DefaultServerSetting_so_vits_svc_40v2: ServerInfo = {
     rvcQuality: 0,
     modelSamplingRate: 48000,
 
+    enableEnhancer: 0,
+    enhancerTune: 0,
+
+    inputSampleRate: 24000,
+
+    // 
+    status: "ok",
+    configFile: "",
+    pyTorchModelFile: "",
+    onnxModelFile: "",
+    onnxExecutionProviders: []
+}
+
+export const DefaultServerSetting_DDSP_SVC: ServerInfo = {
+    srcId: 0,
+    dstId: 0,
+    gpu: 0,
+
+    crossFadeOffsetRate: 0.0,
+    crossFadeEndRate: 1.0,
+    crossFadeOverlapSize: CrossFadeOverlapSize[1024],
+    solaEnabled: 0,
+
+    framework: Framework.PyTorch,
+    f0Factor: 1.0,
+    onnxExecutionProvider: OnnxExecutionProvider.CPUExecutionProvider,
+    f0Detector: F0Detector.dio,
+    recordIO: 0,
+
+    // tran: 0,
+    // noiceScale: 0,
+    // predictF0: 0,
+    // silentThreshold: 0,
+    tran: 10,
+    noiceScale: 0.3,
+    predictF0: 0,
+    silentThreshold: 0.00001,
+    extraConvertSize: 1024 * 32,
+    clusterInferRatio: 0.1,
+
+    indexRatio: 0,
+    rvcQuality: 0,
+    modelSamplingRate: 48000,
+
+    enableEnhancer: 0,
+    enhancerTune: 0,
 
     inputSampleRate: 24000,
 
@@ -370,6 +433,9 @@ export const DefaultServerSetting_RVC: ServerInfo = {
     indexRatio: 0,
     rvcQuality: 0,
     modelSamplingRate: 48000,
+
+    enableEnhancer: 0,
+    enhancerTune: 0,
 
     inputSampleRate: 48000,
 
@@ -449,6 +515,13 @@ export const DefaultWorkletNodeSetting_so_vits_svc_40v2: WorkletNodeSetting = {
     downSamplingMode: "average"
 }
 
+export const DefaultWorkletNodeSetting_DDSP_SVC: WorkletNodeSetting = {
+    serverUrl: "",
+    protocol: "sio",
+    sendingSampleRate: 48000,
+    inputChunkNum: 256,
+    downSamplingMode: "average"
+}
 
 export const DefaultWorkletNodeSetting_RVC: WorkletNodeSetting = {
     serverUrl: "",
