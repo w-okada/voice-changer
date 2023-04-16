@@ -51,17 +51,15 @@ class MMVCv13:
         self.gpu_num = torch.cuda.device_count()
         self.text_norm = torch.LongTensor([0, 6, 0])
 
-    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None):
-        self.settings.configFile = config
-        self.hps = get_hparams_from_file(config)
+    def loadModel(self, props):
+        self.settings.configFile = props["files"]["configFilename"]
+        self.hps = get_hparams_from_file(self.settings.configFile)
 
-        if pyTorch_model_file != None:
-            self.settings.pyTorchModelFile = pyTorch_model_file
-        if onnx_model_file:
-            self.settings.onnxModelFile = onnx_model_file
+        self.settings.pyTorchModelFile = props["files"]["pyTorchModelFilename"]
+        self.settings.onnxModelFile = props["files"]["onnxModelFilename"]
 
         # PyTorchモデル生成
-        if pyTorch_model_file != None:
+        if self.settings.pyTorchModelFile != None:
             self.net_g = SynthesizerTrn(
                 len(symbols),
                 self.hps.data.filter_length // 2 + 1,
@@ -69,14 +67,14 @@ class MMVCv13:
                 n_speakers=self.hps.data.n_speakers,
                 **self.hps.model)
             self.net_g.eval()
-            load_checkpoint(pyTorch_model_file, self.net_g, None)
+            load_checkpoint(self.settings.pyTorchModelFile, self.net_g, None)
 
         # ONNXモデル生成
-        if onnx_model_file != None:
+        if self.settings.onnxModelFile != None:
             ort_options = onnxruntime.SessionOptions()
             ort_options.intra_op_num_threads = 8
             self.onnx_session = onnxruntime.InferenceSession(
-                onnx_model_file,
+                self.settings.onnxModelFile,
                 providers=providers
             )
         return self.get_info()

@@ -66,11 +66,14 @@ class SoVitsSvc40v2:
         self.params = params
         print("so-vits-svc 40v2 initialization:", params)
 
-    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, clusterTorchModel: str = None):
-
-        self.settings.configFile = config
-        self.hps = utils.get_hparams_from_file(config)
+    def loadModel(self, props):
+        self.settings.configFile = props["files"]["configFilename"]
+        self.hps = utils.get_hparams_from_file(self.settings.configFile)
         self.settings.speakers = self.hps.spk
+
+        self.settings.pyTorchModelFile = props["files"]["pyTorchModelFilename"]
+        self.settings.onnxModelFile = props["files"]["onnxModelFilename"]
+        clusterTorchModel = props["files"]["clusterTorchModelFilename"]
 
         # hubert model
         try:
@@ -99,25 +102,20 @@ class SoVitsSvc40v2:
         except Exception as e:
             print("EXCEPTION during loading cluster model ", e)
 
-        if pyTorch_model_file != None:
-            self.settings.pyTorchModelFile = pyTorch_model_file
-        if onnx_model_file:
-            self.settings.onnxModelFile = onnx_model_file
-
         # PyTorchモデル生成
-        if pyTorch_model_file != None:
+        if self.settings.pyTorchModelFile != None:
             self.net_g = SynthesizerTrn(
                 self.hps
             )
             self.net_g.eval()
-            utils.load_checkpoint(pyTorch_model_file, self.net_g, None)
+            utils.load_checkpoint(self.settings.pyTorchModelFile, self.net_g, None)
 
         # ONNXモデル生成
-        if onnx_model_file != None:
+        if self.settings.onnxModelFile != None:
             ort_options = onnxruntime.SessionOptions()
             ort_options.intra_op_num_threads = 8
             self.onnx_session = onnxruntime.InferenceSession(
-                onnx_model_file,
+                self.settings.onnxModelFile,
                 providers=providers
             )
             input_info = self.onnx_session.get_inputs()

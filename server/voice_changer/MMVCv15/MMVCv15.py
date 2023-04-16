@@ -51,18 +51,13 @@ class MMVCv15:
 
         self.gpu_num = torch.cuda.device_count()
 
-    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None):
-        self.settings.configFile = config
-        self.hps = get_hparams_from_file(config)
+    def loadModel(self, props):
 
-        if pyTorch_model_file != None:
-            self.settings.pyTorchModelFile = pyTorch_model_file
-        else:
-            self.settings.pyTorchModelFile = ""
-        if onnx_model_file:
-            self.settings.onnxModelFile = onnx_model_file
-        else:
-            self.settings.onnxModelFile = ""
+        self.settings.configFile = props["files"]["configFilename"]
+        self.hps = get_hparams_from_file(self.settings.configFile)
+
+        self.settings.pyTorchModelFile = props["files"]["pyTorchModelFilename"]
+        self.settings.onnxModelFile = props["files"]["onnxModelFilename"]
 
         # PyTorchモデル生成
         self.net_g = SynthesizerTrn(
@@ -83,17 +78,17 @@ class MMVCv15:
             requires_grad_text_enc=self.hps.requires_grad.text_enc,
             requires_grad_dec=self.hps.requires_grad.dec
         )
-        if pyTorch_model_file != None:
+        if self.settings.pyTorchModelFile != None:
             self.net_g.eval()
-            load_checkpoint(pyTorch_model_file, self.net_g, None)
+            load_checkpoint(self.settings.pyTorchModelFile, self.net_g, None)
 
         # ONNXモデル生成
         self.onxx_input_length = 8192
-        if onnx_model_file != None:
+        if self.settings.onnxModelFile != None:
             ort_options = onnxruntime.SessionOptions()
             ort_options.intra_op_num_threads = 8
             self.onnx_session = onnxruntime.InferenceSession(
-                onnx_model_file,
+                self.settings.onnxModelFile,
                 providers=providers
             )
             inputs_info = self.onnx_session.get_inputs()
