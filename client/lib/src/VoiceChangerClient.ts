@@ -282,6 +282,7 @@ export class VoiceChangerClient {
         return this.configurator.concatUploadedFile(filename, chunkNum)
     }
     loadModel = (
+        slot: number | null,
         configFilename: string,
         pyTorchModelFilename: string | null,
         onnxModelFilename: string | null,
@@ -291,7 +292,7 @@ export class VoiceChangerClient {
         isHalf: boolean
     ) => {
         // !! 注意!! hubertTorchModelは固定値で上書きされるため、設定しても効果ない。
-        return this.configurator.loadModel(configFilename, pyTorchModelFilename, onnxModelFilename, clusterTorchModelFilename, featureFilename, indexFilename, isHalf)
+        return this.configurator.loadModel(slot, configFilename, pyTorchModelFilename, onnxModelFilename, clusterTorchModelFilename, featureFilename, indexFilename, isHalf)
     }
 
     //##  Worklet ##//

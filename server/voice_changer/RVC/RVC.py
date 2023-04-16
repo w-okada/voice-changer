@@ -77,11 +77,19 @@ class RVC:
         self.params = params
         print("RVC initialization: ", params)
 
-    def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, feature_file: str = None, index_file: str = None, is_half: bool = True):
-        self.settings.configFile = config
-        self.feature_file = feature_file
-        self.index_file = index_file
-        self.is_half = is_half
+    def loadModel(self, props):
+        self.settings.configFile = props["files"]["configFilename"]
+
+        self.settings.pyTorchModelFile = props["files"]["pyTorchModelFilename"]
+        self.settings.onnxModelFile = props["files"]["onnxModelFilename"]
+
+        self.feature_file = props["files"]["featureFilename"]
+        self.index_file = props["files"]["indexFilename"]
+
+        self.is_half = props["isHalf"]
+        self.slot = props["slot"]
+
+        print("[Voice Changer] RVC loading... slot:", self.slot)
 
         try:
             hubert_path = self.params["hubert"]
@@ -95,14 +103,14 @@ class RVC:
         except Exception as e:
             print("EXCEPTION during loading hubert/contentvec model", e)
 
-        if pyTorch_model_file != None:
-            self.settings.pyTorchModelFile = pyTorch_model_file
-        if onnx_model_file:
-            self.settings.onnxModelFile = onnx_model_file
+        # if pyTorch_model_file != None:
+        #     self.settings.pyTorchModelFile = pyTorch_model_file
+        # if onnx_model_file:
+        #     self.settings.onnxModelFile = onnx_model_file
 
         # PyTorchモデル生成
-        if pyTorch_model_file != None:
-            cpt = torch.load(pyTorch_model_file, map_location="cpu")
+        if self.settings.pyTorchModelFile != None:
+            cpt = torch.load(self.settings.pyTorchModelFile, map_location="cpu")
             self.settings.modelSamplingRate = cpt["config"][-1]
             net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=self.is_half)
             net_g.eval()
@@ -112,8 +120,8 @@ class RVC:
             self.net_g = net_g
 
         # ONNXモデル生成
-        if onnx_model_file != None:
-            self.onnx_session = ModelWrapper(onnx_model_file)
+        if self.settings.onnxModelFile != None:
+            self.onnx_session = ModelWrapper(self.settings.onnxModelFile)
         return self.get_info()
 
     def update_settings(self, key: str, val: any):

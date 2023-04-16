@@ -256,6 +256,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             const configFileName = fileUploadSetting.configFile ? fileUploadSetting.configFile.filename || "-" : "-"
             console.log("IS HALF", fileUploadSetting.isHalf)
             const loadPromise = props.voiceChangerClient.loadModel(
+                0,
                 configFileName,
                 fileUploadSetting.pyTorchModel?.filename || null,
                 fileUploadSetting.onnxModel?.filename || null,

@@ -108,28 +108,27 @@ class VoiceChanger():
 
     def loadModel(
         self,
-        slot: number,
-        config: str,
-        pyTorch_model_file: Optional[str] = None,
-        onnx_model_file: Optional[str] = None,
-        clusterTorchModel: Optional[str] = None,
-        feature_file: Optional[str] = None,
-        index_file: Optional[str] = None,
-        is_half: bool = True,
+        props,
     ):
 
         try:
-            if self.modelType == "MMVCv15" or self.modelType == "MMVCv13":
-                return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file)
-            elif self.modelType == "so-vits-svc-40" or self.modelType == "so-vits-svc-40_c" or self.modelType == "so-vits-svc-40v2":
-                return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, clusterTorchModel)
-            elif self.modelType == "RVC":
-                return self.voiceChanger.loadModel(slot, config, pyTorch_model_file, onnx_model_file, feature_file, index_file, is_half)
-            else:
-                return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, clusterTorchModel)
+            return self.voiceChanger.loadModel(props)
         except Exception as e:
             print("[Voice Changer] Model Load Error! Check your model is valid.", e)
             return {"status": "NG"}
+
+        # try:
+        #     if self.modelType == "MMVCv15" or self.modelType == "MMVCv13":
+        #         return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file)
+        #     elif self.modelType == "so-vits-svc-40" or self.modelType == "so-vits-svc-40_c" or self.modelType == "so-vits-svc-40v2":
+        #         return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, clusterTorchModel)
+        #     elif self.modelType == "RVC":
+        #         return self.voiceChanger.loadModel(slot, config, pyTorch_model_file, onnx_model_file, feature_file, index_file, is_half)
+        #     else:
+        #         return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, clusterTorchModel)
+        # except Exception as e:
+        #     print("[Voice Changer] Model Load Error! Check your model is valid.", e)
+        #     return {"status": "NG"}
 
     def get_info(self):
         data = asdict(self.settings)

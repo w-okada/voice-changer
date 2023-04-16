@@ -11,8 +11,8 @@ class VoiceChangerManager():
             cls._instance.voiceChanger = VoiceChanger(params)
         return cls._instance
 
-    def loadModel(self, slot, config, model, onnx_model, clusterTorchModel, feature_file, index_file, is_half: bool = True):
-        info = self.voiceChanger.loadModel(slot, config, model, onnx_model, clusterTorchModel, feature_file, index_file, is_half)
+    def loadModel(self, props):
+        info = self.voiceChanger.loadModel(props)
         if hasattr(info, "status") and info["status"] == "NG":
             return info
         else:

@@ -63,6 +63,20 @@ class MMVC_Rest_Fileuploader:
         isHalf: bool = Form(...),
     ):
 
+        props = {
+            "slot": slot,
+            "isHalf": isHalf,
+            "files": {
+                "configFilename": configFilename,
+                "pyTorchModelFilename": pyTorchModelFilename,
+                "onnxModelFilename": onnxModelFilename,
+                "clusterTorchModelFilename": clusterTorchModelFilename,
+                "featureFilename": featureFilename,
+                "indexFilename": indexFilename
+            }
+        }
+        # print("---------------------------------------------------->", props)
+
         # # Upload File Path
         # pyTorchModelFilePath = os.path.join(UPLOAD_DIR, pyTorchModelFilename) if pyTorchModelFilename != "-" else None
         # onnxModelFilePath = os.path.join(UPLOAD_DIR, onnxModelFilename) if onnxModelFilename != "-" else None
@@ -85,22 +99,20 @@ class MMVC_Rest_Fileuploader:
         #     pyTorchModelStoredFilePath = os.path.join(UPLOAD_DIR, f"{slot}", pyTorchModelFilename)
         #     shutil.move(pyTorchModelFilePath, pyTorchModelStoredFilePath)
 
-        paths = []
-        for x in [pyTorchModelFilename, onnxModelFilename, configFilename, clusterTorchModelFilename, featureFilename, indexFilename]:
-            if x != "-":
-                uploadPath = os.path.join(UPLOAD_DIR, x)
+        # Change Filepath
+        for key, val in props["files"].items():
+            if val != "-":
+                uploadPath = os.path.join(UPLOAD_DIR, val)
                 storeDir = os.path.join(UPLOAD_DIR, f"{slot}")
                 os.makedirs(storeDir, exist_ok=True)
-                storePath = os.path.join(storeDir, x)
+                storePath = os.path.join(storeDir, val)
                 shutil.move(uploadPath, storePath)
-                paths.push(storePath)
+                props["files"][key] = storePath
             else:
-                paths.push(None)
-        pyTorchModelStoredFilePath, onnxModelStoredFilePath, configStoredFilePath, clusterTorchModelStoredFilePath, featureStoredFilePath, indexStoredFilePath = paths
+                props["files"][key] = None
+        # print("---------------------------------------------------2>", props)
 
-        info = self.voiceChangerManager.loadModel(slot, configStoredFilePath, pyTorchModelStoredFilePath, onnxModelStoredFilePath,
-                                                  clusterTorchModelStoredFilePath, featureStoredFilePath, indexStoredFilePath,
-                                                  isHalf)
+        info = self.voiceChangerManager.loadModel(props)
         json_compatible_item_data = jsonable_encoder(info)
         return JSONResponse(content=json_compatible_item_data)
         # return {"load": f"{configFilePath}, {pyTorchModelFilePath}, {onnxModelFilePath}"}
