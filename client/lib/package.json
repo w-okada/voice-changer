@@ -1,6 +1,6 @@
 {
   "name": "@dannadori/voice-changer-client-js",
-  "version": "1.0.107",
+  "version": "1.0.108",
   "description": "",
   "main": "dist/index.js",
   "directories": {
@@ -43,7 +43,7 @@
     "typescript": "^5.0.4",
     "webpack": "^5.79.0",
     "webpack-cli": "^5.0.1",
-    "webpack-dev-server": "^4.13.2"
+    "webpack-dev-server": "^4.13.3"
   },
   "dependencies": {
     "@types/readable-stream": "^2.3.15",

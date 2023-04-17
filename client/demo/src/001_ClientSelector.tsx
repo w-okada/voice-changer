@@ -32,7 +32,7 @@ export const ClientSelector = () => {
                 <div></div>
                 <div className="body-button-container">
                     <div className="body-button w40 bold" onClick={() => { setClientType("RVC"); setItem(INDEXEDDB_KEY_DEFAULT_MODEL_TYPE, "RVC") }}>RVC</div>
-                    <div className="body-button w40 bold" onClick={() => { setClientType("DDSP-SVC"); setItem(INDEXEDDB_KEY_DEFAULT_MODEL_TYPE, "DDSP-SVC") }}>DDSP-SVC(N/A)</div>
+                    <div className="body-button w40 bold" onClick={() => { setClientType("DDSP-SVC"); setItem(INDEXEDDB_KEY_DEFAULT_MODEL_TYPE, "DDSP-SVC") }}>DDSP-SVC(exp.)</div>
                 </div>
                 <div></div>
             </div>
