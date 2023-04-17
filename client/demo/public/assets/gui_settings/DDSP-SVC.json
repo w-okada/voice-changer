@@ -95,10 +95,9 @@
         ],
         "speakerSetting": [
             {
-                "name": "dstId",
+                "name": "dstId2",
                 "options": {
-                    "showF0": true,
-                    "useServerInfo": false
+                    "selectableIds": [1, 2]
                 }
             },
             {

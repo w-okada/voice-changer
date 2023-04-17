@@ -275,7 +275,7 @@ class DDSP_SVC:
         #     return np.zeros(convertSize).astype(np.int16)
 
         with torch.no_grad():
-            spk_id = torch.LongTensor(np.array([[int(1)]])).to(self.useDevice())
+            spk_id = torch.LongTensor(np.array([[self.settings.dstId]])).to(self.useDevice())
             seg_output, _, (s_h, s_n) = self.model(c, f0, volume, spk_id=spk_id, spk_mix_dict=None)
             seg_output *= mask
 

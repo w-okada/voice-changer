@@ -39,6 +39,7 @@ import { ModelSamplingRateRow, ModelSamplingRateRowProps } from "./components/30
 // import { OnnxExportRow, OnnxExportRowProps } from "./components/304_OnnxExportRow"
 import { SolaEnableRow, SolaEnableRowProps } from "./components/811_SolaEnableRow"
 import { EnableEnhancerRow, EnableEnhancerRowProps } from "./components/610_EnableEnhancerRow"
+import { DstIdRow2, DstIdRow2Props } from "./components/602v2_DstIdRow2"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
 
@@ -79,6 +80,7 @@ const initialize = () => {
 
     addToCatalog("srcId", (props: SrcIdRowProps) => { return <SrcIdRow {...props} /> })
     addToCatalog("dstId", (props: DstIdRowProps) => { return <DstIdRow {...props} /> })
+    addToCatalog("dstId2", (props: DstIdRow2Props) => { return <DstIdRow2 {...props} /> })
     addToCatalog("editSpeakerIdMapping", (props: EditSpeakerIdMappingRowProps) => { return <EditSpeakerIdMappingRow {...props} /> })
     addToCatalog("f0Factor", (props: F0FactorRowProps) => { return <F0FactorRow {...props} /> })
     addToCatalog("tune", (props: TuneRowProps) => { return <TuneRow {...props} /> })
