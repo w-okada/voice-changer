@@ -75,7 +75,9 @@ class RVC:
         self.gpu_num = torch.cuda.device_count()
         self.prevVol = 0
         self.params = params
+        self.mps_enabled: bool = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
         print("RVC initialization: ", params)
+        print("mps: ", self.mps_enabled)
 
     def loadModel(self, props):
         self.settings.configFile = props["files"]["configFilename"]
@@ -241,10 +243,14 @@ class RVC:
             print("[Voice Changer] No pyTorch session.")
             raise NoModeLoadedException("pytorch")
 
-        if self.settings.gpu < 0 or self.gpu_num == 0:
+        if self.settings.gpu < 0 or (self.gpu_num == 0 and self.mps_enabled == False):
             dev = torch.device("cpu")
+        elif self.mps_enabled:
+            dev = torch.device("mps")
         else:
             dev = torch.device("cuda", index=self.settings.gpu)
+
+        print("device:", dev)
 
         self.hubert_model = self.hubert_model.to(dev)
         self.net_g = self.net_g.to(dev)
