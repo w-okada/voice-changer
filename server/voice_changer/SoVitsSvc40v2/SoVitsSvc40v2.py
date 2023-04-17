@@ -23,6 +23,9 @@ import cluster
 import utils
 from fairseq import checkpoint_utils
 import librosa
+
+from Exceptions import NoModeLoadedException
+
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
 
@@ -161,6 +164,8 @@ class SoVitsSvc40v2:
         return data
 
     def get_processing_sampling_rate(self):
+        if hasattr(self, "hps") == False:
+            raise NoModeLoadedException("config")
         return self.hps.data.sampling_rate
 
     def get_unit_f0(self, audio_buffer, tran):
@@ -240,7 +245,7 @@ class SoVitsSvc40v2:
     def _onnx_inference(self, data):
         if hasattr(self, "onnx_session") == False or self.onnx_session == None:
             print("[Voice Changer] No onnx session.")
-            return np.zeros(1).astype(np.int16)
+            raise NoModeLoadedException("ONNX")
 
         convertSize = data[3]
         vol = data[4]
@@ -272,7 +277,7 @@ class SoVitsSvc40v2:
     def _pyTorch_inference(self, data):
         if hasattr(self, "net_g") == False or self.net_g == None:
             print("[Voice Changer] No pyTorch session.")
-            return np.zeros(1).astype(np.int16)
+            raise NoModeLoadedException("pytorch")
 
         if self.settings.gpu < 0 or self.gpu_num == 0:
             dev = torch.device("cpu")

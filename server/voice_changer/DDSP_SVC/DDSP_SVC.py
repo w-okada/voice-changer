@@ -20,6 +20,9 @@ import pyworld as pw
 import ddsp.vocoder as vo
 from ddsp.core import upsample
 from enhancer import Enhancer
+
+from Exceptions import NoModeLoadedException
+
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
 
@@ -224,7 +227,7 @@ class DDSP_SVC:
     def _onnx_inference(self, data):
         if hasattr(self, "onnx_session") == False or self.onnx_session == None:
             print("[Voice Changer] No onnx session.")
-            return np.zeros(1).astype(np.int16)
+            raise NoModeLoadedException("ONNX")
 
         seg_units = data[0]
         # f0 = data[1]
@@ -258,7 +261,7 @@ class DDSP_SVC:
 
         if hasattr(self, "model") == False or self.model == None:
             print("[Voice Changer] No pyTorch session.")
-            return np.zeros(1).astype(np.int16)
+            raise NoModeLoadedException("pytorch")
 
         c = data[0].to(self.useDevice())
         f0 = data[1].to(self.useDevice())

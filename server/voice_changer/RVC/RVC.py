@@ -2,7 +2,7 @@ import sys
 import os
 import resampy
 from voice_changer.RVC.ModelWrapper import ModelWrapper
-
+from Exceptions import NoModeLoadedException
 
 # avoiding parse arg error in RVC
 sys.argv = ["MMVCServerSIO.py"]
@@ -198,7 +198,7 @@ class RVC:
     def _onnx_inference(self, data):
         if hasattr(self, "onnx_session") == False or self.onnx_session == None:
             print("[Voice Changer] No onnx session.")
-            return np.zeros(1).astype(np.int16)
+            raise NoModeLoadedException("ONNX")
 
         if self.settings.gpu < 0 or self.gpu_num == 0:
             dev = torch.device("cpu")
@@ -239,7 +239,7 @@ class RVC:
     def _pyTorch_inference(self, data):
         if hasattr(self, "net_g") == False or self.net_g == None:
             print("[Voice Changer] No pyTorch session.")
-            return np.zeros(1).astype(np.int16)
+            raise NoModeLoadedException("pytorch")
 
         if self.settings.gpu < 0 or self.gpu_num == 0:
             dev = torch.device("cpu")

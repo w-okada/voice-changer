@@ -14,7 +14,7 @@ from voice_changer.IORecorder import IORecorder
 from voice_changer.utils.Timer import Timer
 from voice_changer.utils.VoiceChangerModel import VoiceChangerModel, AudioInOut
 import time
-
+from Exceptions import NoModeLoadedException
 
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
@@ -211,27 +211,27 @@ class VoiceChanger():
         return self.on_request_sola(receivedData)
 
     def on_request_sola(self, receivedData: AudioInOut) -> tuple[AudioInOut, list[Union[int, float]]]:
-        processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
+        try:
+            processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
 
-        # 前処理
-        with Timer("pre-process") as t:
-            if self.settings.inputSampleRate != processing_sampling_rate:
-                newData = cast(AudioInOut, resampy.resample(receivedData, self.settings.inputSampleRate, processing_sampling_rate))
-            else:
-                newData = receivedData
+            # 前処理
+            with Timer("pre-process") as t:
+                if self.settings.inputSampleRate != processing_sampling_rate:
+                    newData = cast(AudioInOut, resampy.resample(receivedData, self.settings.inputSampleRate, processing_sampling_rate))
+                else:
+                    newData = receivedData
 
-            sola_search_frame = int(0.012 * processing_sampling_rate)
-            # sola_search_frame = 0
-            block_frame = newData.shape[0]
-            crossfade_frame = min(self.settings.crossFadeOverlapSize, block_frame)
-            self._generate_strength(crossfade_frame)
+                sola_search_frame = int(0.012 * processing_sampling_rate)
+                # sola_search_frame = 0
+                block_frame = newData.shape[0]
+                crossfade_frame = min(self.settings.crossFadeOverlapSize, block_frame)
+                self._generate_strength(crossfade_frame)
 
-            data = self.voiceChanger.generate_input(newData, block_frame, crossfade_frame, sola_search_frame)
-        preprocess_time = t.secs
+                data = self.voiceChanger.generate_input(newData, block_frame, crossfade_frame, sola_search_frame)
+            preprocess_time = t.secs
 
-        # 変換処理
-        with Timer("main-process") as t:
-            try:
+            # 変換処理
+            with Timer("main-process") as t:
                 # Inference
                 audio = self.voiceChanger.inference(data)
 
@@ -258,38 +258,41 @@ class VoiceChanger():
                 else:
                     self.sola_buffer = audio[- crossfade_frame:] * self.np_prev_strength
                     # self.sola_buffer = audio[- crossfade_frame:]
+            mainprocess_time = t.secs
 
-            except Exception as e:
-                print("VC PROCESSING!!!! EXCEPTION!!!", e)
-                print(traceback.format_exc())
-                return np.zeros(1).astype(np.int16), [0, 0, 0]
-        mainprocess_time = t.secs
+            # 後処理
+            with Timer("post-process") as t:
+                result = result.astype(np.int16)
+                if self.settings.inputSampleRate != processing_sampling_rate:
+                    outputData = cast(AudioInOut, resampy.resample(result, processing_sampling_rate, self.settings.inputSampleRate).astype(np.int16))
+                else:
+                    outputData = result
 
-        # 後処理
-        with Timer("post-process") as t:
-            result = result.astype(np.int16)
-            if self.settings.inputSampleRate != processing_sampling_rate:
-                outputData = cast(AudioInOut, resampy.resample(result, processing_sampling_rate, self.settings.inputSampleRate).astype(np.int16))
-            else:
-                outputData = result
+                print_convert_processing(
+                    f" Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
 
-            print_convert_processing(
-                f" Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
+                if self.settings.recordIO == 1:
+                    self.ioRecorder.writeInput(receivedData)
+                    self.ioRecorder.writeOutput(outputData.tobytes())
 
-            if self.settings.recordIO == 1:
-                self.ioRecorder.writeInput(receivedData)
-                self.ioRecorder.writeOutput(outputData.tobytes())
+                # if receivedData.shape[0] != outputData.shape[0]:
+                #     print(f"Padding, in:{receivedData.shape[0]} out:{outputData.shape[0]}")
+                #     outputData = pad_array(outputData, receivedData.shape[0])
+                #     # print_convert_processing(
+                #     #     f" Padded!, Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
+            postprocess_time = t.secs
 
-            # if receivedData.shape[0] != outputData.shape[0]:
-            #     print(f"Padding, in:{receivedData.shape[0]} out:{outputData.shape[0]}")
-            #     outputData = pad_array(outputData, receivedData.shape[0])
-            #     # print_convert_processing(
-            #     #     f" Padded!, Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
-        postprocess_time = t.secs
+            print_convert_processing(f" [fin] Input/Output size:{receivedData.shape[0]},{outputData.shape[0]}")
+            perf = [preprocess_time, mainprocess_time, postprocess_time]
+            return outputData, perf
 
-        print_convert_processing(f" [fin] Input/Output size:{receivedData.shape[0]},{outputData.shape[0]}")
-        perf = [preprocess_time, mainprocess_time, postprocess_time]
-        return outputData, perf
+        except NoModeLoadedException as e:
+            print("[Voice Changer] [Exception]", e)
+            return np.zeros(1).astype(np.int16), [0, 0, 0]
+        except Exception as e:
+            print("VC PROCESSING!!!! EXCEPTION!!!", e)
+            print(traceback.format_exc())
+            return np.zeros(1).astype(np.int16), [0, 0, 0]
 
     def export2onnx(self):
         return self.voiceChanger.export2onnx()

@@ -22,6 +22,8 @@ from symbols import symbols
 from models import SynthesizerTrn
 from voice_changer.MMVCv13.TrainerFunctions import TextAudioSpeakerCollate, spectrogram_torch, load_checkpoint, get_hparams_from_file
 
+from Exceptions import NoModeLoadedException
+
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
 
@@ -119,6 +121,8 @@ class MMVCv13:
         return data
 
     def get_processing_sampling_rate(self):
+        if hasattr(self, "hps") == False:
+            raise NoModeLoadedException("config")
         return self.hps.data.sampling_rate
 
     def _get_spec(self, audio: any):
@@ -158,7 +162,7 @@ class MMVCv13:
     def _onnx_inference(self, data):
         if hasattr(self, "onnx_session") == False or self.onnx_session == None:
             print("[Voice Changer] No ONNX session.")
-            return np.zeros(1).astype(np.int16)
+            raise NoModeLoadedException("ONNX")
 
         x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [x for x in data]
         sid_tgt1 = torch.LongTensor([self.settings.dstId])
@@ -176,7 +180,7 @@ class MMVCv13:
     def _pyTorch_inference(self, data):
         if hasattr(self, "net_g") == False or self.net_g == None:
             print("[Voice Changer] No pyTorch session.")
-            return np.zeros(1).astype(np.int16)
+            raise NoModeLoadedException("pytorch")
 
         if self.settings.gpu < 0 or self.gpu_num == 0:
             dev = torch.device("cpu")

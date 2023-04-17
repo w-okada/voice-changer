@@ -20,6 +20,8 @@ import pyworld as pw
 from models import SynthesizerTrn
 from voice_changer.MMVCv15.client_modules import convert_continuos_f0, spectrogram_torch, get_hparams_from_file, load_checkpoint
 
+from Exceptions import NoModeLoadedException
+
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
 
@@ -138,6 +140,8 @@ class MMVCv15:
         return data
 
     def get_processing_sampling_rate(self):
+        if hasattr(self, "hps") == False:
+            raise NoModeLoadedException("config")
         return self.hps.data.sampling_rate
 
     def _get_f0(self, detector: str, newData: any):
@@ -191,7 +195,7 @@ class MMVCv15:
     def _onnx_inference(self, data):
         if self.settings.onnxModelFile == "":
             print("[Voice Changer] No ONNX session.")
-            return np.zeros(1).astype(np.int16)
+            raise NoModeLoadedException("ONNX")
 
         spec, f0, sid_src = data
         spec = spec.unsqueeze(0)
@@ -217,7 +221,7 @@ class MMVCv15:
     def _pyTorch_inference(self, data):
         if self.settings.pyTorchModelFile == "":
             print("[Voice Changer] No pyTorch session.")
-            return np.zeros(1).astype(np.int16)
+            raise NoModeLoadedException("pytorch")
 
         if self.settings.gpu < 0 or self.gpu_num == 0:
             dev = torch.device("cpu")
