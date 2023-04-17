@@ -250,7 +250,7 @@ class RVC:
         else:
             dev = torch.device("cuda", index=self.settings.gpu)
 
-        print("device:", dev)
+        # print("device:", dev)
 
         self.hubert_model = self.hubert_model.to(dev)
         self.net_g = self.net_g.to(dev)
