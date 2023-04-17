@@ -73,7 +73,7 @@ class DDSP_SVC:
             return torch.device("cpu")
 
     def loadModel(self, props):
-        self.settings.configFile = props["files"]["configFilename"]
+        # self.settings.configFile = props["files"]["configFilename"] # 同じフォルダにあるyamlを使う
         self.settings.pyTorchModelFile = props["files"]["pyTorchModelFilename"]
         # model
         model, args = vo.load_model(self.settings.pyTorchModelFile, device=self.useDevice())
@@ -136,7 +136,7 @@ class DDSP_SVC:
                 if "CUDAExecutionProvider" in providers:
                     provider_options = [{'device_id': self.settings.gpu}]
                     self.onnx_session.set_providers(providers=["CUDAExecutionProvider"], provider_options=provider_options)
-            if key == "gpu":
+            if key == "gpu" and len(self.settings.pyTorchModelFile) > 0:
                 model, _args = vo.load_model(self.settings.pyTorchModelFile, device=self.useDevice())
                 self.model = model
                 self.enhancer = Enhancer(self.args.enhancer.type, self.enhancer_path, device=self.useDevice())
