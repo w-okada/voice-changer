@@ -119,7 +119,7 @@ export class VoiceChangerClient {
 
         //// Input デバイスがnullの時はmicStreamを止めてリターン
         if (!this.setting.audioInput) {
-            console.log(`Input Setup=> client mic is disabled.`)
+            console.log(`Input Setup=> client mic is disabled. ${this.setting.audioInput}`)
             this.vcInNode.stop()
             await this.unlock(lockNum)
             return
@@ -127,18 +127,21 @@ export class VoiceChangerClient {
 
         if (typeof this.setting.audioInput == "string") {
             try {
-                this.currentMediaStream = await navigator.mediaDevices.getUserMedia({
-                    audio: {
-                        deviceId: this.setting.audioInput,
-                        channelCount: 1,
-                        sampleRate: this.setting.sampleRate,
-                        sampleSize: 16,
-                        autoGainControl: false,
-                        echoCancellation: this.setting.echoCancel,
-                        noiseSuppression: this.setting.noiseSuppression
-                    }
-                })
-
+                if (this.setting.audioInput == "none") {
+                    this.currentMediaStream = createDummyMediaStream(this.ctx)
+                } else {
+                    this.currentMediaStream = await navigator.mediaDevices.getUserMedia({
+                        audio: {
+                            deviceId: this.setting.audioInput,
+                            channelCount: 1,
+                            sampleRate: this.setting.sampleRate,
+                            sampleSize: 16,
+                            autoGainControl: false,
+                            echoCancellation: this.setting.echoCancel,
+                            noiseSuppression: this.setting.noiseSuppression
+                        }
+                    })
+                }
             } catch (e) {
                 console.warn(e)
                 throw e

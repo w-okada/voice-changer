@@ -249,7 +249,7 @@ class VoiceChanger():
 
                     result = output_wav
                 else:
-                    print("no sola buffer")
+                    print("[Voice Changer] no sola buffer. (You can ignore this.)")
                     result = np.zeros(4096).astype(np.int16)
 
                 if hasattr(self, 'sola_buffer') == True and sola_offset < sola_search_frame:
