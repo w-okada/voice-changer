@@ -39,7 +39,7 @@ class RVCSettings():
     gpu: int = 0
     dstId: int = 0
 
-    f0Detector: str = "dio"  # dio or harvest
+    f0Detector: str = "pm"  # pm or harvest
     tran: int = 20
     noiceScale: float = 0.3
     predictF0: int = 0  # 0:False, 1:True
@@ -270,7 +270,7 @@ class RVC:
             sid = 0
             times = [0, 0, 0]
             f0_up_key = self.settings.tran
-            f0_method = "pm" if self.settings.f0Detector == "dio" else "harvest"
+            f0_method = self.settings.f0Detector
             file_index = self.index_file if self.index_file != None else ""
             file_big_npy = self.feature_file if self.feature_file != None else ""
             index_rate = self.settings.indexRatio
