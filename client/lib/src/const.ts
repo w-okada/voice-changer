@@ -360,7 +360,7 @@ export const DefaultServerSetting_so_vits_svc_40v2: ServerInfo = {
 
 export const DefaultServerSetting_DDSP_SVC: ServerInfo = {
     srcId: 0,
-    dstId: 0,
+    dstId: 1,
     gpu: 0,
 
     crossFadeOffsetRate: 0.0,
