@@ -83,22 +83,27 @@ class SoVitsSvc40:
         self.settings.onnxModelFile = props["files"]["onnxModelFilename"]
         clusterTorchModel = props["files"]["clusterTorchModelFilename"]
 
+        content_vec_path = self.params["content_vec_500"]
+        content_vec_hubert_onnx_path = self.params["content_vec_500_onnx"]
+        content_vec_hubert_onnx_on = self.params["content_vec_500_onnx_on"]
+        hubert_base_path = self.params["hubert_base"]
+
         # hubert model
         try:
-            hubert_path = self.params["hubert"]
-            useHubertOnnx = self.params["useHubertOnnx"]
-            self.useHubertOnnx = useHubertOnnx
 
-            if useHubertOnnx == True:
+            if os.path.exists(content_vec_path) == False:
+                content_vec_path = hubert_base_path
+
+            if content_vec_hubert_onnx_on == True:
                 ort_options = onnxruntime.SessionOptions()
                 ort_options.intra_op_num_threads = 8
                 self.hubert_onnx = onnxruntime.InferenceSession(
-                    HUBERT_ONNX_MODEL_PATH,
+                    content_vec_hubert_onnx_path,
                     providers=providers
                 )
             else:
                 models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(
-                    [hubert_path],
+                    [content_vec_path],
                     suffix="",
                 )
                 model = models[0]

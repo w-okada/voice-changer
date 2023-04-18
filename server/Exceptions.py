@@ -5,3 +5,8 @@ class NoModeLoadedException(Exception):
 
     def __str__(self):
         return repr(f"No model for {self.framework} loaded. Please confirm the model uploaded.")
+
+
+class ONNXInputArgumentException(Exception):
+    def __str__(self):
+        return repr(f"ONNX received invalid argument.")

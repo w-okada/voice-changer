@@ -94,7 +94,7 @@ class RVC:
         print("[Voice Changer] RVC loading... slot:", self.slot)
 
         try:
-            hubert_path = self.params["hubert"]
+            hubert_path = self.params["hubert_base"]
             models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task([hubert_path], suffix="",)
             model = models[0]
             model.eval()

@@ -14,7 +14,7 @@ from voice_changer.IORecorder import IORecorder
 from voice_changer.utils.Timer import Timer
 from voice_changer.utils.VoiceChangerModel import VoiceChangerModel, AudioInOut
 import time
-from Exceptions import NoModeLoadedException
+from Exceptions import NoModeLoadedException, ONNXInputArgumentException
 
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
@@ -287,6 +287,9 @@ class VoiceChanger():
             return outputData, perf
 
         except NoModeLoadedException as e:
+            print("[Voice Changer] [Exception]", e)
+            return np.zeros(1).astype(np.int16), [0, 0, 0]
+        except ONNXInputArgumentException as e:
             print("[Voice Changer] [Exception]", e)
             return np.zeros(1).astype(np.int16), [0, 0, 0]
         except Exception as e:

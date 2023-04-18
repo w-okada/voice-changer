@@ -40,9 +40,6 @@ client/lib/worklet/dist
 
 docker/cudnn/
 
-server/hubert_base.pt
-server/hubert-soft-0d54a1f4.pt
-server/nsf_hifigan/
-
+server/weights/
 
 start_trainer.sh

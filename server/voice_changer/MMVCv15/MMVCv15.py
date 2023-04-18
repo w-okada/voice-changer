@@ -20,7 +20,7 @@ import pyworld as pw
 from models import SynthesizerTrn
 from voice_changer.MMVCv15.client_modules import convert_continuos_f0, spectrogram_torch, get_hparams_from_file, load_checkpoint
 
-from Exceptions import NoModeLoadedException
+from Exceptions import NoModeLoadedException, ONNXInputArgumentException
 
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
@@ -241,11 +241,15 @@ class MMVCv15:
         return result
 
     def inference(self, data):
-        if self.settings.framework == "ONNX":
-            audio = self._onnx_inference(data)
-        else:
-            audio = self._pyTorch_inference(data)
-        return audio
+        try:
+            if self.settings.framework == "ONNX":
+                audio = self._onnx_inference(data)
+            else:
+                audio = self._pyTorch_inference(data)
+            return audio
+        except onnxruntime.capi.onnxruntime_pybind11_state.InvalidArgument as e:
+            print(e)
+            raise ONNXInputArgumentException()
 
     def __del__(self):
         del self.net_g

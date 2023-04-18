@@ -42,11 +42,18 @@ def setupArgParser():
     parser.add_argument("--cluster", type=str, help="path to cluster model")
     parser.add_argument("--internal", type=strtobool, default=False, help="各種パスをmac appの中身に変換")
 
-    parser.add_argument("--hubert", type=str, help="path to hubert model")
-    parser.add_argument("--useHubertOnnx", type=strtobool, default=False, help="use hubert onnx")
-    parser.add_argument("--hubertSoftPt", type=str, help="path to hubert-soft model(pytorch)")
-    parser.add_argument("--enhancerPt", type=str, help="path to enhancer model(pytorch)")
-    parser.add_argument("--enhancerOnnx", type=str, help="path to enhancer model(onnx)")
+    # parser.add_argument("--hubert", type=str, help="path to hubert model")
+    # parser.add_argument("--useHubertOnnx", type=strtobool, default=False, help="use hubert onnx")
+    # parser.add_argument("--hubertSoftPt", type=str, help="path to hubert-soft model(pytorch)")
+    # parser.add_argument("--enhancerPt", type=str, help="path to enhancer model(pytorch)")
+    # parser.add_argument("--enhancerOnnx", type=str, help="path to enhancer model(onnx)")
+
+    parser.add_argument("--content_vec_500", type=str, help="path to content_vec_500 model(pytorch)")
+    parser.add_argument("--content_vec_500_onnx", type=str, help="path to content_vec_500 model(onnx)")
+    parser.add_argument("--content_vec_500_onnx_on", type=strtobool, default=False, help="use or not onnx for  content_vec_500")
+    parser.add_argument("--hubert_base", type=str, help="path to hubert_base model(pytorch)")
+    parser.add_argument("--hubert_soft", type=str, help="path to hubert_soft model(pytorch)")
+    parser.add_argument("--nsf_hifigan", type=str, help="path to nsf_hifigan model(pytorch)")
 
     return parser
 
@@ -129,11 +136,12 @@ if args.colab == True:
 
 if __name__ == 'MMVCServerSIO':
     voiceChangerManager = VoiceChangerManager.get_instance({
-        "hubert": args.hubert,
-        "useHubertOnnx": args.useHubertOnnx,
-        "hubertSoftPt": args.hubertSoftPt,
-        "enhancerPt": args.enhancerPt,
-        "enhancerOnnx": args.enhancerOnnx
+        "content_vec_500": args.content_vec_500,
+        "content_vec_500_onnx": args.content_vec_500_onnx,
+        "content_vec_500_onnx_on": args.content_vec_500_onnx_on,
+        "hubert_base": args.hubert_base,
+        "hubert_soft": args.hubert_soft,
+        "nsf_hifigan": args.nsf_hifigan,
     })
     if CONFIG and (MODEL or ONNX_MODEL):
         if MODEL_TYPE == "MMVCv15" or MODEL_TYPE == "MMVCv13":

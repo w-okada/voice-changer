@@ -84,7 +84,7 @@ class DDSP_SVC:
         print("-------------------hopsize", self.hop_size)
 
         # hubert
-        self.vec_path = self.params["hubertSoftPt"]
+        self.vec_path = self.params["hubert_soft"]
         self.encoder = vo.Units_Encoder(
             self.args.data.encoder,
             self.vec_path,
@@ -115,7 +115,7 @@ class DDSP_SVC:
             float(1100))
 
         self.volume_extractor = vo.Volume_Extractor(self.hop_size)
-        self.enhancer_path = self.params["enhancerPt"]
+        self.enhancer_path = self.params["nsf_hifigan"]
         self.enhancer = Enhancer(self.args.enhancer.type, self.enhancer_path, device=self.useDevice())
         return self.get_info()
 
