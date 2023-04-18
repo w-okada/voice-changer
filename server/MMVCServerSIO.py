@@ -189,12 +189,12 @@ if __name__ == '__main__':
         p.start()
         try:
             if sys.platform.startswith('win'):
-                process = subprocess.Popen([NATIVE_CLIENT_FILE_WIN, "-u", f"http://localhost:{PORT}/{path}"])
+                process = subprocess.Popen([NATIVE_CLIENT_FILE_WIN, "-u", f"http://localhost:{PORT}/"])
                 return_code = process.wait()
                 print("client closed.")
                 p.terminate()
             elif sys.platform.startswith('darwin'):
-                process = subprocess.Popen([NATIVE_CLIENT_FILE_MAC, "-u", f"http://localhost:{PORT}/{path}"])
+                process = subprocess.Popen([NATIVE_CLIENT_FILE_MAC, "-u", f"http://localhost:{PORT}/"])
                 return_code = process.wait()
                 print("client closed.")
                 p.terminate()
