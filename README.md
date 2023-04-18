@@ -71,7 +71,7 @@ Windows 版と Mac 版を提供しています。
 
 | Version   | OS  | フレームワーク                    | link                                                                                         | サポート VC                                                                   | サイズ |
 | --------- | --- | --------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------ |
-| v.1.5.2.3 | mac | -                                 | [standard](https://drive.google.com/uc?id=1isX5N9FyC125D5FynJ7NuMnjBCf5dAll&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 798MB  |
+| v.1.5.2.3 | mac | ONNX(cpu,cuda), PyTorch(cpu,mps)  | [standard](https://drive.google.com/uc?id=1isX5N9FyC125D5FynJ7NuMnjBCf5dAll&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 798MB  |
 |           | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [standard](https://drive.google.com/uc?id=1UezbE-QTa5jK4mXHRvZz4w07qRnMaPL5&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2871MB |
 
 ※ [hugging_face](https://huggingface.co/wok000/vcclient/tree/main)でも公開（experimental）
