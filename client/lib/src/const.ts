@@ -93,6 +93,7 @@ export const ServerSettingKey = {
     "indexRatio": "indexRatio",
     "rvcQuality": "rvcQuality",
     "modelSamplingRate": "modelSamplingRate",
+    "silenceFront": "silenceFront",
 
     "enableEnhancer": "enableEnhancer",
     "enhancerTune": "enhancerTune",
@@ -128,6 +129,7 @@ export type VoiceChangerServerSetting = {
 
     indexRatio: number // RVC
     rvcQuality: number // 0:low, 1:high
+    silenceFront: number // 0:off, 1:on
     modelSamplingRate: ModelSamplingRate // 32000,40000,48000
 
     enableEnhancer: number // DDSP-SVC
@@ -173,6 +175,7 @@ export const DefaultServerSetting_MMVCv15: ServerInfo = {
     indexRatio: 0,
     rvcQuality: 0,
     modelSamplingRate: 48000,
+    silenceFront: 0,
 
     enableEnhancer: 0,
     enhancerTune: 0,
@@ -213,6 +216,7 @@ export const DefaultServerSetting_MMVCv13: ServerInfo = {
     indexRatio: 0,
     rvcQuality: 0,
     modelSamplingRate: 48000,
+    silenceFront: 0,
 
     enableEnhancer: 0,
     enhancerTune: 0,
@@ -257,6 +261,7 @@ export const DefaultServerSetting_so_vits_svc_40: ServerInfo = {
     indexRatio: 0,
     rvcQuality: 0,
     modelSamplingRate: 48000,
+    silenceFront: 0,
 
     enableEnhancer: 0,
     enhancerTune: 0,
@@ -301,6 +306,7 @@ export const DefaultServerSetting_so_vits_svc_40_c: ServerInfo = {
     indexRatio: 0,
     rvcQuality: 0,
     modelSamplingRate: 48000,
+    silenceFront: 0,
 
     enableEnhancer: 0,
     enhancerTune: 0,
@@ -344,6 +350,7 @@ export const DefaultServerSetting_so_vits_svc_40v2: ServerInfo = {
     indexRatio: 0,
     rvcQuality: 0,
     modelSamplingRate: 48000,
+    silenceFront: 0,
 
     enableEnhancer: 0,
     enhancerTune: 0,
@@ -388,6 +395,7 @@ export const DefaultServerSetting_DDSP_SVC: ServerInfo = {
     indexRatio: 0,
     rvcQuality: 0,
     modelSamplingRate: 48000,
+    silenceFront: 1,
 
     enableEnhancer: 0,
     enhancerTune: 0,
@@ -433,6 +441,7 @@ export const DefaultServerSetting_RVC: ServerInfo = {
     indexRatio: 0,
     rvcQuality: 0,
     modelSamplingRate: 48000,
+    silenceFront: 1,
 
     enableEnhancer: 0,
     enhancerTune: 0,

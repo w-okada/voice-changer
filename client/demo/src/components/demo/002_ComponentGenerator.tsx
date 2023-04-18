@@ -40,6 +40,7 @@ import { ModelSamplingRateRow, ModelSamplingRateRowProps } from "./components/30
 import { SolaEnableRow, SolaEnableRowProps } from "./components/811_SolaEnableRow"
 import { EnableEnhancerRow, EnableEnhancerRowProps } from "./components/610_EnableEnhancerRow"
 import { DstIdRow2, DstIdRow2Props } from "./components/602v2_DstIdRow2"
+import { SilenceFrontRow, SilenceFrontRowProps } from "./components/812_SilenceFrontRow"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
 
@@ -107,6 +108,7 @@ const initialize = () => {
     addToCatalog("trancateNumThreshold", (props: TrancateNumTresholdRowProps) => { return <TrancateNumTresholdRow {...props} /> })
     addToCatalog("rvcQuality", (props: RVCQualityRowProps) => { return <RVCQualityRow {...props} /> })
     addToCatalog("solaEnable", (props: SolaEnableRowProps) => { return <SolaEnableRow {...props} /> })
+    addToCatalog("silenceFront", (props: SilenceFrontRowProps) => { return <SilenceFrontRow {...props} /> })
 
 
 

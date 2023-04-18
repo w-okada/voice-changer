@@ -25,14 +25,21 @@ class VC(object):
         self.device = device
         self.is_half = is_half
 
-    def get_f0(self, x, p_len, f0_up_key, f0_method, inp_f0=None):
+    def get_f0(self, audio, p_len, f0_up_key, f0_method, inp_f0=None, silence_front=0):
+
+        n_frames = int(len(audio) // self.window) + 1
+        start_frame = int(silence_front * self.sr / self.window)
+        real_silence_front = start_frame * self.window / self.sr
+
+        audio = audio[int(np.round(real_silence_front * self.sr)):]
+
         time_step = self.window / self.sr * 1000
         f0_min = 50
         f0_max = 1100
         f0_mel_min = 1127 * np.log(1 + f0_min / 700)
         f0_mel_max = 1127 * np.log(1 + f0_max / 700)
         if (f0_method == "pm"):
-            f0 = parselmouth.Sound(x, self.sr).to_pitch_ac(
+            f0 = parselmouth.Sound(audio, self.sr).to_pitch_ac(
                 time_step=time_step / 1000, voicing_threshold=0.6,
                 pitch_floor=f0_min, pitch_ceiling=f0_max).selected_array['frequency']
             pad_size = (p_len - len(f0) + 1) // 2
@@ -40,13 +47,16 @@ class VC(object):
                 f0 = np.pad(f0, [[pad_size, p_len - len(f0) - pad_size]], mode='constant')
         elif (f0_method == "harvest"):
             f0, t = pyworld.harvest(
-                x.astype(np.double),
+                audio.astype(np.double),
                 fs=self.sr,
                 f0_ceil=f0_max,
                 frame_period=10,
             )
-            f0 = pyworld.stonemask(x.astype(np.double), f0, t, self.sr)
+            f0 = pyworld.stonemask(audio.astype(np.double), f0, t, self.sr)
             f0 = signal.medfilt(f0, 3)
+
+            f0 = np.pad(f0.astype('float'), (start_frame, n_frames - len(f0) - start_frame))
+
         f0 *= pow(2, f0_up_key / 12)
         # with open("test.txt","w")as f:f.write("\n".join([str(i)for i in f0.tolist()]))
         tf0 = self.sr // self.window  # 每秒f0点数
@@ -117,7 +127,7 @@ class VC(object):
         times[2] += (t2 - t1)
         return audio1
 
-    def pipeline(self, model, net_g, sid, audio, times, f0_up_key, f0_method, file_index, file_big_npy, index_rate, if_f0, f0_file=None):
+    def pipeline(self, model, net_g, sid, audio, times, f0_up_key, f0_method, file_index, file_big_npy, index_rate, if_f0, f0_file=None, silence_front=0):
         if (file_big_npy != "" and file_index != "" and os.path.exists(file_big_npy) == True and os.path.exists(file_index) == True and index_rate != 0):
             try:
                 index = faiss.read_index(file_index)
@@ -138,7 +148,7 @@ class VC(object):
         sid = torch.tensor(sid, device=self.device).unsqueeze(0).long()
         pitch, pitchf = None, None
         if (if_f0 == 1):
-            pitch, pitchf = self.get_f0(audio_pad, p_len, f0_up_key, f0_method, inp_f0)
+            pitch, pitchf = self.get_f0(audio_pad, p_len, f0_up_key, f0_method, inp_f0, silence_front=silence_front)
             pitch = pitch[:p_len]
             pitchf = pitchf[:p_len]
             pitch = torch.tensor(pitch, device=self.device).unsqueeze(0).long()

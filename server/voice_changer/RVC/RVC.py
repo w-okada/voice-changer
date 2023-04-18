@@ -54,6 +54,7 @@ class RVCSettings():
 
     indexRatio: float = 0
     rvcQuality: int = 0
+    silenceFront: int = 1  # 0:off, 1:on
     modelSamplingRate: int = 48000
 
     speakers: dict[str, int] = field(
@@ -61,7 +62,7 @@ class RVCSettings():
     )
 
     # ↓mutableな物だけ列挙
-    intData = ["gpu", "dstId", "tran", "predictF0", "extraConvertSize", "rvcQuality", "modelSamplingRate"]
+    intData = ["gpu", "dstId", "tran", "predictF0", "extraConvertSize", "rvcQuality", "modelSamplingRate", "silenceFront"]
     floatData = ["noiceScale", "silentThreshold", "indexRatio"]
     strData = ["framework", "f0Detector"]
 
@@ -272,8 +273,13 @@ class RVC:
             if_f0 = 1
             f0_file = None
 
-            audio_out = vc.pipeline(self.hubert_model, self.net_g, sid, audio, times, f0_up_key, f0_method,
-                                    file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file)
+            if self.settings.silenceFront == 0:
+                audio_out = vc.pipeline(self.hubert_model, self.net_g, sid, audio, times, f0_up_key, f0_method,
+                                        file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file, silence_front=0)
+            else:
+                audio_out = vc.pipeline(self.hubert_model, self.net_g, sid, audio, times, f0_up_key, f0_method,
+                                        file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file, silence_front=self.settings.extraConvertSize / self.settings.modelSamplingRate)
+
             result = audio_out * np.sqrt(vol)
 
         return result

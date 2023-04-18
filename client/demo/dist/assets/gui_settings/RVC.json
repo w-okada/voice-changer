@@ -168,6 +168,10 @@
             {
                 "name": "rvcQuality",
                 "options": {}
+            },
+            {
+                "name": "silenceFront",
+                "options": {}
             }
         ]
     },
