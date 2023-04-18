@@ -1,6 +1,6 @@
 {
   "name": "@dannadori/voice-changer-client-js",
-  "version": "1.0.109",
+  "version": "1.0.110",
   "description": "",
   "main": "dist/index.js",
   "directories": {
@@ -28,7 +28,7 @@
   "devDependencies": {
     "@types/audioworklet": "^0.0.41",
     "@types/node": "^18.15.11",
-    "@types/react": "18.0.35",
+    "@types/react": "18.0.37",
     "@types/react-dom": "18.0.11",
     "eslint": "^8.38.0",
     "eslint-config-prettier": "^8.8.0",
