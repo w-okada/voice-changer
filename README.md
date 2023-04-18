@@ -4,6 +4,17 @@
 
 ## What's New!
 
+- v.1.5.2.3
+
+  - 全ボイチェンの音声結合に SOLA を採用
+  - DDSP-SVC サポート
+  - M1Mac MPS 対応
+
+- v.1.5.2.2
+
+  - RVC の音声結合に SOLA を採用
+  - ONNX 対応
+
 - v.1.5.2.1
 
   - 各サポート VC を選択するランチャーを実装しました。これに伴い起動バッチファイルは、`start_http.bat`と`start_https.bat`の二つになります。

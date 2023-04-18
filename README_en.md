@@ -2,6 +2,17 @@
 
 ## What's New!
 
+- v.1.5.2.3
+
+  - apply SOLA to All VC
+  - support DDSP-SVC
+  - support M1Mac MPS
+
+- v.1.5.2.2
+
+  - apply SOLA to RCA
+  - support ONNX
+
 - v.1.5.2.1
 
   - Launcher for Each Voice Conversion AI. Use `start_http.bat` or `start_https.bat`.
