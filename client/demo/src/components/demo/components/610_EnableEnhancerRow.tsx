@@ -21,7 +21,7 @@ export const EnableEnhancerRow = (_props: EnableEnhancerRowProps) => {
                         </select>
                     </div>
                 </div>
-                <div className="body-row split-3-3-4 left-padding-1 guided">
+                {/* <div className="body-row split-3-3-4 left-padding-1 guided">
                     <div className="body-item-title left-padding-1 ">Enhancer Tune</div>
                     <div>
                         <input type="range" className="body-item-input-slider" min="0" max="10" step="1" value={appState.serverSetting.serverSetting.enhancerTune || 0} onChange={(e) => {
@@ -31,7 +31,7 @@ export const EnableEnhancerRow = (_props: EnableEnhancerRowProps) => {
                     </div>
                     <div className="body-button-container">
                     </div>
-                </div>
+                </div> */}
             </>
         )
     }, [

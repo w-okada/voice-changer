@@ -199,7 +199,8 @@ class DDSP_SVC:
         self.audio_buffer = self.audio_buffer[-1 * convertSize:]  # 変換対象の部分だけ抽出
 
         # f0
-        f0 = self.f0_detector.extract(self.audio_buffer * 32768.0, uv_interp=True)
+        f0 = self.f0_detector.extract(self.audio_buffer * 32768.0, uv_interp=True,
+                                      silence_front=self.settings.extraConvertSize / self.sampling_rate)
         f0 = torch.from_numpy(f0).float().unsqueeze(-1).unsqueeze(0)
         f0 = f0 * 2 ** (float(self.settings.tran) / 12)
 
@@ -285,7 +286,9 @@ class DDSP_SVC:
                     self.args.data.sampling_rate,
                     f0,
                     self.args.data.block_size,
-                    adaptive_key=float(self.settings.enhancerTune))
+                    # adaptive_key=float(self.settings.enhancerTune),
+                    adaptive_key='auto',
+                    silence_front=self.settings.extraConvertSize / self.sampling_rate)
 
             result = seg_output.squeeze().cpu().numpy() * 32768.0
         return np.array(result).astype(np.int16)
