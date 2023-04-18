@@ -185,28 +185,19 @@ if __name__ == '__main__':
             # log_level="warning"
         )
     else:
-        # HTTP サーバ起動
-        if args.colab == True:
-            uvicorn.run(
-                f"{os.path.basename(__file__)[:-3]}:app_fastapi",
-                host="0.0.0.0",
-                port=int(PORT),
-                log_level="warning"
-            )
-        else:
-            p = mp.Process(name="p", target=localServer)
-            p.start()
-            try:
-                if sys.platform.startswith('win'):
-                    process = subprocess.Popen([NATIVE_CLIENT_FILE_WIN, "-u", f"http://localhost:{PORT}/{path}"])
-                    return_code = process.wait()
-                    print("client closed.")
-                    p.terminate()
-                elif sys.platform.startswith('darwin'):
-                    process = subprocess.Popen([NATIVE_CLIENT_FILE_MAC, "-u", f"http://localhost:{PORT}/{path}"])
-                    return_code = process.wait()
-                    print("client closed.")
-                    p.terminate()
+        p = mp.Process(name="p", target=localServer)
+        p.start()
+        try:
+            if sys.platform.startswith('win'):
+                process = subprocess.Popen([NATIVE_CLIENT_FILE_WIN, "-u", f"http://localhost:{PORT}/{path}"])
+                return_code = process.wait()
+                print("client closed.")
+                p.terminate()
+            elif sys.platform.startswith('darwin'):
+                process = subprocess.Popen([NATIVE_CLIENT_FILE_MAC, "-u", f"http://localhost:{PORT}/{path}"])
+                return_code = process.wait()
+                print("client closed.")
+                p.terminate()
 
-            except Exception as e:
-                print(e)
+        except Exception as e:
+            print(e)
