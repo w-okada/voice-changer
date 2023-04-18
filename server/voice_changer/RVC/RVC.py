@@ -105,11 +105,6 @@ class RVC:
         except Exception as e:
             print("EXCEPTION during loading hubert/contentvec model", e)
 
-        # if pyTorch_model_file != None:
-        #     self.settings.pyTorchModelFile = pyTorch_model_file
-        # if onnx_model_file:
-        #     self.settings.onnxModelFile = onnx_model_file
-
         # PyTorchモデル生成
         if self.settings.pyTorchModelFile != None:
             cpt = torch.load(self.settings.pyTorchModelFile, map_location="cpu")

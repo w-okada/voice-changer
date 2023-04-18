@@ -75,30 +75,6 @@ class MMVC_Rest_Fileuploader:
                 "indexFilename": indexFilename
             }
         }
-        # print("---------------------------------------------------->", props)
-
-        # # Upload File Path
-        # pyTorchModelFilePath = os.path.join(UPLOAD_DIR, pyTorchModelFilename) if pyTorchModelFilename != "-" else None
-        # onnxModelFilePath = os.path.join(UPLOAD_DIR, onnxModelFilename) if onnxModelFilename != "-" else None
-        # configFilePath = os.path.join(UPLOAD_DIR, configFilename)
-        # clusterTorchModelFilePath = os.path.join(UPLOAD_DIR, clusterTorchModelFilename) if clusterTorchModelFilename != "-" else None
-        # featureFilePath = os.path.join(UPLOAD_DIR, featureFilename) if featureFilename != "-" else None
-        # indexFilePath = os.path.join(UPLOAD_DIR, indexFilename) if indexFilename != "-" else None
-
-        # # Stored File Path by Slot
-        # pyTorchModelStoredFilePath = os.path.join(UPLOAD_DIR, f"{slot}", pyTorchModelFilename) if pyTorchModelFilename != "-" else None
-        # onnxModelStoredFilePath = os.path.join(UPLOAD_DIR, f"{slot}", onnxModelFilename) if onnxModelFilename != "-" else None
-        # configStoredFilePath = os.path.join(UPLOAD_DIR, f"{slot}", configFilename)
-        # clusterTorchModelStoredFilePath = os.path.join(UPLOAD_DIR, f"{slot}", clusterTorchModelFilename) if clusterTorchModelFilename != "-" else None
-        # featureStoredFilePath = os.path.join(UPLOAD_DIR, f"{slot}", featureFilename) if featureFilename != "-" else None
-        # indexStoredFilePath = os.path.join(UPLOAD_DIR, f"{slot}", indexFilename) if indexFilename != "-" else None
-
-        # # Store File
-        # if pyTorchModelFilename != "-":
-        #     pyTorchModelFilePath = os.path.join(UPLOAD_DIR, pyTorchModelFilename)
-        #     pyTorchModelStoredFilePath = os.path.join(UPLOAD_DIR, f"{slot}", pyTorchModelFilename)
-        #     shutil.move(pyTorchModelFilePath, pyTorchModelStoredFilePath)
-
         # Change Filepath
         for key, val in props["files"].items():
             if val != "-":
@@ -151,7 +127,7 @@ class MMVC_Rest_Fileuploader:
     def get_model_type(
         self,
     ):
-        info = self.voiceChangerManager.getModelType(modelType)
+        info = self.voiceChangerManager.getModelType()
         json_compatible_item_data = jsonable_encoder(info)
         return JSONResponse(content=json_compatible_item_data)
 
