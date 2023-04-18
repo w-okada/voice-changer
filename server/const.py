@@ -26,16 +26,12 @@ TMP_DIR = os.path.join(tmpdir.name, "tmp_dir") if hasattr(sys, "_MEIPASS") else 
 os.makedirs(TMP_DIR, exist_ok=True)
 
 
-modelType: ModelType = "MMVCv15"
-
-
-def getModelType() -> ModelType:
-    return modelType
-
-
-def setModelType(_modelType: ModelType):
-    global modelType
-    modelType = _modelType
+# modelType: ModelType = "MMVCv15"
+# def getModelType() -> ModelType:
+#     return modelType
+# def setModelType(_modelType: ModelType):
+#     global modelType
+#     modelType = _modelType
 
 
 def getFrontendPath():

@@ -84,8 +84,8 @@ class SoVitsSvc40:
         clusterTorchModel = props["files"]["clusterTorchModelFilename"]
 
         content_vec_path = self.params["content_vec_500"]
-        content_vec_hubert_onnx_path = self.params["content_vec_500_onnx"]
-        content_vec_hubert_onnx_on = self.params["content_vec_500_onnx_on"]
+        content_vec_onnx_path = self.params["content_vec_500_onnx"]
+        content_vec_onnx_on = self.params["content_vec_500_onnx_on"]
         hubert_base_path = self.params["hubert_base"]
 
         # hubert model
@@ -94,11 +94,11 @@ class SoVitsSvc40:
             if os.path.exists(content_vec_path) == False:
                 content_vec_path = hubert_base_path
 
-            if content_vec_hubert_onnx_on == True:
+            if content_vec_onnx_on == True:
                 ort_options = onnxruntime.SessionOptions()
                 ort_options.intra_op_num_threads = 8
-                self.hubert_onnx = onnxruntime.InferenceSession(
-                    content_vec_hubert_onnx_path,
+                self.content_vec_onnx = onnxruntime.InferenceSession(
+                    content_vec_onnx_path,
                     providers=providers
                 )
             else:
@@ -154,12 +154,12 @@ class SoVitsSvc40:
                     self.settings.gpu = 0
                 provider_options = [{'device_id': self.settings.gpu}]
                 self.onnx_session.set_providers(providers=[val], provider_options=provider_options)
-                if hasattr(self, "hubert_onnx"):
-                    self.hubert_onnx.set_providers(providers=[val], provider_options=provider_options)
+                if hasattr(self, "content_vec_onnx"):
+                    self.content_vec_onnx.set_providers(providers=[val], provider_options=provider_options)
             else:
                 self.onnx_session.set_providers(providers=[val])
-                if hasattr(self, "hubert_onnx"):
-                    self.hubert_onnx.set_providers(providers=[val])
+                if hasattr(self, "content_vec_onnx"):
+                    self.content_vec_onnx.set_providers(providers=[val])
         elif key == "onnxExecutionProvider" and self.onnx_session == None:
             print("Onnx is not enabled. Please load model.")
             return False
@@ -227,14 +227,14 @@ class SoVitsSvc40:
         else:
             dev = torch.device("cuda", index=self.settings.gpu)
 
-        if hasattr(self, "hubert_onnx"):
-            c = self.hubert_onnx.run(
+        if hasattr(self, "content_vec_onnx"):
+            c = self.content_vec_onnx.run(
                 ["units"],
                 {
                     "audio": wav16k_numpy.reshape(1, -1),
                 })
             c = torch.from_numpy(np.array(c)).squeeze(0).transpose(1, 2)
-            # print("onnx hubert:", self.hubert_onnx.get_providers())
+            # print("onnx hubert:", self.content_vec_onnx.get_providers())
         else:
             if self.hps.model.ssl_dim == 768:
                 self.hubert_model = self.hubert_model.to(dev)
@@ -257,6 +257,7 @@ class SoVitsSvc40:
             else:
                 cluster_c = cluster.get_cluster_center_result(self.cluster_model, c.cpu().numpy().T, speaker[0]).T
                 cluster_c = torch.FloatTensor(cluster_c).to(dev)
+                c = c.to(dev)
                 c = self.settings.clusterInferRatio * cluster_c + (1 - self.settings.clusterInferRatio) * c
 
         c = c.unsqueeze(0)
