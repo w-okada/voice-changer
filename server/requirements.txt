@@ -1,19 +1,44 @@
+# uvicorn==0.21.1
+# pyOpenSSL==23.0.0
+# numpy==1.23.5
+# #torch==2.0.0
+# torch==1.13.1
+# resampy==0.4.2
+# matplotlib==3.7.1
+# librosa==0.10.0.post1
+# pyworld==0.3.2
+# python-socketio==5.7.2
+# fastapi==0.94.1
+# onnxruntime-gpu==1.14.1
+# python-multipart==0.0.6
+# fairseq==0.12.2
+# # apt-get update
+# # apt-get install -y emacs mlocate wget git curl gcc g++ make unzip
+# # wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh
+# # bash Anaconda3-2022.10-Linux-x86_64.sh
+
+
+
+
 uvicorn==0.21.1
-pyOpenSSL==23.0.0
+pyOpenSSL==23.1.1
 numpy==1.23.5
-#torch==2.0.0
 torch==1.13.1
 resampy==0.4.2
-matplotlib==3.7.1
-librosa==0.10.0.post1
-pyworld==0.3.2
-python-socketio==5.7.2
-fastapi==0.94.1
-onnxruntime-gpu==1.14.1
+python-socketio==5.8.0
+fastapi==0.95.1
 python-multipart==0.0.6
+onnxruntime-gpu==1.14.1
+pyworld==0.3.3
+scipy==1.10.1
+matplotlib==3.7.1
 fairseq==0.12.2
-# apt-get update
-# apt-get install -y emacs mlocate wget git curl gcc g++ make unzip
-# wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh
-# bash Anaconda3-2022.10-Linux-x86_64.sh
-
+websockets==11.0.2
+praat-parselmouth==0.4.3
+faiss-cpu==1.7.3
+torchcrepe==0.0.18
+librosa==0.10.0.post1
+gin==0.1.6
+gin_config==0.5.0
+einops==0.6.0
+local_attention==1.8.5

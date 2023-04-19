@@ -81,7 +81,6 @@ class DDSP_SVC:
         self.args = args
         self.sampling_rate = args.data.sampling_rate
         self.hop_size = int(self.args.data.block_size * self.sampling_rate / self.args.data.sampling_rate)
-        print("-------------------hopsize", self.hop_size)
 
         # hubert
         self.vec_path = self.params["hubert_soft"]
