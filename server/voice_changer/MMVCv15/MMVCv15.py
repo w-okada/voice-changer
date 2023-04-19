@@ -193,7 +193,7 @@ class MMVCv15:
         return [spec, f0, sid]
 
     def _onnx_inference(self, data):
-        if self.settings.onnxModelFile == "":
+        if self.settings.onnxModelFile == "" or self.settings.onnxModelFile == None:
             print("[Voice Changer] No ONNX session.")
             raise NoModeLoadedException("ONNX")
 
@@ -219,7 +219,7 @@ class MMVCv15:
         return audio1
 
     def _pyTorch_inference(self, data):
-        if self.settings.pyTorchModelFile == "":
+        if self.settings.pyTorchModelFile == "" or self.settings.pyTorchModelFile == None:
             print("[Voice Changer] No pyTorch session.")
             raise NoModeLoadedException("pytorch")
 
