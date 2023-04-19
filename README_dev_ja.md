@@ -40,7 +40,7 @@ git clone https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI.gi
 
 2. 外部のモデルの重みを配置する
 
-copy weights of emmbedding or vocoder. These file path can be set as parameter when invoke server.
+エンコーダやボコーダなどの外部のモデルの重みを入手して配置する。
 
 (1) hubert_base.pt
 
@@ -66,7 +66,7 @@ $ pip install -r requirements.txt
 
 4. サーバを起動する
 
-Run server with the below command. You can replace the path to each weight.
+次のコマンドで起動します。各種重みについてのパスは環境に合わせて変えてください。
 
 ```
 $ python3 MMVCServerSIO.py -p 18888 --https true \
@@ -76,7 +76,7 @@ $ python3 MMVCServerSIO.py -p 18888 --https true \
   --nsf_hifigan weights/nsf_hifigan/model
 ```
 
-5. 開発しましょう
+1. 開発しましょう
 
 ## クライアント開発者向け
 
