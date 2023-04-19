@@ -123,6 +123,8 @@ https://user-images.githubusercontent.com/48346627/212569645-e30b7f4e-079d-4504-
 
 [WSL2 と Anaconda のインストールの解説動画](https://youtu.be/fba9Zhsukqw)
 
+Docker での実行は、[Docker を使用する](docker_vcclient/README.md)を参考にサーバを起動してください。
+
 Anaconda の仮想環境上での実行は、[サーバ開発者向けのページ](README_dev_ja.md)を参考にサーバを起動してください。
 
 ## リアルタイム性
