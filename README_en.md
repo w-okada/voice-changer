@@ -1,5 +1,7 @@
 ## VC Client
 
+[Japanese](/README_ja.md)
+
 ## What's New!
 
 - v.1.5.2.3a
