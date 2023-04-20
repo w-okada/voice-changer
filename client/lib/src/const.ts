@@ -180,7 +180,7 @@ export const DefaultServerSetting_MMVCv15: ServerInfo = {
     enableEnhancer: 0,
     enhancerTune: 0,
 
-    inputSampleRate: 24000,
+    inputSampleRate: 48000,
 
     // 
     status: "ok",
@@ -221,7 +221,7 @@ export const DefaultServerSetting_MMVCv13: ServerInfo = {
     enableEnhancer: 0,
     enhancerTune: 0,
 
-    inputSampleRate: 24000,
+    inputSampleRate: 48000,
 
     // 
     status: "ok",
@@ -266,7 +266,7 @@ export const DefaultServerSetting_so_vits_svc_40: ServerInfo = {
     enableEnhancer: 0,
     enhancerTune: 0,
 
-    inputSampleRate: 24000,
+    inputSampleRate: 48000,
 
     // 
     status: "ok",
@@ -311,7 +311,7 @@ export const DefaultServerSetting_so_vits_svc_40_c: ServerInfo = {
     enableEnhancer: 0,
     enhancerTune: 0,
 
-    inputSampleRate: 24000,
+    inputSampleRate: 48000,
 
     // 
     status: "ok",
@@ -355,7 +355,7 @@ export const DefaultServerSetting_so_vits_svc_40v2: ServerInfo = {
     enableEnhancer: 0,
     enhancerTune: 0,
 
-    inputSampleRate: 24000,
+    inputSampleRate: 48000,
 
     // 
     status: "ok",
@@ -400,7 +400,7 @@ export const DefaultServerSetting_DDSP_SVC: ServerInfo = {
     enableEnhancer: 0,
     enhancerTune: 0,
 
-    inputSampleRate: 24000,
+    inputSampleRate: 48000,
 
     // 
     status: "ok",

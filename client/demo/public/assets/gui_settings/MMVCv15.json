@@ -113,19 +113,7 @@
         ],
         "advancedSetting": [
             {
-                "name": "serverURL",
-                "options": {}
-            },
-            {
                 "name": "protocol",
-                "options": {}
-            },
-            {
-                "name": "sampleRate",
-                "options": {}
-            },
-            {
-                "name": "sendingSampleRate",
                 "options": {}
             },
             {
@@ -138,10 +126,6 @@
             },
             {
                 "name": "crossFadeEndRate",
-                "options": {}
-            },
-            {
-                "name": "downSamplingMode",
                 "options": {}
             },
             {

@@ -26,7 +26,7 @@ STREAM_ANALYZE_FILE_HARVEST = os.path.join(TMP_DIR, "analyze-harvest.png")
 
 @dataclass
 class VoiceChangerSettings():
-    inputSampleRate: int = 24000  # 48000 or 24000
+    inputSampleRate: int = 48000  # 48000 or 24000
 
     crossFadeOffsetRate: float = 0.1
     crossFadeEndRate: float = 0.9
