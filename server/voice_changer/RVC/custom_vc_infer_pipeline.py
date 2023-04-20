@@ -94,15 +94,24 @@ class VC(object):
         feats = feats.view(1, -1)
         padding_mask = torch.BoolTensor(feats.shape).to(self.device).fill_(False)
 
+        is_feats_dim_768 = net_g.emb_channels == 768
+
         inputs = {
             "source": feats.to(self.device),
             "padding_mask": padding_mask,
             "output_layer": 9,  # layer 9
+        } if not is_feats_dim_768 else {
+            "source": feats.to(self.device),
+            "padding_mask": padding_mask,
+            # no pass "output_layer"
         }
         t0 = ttime()
         with torch.no_grad():
             logits = model.extract_features(**inputs)
-            feats = model.final_proj(logits[0])
+            if is_feats_dim_768:
+                feats = logits[0]
+            else:
+                feats = model.final_proj(logits[0])
 
         if (isinstance(index, type(None)) == False and isinstance(big_npy, type(None)) == False and index_rate != 0):
             npy = feats[0].cpu().numpy()

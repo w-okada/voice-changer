@@ -30,9 +30,38 @@ from const import HUBERT_ONNX_MODEL_PATH, TMP_DIR
 import pyworld as pw
 
 from voice_changer.RVC.custom_vc_infer_pipeline import VC
-from infer_pack.models import SynthesizerTrnMs256NSFsid
+from .models import SynthesizerTrnMsNSFsid
 from fairseq import checkpoint_utils
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
+
+
+def update_state_dict(state_dict):
+    if "params" in state_dict:
+        return
+    state_dict["params"] = {}
+    keys = [
+        "spec_channels",
+        "segment_size",
+        "inter_channels",
+        "hidden_channels",
+        "filter_channels",
+        "n_heads",
+        "n_layers",
+        "kernel_size",
+        "p_dropout",
+        "resblock",
+        "resblock_kernel_sizes",
+        "resblock_dilation_sizes",
+        "upsample_rates",
+        "upsample_initial_channel",
+        "upsample_kernel_sizes",
+        "spk_embed_dim",
+        "gin_channels",
+        "emb_channels",
+        "sr",
+    ]
+    for i, key in enumerate(keys):
+        state_dict["params"][key] = state_dict["config"][i]
 
 
 @dataclass
@@ -147,11 +176,14 @@ class RVC:
         print("[Voice Changer] Prepare Model of slot:", slot)
         pyTorchModelFile = self.settings.modelSlots[slot].pyTorchModelFile
         onnxModelFile = self.settings.modelSlots[slot].onnxModelFile
-        # PyTorchモデル生成
+
         if pyTorchModelFile != None and pyTorchModelFile != "":
             cpt = torch.load(pyTorchModelFile, map_location="cpu")
-            self.settings.modelSamplingRate = cpt["config"][-1]
-            net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=self.is_half)
+            update_state_dict(cpt)
+            self.settings.modelSamplingRate = cpt["params"]["sr"]
+            if "emb_channels" not in cpt["params"]:
+                cpt["params"]["emb_channels"] = 256
+            net_g = SynthesizerTrnMsNSFsid(**cpt["params"], is_half=self.is_half)
             net_g.eval()
             net_g.load_state_dict(cpt["weight"], strict=False)
             if self.is_half:

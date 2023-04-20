@@ -7,10 +7,13 @@ from torch import nn
 from onnxsim import simplify
 import onnx
 
-from infer_pack.models import TextEncoder256, GeneratorNSF, PosteriorEncoder, ResidualCouplingBlock
+from .RVC import update_state_dict
+from .models import TextEncoder
+
+from infer_pack.models import GeneratorNSF, PosteriorEncoder, ResidualCouplingBlock
 
 
-class SynthesizerTrnMs256NSFsid_ONNX(nn.Module):
+class SynthesizerTrnMsNSFsid_ONNX(nn.Module):
     def __init__(
         self,
         spec_channels,
@@ -30,6 +33,7 @@ class SynthesizerTrnMs256NSFsid_ONNX(nn.Module):
         upsample_kernel_sizes,
         spk_embed_dim,
         gin_channels,
+        emb_channels,
         sr,
         **kwargs
     ):
@@ -53,12 +57,14 @@ class SynthesizerTrnMs256NSFsid_ONNX(nn.Module):
         self.upsample_kernel_sizes = upsample_kernel_sizes
         self.segment_size = segment_size
         self.gin_channels = gin_channels
+        self.emb_channels = emb_channels
         # self.hop_length = hop_length#
         self.spk_embed_dim = spk_embed_dim
-        self.enc_p = TextEncoder256(
+        self.enc_p = TextEncoder(
             inter_channels,
             hidden_channels,
             filter_channels,
+            emb_channels,
             n_heads,
             n_layers,
             kernel_size,
@@ -100,12 +106,13 @@ class SynthesizerTrnMs256NSFsid_ONNX(nn.Module):
 
 def export2onnx(input_model, output_model, output_model_simple, is_half):
     cpt = torch.load(input_model, map_location="cpu")
+    update_state_dict(cpt)
     if is_half:
         dev = torch.device("cuda", index=0)
     else:
         dev = torch.device("cpu")
 
-    net_g_onnx = SynthesizerTrnMs256NSFsid_ONNX(*cpt["config"], is_half=is_half)
+    net_g_onnx = SynthesizerTrnMsNSFsid_ONNX(**cpt["params"], is_half=is_half)
     net_g_onnx.eval().to(dev)
     net_g_onnx.load_state_dict(cpt["weight"], strict=False)
     if is_half:
