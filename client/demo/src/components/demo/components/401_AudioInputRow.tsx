@@ -22,12 +22,6 @@ export const AudioInputRow = (_props: AudioInputRowProps) => {
         }
     }, [guiState.inputAudioDeviceInfo, appState.clientSetting.clientSetting.audioInput])
 
-    useEffect(() => {
-        if (guiState.audioInputForGUI == "file") {
-        } else {
-            appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, audioInput: guiState.audioInputForGUI })
-        }
-    }, [guiState.audioInputForGUI, appState.clientSetting.updateClientSetting])
 
     const audioInputRow = useMemo(() => {
         return (
@@ -36,6 +30,9 @@ export const AudioInputRow = (_props: AudioInputRowProps) => {
                 <div className="body-select-container">
                     <select className="body-select" value={guiState.audioInputForGUI} onChange={(e) => {
                         guiState.setAudioInputForGUI(e.target.value)
+                        if (guiState.audioInputForGUI != "file") {
+                            appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, audioInput: e.target.value })
+                        }
                     }}>
                         {
                             guiState.inputAudioDeviceInfo.map(x => {
@@ -46,7 +43,7 @@ export const AudioInputRow = (_props: AudioInputRowProps) => {
                 </div>
             </div>
         )
-    }, [guiState.inputAudioDeviceInfo, guiState.audioInputForGUI])
+    }, [guiState.inputAudioDeviceInfo, guiState.audioInputForGUI, appState.clientSetting.clientSetting, appState.clientSetting.updateClientSetting])
 
 
 
