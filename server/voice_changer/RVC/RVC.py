@@ -41,7 +41,6 @@ class RVCSettings():
 
     f0Detector: str = "pm"  # pm or harvest
     tran: int = 20
-    noiceScale: float = 0.3
     predictF0: int = 0  # 0:False, 1:True
     silentThreshold: float = 0.00001
     extraConvertSize: int = 1024 * 32
@@ -63,7 +62,7 @@ class RVCSettings():
 
     # ↓mutableな物だけ列挙
     intData = ["gpu", "dstId", "tran", "predictF0", "extraConvertSize", "rvcQuality", "modelSamplingRate", "silenceFront"]
-    floatData = ["noiceScale", "silentThreshold", "indexRatio"]
+    floatData = ["silentThreshold", "indexRatio"]
     strData = ["framework", "f0Detector"]
 
 

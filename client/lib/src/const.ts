@@ -74,7 +74,6 @@ export const ServerSettingKey = {
     "crossFadeOffsetRate": "crossFadeOffsetRate",
     "crossFadeEndRate": "crossFadeEndRate",
     "crossFadeOverlapSize": "crossFadeOverlapSize",
-    "solaEnabled": "solaEnabled",
 
     "framework": "framework",
     "onnxExecutionProvider": "onnxExecutionProvider",
@@ -84,7 +83,7 @@ export const ServerSettingKey = {
     "recordIO": "recordIO",
 
     "tran": "tran",
-    "noiceScale": "noiceScale",
+    "noiseScale": "noiseScale",
     "predictF0": "predictF0",
     "silentThreshold": "silentThreshold",
     "extraConvertSize": "extraConvertSize",
@@ -111,7 +110,6 @@ export type VoiceChangerServerSetting = {
     crossFadeOffsetRate: number,
     crossFadeEndRate: number,
     crossFadeOverlapSize: CrossFadeOverlapSize,
-    solaEnabled: number,
 
     framework: Framework
     onnxExecutionProvider: OnnxExecutionProvider,
@@ -121,7 +119,7 @@ export type VoiceChangerServerSetting = {
     recordIO: number // 0:off, 1:on
 
     tran: number // so-vits-svc
-    noiceScale: number // so-vits-svc
+    noiseScale: number // so-vits-svc
     predictF0: number // so-vits-svc
     silentThreshold: number // so-vits-svc
     extraConvertSize: number// so-vits-svc
@@ -149,248 +147,35 @@ export type ServerInfo = VoiceChangerServerSetting & {
 export type ServerInfoSoVitsSVC = ServerInfo & {
     speakers: { [key: string]: number }
 }
-export const DefaultServerSetting_MMVCv15: ServerInfo = {
-    srcId: 0,
-    dstId: 101,
-    gpu: 0,
+
+export const DefaultServerSetting: ServerInfo = {
+    // VC Common 
+    inputSampleRate: 48000,
 
     crossFadeOffsetRate: 0.0,
     crossFadeEndRate: 1.0,
     crossFadeOverlapSize: CrossFadeOverlapSize[1024],
-    solaEnabled: 0,
 
-    framework: Framework.PyTorch,
-    f0Factor: 1.0,
-    onnxExecutionProvider: OnnxExecutionProvider.CPUExecutionProvider,
-    f0Detector: F0Detector.dio,
     recordIO: 0,
 
-    tran: 0,
-    noiceScale: 0,
-    predictF0: 0,
-    silentThreshold: 0,
-    extraConvertSize: 0,
-    clusterInferRatio: 0,
 
-    indexRatio: 0,
-    rvcQuality: 0,
-    modelSamplingRate: 48000,
-    silenceFront: 0,
-
-    enableEnhancer: 0,
-    enhancerTune: 0,
-
-    inputSampleRate: 48000,
-
-    // 
-    status: "ok",
-    configFile: "",
-    pyTorchModelFile: "",
-    onnxModelFile: "",
-    onnxExecutionProviders: []
-}
-
-export const DefaultServerSetting_MMVCv13: ServerInfo = {
-    srcId: 107,
-    dstId: 100,
-    gpu: 0,
-
-    crossFadeOffsetRate: 0.0,
-    crossFadeEndRate: 1.0,
-    crossFadeOverlapSize: CrossFadeOverlapSize[1024],
-    solaEnabled: 0,
-
-    framework: Framework.ONNX,
-    f0Factor: 1.0,
-    onnxExecutionProvider: OnnxExecutionProvider.CPUExecutionProvider,
-    f0Detector: F0Detector.dio,
-    recordIO: 0,
-
-    tran: 0,
-    noiceScale: 0,
-    predictF0: 0,
-    silentThreshold: 0,
-    extraConvertSize: 0,
-    clusterInferRatio: 0,
-
-    indexRatio: 0,
-    rvcQuality: 0,
-    modelSamplingRate: 48000,
-    silenceFront: 0,
-
-    enableEnhancer: 0,
-    enhancerTune: 0,
-
-    inputSampleRate: 48000,
-
-    // 
-    status: "ok",
-    configFile: "",
-    pyTorchModelFile: "",
-    onnxModelFile: "",
-    onnxExecutionProviders: []
-}
-
-export const DefaultServerSetting_so_vits_svc_40: ServerInfo = {
-    srcId: 0,
-    dstId: 0,
-    gpu: 0,
-
-    crossFadeOffsetRate: 0.0,
-    crossFadeEndRate: 1.0,
-    crossFadeOverlapSize: CrossFadeOverlapSize[1024],
-    solaEnabled: 0,
-
-    framework: Framework.PyTorch,
-    f0Factor: 1.0,
-    onnxExecutionProvider: OnnxExecutionProvider.CPUExecutionProvider,
-    f0Detector: F0Detector.dio,
-    recordIO: 0,
-
-    // tran: 0,
-    // noiceScale: 0,
-    // predictF0: 0,
-    // silentThreshold: 0,
-    tran: 10,
-    noiceScale: 0.3,
-    predictF0: 0,
-    silentThreshold: 0.00001,
-    extraConvertSize: 1024 * 32,
-    clusterInferRatio: 0.1,
-
-    indexRatio: 0,
-    rvcQuality: 0,
-    modelSamplingRate: 48000,
-    silenceFront: 0,
-
-    enableEnhancer: 0,
-    enhancerTune: 0,
-
-    inputSampleRate: 48000,
-
-    // 
-    status: "ok",
-    configFile: "",
-    pyTorchModelFile: "",
-    onnxModelFile: "",
-    onnxExecutionProviders: []
-}
-
-export const DefaultServerSetting_so_vits_svc_40_c: ServerInfo = {
-    srcId: 0,
-    dstId: 0,
-    gpu: 0,
-
-    crossFadeOffsetRate: 0.0,
-    crossFadeEndRate: 1.0,
-    crossFadeOverlapSize: CrossFadeOverlapSize[1024],
-    solaEnabled: 0,
-
-    framework: Framework.ONNX,
-    f0Factor: 1.0,
-    onnxExecutionProvider: OnnxExecutionProvider.CPUExecutionProvider,
-    f0Detector: F0Detector.dio,
-    recordIO: 0,
-
-    // tran: 0,
-    // noiceScale: 0,
-    // predictF0: 0,
-    // silentThreshold: 0,
-    tran: 10,
-    noiceScale: 0.3,
-    predictF0: 0,
-    silentThreshold: 0.00001,
-    extraConvertSize: 1024 * 32,
-    clusterInferRatio: 0.1,
-
-    indexRatio: 0,
-    rvcQuality: 0,
-    modelSamplingRate: 48000,
-    silenceFront: 0,
-
-    enableEnhancer: 0,
-    enhancerTune: 0,
-
-    inputSampleRate: 48000,
-
-    // 
-    status: "ok",
-    configFile: "",
-    pyTorchModelFile: "",
-    onnxModelFile: "",
-    onnxExecutionProviders: []
-}
-export const DefaultServerSetting_so_vits_svc_40v2: ServerInfo = {
-    srcId: 0,
-    dstId: 0,
-    gpu: 0,
-
-    crossFadeOffsetRate: 0.0,
-    crossFadeEndRate: 1.0,
-    crossFadeOverlapSize: CrossFadeOverlapSize[1024],
-    solaEnabled: 0,
-
-    framework: Framework.PyTorch,
-    f0Factor: 1.0,
-    onnxExecutionProvider: OnnxExecutionProvider.CPUExecutionProvider,
-    f0Detector: F0Detector.dio,
-    recordIO: 0,
-
-    // tran: 0,
-    // noiceScale: 0,
-    // predictF0: 0,
-    // silentThreshold: 0,
-    tran: 10,
-    noiceScale: 0.3,
-    predictF0: 0,
-    silentThreshold: 0.00001,
-    extraConvertSize: 1024 * 32,
-    clusterInferRatio: 0.1,
-
-    indexRatio: 0,
-    rvcQuality: 0,
-    modelSamplingRate: 48000,
-    silenceFront: 0,
-
-    enableEnhancer: 0,
-    enhancerTune: 0,
-
-    inputSampleRate: 48000,
-
-    // 
-    status: "ok",
-    configFile: "",
-    pyTorchModelFile: "",
-    onnxModelFile: "",
-    onnxExecutionProviders: []
-}
-
-export const DefaultServerSetting_DDSP_SVC: ServerInfo = {
+    // VC Specific
     srcId: 0,
     dstId: 1,
     gpu: 0,
 
-    crossFadeOffsetRate: 0.0,
-    crossFadeEndRate: 1.0,
-    crossFadeOverlapSize: CrossFadeOverlapSize[1024],
-    solaEnabled: 0,
 
     framework: Framework.PyTorch,
     f0Factor: 1.0,
     onnxExecutionProvider: OnnxExecutionProvider.CPUExecutionProvider,
     f0Detector: F0Detector.dio,
-    recordIO: 0,
 
-    // tran: 0,
-    // noiceScale: 0,
-    // predictF0: 0,
-    // silentThreshold: 0,
-    tran: 10,
-    noiceScale: 0.3,
+    tran: 0,
+    noiseScale: 0,
     predictF0: 0,
-    silentThreshold: 0.00001,
-    extraConvertSize: 1024 * 32,
-    clusterInferRatio: 0.1,
+    silentThreshold: 0,
+    extraConvertSize: 0,
+    clusterInferRatio: 0,
 
     indexRatio: 0,
     rvcQuality: 0,
@@ -400,7 +185,6 @@ export const DefaultServerSetting_DDSP_SVC: ServerInfo = {
     enableEnhancer: 0,
     enhancerTune: 0,
 
-    inputSampleRate: 48000,
 
     // 
     status: "ok",
@@ -409,51 +193,31 @@ export const DefaultServerSetting_DDSP_SVC: ServerInfo = {
     onnxModelFile: "",
     onnxExecutionProviders: []
 }
+export const DefaultServerSetting_MMVCv15: ServerInfo = {
+    ...DefaultServerSetting, dstId: 101,
+}
+export const DefaultServerSetting_MMVCv13: ServerInfo = {
+    ...DefaultServerSetting, srcId: 107, dstId: 100,
+}
+
+export const DefaultServerSetting_so_vits_svc_40: ServerInfo = {
+    ...DefaultServerSetting, tran: 10, noiseScale: 0.3, extraConvertSize: 1024 * 32, clusterInferRatio: 0.1,
+}
+
+export const DefaultServerSetting_so_vits_svc_40_c: ServerInfo = {
+    ...DefaultServerSetting, tran: 10, noiseScale: 0.3, extraConvertSize: 1024 * 32, clusterInferRatio: 0.1,
+}
+export const DefaultServerSetting_so_vits_svc_40v2: ServerInfo = {
+    ...DefaultServerSetting, tran: 10, noiseScale: 0.3, extraConvertSize: 1024 * 32, clusterInferRatio: 0.1,
+}
+
+export const DefaultServerSetting_DDSP_SVC: ServerInfo = {
+    ...DefaultServerSetting, dstId: 1, tran: 10, extraConvertSize: 1024 * 32, clusterInferRatio: 0.1, enableEnhancer: 1
+}
 
 
 export const DefaultServerSetting_RVC: ServerInfo = {
-    srcId: 0,
-    dstId: 0,
-    gpu: 0,
-
-    crossFadeOffsetRate: 0.1,
-    crossFadeEndRate: 0.8,
-    crossFadeOverlapSize: CrossFadeOverlapSize[1024],
-    solaEnabled: 1,
-
-    framework: Framework.PyTorch,
-    f0Factor: 1.0,
-    onnxExecutionProvider: OnnxExecutionProvider.CPUExecutionProvider,
-    f0Detector: F0Detector.harvest,
-    recordIO: 0,
-
-    // tran: 0,
-    // noiceScale: 0,
-    // predictF0: 0,
-    // silentThreshold: 0,
-    tran: 10,
-    noiceScale: 0.3,
-    predictF0: 0,
-    silentThreshold: 0.00001,
-    extraConvertSize: 1024 * 32,
-    clusterInferRatio: 0.1,
-
-    indexRatio: 0,
-    rvcQuality: 0,
-    modelSamplingRate: 48000,
-    silenceFront: 1,
-
-    enableEnhancer: 0,
-    enhancerTune: 0,
-
-    inputSampleRate: 48000,
-
-    // 
-    status: "ok",
-    configFile: "",
-    pyTorchModelFile: "",
-    onnxModelFile: "",
-    onnxExecutionProviders: []
+    ...DefaultServerSetting, tran: 10, extraConvertSize: 1024 * 32,
 }
 
 ///////////////////////
@@ -503,41 +267,25 @@ export type WorkletNodeSetting = {
 export const DefaultWorkletNodeSetting: WorkletNodeSetting = {
     serverUrl: "",
     protocol: "sio",
-    sendingSampleRate: 24000,
+    sendingSampleRate: 48000,
     inputChunkNum: 48,
     downSamplingMode: "average"
 }
 
 export const DefaultWorkletNodeSetting_so_vits_svc_40: WorkletNodeSetting = {
-    serverUrl: "",
-    protocol: "sio",
-    sendingSampleRate: 24000,
-    inputChunkNum: 128,
-    downSamplingMode: "average"
+    ...DefaultWorkletNodeSetting, inputChunkNum: 128,
 }
 
 export const DefaultWorkletNodeSetting_so_vits_svc_40v2: WorkletNodeSetting = {
-    serverUrl: "",
-    protocol: "sio",
-    sendingSampleRate: 24000,
-    inputChunkNum: 128,
-    downSamplingMode: "average"
+    ...DefaultWorkletNodeSetting, inputChunkNum: 128,
 }
 
 export const DefaultWorkletNodeSetting_DDSP_SVC: WorkletNodeSetting = {
-    serverUrl: "",
-    protocol: "sio",
-    sendingSampleRate: 48000,
-    inputChunkNum: 256,
-    downSamplingMode: "average"
+    ...DefaultWorkletNodeSetting, inputChunkNum: 256,
 }
 
 export const DefaultWorkletNodeSetting_RVC: WorkletNodeSetting = {
-    serverUrl: "",
-    protocol: "sio",
-    sendingSampleRate: 48000,
-    inputChunkNum: 256,
-    downSamplingMode: "average"
+    ...DefaultWorkletNodeSetting, inputChunkNum: 256,
 }
 
 ///////////////////////

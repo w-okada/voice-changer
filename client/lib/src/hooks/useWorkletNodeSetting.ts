@@ -45,7 +45,7 @@ export const useWorkletNodeSetting = (props: UseWorkletNodeSettingProps): Workle
         const loadCache = async () => {
             const setting = await getItem(INDEXEDDB_KEY_WORKLETNODE) as WorkletNodeSetting
             if (setting) {
-                _setWorkletNodeSetting(setting)
+                _setWorkletNodeSetting({ ...setting, sendingSampleRate: 48000 }) // sample rateは時限措置
             }
         }
         loadCache()

@@ -31,13 +31,12 @@ class VoiceChangerSettings():
     crossFadeOffsetRate: float = 0.1
     crossFadeEndRate: float = 0.9
     crossFadeOverlapSize: int = 4096
-    solaEnabled: int = 1  # 0:off, 1:on
 
     recordIO: int = 0  # 0:off, 1:on
 
     # ↓mutableな物だけ列挙
     intData: list[str] = field(
-        default_factory=lambda: ["inputSampleRate", "crossFadeOverlapSize", "recordIO", "solaEnabled"]
+        default_factory=lambda: ["inputSampleRate", "crossFadeOverlapSize", "recordIO"]
     )
     floatData: list[str] = field(
         default_factory=lambda: ["crossFadeOffsetRate", "crossFadeEndRate"]

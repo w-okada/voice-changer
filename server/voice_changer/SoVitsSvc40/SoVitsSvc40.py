@@ -40,7 +40,7 @@ class SoVitsSvc40Settings():
 
     f0Detector: str = "dio"  # dio or harvest
     tran: int = 20
-    noiceScale: float = 0.3
+    noiseScale: float = 0.3
     predictF0: int = 0  # 0:False, 1:True
     silentThreshold: float = 0.00001
     extraConvertSize: int = 1024 * 32
@@ -57,7 +57,7 @@ class SoVitsSvc40Settings():
 
     # ↓mutableな物だけ列挙
     intData = ["gpu", "dstId", "tran", "predictF0", "extraConvertSize"]
-    floatData = ["noiceScale", "silentThreshold", "clusterInferRatio"]
+    floatData = ["noiseScale", "silentThreshold", "clusterInferRatio"]
     strData = ["framework", "f0Detector"]
 
 
@@ -308,7 +308,7 @@ class SoVitsSvc40:
                 "f0": f0.astype(np.float32),
                 "uv": uv.astype(np.float32),
                 "g": sid_target.astype(np.int64),
-                "noice_scale": np.array([self.settings.noiceScale]).astype(np.float32),
+                "noise_scale": np.array([self.settings.noiseScale]).astype(np.float32),
                 # "predict_f0": np.array([self.settings.dstId]).astype(np.int64),
 
 
@@ -342,7 +342,7 @@ class SoVitsSvc40:
             # audio1 = self.net_g.infer(c, f0=f0, g=sid_target, uv=uv, predict_f0=True, noice_scale=0.1)[0][0, 0].data.float()
             predict_f0_flag = True if self.settings.predictF0 == 1 else False
             audio1 = self.net_g.infer(c, f0=f0, g=sid_target, uv=uv, predict_f0=predict_f0_flag,
-                                      noice_scale=self.settings.noiceScale)
+                                      noice_scale=self.settings.noiseScale)
             audio1 = audio1[0][0].data.float()
             # audio1 = self.net_g.infer(c, f0=f0, g=sid_target, uv=uv, predict_f0=predict_f0_flag,
             #                           noice_scale=self.settings.noiceScale)[0][0, 0].data.float()

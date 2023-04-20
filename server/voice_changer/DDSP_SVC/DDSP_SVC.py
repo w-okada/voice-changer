@@ -51,7 +51,7 @@ class DDSP_SVCSettings():
 
     # ↓mutableな物だけ列挙
     intData = ["gpu", "dstId", "tran", "predictF0", "extraConvertSize", "enableEnhancer", "enhancerTune"]
-    floatData = ["noiceScale", "silentThreshold", "clusterInferRatio"]
+    floatData = ["silentThreshold", "clusterInferRatio"]
     strData = ["framework", "f0Detector"]
 
 
@@ -229,33 +229,7 @@ class DDSP_SVC:
             print("[Voice Changer] No onnx session.")
             raise NoModeLoadedException("ONNX")
 
-        seg_units = data[0]
-        # f0 = data[1]
-        # convertSize = data[2]
-        # vol = data[3]
-
-        if vol < self.settings.silentThreshold:
-            return np.zeros(convertSize).astype(np.int16)
-
-        c, f0, uv = [x.numpy() for x in data]
-        audio1 = self.onnx_session.run(
-            ["audio"],
-            {
-                "c": c,
-                "f0": f0,
-                "g": np.array([self.settings.dstId]).astype(np.int64),
-                "uv": np.array([self.settings.dstId]).astype(np.int64),
-                "predict_f0": np.array([self.settings.dstId]).astype(np.int64),
-                "noice_scale": np.array([self.settings.dstId]).astype(np.int64),
-
-
-            })[0][0, 0] * self.hps.data.max_wav_value
-
-        audio1 = audio1 * vol
-
-        result = audio1
-
-        return result
+        raise NoModeLoadedException("ONNX")
 
     def _pyTorch_inference(self, data):
 
