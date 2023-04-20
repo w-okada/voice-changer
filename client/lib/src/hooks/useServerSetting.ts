@@ -15,7 +15,6 @@ export type FileUploadSetting = {
     onnxModel: ModelData | null
     configFile: ModelData | null
     clusterTorchModel: ModelData | null
-    hubertTorchModel: ModelData | null // !! 注意!! hubertTorchModelは固定値で上書きされるため、設定しても効果ない。
 
     feature: ModelData | null //RVC
     index: ModelData | null   //RVC
@@ -29,7 +28,6 @@ const InitialFileUploadSetting: FileUploadSetting = {
     configFile: null,
     onnxModel: null,
     clusterTorchModel: null,
-    hubertTorchModel: null,
 
     feature: null,
     index: null,
@@ -185,10 +183,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 return
             }
 
-            // if (props.clientType == "so_vits_svc_40v2c" && !fileUploadSetting.hubertTorchModel) {
-            //     alert("content vecのファイルを指定する必要があります。")
-            //     return
-            // }
             if (!props.voiceChangerClient) return
 
             setUploadProgress(0)
@@ -207,10 +201,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 fileUploadSetting.configFile.data = await fileUploadSetting.configFile.file!.arrayBuffer()
                 fileUploadSetting.configFile.filename = await fileUploadSetting.configFile.file!.name
             }
-            // if (props.clientType == "so_vits_svc_40v2c" && !fileUploadSetting.hubertTorchModel!.data) {
-            //     fileUploadSetting.hubertTorchModel!.data = await fileUploadSetting.hubertTorchModel!.file!.arrayBuffer()
-            //     fileUploadSetting.hubertTorchModel!.filename = await fileUploadSetting.hubertTorchModel!.file!.name
-            // }
+
             if (fileUploadSetting.clusterTorchModel) {
                 if ((props.clientType == "so-vits-svc-40v2" || props.clientType == "so-vits-svc-40") && !fileUploadSetting.clusterTorchModel!.data) {
                     fileUploadSetting.clusterTorchModel!.data = await fileUploadSetting.clusterTorchModel!.file!.arrayBuffer()
@@ -254,7 +245,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 })
             }
 
-            // !! 注意!! hubertTorchModelは固定値で上書きされるため、設定しても効果ない。
             const configFileName = fileUploadSetting.configFile ? fileUploadSetting.configFile.filename || "-" : "-"
             console.log("IS HALF", fileUploadSetting.isHalf)
             const loadPromise = props.voiceChangerClient.loadModel(
@@ -275,9 +265,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                     pyTorchModel: fileUploadSetting.pyTorchModel ? { data: fileUploadSetting.pyTorchModel.data, filename: fileUploadSetting.pyTorchModel.filename } : null,
                     onnxModel: fileUploadSetting.onnxModel ? { data: fileUploadSetting.onnxModel.data, filename: fileUploadSetting.onnxModel.filename } : null,
                     configFile: fileUploadSetting.configFile ? { data: fileUploadSetting.configFile.data, filename: fileUploadSetting.configFile.filename } : null,
-                    hubertTorchModel: fileUploadSetting.hubertTorchModel ? {
-                        data: fileUploadSetting.hubertTorchModel.data, filename: fileUploadSetting.hubertTorchModel.filename
-                    } : null,
                     clusterTorchModel: fileUploadSetting.clusterTorchModel ? {
                         data: fileUploadSetting.clusterTorchModel.data, filename: fileUploadSetting.clusterTorchModel.filename
                     } : null,
