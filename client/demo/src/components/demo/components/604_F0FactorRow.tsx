@@ -24,7 +24,7 @@ export const F0FactorRow = (_props: F0FactorRowProps) => {
                     <input type="range" className="body-item-input-slider" min="0.1" max="5.0" step="0.01" value={appState.serverSetting.serverSetting.f0Factor || 0} onChange={(e) => {
                         appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, f0Factor: Number(e.target.value) })
                     }}></input>
-                    <span className="body-item-input-slider-val">{appState.serverSetting.serverSetting.f0Factor?.toFixed(1) || 0}</span>
+                    <span className="body-item-input-slider-val">{appState.serverSetting.serverSetting.f0Factor?.toFixed(2) || 0}</span>
                 </div>
                 <div className="body-item-text"></div>
                 <div className="body-item-text">recommend: {recommendedF0Factor.toFixed(1)}</div>
