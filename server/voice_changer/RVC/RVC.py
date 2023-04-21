@@ -1,5 +1,6 @@
 import sys
 import os
+import json
 import resampy
 from voice_changer.RVC.ModelWrapper import ModelWrapper
 from Exceptions import NoModeLoadedException
@@ -40,6 +41,7 @@ class ModelSlot():
     onnxModelFile: str = ""
     featureFile: str = ""
     indexFile: str = ""
+    defaultTrans: int = ""
 
 
 @dataclass
@@ -82,15 +84,12 @@ class RVC:
     def __init__(self, params):
         self.settings = RVCSettings()
 
+        self.inferenceing: bool = False
+
         self.net_g = None
         self.onnx_session = None
         self.feature_file = None
         self.index_file = None
-
-        # self.net_g1 = None
-        # self.onnx_session1 = None
-        # self.feature_file1 = None
-        # self.index_file1 = None
 
         # self.net_g2 = None
         # self.onnx_session2 = None
@@ -108,12 +107,15 @@ class RVC:
     def loadModel(self, props):
         self.is_half = props["isHalf"]
         self.tmp_slot = props["slot"]
+        params_str = props["params"]
+        params = json.loads(params_str)
 
         self.settings.modelSlots[self.tmp_slot] = ModelSlot(
             pyTorchModelFile=props["files"]["pyTorchModelFilename"],
             onnxModelFile=props["files"]["onnxModelFilename"],
             featureFile=props["files"]["featureFilename"],
-            indexFile=props["files"]["indexFilename"]
+            indexFile=props["files"]["indexFilename"],
+            defaultTrans=params["trans"]
         )
 
         print("[Voice Changer] RVC loading... slot:", self.tmp_slot)
@@ -161,16 +163,18 @@ class RVC:
 
         self.next_feature_file = self.settings.modelSlots[slot].featureFile
         self.next_index_file = self.settings.modelSlots[slot].indexFile
+        self.next_trans = self.settings.modelSlots[slot].defaultTrans
 
         return self.get_info()
 
     def switchModel(self):
-        del self.net_g
-        del self.onnx_session
+        # del self.net_g
+        # del self.onnx_session
         self.net_g = self.next_net_g
         self.onnx_session = self.next_onnx_session
         self.feature_file = self.next_feature_file
         self.index_file = self.next_index_file
+        self.settings.tran = self.next_trans
         self.next_net_g = None
         self.next_onnx_session = None
 
@@ -304,10 +308,9 @@ class RVC:
             dev = torch.device("cuda", index=self.settings.gpu)
 
         # print("device:", dev)
-        net_g = self.net_g.to(dev)
 
         self.hubert_model = self.hubert_model.to(dev)
-        # self.net_g = self.net_g.to(dev)
+        self.net_g = self.net_g.to(dev)
 
         audio = data[0]
         convertSize = data[1]
@@ -332,10 +335,10 @@ class RVC:
             f0_file = None
 
             if self.settings.silenceFront == 0:
-                audio_out = vc.pipeline(self.hubert_model, net_g, sid, audio, times, f0_up_key, f0_method,
+                audio_out = vc.pipeline(self.hubert_model, self.net_g, sid, audio, times, f0_up_key, f0_method,
                                         file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file, silence_front=0)
             else:
-                audio_out = vc.pipeline(self.hubert_model, net_g, sid, audio, times, f0_up_key, f0_method,
+                audio_out = vc.pipeline(self.hubert_model, self.net_g, sid, audio, times, f0_up_key, f0_method,
                                         file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file, silence_front=self.settings.extraConvertSize / self.settings.modelSamplingRate)
 
             result = audio_out * np.sqrt(vol)
@@ -343,16 +346,31 @@ class RVC:
         return result
 
     def inference(self, data):
-        if self.currentSlot != self.slot:
-            self.currentSlot = self.slot
-            self.switchModel()
+        if self.inferenceing == True:
+            raise NoModeLoadedException("---------------------------------- tmp")
 
-        if self.settings.framework == "ONNX":
-            audio = self._onnx_inference(data)
-        else:
-            audio = self._pyTorch_inference(data)
+        self.inferenceing = True
 
-        return audio
+        try:
+            if self.currentSlot != self.slot:
+                import time
+                # time.sleep(1)
+                self.currentSlot = self.slot
+                # self.prepareModel(self.currentSlot)
+                self.switchModel()
+                # time.sleep(1)
+
+            if self.settings.framework == "ONNX":
+                audio = self._onnx_inference(data)
+            else:
+                audio = self._pyTorch_inference(data)
+
+            self.inferenceing = False
+
+            return audio
+        except Exception as e:
+            self.inferenceing = False
+            raise e
 
     def __del__(self):
         del self.net_g

@@ -61,6 +61,7 @@ class MMVC_Rest_Fileuploader:
         featureFilename: str = Form(...),
         indexFilename: str = Form(...),
         isHalf: bool = Form(...),
+        params: str = Form(...),
     ):
 
         props = {
@@ -73,7 +74,8 @@ class MMVC_Rest_Fileuploader:
                 "clusterTorchModelFilename": clusterTorchModelFilename,
                 "featureFilename": featureFilename,
                 "indexFilename": indexFilename
-            }
+            },
+            "params": params
         }
         # Change Filepath
         for key, val in props["files"].items():

@@ -21,7 +21,7 @@ export const F0FactorRow = (_props: F0FactorRowProps) => {
             <div className="body-row split-3-2-1-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">F0 Factor</div>
                 <div className="body-input-container">
-                    <input type="range" className="body-item-input-slider" min="0.1" max="5.0" step="0.1" value={appState.serverSetting.serverSetting.f0Factor || 0} onChange={(e) => {
+                    <input type="range" className="body-item-input-slider" min="0.1" max="5.0" step="0.01" value={appState.serverSetting.serverSetting.f0Factor || 0} onChange={(e) => {
                         appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, f0Factor: Number(e.target.value) })
                     }}></input>
                     <span className="body-item-input-slider-val">{appState.serverSetting.serverSetting.f0Factor?.toFixed(1) || 0}</span>

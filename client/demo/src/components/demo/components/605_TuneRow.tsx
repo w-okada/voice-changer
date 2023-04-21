@@ -4,13 +4,11 @@ import { useGuiState } from "../001_GuiStateProvider"
 
 export type TuneRowProps = {
     showPredictF0: boolean
-    showSetDefault: boolean
 }
 export const TuneRow = (props: TuneRowProps) => {
     const appState = useAppState()
     const guiState = useGuiState()
     const tuneRow = useMemo(() => {
-        const slot = guiState.modelSlotNum
         const predictF0 = props.showPredictF0 ?
             <>
                 <input type="checkbox" checked={appState.serverSetting.serverSetting.predictF0 == 1} onChange={(e) => {
@@ -19,13 +17,6 @@ export const TuneRow = (props: TuneRowProps) => {
             </> :
             <></>
 
-        const showSetDefault = props.showSetDefault ?
-            <>
-                <div className="body-button" onClick={() => {
-                    appState.serverSetting.updateDefaultTune(slot, appState.serverSetting.serverSetting.tran)
-                }}>set model default</div>
-            </> :
-            <></>
 
         return (
             <div className="body-row split-3-2-1-4 left-padding-1 guided">
@@ -40,7 +31,6 @@ export const TuneRow = (props: TuneRowProps) => {
                     {predictF0}
                 </div>
                 <div className="body-button-container">
-                    {showSetDefault}
                 </div>
             </div>
         )

@@ -11,9 +11,8 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
     const modelSwitchRow = useMemo(() => {
 
         const onSwitchModelClicked = (index: number) => {
-            const fileUploadSetting = appState.serverSetting.fileUploadSettings[index]
 
-            appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, modelSlotIndex: index, tran: fileUploadSetting.defaultTune })
+            appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, modelSlotIndex: index })
 
         }
         let filename = ""

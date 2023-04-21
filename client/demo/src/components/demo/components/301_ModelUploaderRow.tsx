@@ -10,7 +10,7 @@ import { IndexSelectRow } from "./301-7_IndexSelectRow"
 import { HalfPrecisionRow } from "./301-8_HalfPrescisionRow"
 import { ModelUploadButtonRow } from "./301-9_ModelUploadButtonRow"
 import { ModelSlotRow } from "./301-a_ModelSlotRow"
-import { DescriptionRow } from "./301-b_DescriptionRow"
+import { DefaultTuneRow } from "./301-c_DefaultTuneRow"
 
 export type ModelUploaderRowProps = {
     showModelSlot: boolean
@@ -24,6 +24,7 @@ export type ModelUploaderRowProps = {
     showIndex: boolean
     showHalfPrecision: boolean
     showDescription: boolean
+    showDefaultTune: boolean
 
     defaultEnablePyTorch: boolean
 
@@ -61,7 +62,7 @@ export const ModelUploaderRow = (props: ModelUploaderRowProps) => {
                 {props.showFeature ? <FeatureSelectRow /> : <></>}
                 {props.showIndex ? <IndexSelectRow /> : <></>}
                 {props.showHalfPrecision ? <HalfPrecisionRow /> : <></>}
-                {props.showDescription ? <DescriptionRow /> : <></>}
+                {props.showDefaultTune ? <DefaultTuneRow /> : <></>}
 
                 <ModelUploadButtonRow />
             </>

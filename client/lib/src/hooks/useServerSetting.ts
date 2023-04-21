@@ -22,6 +22,7 @@ export type FileUploadSetting = {
     isHalf: boolean
     uploaded: boolean
     defaultTune: number
+    params: string
 
 }
 
@@ -36,7 +37,8 @@ const InitialFileUploadSetting: FileUploadSetting = {
 
     isHalf: true,
     uploaded: false,
-    defaultTune: 0
+    defaultTune: 0,
+    params: "{}"
 }
 
 export type UseServerSettingProps = {
@@ -57,7 +59,7 @@ export type ServerSettingState = {
     isUploading: boolean
 
     getOnnx: () => Promise<OnnxExporterInfo>
-    updateDefaultTune: (slot: number, tune: number) => void
+    // updateDefaultTune: (slot: number, tune: number) => void
 
 }
 
@@ -264,6 +266,9 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             }
 
             const configFileName = fileUploadSetting.configFile ? fileUploadSetting.configFile.filename || "-" : "-"
+            const params = JSON.stringify({
+                trans: fileUploadSetting.defaultTune
+            })
             const loadPromise = props.voiceChangerClient.loadModel(
                 slot,
                 configFileName,
@@ -272,7 +277,8 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 fileUploadSetting.clusterTorchModel?.filename || null,
                 fileUploadSetting.feature?.filename || null,
                 fileUploadSetting.index?.filename || null,
-                fileUploadSetting.isHalf
+                fileUploadSetting.isHalf,
+                params,
 
             )
 
@@ -292,11 +298,11 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
     }, [fileUploadSettings, props.voiceChangerClient, props.clientType])
 
 
-    const updateDefaultTune = (slot: number, tune: number) => {
-        fileUploadSettings[slot].defaultTune = tune
-        storeToCache(slot, fileUploadSettings[slot])
-        setFileUploadSettings([...fileUploadSettings])
-    }
+    // const updateDefaultTune = (slot: number, tune: number) => {
+    //     fileUploadSettings[slot].defaultTune = tune
+    //     storeToCache(slot, fileUploadSettings[slot])
+    //     setFileUploadSettings([...fileUploadSettings])
+    // }
 
     const storeToCache = (slot: number, fileUploadSetting: FileUploadSetting) => {
         try {
@@ -315,7 +321,8 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 } : null,
                 isHalf: fileUploadSetting.isHalf, // キャッシュとしては不使用。guiで上書きされる。
                 uploaded: false, // キャッシュから読み込まれるときには、まだuploadされていないから。
-                defaultTune: fileUploadSetting.defaultTune
+                defaultTune: fileUploadSetting.defaultTune,
+                params: fileUploadSetting.params
             }
             setItem(`${INDEXEDDB_KEY_MODEL_DATA}_${slot}`, saveData)
         } catch (e) {
@@ -364,6 +371,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         uploadProgress,
         isUploading,
         getOnnx,
-        updateDefaultTune,
+        // updateDefaultTune,
     }
 }

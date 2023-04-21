@@ -51,7 +51,7 @@
                     "defaultEnablePyTorch": true,
 
                     "showOnnxExportButton": true,
-                    "showDescription": true
+                    "showDefaultTune": true
                 }
             },
             {
@@ -109,9 +109,7 @@
             },
             {
                 "name": "tune",
-                "options": {
-                    "showSetDefault": true
-                }
+                "options": {}
             },
             {
                 "name": "indexRatio",
