@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react"
-import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc_40v2, DefaultServerSetting_so_vits_svc_40, DefaultServerSetting_so_vits_svc_40_c, DefaultServerSetting_RVC, OnnxExporterInfo, DefaultServerSetting_DDSP_SVC } from "../const"
+import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc_40v2, DefaultServerSetting_so_vits_svc_40, DefaultServerSetting_so_vits_svc_40_c, DefaultServerSetting_RVC, OnnxExporterInfo, DefaultServerSetting_DDSP_SVC, MAX_MODEL_SLOT_NUM } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
@@ -20,6 +20,8 @@ export type FileUploadSetting = {
     index: ModelData | null   //RVC
 
     isHalf: boolean
+    uploaded: boolean
+    defaultTune: number
 
 }
 
@@ -32,7 +34,9 @@ const InitialFileUploadSetting: FileUploadSetting = {
     feature: null,
     index: null,
 
-    isHalf: true
+    isHalf: true,
+    uploaded: false,
+    defaultTune: 0
 }
 
 export type UseServerSettingProps = {
@@ -46,13 +50,14 @@ export type ServerSettingState = {
     clearSetting: () => Promise<void>
     reloadServerInfo: () => Promise<void>;
 
-    fileUploadSetting: FileUploadSetting
-    setFileUploadSetting: (val: FileUploadSetting) => void
-    loadModel: () => Promise<void>
+    fileUploadSettings: FileUploadSetting[]
+    setFileUploadSetting: (slot: number, val: FileUploadSetting) => void
+    loadModel: (slot: number) => Promise<void>
     uploadProgress: number
     isUploading: boolean
 
     getOnnx: () => Promise<OnnxExporterInfo>
+    updateDefaultTune: (slot: number, tune: number) => void
 
 }
 
@@ -80,7 +85,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
     }
 
     const [serverSetting, setServerSetting] = useState<ServerInfo>(getDefaultServerSetting())
-    const [fileUploadSetting, setFileUploadSetting] = useState<FileUploadSetting>(InitialFileUploadSetting)
+    const [fileUploadSettings, setFileUploadSettings] = useState<FileUploadSetting[]>([])
     const { setItem, getItem, removeItem } = useIndexedDB({ clientType: props.clientType })
 
 
@@ -88,7 +93,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
     useEffect(() => {
         if (!props.voiceChangerClient) return
         if (!props.clientType) return
-
         const setInitialSetting = async () => {
             // Set Model Type
             await props.voiceChangerClient!.switchModelType(props.clientType!)
@@ -99,10 +103,8 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             let initialSetting: ServerInfo
             if (cachedServerSetting) {
                 initialSetting = { ...defaultServerSetting, ...cachedServerSetting as ServerInfo, inputSampleRate: 48000 }// sample rateは時限措置
-                console.log("Initial Setting1:", initialSetting)
             } else {
                 initialSetting = { ...defaultServerSetting }
-                console.log("Initial Setting2:", initialSetting)
             }
             setServerSetting(initialSetting)
 
@@ -115,12 +117,19 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 }
             }
 
-            // Load file upload cache 
-            const fileuploadSetting = await getItem(INDEXEDDB_KEY_MODEL_DATA)
-            if (!fileuploadSetting) {
-            } else {
-                setFileUploadSetting(fileuploadSetting as FileUploadSetting)
+            // Load file upload cache
+            const loadedFileUploadSettings: FileUploadSetting[] = []
+            for (let i = 0; i < MAX_MODEL_SLOT_NUM; i++) {
+                const modleKey = `${INDEXEDDB_KEY_MODEL_DATA}_${i}`
+                const fileuploadSetting = await getItem(modleKey)
+                if (!fileuploadSetting) {
+                    loadedFileUploadSettings.push(InitialFileUploadSetting)
+                } else {
+                    loadedFileUploadSettings.push(fileuploadSetting as FileUploadSetting)
+                }
             }
+            setFileUploadSettings(loadedFileUploadSettings)
+
 
             reloadServerInfo()
         }
@@ -156,6 +165,14 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         }
     }, [props.voiceChangerClient, serverSetting])
 
+    const setFileUploadSetting = useMemo(() => {
+        return async (slot: number, fileUploadSetting: FileUploadSetting) => {
+            fileUploadSetting.uploaded = false
+            fileUploadSettings[slot] = fileUploadSetting
+            setFileUploadSettings([...fileUploadSettings])
+        }
+    }, [fileUploadSettings])
+
 
     //////////////
     // 操作
@@ -173,12 +190,12 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         }
     }, [props.voiceChangerClient])
     const loadModel = useMemo(() => {
-        return async () => {
-            if (!fileUploadSetting.pyTorchModel && !fileUploadSetting.onnxModel) {
+        return async (slot: number) => {
+            if (!fileUploadSettings[slot].pyTorchModel && !fileUploadSettings[slot].onnxModel) {
                 alert("PyTorchモデルとONNXモデルのどちらか一つ以上指定する必要があります。")
                 return
             }
-            if (!fileUploadSetting.configFile && props.clientType != "RVC") {
+            if (!fileUploadSettings[slot].configFile && props.clientType != "RVC") {
                 alert("Configファイルを指定する必要があります。")
                 return
             }
@@ -189,6 +206,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             setIsUploading(true)
 
             // ファイルをメモリにロード(dataがある場合は、キャッシュから読まれていると想定しスキップ)
+            const fileUploadSetting = fileUploadSettings[slot]
             if (fileUploadSetting.onnxModel && !fileUploadSetting.onnxModel.data) {
                 fileUploadSetting.onnxModel.data = await fileUploadSetting.onnxModel.file!.arrayBuffer()
                 fileUploadSetting.onnxModel.filename = await fileUploadSetting.onnxModel.file!.name
@@ -246,9 +264,8 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             }
 
             const configFileName = fileUploadSetting.configFile ? fileUploadSetting.configFile.filename || "-" : "-"
-            console.log("IS HALF", fileUploadSetting.isHalf)
             const loadPromise = props.voiceChangerClient.loadModel(
-                0,
+                slot,
                 configFileName,
                 fileUploadSetting.pyTorchModel?.filename || null,
                 fileUploadSetting.onnxModel?.filename || null,
@@ -260,34 +277,53 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             )
 
             // サーバでロード中にキャッシュにセーブ
-            try {
-                const saveData: FileUploadSetting = {
-                    pyTorchModel: fileUploadSetting.pyTorchModel ? { data: fileUploadSetting.pyTorchModel.data, filename: fileUploadSetting.pyTorchModel.filename } : null,
-                    onnxModel: fileUploadSetting.onnxModel ? { data: fileUploadSetting.onnxModel.data, filename: fileUploadSetting.onnxModel.filename } : null,
-                    configFile: fileUploadSetting.configFile ? { data: fileUploadSetting.configFile.data, filename: fileUploadSetting.configFile.filename } : null,
-                    clusterTorchModel: fileUploadSetting.clusterTorchModel ? {
-                        data: fileUploadSetting.clusterTorchModel.data, filename: fileUploadSetting.clusterTorchModel.filename
-                    } : null,
-                    feature: fileUploadSetting.feature ? {
-                        data: fileUploadSetting.feature.data, filename: fileUploadSetting.feature.filename
-                    } : null,
-                    index: fileUploadSetting.index ? {
-                        data: fileUploadSetting.index.data, filename: fileUploadSetting.index.filename
-                    } : null,
-                    isHalf: fileUploadSetting.isHalf
-                }
-                setItem(INDEXEDDB_KEY_MODEL_DATA, saveData)
-
-            } catch (e) {
-                console.log("Excpetion:::::::::", e)
-            }
+            storeToCache(slot, fileUploadSetting)
 
             await loadPromise
+
+            fileUploadSetting.uploaded = true
+            fileUploadSettings[slot] = fileUploadSetting
+            setFileUploadSettings([...fileUploadSettings])
+
             setUploadProgress(0)
             setIsUploading(false)
             reloadServerInfo()
         }
-    }, [fileUploadSetting, props.voiceChangerClient, props.clientType])
+    }, [fileUploadSettings, props.voiceChangerClient, props.clientType])
+
+
+    const updateDefaultTune = (slot: number, tune: number) => {
+        fileUploadSettings[slot].defaultTune = tune
+        storeToCache(slot, fileUploadSettings[slot])
+        setFileUploadSettings([...fileUploadSettings])
+    }
+
+    const storeToCache = (slot: number, fileUploadSetting: FileUploadSetting) => {
+        try {
+            const saveData: FileUploadSetting = {
+                pyTorchModel: fileUploadSetting.pyTorchModel ? { data: fileUploadSetting.pyTorchModel.data, filename: fileUploadSetting.pyTorchModel.filename } : null,
+                onnxModel: fileUploadSetting.onnxModel ? { data: fileUploadSetting.onnxModel.data, filename: fileUploadSetting.onnxModel.filename } : null,
+                configFile: fileUploadSetting.configFile ? { data: fileUploadSetting.configFile.data, filename: fileUploadSetting.configFile.filename } : null,
+                clusterTorchModel: fileUploadSetting.clusterTorchModel ? {
+                    data: fileUploadSetting.clusterTorchModel.data, filename: fileUploadSetting.clusterTorchModel.filename
+                } : null,
+                feature: fileUploadSetting.feature ? {
+                    data: fileUploadSetting.feature.data, filename: fileUploadSetting.feature.filename
+                } : null,
+                index: fileUploadSetting.index ? {
+                    data: fileUploadSetting.index.data, filename: fileUploadSetting.index.filename
+                } : null,
+                isHalf: fileUploadSetting.isHalf, // キャッシュとしては不使用。guiで上書きされる。
+                uploaded: false, // キャッシュから読み込まれるときには、まだuploadされていないから。
+                defaultTune: fileUploadSetting.defaultTune
+            }
+            setItem(`${INDEXEDDB_KEY_MODEL_DATA}_${slot}`, saveData)
+        } catch (e) {
+            console.log("Excpetion:::::::::", e)
+        }
+    }
+
+
 
     const reloadServerInfo = useMemo(() => {
         return async () => {
@@ -305,6 +341,10 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
     const clearSetting = async () => {
         await removeItem(INDEXEDDB_KEY_SERVER)
         await removeItem(INDEXEDDB_KEY_MODEL_DATA)
+        for (let i = 0; i < MAX_MODEL_SLOT_NUM; i++) {
+            const modleKey = `${INDEXEDDB_KEY_MODEL_DATA}_${i}`
+            await removeItem(modleKey)
+        }
     }
 
 
@@ -318,11 +358,12 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         clearSetting,
         reloadServerInfo,
 
-        fileUploadSetting,
+        fileUploadSettings,
         setFileUploadSetting,
         loadModel,
         uploadProgress,
         isUploading,
         getOnnx,
+        updateDefaultTune,
     }
 }

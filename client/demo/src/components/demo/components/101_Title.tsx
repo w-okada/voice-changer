@@ -11,8 +11,6 @@ export type TitleProps = {
 
 export const Title = (props: TitleProps) => {
     const guiState = useGuiState()
-
-
     const githubLink = useMemo(() => {
         return isDesktopApp() ?
             (

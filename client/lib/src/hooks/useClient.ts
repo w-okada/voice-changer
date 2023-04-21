@@ -78,6 +78,7 @@ export const useClient = (props: UseClientProps): ClientState => {
     const [performance, setPerformance] = useState<PerformanceData>(InitialPerformanceData)
     const [volume, setVolume] = useState<number>(0)
 
+
     // (1-4) エラーステータス
     const errorCountRef = useRef<number>(0)
 

@@ -43,6 +43,7 @@ export const useIndexedDB = (props: UseIndexedDBProps): IndexedDBStateAndMethod 
     const removeItem = useMemo(() => {
         return async (key: string) => {
             const clientKey = `${clientType}_${key}`
+            // console.log("remove key:", clientKey)
             return await localForage.removeItem(clientKey)
         }
     }, [props.clientType])

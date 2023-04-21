@@ -56,6 +56,14 @@ class VC(object):
             f0 = signal.medfilt(f0, 3)
 
             f0 = np.pad(f0.astype('float'), (start_frame, n_frames - len(f0) - start_frame))
+        else:
+            print("[Voice Changer] invalid f0 detector, use pm.", f0_method)
+            f0 = parselmouth.Sound(audio, self.sr).to_pitch_ac(
+                time_step=time_step / 1000, voicing_threshold=0.6,
+                pitch_floor=f0_min, pitch_ceiling=f0_max).selected_array['frequency']
+            pad_size = (p_len - len(f0) + 1) // 2
+            if (pad_size > 0 or p_len - len(f0) - pad_size > 0):
+                f0 = np.pad(f0, [[pad_size, p_len - len(f0) - pad_size]], mode='constant')
 
         f0 *= pow(2, f0_up_key / 12)
         # with open("test.txt","w")as f:f.write("\n".join([str(i)for i in f0.tolist()]))

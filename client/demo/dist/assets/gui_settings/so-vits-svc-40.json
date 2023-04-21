@@ -92,7 +92,9 @@
             },
             {
                 "name": "tune",
-                "options": {}
+                "options": {
+                    "showPredictF0": true
+                }
             },
             {
                 "name": "clusterInferRatio",

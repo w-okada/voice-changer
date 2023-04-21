@@ -28,12 +28,17 @@
             {
                 "name": "serverInfo",
                 "options": {}
+            },
+            {
+                "name": "modelSwitch",
+                "options": {}
             }
         ],
         "modelSetting": [
             {
                 "name": "modelUploader",
                 "options": {
+                    "showModelSlot": true,
                     "showConfig": false,
                     "showOnnx": true,
                     "showPyTorch": true,
@@ -45,7 +50,8 @@
                     "showHalfPrecision": true,
                     "defaultEnablePyTorch": true,
 
-                    "showOnnxExportButton": true
+                    "showOnnxExportButton": true,
+                    "showDescription": true
                 }
             },
             {
@@ -103,7 +109,9 @@
             },
             {
                 "name": "tune",
-                "options": {}
+                "options": {
+                    "showSetDefault": true
+                }
             },
             {
                 "name": "indexRatio",

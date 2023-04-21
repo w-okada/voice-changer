@@ -12,23 +12,24 @@ export const PyTorchSelectRow = (props: PyTorchSelectRow) => {
     const guiState = useGuiState()
 
     const pyTorchSelectRow = useMemo(() => {
-        const pyTorchFilenameText = appState.serverSetting.fileUploadSetting.pyTorchModel?.filename || appState.serverSetting.fileUploadSetting.pyTorchModel?.file?.name || ""
+        const slot = guiState.modelSlotNum
+        const pyTorchFilenameText = appState.serverSetting.fileUploadSettings[slot]?.pyTorchModel?.filename || appState.serverSetting.fileUploadSettings[slot]?.pyTorchModel?.file?.name || ""
         const onPyTorchFileLoadClicked = async () => {
             const file = await fileSelector("")
             if (file.name.endsWith(".pth") == false) {
                 alert("モデルファイルの拡張子はpthである必要があります。")
                 return
             }
-            appState.serverSetting.setFileUploadSetting({
-                ...appState.serverSetting.fileUploadSetting,
+            appState.serverSetting.setFileUploadSetting(slot, {
+                ...appState.serverSetting.fileUploadSettings[slot],
                 pyTorchModel: {
                     file: file
                 }
             })
         }
         const onPyTorchFileClearClicked = () => {
-            appState.serverSetting.setFileUploadSetting({
-                ...appState.serverSetting.fileUploadSetting,
+            appState.serverSetting.setFileUploadSetting(slot, {
+                ...appState.serverSetting.fileUploadSettings[slot],
                 pyTorchModel: null
             })
         }
@@ -67,7 +68,7 @@ export const PyTorchSelectRow = (props: PyTorchSelectRow) => {
                 </div>
             </div>
         )
-    }, [guiState.showPyTorchModelUpload, appState.serverSetting.fileUploadSetting, appState.serverSetting.setFileUploadSetting, appState.serverSetting.serverSetting, appState.serverSetting.updateServerSettings, guiState.isConverting])
+    }, [guiState.showPyTorchModelUpload, appState.serverSetting.fileUploadSettings, appState.serverSetting.setFileUploadSetting, appState.serverSetting.serverSetting, appState.serverSetting.updateServerSettings, guiState.isConverting, guiState.modelSlotNum])
 
     return pyTorchSelectRow
 }

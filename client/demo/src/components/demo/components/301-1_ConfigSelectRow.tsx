@@ -1,28 +1,31 @@
 import React, { useMemo } from "react"
 import { fileSelector } from "@dannadori/voice-changer-client-js"
 import { useAppState } from "../../../001_provider/001_AppStateProvider"
+import { useGuiState } from "../001_GuiStateProvider"
 
 export const ConfigSelectRow = () => {
     const appState = useAppState()
+    const guiState = useGuiState()
 
     const configSelectRow = useMemo(() => {
-        const configFilenameText = appState.serverSetting.fileUploadSetting.configFile?.filename || appState.serverSetting.fileUploadSetting.configFile?.file?.name || ""
+        const slot = guiState.modelSlotNum
+        const configFilenameText = appState.serverSetting.fileUploadSettings[slot]?.configFile?.filename || appState.serverSetting.fileUploadSettings[slot]?.configFile?.file?.name || ""
         const onConfigFileLoadClicked = async () => {
             const file = await fileSelector("")
             if (file.name.endsWith(".json") == false && file.name.endsWith(".yaml") == false) {
                 alert("モデルファイルの拡張子はjsonである必要があります。")
                 return
             }
-            appState.serverSetting.setFileUploadSetting({
-                ...appState.serverSetting.fileUploadSetting,
+            appState.serverSetting.setFileUploadSetting(slot, {
+                ...appState.serverSetting.fileUploadSettings[slot],
                 configFile: {
                     file: file
                 }
             })
         }
         const onConfigFileClearClicked = () => {
-            appState.serverSetting.setFileUploadSetting({
-                ...appState.serverSetting.fileUploadSetting,
+            appState.serverSetting.setFileUploadSetting(slot, {
+                ...appState.serverSetting.fileUploadSettings[slot],
                 configFile: null
             })
         }
@@ -39,7 +42,7 @@ export const ConfigSelectRow = () => {
                 </div>
             </div>
         )
-    }, [appState.serverSetting.fileUploadSetting, appState.serverSetting.setFileUploadSetting])
+    }, [appState.serverSetting.fileUploadSettings, appState.serverSetting.setFileUploadSetting, guiState.modelSlotNum])
 
     return configSelectRow
 }

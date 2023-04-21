@@ -40,6 +40,7 @@ import { ModelSamplingRateRow, ModelSamplingRateRowProps } from "./components/30
 import { EnableEnhancerRow, EnableEnhancerRowProps } from "./components/610_EnableEnhancerRow"
 import { DstIdRow2, DstIdRow2Props } from "./components/602v2_DstIdRow2"
 import { SilenceFrontRow, SilenceFrontRowProps } from "./components/812_SilenceFrontRow"
+import { ModelSwitchRow, ModelSwitchRowProps } from "./components/204_ModelSwitchRow"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
 
@@ -64,6 +65,9 @@ const initialize = () => {
     addToCatalog("startButton", (props: StartButtonRowProps) => { return <StartButtonRow {...props} /> })
     addToCatalog("performance", (props: PerformanceRowProps) => { return <PerformanceRow {...props} /> })
     addToCatalog("serverInfo", (props: ServerInfoRowProps) => { return <ServerInfoRow {...props} /> })
+    addToCatalog("modelSwitch", (props: ModelSwitchRowProps) => { return <ModelSwitchRow {...props} /> })
+
+
 
     addToCatalog("modelUploader", (props: ModelUploaderRowProps) => { return <ModelUploaderRow {...props} /> })
     addToCatalog("framework", (props: FrameworkRowProps) => { return <FrameworkRow {...props} /> })

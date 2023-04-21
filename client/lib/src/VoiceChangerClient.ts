@@ -285,7 +285,7 @@ export class VoiceChangerClient {
         return this.configurator.concatUploadedFile(filename, chunkNum)
     }
     loadModel = (
-        slot: number | null,
+        slot: number,
         configFilename: string,
         pyTorchModelFilename: string | null,
         onnxModelFilename: string | null,

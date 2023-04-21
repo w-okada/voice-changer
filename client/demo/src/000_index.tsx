@@ -10,7 +10,7 @@ import { far } from "@fortawesome/free-regular-svg-icons";
 import { fab } from "@fortawesome/free-brands-svg-icons";
 import { AppRootProvider, useAppRoot } from "./001_provider/001_AppRootProvider";
 import ErrorBoundary from "./001_provider/900_ErrorBoundary";
-import { ClientType, INDEXEDDB_KEY_CLIENT, INDEXEDDB_KEY_MODEL_DATA, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_WORKLET, INDEXEDDB_KEY_WORKLETNODE, useIndexedDB } from "@dannadori/voice-changer-client-js";
+import { ClientType, INDEXEDDB_KEY_CLIENT, INDEXEDDB_KEY_MODEL_DATA, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_WORKLET, INDEXEDDB_KEY_WORKLETNODE, MAX_MODEL_SLOT_NUM, useIndexedDB } from "@dannadori/voice-changer-client-js";
 import { INDEXEDDB_KEY_AUDIO_OUTPUT, INDEXEDDB_KEY_DEFAULT_MODEL_TYPE } from "./const";
 import { Demo } from "./components/demo/010_Demo";
 import { ClientSelector } from "./001_ClientSelector";
@@ -55,13 +55,18 @@ const AppStateWrapper = () => {
                 INDEXEDDB_KEY_CLIENT,
                 INDEXEDDB_KEY_SERVER,
                 INDEXEDDB_KEY_WORKLETNODE,
-                INDEXEDDB_KEY_MODEL_DATA,
                 INDEXEDDB_KEY_WORKLET,
                 INDEXEDDB_KEY_AUDIO_OUTPUT
             ]
             for (const k of indexedDBKeys) {
                 await removeItem(k)
             }
+
+            for (let i = 0; i < MAX_MODEL_SLOT_NUM; i++) {
+                const modleKey = `${INDEXEDDB_KEY_MODEL_DATA}_${i}`
+                await removeItem(modleKey)
+            }
+
             location.reload();
         }
         return (

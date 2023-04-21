@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { ReactNode } from "react";
+import { useAppRoot } from "../../001_provider/001_AppRootProvider";
 import { StateControlCheckbox, useStateControlCheckbox } from "../../hooks/useStateControlCheckbox";
 
 export const OpenServerControlCheckbox = "open-server-control-checkbox"
@@ -51,6 +52,9 @@ type GuiStateAndMethod = {
     setAudioOutputForGUI: (val: string) => void
     setFileInputEchoback: (val: boolean) => void
     setAudioOutputForAnalyzer: (val: string) => void
+
+    modelSlotNum: number
+    setModelSlotNum: (val: number) => void
 }
 
 const GuiStateContext = React.createContext<GuiStateAndMethod | null>(null);
@@ -63,8 +67,10 @@ export const useGuiState = (): GuiStateAndMethod => {
 };
 
 export const GuiStateProvider = ({ children }: Props) => {
+    const { clientType } = useAppRoot()
     const [isConverting, setIsConverting] = useState<boolean>(false)
     const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false)
+    const [modelSlotNum, setModelSlotNum] = useState<number>(0)
 
     const [showPyTorchModelUpload, setShowPyTorchModelUpload] = useState<boolean>(false)
 
@@ -153,6 +159,11 @@ export const GuiStateProvider = ({ children }: Props) => {
     }, [])
 
 
+    useEffect(() => {
+        setModelSlotNum(0)
+    }, [clientType])
+
+
     const providerValue = {
         stateControls: {
             openServerControlCheckbox,
@@ -187,6 +198,9 @@ export const GuiStateProvider = ({ children }: Props) => {
         setAudioOutputForGUI,
         setFileInputEchoback,
         setAudioOutputForAnalyzer,
+
+        modelSlotNum,
+        setModelSlotNum
     };
     return <GuiStateContext.Provider value={providerValue}>{children}</GuiStateContext.Provider>;
 };

@@ -93,6 +93,7 @@ export const ServerSettingKey = {
     "rvcQuality": "rvcQuality",
     "modelSamplingRate": "modelSamplingRate",
     "silenceFront": "silenceFront",
+    "modelSlotIndex": "modelSlotIndex",
 
     "enableEnhancer": "enableEnhancer",
     "enhancerTune": "enhancerTune",
@@ -129,6 +130,7 @@ export type VoiceChangerServerSetting = {
     rvcQuality: number // 0:low, 1:high
     silenceFront: number // 0:off, 1:on
     modelSamplingRate: ModelSamplingRate // 32000,40000,48000
+    modelSlotIndex: number,
 
     enableEnhancer: number // DDSP-SVC
     enhancerTune: number // DDSP-SVC
@@ -142,6 +144,7 @@ export type ServerInfo = VoiceChangerServerSetting & {
     pyTorchModelFile: string,
     onnxModelFile: string,
     onnxExecutionProviders: OnnxExecutionProvider[]
+    modelSlots: any[]
 }
 
 export type ServerInfoSoVitsSVC = ServerInfo & {
@@ -181,6 +184,7 @@ export const DefaultServerSetting: ServerInfo = {
     rvcQuality: 0,
     modelSamplingRate: 48000,
     silenceFront: 1,
+    modelSlotIndex: 0,
 
     enableEnhancer: 0,
     enhancerTune: 0,
@@ -191,7 +195,8 @@ export const DefaultServerSetting: ServerInfo = {
     configFile: "",
     pyTorchModelFile: "",
     onnxModelFile: "",
-    onnxExecutionProviders: []
+    onnxExecutionProviders: [],
+    modelSlots: []
 }
 export const DefaultServerSetting_MMVCv15: ServerInfo = {
     ...DefaultServerSetting, dstId: 101,
@@ -217,7 +222,7 @@ export const DefaultServerSetting_DDSP_SVC: ServerInfo = {
 
 
 export const DefaultServerSetting_RVC: ServerInfo = {
-    ...DefaultServerSetting, tran: 10, extraConvertSize: 1024 * 32,
+    ...DefaultServerSetting, tran: 10, extraConvertSize: 1024 * 32, f0Detector: F0Detector.harvest
 }
 
 ///////////////////////
@@ -382,4 +387,7 @@ export type OnnxExporterInfo = {
     "status": string
     "path": string
     "filename": string
-} 
+}
+
+
+export const MAX_MODEL_SLOT_NUM = 3

@@ -35,13 +35,20 @@ providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecution
 
 
 @dataclass
+class ModelSlot():
+    pyTorchModelFile: str = ""
+    onnxModelFile: str = ""
+    featureFile: str = ""
+    indexFile: str = ""
+
+
+@dataclass
 class RVCSettings():
     gpu: int = 0
     dstId: int = 0
 
     f0Detector: str = "pm"  # pm or harvest
     tran: int = 20
-    predictF0: int = 0  # 0:False, 1:True
     silentThreshold: float = 0.00001
     extraConvertSize: int = 1024 * 32
     clusterInferRatio: float = 0.1
@@ -50,18 +57,23 @@ class RVCSettings():
     pyTorchModelFile: str = ""
     onnxModelFile: str = ""
     configFile: str = ""
-
+    modelSlots: list[ModelSlot] = field(
+        default_factory=lambda: [
+            ModelSlot(), ModelSlot(), ModelSlot()
+        ]
+    )
     indexRatio: float = 0
     rvcQuality: int = 0
     silenceFront: int = 1  # 0:off, 1:on
     modelSamplingRate: int = 48000
+    modelSlotIndex: int = 0
 
     speakers: dict[str, int] = field(
         default_factory=lambda: {}
     )
 
     # ↓mutableな物だけ列挙
-    intData = ["gpu", "dstId", "tran", "predictF0", "extraConvertSize", "rvcQuality", "modelSamplingRate", "silenceFront"]
+    intData = ["gpu", "dstId", "tran", "extraConvertSize", "rvcQuality", "modelSamplingRate", "silenceFront", "modelSlotIndex"]
     floatData = ["silentThreshold", "indexRatio"]
     strData = ["framework", "f0Detector"]
 
@@ -80,16 +92,22 @@ class RVC:
         print("mps: ", self.mps_enabled)
 
     def loadModel(self, props):
-        self.settings.configFile = props["files"]["configFilename"]
 
-        self.settings.pyTorchModelFile = props["files"]["pyTorchModelFilename"]
-        self.settings.onnxModelFile = props["files"]["onnxModelFilename"]
+        # self.settings.pyTorchModelFile = props["files"]["pyTorchModelFilename"]
+        # self.settings.onnxModelFile = props["files"]["onnxModelFilename"]
 
-        self.feature_file = props["files"]["featureFilename"]
-        self.index_file = props["files"]["indexFilename"]
+        # self.feature_file = props["files"]["featureFilename"]
+        # self.index_file = props["files"]["indexFilename"]
 
         self.is_half = props["isHalf"]
         self.slot = props["slot"]
+
+        self.settings.modelSlots[self.slot] = ModelSlot(
+            pyTorchModelFile=props["files"]["pyTorchModelFilename"],
+            onnxModelFile=props["files"]["onnxModelFilename"],
+            featureFile=props["files"]["featureFilename"],
+            indexFile=props["files"]["indexFilename"]
+        )
 
         print("[Voice Changer] RVC loading... slot:", self.slot)
 
@@ -105,9 +123,18 @@ class RVC:
         except Exception as e:
             print("EXCEPTION during loading hubert/contentvec model", e)
 
+        self.switchModel(self.slot)
+
+        return self.get_info()
+
+    def switchModel(self, slot: int):
+        print("[Voice Changer] Switch Model to:", slot)
+        self.slot = slot
+        pyTorchModelFile = self.settings.modelSlots[slot].pyTorchModelFile
+        onnxModelFile = self.settings.modelSlots[slot].onnxModelFile
         # PyTorchモデル生成
-        if self.settings.pyTorchModelFile != None:
-            cpt = torch.load(self.settings.pyTorchModelFile, map_location="cpu")
+        if pyTorchModelFile != None:
+            cpt = torch.load(pyTorchModelFile, map_location="cpu")
             self.settings.modelSamplingRate = cpt["config"][-1]
             net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=self.is_half)
             net_g.eval()
@@ -115,10 +142,18 @@ class RVC:
             if self.is_half:
                 net_g = net_g.half()
             self.net_g = net_g
+        else:
+            self.net_g = None
 
         # ONNXモデル生成
-        if self.settings.onnxModelFile != None:
-            self.onnx_session = ModelWrapper(self.settings.onnxModelFile)
+        if onnxModelFile != None:
+            self.onnx_session = ModelWrapper(onnxModelFile)
+        else:
+            self.onnx_session = None
+
+        self.feature_file = self.settings.modelSlots[slot].featureFile
+        self.index_file = self.settings.modelSlots[slot].indexFile
+
         return self.get_info()
 
     def update_settings(self, key: str, val: any):
@@ -145,6 +180,8 @@ class RVC:
                 if "CUDAExecutionProvider" in providers:
                     provider_options = [{'device_id': self.settings.gpu}]
                     self.onnx_session.set_providers(providers=["CUDAExecutionProvider"], provider_options=provider_options)
+            if key == "modelSlotIndex":
+                self.switchModel(int(val))
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:

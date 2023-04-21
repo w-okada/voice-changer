@@ -1,21 +1,25 @@
 import React, { useMemo } from "react"
 import { fileSelector } from "@dannadori/voice-changer-client-js"
 import { useAppState } from "../../../001_provider/001_AppStateProvider"
+import { useGuiState } from "../001_GuiStateProvider"
 
 
 export const IndexSelectRow = () => {
     const appState = useAppState()
+    const guiState = useGuiState()
+
 
     const indexSelectRow = useMemo(() => {
-        const indexFilenameText = appState.serverSetting.fileUploadSetting.index?.filename || appState.serverSetting.fileUploadSetting.index?.file?.name || ""
+        const slot = guiState.modelSlotNum
+        const indexFilenameText = appState.serverSetting.fileUploadSettings[slot]?.index?.filename || appState.serverSetting.fileUploadSettings[slot]?.index?.file?.name || ""
         const onIndexFileLoadClicked = async () => {
             const file = await fileSelector("")
             if (file.name.endsWith(".index") == false) {
                 alert("Index file's extension should be .index")
                 return
             }
-            appState.serverSetting.setFileUploadSetting({
-                ...appState.serverSetting.fileUploadSetting,
+            appState.serverSetting.setFileUploadSetting(slot, {
+                ...appState.serverSetting.fileUploadSettings[slot],
                 index: {
                     file: file
                 }
@@ -23,8 +27,8 @@ export const IndexSelectRow = () => {
         }
 
         const onIndexFileClearClicked = () => {
-            appState.serverSetting.setFileUploadSetting({
-                ...appState.serverSetting.fileUploadSetting,
+            appState.serverSetting.setFileUploadSetting(slot, {
+                ...appState.serverSetting.fileUploadSettings[slot],
                 index: null
             })
         }
@@ -41,7 +45,7 @@ export const IndexSelectRow = () => {
                 </div>
             </div>
         )
-    }, [appState.serverSetting.fileUploadSetting, appState.serverSetting.setFileUploadSetting])
+    }, [appState.serverSetting.fileUploadSettings, appState.serverSetting.setFileUploadSetting, guiState.modelSlotNum])
 
     return indexSelectRow
 }

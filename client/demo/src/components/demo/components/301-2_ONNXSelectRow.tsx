@@ -1,28 +1,32 @@
 import React, { useMemo } from "react"
 import { fileSelector } from "@dannadori/voice-changer-client-js"
 import { useAppState } from "../../../001_provider/001_AppStateProvider"
+import { useGuiState } from "../001_GuiStateProvider"
 
 export const ONNXSelectRow = () => {
     const appState = useAppState()
+    const guiState = useGuiState()
+
 
     const onnxSelectRow = useMemo(() => {
-        const onnxModelFilenameText = appState.serverSetting.fileUploadSetting.onnxModel?.filename || appState.serverSetting.fileUploadSetting.onnxModel?.file?.name || ""
+        const slot = guiState.modelSlotNum
+        const onnxModelFilenameText = appState.serverSetting.fileUploadSettings[slot]?.onnxModel?.filename || appState.serverSetting.fileUploadSettings[slot]?.onnxModel?.file?.name || ""
         const onOnnxFileLoadClicked = async () => {
             const file = await fileSelector("")
             if (file.name.endsWith(".onnx") == false) {
                 alert("モデルファイルの拡張子はonnxである必要があります。")
                 return
             }
-            appState.serverSetting.setFileUploadSetting({
-                ...appState.serverSetting.fileUploadSetting,
+            appState.serverSetting.setFileUploadSetting(slot, {
+                ...appState.serverSetting.fileUploadSettings[slot],
                 onnxModel: {
                     file: file
                 }
             })
         }
         const onOnnxFileClearClicked = () => {
-            appState.serverSetting.setFileUploadSetting({
-                ...appState.serverSetting.fileUploadSetting,
+            appState.serverSetting.setFileUploadSetting(slot, {
+                ...appState.serverSetting.fileUploadSettings[slot],
                 onnxModel: null
             })
         }
@@ -39,7 +43,7 @@ export const ONNXSelectRow = () => {
                 </div>
             </div>
         )
-    }, [appState.serverSetting.fileUploadSetting, appState.serverSetting.setFileUploadSetting])
+    }, [appState.serverSetting.fileUploadSettings, appState.serverSetting.setFileUploadSetting, guiState.modelSlotNum])
 
     return onnxSelectRow
 }

@@ -16,6 +16,7 @@ export const useVCClient = (props: UseVCClientProps): VCClientState => {
 
     })
 
+
     // const setClientType = (clientType: ClientType) => {
     //     console.log("SET CLIENT TYPE", clientType)
     //     clientState.setClientType(clientType)
