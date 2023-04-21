@@ -81,8 +81,21 @@ class RVCSettings():
 class RVC:
     def __init__(self, params):
         self.settings = RVCSettings()
+
         self.net_g = None
         self.onnx_session = None
+        self.feature_file = None
+        self.index_file = None
+
+        # self.net_g1 = None
+        # self.onnx_session1 = None
+        # self.feature_file1 = None
+        # self.index_file1 = None
+
+        # self.net_g2 = None
+        # self.onnx_session2 = None
+        # self.feature_file2 = None
+        # self.index_file2 = None
 
         self.gpu_num = torch.cuda.device_count()
         self.prevVol = 0
@@ -93,13 +106,6 @@ class RVC:
         print("mps: ", self.mps_enabled)
 
     def loadModel(self, props):
-
-        # self.settings.pyTorchModelFile = props["files"]["pyTorchModelFilename"]
-        # self.settings.onnxModelFile = props["files"]["onnxModelFilename"]
-
-        # self.feature_file = props["files"]["featureFilename"]
-        # self.index_file = props["files"]["indexFilename"]
-
         self.is_half = props["isHalf"]
         self.tmp_slot = props["slot"]
 
@@ -298,9 +304,10 @@ class RVC:
             dev = torch.device("cuda", index=self.settings.gpu)
 
         # print("device:", dev)
+        net_g = self.net_g.to(dev)
 
         self.hubert_model = self.hubert_model.to(dev)
-        self.net_g = self.net_g.to(dev)
+        # self.net_g = self.net_g.to(dev)
 
         audio = data[0]
         convertSize = data[1]
@@ -325,10 +332,10 @@ class RVC:
             f0_file = None
 
             if self.settings.silenceFront == 0:
-                audio_out = vc.pipeline(self.hubert_model, self.net_g, sid, audio, times, f0_up_key, f0_method,
+                audio_out = vc.pipeline(self.hubert_model, net_g, sid, audio, times, f0_up_key, f0_method,
                                         file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file, silence_front=0)
             else:
-                audio_out = vc.pipeline(self.hubert_model, self.net_g, sid, audio, times, f0_up_key, f0_method,
+                audio_out = vc.pipeline(self.hubert_model, net_g, sid, audio, times, f0_up_key, f0_method,
                                         file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file, silence_front=self.settings.extraConvertSize / self.settings.modelSamplingRate)
 
             result = audio_out * np.sqrt(vol)
