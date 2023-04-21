@@ -82,6 +82,7 @@ class RVCSettings():
 
 class RVC:
     def __init__(self, params):
+        self.initialLoad = True
         self.settings = RVCSettings()
 
         self.inferenceing: bool = False
@@ -133,8 +134,12 @@ class RVC:
             print("EXCEPTION during loading hubert/contentvec model", e)
 
         # self.switchModel(self.slot)
-        self.prepareModel(self.tmp_slot)
-        self.slot = self.tmp_slot
+        if self.initialLoad:
+            self.prepareModel(self.tmp_slot)
+            self.slot = self.tmp_slot
+            self.currentSlot = self.slot
+            self.switchModel()
+            self.initialLoad = False
 
         return self.get_info()
 
@@ -346,31 +351,16 @@ class RVC:
         return result
 
     def inference(self, data):
-        if self.inferenceing == True:
-            raise NoModeLoadedException("---------------------------------- tmp")
+        if self.currentSlot != self.slot:
+            self.currentSlot = self.slot
+            self.switchModel()
 
-        self.inferenceing = True
+        if self.settings.framework == "ONNX":
+            audio = self._onnx_inference(data)
+        else:
+            audio = self._pyTorch_inference(data)
 
-        try:
-            if self.currentSlot != self.slot:
-                import time
-                # time.sleep(1)
-                self.currentSlot = self.slot
-                # self.prepareModel(self.currentSlot)
-                self.switchModel()
-                # time.sleep(1)
-
-            if self.settings.framework == "ONNX":
-                audio = self._onnx_inference(data)
-            else:
-                audio = self._pyTorch_inference(data)
-
-            self.inferenceing = False
-
-            return audio
-        except Exception as e:
-            self.inferenceing = False
-            raise e
+        return audio
 
     def __del__(self):
         del self.net_g
