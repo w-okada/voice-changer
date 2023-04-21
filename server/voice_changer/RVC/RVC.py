@@ -133,7 +133,7 @@ class RVC:
         pyTorchModelFile = self.settings.modelSlots[slot].pyTorchModelFile
         onnxModelFile = self.settings.modelSlots[slot].onnxModelFile
         # PyTorchモデル生成
-        if pyTorchModelFile != None:
+        if pyTorchModelFile != None and pyTorchModelFile != "":
             cpt = torch.load(pyTorchModelFile, map_location="cpu")
             self.settings.modelSamplingRate = cpt["config"][-1]
             net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=self.is_half)
@@ -146,7 +146,7 @@ class RVC:
             self.net_g = None
 
         # ONNXモデル生成
-        if onnxModelFile != None:
+        if onnxModelFile != None and onnxModelFile != "":
             self.onnx_session = ModelWrapper(onnxModelFile)
         else:
             self.onnx_session = None
