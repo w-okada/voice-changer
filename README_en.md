@@ -4,24 +4,10 @@
 
 ## What's New!
 
-- v.1.5.2.3a
+- v.1.5.2.4
 
-  - improve response time of DDSP-SVC and RVC
-
-- v.1.5.2.3
-
-  - apply SOLA to All VC
-  - support DDSP-SVC
-  - support M1Mac MPS
-
-- v.1.5.2.2
-
-  - apply SOLA to RCA
-  - support ONNX
-
-- v.1.5.2.1
-
-  - Launcher for Each Voice Conversion AI. Use `start_http.bat` or `start_https.bat`.
+  - multi model selection for RVC
+  - communication path is fixed to 48KHz
 
 # What is VC Client
 
