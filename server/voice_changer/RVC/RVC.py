@@ -383,20 +383,23 @@ class RVC:
         if hasattr(self, "net_g") == False or self.net_g == None:
             print("[Voice Changer] export2onnx, No pyTorch session.")
             return {"status": "ng", "path": f""}
-        if self.settings.pyTorchModelFile == None:
+
+        pyTorchModelFile = self.settings.modelSlots[self.currentSlot].pyTorchModelFile
+
+        if pyTorchModelFile == None:
             print("[Voice Changer] export2onnx, No pyTorch filepath.")
             return {"status": "ng", "path": f""}
         import voice_changer.RVC.export2onnx as onnxExporter
 
-        output_file = os.path.splitext(os.path.basename(self.settings.pyTorchModelFile))[0] + ".onnx"
-        output_file_simple = os.path.splitext(os.path.basename(self.settings.pyTorchModelFile))[0] + "_simple.onnx"
+        output_file = os.path.splitext(os.path.basename(pyTorchModelFile))[0] + ".onnx"
+        output_file_simple = os.path.splitext(os.path.basename(pyTorchModelFile))[0] + "_simple.onnx"
         output_path = os.path.join(TMP_DIR, output_file)
         output_path_simple = os.path.join(TMP_DIR, output_file_simple)
 
         if torch.cuda.device_count() > 0:
-            onnxExporter.export2onnx(self.settings.pyTorchModelFile, output_path, output_path_simple, True)
+            onnxExporter.export2onnx(pyTorchModelFile, output_path, output_path_simple, True)
         else:
             print("[Voice Changer] Warning!!! onnx export with float32. maybe size is doubled.")
-            onnxExporter.export2onnx(self.settings.pyTorchModelFile, output_path, output_path_simple, False)
+            onnxExporter.export2onnx(pyTorchModelFile, output_path, output_path_simple, False)
 
         return {"status": "ok", "path": f"/tmp/{output_file_simple}", "filename": output_file_simple}
