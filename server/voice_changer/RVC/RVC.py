@@ -31,6 +31,8 @@ import pyworld as pw
 
 from voice_changer.RVC.custom_vc_infer_pipeline import VC
 from infer_pack.models import SynthesizerTrnMs256NSFsid, SynthesizerTrnMs256NSFsid_nono
+from .models import SynthesizerTrnMsNSFsid as SynthesizerTrnMs768NSFsid
+from .const import RVC_MODEL_TYPE_NORMAL, RVC_MODEL_TYPE_PITCH_LESS, RVC_MODEL_TYPE_NORMAL_768, RVC_MODEL_TYPE_UNKNOWN
 from fairseq import checkpoint_utils
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
@@ -42,6 +44,7 @@ class ModelSlot():
     featureFile: str = ""
     indexFile: str = ""
     defaultTrans: int = ""
+    modelType: int = RVC_MODEL_TYPE_UNKNOWN
 
 
 @dataclass
@@ -116,7 +119,8 @@ class RVC:
             onnxModelFile=props["files"]["onnxModelFilename"],
             featureFile=props["files"]["featureFilename"],
             indexFile=props["files"]["indexFilename"],
-            defaultTrans=params["trans"]
+            defaultTrans=params["trans"],
+            modelType=RVC_MODEL_TYPE_UNKNOWN
         )
 
         print("[Voice Changer] RVC loading... slot:", self.tmp_slot)
@@ -150,9 +154,50 @@ class RVC:
         # PyTorchモデル生成
         if pyTorchModelFile != None and pyTorchModelFile != "":
             cpt = torch.load(pyTorchModelFile, map_location="cpu")
+            '''
+            ※ ノーマル or Pitchレス判定 ⇒ コンフィグのpsamplingrateの形状から判断
+            ■ ノーマル
+            [1025, 32, 192, 192, 768, 2, 6, 3, 0, '1', [3, 7, 11], [[1, 3, 5], [1, 3, 5], [1, 3, 5]], [10, 6, 2, 2, 2], 512, [16, 16, 4, 4, 4], 109, 256, 48000]
+            ■ピッチレス
+            [1025, 32, 192, 192, 768, 2, 6, 3, 0, '1', [3, 7, 11], [[1, 3, 5], [1, 3, 5], [1, 3, 5]], [10, 10, 2, 2], 　512, [16, 16, 4, 4],109, 256, 40000]
+
+            12番目の要素upsamplingrateの数で判定。4: ピッチレス, 5:ノーマル
+
+            
+            ※ 256 or 768判定 ⇒ config全体の形状
+            ■ ノーマル256
+            [1025, 32, 192, 192, 768, 2, 6, 3, 0, '1', [3, 7, 11], [[1, 3, 5], [1, 3, 5], [1, 3, 5]], [10, 6, 2, 2, 2], 512, [16, 16, 4, 4, 4], 109, 256, 48000]
+            ■ ノーマル 768対応
+            [1025, 32, 192, 192, 768, 2, 6, 3, 0, '1', [3, 7, 11], [[1, 3, 5], [1, 3, 5], [1, 3, 5]], [10, 6, 2, 2, 2], 512, [16, 16, 4, 4, 4], 109, 256, 768, 48000]
+            config全体の長さで判定 ⇒ config全体の形状
+            '''
+
+            config_len = len(cpt["config"])
+            upsamplingRateDims = len(cpt["config"][12])
+            if config_len == 18 and upsamplingRateDims == 4:
+                print("[Voice Changer] RVC Model Type: Pitch-Less")
+                self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_PITCH_LESS
+            elif config_len == 18 and upsamplingRateDims == 5:
+                print("[Voice Changer] RVC Model Type: Normal")
+                self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_NORMAL
+            elif config_len == 19:
+                print("[Voice Changer] RVC Model Type: Normal_768")
+                self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_NORMAL_768
+            else:
+                print("[Voice Changer] RVC Model Type: UNKNOWN")
+                self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_UNKNOWN
+
             self.settings.modelSamplingRate = cpt["config"][-1]
-            # net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=self.is_half)
-            net_g = SynthesizerTrnMs256NSFsid_nono(*cpt["config"])
+
+            if self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_NORMAL:
+                net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=self.is_half)
+            elif self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_PITCH_LESS:
+                net_g = SynthesizerTrnMs256NSFsid_nono(*cpt["config"])
+            elif self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_NORMAL_768:
+                net_g = SynthesizerTrnMs768NSFsid(**cpt["params"], is_half=self.is_half)
+            else:
+                print("unknwon")
+
             net_g.eval()
             net_g.load_state_dict(cpt["weight"], strict=False)
             if self.is_half:
@@ -340,12 +385,9 @@ class RVC:
             if_f0 = 1
             f0_file = None
 
-            if self.settings.silenceFront == 0:
-                audio_out = vc.pipeline(self.hubert_model, self.net_g, sid, audio, times, f0_up_key, f0_method,
-                                        file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file, silence_front=0)
-            else:
-                audio_out = vc.pipeline(self.hubert_model, self.net_g, sid, audio, times, f0_up_key, f0_method,
-                                        file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file, silence_front=self.settings.extraConvertSize / self.settings.modelSamplingRate)
+            modelType = self.settings.modelSlots[self.currentSlot].modelType
+            audio_out = vc.pipeline(self.hubert_model, self.net_g, sid, audio, times, f0_up_key, f0_method,
+                                    file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file, silence_front=self.settings.extraConvertSize / self.settings.modelSamplingRate, modelType=modelType)
 
             result = audio_out * np.sqrt(vol)
 

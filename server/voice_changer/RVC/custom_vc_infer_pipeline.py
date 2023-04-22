@@ -10,6 +10,7 @@ import pyworld
 import os
 import traceback
 import faiss
+from .const import RVC_MODEL_TYPE_NORMAL, RVC_MODEL_TYPE_PITCH_LESS, RVC_MODEL_TYPE_NORMAL_768
 
 
 class VC(object):
@@ -82,7 +83,7 @@ class VC(object):
         f0_coarse = np.rint(f0_mel).astype(np.int)
         return f0_coarse, f0bak  # 1-0
 
-    def vc(self, model, net_g, sid, audio0, pitch, pitchf, times, index, big_npy, index_rate):  # ,file_index,file_big_npy
+    def vc(self, model, net_g, sid, audio0, pitch, pitchf, times, index, big_npy, index_rate, modelType):  # ,file_index,file_big_npy
         feats = torch.from_numpy(audio0)
         if (self.is_half == True):
             feats = feats.half()
@@ -93,16 +94,25 @@ class VC(object):
         assert feats.dim() == 1, feats.dim()
         feats = feats.view(1, -1)
         padding_mask = torch.BoolTensor(feats.shape).to(self.device).fill_(False)
+        if modelType == RVC_MODEL_TYPE_NORMAL or modelType == RVC_MODEL_TYPE_PITCH_LESS:
+            inputs = {
+                "source": feats.to(self.device),
+                "padding_mask": padding_mask,
+                "output_layer": 9,  # layer 9
+            }
+        else:
+            inputs = {
+                "source": feats.to(self.device),
+                "padding_mask": padding_mask,
+            }
 
-        inputs = {
-            "source": feats.to(self.device),
-            "padding_mask": padding_mask,
-            "output_layer": 9,  # layer 9
-        }
         t0 = ttime()
         with torch.no_grad():
             logits = model.extract_features(**inputs)
-            feats = model.final_proj(logits[0])
+            if modelType == RVC_MODEL_TYPE_NORMAL or modelType == RVC_MODEL_TYPE_PITCH_LESS:
+                feats = model.final_proj(logits[0])
+            else:
+                feats = logits[0]
 
         if (isinstance(index, type(None)) == False and isinstance(big_npy, type(None)) == False and index_rate != 0):
             npy = feats[0].cpu().numpy()
@@ -126,8 +136,10 @@ class VC(object):
         p_len = torch.tensor([p_len], device=self.device).long()
 
         with torch.no_grad():
-            # audio1 = (net_g.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0] * 32768).data.cpu().float().numpy().astype(np.int16)
-            audio1 = (net_g.infer(feats, p_len, sid)[0][0, 0] * 32768).data.cpu().float().numpy().astype(np.int16)
+            if modelType == RVC_MODEL_TYPE_NORMAL or modelType == RVC_MODEL_TYPE_NORMAL_768:
+                audio1 = (net_g.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0] * 32768).data.cpu().float().numpy().astype(np.int16)
+            else:
+                audio1 = (net_g.infer(feats, p_len, sid)[0][0, 0] * 32768).data.cpu().float().numpy().astype(np.int16)
 
         del feats, p_len, padding_mask
         torch.cuda.empty_cache()
@@ -136,7 +148,7 @@ class VC(object):
         times[2] += (t2 - t1)
         return audio1
 
-    def pipeline(self, model, net_g, sid, audio, times, f0_up_key, f0_method, file_index, file_big_npy, index_rate, if_f0, f0_file=None, silence_front=0):
+    def pipeline(self, model, net_g, sid, audio, times, f0_up_key, f0_method, file_index, file_big_npy, index_rate, if_f0, f0_file=None, silence_front=0, modelType: int = RVC_MODEL_TYPE_NORMAL):
         if (file_big_npy != "" and file_index != "" and os.path.exists(file_big_npy) == True and os.path.exists(file_index) == True and index_rate != 0):
             try:
                 index = faiss.read_index(file_index)
@@ -166,11 +178,11 @@ class VC(object):
         t2 = ttime()
         times[1] += (t2 - t1)
         if self.t_pad_tgt == 0:
-            audio_opt.append(self.vc(model, net_g, sid, audio_pad[t:], pitch[:, t // self.window:]if t is not None else pitch, pitchf[:,
-                                                                                                                                      t // self.window:]if t is not None else pitchf, times, index, big_npy, index_rate))
+            audio_opt.append(self.vc(model, net_g, sid, audio_pad[t:], pitch[:, t // self.window:]if t is not None else pitch,
+                                     pitchf[:, t // self.window:]if t is not None else pitchf, times, index, big_npy, index_rate, modelType))
         else:
-            audio_opt.append(self.vc(model, net_g, sid, audio_pad[t:], pitch[:, t // self.window:]if t is not None else pitch, pitchf[:,
-                                                                                                                                      t // self.window:]if t is not None else pitchf, times, index, big_npy, index_rate)[self.t_pad_tgt:-self.t_pad_tgt])
+            audio_opt.append(self.vc(model, net_g, sid, audio_pad[t:], pitch[:, t // self.window:]if t is not None else pitch,
+                                     pitchf[:, t // self.window:]if t is not None else pitchf, times, index, big_npy, index_rate, modelType)[self.t_pad_tgt:-self.t_pad_tgt])
 
         audio_opt = np.concatenate(audio_opt)
         del pitch, pitchf, sid
