@@ -70,10 +70,12 @@ We offer Windows and Mac versions.
 
 - You need to have the hubert model to use RVC(Retrieval-based-Voice-Conversion). Please download `hubert_base.pt` from [this repository](https://huggingface.co/lj1995/VoiceConversionWebUI/tree/main) and store it in the folder where the batch file is located.
 
-| Version   | OS  | Framework                         | link                                                                                       | VC Support                                                                    | Size   |
-| --------- | --- | --------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- | ------ |
-| v.1.5.2.4 | mac | ONNX(cpu,cuda), PyTorch(cpu,mps)  | [normal](https://drive.google.com/uc?id=1UC0n6Lgyy4ugPznJ-Erd7lskKaOE6--X&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 795MB  |
-|           | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1OmSug85MUR58cnYo_P6Xe_GtNAG7PkKO&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2871MB |
+| Version    | OS  | Framework                         | link                                                                                       | VC Support                                                                    | Size   |
+| ---------- | --- | --------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- | ------ |
+| v.1.5.2.4a | mac | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1fR86gRWalhpi8kQURJmMfWuDvi53V2Ah&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 795MB  |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1lttvCgnZengcKkP4f0O2UBAVOcOph4b2&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2871MB |
+| v.1.5.2.4  | mac | ONNX(cpu,cuda), PyTorch(cpu,mps)  | [normal](https://drive.google.com/uc?id=1UC0n6Lgyy4ugPznJ-Erd7lskKaOE6--X&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 795MB  |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1OmSug85MUR58cnYo_P6Xe_GtNAG7PkKO&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2871MB |
 
 \*\*\* [hugging_face](https://huggingface.co/wok000/vcclient/tree/main) (experimental)
 
