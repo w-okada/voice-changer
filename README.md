@@ -4,6 +4,10 @@
 
 ## What's New!
 
+- v.1.5.2.4a
+
+  - Fix: Export ONNX
+
 - v.1.5.2.4
 
   - RVC で複数も出出る切り替えを実装

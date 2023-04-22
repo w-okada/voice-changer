@@ -4,6 +4,10 @@
 
 ## What's New!
 
+- v.1.5.2.4a
+
+  - Fix: Export ONNX
+
 - v.1.5.2.4
 
   - multi model selection for RVC
