@@ -30,7 +30,7 @@ from const import HUBERT_ONNX_MODEL_PATH, TMP_DIR
 import pyworld as pw
 
 from voice_changer.RVC.custom_vc_infer_pipeline import VC
-from infer_pack.models import SynthesizerTrnMs256NSFsid
+from infer_pack.models import SynthesizerTrnMs256NSFsid, SynthesizerTrnMs256NSFsid_nono
 from fairseq import checkpoint_utils
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
@@ -151,7 +151,8 @@ class RVC:
         if pyTorchModelFile != None and pyTorchModelFile != "":
             cpt = torch.load(pyTorchModelFile, map_location="cpu")
             self.settings.modelSamplingRate = cpt["config"][-1]
-            net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=self.is_half)
+            # net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=self.is_half)
+            net_g = SynthesizerTrnMs256NSFsid_nono(*cpt["config"])
             net_g.eval()
             net_g.load_state_dict(cpt["weight"], strict=False)
             if self.is_half:
@@ -351,6 +352,10 @@ class RVC:
         return result
 
     def inference(self, data):
+        if hasattr(self, "slot") == False:
+            print("[Voice Changer] No model uploaded.")
+            raise NoModeLoadedException("model_common")
+
         if self.currentSlot != self.slot:
             self.currentSlot = self.slot
             self.switchModel()

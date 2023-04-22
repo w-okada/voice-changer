@@ -53,7 +53,7 @@ export const ModelUploaderRow = (props: ModelUploaderRowProps) => {
                         </div>
                     </div>
                 </div>
-                <ModelSlotRow />
+                {props.showModelSlot ? <ModelSlotRow /> : <></>}
                 {props.showConfig ? <ConfigSelectRow /> : <></>}
                 {props.showOnnx ? <ONNXSelectRow /> : <></>}
                 {props.showPyTorch && guiState.showPyTorchModelUpload ? <PyTorchSelectRow /> : <></>}
