@@ -384,7 +384,7 @@ class RVC:
             print("[Voice Changer] export2onnx, No pyTorch session.")
             return {"status": "ng", "path": f""}
 
-        pyTorchModelFile = self.settings.modelSlots[self.currentSlot].pyTorchModelFile
+        pyTorchModelFile = self.settings.modelSlots[self.slot].pyTorchModelFile  # inference前にexportできるようにcurrentSlotではなくslot
 
         if pyTorchModelFile == None:
             print("[Voice Changer] export2onnx, No pyTorch filepath.")

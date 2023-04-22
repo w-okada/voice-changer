@@ -32,6 +32,10 @@
             {
                 "name": "modelSwitch",
                 "options": {}
+            },
+            {
+                "name": "onnxExport",
+                "options": {}
             }
         ],
         "modelSetting": [
@@ -50,7 +54,6 @@
                     "showHalfPrecision": true,
                     "defaultEnablePyTorch": true,
 
-                    "showOnnxExportButton": true,
                     "showDefaultTune": true
                 }
             },

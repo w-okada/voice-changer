@@ -41,6 +41,7 @@ import { EnableEnhancerRow, EnableEnhancerRowProps } from "./components/610_Enab
 import { DstIdRow2, DstIdRow2Props } from "./components/602v2_DstIdRow2"
 import { SilenceFrontRow, SilenceFrontRowProps } from "./components/812_SilenceFrontRow"
 import { ModelSwitchRow, ModelSwitchRowProps } from "./components/204_ModelSwitchRow"
+import { ONNXExportRow, ONNXExportRowProps } from "./components/205_ONNXExportRow"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
 
@@ -66,6 +67,7 @@ const initialize = () => {
     addToCatalog("performance", (props: PerformanceRowProps) => { return <PerformanceRow {...props} /> })
     addToCatalog("serverInfo", (props: ServerInfoRowProps) => { return <ServerInfoRow {...props} /> })
     addToCatalog("modelSwitch", (props: ModelSwitchRowProps) => { return <ModelSwitchRow {...props} /> })
+    addToCatalog("onnxExport", (props: ONNXExportRowProps) => { return <ONNXExportRow {...props} /> })
 
 
 

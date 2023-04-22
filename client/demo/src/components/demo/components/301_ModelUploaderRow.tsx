@@ -56,7 +56,7 @@ export const ModelUploaderRow = (props: ModelUploaderRowProps) => {
                 <ModelSlotRow />
                 {props.showConfig ? <ConfigSelectRow /> : <></>}
                 {props.showOnnx ? <ONNXSelectRow /> : <></>}
-                {props.showPyTorch && guiState.showPyTorchModelUpload ? <PyTorchSelectRow showOnnxExportButton={props.showOnnxExportButton || false} /> : <></>}
+                {props.showPyTorch && guiState.showPyTorchModelUpload ? <PyTorchSelectRow /> : <></>}
                 {props.showCorrespondence ? <CorrespondenceSelectRow /> : <></>}
                 {props.showPyTorchCluster ? <PyTorchClusterSelectRow /> : <></>}
                 {props.showFeature ? <FeatureSelectRow /> : <></>}

@@ -30,7 +30,7 @@
         "babel-loader": "^9.1.2",
         "copy-webpack-plugin": "^11.0.0",
         "css-loader": "^6.7.3",
-        "eslint": "^8.38.0",
+        "eslint": "^8.39.0",
         "eslint-config-prettier": "^8.8.0",
         "eslint-plugin-prettier": "^4.2.1",
         "eslint-plugin-react": "^7.32.2",
@@ -51,7 +51,7 @@
         "webpack-dev-server": "^4.13.3"
     },
     "dependencies": {
-        "@dannadori/voice-changer-client-js": "^1.0.113",
+        "@dannadori/voice-changer-client-js": "^1.0.114",
         "@fortawesome/fontawesome-svg-core": "^6.4.0",
         "@fortawesome/free-brands-svg-icons": "^6.4.0",
         "@fortawesome/free-regular-svg-icons": "^6.4.0",
