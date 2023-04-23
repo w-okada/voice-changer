@@ -10,7 +10,7 @@ import pyworld
 import os
 import traceback
 import faiss
-from .const import RVC_MODEL_TYPE_NORMAL, RVC_MODEL_TYPE_PITCH_LESS, RVC_MODEL_TYPE_NORMAL_768
+from .const import RVC_MODEL_TYPE_NORMAL, RVC_MODEL_TYPE_PITCH_LESS, RVC_MODEL_TYPE_WEBUI_256_NORMAL, RVC_MODEL_TYPE_WEBUI_768_NORMAL
 
 
 class VC(object):
@@ -94,7 +94,7 @@ class VC(object):
         assert feats.dim() == 1, feats.dim()
         feats = feats.view(1, -1)
         padding_mask = torch.BoolTensor(feats.shape).to(self.device).fill_(False)
-        if modelType == RVC_MODEL_TYPE_NORMAL or modelType == RVC_MODEL_TYPE_PITCH_LESS:
+        if modelType == RVC_MODEL_TYPE_NORMAL or modelType == RVC_MODEL_TYPE_PITCH_LESS or modelType == RVC_MODEL_TYPE_WEBUI_256_NORMAL:
             inputs = {
                 "source": feats.to(self.device),
                 "padding_mask": padding_mask,
@@ -109,7 +109,7 @@ class VC(object):
         t0 = ttime()
         with torch.no_grad():
             logits = model.extract_features(**inputs)
-            if modelType == RVC_MODEL_TYPE_NORMAL or modelType == RVC_MODEL_TYPE_PITCH_LESS:
+            if modelType == RVC_MODEL_TYPE_NORMAL or modelType == RVC_MODEL_TYPE_PITCH_LESS or modelType == RVC_MODEL_TYPE_WEBUI_256_NORMAL:
                 feats = model.final_proj(logits[0])
             else:
                 feats = logits[0]
@@ -136,7 +136,7 @@ class VC(object):
         p_len = torch.tensor([p_len], device=self.device).long()
 
         with torch.no_grad():
-            if modelType == RVC_MODEL_TYPE_NORMAL or modelType == RVC_MODEL_TYPE_NORMAL_768:
+            if modelType == RVC_MODEL_TYPE_NORMAL or modelType == RVC_MODEL_TYPE_WEBUI_256_NORMAL or modelType == RVC_MODEL_TYPE_WEBUI_768_NORMAL:
                 audio1 = (net_g.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0] * 32768).data.cpu().float().numpy().astype(np.int16)
             else:
                 audio1 = (net_g.infer(feats, p_len, sid)[0][0, 0] * 32768).data.cpu().float().numpy().astype(np.int16)
