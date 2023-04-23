@@ -32,7 +32,8 @@ import pyworld as pw
 from voice_changer.RVC.custom_vc_infer_pipeline import VC
 from infer_pack.models import SynthesizerTrnMs256NSFsid, SynthesizerTrnMs256NSFsid_nono
 from .models import SynthesizerTrnMsNSFsid as SynthesizerTrnMs768NSFsid
-from .const import RVC_MODEL_TYPE_NORMAL, RVC_MODEL_TYPE_PITCHLESS, RVC_MODEL_TYPE_WEBUI_256_NORMAL, RVC_MODEL_TYPE_WEBUI_768_NORMAL, RVC_MODEL_TYPE_WEBUI_256_PITCHLESS, RVC_MODEL_TYPE_WEBUI_768_PITCHLESS, RVC_MODEL_TYPE_UNKNOWN
+# from .const import RVC_MODEL_TYPE_NORMAL, RVC_MODEL_TYPE_PITCHLESS, RVC_MODEL_TYPE_WEBUI_256_NORMAL, RVC_MODEL_TYPE_WEBUI_768_NORMAL, RVC_MODEL_TYPE_WEBUI_256_PITCHLESS, RVC_MODEL_TYPE_WEBUI_768_PITCHLESS, RVC_MODEL_TYPE_UNKNOWN
+from .const import RVC_MODEL_TYPE_RVC, RVC_MODEL_TYPE_WEBUI
 from fairseq import checkpoint_utils
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
@@ -44,7 +45,12 @@ class ModelSlot():
     featureFile: str = ""
     indexFile: str = ""
     defaultTrans: int = ""
-    modelType: int = RVC_MODEL_TYPE_UNKNOWN
+    modelType: int = RVC_MODEL_TYPE_RVC
+    samplingRate: int = -1
+    f0: bool = True
+    embChannels: int = 256
+    samplingRateOnnx: int = -1
+    f0Onnx: bool = True
 
 
 @dataclass
@@ -119,8 +125,7 @@ class RVC:
             onnxModelFile=props["files"]["onnxModelFilename"],
             featureFile=props["files"]["featureFilename"],
             indexFile=props["files"]["indexFilename"],
-            defaultTrans=params["trans"],
-            modelType=RVC_MODEL_TYPE_UNKNOWN
+            defaultTrans=params["trans"]
         )
 
         print("[Voice Changer] RVC loading... slot:", self.tmp_slot)
@@ -172,40 +177,53 @@ class RVC:
             # print("config shape:2::::", (cpt).keys)
             config_len = len(cpt["config"])
             upsamplingRateDims = len(cpt["config"][12])
-            if config_len == 18 and cpt["f0"] == 0:
-                print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_PITCHLESS")
-                self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_PITCHLESS
-            elif config_len == 18 and cpt["f0"] == 1:
-                print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_NORMAL")
-                self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_NORMAL
-            elif config_len == 19:
-                print("PARAMS:::::::::", cpt["params"])
-                embedding = cpt["config"][17]
-                if embedding == 256 and cpt["f0"] == 0:
-                    print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_WEBUI_256_PITCHLESS")
-                    self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI_256_PITCHLESS
-                elif embedding == 256 and cpt["f0"] == 1:
-                    print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_WEBUI_256_NORMAL")
-                    self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI_256_NORMAL
-                elif embedding == 768 and cpt["f0"] == 0:
-                    print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_WEBUI_768_PITCHLESS")
-                    self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI_768_PITCHLESS
-                else:
-                    print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_WEBUI_768_NORMAL")
-                    self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI_768_NORMAL
+            if config_len == 18:
+                self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_RVC
+                self.settings.modelSlots[slot].embChannels = 256
             else:
-                print("[Voice Changer] RVC Model Type: UNKNOWN")
-                self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_UNKNOWN
+                self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI
+                self.settings.modelSlots[slot].embChannels = cpt["config"][17]
+            self.settings.modelSlots[slot].f0 = True if cpt["f0"] == 1 else False
+            self.settings.modelSlots[slot].samplingRate = cpt["config"][-1]
 
             self.settings.modelSamplingRate = cpt["config"][-1]
 
-            if self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_NORMAL:
+            # if config_len == 18 and cpt["f0"] == 0:
+            #     print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_PITCHLESS")
+            #     self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_PITCHLESS
+            # elif config_len == 18 and cpt["f0"] == 1:
+            #     print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_NORMAL")
+            #     self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_NORMAL
+            # elif config_len == 19:
+            #     print("PARAMS:::::::::", cpt["params"])
+            #     embedding = cpt["config"][17]
+            #     if embedding == 256 and cpt["f0"] == 0:
+            #         print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_WEBUI_256_PITCHLESS")
+            #         self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI_256_PITCHLESS
+            #     elif embedding == 256 and cpt["f0"] == 1:
+            #         print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_WEBUI_256_NORMAL")
+            #         self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI_256_NORMAL
+            #     elif embedding == 768 and cpt["f0"] == 0:
+            #         print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_WEBUI_768_PITCHLESS")
+            #         self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI_768_PITCHLESS
+            #     else:
+            #         print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_WEBUI_768_NORMAL")
+            #         self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI_768_NORMAL
+            # else:
+            #     print("[Voice Changer] RVC Model Type: UNKNOWN")
+            #     self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_UNKNOWN
+
+            if self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_RVC and self.settings.modelSlots[slot].f0 == True:
                 net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=self.is_half)
-            elif self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_PITCHLESS:
+            elif self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_RVC and self.settings.modelSlots[slot].f0 == False:
                 net_g = SynthesizerTrnMs256NSFsid_nono(*cpt["config"])
-            elif self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_WEBUI_256_NORMAL or self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_WEBUI_768_NORMAL:
+            elif self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_WEBUI and self.settings.modelSlots[slot].f0 == True:
                 net_g = SynthesizerTrnMs768NSFsid(**cpt["params"], is_half=self.is_half)
-            elif self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_WEBUI_256_PITCHLESS or self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_WEBUI_768_PITCHLESS:
+            elif self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_WEBUI and self.settings.modelSlots[slot].f0 == False:
+                ######################
+                # TBD
+                ######################
+                print("webui non-f0 is not supported yet")
                 net_g = SynthesizerTrnMs768NSFsid(**cpt["params"], is_half=self.is_half)
             else:
                 print("unknwon")
@@ -221,6 +239,15 @@ class RVC:
         # ONNXモデル生成
         if onnxModelFile != None and onnxModelFile != "":
             self.next_onnx_session = ModelWrapper(onnxModelFile)
+            self.settings.modelSlots[slot].samplingRateOnnx = self.next_onnx_session.getSamplingRate()
+            self.settings.modelSlots[slot].f0Onnx = self.next_onnx_session.getF0()
+            if self.settings.modelSlots[slot].samplingRate == -1:  # ONNXにsampling rateが入っていない
+                self.settings.modelSlots[slot].samplingRate = self.settings.modelSamplingRate
+
+            # ONNXがある場合は、ONNXの設定を優先
+            self.settings.modelSlots[slot].samplingRate = self.settings.modelSlots[slot].samplingRateOnnx
+            self.settings.modelSlots[slot].f0 = self.settings.modelSlots[slot].f0Onnx
+
         else:
             self.next_onnx_session = None
 
@@ -352,8 +379,10 @@ class RVC:
             if_f0 = 1
             f0_file = None
 
+            f0 = self.settings.modelSlots[self.currentSlot].f0
+            embChannels = self.settings.modelSlots[self.currentSlot].embChannels
             audio_out = vc.pipeline(self.hubert_model, self.onnx_session, sid, audio, times, f0_up_key, f0_method,
-                                    file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file)
+                                    file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file, silence_front=self.settings.extraConvertSize / self.settings.modelSamplingRate, f0=f0, embChannels=embChannels)
             result = audio_out * np.sqrt(vol)
 
         return result
@@ -397,9 +426,11 @@ class RVC:
             if_f0 = 1
             f0_file = None
 
-            modelType = self.settings.modelSlots[self.currentSlot].modelType
+            f0 = self.settings.modelSlots[self.currentSlot].f0
+
+            embChannels = self.settings.modelSlots[self.currentSlot].embChannels
             audio_out = vc.pipeline(self.hubert_model, self.net_g, sid, audio, times, f0_up_key, f0_method,
-                                    file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file, silence_front=self.settings.extraConvertSize / self.settings.modelSamplingRate, modelType=modelType)
+                                    file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file, silence_front=self.settings.extraConvertSize / self.settings.modelSamplingRate, f0=f0, embChannels=embChannels)
 
             result = audio_out * np.sqrt(vol)
 
@@ -454,11 +485,19 @@ class RVC:
         output_file_simple = os.path.splitext(os.path.basename(pyTorchModelFile))[0] + "_simple.onnx"
         output_path = os.path.join(TMP_DIR, output_file)
         output_path_simple = os.path.join(TMP_DIR, output_file_simple)
+        metadata = {
+            "application": "VC_CLIENT",
+            "version": "1",
+            "ModelType": self.settings.modelSlots[self.slot].modelType,
+            "samplingRate": self.settings.modelSlots[self.slot].samplingRate,
+            "f0": self.settings.modelSlots[self.slot].f0,
+            "embChannels": self.settings.modelSlots[self.slot].embChannels,
+        }
 
         if torch.cuda.device_count() > 0:
-            onnxExporter.export2onnx(pyTorchModelFile, output_path, output_path_simple, True)
+            onnxExporter.export2onnx(pyTorchModelFile, output_path, output_path_simple, True, metadata)
         else:
             print("[Voice Changer] Warning!!! onnx export with float32. maybe size is doubled.")
-            onnxExporter.export2onnx(pyTorchModelFile, output_path, output_path_simple, False)
+            onnxExporter.export2onnx(pyTorchModelFile, output_path, output_path_simple, False, metadata)
 
         return {"status": "ok", "path": f"/tmp/{output_file_simple}", "filename": output_file_simple}

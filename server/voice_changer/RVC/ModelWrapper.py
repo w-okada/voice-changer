@@ -1,6 +1,7 @@
 import onnxruntime
 import torch
 import numpy as np
+import json
 # providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 providers = ["CPUExecutionProvider"]
 
@@ -21,6 +22,23 @@ class ModelWrapper:
             self.is_half = False
         else:
             self.is_half = True
+        modelmeta = self.onnx_session.get_modelmeta()
+        try:
+            metadata = json.loads(modelmeta.custom_metadata_map["metadata"])
+            self.samplingRate = metadata["samplingRate"]
+            self.f0 = metadata["f0"]
+            print(f"[Voice Changer] Onnx metadata: sr:{self.samplingRate}, f0:{self.f0}")
+        except:
+            self.samplingRate = -1
+            self.f0 = True
+            print(f"[Voice Changer] Onnx version is old. Please regenerate onnxfile. Fallback to default")
+            print(f"[Voice Changer] Onnx metadata: sr:{self.samplingRate}, f0:{self.f0}")
+
+    def getSamplingRate(self):
+        return self.samplingRate
+
+    def getF0(self):
+        return self.f0
 
     def set_providers(self, providers, provider_options=[{}]):
         self.onnx_session.set_providers(providers=providers, provider_options=provider_options)
@@ -28,14 +46,27 @@ class ModelWrapper:
     def get_providers(self):
         return self.onnx_session.get_providers()
 
+    def infer_pitchless(self, feats, p_len, sid):
+        if self.is_half:
+            audio1 = self.onnx_session.run(
+                ["audio"],
+                {
+                    "feats": feats.cpu().numpy().astype(np.float16),
+                    "p_len": p_len.cpu().numpy().astype(np.int64),
+                    "sid": sid.cpu().numpy().astype(np.int64),
+                })
+        else:
+            audio1 = self.onnx_session.run(
+                ["audio"],
+                {
+                    "feats": feats.cpu().numpy().astype(np.float32),
+                    "p_len": p_len.cpu().numpy().astype(np.int64),
+                    "sid": sid.cpu().numpy().astype(np.int64),
+                })
+        return torch.tensor(np.array(audio1))
+
     def infer(self, feats, p_len, pitch, pitchf, sid):
         if self.is_half:
-            # print("feats", feats.cpu().numpy().dtype)
-            # print("p_len", p_len.cpu().numpy().dtype)
-            # print("pitch", pitch.cpu().numpy().dtype)
-            # print("pitchf", pitchf.cpu().numpy().dtype)
-            # print("sid", sid.cpu().numpy().dtype)
-
             audio1 = self.onnx_session.run(
                 ["audio"],
                 {
