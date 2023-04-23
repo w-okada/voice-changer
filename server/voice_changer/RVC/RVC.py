@@ -32,7 +32,7 @@ import pyworld as pw
 from voice_changer.RVC.custom_vc_infer_pipeline import VC
 from infer_pack.models import SynthesizerTrnMs256NSFsid, SynthesizerTrnMs256NSFsid_nono
 from .models import SynthesizerTrnMsNSFsid as SynthesizerTrnMs768NSFsid
-from .const import RVC_MODEL_TYPE_NORMAL, RVC_MODEL_TYPE_PITCH_LESS, RVC_MODEL_TYPE_WEBUI_256_NORMAL, RVC_MODEL_TYPE_WEBUI_768_NORMAL, RVC_MODEL_TYPE_UNKNOWN
+from .const import RVC_MODEL_TYPE_NORMAL, RVC_MODEL_TYPE_PITCHLESS, RVC_MODEL_TYPE_WEBUI_256_NORMAL, RVC_MODEL_TYPE_WEBUI_768_NORMAL, RVC_MODEL_TYPE_WEBUI_256_PITCHLESS, RVC_MODEL_TYPE_WEBUI_768_PITCHLESS, RVC_MODEL_TYPE_UNKNOWN
 from fairseq import checkpoint_utils
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
 
@@ -162,39 +162,34 @@ class RVC:
             [1025, 32, 192, 192, 768, 2, 6, 3, 0, '1', [3, 7, 11], [[1, 3, 5], [1, 3, 5], [1, 3, 5]], [10, 6, 2, 2, 2], 512, [16, 16, 4, 4, 4], 109, 256, 768, 48000]
             ⇒ 18: オリジナル, 19: rvc-webui
 
-            (2-1) オリジナルのノーマルorPitchレス判定 ⇒ コンフィグのpsamplingrateの形状から判断
-            ■ ノーマル
-            [1025, 32, 192, 192, 768, 2, 6, 3, 0, '1', [3, 7, 11], [[1, 3, 5], [1, 3, 5], [1, 3, 5]], [10, 6, 2, 2, 2], 512, [16, 16, 4, 4, 4], 109, 256, 48000]
-            ■ピッチレス
-            [1025, 32, 192, 192, 768, 2, 6, 3, 0, '1', [3, 7, 11], [[1, 3, 5], [1, 3, 5], [1, 3, 5]], [10, 10, 2, 2], 　512, [16, 16, 4, 4],109, 256, 40000]
-            12番目の要素upsamplingrateの数で判定。4: ピッチレス, 5:ノーマル
+            (2-1) オリジナルのノーマルorPitchレス判定 ⇒ ckp["f0"]で判定
+            0: ピッチレス, 1:ノーマル
 
-            (2-2) rvc-webuiの、(256 or 768) x (ノーマルor pitchレス)判定 ⇒ 256, or 768 は17番目の要素で判定。
-            ■ 256 x ノーマル
-            [1025, 32, 192, 192, 768, 2, 6, 3, 0, '1', [3, 7, 11], [[1, 3, 5], [1, 3, 5], [1, 3, 5]], [10, 6, 2, 2, 2], 512, [16, 16, 4, 4, 4], 109, 256, 256, 48000]
-            ■ 256 x pitchレス
-            [1025, 32, 192, 192, 768, 2, 6, 3, 0, '1', [3, 7, 11], [[1, 3, 5], [1, 3, 5], [1, 3, 5]], [10, 6, 2, 2, 2], 512, [16, 16, 4, 4, 4], 109, 256, 256, 48000]
-            ■ 768 x ノーマル
-            [1025, 32, 192, 192, 768, 2, 6, 3, 0, '1', [3, 7, 11], [[1, 3, 5], [1, 3, 5], [1, 3, 5]], [10, 6, 2, 2, 2], 512, [16, 16, 4, 4, 4], 109, 256, 768, 48000]
-            ■ 768 x pitchレス
-            [1025, 32, 192, 192, 768, 2, 6, 3, 0, '1', [3, 7, 11], [[1, 3, 5], [1, 3, 5], [1, 3, 5]], [10, 6, 2, 2, 2], 512, [16, 16, 4, 4, 4], 109, 256, 768, 48000]
-            
+            (2-2) rvc-webuiの、(256 or 768) x (ノーマルor pitchレス)判定 ⇒ 256, or 768 は17番目の要素で判定。, ノーマルor pitchレスはckp["f0"]で判定            
             '''
-            print("config shape:::::", cpt["config"])
 
+            # print("config shape:1::::", cpt["config"], cpt["f0"])
+            # print("config shape:2::::", (cpt).keys)
             config_len = len(cpt["config"])
             upsamplingRateDims = len(cpt["config"][12])
-            if config_len == 18 and upsamplingRateDims == 4:
-                print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_PITCH_LESS")
-                self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_PITCH_LESS
-            elif config_len == 18 and upsamplingRateDims == 5:
+            if config_len == 18 and cpt["f0"] == 0:
+                print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_PITCHLESS")
+                self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_PITCHLESS
+            elif config_len == 18 and cpt["f0"] == 1:
                 print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_NORMAL")
                 self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_NORMAL
             elif config_len == 19:
+                print("PARAMS:::::::::", cpt["params"])
                 embedding = cpt["config"][17]
-                if embedding == 256:
+                if embedding == 256 and cpt["f0"] == 0:
+                    print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_WEBUI_256_PITCHLESS")
+                    self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI_256_PITCHLESS
+                elif embedding == 256 and cpt["f0"] == 1:
                     print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_WEBUI_256_NORMAL")
                     self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI_256_NORMAL
+                elif embedding == 768 and cpt["f0"] == 0:
+                    print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_WEBUI_768_PITCHLESS")
+                    self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI_768_PITCHLESS
                 else:
                     print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_WEBUI_768_NORMAL")
                     self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI_768_NORMAL
@@ -206,9 +201,11 @@ class RVC:
 
             if self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_NORMAL:
                 net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=self.is_half)
-            elif self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_PITCH_LESS:
+            elif self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_PITCHLESS:
                 net_g = SynthesizerTrnMs256NSFsid_nono(*cpt["config"])
             elif self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_WEBUI_256_NORMAL or self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_WEBUI_768_NORMAL:
+                net_g = SynthesizerTrnMs768NSFsid(**cpt["params"], is_half=self.is_half)
+            elif self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_WEBUI_256_PITCHLESS or self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_WEBUI_768_PITCHLESS:
                 net_g = SynthesizerTrnMs768NSFsid(**cpt["params"], is_half=self.is_half)
             else:
                 print("unknwon")
