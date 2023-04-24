@@ -79,7 +79,7 @@ class RVCSettings():
     rvcQuality: int = 0
     silenceFront: int = 1  # 0:off, 1:on
     modelSamplingRate: int = 48000
-    modelSlotIndex: int = 0
+    modelSlotIndex: int = -1
 
     speakers: dict[str, int] = field(
         default_factory=lambda: {}
@@ -118,13 +118,30 @@ class RVC:
         params_str = props["params"]
         params = json.loads(params_str)
 
-        self.settings.modelSlots[self.tmp_slot] = ModelSlot(
-            pyTorchModelFile=props["files"]["pyTorchModelFilename"],
-            onnxModelFile=props["files"]["onnxModelFilename"],
-            featureFile=props["files"]["featureFilename"],
-            indexFile=props["files"]["indexFilename"],
-            defaultTrans=params["trans"]
-        )
+        # self.settings.modelSlots[self.tmp_slot] = ModelSlot(
+        #     pyTorchModelFile=props["files"]["pyTorchModelFilename"],
+        #     onnxModelFile=props["files"]["onnxModelFilename"],
+        #     featureFile=props["files"]["featureFilename"],
+        #     indexFile=props["files"]["indexFilename"],
+        #     defaultTrans=params["trans"]
+        # )
+
+        newSlot = asdict(self.settings.modelSlots[self.tmp_slot])
+        newSlot.update({
+            "pyTorchModelFile": props["files"]["pyTorchModelFilename"],
+            "onnxModelFile": props["files"]["onnxModelFilename"],
+            "featureFile": props["files"]["featureFilename"],
+            "indexFile": props["files"]["indexFilename"],
+            "defaultTrans": params["trans"]
+        })
+        # .update({
+        #     pyTorchModelFile: props["files"]["pyTorchModelFilename"],
+        #     onnxModelFile: props["files"]["onnxModelFilename"],
+        #     featureFile: props["files"]["featureFilename"],
+        #     indexFile: props["files"]["indexFilename"],
+        #     defaultTrans: params["trans"]
+        # })
+        self.settings.modelSlots[self.tmp_slot] = ModelSlot(**newSlot)
 
         print("[Voice Changer] RVC loading... slot:", self.tmp_slot)
 
@@ -213,8 +230,8 @@ class RVC:
             self.next_onnx_session = ModelWrapper(onnxModelFile)
             self.settings.modelSlots[slot].samplingRateOnnx = self.next_onnx_session.getSamplingRate()
             self.settings.modelSlots[slot].f0Onnx = self.next_onnx_session.getF0()
-            if self.settings.modelSlots[slot].samplingRate == -1:  # ONNXにsampling rateが入っていない
-                self.settings.modelSlots[slot].samplingRate = self.settings.modelSamplingRate
+            # if self.settings.modelSlots[slot].samplingRate == -1:  # ONNXにsampling rateが入っていない
+            #     self.settings.modelSlots[slot].samplingRate = self.settings.modelSamplingRate
             self.settings.modelSlots[slot].embChannelsOnnx = self.next_onnx_session.getEmbChannels()
 
             # ONNXがある場合は、ONNXの設定を優先
@@ -228,6 +245,8 @@ class RVC:
         self.next_feature_file = self.settings.modelSlots[slot].featureFile
         self.next_index_file = self.settings.modelSlots[slot].indexFile
         self.next_trans = self.settings.modelSlots[slot].defaultTrans
+        self.next_samplingRate = self.settings.modelSlots[slot].samplingRate
+        self.next_framework = "ONNX" if self.next_onnx_session != None else "PyTorch"
         print("[Voice Changer] Prepare done.",)
         return self.get_info()
 
@@ -240,6 +259,8 @@ class RVC:
         self.feature_file = self.next_feature_file
         self.index_file = self.next_index_file
         self.settings.tran = self.next_trans
+        self.settings.framework = self.next_framework
+        self.settings.modelSamplingRate = self.next_samplingRate
         self.next_net_g = None
         self.next_onnx_session = None
         print("[Voice Changer] Switching model..done",)
@@ -351,14 +372,13 @@ class RVC:
             file_index = self.index_file if self.index_file != None else ""
             file_big_npy = self.feature_file if self.feature_file != None else ""
             index_rate = self.settings.indexRatio
-            if_f0 = 1
+            if_f0 = 1 if self.settings.modelSlots[self.currentSlot].f0 else 0
             f0_file = None
 
             f0 = self.settings.modelSlots[self.currentSlot].f0
             embChannels = self.settings.modelSlots[self.currentSlot].embChannels
-            print("embChannels::1:", embChannels)
             audio_out = vc.pipeline(self.hubert_model, self.onnx_session, sid, audio, times, f0_up_key, f0_method,
-                                    file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file, silence_front=self.settings.extraConvertSize / self.settings.modelSamplingRate, f0=f0, embChannels=embChannels)
+                                    file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file, silence_front=self.settings.extraConvertSize / self.settings.modelSamplingRate, embChannels=embChannels)
             result = audio_out * np.sqrt(vol)
 
         return result
@@ -399,22 +419,21 @@ class RVC:
             file_index = self.index_file if self.index_file != None else ""
             file_big_npy = self.feature_file if self.feature_file != None else ""
             index_rate = self.settings.indexRatio
-            if_f0 = 1
+            if_f0 = 1 if self.settings.modelSlots[self.currentSlot].f0 else 0
             f0_file = None
 
-            f0 = self.settings.modelSlots[self.currentSlot].f0
             embChannels = self.settings.modelSlots[self.currentSlot].embChannels
             audio_out = vc.pipeline(self.hubert_model, self.net_g, sid, audio, times, f0_up_key, f0_method,
-                                    file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file, silence_front=self.settings.extraConvertSize / self.settings.modelSamplingRate, f0=f0, embChannels=embChannels)
+                                    file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file, silence_front=self.settings.extraConvertSize / self.settings.modelSamplingRate, embChannels=embChannels)
 
             result = audio_out * np.sqrt(vol)
 
         return result
 
     def inference(self, data):
-        # if self.settings.modelSlotIndex < -1:
-        #     print("[Voice Changer] No model uploaded.")
-        #     raise NoModeLoadedException("model_common")
+        if self.settings.modelSlotIndex < -1:
+            print("[Voice Changer] No model uploaded.")
+            raise NoModeLoadedException("model_common")
 
         if self.currentSlot != self.settings.modelSlotIndex:
             print(f"Switch model {self.currentSlot} -> {self.settings.modelSlotIndex}")

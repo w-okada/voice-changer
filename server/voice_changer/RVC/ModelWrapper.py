@@ -30,10 +30,13 @@ class ModelWrapper:
             self.embChannels = metadata["embChannels"]
             print(f"[Voice Changer] Onnx metadata: sr:{self.samplingRate}, f0:{self.f0}")
         except:
-            self.samplingRate = -1
+            self.samplingRate = 48000
             self.f0 = True
-            print(f"[Voice Changer] Onnx version is old. Please regenerate onnxfile. Fallback to default")
+            self.embChannels = 256
+            print(f"[Voice Changer] ############## !!!! CAUTION !!!! ####################")
+            print(f"[Voice Changer] This onnx's version is depricated. Please regenerate onnxfile. Fallback to default")
             print(f"[Voice Changer] Onnx metadata: sr:{self.samplingRate}, f0:{self.f0}")
+            print(f"[Voice Changer] ############## !!!! CAUTION !!!! ####################")
 
     def getSamplingRate(self):
         return self.samplingRate

@@ -84,7 +84,7 @@ class VC(object):
         f0_coarse = np.rint(f0_mel).astype(np.int)
         return f0_coarse, f0bak  # 1-0
 
-    def vc(self, model, net_g, sid, audio0, pitch, pitchf, times, index, big_npy, index_rate, f0=True, embChannels=256):  # ,file_index,file_big_npy
+    def vc(self, model, net_g, sid, audio0, pitch, pitchf, times, index, big_npy, index_rate, embChannels=256):  # ,file_index,file_big_npy
         feats = torch.from_numpy(audio0)
         if (self.is_half == True):
             feats = feats.half()
@@ -137,7 +137,7 @@ class VC(object):
         p_len = torch.tensor([p_len], device=self.device).long()
 
         with torch.no_grad():
-            if f0 == True:
+            if pitch != None:
                 audio1 = (net_g.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0] * 32768).data.cpu().float().numpy().astype(np.int16)
             else:
                 if hasattr(net_g, "infer_pitchless"):
@@ -154,7 +154,7 @@ class VC(object):
         times[2] += (t2 - t1)
         return audio1
 
-    def pipeline(self, model, net_g, sid, audio, times, f0_up_key, f0_method, file_index, file_big_npy, index_rate, if_f0, f0_file=None, silence_front=0, f0=True, embChannels=256):
+    def pipeline(self, model, net_g, sid, audio, times, f0_up_key, f0_method, file_index, file_big_npy, index_rate, if_f0, f0_file=None, silence_front=0, embChannels=256):
         if (file_big_npy != "" and file_index != "" and os.path.exists(file_big_npy) == True and os.path.exists(file_index) == True and index_rate != 0):
             try:
                 index = faiss.read_index(file_index)
@@ -185,10 +185,10 @@ class VC(object):
         times[1] += (t2 - t1)
         if self.t_pad_tgt == 0:
             audio_opt.append(self.vc(model, net_g, sid, audio_pad[t:], pitch[:, t // self.window:]if t is not None else pitch,
-                                     pitchf[:, t // self.window:]if t is not None else pitchf, times, index, big_npy, index_rate, f0, embChannels))
+                                     pitchf[:, t // self.window:]if t is not None else pitchf, times, index, big_npy, index_rate, embChannels))
         else:
             audio_opt.append(self.vc(model, net_g, sid, audio_pad[t:], pitch[:, t // self.window:]if t is not None else pitch,
-                                     pitchf[:, t // self.window:]if t is not None else pitchf, times, index, big_npy, index_rate, f0, embChannels)[self.t_pad_tgt:-self.t_pad_tgt])
+                                     pitchf[:, t // self.window:]if t is not None else pitchf, times, index, big_npy, index_rate, embChannels)[self.t_pad_tgt:-self.t_pad_tgt])
 
         audio_opt = np.concatenate(audio_opt)
         del pitch, pitchf, sid

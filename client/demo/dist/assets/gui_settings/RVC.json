@@ -40,6 +40,10 @@
             {
                 "name": "onnxExecutor",
                 "options": {}
+            },
+            {
+                "name": "modelSamplingRate",
+                "options": {}
             }
         ],
         "modelSetting": [
