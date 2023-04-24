@@ -1,7 +1,7 @@
 import React, { useMemo, useEffect } from "react"
 import { useGuiState } from "../001_GuiStateProvider"
 import { ConfigSelectRow } from "./301-1_ConfigSelectRow"
-import { ModelSelectRow } from "./301-2-5_ModelSelectRow copy"
+import { ModelSelectRow } from "./301-2-5_ModelSelectRow"
 import { ONNXSelectRow } from "./301-2_ONNXSelectRow"
 import { PyTorchSelectRow } from "./301-3_PyTorchSelectRow"
 import { CorrespondenceSelectRow } from "./301-4_CorrespondenceSelectRow"

@@ -27,6 +27,7 @@ class ModelWrapper:
             metadata = json.loads(modelmeta.custom_metadata_map["metadata"])
             self.samplingRate = metadata["samplingRate"]
             self.f0 = metadata["f0"]
+            self.embChannels = metadata["embChannels"]
             print(f"[Voice Changer] Onnx metadata: sr:{self.samplingRate}, f0:{self.f0}")
         except:
             self.samplingRate = -1
@@ -39,6 +40,9 @@ class ModelWrapper:
 
     def getF0(self):
         return self.f0
+
+    def getEmbChannels(self):
+        return self.embChannels
 
     def set_providers(self, providers, provider_options=[{}]):
         self.onnx_session.set_providers(providers=providers, provider_options=provider_options)

@@ -52,6 +52,7 @@ class ModelSlot():
     embChannels: int = 256
     samplingRateOnnx: int = -1
     f0Onnx: bool = True
+    embChannelsOnnx: int = 256
 
 
 @dataclass
@@ -169,9 +170,6 @@ class RVC:
 
             (2-2) rvc-webuiの、(256 or 768) x (ノーマルor pitchレス)判定 ⇒ 256, or 768 は17番目の要素で判定。, ノーマルor pitchレスはckp["f0"]で判定            
             '''
-
-            # print("config shape:1::::", cpt["config"], cpt["f0"])
-            # print("config shape:2::::", (cpt).keys)
             config_len = len(cpt["config"])
             if config_len == 18:
                 self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_RVC
@@ -217,11 +215,12 @@ class RVC:
             self.settings.modelSlots[slot].f0Onnx = self.next_onnx_session.getF0()
             if self.settings.modelSlots[slot].samplingRate == -1:  # ONNXにsampling rateが入っていない
                 self.settings.modelSlots[slot].samplingRate = self.settings.modelSamplingRate
+            self.settings.modelSlots[slot].embChannelsOnnx = self.next_onnx_session.getEmbChannels()
 
             # ONNXがある場合は、ONNXの設定を優先
             self.settings.modelSlots[slot].samplingRate = self.settings.modelSlots[slot].samplingRateOnnx
             self.settings.modelSlots[slot].f0 = self.settings.modelSlots[slot].f0Onnx
-
+            self.settings.modelSlots[slot].embChannels = self.settings.modelSlots[slot].embChannelsOnnx
         else:
             print("[Voice Changer] Skip Loading ONNX Model...")
             self.next_onnx_session = None
@@ -357,6 +356,7 @@ class RVC:
 
             f0 = self.settings.modelSlots[self.currentSlot].f0
             embChannels = self.settings.modelSlots[self.currentSlot].embChannels
+            print("embChannels::1:", embChannels)
             audio_out = vc.pipeline(self.hubert_model, self.onnx_session, sid, audio, times, f0_up_key, f0_method,
                                     file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file, silence_front=self.settings.extraConvertSize / self.settings.modelSamplingRate, f0=f0, embChannels=embChannels)
             result = audio_out * np.sqrt(vol)
@@ -403,7 +403,6 @@ class RVC:
             f0_file = None
 
             f0 = self.settings.modelSlots[self.currentSlot].f0
-
             embChannels = self.settings.modelSlots[self.currentSlot].embChannels
             audio_out = vc.pipeline(self.hubert_model, self.net_g, sid, audio, times, f0_up_key, f0_method,
                                     file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file, silence_front=self.settings.extraConvertSize / self.settings.modelSamplingRate, f0=f0, embChannels=embChannels)
