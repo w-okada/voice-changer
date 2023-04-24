@@ -21,12 +21,13 @@
   - [MMVC](https://github.com/isletennos/MMVC_Trainer)
   - [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc)
   - [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI)
+  - [DDSP-SVC](https://github.com/yxlllc/DDSP-SVC)
 
 2. 本ソフトウェアは、ネットワークを介した利用も可能であり、ゲームなどの高負荷なアプリケーションと同時に使用する場合などに音声変換処理の負荷を外部にオフロードすることができます。
 
 ![image](https://user-images.githubusercontent.com/48346627/206640768-53f6052d-0a96-403b-a06c-6714a0b7471d.png)
 
-3. 複数のプラットフォーに対応しています。
+3. 複数のプラットフォームに対応しています。
 
 - Windows, Mac(M1), Linux, Google Colab (MMVC のみ)
 
@@ -59,13 +60,9 @@ Windows 版と Mac 版を提供しています。
 
 - Windows 版は、ダウンロードした zip ファイルを解凍して、`start_http.bat`を実行してください。
 
-- Mac 版はダウンロードファイルを解凍したのちに、`startHttp.command`を実行してください。開発元を検証できない旨が示される場合は、再度コントロールキーを押してクリックして実行してください(or 右クリックから実行してください)。（詳細下記 \*1）
+- Mac 版はダウンロードファイルを解凍したのちに、`startHttp.command`を実行してください。開発元を検証できない旨が示される場合は、再度コントロールキーを押してクリックして実行してください(or 右クリックから実行してください)。
 
 - リモートから接続する場合は、`.bat`ファイル(win)、`.command`ファイル(mac)の http が https に置き換わっているものを使用してください。
-
-- Windows 環境で Nvidia の GPU をお持ちの方は多くの場合は `ONNX(cpu,cuda), PyTorch(cpu,cuda)`版で動きます。
-
-- Windows 環境で Nvidia の GPU をお持ちでない方は多くの場合は `ONNX(cpu,DirectML), PyTorch(cpu) `版で動きます。
 
 - つくよみちゃん、あみたろ、黄琴まひろ、黄琴海月、の動作には content vec のモデルが必要となります。こちらの[リポジトリ](https://github.com/auspicious3000/contentvec)から、ContentVec_legacy 500 のモデルをダウンロードして、実行する`startHttp.command`や`start_http.bat`と同じフォルダに配置してください。
 
@@ -74,6 +71,10 @@ Windows 版と Mac 版を提供しています。
 - DDSP-SVC の動作には、hubert-soft と enhancer のモデルが必要です。hubert-soft は[このリンク](https://github.com/bshall/hubert/releases/download/v0.1/hubert-soft-0d54a1f4.pt)からダウンロードして、バッチファイルがあるフォルダに格納してください。enhancer は[このサイト](https://github.com/openvpi/vocoders/releases/tag/nsf-hifigan-v1)から`nsf_hifigan_20221211.zip`ダウンロードして下さい。解凍すると出てくる`nsf_hifigan`というフォルダをバッチファイルがあるフォルダに格納してください。
 - DDPS-SVC の encoder は hubert-soft のみ対応です。
 
+- RVC で使用する場合の GUI の各項目説明は[こちら](tutorials/tutorial_rvc_ja.md)をご覧ください
+
+- ダウンロードはこちらから。
+
 | Version    | OS  | フレームワーク                    | link                                                                                       | サポート VC                                                                   | サイズ |
 | ---------- | --- | --------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- | ------ |
 | v.1.5.2.4a | mac | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1fR86gRWalhpi8kQURJmMfWuDvi53V2Ah&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 795MB  |
@@ -81,7 +82,7 @@ Windows 版と Mac 版を提供しています。
 | v.1.5.2.4  | mac | ONNX(cpu,cuda), PyTorch(cpu,mps)  | [normal](https://drive.google.com/uc?id=1UC0n6Lgyy4ugPznJ-Erd7lskKaOE6--X&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 795MB  |
 |            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1OmSug85MUR58cnYo_P6Xe_GtNAG7PkKO&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2871MB |
 
-※ [hugging_face](https://huggingface.co/wok000/vcclient/tree/main)でも公開（experimental）
+※ Google Drive からダウンロードできない方は、[hugging_face](https://huggingface.co/wok000/vcclient/tree/main)からダウンロードしてみてください。（experimental）
 
 - 各キャラクター専用(近々 RVC 版として提供予定)
 
@@ -99,12 +100,6 @@ Windows 版と Mac 版を提供しています。
 
 \*2 解凍や起動が遅い場合、ウィルス対策ソフトのチェックが走っている可能性があります。ファイルやフォルダを対象外にして実行してみてください。（自己責任です）
 
-\*3 本ソフトウェアは開発元の署名しておりません。下記のように警告が出ますが、コントロールキーを押しながらアイコンをクリックすると実行できるようになります。これは Apple のセキュリティポリシーによるものです。実行は自己責任となります。
-
-![image](https://user-images.githubusercontent.com/48346627/212567711-c4a8d599-e24c-4fa3-8145-a5df7211f023.png)
-
-https://user-images.githubusercontent.com/48346627/212569645-e30b7f4e-079d-4504-8cf8-7816c5f40b00.mp4
-
 ## (3) Docker や Anaconda など環境構築を行った上での利用
 
 本リポジトリをクローンして利用します。Windows では WSL2 の環境構築が必須になります。また、WSL2 上で Docker もしくは Anaconda などの仮想環境の構築が必要となります。Mac では Anaconda などの Python の仮想環境の構築が必要となります。事前準備が必要となりますが、多くの環境においてこの方法が一番高速で動きます。**<font color="red"> GPU が無くてもそこそこ新しい CPU であれば十分動く可能性があります </font>（下記のリアルタイム性の節を参照）**。
@@ -117,7 +112,7 @@ Docker での実行は、[Docker を使用する](docker_vcclient/README.md)を�
 
 Anaconda の仮想環境上での実行は、[サーバ開発者向けのページ](README_dev_ja.md)を参考にサーバを起動してください。
 
-## リアルタイム性
+# リアルタイム性（MMVC）
 
 GPU を使用するとほとんどタイムラグなく変換可能です。
 
@@ -128,6 +123,12 @@ CPU でも最近のであればそれなりの速度で変換可能。
 https://twitter.com/DannadoriYellow/status/1613553862773997569?s=20&t=7CLD79h1F3dfKiTb7M8RUQ
 
 古い CPU( i7-4770)だと、1000msec くらいかかってしまう。
+
+# 開発者の署名について
+
+本ソフトウェアは開発元の署名しておりません。下記のように警告が出ますが、コントロールキーを押しながらアイコンをクリックすると実行できるようになります。これは Apple のセキュリティポリシーによるものです。実行は自己責任となります。
+
+![image](https://user-images.githubusercontent.com/48346627/212567711-c4a8d599-e24c-4fa3-8145-a5df7211f023.png)
 
 # Acknowledgments
 
