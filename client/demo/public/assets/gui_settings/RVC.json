@@ -36,6 +36,10 @@
             {
                 "name": "onnxExport",
                 "options": {}
+            },
+            {
+                "name": "onnxExecutor",
+                "options": {}
             }
         ],
         "modelSetting": [
@@ -43,29 +47,23 @@
                 "name": "modelUploader",
                 "options": {
                     "showModelSlot": true,
+                    "showFrameworkSelector": false,
                     "showConfig": false,
-                    "showOnnx": true,
-                    "showPyTorch": true,
+                    "oneModelFileType": true,
+                    "showOnnx": false,
+                    "showPyTorch": false,
                     "showCorrespondence": false,
                     "showPyTorchCluster": false,
 
                     "showFeature": true,
                     "showIndex": true,
                     "showHalfPrecision": true,
+                    "showPyTorchEnableCheckBox": false,
                     "defaultEnablePyTorch": true,
+                    "onlySelectedFramework": true,
 
                     "showDefaultTune": true
                 }
-            },
-            {
-                "name": "framework",
-                "options": {
-                    "showFramework": true
-                }
-            },
-            {
-                "name": "modelSamplingRate",
-                "options": {}
             }
         ],
         "deviceSetting": [

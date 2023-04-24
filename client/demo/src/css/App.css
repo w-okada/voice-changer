@@ -535,6 +535,14 @@ body {
     color: rgb(30, 30, 30);
     font-size: 0.7rem;
 }
+.body-item-text-em {
+    color: rgb(250, 30, 30);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 700;
+}
+
 .body-input-container {
     display: flex;
 }

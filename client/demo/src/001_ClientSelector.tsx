@@ -19,7 +19,7 @@ export const ClientSelector = () => {
         if (ua.indexOf("mac os x") !== -1) {
             return ["MMVCv13", "MMVCv15", "so-vits-svc-40", "RVC"] as ClientType[]
         } else {
-            return ["MMVCv13", "MMVCv15", "so-vits-svc-40", "so-vits-svc-40v2", "RVC", "DDSP-SVC"] as ClientType[]
+            return ["MMVCv13", "MMVCv15", "so-vits-svc-40", "so-vits-svc-40v2", "RVC", "DDSP-SVC", "RVC_CLASSIC_GUI"] as ClientType[]
         }
     }, [])
 

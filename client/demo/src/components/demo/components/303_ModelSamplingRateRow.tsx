@@ -1,5 +1,5 @@
 import React, { useMemo } from "react"
-import { fileSelector, ModelSamplingRate } from "@dannadori/voice-changer-client-js"
+import { ModelSamplingRate } from "@dannadori/voice-changer-client-js"
 import { useAppState } from "../../../001_provider/001_AppStateProvider"
 
 export type ModelSamplingRateRowProps = {

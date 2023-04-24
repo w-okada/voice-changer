@@ -8,6 +8,10 @@ export const DefaultTuneRow = () => {
     const defaultTuneRow = useMemo(() => {
         const slot = guiState.modelSlotNum
         const fileUploadSetting = appState.serverSetting.fileUploadSettings[slot]
+        if (!fileUploadSetting) {
+            return <></>
+        }
+        const currentValue = fileUploadSetting.defaultTune
 
         const onDefaultTuneChanged = (val: number) => {
             appState.serverSetting.setFileUploadSetting(slot, {
@@ -20,10 +24,10 @@ export const DefaultTuneRow = () => {
             <div className="body-row split-3-2-1-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-2 ">Default Tune</div>
                 <div>
-                    <input type="range" className="body-item-input-slider" min="-50" max="50" step="1" value={fileUploadSetting?.defaultTune || 0} onChange={(e) => {
+                    <input type="range" className="body-item-input-slider" min="-50" max="50" step="1" value={currentValue} onChange={(e) => {
                         onDefaultTuneChanged(Number(e.target.value))
                     }}></input>
-                    <span className="body-item-input-slider-val">{fileUploadSetting?.defaultTune || 0}</span>
+                    <span className="body-item-input-slider-val">{currentValue}</span>
                 </div>
                 <div>
                 </div>

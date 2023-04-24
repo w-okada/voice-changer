@@ -40,6 +40,7 @@
                     "showCorrespondence": false,
                     "showPyTorchCluster": false,
 
+                    "showPyTorchEnableCheckBox": true,
                     "defaultEnablePyTorch": false
                 }
             },

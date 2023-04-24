@@ -12,6 +12,10 @@ export const ONNXExportRow = (_props: ONNXExportRowProps) => {
     const guiState = useGuiState()
 
     const onnxExporthRow = useMemo(() => {
+        if (appState.serverSetting.serverSetting.framework != "PyTorch") {
+            return <></>
+        }
+
         const onnxExportButtonAction = async () => {
 
             if (guiState.isConverting) {

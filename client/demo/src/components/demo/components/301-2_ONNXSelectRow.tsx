@@ -3,13 +3,21 @@ import { fileSelector } from "@dannadori/voice-changer-client-js"
 import { useAppState } from "../../../001_provider/001_AppStateProvider"
 import { useGuiState } from "../001_GuiStateProvider"
 
-export const ONNXSelectRow = () => {
+type ONNXSelectRowProps = {
+    onlyWhenSelected: boolean
+}
+
+export const ONNXSelectRow = (props: ONNXSelectRowProps) => {
     const appState = useAppState()
     const guiState = useGuiState()
 
 
     const onnxSelectRow = useMemo(() => {
         const slot = guiState.modelSlotNum
+        if (props.onlyWhenSelected && appState.serverSetting.fileUploadSettings[slot]?.framework != "ONNX") {
+            return <></>
+        }
+
         const onnxModelFilenameText = appState.serverSetting.fileUploadSettings[slot]?.onnxModel?.filename || appState.serverSetting.fileUploadSettings[slot]?.onnxModel?.file?.name || ""
         const onOnnxFileLoadClicked = async () => {
             const file = await fileSelector("")

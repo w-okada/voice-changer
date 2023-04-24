@@ -31,8 +31,9 @@ import pyworld as pw
 
 from voice_changer.RVC.custom_vc_infer_pipeline import VC
 from infer_pack.models import SynthesizerTrnMs256NSFsid, SynthesizerTrnMs256NSFsid_nono
-from .models import SynthesizerTrnMsNSFsid as SynthesizerTrnMs768NSFsid
-# from .const import RVC_MODEL_TYPE_NORMAL, RVC_MODEL_TYPE_PITCHLESS, RVC_MODEL_TYPE_WEBUI_256_NORMAL, RVC_MODEL_TYPE_WEBUI_768_NORMAL, RVC_MODEL_TYPE_WEBUI_256_PITCHLESS, RVC_MODEL_TYPE_WEBUI_768_PITCHLESS, RVC_MODEL_TYPE_UNKNOWN
+from .models import SynthesizerTrnMsNSFsid as SynthesizerTrnMsNSFsid_webui
+from .models import SynthesizerTrnMsNSFsidNono as SynthesizerTrnMsNSFsidNono_webui
+
 from .const import RVC_MODEL_TYPE_RVC, RVC_MODEL_TYPE_WEBUI
 from fairseq import checkpoint_utils
 providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
@@ -101,14 +102,10 @@ class RVC:
         self.feature_file = None
         self.index_file = None
 
-        # self.net_g2 = None
-        # self.onnx_session2 = None
-        # self.feature_file2 = None
-        # self.index_file2 = None
-
         self.gpu_num = torch.cuda.device_count()
         self.prevVol = 0
         self.params = params
+
         self.mps_enabled: bool = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
         self.currentSlot = -1
         print("RVC initialization: ", params)
@@ -142,11 +139,10 @@ class RVC:
         except Exception as e:
             print("EXCEPTION during loading hubert/contentvec model", e)
 
-        # self.switchModel(self.slot)
         if self.initialLoad:
             self.prepareModel(self.tmp_slot)
-            self.slot = self.tmp_slot
-            self.currentSlot = self.slot
+            self.settings.modelSlotIndex = self.tmp_slot
+            self.currentSlot = self.settings.modelSlotIndex
             self.switchModel()
             self.initialLoad = False
 
@@ -158,6 +154,7 @@ class RVC:
         onnxModelFile = self.settings.modelSlots[slot].onnxModelFile
         # PyTorchモデル生成
         if pyTorchModelFile != None and pyTorchModelFile != "":
+            print("[Voice Changer] Loading Pytorch Model...")
             cpt = torch.load(pyTorchModelFile, map_location="cpu")
             '''
             (1) オリジナルとrvc-webuiのモデル判定 ⇒ config全体の形状
@@ -176,7 +173,6 @@ class RVC:
             # print("config shape:1::::", cpt["config"], cpt["f0"])
             # print("config shape:2::::", (cpt).keys)
             config_len = len(cpt["config"])
-            upsamplingRateDims = len(cpt["config"][12])
             if config_len == 18:
                 self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_RVC
                 self.settings.modelSlots[slot].embChannels = 256
@@ -188,43 +184,19 @@ class RVC:
 
             self.settings.modelSamplingRate = cpt["config"][-1]
 
-            # if config_len == 18 and cpt["f0"] == 0:
-            #     print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_PITCHLESS")
-            #     self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_PITCHLESS
-            # elif config_len == 18 and cpt["f0"] == 1:
-            #     print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_NORMAL")
-            #     self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_NORMAL
-            # elif config_len == 19:
-            #     print("PARAMS:::::::::", cpt["params"])
-            #     embedding = cpt["config"][17]
-            #     if embedding == 256 and cpt["f0"] == 0:
-            #         print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_WEBUI_256_PITCHLESS")
-            #         self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI_256_PITCHLESS
-            #     elif embedding == 256 and cpt["f0"] == 1:
-            #         print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_WEBUI_256_NORMAL")
-            #         self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI_256_NORMAL
-            #     elif embedding == 768 and cpt["f0"] == 0:
-            #         print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_WEBUI_768_PITCHLESS")
-            #         self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI_768_PITCHLESS
-            #     else:
-            #         print("[Voice Changer] RVC Model Type: RVC_MODEL_TYPE_WEBUI_768_NORMAL")
-            #         self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI_768_NORMAL
-            # else:
-            #     print("[Voice Changer] RVC Model Type: UNKNOWN")
-            #     self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_UNKNOWN
-
             if self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_RVC and self.settings.modelSlots[slot].f0 == True:
                 net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=self.is_half)
             elif self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_RVC and self.settings.modelSlots[slot].f0 == False:
                 net_g = SynthesizerTrnMs256NSFsid_nono(*cpt["config"])
             elif self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_WEBUI and self.settings.modelSlots[slot].f0 == True:
-                net_g = SynthesizerTrnMs768NSFsid(**cpt["params"], is_half=self.is_half)
+                net_g = SynthesizerTrnMsNSFsid_webui(**cpt["params"], is_half=self.is_half)
             elif self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_WEBUI and self.settings.modelSlots[slot].f0 == False:
                 ######################
                 # TBD
                 ######################
                 print("webui non-f0 is not supported yet")
-                net_g = SynthesizerTrnMs768NSFsid(**cpt["params"], is_half=self.is_half)
+                net_g = SynthesizerTrnMsNSFsidNono_webui(**cpt["params"], is_half=self.is_half)
+
             else:
                 print("unknwon")
 
@@ -234,10 +206,12 @@ class RVC:
                 net_g = net_g.half()
             self.next_net_g = net_g
         else:
+            print("[Voice Changer] Skip Loading Pytorch Model...")
             self.next_net_g = None
 
         # ONNXモデル生成
         if onnxModelFile != None and onnxModelFile != "":
+            print("[Voice Changer] Loading ONNX Model...")
             self.next_onnx_session = ModelWrapper(onnxModelFile)
             self.settings.modelSlots[slot].samplingRateOnnx = self.next_onnx_session.getSamplingRate()
             self.settings.modelSlots[slot].f0Onnx = self.next_onnx_session.getF0()
@@ -249,15 +223,17 @@ class RVC:
             self.settings.modelSlots[slot].f0 = self.settings.modelSlots[slot].f0Onnx
 
         else:
+            print("[Voice Changer] Skip Loading ONNX Model...")
             self.next_onnx_session = None
 
         self.next_feature_file = self.settings.modelSlots[slot].featureFile
         self.next_index_file = self.settings.modelSlots[slot].indexFile
         self.next_trans = self.settings.modelSlots[slot].defaultTrans
-
+        print("[Voice Changer] Prepare done.",)
         return self.get_info()
 
     def switchModel(self):
+        print("[Voice Changer] Switching model..",)
         # del self.net_g
         # del self.onnx_session
         self.net_g = self.next_net_g
@@ -267,6 +243,7 @@ class RVC:
         self.settings.tran = self.next_trans
         self.next_net_g = None
         self.next_onnx_session = None
+        print("[Voice Changer] Switching model..done",)
 
     def update_settings(self, key: str, val: any):
         if key == "onnxExecutionProvider" and self.onnx_session != None:
@@ -285,7 +262,6 @@ class RVC:
             print("Onnx is not enabled. Please load model.")
             return False
         elif key in self.settings.intData:
-            setattr(self.settings, key, int(val))
             if key == "gpu" and val >= 0 and val < self.gpu_num and self.onnx_session != None:
                 providers = self.onnx_session.get_providers()
                 print("Providers:", providers)
@@ -296,7 +272,7 @@ class RVC:
                 # self.switchModel(int(val))
                 self.tmp_slot = int(val)
                 self.prepareModel(self.tmp_slot)
-                self.slot = self.tmp_slot
+            setattr(self.settings, key, int(val))
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
@@ -389,7 +365,7 @@ class RVC:
 
     def _pyTorch_inference(self, data):
         if hasattr(self, "net_g") == False or self.net_g == None:
-            print("[Voice Changer] No pyTorch session.")
+            print("[Voice Changer] No pyTorch session.", hasattr(self, "net_g"), self.net_g)
             raise NoModeLoadedException("pytorch")
 
         if self.settings.gpu < 0 or (self.gpu_num == 0 and self.mps_enabled == False):
@@ -437,12 +413,13 @@ class RVC:
         return result
 
     def inference(self, data):
-        if hasattr(self, "slot") == False:
-            print("[Voice Changer] No model uploaded.")
-            raise NoModeLoadedException("model_common")
+        # if self.settings.modelSlotIndex < -1:
+        #     print("[Voice Changer] No model uploaded.")
+        #     raise NoModeLoadedException("model_common")
 
-        if self.currentSlot != self.slot:
-            self.currentSlot = self.slot
+        if self.currentSlot != self.settings.modelSlotIndex:
+            print(f"Switch model {self.currentSlot} -> {self.settings.modelSlotIndex}")
+            self.currentSlot = self.settings.modelSlotIndex
             self.switchModel()
 
         if self.settings.framework == "ONNX":
@@ -474,7 +451,7 @@ class RVC:
             print("[Voice Changer] export2onnx, No pyTorch session.")
             return {"status": "ng", "path": f""}
 
-        pyTorchModelFile = self.settings.modelSlots[self.slot].pyTorchModelFile  # inference前にexportできるようにcurrentSlotではなくslot
+        pyTorchModelFile = self.settings.modelSlots[self.settings.modelSlotIndex].pyTorchModelFile  # inference前にexportできるようにcurrentSlotではなくslot
 
         if pyTorchModelFile == None:
             print("[Voice Changer] export2onnx, No pyTorch filepath.")
@@ -488,10 +465,10 @@ class RVC:
         metadata = {
             "application": "VC_CLIENT",
             "version": "1",
-            "ModelType": self.settings.modelSlots[self.slot].modelType,
-            "samplingRate": self.settings.modelSlots[self.slot].samplingRate,
-            "f0": self.settings.modelSlots[self.slot].f0,
-            "embChannels": self.settings.modelSlots[self.slot].embChannels,
+            "ModelType": self.settings.modelSlots[self.settings.modelSlotIndex].modelType,
+            "samplingRate": self.settings.modelSlots[self.settings.modelSlotIndex].samplingRate,
+            "f0": self.settings.modelSlots[self.settings.modelSlotIndex].f0,
+            "embChannels": self.settings.modelSlots[self.settings.modelSlotIndex].embChannels,
         }
 
         if torch.cuda.device_count() > 0:

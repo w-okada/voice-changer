@@ -43,6 +43,7 @@
                     "showFeature": false,
                     "showIndex": false,
                     "showHalfPrecision": false,
+                    "showPyTorchEnableCheckBox": true,
                     "defaultEnablePyTorch": true,
 
                     "showOnnxExportButton": false
