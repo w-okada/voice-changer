@@ -101,7 +101,7 @@ class MMVCv15:
         return self.get_info()
 
     def update_settings(self, key: str, val: any):
-        if key == "onnxExecutionProvider" and self.settings.onnxModelFile != "":  # self.onnx_session != None:
+        if key == "onnxExecutionProvider" and self.settings.onnxModelFile != "" and self.settings.onnxModelFile != None:
             if val == "CUDAExecutionProvider":
                 if self.settings.gpu < 0 or self.settings.gpu >= self.gpu_num:
                     self.settings.gpu = 0
@@ -111,7 +111,7 @@ class MMVCv15:
                 self.onnx_session.set_providers(providers=[val])
         elif key in self.settings.intData:
             setattr(self.settings, key, int(val))
-            if key == "gpu" and val >= 0 and val < self.gpu_num and self.settings.onnxModelFile != "":  # self.onnx_session != None:
+            if key == "gpu" and val >= 0 and val < self.gpu_num and self.settings.onnxModelFile != "" and self.settings.onnxModelFile != None:
                 providers = self.onnx_session.get_providers()
                 print("Providers:", providers)
                 if "CUDAExecutionProvider" in providers:
@@ -129,7 +129,8 @@ class MMVCv15:
     def get_info(self):
         data = asdict(self.settings)
 
-        data["onnxExecutionProviders"] = self.onnx_session.get_providers() if self.settings.onnxModelFile != "" else []
+        data["onnxExecutionProviders"] = self.onnx_session.get_providers(
+        ) if self.settings.onnxModelFile != "" and self.settings.onnxModelFile != None else []
         files = ["configFile", "pyTorchModelFile", "onnxModelFile"]
         for f in files:
             if data[f] != None and os.path.exists(data[f]):
@@ -193,7 +194,7 @@ class MMVCv15:
         return [spec, f0, sid]
 
     def _onnx_inference(self, data):
-        if self.settings.onnxModelFile == "" or self.settings.onnxModelFile == None:
+        if self.settings.onnxModelFile == "" and self.settings.onnxModelFile == None:
             print("[Voice Changer] No ONNX session.")
             raise NoModeLoadedException("ONNX")
 
