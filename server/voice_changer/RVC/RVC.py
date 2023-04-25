@@ -149,7 +149,7 @@ class RVC:
         except Exception as e:
             print("EXCEPTION during loading hubert/contentvec model", e)
 
-        if self.initialLoad:
+        if self.initialLoad or tmp_slot == self.currentSlot:
             self.prepareModel(tmp_slot)
             self.settings.modelSlotIndex = tmp_slot
             self.currentSlot = self.settings.modelSlotIndex
