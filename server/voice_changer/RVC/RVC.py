@@ -114,19 +114,11 @@ class RVC:
 
     def loadModel(self, props):
         self.is_half = props["isHalf"]
-        self.tmp_slot = props["slot"]
+        tmp_slot = props["slot"]
         params_str = props["params"]
         params = json.loads(params_str)
 
-        # self.settings.modelSlots[self.tmp_slot] = ModelSlot(
-        #     pyTorchModelFile=props["files"]["pyTorchModelFilename"],
-        #     onnxModelFile=props["files"]["onnxModelFilename"],
-        #     featureFile=props["files"]["featureFilename"],
-        #     indexFile=props["files"]["indexFilename"],
-        #     defaultTrans=params["trans"]
-        # )
-
-        newSlot = asdict(self.settings.modelSlots[self.tmp_slot])
+        newSlot = asdict(self.settings.modelSlots[tmp_slot])
         newSlot.update({
             "pyTorchModelFile": props["files"]["pyTorchModelFilename"],
             "onnxModelFile": props["files"]["onnxModelFilename"],
@@ -134,16 +126,9 @@ class RVC:
             "indexFile": props["files"]["indexFilename"],
             "defaultTrans": params["trans"]
         })
-        # .update({
-        #     pyTorchModelFile: props["files"]["pyTorchModelFilename"],
-        #     onnxModelFile: props["files"]["onnxModelFilename"],
-        #     featureFile: props["files"]["featureFilename"],
-        #     indexFile: props["files"]["indexFilename"],
-        #     defaultTrans: params["trans"]
-        # })
-        self.settings.modelSlots[self.tmp_slot] = ModelSlot(**newSlot)
+        self.settings.modelSlots[tmp_slot] = ModelSlot(**newSlot)
 
-        print("[Voice Changer] RVC loading... slot:", self.tmp_slot)
+        print("[Voice Changer] RVC loading... slot:", tmp_slot)
 
         try:
             hubert_path = self.params["hubert_base"]
@@ -158,8 +143,8 @@ class RVC:
             print("EXCEPTION during loading hubert/contentvec model", e)
 
         if self.initialLoad:
-            self.prepareModel(self.tmp_slot)
-            self.settings.modelSlotIndex = self.tmp_slot
+            self.prepareModel(tmp_slot)
+            self.settings.modelSlotIndex = tmp_slot
             self.currentSlot = self.settings.modelSlotIndex
             self.switchModel()
             self.initialLoad = False
@@ -290,8 +275,9 @@ class RVC:
                     self.onnx_session.set_providers(providers=["CUDAExecutionProvider"], provider_options=provider_options)
             if key == "modelSlotIndex":
                 # self.switchModel(int(val))
-                self.tmp_slot = int(val)
-                self.prepareModel(self.tmp_slot)
+                val = int(val) % 1000  # Quick hack for same slot is selected
+                self.prepareModel(val)
+                self.currentSlot = -1
             setattr(self.settings, key, int(val))
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
@@ -431,8 +417,8 @@ class RVC:
         return result
 
     def inference(self, data):
-        if self.settings.modelSlotIndex < -1:
-            print("[Voice Changer] No model uploaded.")
+        if self.settings.modelSlotIndex < 0:
+            print("[Voice Changer] wait for loading model...", self.settings.modelSlotIndex, self.currentSlot)
             raise NoModeLoadedException("model_common")
 
         if self.currentSlot != self.settings.modelSlotIndex:

@@ -12,11 +12,13 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
     const modelSwitchRow = useMemo(() => {
         const slot = appState.serverSetting.serverSetting.modelSlotIndex
 
-        const onSwitchModelClicked = (index: number, filename: string) => {
+        const onSwitchModelClicked = async (index: number, filename: string) => {
             const framework: Framework = filename.endsWith(".onnx") ? "ONNX" : "PyTorch"
             console.log("Framework:::", filename, framework)
 
-            appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, modelSlotIndex: index, framework: framework })
+            // Quick hack for same slot is selected. 下３桁が実際のSlotID
+            const dummyModelSlotIndex = (Math.floor(Date.now() / 1000)) * 1000 + index
+            await appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, modelSlotIndex: dummyModelSlotIndex, framework: framework })
         }
         const modelOptions = appState.serverSetting.serverSetting.modelSlots.map((x, index) => {
             const className = index == slot ? "body-button-active left-margin-1" : "body-button left-margin-1"
