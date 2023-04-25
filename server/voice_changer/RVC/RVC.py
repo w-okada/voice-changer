@@ -50,9 +50,10 @@ class ModelSlot():
     samplingRate: int = -1
     f0: bool = True
     embChannels: int = 256
-    samplingRateOnnx: int = -1
-    f0Onnx: bool = True
-    embChannelsOnnx: int = 256
+    deprecated: bool = False
+    # samplingRateOnnx: int = -1
+    # f0Onnx: bool = True
+    # embChannelsOnnx: int = 256
 
 
 @dataclass
@@ -130,6 +131,12 @@ class RVC:
 
         print("[Voice Changer] RVC loading... slot:", tmp_slot)
 
+        # Load metadata
+        if self.settings.modelSlots[tmp_slot].pyTorchModelFile != None and self.settings.modelSlots[tmp_slot].pyTorchModelFile != "":
+            self._setInfoByPytorch(tmp_slot, self.settings.modelSlots[tmp_slot].pyTorchModelFile)
+        if self.settings.modelSlots[tmp_slot].onnxModelFile != None and self.settings.modelSlots[tmp_slot].onnxModelFile != "":
+            self._setInfoByONNX(tmp_slot, self.settings.modelSlots[tmp_slot].onnxModelFile)
+
         try:
             hubert_path = self.params["hubert_base"]
             models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task([hubert_path], suffix="",)
@@ -150,6 +157,28 @@ class RVC:
             self.initialLoad = False
 
         return self.get_info()
+
+    def _setInfoByPytorch(self, slot, file):
+        cpt = torch.load(file, map_location="cpu")
+        config_len = len(cpt["config"])
+        if config_len == 18:
+            self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_RVC
+            self.settings.modelSlots[slot].embChannels = 256
+        else:
+            self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI
+            self.settings.modelSlots[slot].embChannels = cpt["config"][17]
+        self.settings.modelSlots[slot].f0 = True if cpt["f0"] == 1 else False
+        self.settings.modelSlots[slot].samplingRate = cpt["config"][-1]
+
+        self.settings.modelSamplingRate = cpt["config"][-1]
+
+    def _setInfoByONNX(self, slot, file):
+        tmp_onnx_session = ModelWrapper(file)
+        self.settings.modelSlots[slot].modelType = tmp_onnx_session.getModelType()
+        self.settings.modelSlots[slot].embChannelsOnnx = tmp_onnx_session.getEmbChannels()
+        self.settings.modelSlots[slot].f0 = tmp_onnx_session.getF0()
+        self.settings.modelSlots[slot].samplingRate = tmp_onnx_session.getSamplingRate()
+        self.settings.modelSlots[slot].deprecated = tmp_onnx_session.getDeprecated()
 
     def prepareModel(self, slot: int):
         print("[Voice Changer] Prepare Model of slot:", slot)
@@ -172,17 +201,17 @@ class RVC:
 
             (2-2) rvc-webuiの、(256 or 768) x (ノーマルor pitchレス)判定 ⇒ 256, or 768 は17番目の要素で判定。, ノーマルor pitchレスはckp["f0"]で判定            
             '''
-            config_len = len(cpt["config"])
-            if config_len == 18:
-                self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_RVC
-                self.settings.modelSlots[slot].embChannels = 256
-            else:
-                self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI
-                self.settings.modelSlots[slot].embChannels = cpt["config"][17]
-            self.settings.modelSlots[slot].f0 = True if cpt["f0"] == 1 else False
-            self.settings.modelSlots[slot].samplingRate = cpt["config"][-1]
+            # config_len = len(cpt["config"])
+            # if config_len == 18:
+            #     self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_RVC
+            #     self.settings.modelSlots[slot].embChannels = 256
+            # else:
+            #     self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI
+            #     self.settings.modelSlots[slot].embChannels = cpt["config"][17]
+            # self.settings.modelSlots[slot].f0 = True if cpt["f0"] == 1 else False
+            # self.settings.modelSlots[slot].samplingRate = cpt["config"][-1]
 
-            self.settings.modelSamplingRate = cpt["config"][-1]
+            # self.settings.modelSamplingRate = cpt["config"][-1]
 
             if self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_RVC and self.settings.modelSlots[slot].f0 == True:
                 net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=self.is_half)
@@ -213,16 +242,14 @@ class RVC:
         if onnxModelFile != None and onnxModelFile != "":
             print("[Voice Changer] Loading ONNX Model...")
             self.next_onnx_session = ModelWrapper(onnxModelFile)
-            self.settings.modelSlots[slot].samplingRateOnnx = self.next_onnx_session.getSamplingRate()
-            self.settings.modelSlots[slot].f0Onnx = self.next_onnx_session.getF0()
-            # if self.settings.modelSlots[slot].samplingRate == -1:  # ONNXにsampling rateが入っていない
-            #     self.settings.modelSlots[slot].samplingRate = self.settings.modelSamplingRate
-            self.settings.modelSlots[slot].embChannelsOnnx = self.next_onnx_session.getEmbChannels()
+            # self.settings.modelSlots[slot].samplingRateOnnx = self.next_onnx_session.getSamplingRate()
+            # self.settings.modelSlots[slot].f0Onnx = self.next_onnx_session.getF0()
+            # self.settings.modelSlots[slot].embChannelsOnnx = self.next_onnx_session.getEmbChannels()
 
-            # ONNXがある場合は、ONNXの設定を優先
-            self.settings.modelSlots[slot].samplingRate = self.settings.modelSlots[slot].samplingRateOnnx
-            self.settings.modelSlots[slot].f0 = self.settings.modelSlots[slot].f0Onnx
-            self.settings.modelSlots[slot].embChannels = self.settings.modelSlots[slot].embChannelsOnnx
+            # # ONNXがある場合は、ONNXの設定を優先
+            # self.settings.modelSlots[slot].samplingRate = self.settings.modelSlots[slot].samplingRateOnnx
+            # self.settings.modelSlots[slot].f0 = self.settings.modelSlots[slot].f0Onnx
+            # self.settings.modelSlots[slot].embChannels = self.settings.modelSlots[slot].embChannelsOnnx
         else:
             print("[Voice Changer] Skip Loading ONNX Model...")
             self.next_onnx_session = None
@@ -469,7 +496,7 @@ class RVC:
         metadata = {
             "application": "VC_CLIENT",
             "version": "1",
-            "ModelType": self.settings.modelSlots[self.settings.modelSlotIndex].modelType,
+            "modelType": self.settings.modelSlots[self.settings.modelSlotIndex].modelType,
             "samplingRate": self.settings.modelSlots[self.settings.modelSlotIndex].samplingRate,
             "f0": self.settings.modelSlots[self.settings.modelSlotIndex].f0,
             "embChannels": self.settings.modelSlots[self.settings.modelSlotIndex].embChannels,

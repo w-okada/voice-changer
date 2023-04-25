@@ -371,13 +371,13 @@ def export2onnx(input_model, output_model, output_model_simple, is_half, metadat
     else:
         dev = torch.device("cpu")
 
-    if metadata["f0"] == True and metadata["ModelType"] == RVC_MODEL_TYPE_RVC:
+    if metadata["f0"] == True and metadata["modelType"] == RVC_MODEL_TYPE_RVC:
         net_g_onnx = SynthesizerTrnMs256NSFsid_ONNX(*cpt["config"], is_half=is_half)
-    elif metadata["f0"] == True and metadata["ModelType"] == RVC_MODEL_TYPE_WEBUI:
+    elif metadata["f0"] == True and metadata["modelType"] == RVC_MODEL_TYPE_WEBUI:
         net_g_onnx = SynthesizerTrnMsNSFsid_webui_ONNX(**cpt["params"], is_half=is_half)
-    elif metadata["f0"] == False and metadata["ModelType"] == RVC_MODEL_TYPE_RVC:
+    elif metadata["f0"] == False and metadata["modelType"] == RVC_MODEL_TYPE_RVC:
         net_g_onnx = SynthesizerTrnMs256NSFsid_nono_ONNX(*cpt["config"])
-    elif metadata["f0"] == False and metadata["ModelType"] == RVC_MODEL_TYPE_WEBUI:
+    elif metadata["f0"] == False and metadata["modelType"] == RVC_MODEL_TYPE_WEBUI:
         net_g_onnx = SynthesizerTrnMsNSFsidNono_webui_ONNX(**cpt["params"])
 
     net_g_onnx.eval().to(dev)
