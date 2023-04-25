@@ -269,8 +269,11 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
 
             const configFileName = fileUploadSetting.configFile ? fileUploadSetting.configFile.filename || "-" : "-"
             const params = JSON.stringify({
-                trans: fileUploadSetting.defaultTune
+                trans: fileUploadSetting.defaultTune || 0
             })
+            if (fileUploadSetting.isHalf == undefined) {
+                fileUploadSetting.isHalf = false
+            }
             const loadPromise = props.voiceChangerClient.loadModel(
                 slot,
                 configFileName,
@@ -281,7 +284,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 fileUploadSetting.index?.filename || null,
                 fileUploadSetting.isHalf,
                 params,
-
             )
 
             // サーバでロード中にキャッシュにセーブ

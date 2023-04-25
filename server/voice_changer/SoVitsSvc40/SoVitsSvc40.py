@@ -253,7 +253,8 @@ class SoVitsSvc40:
         if self.settings.clusterInferRatio != 0 and hasattr(self, "cluster_model") and self.cluster_model != None:
             speaker = [key for key, value in self.settings.speakers.items() if value == self.settings.dstId]
             if len(speaker) != 1:
-                print("not only one speaker found.", speaker)
+                pass
+                # print("not only one speaker found.", speaker)
             else:
                 cluster_c = cluster.get_cluster_center_result(self.cluster_model, c.cpu().numpy().T, speaker[0]).T
                 cluster_c = torch.FloatTensor(cluster_c).to(dev)
