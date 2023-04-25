@@ -175,7 +175,7 @@ class RVC:
     def _setInfoByONNX(self, slot, file):
         tmp_onnx_session = ModelWrapper(file)
         self.settings.modelSlots[slot].modelType = tmp_onnx_session.getModelType()
-        self.settings.modelSlots[slot].embChannelsOnnx = tmp_onnx_session.getEmbChannels()
+        self.settings.modelSlots[slot].embChannels = tmp_onnx_session.getEmbChannels()
         self.settings.modelSlots[slot].f0 = tmp_onnx_session.getF0()
         self.settings.modelSlots[slot].samplingRate = tmp_onnx_session.getSamplingRate()
         self.settings.modelSlots[slot].deprecated = tmp_onnx_session.getDeprecated()
@@ -493,6 +493,7 @@ class RVC:
         output_file_simple = os.path.splitext(os.path.basename(pyTorchModelFile))[0] + "_simple.onnx"
         output_path = os.path.join(TMP_DIR, output_file)
         output_path_simple = os.path.join(TMP_DIR, output_file_simple)
+        print("embChannels", self.settings.modelSlots[self.settings.modelSlotIndex].embChannels)
         metadata = {
             "application": "VC_CLIENT",
             "version": "1",

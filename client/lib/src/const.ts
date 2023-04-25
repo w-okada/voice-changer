@@ -138,13 +138,28 @@ export type VoiceChangerServerSetting = {
     inputSampleRate: InputSampleRate
 }
 
+type ModelSlot = {
+    onnxModelFile: string,
+    pyTorchModelFile: string
+    featureFile: string,
+    indexFile: string,
+
+    defaultTrans: number,
+
+    modelType: number,
+    embChannels: number,
+    f0: boolean,
+    samplingRate: number
+    deprecated: boolean
+}
+
 export type ServerInfo = VoiceChangerServerSetting & {
     status: string
     configFile: string,
     pyTorchModelFile: string,
     onnxModelFile: string,
     onnxExecutionProviders: OnnxExecutionProvider[]
-    modelSlots: any[]
+    modelSlots: ModelSlot[]
 }
 
 export type ServerInfoSoVitsSVC = ServerInfo & {
