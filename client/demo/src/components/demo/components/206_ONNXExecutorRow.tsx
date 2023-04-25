@@ -1,7 +1,6 @@
-import { OnnxExecutionProvider, OnnxExporterInfo } from "@dannadori/voice-changer-client-js"
+import { OnnxExecutionProvider } from "@dannadori/voice-changer-client-js"
 import React, { useMemo } from "react"
 import { useAppState } from "../../../001_provider/001_AppStateProvider"
-import { useGuiState } from "../001_GuiStateProvider"
 
 
 export type ONNXExecutorRowProps = {
