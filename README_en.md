@@ -79,12 +79,12 @@ We offer Windows and Mac versions.
 
 - Please refer to [here](tutorials/tutorial_rvc_ja.md) for the description of each item of GUI to be used in RVC.
 
+- Download (When you cannot download from google drive, try [hugging_face](https://huggingface.co/wok000/vcclient/tree/main))
+
 | Version   | OS  | フレームワーク                    | link                                                                                       | サポート VC                                                                   | サイズ |
 | --------- | --- | --------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- | ------ |
 | v.1.5.2.5 | mac | ONNX(cpu), PyTorch(cpu,mps)       | [normal](https://drive.google.com/uc?id=1MNsrVEluBqw_JhSjf_H6H8TNL0wEkg-S&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 795MB  |
 |           | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1LILZYbABedhDK6fACOqwERsIdrpIr3gZ&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2871MB |
-
-\*\*\* [hugging_face](https://huggingface.co/wok000/vcclient/tree/main) (experimental)
 
 | Version    | OS                                    | Framework | link                                                                                               | VC Support | Size  |
 | ---------- | ------------------------------------- | --------- | -------------------------------------------------------------------------------------------------- | ---------- | ----- |
