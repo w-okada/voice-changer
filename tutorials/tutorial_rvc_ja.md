@@ -5,11 +5,10 @@ Realtime Voice Changer Client for RVC チュートリアル(v.1.5.2.4)
 
 ## 注意事項
 
-- 録音については別途行う必要があります。
-  - ブラウザ上で実行可能な録音アプリは[録音アプリ on Github Pages](https://w-okada.github.io/voice-changer/)を参照してください。
-  - [解説動画](https://youtu.be/s_GirFEGvaA)
 - 学習については別途行う必要があります。
   - 自身で学習を行う場合は[RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI)で行ってください。
+  - ブラウザ上で学習用の音声を用意するには[録音アプリ on Github Pages](https://w-okada.github.io/voice-changer/)が便利です。
+    - [解説動画](https://youtu.be/s_GirFEGvaA)
   - [trainingのTIPS](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI/blob/main/docs/training_tips_ja.md)が公開されているので参照してください。
 
 # 起動まで
@@ -43,12 +42,12 @@ RVCの実行にはHuBERTが必要です。
 ## GUIの項目の詳細
 ## server control
 ### start
-startでサーバーを起動、stopでサーバーを終了します
+startでサーバーを起動、stopでサーバーを停止します
 
 ### monitor
 リアルタイム変換の状況を示します。
 
-声を出してから変換までのラグは`buf + res秒`です。
+声を出してから変換までのラグは`buf + res秒`です。調整の際はbufの時間がresよりも長くなるように調整してください。
 
 #### vol
 音声変換後の音量です。
