@@ -1,7 +1,10 @@
-Realtime Voice Changer Client for RVC チュートリアル(v.1.5.2.4)
+Realtime Voice Changer Client for RVC チュートリアル(v.1.5.2.5)
 ================================================================
 # はじめに
 本アプリケーションは、各種音声変換 AI(VC, Voice Conversion)を用いてリアルタイム音声変換を行うためのクライアントソフトウェアです。本ドキュメントでは[RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI)に限定した音声変換のためのチュートリアルを行います。
+
+以下、本家の[Retrieval-based-Voice-Conversion-WebUI](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)を本家RVCと表記し、ddPn08氏の作成した[RVC-WebUI](https://github.com/ddPn08/rvc-webui)をだだぱんRVCと記載します。
+
 
 ## 注意事項
 
@@ -63,6 +66,18 @@ Input ChunkとExtra Data Lengthを足したデータを変換にかかる時間�
 
 ### Switch Model
 アップロードしたモデルについて切り替えることができます。
+モデルについては名前の下に[]で情報が示されます
+1. f0(=pitch)を考慮するモデルか
+  - f0: 考慮する
+  - nof0: 考慮しない
+2. モデルの学習に用いられたサンプリングレート
+3. モデルが用いる特徴量のチャンネル数(大きいほど情報を持っていて重い)
+4. 学習に用いられたクライアント
+  - org: [本家RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)で学習したモデルです。
+  - webui:[だだぱんRVC](https://github.com/ddPn08/rvc-webui)で学習したモデルです。
+
+### EXPORT ONNX
+ONNXモデルを出力します。PyTorchのモデルをONNXモデルに変換すると、推論が高速化される場合があります。
 
 ## Model Setting
 ### Model Uploader
@@ -71,20 +86,22 @@ enable PyTorchをオンにするとPyTorchのモデル(拡張子がpth)を選ぶ
 #### Model Slot
 モデルをどの枠にセットするか選べます。セットしたモデルはServer ControlのSwitch Modelで切り替えられます。
 
-#### Onnx(.onnx)
-.onnx形式のモデルをここで指定します。これかPyTorch(.pth)は必須です。
+#### Model(.onnx or .pth)
+学習済みモデルをここで指定します。必須項目です。
+ONNX形式(.onnx)かPyTorch形式(.pth)のいずれかを選択可能です。
 
-#### PyTorch(.pth)
-.pth形式のモデルをここで指定します。これかOnnx(.onnx)は必須です。
-RVC-WebUIで学習させた場合、`/logs/weights`に入っています。
+本家RVCで学習させた場合、`/logs/weights`に入っています。
+だだぱんRVCで学習させた場合、`/models/checkpoints`に入っています。
 
 #### feature(.npy)
 HuBERTで抽出した特徴を訓練データに近づける追加機能です。index(.index)とペアで使用します。
-RVC-WebUIで学習させた場合、`/logs/weights/total_fea.npy`という名前で保存されています。
+本家RVCで学習させた場合、`/logs/実験名/total_fea.npy`という名前で保存されています。(2023/04/26にtotal_fea.npyを省略するアップデートが入ったので今後不要になる可能性があります)
+だだぱんRVCで学習させた場合、`/models/checkpoints/モデル名_index/モデル名.0.big.npy`という名前で保存されています。
 
 #### index(.index)
 HuBERTで抽出した特徴を訓練データに近づける追加機能です。feature(.npy)とペアで使用します。
-RVC-WebUIで学習させた場合、`/logs/weights/add_XXX.index`という名前で保存されています。
+本家RVCで学習させた場合、`/logs/実験名/add_XXX.index`という名前で保存されています。
+だだぱんRVCで学習させた場合、`/models/checkpoints/モデル名_index/モデル名.0.index`という名前で保存されています。
 
 #### half-precision
 精度をfloat32かfloat16のどちらで推論するか選べます。
@@ -99,9 +116,6 @@ RVC-WebUIで学習させた場合、`/logs/weights/add_XXX.index`という名前
 
 #### upload
 上記の項目を設定した後、押すとmodelを使用できる状態にします。
-
-#### Framework
-アップロードしたモデルファイルのどちらを使うか(PyTorchかONNXか)を選びます。次のバージョンではなくなる予定です。
 
 ## Device Setting
 ### AudioInput
