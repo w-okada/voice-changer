@@ -78,12 +78,14 @@ Windows 版と Mac 版を提供しています。
 
 - RVC で使用する場合の GUI の各項目説明は[こちら](tutorials/tutorial_rvc_ja.md)をご覧ください
 
-- ダウンロードはこちらから。(Google Drive からダウンロードできない方は[hugging_face](https://huggingface.co/wok000/vcclient/tree/main)からダウンロードしてみてください)
+- ダウンロードはこちらから。
 
-| Version   | OS  | フレームワーク                    | link                                                                                       | サポート VC                                                                   | サイズ |
-| --------- | --- | --------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- | ------ |
-| v.1.5.2.5 | mac | ONNX(cpu), PyTorch(cpu,mps)       | [normal](https://drive.google.com/uc?id=1MNsrVEluBqw_JhSjf_H6H8TNL0wEkg-S&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 795MB  |
-|           | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1LILZYbABedhDK6fACOqwERsIdrpIr3gZ&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2871MB |
+| Version   | OS  | フレームワーク                    | link                                                                                           | サポート VC                                                                   | サイズ |
+| --------- | --- | --------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------ |
+| v.1.5.2.5 | mac | ONNX(cpu), PyTorch(cpu,mps)       | [normal](https://drive.google.com/uc?id=1MNsrVEluBqw_JhSjf_H6H8TNL0wEkg-S&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 795MB  |
+|           | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1LILZYbABedhDK6fACOqwERsIdrpIr3gZ&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2871MB |
+
+(\*1) Google Drive からダウンロードできない方は[hugging_face](https://huggingface.co/wok000/vcclient/tree/main)からダウンロードしてみてください
 
 - 各キャラクター専用(近々 RVC 版として提供予定)
 
