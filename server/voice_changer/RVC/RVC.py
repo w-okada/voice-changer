@@ -4,10 +4,11 @@ import json
 import resampy
 from voice_changer.RVC.ModelWrapper import ModelWrapper
 from Exceptions import NoModeLoadedException
+from voice_changer.RVC.RVCSettings import RVCSettings
 from voice_changer.utils.LoadModelParams import LoadModelParams
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 
-from dataclasses import dataclass, asdict, field
+from dataclasses import asdict
 import numpy as np
 import torch
 
@@ -44,62 +45,6 @@ providers = [
 ]
 
 
-@dataclass
-class ModelSlot:
-    pyTorchModelFile: str = ""
-    onnxModelFile: str = ""
-    featureFile: str = ""
-    indexFile: str = ""
-    defaultTrans: int = 0
-    modelType: int = RVC_MODEL_TYPE_RVC
-    samplingRate: int = -1
-    f0: bool = True
-    embChannels: int = 256
-    deprecated: bool = False
-    embedder: str = "hubert_base"  # "hubert_base",  "contentvec",  "distilhubert"
-
-
-@dataclass
-class RVCSettings:
-    gpu: int = 0
-    dstId: int = 0
-
-    f0Detector: str = "pm"  # pm or harvest
-    tran: int = 20
-    silentThreshold: float = 0.00001
-    extraConvertSize: int = 1024 * 32
-    clusterInferRatio: float = 0.1
-
-    framework: str = "PyTorch"  # PyTorch or ONNX
-    pyTorchModelFile: str = ""
-    onnxModelFile: str = ""
-    configFile: str = ""
-    modelSlots: list[ModelSlot] = field(
-        default_factory=lambda: [ModelSlot(), ModelSlot(), ModelSlot()]
-    )
-    indexRatio: float = 0
-    rvcQuality: int = 0
-    silenceFront: int = 1  # 0:off, 1:on
-    modelSamplingRate: int = 48000
-    modelSlotIndex: int = -1
-
-    speakers: dict[str, int] = field(default_factory=lambda: {})
-
-    # ↓mutableな物だけ列挙
-    intData = [
-        "gpu",
-        "dstId",
-        "tran",
-        "extraConvertSize",
-        "rvcQuality",
-        "modelSamplingRate",
-        "silenceFront",
-        "modelSlotIndex",
-    ]
-    floatData = ["silentThreshold", "indexRatio"]
-    strData = ["framework", "f0Detector"]
-
-
 class RVC:
     def __init__(self, params: VoiceChangerParams):
         self.initialLoad = True
@@ -123,41 +68,44 @@ class RVC:
         print("mps: ", self.mps_enabled)
 
     def loadModel(self, props: LoadModelParams):
+        """
+        loadModelはスロットへのエントリ（推論向けにはロードしない）。
+        例外的に、まだ一つも推論向けにロードされていない場合は、ロードする。
+        """
         self.is_half = props.isHalf
         tmp_slot = props.slot
         params_str = props.params
         params = json.loads(params_str)
 
-        newSlot = asdict(self.settings.modelSlots[tmp_slot])
-        newSlot.update(
-            {
-                "pyTorchModelFile": props.files.pyTorchModelFilename,
-                "onnxModelFile": props.files.onnxModelFilename,
-                "featureFile": props.files.featureFilename,
-                "indexFile": props.files.indexFilename,
-                "defaultTrans": params["trans"],
-            }
+        self.settings.modelSlots[
+            tmp_slot
+        ].pyTorchModelFile = props.files.pyTorchModelFilename
+        self.settings.modelSlots[tmp_slot].onnxModelFile = props.files.onnxModelFilename
+        self.settings.modelSlots[tmp_slot].featureFile = props.files.featureFilename
+        self.settings.modelSlots[tmp_slot].indexFile = props.files.indexFilename
+        self.settings.modelSlots[tmp_slot].defaultTrans = params["trans"]
+
+        isONNX = (
+            True
+            if self.settings.modelSlots[tmp_slot].onnxModelFile is not None
+            else False
         )
-        self.settings.modelSlots[tmp_slot] = ModelSlot(**newSlot)
 
-        print("[Voice Changer] RVC loading... slot:", tmp_slot)
-
-        # Load metadata
-        if (
-            self.settings.modelSlots[tmp_slot].pyTorchModelFile is not None
-            and self.settings.modelSlots[tmp_slot].pyTorchModelFile != ""
-        ):
-            self._setInfoByPytorch(
-                tmp_slot, self.settings.modelSlots[tmp_slot].pyTorchModelFile
-            )
-        if (
-            self.settings.modelSlots[tmp_slot].onnxModelFile is not None
-            and self.settings.modelSlots[tmp_slot].onnxModelFile != ""
-        ):
+        # メタデータ設定
+        if isONNX:
             self._setInfoByONNX(
                 tmp_slot, self.settings.modelSlots[tmp_slot].onnxModelFile
             )
+        else:
+            self._setInfoByPytorch(
+                tmp_slot, self.settings.modelSlots[tmp_slot].pyTorchModelFile
+            )
 
+        print(
+            f"[Voice Changer] RVC loading... slot:{tmp_slot}",
+            asdict(self.settings.modelSlots[tmp_slot]),
+        )
+        # hubertロード
         try:
             hubert_path = self.params.hubert_base
             models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(
@@ -173,6 +121,7 @@ class RVC:
         except Exception as e:
             print("EXCEPTION during loading hubert/contentvec model", e)
 
+        # 初回のみロード
         if self.initialLoad or tmp_slot == self.currentSlot:
             self.prepareModel(tmp_slot)
             self.settings.modelSlotIndex = tmp_slot
@@ -197,7 +146,6 @@ class RVC:
                 self.settings.modelSlots[slot].embedder = self.settings.modelSlots[
                     slot
                 ].embedder[:-3]
-            print("embedder....", self.settings.modelSlots[slot].embedder)
 
         self.settings.modelSlots[slot].f0 = True if cpt["f0"] == 1 else False
         self.settings.modelSlots[slot].samplingRate = cpt["config"][-1]
@@ -208,84 +156,55 @@ class RVC:
         tmp_onnx_session = ModelWrapper(file)
         self.settings.modelSlots[slot].modelType = tmp_onnx_session.getModelType()
         self.settings.modelSlots[slot].embChannels = tmp_onnx_session.getEmbChannels()
+        self.settings.modelSlots[slot].embedder = tmp_onnx_session.getEmbedder()
         self.settings.modelSlots[slot].f0 = tmp_onnx_session.getF0()
         self.settings.modelSlots[slot].samplingRate = tmp_onnx_session.getSamplingRate()
         self.settings.modelSlots[slot].deprecated = tmp_onnx_session.getDeprecated()
-        self.settings.modelSlots[slot].embedder = tmp_onnx_session.getEmbedder()
-        print("embedder....", self.settings.modelSlots[slot].embedder)
 
     def prepareModel(self, slot: int):
         print("[Voice Changer] Prepare Model of slot:", slot)
-        pyTorchModelFile = self.settings.modelSlots[slot].pyTorchModelFile
         onnxModelFile = self.settings.modelSlots[slot].onnxModelFile
-        # PyTorchモデル生成
-        if pyTorchModelFile != None and pyTorchModelFile != "":
+        isONNX = (
+            True if self.settings.modelSlots[slot].onnxModelFile is not None else False
+        )
+
+        if isONNX:
+            print("[Voice Changer] Loading ONNX Model...")
+            self.next_onnx_session = ModelWrapper(onnxModelFile)
+            self.next_net_g = None
+        else:
             print("[Voice Changer] Loading Pytorch Model...")
-            cpt = torch.load(pyTorchModelFile, map_location="cpu")
-            """
-            (1) オリジナルとrvc-webuiのモデル判定 ⇒ config全体の形状
-            ■ ノーマル256
-            [1025, 32, 192, 192, 768, 2, 6, 3, 0, '1', [3, 7, 11], [[1, 3, 5], [1, 3, 5], [1, 3, 5]], [10, 6, 2, 2, 2], 512, [16, 16, 4, 4, 4], 109, 256, 48000]
-            ■ ノーマル 768対応
-            [1025, 32, 192, 192, 768, 2, 6, 3, 0, '1', [3, 7, 11], [[1, 3, 5], [1, 3, 5], [1, 3, 5]], [10, 6, 2, 2, 2], 512, [16, 16, 4, 4, 4], 109, 256, 768, 48000]
-            ⇒ 18: オリジナル, 19: rvc-webui
-
-            (2-1) オリジナルのノーマルorPitchレス判定 ⇒ ckp["f0"]で判定
-            0: ピッチレス, 1:ノーマル
-
-            (2-2) rvc-webuiの、(256 or 768) x (ノーマルor pitchレス)判定 ⇒ 256, or 768 は17番目の要素で判定。, ノーマルor pitchレスはckp["f0"]で判定            
-            """
+            torchModelSlot = self.settings.modelSlots[slot]
+            cpt = torch.load(torchModelSlot.pyTorchModelFile, map_location="cpu")
 
             if (
-                self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_RVC
-                and self.settings.modelSlots[slot].f0 is True
+                torchModelSlot.modelType == RVC_MODEL_TYPE_RVC
+                and torchModelSlot.f0 is True
             ):
                 net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=self.is_half)
             elif (
-                self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_RVC
-                and self.settings.modelSlots[slot].f0 is False
+                torchModelSlot.modelType == RVC_MODEL_TYPE_RVC
+                and torchModelSlot.f0 is False
             ):
                 net_g = SynthesizerTrnMs256NSFsid_nono(*cpt["config"])
             elif (
-                self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_WEBUI
-                and self.settings.modelSlots[slot].f0 is True
+                torchModelSlot.modelType == RVC_MODEL_TYPE_WEBUI
+                and torchModelSlot.f0 is True
             ):
                 net_g = SynthesizerTrnMsNSFsid_webui(
                     **cpt["params"], is_half=self.is_half
                 )
-            elif (
-                self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_WEBUI
-                and self.settings.modelSlots[slot].f0 is False
-            ):
+            else:
                 net_g = SynthesizerTrnMsNSFsidNono_webui(
                     **cpt["params"], is_half=self.is_half
                 )
-            else:
-                print("unknwon")
-
             net_g.eval()
             net_g.load_state_dict(cpt["weight"], strict=False)
+
             if self.is_half:
                 net_g = net_g.half()
+
             self.next_net_g = net_g
-        else:
-            print("[Voice Changer] Skip Loading Pytorch Model...")
-            self.next_net_g = None
-
-        # ONNXモデル生成
-        if onnxModelFile != None and onnxModelFile != "":
-            print("[Voice Changer] Loading ONNX Model...")
-            self.next_onnx_session = ModelWrapper(onnxModelFile)
-            # self.settings.modelSlots[slot].samplingRateOnnx = self.next_onnx_session.getSamplingRate()
-            # self.settings.modelSlots[slot].f0Onnx = self.next_onnx_session.getF0()
-            # self.settings.modelSlots[slot].embChannelsOnnx = self.next_onnx_session.getEmbChannels()
-
-            # # ONNXがある場合は、ONNXの設定を優先
-            # self.settings.modelSlots[slot].samplingRate = self.settings.modelSlots[slot].samplingRateOnnx
-            # self.settings.modelSlots[slot].f0 = self.settings.modelSlots[slot].f0Onnx
-            # self.settings.modelSlots[slot].embChannels = self.settings.modelSlots[slot].embChannelsOnnx
-        else:
-            print("[Voice Changer] Skip Loading ONNX Model...")
             self.next_onnx_session = None
 
         self.next_feature_file = self.settings.modelSlots[slot].featureFile
@@ -295,15 +214,11 @@ class RVC:
         self.next_framework = (
             "ONNX" if self.next_onnx_session is not None else "PyTorch"
         )
-        print(
-            "[Voice Changer] Prepare done.",
-        )
+        print("[Voice Changer] Prepare done.")
         return self.get_info()
 
     def switchModel(self):
-        print(
-            "[Voice Changer] Switching model..",
-        )
+        print("[Voice Changer] Switching model..")
         # del self.net_g
         # del self.onnx_session
         self.net_g = self.next_net_g

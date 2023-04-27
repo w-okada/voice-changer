@@ -3,12 +3,12 @@ from dataclasses import dataclass
 
 @dataclass
 class FilePaths:
-    configFilename: str
-    pyTorchModelFilename: str
-    onnxModelFilename: str
-    clusterTorchModelFilename: str
-    featureFilename: str
-    indexFilename: str
+    configFilename: str | None
+    pyTorchModelFilename: str | None
+    onnxModelFilename: str | None
+    clusterTorchModelFilename: str | None
+    featureFilename: str | None
+    indexFilename: str | None
 
 
 @dataclass
