@@ -30,13 +30,15 @@ class ModelWrapper:
             self.embChannels = metadata["embChannels"]
             self.modelType = metadata["modelType"]
             self.deprecated = False
-            print(f"[Voice Changer] Onnx metadata: sr:{self.samplingRate}, f0:{self.f0}")
+            self.embedder = metadata["embedder"] if "embedder" in metadata else "hubert_base"
+            print(f"[Voice Changer] Onnx metadata: sr:{self.samplingRate}, f0:{self.f0}, embedder:{self.embedder}")
         except:
             self.samplingRate = 48000
             self.f0 = True
             self.embChannels = 256
             self.modelType = 0
             self.deprecated = True
+            self.embedder = "hubert_base"
             print(f"[Voice Changer] ############## !!!! CAUTION !!!! ####################")
             print(f"[Voice Changer] This onnx's version is depricated. Please regenerate onnxfile. Fallback to default")
             print(f"[Voice Changer] Onnx metadata: sr:{self.samplingRate}, f0:{self.f0}")
@@ -56,6 +58,9 @@ class ModelWrapper:
 
     def getDeprecated(self):
         return self.deprecated
+
+    def getEmbedder(self):
+        return self.embedder
 
     def set_providers(self, providers, provider_options=[{}]):
         self.onnx_session.set_providers(providers=providers, provider_options=provider_options)

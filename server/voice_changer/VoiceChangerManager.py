@@ -1,12 +1,16 @@
 import numpy as np
 from voice_changer.VoiceChanger import VoiceChanger
 from const import ModelType
+from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 
 
-class VoiceChangerManager():
+class VoiceChangerManager(object):
+    _instance = None
+    voiceChanger: VoiceChanger = None
+
     @classmethod
-    def get_instance(cls, params):
-        if not hasattr(cls, "_instance"):
+    def get_instance(cls, params: VoiceChangerParams):
+        if cls._instance is None:
             cls._instance = cls()
             cls._instance.voiceChanger = VoiceChanger(params)
         return cls._instance
@@ -20,7 +24,7 @@ class VoiceChangerManager():
             return info
 
     def get_info(self):
-        if hasattr(self, 'voiceChanger'):
+        if hasattr(self, "voiceChanger"):
             info = self.voiceChanger.get_info()
             info["status"] = "OK"
             return info
@@ -28,7 +32,7 @@ class VoiceChangerManager():
             return {"status": "ERROR", "msg": "no model loaded"}
 
     def update_settings(self, key: str, val: any):
-        if hasattr(self, 'voiceChanger'):
+        if hasattr(self, "voiceChanger"):
             info = self.voiceChanger.update_settings(key, val)
             info["status"] = "OK"
             return info
@@ -36,7 +40,7 @@ class VoiceChangerManager():
             return {"status": "ERROR", "msg": "no model loaded"}
 
     def changeVoice(self, receivedData: any):
-        if hasattr(self, 'voiceChanger') == True:
+        if hasattr(self, "voiceChanger") is True:
             return self.voiceChanger.on_request(receivedData)
         else:
             print("Voice Change is not loaded. Did you load a correct model?")

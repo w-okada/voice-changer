@@ -4,11 +4,12 @@ import json
 import resampy
 from voice_changer.RVC.ModelWrapper import ModelWrapper
 from Exceptions import NoModeLoadedException
+from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 
 # avoiding parse arg error in RVC
 sys.argv = ["MMVCServerSIO.py"]
 
-if sys.platform.startswith('darwin'):
+if sys.platform.startswith("darwin"):
     baseDir = [x for x in sys.path if x.endswith("Contents/MacOS")]
     if len(baseDir) != 1:
         print("baseDir should be only one ", baseDir)
@@ -24,6 +25,7 @@ from functools import reduce
 import numpy as np
 import torch
 import onnxruntime
+
 # onnxruntime.set_default_logger_severity(3)
 from const import HUBERT_ONNX_MODEL_PATH, TMP_DIR
 
@@ -36,11 +38,17 @@ from .models import SynthesizerTrnMsNSFsidNono as SynthesizerTrnMsNSFsidNono_web
 
 from .const import RVC_MODEL_TYPE_RVC, RVC_MODEL_TYPE_WEBUI
 from fairseq import checkpoint_utils
-providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
+
+providers = [
+    "OpenVINOExecutionProvider",
+    "CUDAExecutionProvider",
+    "DmlExecutionProvider",
+    "CPUExecutionProvider",
+]
 
 
 @dataclass
-class ModelSlot():
+class ModelSlot:
     pyTorchModelFile: str = ""
     onnxModelFile: str = ""
     featureFile: str = ""
@@ -51,13 +59,11 @@ class ModelSlot():
     f0: bool = True
     embChannels: int = 256
     deprecated: bool = False
-    # samplingRateOnnx: int = -1
-    # f0Onnx: bool = True
-    # embChannelsOnnx: int = 256
+    embedder: str = "hubert_base"  # "hubert_base",  "contentvec",  "distilhubert"
 
 
 @dataclass
-class RVCSettings():
+class RVCSettings:
     gpu: int = 0
     dstId: int = 0
 
@@ -72,9 +78,7 @@ class RVCSettings():
     onnxModelFile: str = ""
     configFile: str = ""
     modelSlots: list[ModelSlot] = field(
-        default_factory=lambda: [
-            ModelSlot(), ModelSlot(), ModelSlot()
-        ]
+        default_factory=lambda: [ModelSlot(), ModelSlot(), ModelSlot()]
     )
     indexRatio: float = 0
     rvcQuality: int = 0
@@ -82,22 +86,27 @@ class RVCSettings():
     modelSamplingRate: int = 48000
     modelSlotIndex: int = -1
 
-    speakers: dict[str, int] = field(
-        default_factory=lambda: {}
-    )
+    speakers: dict[str, int] = field(default_factory=lambda: {})
 
     # ↓mutableな物だけ列挙
-    intData = ["gpu", "dstId", "tran", "extraConvertSize", "rvcQuality", "modelSamplingRate", "silenceFront", "modelSlotIndex"]
+    intData = [
+        "gpu",
+        "dstId",
+        "tran",
+        "extraConvertSize",
+        "rvcQuality",
+        "modelSamplingRate",
+        "silenceFront",
+        "modelSlotIndex",
+    ]
     floatData = ["silentThreshold", "indexRatio"]
     strData = ["framework", "f0Detector"]
 
 
 class RVC:
-    def __init__(self, params):
+    def __init__(self, params: VoiceChangerParams):
         self.initialLoad = True
         self.settings = RVCSettings()
-
-        self.inferenceing: bool = False
 
         self.net_g = None
         self.onnx_session = None
@@ -108,7 +117,10 @@ class RVC:
         self.prevVol = 0
         self.params = params
 
-        self.mps_enabled: bool = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
+        self.mps_enabled: bool = (
+            getattr(torch.backends, "mps", None) is not None
+            and torch.backends.mps.is_available()
+        )
         self.currentSlot = -1
         print("RVC initialization: ", params)
         print("mps: ", self.mps_enabled)
@@ -120,26 +132,41 @@ class RVC:
         params = json.loads(params_str)
 
         newSlot = asdict(self.settings.modelSlots[tmp_slot])
-        newSlot.update({
-            "pyTorchModelFile": props["files"]["pyTorchModelFilename"],
-            "onnxModelFile": props["files"]["onnxModelFilename"],
-            "featureFile": props["files"]["featureFilename"],
-            "indexFile": props["files"]["indexFilename"],
-            "defaultTrans": params["trans"]
-        })
+        newSlot.update(
+            {
+                "pyTorchModelFile": props["files"]["pyTorchModelFilename"],
+                "onnxModelFile": props["files"]["onnxModelFilename"],
+                "featureFile": props["files"]["featureFilename"],
+                "indexFile": props["files"]["indexFilename"],
+                "defaultTrans": params["trans"],
+            }
+        )
         self.settings.modelSlots[tmp_slot] = ModelSlot(**newSlot)
 
         print("[Voice Changer] RVC loading... slot:", tmp_slot)
 
         # Load metadata
-        if self.settings.modelSlots[tmp_slot].pyTorchModelFile != None and self.settings.modelSlots[tmp_slot].pyTorchModelFile != "":
-            self._setInfoByPytorch(tmp_slot, self.settings.modelSlots[tmp_slot].pyTorchModelFile)
-        if self.settings.modelSlots[tmp_slot].onnxModelFile != None and self.settings.modelSlots[tmp_slot].onnxModelFile != "":
-            self._setInfoByONNX(tmp_slot, self.settings.modelSlots[tmp_slot].onnxModelFile)
+        if (
+            self.settings.modelSlots[tmp_slot].pyTorchModelFile != None
+            and self.settings.modelSlots[tmp_slot].pyTorchModelFile != ""
+        ):
+            self._setInfoByPytorch(
+                tmp_slot, self.settings.modelSlots[tmp_slot].pyTorchModelFile
+            )
+        if (
+            self.settings.modelSlots[tmp_slot].onnxModelFile != None
+            and self.settings.modelSlots[tmp_slot].onnxModelFile != ""
+        ):
+            self._setInfoByONNX(
+                tmp_slot, self.settings.modelSlots[tmp_slot].onnxModelFile
+            )
 
         try:
-            hubert_path = self.params["hubert_base"]
-            models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task([hubert_path], suffix="",)
+            hubert_path = self.params.hubert_base
+            models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(
+                [hubert_path],
+                suffix="",
+            )
             model = models[0]
             model.eval()
             if self.is_half:
@@ -164,13 +191,21 @@ class RVC:
         if config_len == 18:
             self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_RVC
             self.settings.modelSlots[slot].embChannels = 256
+            self.settings.modelSlots[slot].embedder = "hubert_base"
         else:
             self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI
             self.settings.modelSlots[slot].embChannels = cpt["config"][17]
+            self.settings.modelSlots[slot].embedder = cpt["embedder_name"]
+            if self.settings.modelSlots[slot].embedder.endswith("768"):
+                self.settings.modelSlots[slot].embedder = self.settings.modelSlots[
+                    slot
+                ].embedder[:-3]
+            print("embedder....", self.settings.modelSlots[slot].embedder)
+
         self.settings.modelSlots[slot].f0 = True if cpt["f0"] == 1 else False
         self.settings.modelSlots[slot].samplingRate = cpt["config"][-1]
 
-        self.settings.modelSamplingRate = cpt["config"][-1]
+        # self.settings.modelSamplingRate = cpt["config"][-1]
 
     def _setInfoByONNX(self, slot, file):
         tmp_onnx_session = ModelWrapper(file)
@@ -179,6 +214,8 @@ class RVC:
         self.settings.modelSlots[slot].f0 = tmp_onnx_session.getF0()
         self.settings.modelSlots[slot].samplingRate = tmp_onnx_session.getSamplingRate()
         self.settings.modelSlots[slot].deprecated = tmp_onnx_session.getDeprecated()
+        self.settings.modelSlots[slot].embedder = tmp_onnx_session.getEmbedder()
+        print("embedder....", self.settings.modelSlots[slot].embedder)
 
     def prepareModel(self, slot: int):
         print("[Voice Changer] Prepare Model of slot:", slot)
@@ -188,7 +225,7 @@ class RVC:
         if pyTorchModelFile != None and pyTorchModelFile != "":
             print("[Voice Changer] Loading Pytorch Model...")
             cpt = torch.load(pyTorchModelFile, map_location="cpu")
-            '''
+            """
             (1) オリジナルとrvc-webuiのモデル判定 ⇒ config全体の形状
             ■ ノーマル256
             [1025, 32, 192, 192, 768, 2, 6, 3, 0, '1', [3, 7, 11], [[1, 3, 5], [1, 3, 5], [1, 3, 5]], [10, 6, 2, 2, 2], 512, [16, 16, 4, 4, 4], 109, 256, 48000]
@@ -200,32 +237,32 @@ class RVC:
             0: ピッチレス, 1:ノーマル
 
             (2-2) rvc-webuiの、(256 or 768) x (ノーマルor pitchレス)判定 ⇒ 256, or 768 は17番目の要素で判定。, ノーマルor pitchレスはckp["f0"]で判定            
-            '''
-            # config_len = len(cpt["config"])
-            # if config_len == 18:
-            #     self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_RVC
-            #     self.settings.modelSlots[slot].embChannels = 256
-            # else:
-            #     self.settings.modelSlots[slot].modelType = RVC_MODEL_TYPE_WEBUI
-            #     self.settings.modelSlots[slot].embChannels = cpt["config"][17]
-            # self.settings.modelSlots[slot].f0 = True if cpt["f0"] == 1 else False
-            # self.settings.modelSlots[slot].samplingRate = cpt["config"][-1]
+            """
 
-            # self.settings.modelSamplingRate = cpt["config"][-1]
-
-            if self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_RVC and self.settings.modelSlots[slot].f0 == True:
+            if (
+                self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_RVC
+                and self.settings.modelSlots[slot].f0 == True
+            ):
                 net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=self.is_half)
-            elif self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_RVC and self.settings.modelSlots[slot].f0 == False:
+            elif (
+                self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_RVC
+                and self.settings.modelSlots[slot].f0 == False
+            ):
                 net_g = SynthesizerTrnMs256NSFsid_nono(*cpt["config"])
-            elif self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_WEBUI and self.settings.modelSlots[slot].f0 == True:
-                net_g = SynthesizerTrnMsNSFsid_webui(**cpt["params"], is_half=self.is_half)
-            elif self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_WEBUI and self.settings.modelSlots[slot].f0 == False:
-                ######################
-                # TBD
-                ######################
-                print("webui non-f0 is not supported yet")
-                net_g = SynthesizerTrnMsNSFsidNono_webui(**cpt["params"], is_half=self.is_half)
-
+            elif (
+                self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_WEBUI
+                and self.settings.modelSlots[slot].f0 == True
+            ):
+                net_g = SynthesizerTrnMsNSFsid_webui(
+                    **cpt["params"], is_half=self.is_half
+                )
+            elif (
+                self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_WEBUI
+                and self.settings.modelSlots[slot].f0 == False
+            ):
+                net_g = SynthesizerTrnMsNSFsidNono_webui(
+                    **cpt["params"], is_half=self.is_half
+                )
             else:
                 print("unknwon")
 
@@ -259,11 +296,15 @@ class RVC:
         self.next_trans = self.settings.modelSlots[slot].defaultTrans
         self.next_samplingRate = self.settings.modelSlots[slot].samplingRate
         self.next_framework = "ONNX" if self.next_onnx_session != None else "PyTorch"
-        print("[Voice Changer] Prepare done.",)
+        print(
+            "[Voice Changer] Prepare done.",
+        )
         return self.get_info()
 
     def switchModel(self):
-        print("[Voice Changer] Switching model..",)
+        print(
+            "[Voice Changer] Switching model..",
+        )
         # del self.net_g
         # del self.onnx_session
         self.net_g = self.next_net_g
@@ -275,17 +316,23 @@ class RVC:
         self.settings.modelSamplingRate = self.next_samplingRate
         self.next_net_g = None
         self.next_onnx_session = None
-        print("[Voice Changer] Switching model..done",)
+        print(
+            "[Voice Changer] Switching model..done",
+        )
 
     def update_settings(self, key: str, val: any):
         if key == "onnxExecutionProvider" and self.onnx_session != None:
             if val == "CUDAExecutionProvider":
                 if self.settings.gpu < 0 or self.settings.gpu >= self.gpu_num:
                     self.settings.gpu = 0
-                provider_options = [{'device_id': self.settings.gpu}]
-                self.onnx_session.set_providers(providers=[val], provider_options=provider_options)
+                provider_options = [{"device_id": self.settings.gpu}]
+                self.onnx_session.set_providers(
+                    providers=[val], provider_options=provider_options
+                )
                 if hasattr(self, "hubert_onnx"):
-                    self.hubert_onnx.set_providers(providers=[val], provider_options=provider_options)
+                    self.hubert_onnx.set_providers(
+                        providers=[val], provider_options=provider_options
+                    )
             else:
                 self.onnx_session.set_providers(providers=[val])
                 if hasattr(self, "hubert_onnx"):
@@ -294,12 +341,20 @@ class RVC:
             print("Onnx is not enabled. Please load model.")
             return False
         elif key in self.settings.intData:
-            if key == "gpu" and val >= 0 and val < self.gpu_num and self.onnx_session != None:
+            if (
+                key == "gpu"
+                and val >= 0
+                and val < self.gpu_num
+                and self.onnx_session != None
+            ):
                 providers = self.onnx_session.get_providers()
                 print("Providers:", providers)
                 if "CUDAExecutionProvider" in providers:
-                    provider_options = [{'device_id': self.settings.gpu}]
-                    self.onnx_session.set_providers(providers=["CUDAExecutionProvider"], provider_options=provider_options)
+                    provider_options = [{"device_id": self.settings.gpu}]
+                    self.onnx_session.set_providers(
+                        providers=["CUDAExecutionProvider"],
+                        provider_options=provider_options,
+                    )
             if key == "modelSlotIndex":
                 # self.switchModel(int(val))
                 val = int(val) % 1000  # Quick hack for same slot is selected
@@ -318,7 +373,9 @@ class RVC:
     def get_info(self):
         data = asdict(self.settings)
 
-        data["onnxExecutionProviders"] = self.onnx_session.get_providers() if self.onnx_session != None else []
+        data["onnxExecutionProviders"] = (
+            self.onnx_session.get_providers() if self.onnx_session != None else []
+        )
         files = ["configFile", "pyTorchModelFile", "onnxModelFile"]
         for f in files:
             if data[f] != None and os.path.exists(data[f]):
@@ -331,22 +388,30 @@ class RVC:
     def get_processing_sampling_rate(self):
         return self.settings.modelSamplingRate
 
-    def generate_input(self, newData: any, inputSize: int, crossfadeSize: int, solaSearchFrame: int = 0):
+    def generate_input(
+        self, newData: any, inputSize: int, crossfadeSize: int, solaSearchFrame: int = 0
+    ):
         newData = newData.astype(np.float32) / 32768.0
 
         if hasattr(self, "audio_buffer"):
-            self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)  # 過去のデータに連結
+            self.audio_buffer = np.concatenate(
+                [self.audio_buffer, newData], 0
+            )  # 過去のデータに連結
         else:
             self.audio_buffer = newData
 
-        convertSize = inputSize + crossfadeSize + solaSearchFrame + self.settings.extraConvertSize
+        convertSize = (
+            inputSize + crossfadeSize + solaSearchFrame + self.settings.extraConvertSize
+        )
 
         if convertSize % 128 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
             convertSize = convertSize + (128 - (convertSize % 128))
 
-        self.audio_buffer = self.audio_buffer[-1 * convertSize:]  # 変換対象の部分だけ抽出
+        self.audio_buffer = self.audio_buffer[-1 * convertSize :]  # 変換対象の部分だけ抽出
 
-        crop = self.audio_buffer[-1 * (inputSize + crossfadeSize):-1 * (crossfadeSize)]  # 出力部分だけ切り出して音量を確認。(solaとの関係性について、現状は無考慮)
+        crop = self.audio_buffer[
+            -1 * (inputSize + crossfadeSize) : -1 * (crossfadeSize)
+        ]  # 出力部分だけ切り出して音量を確認。(solaとの関係性について、現状は無考慮)
         rms = np.sqrt(np.square(crop).mean(axis=0))
         vol = max(rms, self.prevVol * 0.0)
         self.prevVol = vol
@@ -390,15 +455,34 @@ class RVC:
 
             f0 = self.settings.modelSlots[self.currentSlot].f0
             embChannels = self.settings.modelSlots[self.currentSlot].embChannels
-            audio_out = vc.pipeline(self.hubert_model, self.onnx_session, sid, audio, times, f0_up_key, f0_method,
-                                    file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file, silence_front=self.settings.extraConvertSize / self.settings.modelSamplingRate, embChannels=embChannels)
+            audio_out = vc.pipeline(
+                self.hubert_model,
+                self.onnx_session,
+                sid,
+                audio,
+                times,
+                f0_up_key,
+                f0_method,
+                file_index,
+                file_big_npy,
+                index_rate,
+                if_f0,
+                f0_file=f0_file,
+                silence_front=self.settings.extraConvertSize
+                / self.settings.modelSamplingRate,
+                embChannels=embChannels,
+            )
             result = audio_out * np.sqrt(vol)
 
         return result
 
     def _pyTorch_inference(self, data):
         if hasattr(self, "net_g") == False or self.net_g == None:
-            print("[Voice Changer] No pyTorch session.", hasattr(self, "net_g"), self.net_g)
+            print(
+                "[Voice Changer] No pyTorch session.",
+                hasattr(self, "net_g"),
+                self.net_g,
+            )
             raise NoModeLoadedException("pytorch")
 
         if self.settings.gpu < 0 or (self.gpu_num == 0 and self.mps_enabled == False):
@@ -436,8 +520,23 @@ class RVC:
             f0_file = None
 
             embChannels = self.settings.modelSlots[self.currentSlot].embChannels
-            audio_out = vc.pipeline(self.hubert_model, self.net_g, sid, audio, times, f0_up_key, f0_method,
-                                    file_index, file_big_npy, index_rate, if_f0, f0_file=f0_file, silence_front=self.settings.extraConvertSize / self.settings.modelSamplingRate, embChannels=embChannels)
+            audio_out = vc.pipeline(
+                self.hubert_model,
+                self.net_g,
+                sid,
+                audio,
+                times,
+                f0_up_key,
+                f0_method,
+                file_index,
+                file_big_npy,
+                index_rate,
+                if_f0,
+                f0_file=f0_file,
+                silence_front=self.settings.extraConvertSize
+                / self.settings.modelSamplingRate,
+                embChannels=embChannels,
+            )
 
             result = audio_out * np.sqrt(vol)
 
@@ -445,7 +544,11 @@ class RVC:
 
     def inference(self, data):
         if self.settings.modelSlotIndex < 0:
-            print("[Voice Changer] wait for loading model...", self.settings.modelSlotIndex, self.currentSlot)
+            print(
+                "[Voice Changer] wait for loading model...",
+                self.settings.modelSlotIndex,
+                self.currentSlot,
+            )
             raise NoModeLoadedException("model_common")
 
         if self.currentSlot != self.settings.modelSlotIndex:
@@ -482,7 +585,9 @@ class RVC:
             print("[Voice Changer] export2onnx, No pyTorch session.")
             return {"status": "ng", "path": f""}
 
-        pyTorchModelFile = self.settings.modelSlots[self.settings.modelSlotIndex].pyTorchModelFile  # inference前にexportできるようにcurrentSlotではなくslot
+        pyTorchModelFile = self.settings.modelSlots[
+            self.settings.modelSlotIndex
+        ].pyTorchModelFile  # inference前にexportできるようにcurrentSlotではなくslot
 
         if pyTorchModelFile == None:
             print("[Voice Changer] export2onnx, No pyTorch filepath.")
@@ -490,23 +595,45 @@ class RVC:
         import voice_changer.RVC.export2onnx as onnxExporter
 
         output_file = os.path.splitext(os.path.basename(pyTorchModelFile))[0] + ".onnx"
-        output_file_simple = os.path.splitext(os.path.basename(pyTorchModelFile))[0] + "_simple.onnx"
+        output_file_simple = (
+            os.path.splitext(os.path.basename(pyTorchModelFile))[0] + "_simple.onnx"
+        )
         output_path = os.path.join(TMP_DIR, output_file)
         output_path_simple = os.path.join(TMP_DIR, output_file_simple)
-        print("embChannels", self.settings.modelSlots[self.settings.modelSlotIndex].embChannels)
+        print(
+            "embChannels",
+            self.settings.modelSlots[self.settings.modelSlotIndex].embChannels,
+        )
         metadata = {
             "application": "VC_CLIENT",
             "version": "1",
-            "modelType": self.settings.modelSlots[self.settings.modelSlotIndex].modelType,
-            "samplingRate": self.settings.modelSlots[self.settings.modelSlotIndex].samplingRate,
+            "modelType": self.settings.modelSlots[
+                self.settings.modelSlotIndex
+            ].modelType,
+            "samplingRate": self.settings.modelSlots[
+                self.settings.modelSlotIndex
+            ].samplingRate,
             "f0": self.settings.modelSlots[self.settings.modelSlotIndex].f0,
-            "embChannels": self.settings.modelSlots[self.settings.modelSlotIndex].embChannels,
+            "embChannels": self.settings.modelSlots[
+                self.settings.modelSlotIndex
+            ].embChannels,
+            "embedder": self.settings.modelSlots[self.settings.modelSlotIndex].embedder,
         }
 
         if torch.cuda.device_count() > 0:
-            onnxExporter.export2onnx(pyTorchModelFile, output_path, output_path_simple, True, metadata)
+            onnxExporter.export2onnx(
+                pyTorchModelFile, output_path, output_path_simple, True, metadata
+            )
         else:
-            print("[Voice Changer] Warning!!! onnx export with float32. maybe size is doubled.")
-            onnxExporter.export2onnx(pyTorchModelFile, output_path, output_path_simple, False, metadata)
+            print(
+                "[Voice Changer] Warning!!! onnx export with float32. maybe size is doubled."
+            )
+            onnxExporter.export2onnx(
+                pyTorchModelFile, output_path, output_path_simple, False, metadata
+            )
 
-        return {"status": "ok", "path": f"/tmp/{output_file_simple}", "filename": output_file_simple}
+        return {
+            "status": "ok",
+            "path": f"/tmp/{output_file_simple}",
+            "filename": output_file_simple,
+        }

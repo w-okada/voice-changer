@@ -31,24 +31,24 @@ class MMVC_Rest_VoiceChanger:
             buffer = voice.buffer
             wav = base64.b64decode(buffer)
 
-            if wav == 0:
-                samplerate, data = read("dummy.wav")
-                unpackedData = data
-            else:
-                unpackedData = np.array(struct.unpack(
-                    '<%sh' % (len(wav) // struct.calcsize('<h')), wav))
-                # write("logs/received_data.wav", 24000,
-                #       unpackedData.astype(np.int16))
+            # if wav == 0:
+            #     samplerate, data = read("dummy.wav")
+            #     unpackedData = data
+            # else:
+            #     unpackedData = np.array(
+            #         struct.unpack("<%sh" % (len(wav) // struct.calcsize("<h")), wav)
+            #     )
+
+            unpackedData = np.array(
+                struct.unpack("<%sh" % (len(wav) // struct.calcsize("<h")), wav)
+            )
 
             self.tlock.acquire()
             changedVoice = self.voiceChangerManager.changeVoice(unpackedData)
             self.tlock.release()
 
-            changedVoiceBase64 = base64.b64encode(changedVoice[0]).decode('utf-8')
-            data = {
-                "timestamp": timestamp,
-                "changedVoiceBase64": changedVoiceBase64
-            }
+            changedVoiceBase64 = base64.b64encode(changedVoice[0]).decode("utf-8")
+            data = {"timestamp": timestamp, "changedVoiceBase64": changedVoiceBase64}
 
             json_compatible_item_data = jsonable_encoder(data)
             return JSONResponse(content=json_compatible_item_data)

@@ -1,7 +1,8 @@
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.routing import APIRoute
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.exceptions import RequestValidationError
 from typing import Callable
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 
@@ -18,7 +19,7 @@ class ValidationErrorLoggingRoute(APIRoute):
         async def custom_route_handler(request: Request) -> Response:
             try:
                 return await original_route_handler(request)
-            except Exception as exc:
+            except RequestValidationError as exc:
                 print("Exception", request.url, str(exc))
                 body = await request.body()
                 detail = {"errors": exc.errors(), "body": body.decode()}
@@ -28,10 +29,11 @@ class ValidationErrorLoggingRoute(APIRoute):
 
 
 class MMVC_Rest:
+    _instance = None
 
     @classmethod
     def get_instance(cls, voiceChangerManager: VoiceChangerManager):
-        if not hasattr(cls, "_instance"):
+        if cls._instance is None:
             app_fastapi = FastAPI()
             app_fastapi.router.route_class = ValidationErrorLoggingRoute
             app_fastapi.add_middleware(
@@ -43,15 +45,25 @@ class MMVC_Rest:
             )
 
             app_fastapi.mount(
-                "/front", StaticFiles(directory=f'{getFrontendPath()}', html=True), name="static")
+                "/front",
+                StaticFiles(directory=f"{getFrontendPath()}", html=True),
+                name="static",
+            )
 
             app_fastapi.mount(
-                "/trainer", StaticFiles(directory=f'{getFrontendPath()}', html=True), name="static")
+                "/trainer",
+                StaticFiles(directory=f"{getFrontendPath()}", html=True),
+                name="static",
+            )
 
             app_fastapi.mount(
-                "/recorder", StaticFiles(directory=f'{getFrontendPath()}', html=True), name="static")
+                "/recorder",
+                StaticFiles(directory=f"{getFrontendPath()}", html=True),
+                name="static",
+            )
             app_fastapi.mount(
-                "/tmp", StaticFiles(directory=f'{TMP_DIR}'), name="static")
+                "/tmp", StaticFiles(directory=f"{TMP_DIR}"), name="static"
+            )
 
             restHello = MMVC_Rest_Hello()
             app_fastapi.include_router(restHello.router)
