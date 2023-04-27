@@ -30,7 +30,6 @@ class MMVC_Namespace(socketio.AsyncNamespace):
         else:
             unpackedData = np.array(struct.unpack('<%sh' % (len(data) // struct.calcsize('<h')), data)).astype(np.int16)
 
-            # audio1, perf = self.voiceChangerManager.changeVoice(unpackedData)
             res = self.voiceChangerManager.changeVoice(unpackedData)
             audio1 = res[0]
             perf = res[1] if len(res) == 2 else [0, 0, 0]

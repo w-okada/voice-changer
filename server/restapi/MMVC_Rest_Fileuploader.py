@@ -10,6 +10,9 @@ from restapi.mods.FileUploader import upload_file, concat_file_chunks
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 
 from const import MODEL_DIR, UPLOAD_DIR, ModelType
+from voice_changer.utils.LoadModelParams import FilePaths, LoadModelParams
+
+from dataclasses import fields
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(MODEL_DIR, exist_ok=True)
@@ -30,12 +33,6 @@ class MMVC_Rest_Fileuploader:
             "/update_settings", self.post_update_settings, methods=["POST"]
         )
         self.router.add_api_route("/load_model", self.post_load_model, methods=["POST"])
-        self.router.add_api_route(
-            "/load_model_for_train", self.post_load_model_for_train, methods=["POST"]
-        )
-        self.router.add_api_route(
-            "/extract_voices", self.post_extract_voices, methods=["POST"]
-        )
         self.router.add_api_route("/model_type", self.post_model_type, methods=["POST"])
         self.router.add_api_route("/model_type", self.get_model_type, methods=["GET"])
         self.router.add_api_route("/onnx", self.get_onnx, methods=["GET"])
@@ -80,74 +77,42 @@ class MMVC_Rest_Fileuploader:
         isHalf: bool = Form(...),
         params: str = Form(...),
     ):
-        props = {
-            "slot": slot,
-            "isHalf": isHalf,
-            "files": {
-                "configFilename": configFilename,
-                "pyTorchModelFilename": pyTorchModelFilename,
-                "onnxModelFilename": onnxModelFilename,
-                "clusterTorchModelFilename": clusterTorchModelFilename,
-                "featureFilename": featureFilename,
-                "indexFilename": indexFilename,
-            },
-            "params": params,
-        }
+        files = FilePaths(
+            configFilename=configFilename,
+            pyTorchModelFilename=pyTorchModelFilename,
+            onnxModelFilename=onnxModelFilename,
+            clusterTorchModelFilename=clusterTorchModelFilename,
+            featureFilename=featureFilename,
+            indexFilename=indexFilename,
+        )
+        props: LoadModelParams = LoadModelParams(
+            slot=slot, isHalf=isHalf, params=params, files=files
+        )
+
         # Change Filepath
-        for key, val in props["files"].items():
+        for field in fields(props.files):
+            key = field.name
+            val = getattr(props.files, key)
             if val != "-":
                 uploadPath = os.path.join(UPLOAD_DIR, val)
                 storeDir = os.path.join(UPLOAD_DIR, f"{slot}")
                 os.makedirs(storeDir, exist_ok=True)
                 storePath = os.path.join(storeDir, val)
                 shutil.move(uploadPath, storePath)
-                props["files"][key] = storePath
+                setattr(props.files, key, storePath)
             else:
-                props["files"][key] = None
-        # print("---------------------------------------------------2>", props)
+                setattr(props.files, key, None)
 
         info = self.voiceChangerManager.loadModel(props)
         json_compatible_item_data = jsonable_encoder(info)
         return JSONResponse(content=json_compatible_item_data)
-        # return {"load": f"{configFilePath}, {pyTorchModelFilePath}, {onnxModelFilePath}"}
 
-    def post_load_model_for_train(
-        self,
-        modelGFilename: str = Form(...),
-        modelGFilenameChunkNum: int = Form(...),
-        modelDFilename: str = Form(...),
-        modelDFilenameChunkNum: int = Form(...),
-    ):
-        modelGFilePath = concat_file_chunks(
-            UPLOAD_DIR, modelGFilename, modelGFilenameChunkNum, MODEL_DIR
-        )
-        modelDFilePath = concat_file_chunks(
-            UPLOAD_DIR, modelDFilename, modelDFilenameChunkNum, MODEL_DIR
-        )
-        return {"File saved": f"{modelGFilePath}, {modelDFilePath}"}
-
-    def post_extract_voices(
-        self,
-        zipFilename: str = Form(...),
-        zipFileChunkNum: int = Form(...),
-    ):
-        zipFilePath = concat_file_chunks(
-            UPLOAD_DIR, zipFilename, zipFileChunkNum, UPLOAD_DIR
-        )
-        shutil.unpack_archive(zipFilePath, "MMVC_Trainer/dataset/textful/")
-        return {"Zip file unpacked": f"{zipFilePath}"}
-
-    def post_model_type(
-        self,
-        modelType: ModelType = Form(...),
-    ):
+    def post_model_type(self, modelType: ModelType = Form(...)):
         info = self.voiceChangerManager.switchModelType(modelType)
         json_compatible_item_data = jsonable_encoder(info)
         return JSONResponse(content=json_compatible_item_data)
 
-    def get_model_type(
-        self,
-    ):
+    def get_model_type(self):
         info = self.voiceChangerManager.getModelType()
         json_compatible_item_data = jsonable_encoder(info)
         return JSONResponse(content=json_compatible_item_data)

@@ -1,4 +1,4 @@
-from typing import Any, Callable, Optional, Protocol, TypeAlias, Union, cast
+from typing import Any, Union, cast
 from const import TMP_DIR, ModelType
 import torch
 import os
@@ -9,6 +9,7 @@ import resampy
 
 
 from voice_changer.IORecorder import IORecorder
+from voice_changer.utils.LoadModelParams import LoadModelParams
 
 from voice_changer.utils.Timer import Timer
 from voice_changer.utils.VoiceChangerModel import VoiceChangerModel, AudioInOut
@@ -24,8 +25,6 @@ providers = [
 
 STREAM_INPUT_FILE = os.path.join(TMP_DIR, "in.wav")
 STREAM_OUTPUT_FILE = os.path.join(TMP_DIR, "out.wav")
-STREAM_ANALYZE_FILE_DIO = os.path.join(TMP_DIR, "analyze-dio.png")
-STREAM_ANALYZE_FILE_HARVEST = os.path.join(TMP_DIR, "analyze-harvest.png")
 
 
 @dataclass
@@ -51,18 +50,20 @@ class VoiceChangerSettings:
 class VoiceChanger:
     settings: VoiceChangerSettings
     voiceChanger: VoiceChangerModel
+    ioRecorder: IORecorder
+    sola_buffer: AudioInOut
 
     def __init__(self, params: VoiceChangerParams):
         # 初期化
         self.settings = VoiceChangerSettings()
         self.onnx_session = None
-        self.currentCrossFadeOffsetRate = 0
-        self.currentCrossFadeEndRate = 0
+        self.currentCrossFadeOffsetRate = 0.0
+        self.currentCrossFadeEndRate = 0.0
         self.currentCrossFadeOverlapSize = 0  # setting
         self.crossfadeSize = 0  # calculated
 
         self.voiceChanger = None
-        self.modelType = None
+        self.modelType: ModelType | None = None
         self.params = params
         self.gpu_num = torch.cuda.device_count()
         self.prev_audio = np.zeros(4096)
@@ -76,7 +77,7 @@ class VoiceChanger:
         )
 
     def switchModelType(self, modelType: ModelType):
-        if hasattr(self, "voiceChanger") and self.voiceChanger != None:
+        if hasattr(self, "voiceChanger") and self.voiceChanger is not None:
             # return {"status": "ERROR", "msg": "vc is already selected. currently re-select is not implemented"}
             del self.voiceChanger
             self.voiceChanger = None
@@ -114,33 +115,17 @@ class VoiceChanger:
         return {"status": "OK", "msg": "vc is switched."}
 
     def getModelType(self):
-        if self.modelType != None:
+        if self.modelType is not None:
             return {"status": "OK", "vc": self.modelType}
         else:
             return {"status": "OK", "vc": "none"}
 
-    def loadModel(
-        self,
-        props,
-    ):
+    def loadModel(self, props: LoadModelParams):
         try:
             return self.voiceChanger.loadModel(props)
         except Exception as e:
             print("[Voice Changer] Model Load Error! Check your model is valid.", e)
             return {"status": "NG"}
-
-        # try:
-        #     if self.modelType == "MMVCv15" or self.modelType == "MMVCv13":
-        #         return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file)
-        #     elif self.modelType == "so-vits-svc-40" or self.modelType == "so-vits-svc-40_c" or self.modelType == "so-vits-svc-40v2":
-        #         return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, clusterTorchModel)
-        #     elif self.modelType == "RVC":
-        #         return self.voiceChanger.loadModel(slot, config, pyTorch_model_file, onnx_model_file, feature_file, index_file, is_half)
-        #     else:
-        #         return self.voiceChanger.loadModel(config, pyTorch_model_file, onnx_model_file, clusterTorchModel)
-        # except Exception as e:
-        #     print("[Voice Changer] Model Load Error! Check your model is valid.", e)
-        #     return {"status": "NG"}
 
     def get_info(self):
         data = asdict(self.settings)
@@ -167,14 +152,6 @@ class VoiceChanger:
                 if hasattr(self, "ioRecorder"):
                     self.ioRecorder.close()
 
-                # if hasattr(self, "ioAnalyzer") == False:
-                #     self.ioAnalyzer = IOAnalyzer()
-
-                # try:
-                #     self.ioAnalyzer.analyze(STREAM_INPUT_FILE, STREAM_ANALYZE_FILE_DIO, STREAM_ANALYZE_FILE_HARVEST, self.settings.inputSampleRate)
-
-                # except Exception as e:
-                #     print("recordIO exception", e)
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
@@ -182,10 +159,10 @@ class VoiceChanger:
         else:
             if hasattr(self, "voiceChanger"):
                 ret = self.voiceChanger.update_settings(key, val)
-                if ret == False:
+                if ret is False:
                     print(f"{key} is not mutable variable or unknown variable!")
             else:
-                print(f"voice changer is not initialized!")
+                print("voice changer is not initialized!")
         return self.get_info()
 
     def _generate_strength(self, crossfadeSize: int):
@@ -228,9 +205,9 @@ class VoiceChanger:
             )
 
             # ひとつ前の結果とサイズが変わるため、記録は消去する。
-            if hasattr(self, "np_prev_audio1") == True:
+            if hasattr(self, "np_prev_audio1") is True:
                 delattr(self, "np_prev_audio1")
-            if hasattr(self, "sola_buffer"):
+            if hasattr(self, "sola_buffer") is True:
                 del self.sola_buffer
 
     #  receivedData: tuple of short
@@ -275,9 +252,14 @@ class VoiceChanger:
                 # Inference
                 audio = self.voiceChanger.inference(data)
 
-                if hasattr(self, "sola_buffer") == True:
+                if hasattr(self, "sola_buffer") is True:
                     np.set_printoptions(threshold=10000)
-                    audio = audio[-sola_search_frame - crossfade_frame - block_frame :]
+                    audio_offset = -1 * (
+                        sola_search_frame + crossfade_frame + block_frame
+                    )
+                    audio = audio[audio_offset:]
+                    a = 0
+                    audio = audio[a:]
                     # SOLA algorithm from https://github.com/yxlllc/DDSP-SVC, https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI
                     cor_nom = np.convolve(
                         audio[: crossfade_frame + sola_search_frame],
@@ -292,11 +274,9 @@ class VoiceChanger:
                         )
                         + 1e-3
                     )
-                    sola_offset = np.argmax(cor_nom / cor_den)
-
-                    output_wav = audio[sola_offset : sola_offset + block_frame].astype(
-                        np.float64
-                    )
+                    sola_offset = int(np.argmax(cor_nom / cor_den))
+                    sola_end = sola_offset + block_frame
+                    output_wav = audio[sola_offset:sola_end].astype(np.float64)
                     output_wav[:crossfade_frame] *= self.np_cur_strength
                     output_wav[:crossfade_frame] += self.sola_buffer[:]
 
@@ -306,15 +286,12 @@ class VoiceChanger:
                     result = np.zeros(4096).astype(np.int16)
 
                 if (
-                    hasattr(self, "sola_buffer") == True
+                    hasattr(self, "sola_buffer") is True
                     and sola_offset < sola_search_frame
                 ):
-                    sola_buf_org = audio[
-                        -sola_search_frame
-                        - crossfade_frame
-                        + sola_offset : -sola_search_frame
-                        + sola_offset
-                    ]
+                    offset = -1 * (sola_search_frame + crossfade_frame - sola_offset)
+                    end = -1 * (sola_search_frame - sola_offset)
+                    sola_buf_org = audio[offset:end]
                     self.sola_buffer = sola_buf_org * self.np_prev_strength
                 else:
                     self.sola_buffer = audio[-crossfade_frame:] * self.np_prev_strength
@@ -379,7 +356,7 @@ PRINT_CONVERT_PROCESSING: bool = False
 
 
 def print_convert_processing(mess: str):
-    if PRINT_CONVERT_PROCESSING == True:
+    if PRINT_CONVERT_PROCESSING is True:
         print(mess)
 
 

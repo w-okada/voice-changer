@@ -4,7 +4,17 @@ import json
 import resampy
 from voice_changer.RVC.ModelWrapper import ModelWrapper
 from Exceptions import NoModeLoadedException
+from voice_changer.utils.LoadModelParams import LoadModelParams
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
+
+from dataclasses import dataclass, asdict, field
+import numpy as np
+import torch
+
+from fairseq import checkpoint_utils
+
+from const import TMP_DIR
+
 
 # avoiding parse arg error in RVC
 sys.argv = ["MMVCServerSIO.py"]
@@ -19,25 +29,12 @@ if sys.platform.startswith("darwin"):
 else:
     sys.path.append("RVC")
 
-import io
-from dataclasses import dataclass, asdict, field
-from functools import reduce
-import numpy as np
-import torch
-import onnxruntime
 
-# onnxruntime.set_default_logger_severity(3)
-from const import HUBERT_ONNX_MODEL_PATH, TMP_DIR
-
-import pyworld as pw
-
-from voice_changer.RVC.custom_vc_infer_pipeline import VC
-from infer_pack.models import SynthesizerTrnMs256NSFsid, SynthesizerTrnMs256NSFsid_nono
 from .models import SynthesizerTrnMsNSFsid as SynthesizerTrnMsNSFsid_webui
 from .models import SynthesizerTrnMsNSFsidNono as SynthesizerTrnMsNSFsidNono_webui
-
 from .const import RVC_MODEL_TYPE_RVC, RVC_MODEL_TYPE_WEBUI
-from fairseq import checkpoint_utils
+from voice_changer.RVC.custom_vc_infer_pipeline import VC
+from infer_pack.models import SynthesizerTrnMs256NSFsid, SynthesizerTrnMs256NSFsid_nono
 
 providers = [
     "OpenVINOExecutionProvider",
@@ -53,7 +50,7 @@ class ModelSlot:
     onnxModelFile: str = ""
     featureFile: str = ""
     indexFile: str = ""
-    defaultTrans: int = ""
+    defaultTrans: int = 0
     modelType: int = RVC_MODEL_TYPE_RVC
     samplingRate: int = -1
     f0: bool = True
@@ -125,19 +122,19 @@ class RVC:
         print("RVC initialization: ", params)
         print("mps: ", self.mps_enabled)
 
-    def loadModel(self, props):
-        self.is_half = props["isHalf"]
-        tmp_slot = props["slot"]
-        params_str = props["params"]
+    def loadModel(self, props: LoadModelParams):
+        self.is_half = props.isHalf
+        tmp_slot = props.slot
+        params_str = props.params
         params = json.loads(params_str)
 
         newSlot = asdict(self.settings.modelSlots[tmp_slot])
         newSlot.update(
             {
-                "pyTorchModelFile": props["files"]["pyTorchModelFilename"],
-                "onnxModelFile": props["files"]["onnxModelFilename"],
-                "featureFile": props["files"]["featureFilename"],
-                "indexFile": props["files"]["indexFilename"],
+                "pyTorchModelFile": props.files.pyTorchModelFilename,
+                "onnxModelFile": props.files.onnxModelFilename,
+                "featureFile": props.files.featureFilename,
+                "indexFile": props.files.indexFilename,
                 "defaultTrans": params["trans"],
             }
         )
@@ -147,14 +144,14 @@ class RVC:
 
         # Load metadata
         if (
-            self.settings.modelSlots[tmp_slot].pyTorchModelFile != None
+            self.settings.modelSlots[tmp_slot].pyTorchModelFile is not None
             and self.settings.modelSlots[tmp_slot].pyTorchModelFile != ""
         ):
             self._setInfoByPytorch(
                 tmp_slot, self.settings.modelSlots[tmp_slot].pyTorchModelFile
             )
         if (
-            self.settings.modelSlots[tmp_slot].onnxModelFile != None
+            self.settings.modelSlots[tmp_slot].onnxModelFile is not None
             and self.settings.modelSlots[tmp_slot].onnxModelFile != ""
         ):
             self._setInfoByONNX(
@@ -241,24 +238,24 @@ class RVC:
 
             if (
                 self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_RVC
-                and self.settings.modelSlots[slot].f0 == True
+                and self.settings.modelSlots[slot].f0 is True
             ):
                 net_g = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=self.is_half)
             elif (
                 self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_RVC
-                and self.settings.modelSlots[slot].f0 == False
+                and self.settings.modelSlots[slot].f0 is False
             ):
                 net_g = SynthesizerTrnMs256NSFsid_nono(*cpt["config"])
             elif (
                 self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_WEBUI
-                and self.settings.modelSlots[slot].f0 == True
+                and self.settings.modelSlots[slot].f0 is True
             ):
                 net_g = SynthesizerTrnMsNSFsid_webui(
                     **cpt["params"], is_half=self.is_half
                 )
             elif (
                 self.settings.modelSlots[slot].modelType == RVC_MODEL_TYPE_WEBUI
-                and self.settings.modelSlots[slot].f0 == False
+                and self.settings.modelSlots[slot].f0 is False
             ):
                 net_g = SynthesizerTrnMsNSFsidNono_webui(
                     **cpt["params"], is_half=self.is_half
@@ -295,7 +292,9 @@ class RVC:
         self.next_index_file = self.settings.modelSlots[slot].indexFile
         self.next_trans = self.settings.modelSlots[slot].defaultTrans
         self.next_samplingRate = self.settings.modelSlots[slot].samplingRate
-        self.next_framework = "ONNX" if self.next_onnx_session != None else "PyTorch"
+        self.next_framework = (
+            "ONNX" if self.next_onnx_session is not None else "PyTorch"
+        )
         print(
             "[Voice Changer] Prepare done.",
         )
@@ -321,7 +320,7 @@ class RVC:
         )
 
     def update_settings(self, key: str, val: any):
-        if key == "onnxExecutionProvider" and self.onnx_session != None:
+        if key == "onnxExecutionProvider" and self.onnx_session is not None:
             if val == "CUDAExecutionProvider":
                 if self.settings.gpu < 0 or self.settings.gpu >= self.gpu_num:
                     self.settings.gpu = 0
@@ -345,7 +344,7 @@ class RVC:
                 key == "gpu"
                 and val >= 0
                 and val < self.gpu_num
-                and self.onnx_session != None
+                and self.onnx_session is not None
             ):
                 providers = self.onnx_session.get_providers()
                 print("Providers:", providers)
@@ -374,11 +373,11 @@ class RVC:
         data = asdict(self.settings)
 
         data["onnxExecutionProviders"] = (
-            self.onnx_session.get_providers() if self.onnx_session != None else []
+            self.onnx_session.get_providers() if self.onnx_session is not None else []
         )
         files = ["configFile", "pyTorchModelFile", "onnxModelFile"]
         for f in files:
-            if data[f] != None and os.path.exists(data[f]):
+            if data[f] is not None and os.path.exists(data[f]):
                 data[f] = os.path.basename(data[f])
             else:
                 data[f] = ""
@@ -477,7 +476,7 @@ class RVC:
         return result
 
     def _pyTorch_inference(self, data):
-        if hasattr(self, "net_g") == False or self.net_g == None:
+        if hasattr(self, "net_g") is False or self.net_g is None:
             print(
                 "[Voice Changer] No pyTorch session.",
                 hasattr(self, "net_g"),
@@ -485,7 +484,7 @@ class RVC:
             )
             raise NoModeLoadedException("pytorch")
 
-        if self.settings.gpu < 0 or (self.gpu_num == 0 and self.mps_enabled == False):
+        if self.settings.gpu < 0 or (self.gpu_num == 0 and self.mps_enabled is False):
             dev = torch.device("cpu")
         elif self.mps_enabled:
             dev = torch.device("mps")

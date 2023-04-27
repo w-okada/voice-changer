@@ -1,6 +1,8 @@
 import numpy as np
 from voice_changer.VoiceChanger import VoiceChanger
 from const import ModelType
+from voice_changer.utils.LoadModelParams import LoadModelParams
+from voice_changer.utils.VoiceChangerModel import AudioInOut
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 
 
@@ -15,7 +17,7 @@ class VoiceChangerManager(object):
             cls._instance.voiceChanger = VoiceChanger(params)
         return cls._instance
 
-    def loadModel(self, props):
+    def loadModel(self, props: LoadModelParams):
         info = self.voiceChanger.loadModel(props)
         if hasattr(info, "status") and info["status"] == "NG":
             return info
@@ -31,7 +33,7 @@ class VoiceChangerManager(object):
         else:
             return {"status": "ERROR", "msg": "no model loaded"}
 
-    def update_settings(self, key: str, val: any):
+    def update_settings(self, key: str, val: str | int | float):
         if hasattr(self, "voiceChanger"):
             info = self.voiceChanger.update_settings(key, val)
             info["status"] = "OK"
@@ -39,7 +41,7 @@ class VoiceChangerManager(object):
         else:
             return {"status": "ERROR", "msg": "no model loaded"}
 
-    def changeVoice(self, receivedData: any):
+    def changeVoice(self, receivedData: AudioInOut):
         if hasattr(self, "voiceChanger") is True:
             return self.voiceChanger.on_request(receivedData)
         else:
