@@ -1,10 +1,14 @@
 import math
 import torch
 from torch import nn
-import numpy as np
 
-from infer_pack.models import sr2sr, GeneratorNSF, PosteriorEncoder, ResidualCouplingBlock, Generator
-from infer_pack import commons, attentions
+from infer_pack.models import (  # type:ignore
+    GeneratorNSF,
+    PosteriorEncoder,
+    ResidualCouplingBlock,
+    Generator,
+)
+from infer_pack import commons, attentions  # type:ignore
 
 
 class TextEncoder(nn.Module):
@@ -31,7 +35,7 @@ class TextEncoder(nn.Module):
         self.p_dropout = p_dropout
         self.emb_phone = nn.Linear(emb_channels, hidden_channels)
         self.lrelu = nn.LeakyReLU(0.1, inplace=True)
-        if f0 == True:
+        if f0 is True:
             self.emb_pitch = nn.Embedding(256, hidden_channels)  # pitch 256
         self.encoder = attentions.Encoder(
             hidden_channels, filter_channels, n_heads, n_layers, kernel_size, p_dropout
@@ -39,7 +43,7 @@ class TextEncoder(nn.Module):
         self.proj = nn.Conv1d(hidden_channels, out_channels * 2, 1)
 
     def forward(self, phone, pitch, lengths):
-        if pitch == None:
+        if pitch is None:
             x = self.emb_phone(phone)
         else:
             x = self.emb_phone(phone) + self.emb_pitch(pitch)
@@ -81,8 +85,6 @@ class SynthesizerTrnMsNSFsid(nn.Module):
         **kwargs
     ):
         super().__init__()
-        if type(sr) == type("strr"):
-            sr = sr2sr[sr]
         self.spec_channels = spec_channels
         self.inter_channels = inter_channels
         self.hidden_channels = hidden_channels
