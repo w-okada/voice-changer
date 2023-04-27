@@ -6,15 +6,17 @@ from voice_changer.RVC.ModelWrapper import ModelWrapper
 from Exceptions import NoModeLoadedException
 from voice_changer.RVC.RVCSettings import RVCSettings
 from voice_changer.utils.LoadModelParams import LoadModelParams
+from voice_changer.utils.VoiceChangerModel import AudioInOut
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 
 from dataclasses import asdict
+from typing import cast
 import numpy as np
 import torch
 
 from fairseq import checkpoint_utils
 
-from const import TMP_DIR
+from const import TMP_DIR  # type:ignore
 
 
 # avoiding parse arg error in RVC
@@ -35,7 +37,10 @@ from .models import SynthesizerTrnMsNSFsid as SynthesizerTrnMsNSFsid_webui
 from .models import SynthesizerTrnMsNSFsidNono as SynthesizerTrnMsNSFsidNono_webui
 from .const import RVC_MODEL_TYPE_RVC, RVC_MODEL_TYPE_WEBUI
 from voice_changer.RVC.custom_vc_infer_pipeline import VC
-from infer_pack.models import SynthesizerTrnMs256NSFsid, SynthesizerTrnMs256NSFsid_nono
+from infer_pack.models import (  # type:ignore
+    SynthesizerTrnMs256NSFsid,
+    SynthesizerTrnMs256NSFsid_nono,
+)
 
 providers = [
     "OpenVINOExecutionProvider",
@@ -46,6 +51,8 @@ providers = [
 
 
 class RVC:
+    audio_buffer: AudioInOut | None = None
+
     def __init__(self, params: VoiceChangerParams):
         self.initialLoad = True
         self.settings = RVCSettings()
@@ -234,7 +241,7 @@ class RVC:
             "[Voice Changer] Switching model..done",
         )
 
-    def update_settings(self, key: str, val: any):
+    def update_settings(self, key: str, val: int | float | str):
         if key == "onnxExecutionProvider" and self.onnx_session is not None:
             if val == "CUDAExecutionProvider":
                 if self.settings.gpu < 0 or self.settings.gpu >= self.gpu_num:
@@ -251,10 +258,11 @@ class RVC:
                 self.onnx_session.set_providers(providers=[val])
                 if hasattr(self, "hubert_onnx"):
                     self.hubert_onnx.set_providers(providers=[val])
-        elif key == "onnxExecutionProvider" and self.onnx_session == None:
+        elif key == "onnxExecutionProvider" and self.onnx_session is None:
             print("Onnx is not enabled. Please load model.")
             return False
         elif key in self.settings.intData:
+            val = cast(int, val)
             if (
                 key == "gpu"
                 and val >= 0
@@ -303,14 +311,17 @@ class RVC:
         return self.settings.modelSamplingRate
 
     def generate_input(
-        self, newData: any, inputSize: int, crossfadeSize: int, solaSearchFrame: int = 0
+        self,
+        newData: AudioInOut,
+        inputSize: int,
+        crossfadeSize: int,
+        solaSearchFrame: int = 0,
     ):
         newData = newData.astype(np.float32) / 32768.0
 
-        if hasattr(self, "audio_buffer"):
-            self.audio_buffer = np.concatenate(
-                [self.audio_buffer, newData], 0
-            )  # 過去のデータに連結
+        if self.audio_buffer is not None:
+            # 過去のデータに連結
+            self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)
         else:
             self.audio_buffer = newData
 
@@ -321,11 +332,13 @@ class RVC:
         if convertSize % 128 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
             convertSize = convertSize + (128 - (convertSize % 128))
 
-        self.audio_buffer = self.audio_buffer[-1 * convertSize :]  # 変換対象の部分だけ抽出
+        convertOffset = -1 * convertSize
+        self.audio_buffer = self.audio_buffer[convertOffset:]  # 変換対象の部分だけ抽出
 
-        crop = self.audio_buffer[
-            -1 * (inputSize + crossfadeSize) : -1 * (crossfadeSize)
-        ]  # 出力部分だけ切り出して音量を確認。(solaとの関係性について、現状は無考慮)
+        # 出力部分だけ切り出して音量を確認。(TODO:段階的消音にする)
+        cropOffset = -1 * (inputSize + crossfadeSize)
+        cropEnd = -1 * (crossfadeSize)
+        crop = self.audio_buffer[cropOffset:cropEnd]
         rms = np.sqrt(np.square(crop).mean(axis=0))
         vol = max(rms, self.prevVol * 0.0)
         self.prevVol = vol
@@ -333,7 +346,7 @@ class RVC:
         return (self.audio_buffer, convertSize, vol)
 
     def _onnx_inference(self, data):
-        if hasattr(self, "onnx_session") == False or self.onnx_session == None:
+        if hasattr(self, "onnx_session") is False or self.onnx_session is None:
             print("[Voice Changer] No onnx session.")
             raise NoModeLoadedException("ONNX")
 
@@ -361,13 +374,12 @@ class RVC:
             times = [0, 0, 0]
             f0_up_key = self.settings.tran
             f0_method = self.settings.f0Detector
-            file_index = self.index_file if self.index_file != None else ""
-            file_big_npy = self.feature_file if self.feature_file != None else ""
+            file_index = self.index_file if self.index_file is not None else ""
+            file_big_npy = self.feature_file if self.feature_file is not None else ""
             index_rate = self.settings.indexRatio
             if_f0 = 1 if self.settings.modelSlots[self.currentSlot].f0 else 0
             f0_file = None
 
-            f0 = self.settings.modelSlots[self.currentSlot].f0
             embChannels = self.settings.modelSlots[self.currentSlot].embChannels
             audio_out = vc.pipeline(
                 self.hubert_model,
@@ -427,8 +439,8 @@ class RVC:
             times = [0, 0, 0]
             f0_up_key = self.settings.tran
             f0_method = self.settings.f0Detector
-            file_index = self.index_file if self.index_file != None else ""
-            file_big_npy = self.feature_file if self.feature_file != None else ""
+            file_index = self.index_file if self.index_file is not None else ""
+            file_big_npy = self.feature_file if self.feature_file is not None else ""
             index_rate = self.settings.indexRatio
             if_f0 = 1 if self.settings.modelSlots[self.currentSlot].f0 else 0
             f0_file = None
@@ -482,7 +494,7 @@ class RVC:
         del self.onnx_session
 
         remove_path = os.path.join("RVC")
-        sys.path = [x for x in sys.path if x.endswith(remove_path) == False]
+        sys.path = [x for x in sys.path if x.endswith(remove_path) is False]
 
         for key in list(sys.modules):
             val = sys.modules.get(key)
@@ -492,20 +504,21 @@ class RVC:
                     print("remove", key, file_path)
                     sys.modules.pop(key)
             except Exception as e:
+                print(e)
                 pass
 
     def export2onnx(self):
-        if hasattr(self, "net_g") == False or self.net_g == None:
+        if hasattr(self, "net_g") is False or self.net_g is None:
             print("[Voice Changer] export2onnx, No pyTorch session.")
-            return {"status": "ng", "path": f""}
+            return {"status": "ng", "path": ""}
 
         pyTorchModelFile = self.settings.modelSlots[
             self.settings.modelSlotIndex
         ].pyTorchModelFile  # inference前にexportできるようにcurrentSlotではなくslot
 
-        if pyTorchModelFile == None:
+        if pyTorchModelFile is None:
             print("[Voice Changer] export2onnx, No pyTorch filepath.")
-            return {"status": "ng", "path": f""}
+            return {"status": "ng", "path": ""}
         import voice_changer.RVC.export2onnx as onnxExporter
 
         output_file = os.path.splitext(os.path.basename(pyTorchModelFile))[0] + ".onnx"
