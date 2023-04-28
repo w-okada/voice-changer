@@ -7,7 +7,7 @@
     "build:docker": "date +%Y%m%d%H%M%S > docker/dummy && DOCKER_BUILDKIT=1 docker build -f docker/Dockerfile docker/ -t voice-changer",
     "build:docker:onnx": "DOCKER_BUILDKIT=1 docker build -f docker_onnx/Dockerfile docker/ -t onnx-converter",
     "build:docker:trainer": "date +%Y%m%d%H%M%S > docker_trainer/dummy && DOCKER_BUILDKIT=1 docker build -f docker_trainer/Dockerfile docker_trainer/ -t trainer",
-    "build:docker:vcclient": "date +%Y%m%d%H%M%S > docker/dummy && DOCKER_BUILDKIT=1 docker build -f docker_vcclient/Dockerfile docker_vcclient/ -t vcclient",
+    "build:docker:vcclient": "date +%Y%m%d%H%M%S > docker_vcclient/dummy && DOCKER_BUILDKIT=1 docker build -f docker_vcclient/Dockerfile docker_vcclient/ -t vcclient",
     "push:docker": "bash script/001_pushDocker.sh",
     "push:docker:trainer": "bash script/002_pushDockerTrainer.sh",
     "push:docker:vcclient": "bash script/003_pushDockerVCClient.sh",

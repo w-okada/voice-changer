@@ -61,6 +61,9 @@ RUN pip install einops==0.6.0
 RUN pip install local_attention==1.8.5
 RUN pip install websockets==11.0.2
 
+WORKDIR /
+ADD dummy /
+
 RUN git clone https://github.com/w-okada/voice-changer.git
 
 ADD /setup.sh  /voice-changer/server
