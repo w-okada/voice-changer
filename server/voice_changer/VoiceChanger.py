@@ -124,6 +124,7 @@ class VoiceChanger:
         try:
             return self.voiceChanger.loadModel(props)
         except Exception as e:
+            print(traceback.format_exc())
             print("[Voice Changer] Model Load Error! Check your model is valid.", e)
             return {"status": "NG"}
 

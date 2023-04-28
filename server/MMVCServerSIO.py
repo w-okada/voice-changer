@@ -16,6 +16,9 @@ from restapi.MMVC_Rest import MMVC_Rest
 from const import NATIVE_CLIENT_FILE_MAC, NATIVE_CLIENT_FILE_WIN, SSL_KEY_DIR
 import subprocess
 import multiprocessing as mp
+from misc.log_control import setup_loggers
+
+setup_loggers()
 
 
 def setupArgParser():
