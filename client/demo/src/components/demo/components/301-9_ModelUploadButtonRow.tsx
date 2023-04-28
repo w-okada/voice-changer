@@ -27,7 +27,7 @@ export const ModelUploadButtonRow = () => {
                 </div>
                 <div className="body-button-container">
                     <div className={uploadButtonClassName} onClick={uploadButtonAction}>{uploadButtonLabel}</div>
-                    <div>{uploadedText}</div>
+                    <div className="body-item-text-em" >{uploadedText}</div>
                 </div>
             </div>
 

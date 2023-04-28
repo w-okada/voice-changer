@@ -1,0 +1,183 @@
+{
+    "type": "demo",
+    "id": "RVC",
+    "front": {
+        "title": [
+            {
+                "name": "title",
+                "options": {
+                    "mainTitle": "Realtime Voice Changer Client",
+                    "subTitle": "for RVC",
+                    "lineNum": 1
+                }
+            },
+            {
+                "name": "clearSetting",
+                "options": {}
+            }
+        ],
+        "serverControl": [
+            {
+                "name": "startButton",
+                "options": {}
+            },
+            {
+                "name": "performance",
+                "options": {}
+            },
+            {
+                "name": "serverInfo",
+                "options": {}
+            },
+            {
+                "name": "modelSwitch",
+                "options": {}
+            },
+            {
+                "name": "onnxExport",
+                "options": {}
+            }
+        ],
+        "modelSetting": [
+            {
+                "name": "modelUploader",
+                "options": {
+                    "showModelSlot": true,
+                    "showConfig": false,
+                    "showOnnx": true,
+                    "showPyTorch": true,
+                    "showCorrespondence": false,
+                    "showPyTorchCluster": false,
+
+                    "showFeature": true,
+                    "showIndex": true,
+                    "showHalfPrecision": true,
+                    "defaultEnablePyTorch": true,
+
+                    "showDefaultTune": true
+                }
+            },
+            {
+                "name": "framework",
+                "options": {
+                    "showFramework": true
+                }
+            },
+            {
+                "name": "modelSamplingRate",
+                "options": {}
+            }
+        ],
+        "deviceSetting": [
+            {
+                "name": "audioInput",
+                "options": {}
+            },
+            {
+                "name": "audioOutput",
+                "options": {}
+            }
+        ],
+        "qualityControl": [
+            {
+                "name": "noiseControl",
+                "options": {}
+            },
+            {
+                "name": "gainControl",
+                "options": {}
+            },
+            {
+                "name": "f0Detector",
+                "options": {
+                    "detectors": ["pm", "harvest"]
+                }
+            },
+            {
+                "name": "divider",
+                "options": {}
+            },
+            {
+                "name": "analyzer",
+                "options": {}
+            }
+        ],
+        "speakerSetting": [
+            {
+                "name": "dstId",
+                "options": {
+                    "showF0": true,
+                    "useServerInfo": false
+                }
+            },
+            {
+                "name": "tune",
+                "options": {}
+            },
+            {
+                "name": "indexRatio",
+                "options": {}
+            },
+            {
+                "name": "silentThreshold",
+                "options": {}
+            }
+        ],
+        "converterSetting": [
+            {
+                "name": "inputChunkNum",
+                "options": {}
+            },
+            {
+                "name": "extraDataLength",
+                "options": {}
+            },
+            {
+                "name": "gpu",
+                "options": {}
+            }
+        ],
+        "advancedSetting": [
+            {
+                "name": "protocol",
+                "options": {}
+            },
+            {
+                "name": "crossFadeOverlapSize",
+                "options": {}
+            },
+            {
+                "name": "crossFadeOffsetRate",
+                "options": {}
+            },
+            {
+                "name": "crossFadeEndRate",
+                "options": {}
+            },
+            {
+                "name": "trancateNumThreshold",
+                "options": {}
+            },
+            {
+                "name": "rvcQuality",
+                "options": {}
+            },
+            {
+                "name": "silenceFront",
+                "options": {}
+            }
+        ]
+    },
+
+    "dialogs": {
+        "license": [
+            {
+                "title": "Retrieval-based-Voice-Conversion-WebUI",
+                "auther": "liujing04",
+                "contact": "",
+                "url": "https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI",
+                "license": "MIT"
+            }
+        ]
+    }
+}

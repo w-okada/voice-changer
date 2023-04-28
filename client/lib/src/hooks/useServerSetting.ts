@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react"
-import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc_40v2, DefaultServerSetting_so_vits_svc_40, DefaultServerSetting_so_vits_svc_40_c, DefaultServerSetting_RVC, OnnxExporterInfo, DefaultServerSetting_DDSP_SVC, MAX_MODEL_SLOT_NUM } from "../const"
+import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc_40v2, DefaultServerSetting_so_vits_svc_40, DefaultServerSetting_so_vits_svc_40_c, DefaultServerSetting_RVC, OnnxExporterInfo, DefaultServerSetting_DDSP_SVC, MAX_MODEL_SLOT_NUM, Framework } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
@@ -22,6 +22,7 @@ export type FileUploadSetting = {
     isHalf: boolean
     uploaded: boolean
     defaultTune: number
+    framework: Framework
     params: string
 
 }
@@ -38,6 +39,7 @@ const InitialFileUploadSetting: FileUploadSetting = {
     isHalf: true,
     uploaded: false,
     defaultTune: 0,
+    framework: Framework.PyTorch,
     params: "{}"
 }
 
@@ -267,8 +269,11 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
 
             const configFileName = fileUploadSetting.configFile ? fileUploadSetting.configFile.filename || "-" : "-"
             const params = JSON.stringify({
-                trans: fileUploadSetting.defaultTune
+                trans: fileUploadSetting.defaultTune || 0
             })
+            if (fileUploadSetting.isHalf == undefined) {
+                fileUploadSetting.isHalf = false
+            }
             const loadPromise = props.voiceChangerClient.loadModel(
                 slot,
                 configFileName,
@@ -279,7 +284,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 fileUploadSetting.index?.filename || null,
                 fileUploadSetting.isHalf,
                 params,
-
             )
 
             // サーバでロード中にキャッシュにセーブ
@@ -322,6 +326,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 isHalf: fileUploadSetting.isHalf, // キャッシュとしては不使用。guiで上書きされる。
                 uploaded: false, // キャッシュから読み込まれるときには、まだuploadされていないから。
                 defaultTune: fileUploadSetting.defaultTune,
+                framework: fileUploadSetting.framework,
                 params: fileUploadSetting.params
             }
             setItem(`${INDEXEDDB_KEY_MODEL_DATA}_${slot}`, saveData)

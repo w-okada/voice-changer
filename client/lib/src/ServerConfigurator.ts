@@ -110,6 +110,10 @@ export class ServerConfigurator {
     }
 
     loadModel = async (slot: number, configFilename: string, pyTorchModelFilename: string | null, onnxModelFilename: string | null, clusterTorchModelFilename: string | null, featureFilename: string | null, indexFilename: string | null, isHalf: boolean, params: string = "{}") => {
+        if (isHalf == undefined || isHalf == null) {
+            console.warn("isHalf is invalid value", isHalf)
+            isHalf = false
+        }
         const url = this.serverUrl + "/load_model"
         const info = new Promise<ServerInfo>(async (resolve) => {
             const formData = new FormData();

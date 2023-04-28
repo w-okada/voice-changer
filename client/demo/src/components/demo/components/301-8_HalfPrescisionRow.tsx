@@ -9,6 +9,11 @@ export const HalfPrecisionRow = () => {
 
     const halfPrecisionSelectRow = useMemo(() => {
         const slot = guiState.modelSlotNum
+        const fileUploadSetting = appState.serverSetting.fileUploadSettings[slot]
+        if (!fileUploadSetting) {
+            return <></>
+        }
+        const currentValue = fileUploadSetting ? fileUploadSetting.isHalf : true
         const onHalfPrecisionChanged = () => {
             appState.serverSetting.setFileUploadSetting(slot, {
                 ...appState.serverSetting.fileUploadSettings[slot],
@@ -16,16 +21,13 @@ export const HalfPrecisionRow = () => {
             })
         }
 
-
-        const currentVal = appState.serverSetting.fileUploadSettings[slot] ? appState.serverSetting.fileUploadSettings[slot].isHalf : true
         return (
             <div className="body-row split-3-3-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-2">-</div>
                 <div className="body-item-text">
-                    <div></div>
+                    <input type="checkbox" checked={currentValue} onChange={() => onHalfPrecisionChanged()} /> half-precision
                 </div>
                 <div className="body-button-container">
-                    <input type="checkbox" checked={currentVal} onChange={() => onHalfPrecisionChanged()} /> half-precision
                 </div>
             </div>
         )

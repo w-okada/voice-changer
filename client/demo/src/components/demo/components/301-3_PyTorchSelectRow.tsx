@@ -3,15 +3,24 @@ import { fileSelector } from "@dannadori/voice-changer-client-js"
 import { useAppState } from "../../../001_provider/001_AppStateProvider"
 import { useGuiState } from "../001_GuiStateProvider"
 
-export type PyTorchSelectRow = {
+export type PyTorchSelectRowProps = {
+    onlyWhenSelected: boolean
 }
 
-export const PyTorchSelectRow = (_props: PyTorchSelectRow) => {
+export const PyTorchSelectRow = (props: PyTorchSelectRowProps) => {
     const appState = useAppState()
     const guiState = useGuiState()
 
     const pyTorchSelectRow = useMemo(() => {
+        if (guiState.showPyTorchModelUpload == false) {
+            return <></>
+        }
         const slot = guiState.modelSlotNum
+        if (props.onlyWhenSelected && appState.serverSetting.fileUploadSettings[slot]?.framework != "PyTorch") {
+            return <></>
+        }
+
+
         const pyTorchFilenameText = appState.serverSetting.fileUploadSettings[slot]?.pyTorchModel?.filename || appState.serverSetting.fileUploadSettings[slot]?.pyTorchModel?.file?.name || ""
         const onPyTorchFileLoadClicked = async () => {
             const file = await fileSelector("")

@@ -42,6 +42,7 @@ import { DstIdRow2, DstIdRow2Props } from "./components/602v2_DstIdRow2"
 import { SilenceFrontRow, SilenceFrontRowProps } from "./components/812_SilenceFrontRow"
 import { ModelSwitchRow, ModelSwitchRowProps } from "./components/204_ModelSwitchRow"
 import { ONNXExportRow, ONNXExportRowProps } from "./components/205_ONNXExportRow"
+import { ONNXExecutorRow, ONNXExecutorRowProps } from "./components/206_ONNXExecutorRow"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
 
@@ -68,6 +69,7 @@ const initialize = () => {
     addToCatalog("serverInfo", (props: ServerInfoRowProps) => { return <ServerInfoRow {...props} /> })
     addToCatalog("modelSwitch", (props: ModelSwitchRowProps) => { return <ModelSwitchRow {...props} /> })
     addToCatalog("onnxExport", (props: ONNXExportRowProps) => { return <ONNXExportRow {...props} /> })
+    addToCatalog("onnxExecutor", (props: ONNXExecutorRowProps) => { return <ONNXExecutorRow {...props} /> })
 
 
 

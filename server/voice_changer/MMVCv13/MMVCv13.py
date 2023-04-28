@@ -1,6 +1,10 @@
 import sys
 import os
-if sys.platform.startswith('darwin'):
+
+from voice_changer.utils.LoadModelParams import LoadModelParams
+from voice_changer.utils.VoiceChangerModel import AudioInOut
+
+if sys.platform.startswith("darwin"):
     baseDir = [x for x in sys.path if x.endswith("Contents/MacOS")]
     if len(baseDir) != 1:
         print("baseDir should be only one ", baseDir)
@@ -12,23 +16,32 @@ else:
     sys.path.append(modulePath)
 
 
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 import numpy as np
 import torch
 import onnxruntime
-import pyworld as pw
 
-from symbols import symbols
-from models import SynthesizerTrn
-from voice_changer.MMVCv13.TrainerFunctions import TextAudioSpeakerCollate, spectrogram_torch, load_checkpoint, get_hparams_from_file
+from symbols import symbols  # type:ignore
+from models import SynthesizerTrn  # type:ignore
+from voice_changer.MMVCv13.TrainerFunctions import (
+    TextAudioSpeakerCollate,
+    spectrogram_torch,
+    load_checkpoint,
+    get_hparams_from_file,
+)
 
 from Exceptions import NoModeLoadedException
 
-providers = ['OpenVINOExecutionProvider', "CUDAExecutionProvider", "DmlExecutionProvider", "CPUExecutionProvider"]
+providers = [
+    "OpenVINOExecutionProvider",
+    "CUDAExecutionProvider",
+    "DmlExecutionProvider",
+    "CPUExecutionProvider",
+]
 
 
 @dataclass
-class MMVCv13Settings():
+class MMVCv13Settings:
     gpu: int = 0
     srcId: int = 0
     dstId: int = 101
@@ -40,11 +53,13 @@ class MMVCv13Settings():
 
     # ↓mutableな物だけ列挙
     intData = ["gpu", "srcId", "dstId"]
-    floatData = []
+    floatData: list[str] = field(default_factory=lambda: [])
     strData = ["framework"]
 
 
 class MMVCv13:
+    audio_buffer: AudioInOut | None = None
+
     def __init__(self):
         self.settings = MMVCv13Settings()
         self.net_g = None
@@ -53,51 +68,62 @@ class MMVCv13:
         self.gpu_num = torch.cuda.device_count()
         self.text_norm = torch.LongTensor([0, 6, 0])
 
-    def loadModel(self, props):
-        self.settings.configFile = props["files"]["configFilename"]
+    def loadModel(self, props: LoadModelParams):
+        self.settings.configFile = props.files.configFilename
         self.hps = get_hparams_from_file(self.settings.configFile)
 
-        self.settings.pyTorchModelFile = props["files"]["pyTorchModelFilename"]
-        self.settings.onnxModelFile = props["files"]["onnxModelFilename"]
+        self.settings.pyTorchModelFile = props.files.pyTorchModelFilename
+        self.settings.onnxModelFile = props.files.onnxModelFilename
 
         # PyTorchモデル生成
-        if self.settings.pyTorchModelFile != None:
+        if self.settings.pyTorchModelFile is not None:
             self.net_g = SynthesizerTrn(
                 len(symbols),
                 self.hps.data.filter_length // 2 + 1,
                 self.hps.train.segment_size // self.hps.data.hop_length,
                 n_speakers=self.hps.data.n_speakers,
-                **self.hps.model)
+                **self.hps.model
+            )
             self.net_g.eval()
             load_checkpoint(self.settings.pyTorchModelFile, self.net_g, None)
 
         # ONNXモデル生成
-        if self.settings.onnxModelFile != None:
+        if self.settings.onnxModelFile is not None:
             ort_options = onnxruntime.SessionOptions()
             ort_options.intra_op_num_threads = 8
             self.onnx_session = onnxruntime.InferenceSession(
-                self.settings.onnxModelFile,
-                providers=providers
+                self.settings.onnxModelFile, providers=providers
             )
         return self.get_info()
 
-    def update_settings(self, key: str, val: any):
-        if key == "onnxExecutionProvider" and self.onnx_session != None:
+    def update_settings(self, key: str, val: int | float | str):
+        if key == "onnxExecutionProvider" and self.onnx_session is not None:
             if val == "CUDAExecutionProvider":
                 if self.settings.gpu < 0 or self.settings.gpu >= self.gpu_num:
                     self.settings.gpu = 0
-                provider_options = [{'device_id': self.settings.gpu}]
-                self.onnx_session.set_providers(providers=[val], provider_options=provider_options)
+                provider_options = [{"device_id": self.settings.gpu}]
+                self.onnx_session.set_providers(
+                    providers=[val], provider_options=provider_options
+                )
             else:
                 self.onnx_session.set_providers(providers=[val])
         elif key in self.settings.intData:
-            setattr(self.settings, key, int(val))
-            if key == "gpu" and val >= 0 and val < self.gpu_num and self.onnx_session != None:
+            val = int(val)
+            setattr(self.settings, key, val)
+            if (
+                key == "gpu"
+                and val >= 0
+                and val < self.gpu_num
+                and self.onnx_session is not None
+            ):
                 providers = self.onnx_session.get_providers()
                 print("Providers:", providers)
                 if "CUDAExecutionProvider" in providers:
-                    provider_options = [{'device_id': self.settings.gpu}]
-                    self.onnx_session.set_providers(providers=["CUDAExecutionProvider"], provider_options=provider_options)
+                    provider_options = [{"device_id": self.settings.gpu}]
+                    self.onnx_session.set_providers(
+                        providers=["CUDAExecutionProvider"],
+                        provider_options=provider_options,
+                    )
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
@@ -110,10 +136,12 @@ class MMVCv13:
     def get_info(self):
         data = asdict(self.settings)
 
-        data["onnxExecutionProviders"] = self.onnx_session.get_providers() if self.onnx_session != None else []
+        data["onnxExecutionProviders"] = (
+            self.onnx_session.get_providers() if self.onnx_session is not None else []
+        )
         files = ["configFile", "pyTorchModelFile", "onnxModelFile"]
         for f in files:
-            if data[f] != None and os.path.exists(data[f]):
+            if data[f] is not None and os.path.exists(data[f]):
                 data[f] = os.path.basename(data[f])
             else:
                 data[f] = ""
@@ -121,22 +149,35 @@ class MMVCv13:
         return data
 
     def get_processing_sampling_rate(self):
-        if hasattr(self, "hps") == False:
+        if hasattr(self, "hps") is False:
             raise NoModeLoadedException("config")
         return self.hps.data.sampling_rate
 
-    def _get_spec(self, audio: any):
-        spec = spectrogram_torch(audio, self.hps.data.filter_length,
-                                 self.hps.data.sampling_rate, self.hps.data.hop_length, self.hps.data.win_length,
-                                 center=False)
+    def _get_spec(self, audio: AudioInOut):
+        spec = spectrogram_torch(
+            audio,
+            self.hps.data.filter_length,
+            self.hps.data.sampling_rate,
+            self.hps.data.hop_length,
+            self.hps.data.win_length,
+            center=False,
+        )
         spec = torch.squeeze(spec, 0)
         return spec
 
-    def generate_input(self, newData: any, inputSize: int, crossfadeSize: int, solaSearchFrame: int = 0):
+    def generate_input(
+        self,
+        newData: AudioInOut,
+        inputSize: int,
+        crossfadeSize: int,
+        solaSearchFrame: int = 0,
+    ):
         newData = newData.astype(np.float32) / self.hps.data.max_wav_value
 
-        if hasattr(self, "audio_buffer"):
-            self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)  # 過去のデータに連結
+        if self.audio_buffer is not None:
+            self.audio_buffer = np.concatenate(
+                [self.audio_buffer, newData], 0
+            )  # 過去のデータに連結
         else:
             self.audio_buffer = newData
 
@@ -145,9 +186,12 @@ class MMVCv13:
         if convertSize < 8192:
             convertSize = 8192
         if convertSize % self.hps.data.hop_length != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
-            convertSize = convertSize + (self.hps.data.hop_length - (convertSize % self.hps.data.hop_length))
+            convertSize = convertSize + (
+                self.hps.data.hop_length - (convertSize % self.hps.data.hop_length)
+            )
 
-        self.audio_buffer = self.audio_buffer[-1 * convertSize:]  # 変換対象の部分だけ抽出
+        convertOffset = -1 * convertSize
+        self.audio_buffer = self.audio_buffer[convertOffset:]  # 変換対象の部分だけ抽出
 
         audio = torch.FloatTensor(self.audio_buffer)
         audio_norm = audio.unsqueeze(0)  # unsqueeze
@@ -160,25 +204,29 @@ class MMVCv13:
         return data
 
     def _onnx_inference(self, data):
-        if hasattr(self, "onnx_session") == False or self.onnx_session == None:
+        if hasattr(self, "onnx_session") is False or self.onnx_session is None:
             print("[Voice Changer] No ONNX session.")
             raise NoModeLoadedException("ONNX")
 
         x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [x for x in data]
         sid_tgt1 = torch.LongTensor([self.settings.dstId])
         # if spec.size()[2] >= 8:
-        audio1 = self.onnx_session.run(
-            ["audio"],
-            {
-                "specs": spec.numpy(),
-                "lengths": spec_lengths.numpy(),
-                "sid_src": sid_src.numpy(),
-                "sid_tgt": sid_tgt1.numpy()
-            })[0][0, 0] * self.hps.data.max_wav_value
+        audio1 = (
+            self.onnx_session.run(
+                ["audio"],
+                {
+                    "specs": spec.numpy(),
+                    "lengths": spec_lengths.numpy(),
+                    "sid_src": sid_src.numpy(),
+                    "sid_tgt": sid_tgt1.numpy(),
+                },
+            )[0][0, 0]
+            * self.hps.data.max_wav_value
+        )
         return audio1
 
     def _pyTorch_inference(self, data):
-        if hasattr(self, "net_g") == False or self.net_g == None:
+        if hasattr(self, "net_g") is False or self.net_g is None:
             print("[Voice Changer] No pyTorch session.")
             raise NoModeLoadedException("pytorch")
 
@@ -188,11 +236,19 @@ class MMVCv13:
             dev = torch.device("cuda", index=self.settings.gpu)
 
         with torch.no_grad():
-            x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [x.to(dev) for x in data]
+            x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [
+                x.to(dev) for x in data
+            ]
             sid_target = torch.LongTensor([self.settings.dstId]).to(dev)
 
-            audio1 = (self.net_g.to(dev).voice_conversion(spec, spec_lengths, sid_src=sid_src,
-                      sid_tgt=sid_target)[0, 0].data * self.hps.data.max_wav_value)
+            audio1 = (
+                self.net_g.to(dev)
+                .voice_conversion(
+                    spec, spec_lengths, sid_src=sid_src, sid_tgt=sid_target
+                )[0, 0]
+                .data
+                * self.hps.data.max_wav_value
+            )
             result = audio1.float().cpu().numpy()
 
         return result
@@ -208,7 +264,7 @@ class MMVCv13:
         del self.net_g
         del self.onnx_session
         remove_path = os.path.join("MMVC_Client_v13", "python")
-        sys.path = [x for x in sys.path if x.endswith(remove_path) == False]
+        sys.path = [x for x in sys.path if x.endswith(remove_path) is False]
 
         for key in list(sys.modules):
             val = sys.modules.get(key)
@@ -217,5 +273,5 @@ class MMVCv13:
                 if file_path.find(remove_path + os.path.sep) >= 0:
                     print("remove", key, file_path)
                     sys.modules.pop(key)
-            except Exception as e:
+            except:  # type:ignore
                 pass

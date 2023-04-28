@@ -4,6 +4,11 @@
 
 ## What's New!
 
+- v.1.5.2.5
+
+  - RVC: Support pitch-less model and rvc-webui model
+  - so-vits-svc40: some bugfix
+
 - v.1.5.2.4a
 
   - Fix: Export ONNX
@@ -15,20 +20,20 @@
 
 # What is VC Client
 
-[VC Client](https://github.com/w-okada/voice-changer) is a client software for real-time voice changers that uses AI such as [MMVC](https://github.com/isletennos/MMVC_Trainer) and [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc), [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI). It also provides an app for recording training audio for real-time voice changers, specifically for MMVC.
+1. This is a client software for performing real-time voice conversion using various Voice Conversion (VC) AI. The supported AI for voice conversion are as follows.
 
-# Features
+- [MMVC](https://github.com/isletennos/MMVC_Trainer)
+- [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc)
+- [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI)
+- [DDSP-SVC](https://github.com/yxlllc/DDSP-SVC)
 
-1. Cross-platform compatibility
-   Supports Windows, Mac (including Apple Silicon M1), Linux, and Google Colaboratory.
-
-2. No need to install a separate audio recording app
-   Audio recording can be done directly on the application hosted on Github Pages. Since it runs entirely on the browser, there is no need to install any special application. Additionally, since it works entirely as a browser application, no data is sent to the server.
-
-3. Distribute the load by running Voice Changer on a different PC
+2. Distribute the load by running Voice Changer on a different PC
    The real-time voice changer of this application works on a server-client configuration. By running the MMVC server on a separate PC, you can run it while minimizing the impact on other resource-intensive processes such as gaming commentary.
 
 ![image](https://user-images.githubusercontent.com/48346627/206640768-53f6052d-0a96-403b-a06c-6714a0b7471d.png)
+
+3. Cross-platform compatibility
+   Supports Windows, Mac (including Apple Silicon M1), Linux, and Google Colaboratory.
 
 # usage
 
@@ -58,30 +63,28 @@ You can run it on Google's machine learning platform, Colaboratory. If you have 
 You can download and run executable binaries.
 We offer Windows and Mac versions.
 
-- For Mac version, after unzipping the downloaded file, double-click the `startHttp.command` file corresponding to your VC. If a message indicating that the developer cannot be verified is displayed, please press the control key and click to run it again (or right-click to run it). (Details below \* 1)
-
 - For Windows user, after unzipping the downloaded zip file, please run the `start_http.bat` file corresponding to your VC.
+
+- For Mac version, after unzipping the downloaded file, double-click the `startHttp.command` file corresponding to your VC. If a message indicating that the developer cannot be verified is displayed, please press the control key and click to run it again (or right-click to run it).
 
 - If you are connecting remotely, please use the `.command` file (Mac) or `.bat` file (Windows) with https instead of http.
 
-- If you have an Nvidia GPU on Windows, it will usually work with the `ONNX(cpu,cuda),PyTorch(cpu)` version. In rare cases, the GPU may not be recognized, in which case please use the `ONNX(cpu,cuda), PyTorch(cpu,cuda)` version (which is much larger in size).
+- Tsukuyomi-chan, Ami-taro, Kogane Mahiro, and Kogane Kaigetsu require the Content Vec model for their actions. Please download the ContentVec_legacy 500 model from [this repository](https://github.com/auspicious3000/contentvec) and place it in the same folder as startHttp.command or start_http.bat to execute it.
 
-- If you do not have an Nvidia GPU on Windows, it will usually work with the `ONNX(cpu,DirectML), PyTorch(cpu)` version.
+- For the operation of RVC (Retrieval-based-Voice-Conversion) on so-vits-svc 4.0/so-vits-svc 4.0v2, a model of hubert is required. Please download `hubert_base.pt` from [this repository](https://huggingface.co/lj1995/VoiceConversionWebUI/tree/main) and store it in the folder where the batch files are located.
 
-- If you are using `so-vits-svc 4.0`/`so-vits-svc 4.0v2` on Windows, please use the `ONNX(cpu,cuda), PyTorch(cpu,cuda)` version.
+- To run DDSP-SVC, you need to download the hubert-soft and enhancer models. Download hubert-soft from [this link](https://github.com/bshall/hubert/releases/download/v0.1/hubert-soft-0d54a1f4.pt) and store it in the folder with the batch files. Download nsf_hifigan_20221211.zip from [this site](https://github.com/openvpi/vocoders/releases/tag/nsf-hifigan-v1) for enhancer. After unzipping, store the nsf_hifigan folder in the folder with the batch files.
 
-- To use `so-vits-svc 4.0`/`so-vits-svc 4.0v2` or `tsukuyomi-chan`, you need the content vec model. Please download the ContentVec_legacy 500 model from [this repository](https://github.com/auspicious3000/contentvec), and place it in the same folder as `startHttp_xxx.command` or `start_http_xxx.bat` to run.
+- The encoder of DDPS-SVC only supports hubert-soft.
 
-- You need to have the hubert model to use RVC(Retrieval-based-Voice-Conversion). Please download `hubert_base.pt` from [this repository](https://huggingface.co/lj1995/VoiceConversionWebUI/tree/main) and store it in the folder where the batch file is located.
+- Please refer to [here](tutorials/tutorial_rvc_en.md) for the description of each item of GUI to be used in RVC.
 
-| Version    | OS  | Framework                         | link                                                                                       | VC Support                                                                    | Size   |
-| ---------- | --- | --------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- | ------ |
-| v.1.5.2.4a | mac | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1fR86gRWalhpi8kQURJmMfWuDvi53V2Ah&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 795MB  |
-|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1lttvCgnZengcKkP4f0O2UBAVOcOph4b2&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2871MB |
-| v.1.5.2.4  | mac | ONNX(cpu,cuda), PyTorch(cpu,mps)  | [normal](https://drive.google.com/uc?id=1UC0n6Lgyy4ugPznJ-Erd7lskKaOE6--X&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 795MB  |
-|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1OmSug85MUR58cnYo_P6Xe_GtNAG7PkKO&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2871MB |
+- Download (When you cannot download from google drive, try [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main))
 
-\*\*\* [hugging_face](https://huggingface.co/wok000/vcclient/tree/main) (experimental)
+| Version   | OS  | フレームワーク                    | link                                                                                     | サポート VC                                                                   | サイズ |
+| --------- | --- | --------------------------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------ |
+| v.1.5.2.6 | mac | ONNX(cpu), PyTorch(cpu,mps)       | [通常](https://drive.google.com/uc?id=1NTdtBeKU1bdQKP0_LpbmU3xAjuua1dCT&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 784MB  |
+|           | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [通常](https://drive.google.com/uc?id=1XdoMQoghBOjW__rE2a02zMyQDz8Gi56n&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2861MB |
 
 | Version    | OS                                    | Framework | link                                                                                               | VC Support | Size  |
 | ---------- | ------------------------------------- | --------- | -------------------------------------------------------------------------------------------------- | ---------- | ----- |
@@ -94,17 +97,9 @@ We offer Windows and Mac versions.
 |            | <span style="color: blue;">win</span> | -         | [Kikoto Kurage](https://drive.google.com/uc?id=1fiymPcoYzwE1yxyIfC_FTPiFfGEC2jA8&export=download)  | -          | 823MB |
 |            | <span style="color: blue;">win</span> | -         | [Amitaro](https://drive.google.com/uc?id=1Vt4WBEOAz0EhIWs3ZRFIcg7ELtSHnYfe&export=download)        | -          | 821MB |
 
-\*1 MMVC v.1.5.x is Experimental.
+\*1 Tsukuyo Michan uses free character "Tsukuyo Michan" voice data that is publicly available for free. (Details such as terms of use are at the end of the document)
 
-\*2 Tsukuyo Michan uses free character "Tsukuyo Michan" voice data that is publicly available for free. (Details such as terms of use are at the end of the document)
-
-\*3 If unpacking or starting is slow, there is a possibility that virus checking is running on your antivirus software. Please try running it with the file or folder excluded from the target. (At your own risk)
-
-\*4 This software is not signed by the developer. A warning message will appear, but you can run the software by clicking the icon while holding down the control key. This is due to Apple's security policy. Running the software is at your own risk.
-
-![image](https://user-images.githubusercontent.com/48346627/212567711-c4a8d599-e24c-4fa3-8145-a5df7211f023.png)
-
-https://user-images.githubusercontent.com/48346627/212569645-e30b7f4e-079d-4504-8cf8-7816c5f40b00.mp4
+\*2 If unpacking or starting is slow, there is a possibility that virus checking is running on your antivirus software. Please try running it with the file or folder excluded from the target. (At your own risk)
 
 ## (2-3) Usage after setting up the environment such as Docker or Anaconda
 
@@ -118,7 +113,7 @@ To run docker, see [start docker](docker_vcclient/README_en.md).
 
 To run on Anaconda venv, see [server developer's guide](README_dev_en.md)
 
-## Real-time performance
+# Real-time performance
 
 Conversion is almost instantaneous when using GPU.
 
@@ -129,6 +124,14 @@ Even with CPU, recent ones can perform conversions at a reasonable speed.
 https://twitter.com/DannadoriYellow/status/1613553862773997569?s=20&t=7CLD79h1F3dfKiTb7M8RUQ
 
 With an old CPU (i7-4770), it takes about 1000 msec for conversion.
+
+# Software Signing
+
+This software is not signed by the developer. A warning message will appear, but you can run the software by clicking the icon while holding down the control key. This is due to Apple's security policy. Running the software is at your own risk.
+
+![image](https://user-images.githubusercontent.com/48346627/212567711-c4a8d599-e24c-4fa3-8145-a5df7211f023.png)
+
+https://user-images.githubusercontent.com/48346627/212569645-e30b7f4e-079d-4504-8cf8-7816c5f40b00.mp4
 
 # Acknowledgments
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
+
+
 class MMVC_Rest_Hello:
     def __init__(self):
         self.router = APIRouter()
@@ -8,6 +8,3 @@ class MMVC_Rest_Hello:
 
     def hello(self):
         return {"result": "Index"}
-
-
-
