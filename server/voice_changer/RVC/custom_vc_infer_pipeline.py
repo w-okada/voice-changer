@@ -1,5 +1,6 @@
 import numpy as np
-import parselmouth
+
+# import parselmouth
 import torch
 import torch.nn.functional as F
 from config import x_query, x_center, x_max  # type:ignore
@@ -27,28 +28,13 @@ class VC(object):
         silence_front_offset = int(np.round(real_silence_front * self.sr))
         audio = audio[silence_front_offset:]
 
-        time_step = self.window / self.sr * 1000
+        # time_step = self.window / self.sr * 1000
         f0_min = 50
         f0_max = 1100
         f0_mel_min = 1127 * np.log(1 + f0_min / 700)
         f0_mel_max = 1127 * np.log(1 + f0_max / 700)
         if f0_method == "pm":
-            f0 = (
-                parselmouth.Sound(audio, self.sr)
-                .to_pitch_ac(
-                    time_step=time_step / 1000,
-                    voicing_threshold=0.6,
-                    pitch_floor=f0_min,
-                    pitch_ceiling=f0_max,
-                )
-                .selected_array["frequency"]
-            )
-            pad_size = (p_len - len(f0) + 1) // 2
-            if pad_size > 0 or p_len - len(f0) - pad_size > 0:
-                f0 = np.pad(
-                    f0, [[pad_size, p_len - len(f0) - pad_size]], mode="constant"
-                )
-        elif f0_method == "harvest":
+            print("not implemented. use harvest")
             f0, t = pyworld.harvest(
                 audio.astype(np.double),
                 fs=self.sr,
@@ -62,22 +48,18 @@ class VC(object):
                 f0.astype("float"), (start_frame, n_frames - len(f0) - start_frame)
             )
         else:
-            print("[Voice Changer] invalid f0 detector, use pm.", f0_method)
-            f0 = (
-                parselmouth.Sound(audio, self.sr)
-                .to_pitch_ac(
-                    time_step=time_step / 1000,
-                    voicing_threshold=0.6,
-                    pitch_floor=f0_min,
-                    pitch_ceiling=f0_max,
-                )
-                .selected_array["frequency"]
+            f0, t = pyworld.harvest(
+                audio.astype(np.double),
+                fs=self.sr,
+                f0_ceil=f0_max,
+                frame_period=10,
             )
-            pad_size = (p_len - len(f0) + 1) // 2
-            if pad_size > 0 or p_len - len(f0) - pad_size > 0:
-                f0 = np.pad(
-                    f0, [[pad_size, p_len - len(f0) - pad_size]], mode="constant"
-                )
+            f0 = pyworld.stonemask(audio.astype(np.double), f0, t, self.sr)
+            f0 = signal.medfilt(f0, 3)
+
+            f0 = np.pad(
+                f0.astype("float"), (start_frame, n_frames - len(f0) - start_frame)
+            )
 
         f0 *= pow(2, f0_up_key / 12)
         f0bak = f0.copy()

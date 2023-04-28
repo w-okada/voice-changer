@@ -191,8 +191,8 @@ class DDSP_SVC:
             setattr(self.settings, key, str(val))
             if key == "f0Detector":
                 print("f0Detector update", val)
-                if val == "dio":
-                    val = "parselmouth"
+                # if val == "dio":
+                #     val = "parselmouth"
 
                 if hasattr(self, "sampling_rate") is False:
                     self.sampling_rate = 44100
