@@ -64,7 +64,8 @@ RUN pip install websockets==11.0.2
 WORKDIR /
 ADD dummy /
 
-RUN git clone https://github.com/w-okada/voice-changer.git
+RUN git clone https://github.com/w-okada/voice-changer.git -b v.1.5.2
+
 
 ADD /setup.sh  /voice-changer/server
 ADD /exec.sh  /voice-changer/server
@@ -73,7 +74,11 @@ RUN chmod 0777 /voice-changer/server
 WORKDIR /voice-changer/server
 
 RUN git clone https://github.com/isletennos/MMVC_Client.git MMVC_Client_v13
+RUN cd MMVC_Client_v13 && git checkout 04f3fec4fd82dea6657026ec4e1cd80fb29a415c && cd -
+
 RUN git clone https://github.com/isletennos/MMVC_Client.git MMVC_Client_v15
+RUN cd MMVC_Client_v15 && git checkout 461cb231b57cbb17243110eaac8435d9cca24a26 && cd -
+
 RUN git clone https://github.com/StarStringStudio/so-vits-svc.git so-vits-svc-40
 RUN git clone https://github.com/StarStringStudio/so-vits-svc.git so-vits-svc-40v2
 RUN cd so-vits-svc-40v2 && git checkout 08c70ff3d2f7958820b715db2a2180f4b7f92f8d && cd -

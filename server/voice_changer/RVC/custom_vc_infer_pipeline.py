@@ -3,7 +3,6 @@ import numpy as np
 # import parselmouth
 import torch
 import torch.nn.functional as F
-from config import x_query, x_center, x_max  # type:ignore
 import scipy.signal as signal
 import pyworld
 
@@ -14,9 +13,6 @@ class VC(object):
         self.window = 160  # 每帧点数
         self.t_pad = self.sr * x_pad  # 每条前后pad时间
         self.t_pad_tgt = tgt_sr * x_pad
-        self.t_query = self.sr * x_query  # 查询切点前后查询时间
-        self.t_center = self.sr * x_center  # 查询切点位置
-        self.t_max = self.sr * x_max  # 免查询时长阈值
         self.device = device
         self.is_half = is_half
 
