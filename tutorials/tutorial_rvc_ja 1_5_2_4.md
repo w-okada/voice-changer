@@ -80,11 +80,11 @@ RVC-WebUIで学習させた場合、`/logs/weights`に入っています。
 
 #### feature(.npy)
 HuBERTで抽出した特徴を訓練データに近づける追加機能です。index(.index)とペアで使用します。
-RVC-WebUIで学習させた場合、`/logs/weights/total_fea.npy`という名前で保存されています。
+RVC-WebUIで学習させた場合、`/logs/実験名/total_fea.npy`という名前で保存されています。
 
 #### index(.index)
 HuBERTで抽出した特徴を訓練データに近づける追加機能です。feature(.npy)とペアで使用します。
-RVC-WebUIで学習させた場合、`/logs/weights/add_XXX.index`という名前で保存されています。
+RVC-WebUIで学習させた場合、`/logs/実験名/add_XXX.index`という名前で保存されています。
 
 #### half-precision
 精度をfloat32かfloat16のどちらで推論するか選べます。
