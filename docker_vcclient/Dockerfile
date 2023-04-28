@@ -86,18 +86,3 @@ RUN git clone https://github.com/yxlllc/DDSP-SVC.git DDSP-SVC
 RUN git clone https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI.git RVC
 
 ENTRYPOINT ["/bin/bash", "setup.sh"]
-
-# ### Copy from base
-# COPY --from=base --chmod=777 /usr/local/lib/python3.10/dist-packages /usr/local/lib/python3.10/dist-packages
-# COPY --from=base --chmod=777 /voice-changer /voice-changer
-# COPY --from=base --chmod=777 /MMVC_Client /voice-changer/server/MMVC_Client
-# RUN chmod 0777 /voice-changer/server/MMVC_Client
-# RUN chmod 0777 /voice-changer/server
-
-# ADD /setup.sh  /voice-changer/server
-# ADD /exec.sh  /voice-changer/server
-
-
-# WORKDIR /voice-changer/server
-# ENTRYPOINT ["/bin/bash", "setup.sh"]
-# CMD [ "-h"]
