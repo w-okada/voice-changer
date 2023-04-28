@@ -2,10 +2,9 @@ import numpy as np
 import parselmouth
 import torch
 import torch.nn.functional as F
-from config import x_pad, x_query, x_center, x_max
+from config import x_query, x_center, x_max  # type:ignore
 import scipy.signal as signal
 import pyworld
-from .const import RVC_MODEL_TYPE_RVC, RVC_MODEL_TYPE_WEBUI
 
 
 class VC(object):
@@ -20,12 +19,13 @@ class VC(object):
         self.device = device
         self.is_half = is_half
 
-    def get_f0(self, audio, p_len, f0_up_key, f0_method, inp_f0=None, silence_front=0):
+    def get_f0(self, audio, p_len, f0_up_key, f0_method, silence_front=0):
         n_frames = int(len(audio) // self.window) + 1
         start_frame = int(silence_front * self.sr / self.window)
         real_silence_front = start_frame * self.window / self.sr
 
-        audio = audio[int(np.round(real_silence_front * self.sr)) :]
+        silence_front_offset = int(np.round(real_silence_front * self.sr))
+        audio = audio[silence_front_offset:]
 
         time_step = self.window / self.sr * 1000
         f0_min = 50
@@ -80,18 +80,6 @@ class VC(object):
                 )
 
         f0 *= pow(2, f0_up_key / 12)
-        # with open("test.txt","w")as f:f.write("\n".join([str(i)for i in f0.tolist()]))
-        tf0 = self.sr // self.window  # 每秒f0点数
-        if inp_f0 is not None:
-            delta_t = np.round(
-                (inp_f0[:, 0].max() - inp_f0[:, 0].min()) * tf0 + 1
-            ).astype("int16")
-            replace_f0 = np.interp(
-                list(range(delta_t)), inp_f0[:, 0] * 100, inp_f0[:, 1]
-            )
-            shape = f0[x_pad * tf0 : x_pad * tf0 + len(replace_f0)].shape[0]
-            f0[x_pad * tf0 : x_pad * tf0 + len(replace_f0)] = replace_f0[:shape]
-        # with open("test_opt.txt","w")as f:f.write("\n".join([str(i)for i in f0.tolist()]))
         f0bak = f0.copy()
         f0_mel = 1127 * np.log(1 + f0 / 700)
         f0_mel[f0_mel > 0] = (f0_mel[f0_mel > 0] - f0_mel_min) * 254 / (
@@ -102,107 +90,108 @@ class VC(object):
         f0_coarse = np.rint(f0_mel).astype(np.int)
         return f0_coarse, f0bak  # 1-0
 
-    def vc(
-        self,
-        model,
-        net_g,
-        sid,
-        audio0,
-        pitch,
-        pitchf,
-        index,
-        big_npy,
-        index_rate,
-        embChannels=256,
-    ):  # ,file_index,file_big_npy
-        feats = torch.from_numpy(audio0)
-        if self.is_half == True:
-            feats = feats.half()
-        else:
-            feats = feats.float()
-        if feats.dim() == 2:  # double channels
-            feats = feats.mean(-1)
-        assert feats.dim() == 1, feats.dim()
-        feats = feats.view(1, -1)
-        padding_mask = torch.BoolTensor(feats.shape).to(self.device).fill_(False)
-        if embChannels == 256:
-            inputs = {
-                "source": feats.to(self.device),
-                "padding_mask": padding_mask,
-                "output_layer": 9,  # layer 9
-            }
-        else:
-            inputs = {
-                "source": feats.to(self.device),
-                "padding_mask": padding_mask,
-            }
+    # def vc(
+    #     self,
+    #     model,
+    #     net_g,
+    #     sid,
+    #     audio0,
+    #     pitch,
+    #     pitchf,
+    #     index,
+    #     big_npy,
+    #     index_rate,
+    #     embChannels=256,
+    # ):  # ,file_index,file_big_npy
+    #     feats = torch.from_numpy(audio0)
+    #     if self.is_half is True:
+    #         feats = feats.half()
+    #     else:
+    #         feats = feats.float()
+    #     if feats.dim() == 2:  # double channels
+    #         feats = feats.mean(-1)
+    #     assert feats.dim() == 1, feats.dim()
+    #     feats = feats.view(1, -1)
 
-        with torch.no_grad():
-            logits = model.extract_features(**inputs)
-            if embChannels == 256:
-                feats = model.final_proj(logits[0])
-            else:
-                feats = logits[0]
+    #     padding_mask = torch.BoolTensor(feats.shape).to(self.device).fill_(False)
+    #     if embChannels == 256:
+    #         inputs = {
+    #             "source": feats.to(self.device),
+    #             "padding_mask": padding_mask,
+    #             "output_layer": 9,  # layer 9
+    #         }
+    #     else:
+    #         inputs = {
+    #             "source": feats.to(self.device),
+    #             "padding_mask": padding_mask,
+    #         }
 
-        if (
-            isinstance(index, type(None)) is False
-            and isinstance(big_npy, type(None)) is False
-            and index_rate != 0
-        ):
-            npy = feats[0].cpu().numpy()
-            if self.is_half is True:
-                npy = npy.astype("float32")
-            D, I = index.search(npy, 1)
-            npy = big_npy[I.squeeze()]
-            if self.is_half is True:
-                npy = npy.astype("float16")
+    #     with torch.no_grad():
+    #         logits = model.extract_features(**inputs)
+    #         if embChannels == 256:
+    #             feats = model.final_proj(logits[0])
+    #         else:
+    #             feats = logits[0]
 
-            feats = (
-                torch.from_numpy(npy).unsqueeze(0).to(self.device) * index_rate
-                + (1 - index_rate) * feats
-            )
+    #     if (
+    #         isinstance(index, type(None)) is False
+    #         and isinstance(big_npy, type(None)) is False
+    #         and index_rate != 0
+    #     ):
+    #         npy = feats[0].cpu().numpy()
+    #         if self.is_half is True:
+    #             npy = npy.astype("float32")
+    #         D, I = index.search(npy, 1)
+    #         npy = big_npy[I.squeeze()]
+    #         if self.is_half is True:
+    #             npy = npy.astype("float16")
 
-        feats = F.interpolate(feats.permute(0, 2, 1), scale_factor=2).permute(0, 2, 1)
+    #         feats = (
+    #             torch.from_numpy(npy).unsqueeze(0).to(self.device) * index_rate
+    #             + (1 - index_rate) * feats
+    #         )
 
-        p_len = audio0.shape[0] // self.window
-        if feats.shape[1] < p_len:
-            p_len = feats.shape[1]
-            if pitch is not None and pitchf is not None:
-                pitch = pitch[:, :p_len]
-                pitchf = pitchf[:, :p_len]
-        p_len = torch.tensor([p_len], device=self.device).long()
+    #     feats = F.interpolate(feats.permute(0, 2, 1), scale_factor=2).permute(0, 2, 1)
 
-        with torch.no_grad():
-            if pitch is not None:
-                audio1 = (
-                    (net_g.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0] * 32768)
-                    .data.cpu()
-                    .float()
-                    .numpy()
-                    .astype(np.int16)
-                )
-            else:
-                if hasattr(net_g, "infer_pitchless"):
-                    audio1 = (
-                        (net_g.infer_pitchless(feats, p_len, sid)[0][0, 0] * 32768)
-                        .data.cpu()
-                        .float()
-                        .numpy()
-                        .astype(np.int16)
-                    )
-                else:
-                    audio1 = (
-                        (net_g.infer(feats, p_len, sid)[0][0, 0] * 32768)
-                        .data.cpu()
-                        .float()
-                        .numpy()
-                        .astype(np.int16)
-                    )
+    #     p_len = audio0.shape[0] // self.window
+    #     if feats.shape[1] < p_len:
+    #         p_len = feats.shape[1]
+    #         if pitch is not None and pitchf is not None:
+    #             pitch = pitch[:, :p_len]
+    #             pitchf = pitchf[:, :p_len]
+    #     p_len = torch.tensor([p_len], device=self.device).long()
 
-        del feats, p_len, padding_mask
-        torch.cuda.empty_cache()
+    #     with torch.no_grad():
+    #         if pitch is not None:
+    #             audio1 = (
+    #                 (net_g.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0] * 32768)
+    #                 .data.cpu()
+    #                 .float()
+    #                 .numpy()
+    #                 .astype(np.int16)
+    #             )
+    #         else:
+    #             if hasattr(net_g, "infer_pitchless"):
+    #                 audio1 = (
+    #                     (net_g.infer_pitchless(feats, p_len, sid)[0][0, 0] * 32768)
+    #                     .data.cpu()
+    #                     .float()
+    #                     .numpy()
+    #                     .astype(np.int16)
+    #                 )
+    #             else:
+    #                 audio1 = (
+    #                     (net_g.infer(feats, p_len, sid)[0][0, 0] * 32768)
+    #                     .data.cpu()
+    #                     .float()
+    #                     .numpy()
+    #                     .astype(np.int16)
+    #                 )
 
-        return audio1
+    #     del feats, p_len, padding_mask
+    #     torch.cuda.empty_cache()
+
+    #     return audio1
 
     def pipeline(
         self,
@@ -221,7 +210,6 @@ class VC(object):
     ):
         audio_pad = np.pad(audio, (self.t_pad, self.t_pad), mode="reflect")
         p_len = audio_pad.shape[0] // self.window
-        inp_f0 = None
         sid = torch.tensor(sid, device=self.device).unsqueeze(0).long()
 
         # ピッチ検出
@@ -232,7 +220,6 @@ class VC(object):
                 p_len,
                 f0_up_key,
                 f0_method,
-                inp_f0,
                 silence_front=silence_front,
             )
             pitch = pitch[:p_len]
@@ -242,23 +229,126 @@ class VC(object):
                 pitchf, device=self.device, dtype=torch.float
             ).unsqueeze(0)
 
-        output = self.vc(
-            embedder,
-            model,
-            sid,
-            audio_pad,
-            pitch,
-            pitchf,
-            index,
-            big_npy,
-            index_rate,
-            embChannels,
-        )
+        # tensor
+        feats = torch.from_numpy(audio_pad)
+        if self.is_half is True:
+            feats = feats.half()
+        else:
+            feats = feats.float()
+        if feats.dim() == 2:  # double channels
+            feats = feats.mean(-1)
+        assert feats.dim() == 1, feats.dim()
+        feats = feats.view(1, -1)
+
+        # embedding
+        padding_mask = torch.BoolTensor(feats.shape).to(self.device).fill_(False)
+        if embChannels == 256:
+            inputs = {
+                "source": feats.to(self.device),
+                "padding_mask": padding_mask,
+                "output_layer": 9,  # layer 9
+            }
+        else:
+            inputs = {
+                "source": feats.to(self.device),
+                "padding_mask": padding_mask,
+            }
+
+        with torch.no_grad():
+            logits = embedder.extract_features(**inputs)
+            if embChannels == 256:
+                feats = embedder.final_proj(logits[0])
+            else:
+                feats = logits[0]
+
+        # Index - feature抽出
+        if (
+            isinstance(index, type(None)) is False
+            and isinstance(big_npy, type(None)) is False
+            and index_rate != 0
+        ):
+            npy = feats[0].cpu().numpy()
+            if self.is_half is True:
+                npy = npy.astype("float32")
+            D, I = index.search(npy, 1)
+            npy = big_npy[I.squeeze()]
+            if self.is_half is True:
+                npy = npy.astype("float16")
+
+            feats = (
+                torch.from_numpy(npy).unsqueeze(0).to(self.device) * index_rate
+                + (1 - index_rate) * feats
+            )
+
+        #
+        feats = F.interpolate(feats.permute(0, 2, 1), scale_factor=2).permute(0, 2, 1)
+
+        # ピッチ抽出
+        p_len = audio_pad.shape[0] // self.window
+        if feats.shape[1] < p_len:
+            p_len = feats.shape[1]
+            if pitch is not None and pitchf is not None:
+                pitch = pitch[:, :p_len]
+                pitchf = pitchf[:, :p_len]
+        p_len = torch.tensor([p_len], device=self.device).long()
+
+        # 推論実行
+        with torch.no_grad():
+            if pitch is not None:
+                audio1 = (
+                    (model.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0] * 32768)
+                    .data.cpu()
+                    .float()
+                    .numpy()
+                    .astype(np.int16)
+                )
+            else:
+                if hasattr(model, "infer_pitchless"):
+                    audio1 = (
+                        (model.infer_pitchless(feats, p_len, sid)[0][0, 0] * 32768)
+                        .data.cpu()
+                        .float()
+                        .numpy()
+                        .astype(np.int16)
+                    )
+                else:
+                    audio1 = (
+                        (model.infer(feats, p_len, sid)[0][0, 0] * 32768)
+                        .data.cpu()
+                        .float()
+                        .numpy()
+                        .astype(np.int16)
+                    )
+
+        del feats, p_len, padding_mask
+        torch.cuda.empty_cache()
+
         if self.t_pad_tgt != 0:
             offset = self.t_pad_tgt
             end = -1 * self.t_pad_tgt
-            output = output[offset:end]
+            audio1 = audio1[offset:end]
 
         del pitch, pitchf, sid
         torch.cuda.empty_cache()
-        return output
+        return audio1
+
+        # output = self.vc(
+        #     embedder,
+        #     model,
+        #     sid,
+        #     audio_pad,
+        #     pitch,
+        #     pitchf,
+        #     index,
+        #     big_npy,
+        #     index_rate,
+        #     embChannels,
+        # )
+        # if self.t_pad_tgt != 0:
+        #     offset = self.t_pad_tgt
+        #     end = -1 * self.t_pad_tgt
+        #     output = output[offset:end]
+
+        # del pitch, pitchf, sid
+        # torch.cuda.empty_cache()
+        # return output
