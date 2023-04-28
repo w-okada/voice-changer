@@ -406,14 +406,10 @@ class RVC:
             repeat *= self.settings.rvcQuality  # 0 or 3
             vc = VC(self.settings.modelSamplingRate, dev, self.is_half, repeat)
             sid = 0
-            times = [0, 0, 0]
             f0_up_key = self.settings.tran
             f0_method = self.settings.f0Detector
-            file_index = self.index_file if self.index_file is not None else ""
-            file_big_npy = self.feature_file if self.feature_file is not None else ""
             index_rate = self.settings.indexRatio
             if_f0 = 1 if self.settings.modelSlots[self.currentSlot].f0 else 0
-            f0_file = None
 
             embChannels = self.settings.modelSlots[self.currentSlot].embChannels
             audio_out = vc.pipeline(
@@ -421,14 +417,12 @@ class RVC:
                 self.onnx_session,
                 sid,
                 audio,
-                times,
                 f0_up_key,
                 f0_method,
-                file_index,
-                file_big_npy,
+                self.index,
+                self.feature,
                 index_rate,
                 if_f0,
-                f0_file=f0_file,
                 silence_front=self.settings.extraConvertSize
                 / self.settings.modelSamplingRate,
                 embChannels=embChannels,
@@ -453,14 +447,13 @@ class RVC:
         else:
             dev = torch.device("cuda", index=self.settings.gpu)
 
-        # print("device:", dev)
-
         self.hubert_model = self.hubert_model.to(dev)
         self.net_g = self.net_g.to(dev)
 
         audio = data[0]
         convertSize = data[1]
         vol = data[2]
+
         audio = resampy.resample(audio, self.settings.modelSamplingRate, 16000)
 
         if vol < self.settings.silentThreshold:
