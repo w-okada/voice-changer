@@ -88,7 +88,32 @@ class VC(object):
         f0_mel[f0_mel <= 1] = 1
         f0_mel[f0_mel > 255] = 255
         f0_coarse = np.rint(f0_mel).astype(np.int)
-        return f0_coarse, f0bak  # 1-0
+
+        # Volume Extract
+        # volume = self.extractVolume(audio, 512)
+        # volume = np.pad(
+        #     volume.astype("float"), (start_frame, n_frames - len(volume) - start_frame)
+        # )
+
+        # return f0_coarse, f0bak, volume  # 1-0
+        return f0_coarse, f0bak
+
+    # def extractVolume(self, audio, hopsize):
+    #     n_frames = int(len(audio) // hopsize) + 1
+    #     audio2 = audio**2
+    #     audio2 = np.pad(
+    #         audio2,
+    #         (int(hopsize // 2), int((hopsize + 1) // 2)),
+    #         mode="reflect",
+    #     )
+    #     volume = np.array(
+    #         [
+    #             np.mean(audio2[int(n * hopsize) : int((n + 1) * hopsize)])  # noqa:E203
+    #             for n in range(n_frames)
+    #         ]
+    #     )
+    #     volume = np.sqrt(volume)
+    #     return volume
 
     def pipeline(
         self,
