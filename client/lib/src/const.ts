@@ -59,7 +59,7 @@ export type Framework = typeof Framework[keyof typeof Framework]
 export const F0Detector = {
     "dio": "dio",
     "harvest": "harvest",
-    "parselmouth": "parselmouth",
+    // "parselmouth": "parselmouth",
     "crepe": "crepe",
 } as const
 export type F0Detector = typeof F0Detector[keyof typeof F0Detector]

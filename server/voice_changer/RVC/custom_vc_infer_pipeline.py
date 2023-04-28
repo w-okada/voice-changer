@@ -33,17 +33,16 @@ class VC(object):
         f0_max = 1100
         f0_mel_min = 1127 * np.log(1 + f0_min / 700)
         f0_mel_max = 1127 * np.log(1 + f0_max / 700)
-        if f0_method == "pm":
-            print("not implemented. use harvest")
-            f0, t = pyworld.harvest(
+        if f0_method == "dio":
+            _f0, t = pyworld.dio(
                 audio.astype(np.double),
-                fs=self.sr,
+                self.sr,
+                f0_floor=f0_min,
                 f0_ceil=f0_max,
+                channels_in_octave=2,
                 frame_period=10,
             )
-            f0 = pyworld.stonemask(audio.astype(np.double), f0, t, self.sr)
-            f0 = signal.medfilt(f0, 3)
-
+            f0 = pyworld.stonemask(audio.astype(np.double), _f0, t, self.sr)
             f0 = np.pad(
                 f0.astype("float"), (start_frame, n_frames - len(f0) - start_frame)
             )

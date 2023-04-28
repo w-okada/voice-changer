@@ -92,7 +92,7 @@
             {
                 "name": "f0Detector",
                 "options": {
-                    "detectors": ["pm", "harvest"]
+                    "detectors": ["dio", "harvest"]
                 }
             },
             {
