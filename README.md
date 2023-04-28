@@ -85,7 +85,7 @@ Windows 版と Mac 版を提供しています。
 | v.1.5.2.6 | mac | ONNX(cpu), PyTorch(cpu,mps)       | [通常](https://drive.google.com/uc?id=1NTdtBeKU1bdQKP0_LpbmU3xAjuua1dCT&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 784MB  |
 |           | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [通常](https://drive.google.com/uc?id=1XdoMQoghBOjW__rE2a02zMyQDz8Gi56n&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2861MB |
 
-(\*1) Google Drive からダウンロードできない方は[hugging_face](https://huggingface.co/wok000/vcclient/tree/main)からダウンロードしてみてください
+(\*1) Google Drive からダウンロードできない方は[hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)からダウンロードしてみてください
 
 - 各キャラクター専用(近々 RVC 版として提供予定)
 
