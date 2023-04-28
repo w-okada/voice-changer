@@ -3,13 +3,13 @@ Realtime Voice Changer Client for RVC チュートリアル(v.1.5.2.5)
 # はじめに
 本アプリケーションは、各種音声変換 AI(VC, Voice Conversion)を用いてリアルタイム音声変換を行うためのクライアントソフトウェアです。本ドキュメントでは[RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI)に限定した音声変換のためのチュートリアルを行います。
 
-以下、本家の[Retrieval-based-Voice-Conversion-WebUI](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)を本家RVCと表記し、ddPn08氏の作成した[RVC-WebUI](https://github.com/ddPn08/rvc-webui)をだだぱんRVCと記載します。
+以下、本家の[Retrieval-based-Voice-Conversion-WebUI](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)を本家RVCと表記し、ddPn08氏の作成した[RVC-WebUI](https://github.com/ddPn08/rvc-webui)をddPn08RVCと記載します。
 
 
 ## 注意事項
 
 - 学習については別途行う必要があります。
-  - 自身で学習を行う場合は[RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI)で行ってください。
+  - 自身で学習を行う場合は[本家RVC](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI)または[ddPn08RVC](https://github.com/ddPn08/rvc-webui)で行ってください。
   - ブラウザ上で学習用の音声を用意するには[録音アプリ on Github Pages](https://w-okada.github.io/voice-changer/)が便利です。
     - [解説動画](https://youtu.be/s_GirFEGvaA)
   - [trainingのTIPS](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI/blob/main/docs/training_tips_ja.md)が公開されているので参照してください。
@@ -32,12 +32,13 @@ RVCの実行にはHuBERTが必要です。
 ## クライアントの選択
 下記のようなLauncher画面が出れば成功です。この画面からRVCを選択してください。
 
-<img src="/tutorials/images/launcher.png" alt="launcher" width="800" loading="lazy">
+![クライアントの選択画面](https://user-images.githubusercontent.com/23290400/235131650-9eeee978-96fa-478a-b728-3581ae0b8b67.png)
+
 
 ## RVC用の画面
 下記のような画面が出れば成功です。右上の?ボタンから[マニュアル](https://zenn.dev/wok/books/0004_vc-client-v_1_5_1_x)に移動できます。
 
-<img src="/tutorials/images/RVC_GUI.png" alt="launcher" width="800" loading="lazy">
+![v1.5.2.5 RVC初期画面](https://user-images.githubusercontent.com/23290400/235131679-5b4a1b7e-5d1d-4163-bfe7-84f3a4585ab7.png)
 
 # クイックスタート
 日本語版では[マニュアル](https://zenn.dev/wok/books/0004_vc-client-v_1_5_1_x/viewer/003-1_quick-start)が用意されているのでこちらを参照してください。
@@ -74,7 +75,7 @@ Input ChunkとExtra Data Lengthを足したデータを変換にかかる時間�
 3. モデルが用いる特徴量のチャンネル数(大きいほど情報を持っていて重い)
 4. 学習に用いられたクライアント
   - org: [本家RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)で学習したモデルです。
-  - webui:[だだぱんRVC](https://github.com/ddPn08/rvc-webui)で学習したモデルです。
+  - webui:[ddPn08RVC](https://github.com/ddPn08/rvc-webui)で学習したモデルです。
 
 ### EXPORT ONNX
 ONNXモデルを出力します。PyTorchのモデルをONNXモデルに変換すると、推論が高速化される場合があります。
@@ -91,17 +92,17 @@ enable PyTorchをオンにするとPyTorchのモデル(拡張子がpth)を選ぶ
 ONNX形式(.onnx)かPyTorch形式(.pth)のいずれかを選択可能です。
 
 本家RVCで学習させた場合、`/logs/weights`に入っています。
-だだぱんRVCで学習させた場合、`/models/checkpoints`に入っています。
+ddPn08RVCで学習させた場合、`/models/checkpoints`に入っています。
 
 #### feature(.npy)
 HuBERTで抽出した特徴を訓練データに近づける追加機能です。index(.index)とペアで使用します。
 本家RVCで学習させた場合、`/logs/実験名/total_fea.npy`という名前で保存されています。(2023/04/26にtotal_fea.npyを省略するアップデートが入ったので今後不要になる可能性があります)
-だだぱんRVCで学習させた場合、`/models/checkpoints/モデル名_index/モデル名.0.big.npy`という名前で保存されています。
+ddPn08RVCで学習させた場合、`/models/checkpoints/モデル名_index/モデル名.0.big.npy`という名前で保存されています。
 
 #### index(.index)
 HuBERTで抽出した特徴を訓練データに近づける追加機能です。feature(.npy)とペアで使用します。
 本家RVCで学習させた場合、`/logs/実験名/add_XXX.index`という名前で保存されています。
-だだぱんRVCで学習させた場合、`/models/checkpoints/モデル名_index/モデル名.0.index`という名前で保存されています。
+ddPn08RVCで学習させた場合、`/models/checkpoints/モデル名_index/モデル名.0.index`という名前で保存されています。
 
 #### half-precision
 精度をfloat32かfloat16のどちらで推論するか選べます。
@@ -152,7 +153,7 @@ startをおしてからstopを押すまでの音声が記録されます。
 
 ## Speaker Setting
 ### Destination Speaker Id
-複数話者に対応した時の設定かと思われますが、RVC本家が対応していない(見込みもない)ので現状は使わない項目です。
+複数話者に対応した時の設定かと思われますが、[本家RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)が対応していないので現状は使わない項目です。
 
 ### Tuning
 声のピッチを調整します。以下は設定の目安です。
