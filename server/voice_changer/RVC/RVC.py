@@ -15,6 +15,8 @@ import numpy as np
 import torch
 
 from fairseq import checkpoint_utils
+import traceback
+import faiss
 
 from const import TMP_DIR  # type:ignore
 
@@ -169,12 +171,15 @@ class RVC:
         self.settings.modelSlots[slot].deprecated = tmp_onnx_session.getDeprecated()
 
     def prepareModel(self, slot: int):
+        if slot < 0:
+            return self.get_info()
         print("[Voice Changer] Prepare Model of slot:", slot)
         onnxModelFile = self.settings.modelSlots[slot].onnxModelFile
         isONNX = (
             True if self.settings.modelSlots[slot].onnxModelFile is not None else False
         )
 
+        # モデルのロード
         if isONNX:
             print("[Voice Changer] Loading ONNX Model...")
             self.next_onnx_session = ModelWrapper(onnxModelFile)
@@ -214,8 +219,36 @@ class RVC:
             self.next_net_g = net_g
             self.next_onnx_session = None
 
+        # Indexのロード
+        print("[Voice Changer] Loading index...")
         self.next_feature_file = self.settings.modelSlots[slot].featureFile
         self.next_index_file = self.settings.modelSlots[slot].indexFile
+
+        if (
+            self.settings.modelSlots[slot].featureFile is not None
+            and self.settings.modelSlots[slot].indexFile is not None
+        ):
+            if (
+                os.path.exists(self.settings.modelSlots[slot].featureFile) is True
+                and os.path.exists(self.settings.modelSlots[slot].indexFile) is True
+            ):
+                try:
+                    self.next_index = faiss.read_index(
+                        self.settings.modelSlots[slot].indexFile
+                    )
+                    self.next_feature = np.load(
+                        self.settings.modelSlots[slot].featureFile
+                    )
+                except:
+                    print("[Voice Changer] load index failed. Use no index.")
+                    traceback.print_exc()
+                    self.next_index = self.next_feature = None
+            else:
+                print("[Voice Changer] Index file is not found. Use no index.")
+                self.next_index = self.next_feature = None
+        else:
+            self.next_index = self.next_feature = None
+
         self.next_trans = self.settings.modelSlots[slot].defaultTrans
         self.next_samplingRate = self.settings.modelSlots[slot].samplingRate
         self.next_framework = (
@@ -232,6 +265,8 @@ class RVC:
         self.onnx_session = self.next_onnx_session
         self.feature_file = self.next_feature_file
         self.index_file = self.next_index_file
+        self.feature = self.next_feature
+        self.index = self.next_index
         self.settings.tran = self.next_trans
         self.settings.framework = self.next_framework
         self.settings.modelSamplingRate = self.next_samplingRate
@@ -436,14 +471,10 @@ class RVC:
             repeat *= self.settings.rvcQuality  # 0 or 3
             vc = VC(self.settings.modelSamplingRate, dev, self.is_half, repeat)
             sid = 0
-            times = [0, 0, 0]
             f0_up_key = self.settings.tran
             f0_method = self.settings.f0Detector
-            file_index = self.index_file if self.index_file is not None else ""
-            file_big_npy = self.feature_file if self.feature_file is not None else ""
             index_rate = self.settings.indexRatio
             if_f0 = 1 if self.settings.modelSlots[self.currentSlot].f0 else 0
-            f0_file = None
 
             embChannels = self.settings.modelSlots[self.currentSlot].embChannels
             audio_out = vc.pipeline(
@@ -451,14 +482,12 @@ class RVC:
                 self.net_g,
                 sid,
                 audio,
-                times,
                 f0_up_key,
                 f0_method,
-                file_index,
-                file_big_npy,
+                self.index,
+                self.feature,
                 index_rate,
                 if_f0,
-                f0_file=f0_file,
                 silence_front=self.settings.extraConvertSize
                 / self.settings.modelSamplingRate,
                 embChannels=embChannels,
