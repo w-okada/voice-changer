@@ -47,7 +47,7 @@ class SoVitsSvc40Settings:
     gpu: int = 0
     dstId: int = 0
 
-    f0Detector: str = "dio"  # dio or harvest
+    f0Detector: str = "harvest"  # dio or harvest
     tran: int = 20
     noiseScale: float = 0.3
     predictF0: int = 0  # 0:False, 1:True
