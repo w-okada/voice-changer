@@ -4,6 +4,10 @@
 
 ## What's New!
 
+- v.1.5.2.6a
+
+  - RVC:change light weight f0 estimator from pm to dio
+
 - v.1.5.2.5
 
   - RVC: Support pitch-less model and rvc-webui model
