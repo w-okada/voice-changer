@@ -1,13 +1,15 @@
-# Realtime Voice Changer Client for RVC Tutorial (v.1.5.2.4)
+# Realtime Voice Changer Client for RVC Tutorial (v.1.5.2.5)
 
 # Introduction
 
 This application is client software for real-time voice conversion that supports various voice conversion models. This document provides a description for voice conversion limited to [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI).
 
+From the following, the original [Retrieval-based-Voice-Conversion-WebUI](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI) is referred to as the original-RVC,  [RVC-WebUI](https://github.com/ddPn08/rvc-webui) created by ddPn08 is referred to as ddPn08-RVC.
+
 ## Notes
 
 - Model training must be done separately.
-  - If you want to learn by yourself, please go to [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI).
+  - If you want to learn by yourself, please go to [original-RVC](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI) or [ddPn08RVC](https://github.com/ddPn08/rvc-webui).
   - [Recording app on Github Pages](https://w-okada.github.io/voice-changer/) is convenient for preparing voice for learning on the browser.
     - [Commentary video] (https://youtu.be/s_GirFEGvaA)
   - [TIPS for training](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI/blob/main/docs/training_tips_en.md) has been published, so please refer to it.
@@ -37,13 +39,14 @@ When connecting remotely, please use `.bat` file (win) and `.command` file (mac)
 
 It is successful if the Launcher screen like the one below appears. Select RVC from this screen.
 
-<img src="/tutorials/images/launcher.png" alt="launcher" width="800" loading="lazy">
+![client selection](https://user-images.githubusercontent.com/23290400/235131650-9eeee978-96fa-478a-b728-3581ae0b8b67.png)
 
 ## Screen for RVC
 
 It is successful if the following screen appears.
 
-<img src="/tutorials/images/RVC_GUI.png" alt="launcher" width="800" loading="lazy">
+![v1.5.2.5 init](https://user-images.githubusercontent.com/23290400/235131679-5b4a1b7e-5d1d-4163-bfe7-84f3a4585ab7.png)
+
 
 ## GUI item details
 
@@ -76,37 +79,47 @@ This is the time it takes to convert data that is the sum of Input Chunk and Ext
 Get information held by the server. If information synchronization between server and client seems not to be successful, please press the Reload button.
 
 ### Switch Model
-
 You can switch between uploaded models.
+Information about the model is shown in [] under the name
+1. Is the model considering f0(=pitch)?
+   - f0: consider
+   - nof0: don't consider
+2. Sampling rate used to train the model
+3. Number of feature channels used by the model
+4. Clients used for learning
+   - org: This is the model trained in [orginal-RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI).
+   - webui: The model trained on [ddPn08-RVC](https://github.com/ddPn08/rvc-webui).
 
 ## Model Setting
 
 ### Model Uploader
 
-If enable PyTorch is turned on, you can select the PyTorch model (extension is pth). If you turn this on when using a model converted from RVC, the PyTorch item will appear. （From the next version, you can only choose either PyTorch or ONNX for each slot.
+You can choose either PyTorch or ONNX for each slot.
 
 #### Model Slot
 
 You can choose which frame to set the model in. The set model can be switched with Switch Model in Server Control.
 
-#### Onnx(.onnx)
+#### Model(.onnx or .pth)
+Specify the trained model here. Required fields.
+You can choose either ONNX format (.onnx) or PyTorch format (.pth).
 
-Specify the model in .onnx format here. This or PyTorch (.pth) is required.
-
-#### PyTorch(.pth)
-
-Specify the model in .pth format here. This or Onnx (.onnx) is required.
-If you trained with RVC-WebUI, it's in `/logs/weights`.
+- If trained with [orginal-RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI), it is in `/logs/weights`.
+- If trained with [ddPn08-RVC](https://github.com/ddPn08/rvc-webui), it is in `/models/checkpoints`.
 
 #### feature(.npy)
 
 This is an additional function that brings the features extracted by HuBERT closer to the training data. Used in pairs with index(.index).
-If you trained with RVC-WebUI, it is saved as `/logs/weights/total_fea.npy`.
+
+- If trained with [orginal-RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI), it is in `/logs/your-expetiment-name/total_fea.npy`.
+- If trained with [ddPn08-RVC](https://github.com/ddPn08/rvc-webui), it is in `/models/checkpoints/your-model-name_index/your-model-name.0.big.npy`.
 
 #### index(.index)
 
 This is an additional function that brings the features extracted by HuBERT closer to the training data. Used in pairs with feature(.npy).
-If you trained with RVC-WebUI, it is saved as `/logs/weights/add_XXX.index`.
+
+- If trained with [orginal-RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI), it is in `/logs/your-expetiment-name/total_fea.npy`.
+- If trained with [ddPn08-RVC](https://github.com/ddPn08/rvc-webui), it is in `/models/checkpoints/your-model-name_index/your-model-name.0.big.npy`.
 
 #### half-precision
 

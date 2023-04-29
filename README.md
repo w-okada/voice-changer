@@ -76,7 +76,7 @@ Windows 版と Mac 版を提供しています。
 - DDSP-SVC の動作には、hubert-soft と enhancer のモデルが必要です。hubert-soft は[このリンク](https://github.com/bshall/hubert/releases/download/v0.1/hubert-soft-0d54a1f4.pt)からダウンロードして、バッチファイルがあるフォルダに格納してください。enhancer は[このサイト](https://github.com/openvpi/vocoders/releases/tag/nsf-hifigan-v1)から`nsf_hifigan_20221211.zip`ダウンロードして下さい。解凍すると出てくる`nsf_hifigan`というフォルダをバッチファイルがあるフォルダに格納してください。
 - DDPS-SVC の encoder は hubert-soft のみ対応です。
 
-- RVC で使用する場合の GUI の各項目説明は[こちら](tutorials/tutorial_rvc_ja.md)をご覧ください
+- RVC で使用する場合の GUI の各項目説明は[こちら](tutorials/tutorial_rvc_ja_latest.md)をご覧ください
 
 - ダウンロードはこちらから。
 

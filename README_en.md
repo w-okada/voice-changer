@@ -77,7 +77,7 @@ We offer Windows and Mac versions.
 
 - The encoder of DDPS-SVC only supports hubert-soft.
 
-- Please refer to [here](tutorials/tutorial_rvc_en.md) for the description of each item of GUI to be used in RVC.
+- Please refer to [here](tutorials/tutorial_rvc_en_latest.md) for the description of each item of GUI to be used in RVC.
 
 - Download (When you cannot download from google drive, try [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main))
 

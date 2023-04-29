@@ -82,7 +82,7 @@ ONNXモデルを出力します。PyTorchのモデルをONNXモデルに変換�
 
 ## Model Setting
 ### Model Uploader
-enable PyTorchをオンにするとPyTorchのモデル(拡張子がpth)を選ぶことができます。RVCから変換したモデルを使うときはこちらをオンにすると、PyTorchの項目がでてきます。次のバージョンからSlot毎にPyTorchかONNXのどちらかしか選べなくなります。
+Slot毎にPyTorchかONNXのどちらかのみ選べます。
 
 #### Model Slot
 モデルをどの枠にセットするか選べます。セットしたモデルはServer ControlのSwitch Modelで切り替えられます。
@@ -91,18 +91,20 @@ enable PyTorchをオンにするとPyTorchのモデル(拡張子がpth)を選ぶ
 学習済みモデルをここで指定します。必須項目です。
 ONNX形式(.onnx)かPyTorch形式(.pth)のいずれかを選択可能です。
 
-本家RVCで学習させた場合、`/logs/weights`に入っています。
-ddPn08RVCで学習させた場合、`/models/checkpoints`に入っています。
+- [orginal-RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)で学習させた場合、`/logs/weights`に入っています。
+- [ddPn08RVC](https://github.com/ddPn08/rvc-webui)で学習させた場合、`/models/checkpoints`に入っています。
 
 #### feature(.npy)
 HuBERTで抽出した特徴を訓練データに近づける追加機能です。index(.index)とペアで使用します。
-本家RVCで学習させた場合、`/logs/実験名/total_fea.npy`という名前で保存されています。(2023/04/26にtotal_fea.npyを省略するアップデートが入ったので今後不要になる可能性があります)
-ddPn08RVCで学習させた場合、`/models/checkpoints/モデル名_index/モデル名.0.big.npy`という名前で保存されています。
+
+- [orginal-RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)で学習させた場合、`/logs/実験名/total_fea.npy`という名前で保存されています。(2023/04/26にtotal_fea.npyを省略するアップデートが入ったので今後不要になる可能性があります)
+- [ddPn08RVC](https://github.com/ddPn08/rvc-webui)で学習させた場合、`/models/checkpoints/モデル名_index/モデル名.0.big.npy`という名前で保存されています。
 
 #### index(.index)
 HuBERTで抽出した特徴を訓練データに近づける追加機能です。feature(.npy)とペアで使用します。
-本家RVCで学習させた場合、`/logs/実験名/add_XXX.index`という名前で保存されています。
-ddPn08RVCで学習させた場合、`/models/checkpoints/モデル名_index/モデル名.0.index`という名前で保存されています。
+
+- [orginal-RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)で学習させた場合、`/logs/実験名/add_XXX.index`という名前で保存されています。
+- [ddPn08RVC](https://github.com/ddPn08/rvc-webui)で学習させた場合、`/models/checkpoints/モデル名_index/モデル名.0.index`という名前で保存されています。
 
 #### half-precision
 精度をfloat32かfloat16のどちらで推論するか選べます。
