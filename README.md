@@ -80,10 +80,10 @@ Windows 版と Mac 版を提供しています。
 
 - ダウンロードはこちらから。
 
-| Version   | OS  | フレームワーク                    | link                                                                                     | サポート VC                                                                   | サイズ |
-| --------- | --- | --------------------------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------ |
-| v.1.5.2.6 | mac | ONNX(cpu), PyTorch(cpu,mps)       | [通常](https://drive.google.com/uc?id=1NTdtBeKU1bdQKP0_LpbmU3xAjuua1dCT&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 784MB  |
-|           | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [通常](https://drive.google.com/uc?id=1XdoMQoghBOjW__rE2a02zMyQDz8Gi56n&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2861MB |
+| Version    | OS  | フレームワーク                    | link                                                                                     | サポート VC                                                                   | サイズ |
+| ---------- | --- | --------------------------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------ |
+| v.1.5.2.6a | mac | ONNX(cpu), PyTorch(cpu,mps)       | [通常](https://drive.google.com/uc?id=1yx6V8ZBnUcwWmAIKhGyZ_JumU_Hi8YAi&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 784MB  |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [通常](https://drive.google.com/uc?id=1nKLbfg9KEp7NcuBVPj3CWR8XfZLfZc-t&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2860MB |
 
 (\*1) Google Drive からダウンロードできない方は[hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)からダウンロードしてみてください
 
