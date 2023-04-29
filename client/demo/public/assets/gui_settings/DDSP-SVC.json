@@ -82,7 +82,7 @@
             {
                 "name": "f0Detector",
                 "options": {
-                    "detectors": ["dio", "parselmouth", "harvest", "crepe"]
+                    "detectors": ["dio", "harvest", "crepe"]
                 }
             },
             {

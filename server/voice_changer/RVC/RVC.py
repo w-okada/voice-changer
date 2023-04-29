@@ -313,6 +313,8 @@ class RVC:
                         provider_options=provider_options,
                     )
             if key == "modelSlotIndex":
+                if int(val) < 0:
+                    return True
                 # self.switchModel(int(val))
                 val = int(val) % 1000  # Quick hack for same slot is selected
                 self.prepareModel(val)
@@ -515,6 +517,8 @@ class RVC:
         del self.net_g
         del self.onnx_session
 
+        print("---------- REMOVING ---------------")
+
         remove_path = os.path.join("RVC")
         sys.path = [x for x in sys.path if x.endswith(remove_path) is False]
 
@@ -525,8 +529,8 @@ class RVC:
                 if file_path.find("RVC" + os.path.sep) >= 0:
                     print("remove", key, file_path)
                     sys.modules.pop(key)
-            except Exception as e:
-                print(e)
+            except Exception:  # type:ignore
+                # print(e)
                 pass
 
     def export2onnx(self):

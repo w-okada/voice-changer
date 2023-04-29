@@ -3,7 +3,6 @@ import numpy as np
 # import parselmouth
 import torch
 import torch.nn.functional as F
-from config import x_query, x_center, x_max  # type:ignore
 import scipy.signal as signal
 import pyworld
 
@@ -14,9 +13,6 @@ class VC(object):
         self.window = 160  # 每帧点数
         self.t_pad = self.sr * x_pad  # 每条前后pad时间
         self.t_pad_tgt = tgt_sr * x_pad
-        self.t_query = self.sr * x_query  # 查询切点前后查询时间
-        self.t_center = self.sr * x_center  # 查询切点位置
-        self.t_max = self.sr * x_max  # 免查询时长阈值
         self.device = device
         self.is_half = is_half
 
@@ -33,17 +29,16 @@ class VC(object):
         f0_max = 1100
         f0_mel_min = 1127 * np.log(1 + f0_min / 700)
         f0_mel_max = 1127 * np.log(1 + f0_max / 700)
-        if f0_method == "pm":
-            print("not implemented. use harvest")
-            f0, t = pyworld.harvest(
+        if f0_method == "dio":
+            _f0, t = pyworld.dio(
                 audio.astype(np.double),
-                fs=self.sr,
+                self.sr,
+                f0_floor=f0_min,
                 f0_ceil=f0_max,
+                channels_in_octave=2,
                 frame_period=10,
             )
-            f0 = pyworld.stonemask(audio.astype(np.double), f0, t, self.sr)
-            f0 = signal.medfilt(f0, 3)
-
+            f0 = pyworld.stonemask(audio.astype(np.double), _f0, t, self.sr)
             f0 = np.pad(
                 f0.astype("float"), (start_frame, n_frames - len(f0) - start_frame)
             )
