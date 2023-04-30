@@ -10,6 +10,7 @@ export const OpenQualityControlCheckbox = "open-quality-control-checkbox"
 export const OpenSpeakerSettingCheckbox = "open-speaker-setting-checkbox"
 export const OpenConverterSettingCheckbox = "open-converter-setting-checkbox"
 export const OpenAdvancedSettingCheckbox = "open-advanced-setting-checkbox"
+export const OpenLabCheckbox = "open-lab-checkbox"
 
 export const OpenLicenseDialogCheckbox = "open-license-dialog-checkbox"
 export const OpenWaitingDialogCheckbox = "open-waiting-dialog-checkbox"
@@ -26,9 +27,11 @@ export type StateControls = {
     openSpeakerSettingCheckbox: StateControlCheckbox
     openConverterSettingCheckbox: StateControlCheckbox
     openAdvancedSettingCheckbox: StateControlCheckbox
+    openLabCheckbox: StateControlCheckbox
 
     showLicenseCheckbox: StateControlCheckbox
     showWaitingCheckbox: StateControlCheckbox
+
 }
 
 type GuiStateAndMethod = {
@@ -141,6 +144,7 @@ export const GuiStateProvider = ({ children }: Props) => {
     const openSpeakerSettingCheckbox = useStateControlCheckbox(OpenSpeakerSettingCheckbox);
     const openConverterSettingCheckbox = useStateControlCheckbox(OpenConverterSettingCheckbox);
     const openAdvancedSettingCheckbox = useStateControlCheckbox(OpenAdvancedSettingCheckbox);
+    const openLabCheckbox = useStateControlCheckbox(OpenLabCheckbox);
 
     const showLicenseCheckbox = useStateControlCheckbox(OpenLicenseDialogCheckbox);
     const showWaitingCheckbox = useStateControlCheckbox(OpenWaitingDialogCheckbox);
@@ -152,6 +156,7 @@ export const GuiStateProvider = ({ children }: Props) => {
         openSpeakerSettingCheckbox.updateState(true)
         openConverterSettingCheckbox.updateState(true)
         openQualityControlCheckbox.updateState(true)
+        openLabCheckbox.updateState(true)
 
         showLicenseCheckbox.updateState(false)
         showWaitingCheckbox.updateState(false)
@@ -173,6 +178,7 @@ export const GuiStateProvider = ({ children }: Props) => {
             openSpeakerSettingCheckbox,
             openConverterSettingCheckbox,
             openAdvancedSettingCheckbox,
+            openLabCheckbox,
 
             showLicenseCheckbox,
             showWaitingCheckbox

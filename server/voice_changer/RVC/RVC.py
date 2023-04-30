@@ -129,6 +129,7 @@ class RVC:
 
         except Exception as e:
             print("EXCEPTION during loading hubert/contentvec model", e)
+            print("          hubert_path:", hubert_path)
 
         # 初回のみロード
         if self.initialLoad or tmp_slot == self.currentSlot:

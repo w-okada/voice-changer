@@ -9,6 +9,7 @@ import { QualityControl } from "./500_QualityControl";
 import { SpeakerSetting } from "./600_SpeakerSetting";
 import { ConverterSetting } from "./700_ConverterSetting";
 import { AdvancedSetting } from "./800_AdvancedSetting";
+import { Lab } from "./a00_Lab";
 
 export const Demo = () => {
     return (
@@ -19,6 +20,7 @@ export const Demo = () => {
                 <TitleArea />
                 <ServerControl />
                 <ModelSetting />
+                <Lab></Lab>
                 <DeviceSetting />
                 <QualityControl />
                 <SpeakerSetting />

@@ -60,6 +60,8 @@
                 "options": {}
             }
         ],
+        "lab": [],
+
         "deviceSetting": [
             {
                 "name": "audioInput",

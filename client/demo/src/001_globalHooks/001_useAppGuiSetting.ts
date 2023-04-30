@@ -15,6 +15,7 @@ export type AppGuiDemoSetting = {
         "speakerSetting": GuiComponentSetting[],
         "converterSetting": GuiComponentSetting[],
         "advancedSetting": GuiComponentSetting[],
+        "lab": GuiComponentSetting[],
     },
     dialogs: {
         "license": { title: string, auther: string, contact: string, url: string, license: string }[]
@@ -37,7 +38,8 @@ const InitialAppGuiDemoSetting: AppGuiDemoSetting = {
         "qualityControl": [],
         "speakerSetting": [],
         "converterSetting": [],
-        "advancedSetting": []
+        "advancedSetting": [],
+        "lab": []
     },
     dialogs: {
         "license": [{ title: "", auther: "", contact: "", url: "", license: "MIT" }]

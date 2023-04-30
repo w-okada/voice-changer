@@ -13,6 +13,7 @@ export type IndexedDBStateAndMethod = IndexedDBState & {
     getItem: (key: string) => Promise<unknown>
     removeItem: (key: string) => Promise<void>
     // clearAll: () => Promise<void>
+    removeDB: () => Promise<void>
 }
 
 export const useIndexedDB = (props: UseIndexedDBProps): IndexedDBStateAndMethod => {
@@ -43,8 +44,18 @@ export const useIndexedDB = (props: UseIndexedDBProps): IndexedDBStateAndMethod 
     const removeItem = useMemo(() => {
         return async (key: string) => {
             const clientKey = `${clientType}_${key}`
-            // console.log("remove key:", clientKey)
+            console.log("remove key:", clientKey)
             return await localForage.removeItem(clientKey)
+        }
+    }, [props.clientType])
+
+    const removeDB = useMemo(() => {
+        return async () => {
+            const keys = await localForage.keys()
+            for (const key of keys) {
+                console.log("remove key:", key)
+                await localForage.removeItem(key)
+            }
         }
     }, [props.clientType])
 
@@ -54,5 +65,6 @@ export const useIndexedDB = (props: UseIndexedDBProps): IndexedDBStateAndMethod 
         setItem,
         getItem,
         removeItem,
+        removeDB
     }
 }

@@ -43,31 +43,33 @@ const AppStateWrapper = () => {
     // エラーバウンダリー設定
     const [error, setError] = useState<{ error: Error, errorInfo: ErrorInfo }>()
     const { removeItem } = useIndexedDB({ clientType: clientType })
-    const { getItem } = useIndexedDB({ clientType: null })
+    const { getItem, removeDB } = useIndexedDB({ clientType: null })
     const errorComponent = useMemo(() => {
         const errorName = error?.error.name || "no error name"
         const errorMessage = error?.error.message || "no error message"
         const errorInfos = (error?.errorInfo.componentStack || "no error stack").split("\n")
 
         const onClearCacheClicked = async () => {
-
-            const indexedDBKeys = [
-                INDEXEDDB_KEY_CLIENT,
-                INDEXEDDB_KEY_SERVER,
-                INDEXEDDB_KEY_WORKLETNODE,
-                INDEXEDDB_KEY_WORKLET,
-                INDEXEDDB_KEY_AUDIO_OUTPUT
-            ]
-            for (const k of indexedDBKeys) {
-                await removeItem(k)
-            }
-
-            for (let i = 0; i < MAX_MODEL_SLOT_NUM; i++) {
-                const modleKey = `${INDEXEDDB_KEY_MODEL_DATA}_${i}`
-                await removeItem(modleKey)
-            }
-
+            await removeDB()
             location.reload();
+
+            // const indexedDBKeys = [
+            //     INDEXEDDB_KEY_CLIENT,
+            //     INDEXEDDB_KEY_SERVER,
+            //     INDEXEDDB_KEY_WORKLETNODE,
+            //     INDEXEDDB_KEY_WORKLET,
+            //     INDEXEDDB_KEY_AUDIO_OUTPUT
+            // ]
+            // for (const k of indexedDBKeys) {
+            //     await removeItem(k)
+            // }
+
+            // for (let i = 0; i < MAX_MODEL_SLOT_NUM; i++) {
+            //     const modleKey = `${INDEXEDDB_KEY_MODEL_DATA}_${i}`
+            //     await removeItem(modleKey)
+            // }
+
+
         }
         return (
             <div className="error-container">

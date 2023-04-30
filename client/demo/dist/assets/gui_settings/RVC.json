@@ -70,6 +70,12 @@
                 }
             }
         ],
+        "lab": [
+            {
+                "name": "mergeLab",
+                "options": {}
+            }
+        ],
         "deviceSetting": [
             {
                 "name": "audioInput",

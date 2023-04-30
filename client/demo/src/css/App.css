@@ -769,3 +769,17 @@ body {
     cursor: pointer;
     display: inline-block;
 }
+
+/* ##################  */
+.merge-field-container {
+    display: flex;
+    flex-direction: column;
+    .merge-field {
+        display: flex;
+        flex-direction: row;
+        .merge-field-elem {
+            padding-left: 5px;
+            width: 100%;
+        }
+    }
+}

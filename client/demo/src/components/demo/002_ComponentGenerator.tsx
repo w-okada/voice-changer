@@ -43,6 +43,7 @@ import { SilenceFrontRow, SilenceFrontRowProps } from "./components/812_SilenceF
 import { ModelSwitchRow, ModelSwitchRowProps } from "./components/204_ModelSwitchRow"
 import { ONNXExportRow, ONNXExportRowProps } from "./components/205_ONNXExportRow"
 import { ONNXExecutorRow, ONNXExecutorRowProps } from "./components/206_ONNXExecutorRow"
+import { MergeLabRow, MergeLabRowProps } from "./components/a01_MergeLab.Row"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
 
@@ -116,7 +117,7 @@ const initialize = () => {
     addToCatalog("rvcQuality", (props: RVCQualityRowProps) => { return <RVCQualityRow {...props} /> })
     addToCatalog("silenceFront", (props: SilenceFrontRowProps) => { return <SilenceFrontRow {...props} /> })
 
-
+    addToCatalog("mergeLab", (props: MergeLabRowProps) => { return <MergeLabRow {...props} /> })
 
 }
 
