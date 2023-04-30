@@ -12,9 +12,6 @@ export const ONNXExportRow = (_props: ONNXExportRowProps) => {
     const guiState = useGuiState()
 
     const onnxExporthRow = useMemo(() => {
-        if (appState.serverSetting.serverSetting.framework != "PyTorch") {
-            return <></>
-        }
 
         const onnxExportButtonAction = async () => {
 
@@ -34,12 +31,36 @@ export const ONNXExportRow = (_props: ONNXExportRowProps) => {
             guiState.stateControls.showWaitingCheckbox.updateState(false)
 
         }
+        const onDownloadClicked = () => {
+            const slot = appState.serverSetting.serverSetting.modelSlotIndex
+            const model = appState.serverSetting.serverSetting.modelSlots[slot]
+
+            const a = document.createElement("a")
+            if (model.pyTorchModelFile && model.pyTorchModelFile.length > 0) {
+                a.href = model.pyTorchModelFile
+            } else {
+                a.href = model.onnxModelFile
+            }
+            a.download = a.href.replace(/^.*[\\\/]/, '');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            guiState.stateControls.showWaitingCheckbox.updateState(false)
+        }
+
+        const exportOnnx = appState.serverSetting.serverSetting.framework == "PyTorch" ? (
+            <div className="body-button left-margin-1" onClick={onnxExportButtonAction}>export onnx</div>
+        ) : <></>
+
         return (
             <>
                 <div className="body-row split-3-7 left-padding-1 guided">
                     <div className="body-item-title left-padding-1">Export ONNX</div>
                     <div className="body-button-container">
-                        <div className="body-button left-margin-1" onClick={onnxExportButtonAction}>export onnx</div>
+                        {exportOnnx}
+                        <div className="body-button left-margin-1" onClick={() => {
+                            onDownloadClicked()
+                        }}>download</div>
                     </div>
                 </div>
             </>

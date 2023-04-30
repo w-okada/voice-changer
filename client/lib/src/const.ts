@@ -406,3 +406,13 @@ export type OnnxExporterInfo = {
 
 
 export const MAX_MODEL_SLOT_NUM = 3
+
+// Merge
+export type MergeElement = {
+    filename: string
+    strength: number
+}
+export type MergeModelRequest = {
+    command: "mix",
+    files: MergeElement[]
+}

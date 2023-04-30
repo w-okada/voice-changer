@@ -2,10 +2,12 @@ import sys
 import os
 import json
 import resampy
+from voice_changer.RVC.MergeModel import merge_model
+from voice_changer.RVC.MergeModelRequest import MergeModelRequest
 from voice_changer.RVC.ModelWrapper import ModelWrapper
 from Exceptions import NoModeLoadedException
 from voice_changer.RVC.RVCSettings import RVCSettings
-from voice_changer.utils.LoadModelParams import LoadModelParams
+from voice_changer.utils.LoadModelParams import FilePaths, LoadModelParams
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 
@@ -18,7 +20,7 @@ from fairseq import checkpoint_utils
 import traceback
 import faiss
 
-from const import TMP_DIR  # type:ignore
+from const import TMP_DIR, UPLOAD_DIR  # type:ignore
 
 
 # avoiding parse arg error in RVC
@@ -92,7 +94,9 @@ class RVC:
         self.settings.modelSlots[tmp_slot].onnxModelFile = props.files.onnxModelFilename
         self.settings.modelSlots[tmp_slot].featureFile = props.files.featureFilename
         self.settings.modelSlots[tmp_slot].indexFile = props.files.indexFilename
-        self.settings.modelSlots[tmp_slot].defaultTrans = params["trans"]
+        self.settings.modelSlots[tmp_slot].defaultTrans = (
+            params["trans"] if "trans" in params else 0
+        )
 
         isONNX = (
             True
@@ -591,3 +595,35 @@ class RVC:
             "path": f"/tmp/{output_file_simple}",
             "filename": output_file_simple,
         }
+
+    def merge_models(self, request: str):
+        print("[Voice Changer] MergeRequest:", request)
+        req: MergeModelRequest = MergeModelRequest.from_json(request)
+        merged = merge_model(req)
+        targetSlot = 0
+        if req.slot < 0:
+            targetSlot = len(self.settings.modelSlots) - 1
+        else:
+            targetSlot = req.slot
+
+        storeDir = os.path.join(UPLOAD_DIR, f"{targetSlot}")
+        print("[Voice Changer] store merged model to:", storeDir)
+        os.makedirs(storeDir, exist_ok=True)
+        storeFile = os.path.join(storeDir, "merged.pth")
+        torch.save(merged, storeFile)
+
+        filePaths: FilePaths = FilePaths(
+            pyTorchModelFilename=storeFile,
+            configFilename=None,
+            onnxModelFilename=None,
+            featureFilename=None,
+            indexFilename=None,
+            clusterTorchModelFilename=None,
+        )
+        props: LoadModelParams = LoadModelParams(
+            slot=targetSlot, isHalf=True, files=filePaths, params="{}"
+        )
+        self.loadModel(props)
+        self.prepareModel(targetSlot)
+        self.settings.modelSlotIndex = targetSlot
+        self.currentSlot = self.settings.modelSlotIndex

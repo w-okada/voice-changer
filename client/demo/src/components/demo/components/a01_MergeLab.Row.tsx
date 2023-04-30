@@ -1,15 +1,11 @@
-import { Framework } from "@dannadori/voice-changer-client-js"
 import React, { useEffect, useMemo, useState } from "react"
 import { useAppState } from "../../../001_provider/001_AppStateProvider"
+import { MergeElement } from "@dannadori/voice-changer-client-js"
 
 
 export type MergeLabRowProps = {
 }
 
-type MergeElement = {
-    filename: string
-    strength: number
-}
 
 export const MergeLabRow = (_props: MergeLabRowProps) => {
     const [mergeElements, setMergeElements] = useState<MergeElement[]>([])
@@ -51,7 +47,10 @@ export const MergeLabRow = (_props: MergeLabRowProps) => {
 
     const modelSwitchRow = useMemo(() => {
         const onMergeClicked = async () => {
-
+            appState.serverSetting.mergeModel({
+                command: "mix",
+                files: mergeElements
+            })
         }
         const onMergeElementsChanged = (filename: string, strength: number) => {
             const newMergeElements = mergeElements.map(x => {

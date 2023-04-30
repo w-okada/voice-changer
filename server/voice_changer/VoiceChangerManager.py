@@ -56,3 +56,6 @@ class VoiceChangerManager(object):
 
     def export2onnx(self):
         return self.voiceChanger.export2onnx()
+
+    def merge_models(self, request: str):
+        return self.voiceChanger.merge_models(request)

@@ -351,6 +351,10 @@ class VoiceChanger:
 
         ##############
 
+    def merge_models(self, request: str):
+        self.voiceChanger.merge_models(request)
+        return self.get_info()
+
 
 PRINT_CONVERT_PROCESSING: bool = False
 # PRINT_CONVERT_PROCESSING = True

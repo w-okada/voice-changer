@@ -19,7 +19,7 @@ class RVCSettings:
     onnxModelFile: str = ""
     configFile: str = ""
     modelSlots: list[ModelSlot] = field(
-        default_factory=lambda: [ModelSlot(), ModelSlot(), ModelSlot()]
+        default_factory=lambda: [ModelSlot(), ModelSlot(), ModelSlot(), ModelSlot()]
     )
     indexRatio: float = 0
     rvcQuality: int = 0

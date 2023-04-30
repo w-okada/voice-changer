@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react"
-import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc_40v2, DefaultServerSetting_so_vits_svc_40, DefaultServerSetting_so_vits_svc_40_c, DefaultServerSetting_RVC, OnnxExporterInfo, DefaultServerSetting_DDSP_SVC, MAX_MODEL_SLOT_NUM, Framework } from "../const"
+import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc_40v2, DefaultServerSetting_so_vits_svc_40, DefaultServerSetting_so_vits_svc_40_c, DefaultServerSetting_RVC, OnnxExporterInfo, DefaultServerSetting_DDSP_SVC, MAX_MODEL_SLOT_NUM, Framework, MergeModelRequest } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 
@@ -61,6 +61,7 @@ export type ServerSettingState = {
     isUploading: boolean
 
     getOnnx: () => Promise<OnnxExporterInfo>
+    mergeModel: (request: MergeModelRequest) => Promise<ServerInfo>
     // updateDefaultTune: (slot: number, tune: number) => void
 
 }
@@ -364,6 +365,12 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         return props.voiceChangerClient!.getOnnx()
     }
 
+    const mergeModel = async (request: MergeModelRequest) => {
+        const serverInfo = await props.voiceChangerClient!.mergeModel(request)
+        setServerSetting(serverInfo)
+        return serverInfo
+    }
+
     return {
         serverSetting,
         updateServerSettings,
@@ -376,6 +383,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         uploadProgress,
         isUploading,
         getOnnx,
+        mergeModel,
         // updateDefaultTune,
     }
 }

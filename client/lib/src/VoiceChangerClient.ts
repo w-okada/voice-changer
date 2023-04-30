@@ -3,7 +3,7 @@ import { VoiceChangerWorkletNode, VoiceChangerWorkletListener } from "./VoiceCha
 import workerjs from "raw-loader!../worklet/dist/index.js";
 import { VoiceFocusDeviceTransformer, VoiceFocusTransformDevice } from "amazon-chime-sdk-js";
 import { createDummyMediaStream, validateUrl } from "./util";
-import { ClientType, DefaultVoiceChangerClientSetting, ServerSettingKey, VoiceChangerClientSetting, WorkletNodeSetting, WorkletSetting } from "./const";
+import { ClientType, DefaultVoiceChangerClientSetting, MergeModelRequest, ServerSettingKey, VoiceChangerClientSetting, WorkletNodeSetting, WorkletSetting } from "./const";
 import { ServerConfigurator } from "./ServerConfigurator";
 
 // オーディオデータの流れ
@@ -273,7 +273,9 @@ export class VoiceChangerClient {
     getOnnx = async () => {
         return this.configurator.export2onnx()
     }
-
+    mergeModel = async (req: MergeModelRequest) => {
+        return this.configurator.mergeModel(req)
+    }
 
     updateServerSettings = (key: ServerSettingKey, val: string) => {
         return this.configurator.updateSettings(key, val)

@@ -36,6 +36,9 @@ class MMVC_Rest_Fileuploader:
         self.router.add_api_route("/model_type", self.post_model_type, methods=["POST"])
         self.router.add_api_route("/model_type", self.get_model_type, methods=["GET"])
         self.router.add_api_route("/onnx", self.get_onnx, methods=["GET"])
+        self.router.add_api_route(
+            "/merge_model", self.post_merge_models, methods=["POST"]
+        )
 
     def post_upload_file(self, file: UploadFile = File(...), filename: str = Form(...)):
         res = upload_file(UPLOAD_DIR, file, filename)
@@ -119,5 +122,11 @@ class MMVC_Rest_Fileuploader:
 
     def get_onnx(self):
         info = self.voiceChangerManager.export2onnx()
+        json_compatible_item_data = jsonable_encoder(info)
+        return JSONResponse(content=json_compatible_item_data)
+
+    def post_merge_models(self, request: str = Form(...)):
+        print(request)
+        info = self.voiceChangerManager.merge_models(request)
         json_compatible_item_data = jsonable_encoder(info)
         return JSONResponse(content=json_compatible_item_data)

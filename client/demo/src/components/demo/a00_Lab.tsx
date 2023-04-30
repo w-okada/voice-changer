@@ -34,13 +34,13 @@ export const Lab = () => {
                             {accodionButton}
                         </span>
                         <span className="title" onClick={() => { guiState.stateControls.openLabCheckbox.updateState(!guiState.stateControls.openLabCheckbox.checked()) }}>
-                            Labs(N/A)
+                            Labs (Experimental)
                         </span>
                         <span></span>
                     </div>
 
                     <div className="partition-content">
-                        {/* {components} */}
+                        {components}
                     </div>
                 </div>
             </>
