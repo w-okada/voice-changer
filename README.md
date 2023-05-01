@@ -79,12 +79,10 @@ Windows 版と Mac 版を提供しています。
 
 - ダウンロードはこちらから。
 
-| Version    | OS  | フレームワーク                        | link                                                                                     | サポート VC                                                                   | サイズ |
-| ---------- | --- | ------------------------------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------ |
-| v.1.5.2.6b | mac | ONNX(cpu), PyTorch(cpu,mps)           | [通常](https://drive.google.com/uc?id=10ZsHGrcy6PAU-MdHhwrlwICWYp6FgUNk&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 784MB  |
-|            | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [通常](https://drive.google.com/uc?id=11y894Pfj7XYO0RJP8X0F7SvxM1fXzOx7&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2745MB |
-| v.1.5.2.6a | mac | ONNX(cpu), PyTorch(cpu,mps)           | [通常](https://drive.google.com/uc?id=1yx6V8ZBnUcwWmAIKhGyZ_JumU_Hi8YAi&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 784MB  |
-|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [通常](https://drive.google.com/uc?id=1nKLbfg9KEp7NcuBVPj3CWR8XfZLfZc-t&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2860MB |
+| Version   | OS  | フレームワーク                    | link                                                                                       | サポート VC                                                                   | サイズ |
+| --------- | --- | --------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- | ------ |
+| v.1.5.2.7 | mac | ONNX(cpu), PyTorch(cpu,mps)       | [normal](https://drive.google.com/uc?id=19GCHJWIMeWlORUJFU73WUW2QJZZBQ7WT&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 784MB  |
+|           | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1zeeFdRF_l-b69Sh3bhHCtrhR5pLX66DE&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2860MB |
 
 (\*1) Google Drive からダウンロードできない方は[hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)からダウンロードしてみてください
 
