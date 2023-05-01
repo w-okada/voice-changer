@@ -4,10 +4,13 @@
 
 ## What's New!
 
+- v.1.5.2.7
+
+  - New Feature: model merger.
+
 - v.1.5.2.6b
 
   - Bugfix: "clear setting" leaves some data in storage.
-  -
 
 - v.1.5.2.6a
 
