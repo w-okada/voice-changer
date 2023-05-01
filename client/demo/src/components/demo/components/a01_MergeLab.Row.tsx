@@ -10,18 +10,22 @@ export type MergeLabRowProps = {
 export const MergeLabRow = (_props: MergeLabRowProps) => {
     const [mergeElements, setMergeElements] = useState<MergeElement[]>([])
     const appState = useAppState()
+    const [defaultTrans, setDefaultTrans] = useState<number>(0)
 
     // スロットが変更されたときの初期化処理
     const newSlotChangeKey = useMemo(() => {
+        console.log("appState.serverSetting.serverSetting.modelSlots", appState.serverSetting.serverSetting.modelSlots)
         return appState.serverSetting.serverSetting.modelSlots.reduce((prev, cur) => {
             return prev + "_" + cur.pyTorchModelFile
         }, "")
     }, [appState.serverSetting.serverSetting.modelSlots])
 
+    console.log("newSlotChangeKey", newSlotChangeKey)
     useEffect(() => {
         // PyTorchモデルだけフィルタリング
         const models = appState.serverSetting.serverSetting.modelSlots.filter(x => { return x.pyTorchModelFile && x.pyTorchModelFile.length > 0 })
         if (models.length == 0) {
+            setMergeElements([])
             return
         }
 
@@ -45,10 +49,11 @@ export const MergeLabRow = (_props: MergeLabRowProps) => {
     }, [newSlotChangeKey])
 
 
-    const modelSwitchRow = useMemo(() => {
+    const mergeLabRow = useMemo(() => {
         const onMergeClicked = async () => {
             appState.serverSetting.mergeModel({
                 command: "mix",
+                defaultTrans: defaultTrans,
                 files: mergeElements
             })
         }
@@ -89,15 +94,27 @@ export const MergeLabRow = (_props: MergeLabRowProps) => {
             <div className="body-row split-3-3-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Model Merger</div>
                 <div className="merge-field-container">
-                    {modelOptions.length == 0 ? <>no torch model or not same type</> : modelOptions}
+                    {modelOptions.length == 0 ? <>not PyTorch model or not same type</> : modelOptions}
+
+                    <div className="merge-field">
+                        <div className="merge-field-elem grey-bold">Default Tune</div>
+                        <div className="merge-field-elem">
+                            <input type="range" className="body-item-input-slider-2nd" min="-50" max="50" step="1" value={defaultTrans} onChange={(e) => {
+                                setDefaultTrans(Number(e.target.value))
+                            }}></input>
+                            <span className="body-item-input-slider-val">{defaultTrans}</span>
+                        </div>
+                    </div >
+
+
                 </div>
                 <div className="body-button-container">
                     <div className="body-button" onClick={onMergeClicked}>merge</div>
                 </div>
             </div>
         )
-    }, [mergeElements, appState.serverSetting.serverSetting])
+    }, [mergeElements, appState.serverSetting.serverSetting, defaultTrans])
 
-    return modelSwitchRow
+    return mergeLabRow
+
 }
-

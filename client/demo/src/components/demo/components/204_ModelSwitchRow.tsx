@@ -18,6 +18,9 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
             // Quick hack for same slot is selected. 下３桁が実際のSlotID
             const dummyModelSlotIndex = (Math.floor(Date.now() / 1000)) * 1000 + index
             await appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, modelSlotIndex: dummyModelSlotIndex, framework: framework })
+            setTimeout(() => { // quick hack
+                appState.getInfo()
+            }, 1000 * 2)
         }
         const modelOptions = appState.serverSetting.serverSetting.modelSlots.map((x, index) => {
             const className = index == slot ? "body-button-active left-margin-1" : "body-button left-margin-1"

@@ -22,6 +22,9 @@ export const ClearSettingRow = (_props: ClearSettingRowProps) => {
             await removeItem(INDEXEDDB_KEY_AUDIO_OUTPUT)
             location.reload()
         }
+        const onReloadClicked = async () => {
+            location.reload()
+        }
         const onReselectVCClicked = async () => {
             guiState.setIsConverting(false)
             if (guiState.isConverting) {
@@ -37,6 +40,7 @@ export const ClearSettingRow = (_props: ClearSettingRowProps) => {
             <div className="body-row split-2-2-6 left-padding-1">
                 <div className="body-button-container">
                     <div className="body-button" onClick={onClearSettingClicked}>clear setting</div>
+                    <div className="body-button" onClick={onReloadClicked}>reload</div>
                 </div>
                 <div className="body-button-container">
                     <div className="body-button" onClick={onReselectVCClicked}>re-select vc</div>

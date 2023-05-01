@@ -558,6 +558,10 @@ body {
 .body-item-input-slider-val {
     margin-left: 1rem;
 }
+.body-item-input-slider-2nd {
+    width: 60%;
+    accent-color: #33f;
+}
 
 .body-button-container {
     display: flex;
@@ -780,6 +784,16 @@ body {
         .merge-field-elem {
             padding-left: 5px;
             width: 100%;
+        }
+        .red {
+            color: #f00;
+        }
+        .purple {
+            color: #33f;
+        }
+        .grey-bold {
+            color: #555;
+            font-weight: 800;
         }
     }
 }

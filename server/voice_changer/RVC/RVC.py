@@ -620,10 +620,14 @@ class RVC:
             indexFilename=None,
             clusterTorchModelFilename=None,
         )
+        params = {
+            "trans":req.defaultTrans
+        }
         props: LoadModelParams = LoadModelParams(
-            slot=targetSlot, isHalf=True, files=filePaths, params="{}"
+            slot=targetSlot, isHalf=True, files=filePaths, params=json.dumps(params)
         )
         self.loadModel(props)
         self.prepareModel(targetSlot)
         self.settings.modelSlotIndex = targetSlot
         self.currentSlot = self.settings.modelSlotIndex
+        # self.settings.tran = req.defaultTrans
