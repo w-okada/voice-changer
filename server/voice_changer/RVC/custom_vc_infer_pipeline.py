@@ -120,24 +120,6 @@ class VC(object):
         # embedding
         padding_mask = torch.BoolTensor(feats.shape).to(self.device).fill_(False)
         feats = embedder.extractFeatures(feats, embChannels)
-        # if embChannels == 256:
-        #     inputs = {
-        #         "source": feats.to(self.device),
-        #         "padding_mask": padding_mask,
-        #         "output_layer": 9,  # layer 9
-        #     }
-        # else:
-        #     inputs = {
-        #         "source": feats.to(self.device),
-        #         "padding_mask": padding_mask,
-        #     }
-
-        # with torch.no_grad():
-        #     logits = embedder.extract_features(**inputs)
-        #     if embChannels == 256:
-        #         feats = embedder.final_proj(logits[0])
-        #     else:
-        #         feats = logits[0]
 
         # Index - feature抽出
         if (
