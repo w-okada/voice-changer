@@ -1,6 +1,9 @@
 import sys
 import os
 
+from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
+from voice_changer.RVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
+
 # avoiding parse arg error in RVC
 sys.argv = ["MMVCServerSIO.py"]
 
@@ -55,10 +58,14 @@ class RVC:
     audio_buffer: AudioInOut | None = None
     embedder: Embedder | None = None
     inferencer: Inferencer | None = None
+    pitchExtractor: PitchExtractor | None = None
 
     def __init__(self, params: VoiceChangerParams):
         self.initialLoad = True
         self.settings = RVCSettings()
+        self.pitchExtractor = PitchExtractorManager.getPitchExtractor(
+            self.settings.f0Detector
+        )
 
         self.feature_file = None
         self.index_file = None
@@ -102,6 +109,15 @@ class RVC:
 
         return self.get_info()
 
+    def _getDevice(self):
+        if self.settings.gpu < 0 or (self.gpu_num == 0 and self.mps_enabled is False):
+            dev = torch.device("cpu")
+        elif self.mps_enabled:
+            dev = torch.device("mps")
+        else:
+            dev = torch.device("cuda", index=self.settings.gpu)
+        return dev
+
     def prepareModel(self, slot: int):
         if slot < 0:
             return self.get_info()
@@ -110,20 +126,14 @@ class RVC:
         filename = (
             modelSlot.onnxModelFile if modelSlot.isONNX else modelSlot.pyTorchModelFile
         )
-
-        if self.settings.gpu < 0 or (self.gpu_num == 0 and self.mps_enabled is False):
-            dev = torch.device("cpu")
-        elif self.mps_enabled:
-            dev = torch.device("mps")
-        else:
-            dev = torch.device("cuda", index=self.settings.gpu)
+        dev = self._getDevice()
 
         # Inferencerのロード
         inferencer = InferencerManager.getInferencer(
             modelSlot.modelType,
             filename,
             self.settings.isHalf,
-            torch.device("cuda:0"),
+            dev,
         )
         self.next_inferencer = inferencer
 
@@ -156,8 +166,14 @@ class RVC:
 
     def switchModel(self):
         print("[Voice Changer] Switching model..")
-        # del self.net_g
-        # del self.onnx_session
+        if self.settings.gpu < 0 or (self.gpu_num == 0 and self.mps_enabled is False):
+            dev = torch.device("cpu")
+        elif self.mps_enabled:
+            dev = torch.device("mps")
+        else:
+            dev = torch.device("cuda", index=self.settings.gpu)
+
+        # embedderはモデルによらず再利用できる可能性が高いので、Switchのタイミングでこちらで取得
         try:
             self.embedder = EmbedderManager.getEmbedder(
                 self.next_embedder,
@@ -330,6 +346,7 @@ class RVC:
                 # self.hubert_model,
                 self.embedder,
                 self.onnx_session,
+                self.pitchExtractor,
                 sid,
                 audio,
                 f0_up_key,
@@ -391,6 +408,7 @@ class RVC:
             audio_out = vc.pipeline(
                 self.embedder,
                 self.inferencer,
+                self.pitchExtractor,
                 sid,
                 audio,
                 f0_up_key,

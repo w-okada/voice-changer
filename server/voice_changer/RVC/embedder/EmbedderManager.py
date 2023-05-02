@@ -29,12 +29,20 @@ class EmbedderManager:
     def loadEmbedder(
         cls, embederType: EnumEmbedderTypes, file: str, isHalf: bool, dev: device
     ) -> Embedder:
-        if embederType == EnumEmbedderTypes.hubert:
+        if (
+            embederType == EnumEmbedderTypes.hubert
+            or embederType == EnumEmbedderTypes.hubert.value
+        ):
             return FairseqHubert().loadModel(file, dev, isHalf)
-        elif embederType == EnumEmbedderTypes.hubert_jp:  # same as hubert
+        elif (
+            embederType == EnumEmbedderTypes.hubert_jp
+            or embederType == EnumEmbedderTypes.hubert_jp.value
+        ):
             return FairseqHubertJp().loadModel(file, dev, isHalf)
-        elif embederType == EnumEmbedderTypes.contentvec:  # same as hubert
+        elif (
+            embederType == EnumEmbedderTypes.contentvec
+            or embederType == EnumEmbedderTypes.contentvec.value
+        ):
             return FairseqContentvec().loadModel(file, dev, isHalf)
         else:
-            # return hubert as default
             return FairseqHubert().loadModel(file, dev, isHalf)

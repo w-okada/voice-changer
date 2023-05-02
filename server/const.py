@@ -82,6 +82,11 @@ class EnumInferenceTypes(Enum):
     onnxRVCNono = "onnxRVCNono"
 
 
+class EnumPitchExtractorTypes(Enum):
+    harvest = "harvest"
+    dio = "dio"
+
+
 class EnumFrameworkTypes(Enum):
     pyTorch = "pyTorch"
     onnx = "onnx"

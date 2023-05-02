@@ -3,10 +3,10 @@ import numpy as np
 # import parselmouth
 import torch
 import torch.nn.functional as F
-import scipy.signal as signal
-import pyworld
 
 from voice_changer.RVC.embedder.Embedder import Embedder
+from voice_changer.RVC.inferencer.Inferencer import Inferencer
+from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 
 
 class VC(object):
@@ -18,62 +18,11 @@ class VC(object):
         self.device = device
         self.is_half = is_half
 
-    def get_f0(self, audio, p_len, f0_up_key, f0_method, silence_front=0):
-        n_frames = int(len(audio) // self.window) + 1
-        start_frame = int(silence_front * self.sr / self.window)
-        real_silence_front = start_frame * self.window / self.sr
-
-        silence_front_offset = int(np.round(real_silence_front * self.sr))
-        audio = audio[silence_front_offset:]
-
-        # time_step = self.window / self.sr * 1000
-        f0_min = 50
-        f0_max = 1100
-        f0_mel_min = 1127 * np.log(1 + f0_min / 700)
-        f0_mel_max = 1127 * np.log(1 + f0_max / 700)
-        if f0_method == "dio":
-            _f0, t = pyworld.dio(
-                audio.astype(np.double),
-                self.sr,
-                f0_floor=f0_min,
-                f0_ceil=f0_max,
-                channels_in_octave=2,
-                frame_period=10,
-            )
-            f0 = pyworld.stonemask(audio.astype(np.double), _f0, t, self.sr)
-            f0 = np.pad(
-                f0.astype("float"), (start_frame, n_frames - len(f0) - start_frame)
-            )
-        else:
-            f0, t = pyworld.harvest(
-                audio.astype(np.double),
-                fs=self.sr,
-                f0_ceil=f0_max,
-                frame_period=10,
-            )
-            f0 = pyworld.stonemask(audio.astype(np.double), f0, t, self.sr)
-            f0 = signal.medfilt(f0, 3)
-
-            f0 = np.pad(
-                f0.astype("float"), (start_frame, n_frames - len(f0) - start_frame)
-            )
-
-        f0 *= pow(2, f0_up_key / 12)
-        f0bak = f0.copy()
-        f0_mel = 1127 * np.log(1 + f0 / 700)
-        f0_mel[f0_mel > 0] = (f0_mel[f0_mel > 0] - f0_mel_min) * 254 / (
-            f0_mel_max - f0_mel_min
-        ) + 1
-        f0_mel[f0_mel <= 1] = 1
-        f0_mel[f0_mel > 255] = 255
-        f0_coarse = np.rint(f0_mel).astype(np.int)
-
-        return f0_coarse, f0bak
-
     def pipeline(
         self,
         embedder: Embedder,
-        model,
+        inferencer: Inferencer,
+        pitchExtractor: PitchExtractor,
         sid,
         audio,
         f0_up_key,
@@ -92,11 +41,11 @@ class VC(object):
         # ピッチ検出
         pitch, pitchf = None, None
         if if_f0 == 1:
-            pitch, pitchf = self.get_f0(
+            pitch, pitchf = pitchExtractor.extract(
                 audio_pad,
-                p_len,
                 f0_up_key,
-                f0_method,
+                self.sr,
+                self.window,
                 silence_front=silence_front,
             )
             pitch = pitch[:p_len]
@@ -156,16 +105,19 @@ class VC(object):
         with torch.no_grad():
             if pitch is not None:
                 audio1 = (
-                    (model.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0] * 32768)
+                    (
+                        inferencer.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0]
+                        * 32768
+                    )
                     .data.cpu()
                     .float()
                     .numpy()
                     .astype(np.int16)
                 )
             else:
-                if hasattr(model, "infer_pitchless"):
+                if hasattr(inferencer, "infer_pitchless"):
                     audio1 = (
-                        (model.infer_pitchless(feats, p_len, sid)[0][0, 0] * 32768)
+                        (inferencer.infer_pitchless(feats, p_len, sid)[0][0, 0] * 32768)
                         .data.cpu()
                         .float()
                         .numpy()
@@ -173,7 +125,7 @@ class VC(object):
                     )
                 else:
                     audio1 = (
-                        (model.infer(feats, p_len, sid)[0][0, 0] * 32768)
+                        (inferencer.infer(feats, p_len, sid)[0][0, 0] * 32768)
                         .data.cpu()
                         .float()
                         .numpy()

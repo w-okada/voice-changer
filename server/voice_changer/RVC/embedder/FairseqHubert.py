@@ -37,8 +37,6 @@ class FairseqHubert(Embedder):
                 "padding_mask": padding_mask,
             }
 
-        print("feat dev", self.dev)
-
         with torch.no_grad():
             logits = self.model.extract_features(**inputs)
             if embChannels == 256:
