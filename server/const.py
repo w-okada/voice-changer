@@ -1,3 +1,4 @@
+from enum import Enum
 import os
 import sys
 import tempfile
@@ -63,3 +64,9 @@ def getFrontendPath():
         else "../client/demo/dist"
     )
     return frontend_path
+
+
+class EnumEmbedderTypes(Enum):
+    hubert = "hubert"
+    contentvec = "contentvec"
+    hubert_jp = "hubert_jp"

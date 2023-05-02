@@ -7,6 +7,8 @@ from voice_changer.RVC.MergeModelRequest import MergeModelRequest
 from voice_changer.RVC.ModelWrapper import ModelWrapper
 from Exceptions import NoModeLoadedException
 from voice_changer.RVC.RVCSettings import RVCSettings
+from voice_changer.RVC.embedder.Embedder import Embedder
+from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 from voice_changer.utils.LoadModelParams import FilePaths, LoadModelParams
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
@@ -16,7 +18,7 @@ from typing import cast
 import numpy as np
 import torch
 
-from fairseq import checkpoint_utils
+# from fairseq import checkpoint_utils
 import traceback
 import faiss
 
@@ -56,6 +58,7 @@ providers = [
 
 class RVC:
     audio_buffer: AudioInOut | None = None
+    embedder: Embedder | None = None
 
     def __init__(self, params: VoiceChangerParams):
         self.initialLoad = True
@@ -119,21 +122,24 @@ class RVC:
             asdict(self.settings.modelSlots[tmp_slot]),
         )
         # hubertロード
-        try:
-            hubert_path = self.params.hubert_base
-            models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(
-                [hubert_path],
-                suffix="",
-            )
-            model = models[0]
-            model.eval()
-            if self.is_half:
-                model = model.half()
-            self.hubert_model = model
+        # try:
+        #     hubert_path = self.params.hubert_base
+        #     hubert_path_jp = self.params.hubert_base_jp
+        #     print(hubert_path, hubert_path_jp)
 
-        except Exception as e:
-            print("EXCEPTION during loading hubert/contentvec model", e)
-            print("          hubert_path:", hubert_path)
+        #     models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(
+        #         [hubert_path],
+        #         suffix="",
+        #     )
+        #     model = models[0]
+        #     model.eval()
+        #     if self.is_half:
+        #         model = model.half()
+        #     self.hubert_model = model
+
+        # except Exception as e:
+        #     print("EXCEPTION during loading hubert/contentvec model", e)
+        #     print("          hubert_path:", hubert_path)
 
         # 初回のみロード
         if self.initialLoad or tmp_slot == self.currentSlot:
@@ -256,6 +262,7 @@ class RVC:
 
         self.next_trans = self.settings.modelSlots[slot].defaultTrans
         self.next_samplingRate = self.settings.modelSlots[slot].samplingRate
+        self.next_embedder = self.settings.modelSlots[slot].embedder
         self.next_framework = (
             "ONNX" if self.next_onnx_session is not None else "PyTorch"
         )
@@ -266,6 +273,17 @@ class RVC:
         print("[Voice Changer] Switching model..")
         # del self.net_g
         # del self.onnx_session
+        try:
+            self.embedder = EmbedderManager.getEmbedder(
+                self.next_embedder,
+                self.params.hubert_base,
+                True,
+                torch.device("cuda:0"),
+            )
+        except Exception as e:
+            print("[Voice Changer] load hubert error", e)
+            traceback.print_exc()
+
         self.net_g = self.next_net_g
         self.onnx_session = self.next_onnx_session
         self.feature_file = self.next_feature_file
@@ -397,7 +415,8 @@ class RVC:
         else:
             dev = torch.device("cuda", index=self.settings.gpu)
 
-        self.hubert_model = self.hubert_model.to(dev)
+        # self.hubert_model = self.hubert_model.to(dev)
+        self.embedder = self.embedder.to(dev)
 
         audio = data[0]
         convertSize = data[1]
@@ -420,7 +439,8 @@ class RVC:
 
             embChannels = self.settings.modelSlots[self.currentSlot].embChannels
             audio_out = vc.pipeline(
-                self.hubert_model,
+                # self.hubert_model,
+                self.embedder,
                 self.onnx_session,
                 sid,
                 audio,
@@ -454,7 +474,7 @@ class RVC:
         else:
             dev = torch.device("cuda", index=self.settings.gpu)
 
-        self.hubert_model = self.hubert_model.to(dev)
+        self.embedder = self.embedder.to(dev)
         self.net_g = self.net_g.to(dev)
 
         audio = data[0]
@@ -478,7 +498,8 @@ class RVC:
 
             embChannels = self.settings.modelSlots[self.currentSlot].embChannels
             audio_out = vc.pipeline(
-                self.hubert_model,
+                # self.hubert_model,
+                self.embedder,
                 self.net_g,
                 sid,
                 audio,
@@ -620,9 +641,7 @@ class RVC:
             indexFilename=None,
             clusterTorchModelFilename=None,
         )
-        params = {
-            "trans":req.defaultTrans
-        }
+        params = {"trans": req.defaultTrans}
         props: LoadModelParams = LoadModelParams(
             slot=targetSlot, isHalf=True, files=filePaths, params=json.dumps(params)
         )

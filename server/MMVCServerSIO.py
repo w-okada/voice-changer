@@ -54,6 +54,9 @@ def setupArgParser():
         "--hubert_base", type=str, help="path to hubert_base model(pytorch)"
     )
     parser.add_argument(
+        "--hubert_base_jp", type=str, help="path to hubert_base_jp model(pytorch)"
+    )
+    parser.add_argument(
         "--hubert_soft", type=str, help="path to hubert_soft model(pytorch)"
     )
     parser.add_argument(
@@ -109,6 +112,7 @@ if __name__ == "MMVCServerSIO":
         content_vec_500_onnx=args.content_vec_500_onnx,
         content_vec_500_onnx_on=args.content_vec_500_onnx_on,
         hubert_base=args.hubert_base,
+        hubert_base_jp=args.hubert_base_jp,
         hubert_soft=args.hubert_soft,
         nsf_hifigan=args.nsf_hifigan,
     )

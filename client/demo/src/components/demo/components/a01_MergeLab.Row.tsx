@@ -20,7 +20,6 @@ export const MergeLabRow = (_props: MergeLabRowProps) => {
         }, "")
     }, [appState.serverSetting.serverSetting.modelSlots])
 
-    console.log("newSlotChangeKey", newSlotChangeKey)
     useEffect(() => {
         // PyTorchモデルだけフィルタリング
         const models = appState.serverSetting.serverSetting.modelSlots.filter(x => { return x.pyTorchModelFile && x.pyTorchModelFile.length > 0 })

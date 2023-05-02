@@ -6,6 +6,8 @@ import torch.nn.functional as F
 import scipy.signal as signal
 import pyworld
 
+from voice_changer.RVC.embedder.Embedder import Embedder
+
 
 class VC(object):
     def __init__(self, tgt_sr, device, is_half, x_pad):
@@ -66,35 +68,11 @@ class VC(object):
         f0_mel[f0_mel > 255] = 255
         f0_coarse = np.rint(f0_mel).astype(np.int)
 
-        # Volume Extract
-        # volume = self.extractVolume(audio, 512)
-        # volume = np.pad(
-        #     volume.astype("float"), (start_frame, n_frames - len(volume) - start_frame)
-        # )
-
-        # return f0_coarse, f0bak, volume  # 1-0
         return f0_coarse, f0bak
-
-    # def extractVolume(self, audio, hopsize):
-    #     n_frames = int(len(audio) // hopsize) + 1
-    #     audio2 = audio**2
-    #     audio2 = np.pad(
-    #         audio2,
-    #         (int(hopsize // 2), int((hopsize + 1) // 2)),
-    #         mode="reflect",
-    #     )
-    #     volume = np.array(
-    #         [
-    #             np.mean(audio2[int(n * hopsize) : int((n + 1) * hopsize)])  # noqa:E203
-    #             for n in range(n_frames)
-    #         ]
-    #     )
-    #     volume = np.sqrt(volume)
-    #     return volume
 
     def pipeline(
         self,
-        embedder,
+        embedder: Embedder,
         model,
         sid,
         audio,
@@ -141,24 +119,25 @@ class VC(object):
 
         # embedding
         padding_mask = torch.BoolTensor(feats.shape).to(self.device).fill_(False)
-        if embChannels == 256:
-            inputs = {
-                "source": feats.to(self.device),
-                "padding_mask": padding_mask,
-                "output_layer": 9,  # layer 9
-            }
-        else:
-            inputs = {
-                "source": feats.to(self.device),
-                "padding_mask": padding_mask,
-            }
+        feats = embedder.extractFeatures(feats, embChannels)
+        # if embChannels == 256:
+        #     inputs = {
+        #         "source": feats.to(self.device),
+        #         "padding_mask": padding_mask,
+        #         "output_layer": 9,  # layer 9
+        #     }
+        # else:
+        #     inputs = {
+        #         "source": feats.to(self.device),
+        #         "padding_mask": padding_mask,
+        #     }
 
-        with torch.no_grad():
-            logits = embedder.extract_features(**inputs)
-            if embChannels == 256:
-                feats = embedder.final_proj(logits[0])
-            else:
-                feats = logits[0]
+        # with torch.no_grad():
+        #     logits = embedder.extract_features(**inputs)
+        #     if embChannels == 256:
+        #         feats = embedder.final_proj(logits[0])
+        #     else:
+        #         feats = logits[0]
 
         # Index - feature抽出
         if (
