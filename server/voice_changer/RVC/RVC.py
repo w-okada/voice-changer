@@ -1,5 +1,6 @@
 import sys
 import os
+from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 from voice_changer.RVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
@@ -59,6 +60,7 @@ class RVC:
     embedder: Embedder | None = None
     inferencer: Inferencer | None = None
     pitchExtractor: PitchExtractor | None = None
+    deviceManager = DeviceManager.get_instance()
 
     def __init__(self, params: VoiceChangerParams):
         self.initialLoad = True
@@ -70,17 +72,11 @@ class RVC:
         self.feature_file = None
         self.index_file = None
 
-        self.gpu_num = torch.cuda.device_count()
         self.prevVol = 0
         self.params = params
 
-        self.mps_enabled: bool = (
-            getattr(torch.backends, "mps", None) is not None
-            and torch.backends.mps.is_available()
-        )
         self.currentSlot = -1
         print("RVC initialization: ", params)
-        print("mps: ", self.mps_enabled)
 
     def loadModel(self, props: LoadModelParams):
         """
@@ -109,14 +105,14 @@ class RVC:
 
         return self.get_info()
 
-    def _getDevice(self):
-        if self.settings.gpu < 0 or (self.gpu_num == 0 and self.mps_enabled is False):
-            dev = torch.device("cpu")
-        elif self.mps_enabled:
-            dev = torch.device("mps")
-        else:
-            dev = torch.device("cuda", index=self.settings.gpu)
-        return dev
+    # def _getDevice(self):
+    #     if self.settings.gpu < 0 or (self.gpu_num == 0 and self.mps_enabled is False):
+    #         dev = torch.device("cpu")
+    #     elif self.mps_enabled:
+    #         dev = torch.device("mps")
+    #     else:
+    #         dev = torch.device("cuda", index=self.settings.gpu)
+    #     return dev
 
     def prepareModel(self, slot: int):
         if slot < 0:
@@ -126,7 +122,7 @@ class RVC:
         filename = (
             modelSlot.onnxModelFile if modelSlot.isONNX else modelSlot.pyTorchModelFile
         )
-        dev = self._getDevice()
+        dev = self.deviceManager.getDevice(self.settings.gpu)
 
         # Inferencerのロード
         inferencer = InferencerManager.getInferencer(
@@ -166,12 +162,7 @@ class RVC:
 
     def switchModel(self):
         print("[Voice Changer] Switching model..")
-        if self.settings.gpu < 0 or (self.gpu_num == 0 and self.mps_enabled is False):
-            dev = torch.device("cpu")
-        elif self.mps_enabled:
-            dev = torch.device("mps")
-        else:
-            dev = torch.device("cuda", index=self.settings.gpu)
+        dev = self.deviceManager.getDevice(self.settings.gpu)
 
         # embedderはモデルによらず再利用できる可能性が高いので、Switchのタイミングでこちらで取得
         try:
@@ -179,7 +170,7 @@ class RVC:
                 self.next_embedder,
                 self.params.hubert_base,
                 True,
-                torch.device("cuda:0"),
+                dev,
             )
         except Exception as e:
             print("[Voice Changer] load hubert error", e)
@@ -372,18 +363,9 @@ class RVC:
         #     )
         #     raise NoModeLoadedException("pytorch")
 
-        if self.settings.gpu < 0 or (self.gpu_num == 0 and self.mps_enabled is False):
-            dev = torch.device("cpu")
-        elif self.mps_enabled:
-            dev = torch.device("mps")
-        else:
-            dev = torch.device("cuda", index=self.settings.gpu)
-
+        dev = self.deviceManager.getDevice(self.settings.gpu)
         self.embedder = self.embedder.to(dev)
         self.inferencer = self.inferencer.to(dev)
-
-        # self.embedder.printDevice()
-        # self.inferencer.printDevice()
 
         audio = data[0]
         convertSize = data[1]
@@ -394,35 +376,34 @@ class RVC:
         if vol < self.settings.silentThreshold:
             return np.zeros(convertSize).astype(np.int16)
 
-        with torch.no_grad():
-            repeat = 3 if self.is_half else 1
-            repeat *= self.settings.rvcQuality  # 0 or 3
-            vc = VC(self.settings.modelSamplingRate, dev, self.is_half, repeat)
-            sid = 0
-            f0_up_key = self.settings.tran
-            f0_method = self.settings.f0Detector
-            index_rate = self.settings.indexRatio
-            if_f0 = 1 if self.settings.modelSlots[self.currentSlot].f0 else 0
+        repeat = 3 if self.is_half else 1
+        repeat *= self.settings.rvcQuality  # 0 or 3
+        vc = VC(self.settings.modelSamplingRate, dev, self.is_half, repeat)
+        sid = 0
+        f0_up_key = self.settings.tran
+        f0_method = self.settings.f0Detector
+        index_rate = self.settings.indexRatio
+        if_f0 = 1 if self.settings.modelSlots[self.currentSlot].f0 else 0
 
-            embChannels = self.settings.modelSlots[self.currentSlot].embChannels
-            audio_out = vc.pipeline(
-                self.embedder,
-                self.inferencer,
-                self.pitchExtractor,
-                sid,
-                audio,
-                f0_up_key,
-                f0_method,
-                self.index,
-                self.feature,
-                index_rate,
-                if_f0,
-                silence_front=self.settings.extraConvertSize
-                / self.settings.modelSamplingRate,
-                embChannels=embChannels,
-            )
+        embChannels = self.settings.modelSlots[self.currentSlot].embChannels
+        audio_out = vc.pipeline(
+            self.embedder,
+            self.inferencer,
+            self.pitchExtractor,
+            sid,
+            audio,
+            f0_up_key,
+            f0_method,
+            self.index,
+            self.feature,
+            index_rate,
+            if_f0,
+            silence_front=self.settings.extraConvertSize
+            / self.settings.modelSamplingRate,
+            embChannels=embChannels,
+        )
 
-            result = audio_out * np.sqrt(vol)
+        result = audio_out * np.sqrt(vol)
 
         return result
 
@@ -440,12 +421,54 @@ class RVC:
             self.currentSlot = self.settings.modelSlotIndex
             self.switchModel()
 
-        if self.settings.framework == "ONNX":
-            audio = self._onnx_inference(data)
-        else:
-            audio = self._pyTorch_inference(data)
+        dev = self.deviceManager.getDevice(self.settings.gpu)
+        self.embedder = self.embedder.to(dev)
+        self.inferencer = self.inferencer.to(dev)
 
-        return audio
+        audio = data[0]
+        convertSize = data[1]
+        vol = data[2]
+
+        audio = resampy.resample(audio, self.settings.modelSamplingRate, 16000)
+
+        if vol < self.settings.silentThreshold:
+            return np.zeros(convertSize).astype(np.int16)
+
+        repeat = 3 if self.is_half else 1
+        repeat *= self.settings.rvcQuality  # 0 or 3
+        vc = VC(self.settings.modelSamplingRate, dev, self.is_half, repeat)
+        sid = 0
+        f0_up_key = self.settings.tran
+        f0_method = self.settings.f0Detector
+        index_rate = self.settings.indexRatio
+        if_f0 = 1 if self.settings.modelSlots[self.currentSlot].f0 else 0
+
+        embChannels = self.settings.modelSlots[self.currentSlot].embChannels
+        audio_out = vc.pipeline(
+            self.embedder,
+            self.inferencer,
+            self.pitchExtractor,
+            sid,
+            audio,
+            f0_up_key,
+            f0_method,
+            self.index,
+            self.feature,
+            index_rate,
+            if_f0,
+            silence_front=self.settings.extraConvertSize
+            / self.settings.modelSamplingRate,
+            embChannels=embChannels,
+        )
+
+        result = audio_out * np.sqrt(vol)
+
+        # if self.settings.framework == "ONNX":
+        #     audio = self._onnx_inference(data)
+        # else:
+        #     audio = self._pyTorch_inference(data)
+
+        return result
 
     def __del__(self):
         del self.net_g

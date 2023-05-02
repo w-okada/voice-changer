@@ -31,7 +31,6 @@ class Embedder(Protocol):
         self.file = file
         self.isHalf = isHalf
         self.dev = dev
-        print("hubert initialize dev::::", self.dev, dev)
 
     def setHalf(self, isHalf: bool):
         self.isHalf = isHalf
