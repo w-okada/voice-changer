@@ -28,7 +28,7 @@ class RVCSettings:
     modelSlotIndex: int = -1
 
     speakers: dict[str, int] = field(default_factory=lambda: {})
-
+    isHalf: int = 1  # 0:off, 1:on
     # ↓mutableな物だけ列挙
     intData = [
         "gpu",
@@ -39,6 +39,7 @@ class RVCSettings:
         "modelSamplingRate",
         "silenceFront",
         "modelSlotIndex",
+        "isHalf",
     ]
     floatData = ["silentThreshold", "indexRatio"]
     strData = ["framework", "f0Detector"]

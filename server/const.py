@@ -66,7 +66,22 @@ def getFrontendPath():
     return frontend_path
 
 
+# "hubert_base",  "contentvec",  "distilhubert"
 class EnumEmbedderTypes(Enum):
-    hubert = "hubert"
+    hubert = "hubert_base"
     contentvec = "contentvec"
-    hubert_jp = "hubert_jp"
+    hubert_jp = "hubert-base-japanese"
+
+
+class EnumInferenceTypes(Enum):
+    pyTorchRVC = "pyTorchRVC"
+    pyTorchRVCNono = "pyTorchRVCNono"
+    pyTorchWebUI = "pyTorchWebUI"
+    pyTorchWebUINono = "pyTorchWebUINono"
+    onnxRVC = "onnxRVC"
+    onnxRVCNono = "onnxRVCNono"
+
+
+class EnumFrameworkTypes(Enum):
+    pyTorch = "pyTorch"
+    onnx = "onnx"

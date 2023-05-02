@@ -7,7 +7,7 @@ from fairseq import checkpoint_utils
 
 class FairseqHubert(Embedder):
     def loadModel(self, file: str, dev: device, isHalf: bool = True) -> Embedder:
-        super().loadModel(file, dev, isHalf)
+        super().setProps(EnumEmbedderTypes.hubert, file, dev, isHalf)
 
         models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(
             [file],
@@ -21,7 +21,6 @@ class FairseqHubert(Embedder):
             model = model.half()
 
         self.model = model
-        self.embedderType = EnumEmbedderTypes.hubert
         return self
 
     def extractFeatures(self, feats: torch.Tensor, embChannels=256) -> torch.Tensor:
@@ -37,6 +36,8 @@ class FairseqHubert(Embedder):
                 "source": feats.to(self.dev),
                 "padding_mask": padding_mask,
             }
+
+        print("feat dev", self.dev)
 
         with torch.no_grad():
             logits = self.model.extract_features(**inputs)

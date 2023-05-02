@@ -7,5 +7,5 @@ from voice_changer.RVC.embedder.FairseqHubert import FairseqHubert
 class FairseqHubertJp(FairseqHubert):
     def loadModel(self, file: str, dev: device, isHalf: bool = True) -> Embedder:
         super().loadModel(file, dev, isHalf)
-        self.embedderType = EnumEmbedderTypes.hubert_jp
+        super().setProps(EnumEmbedderTypes.hubert_jp, file, dev, isHalf)
         return self

@@ -15,13 +15,23 @@ class Embedder(Protocol):
     model: Any | None = None
 
     def loadModel(self, file: str, dev: device, isHalf: bool = True):
-        self.embedderType = EnumEmbedderTypes.hubert
-        self.file = file
-        self.isHalf = isHalf
-        self.dev = dev
+        ...
 
     def extractFeatures(self, feats: torch.Tensor, embChannels=256) -> torch.Tensor:
         ...
+
+    def setProps(
+        self,
+        embedderType: EnumEmbedderTypes,
+        file: str,
+        dev: device,
+        isHalf: bool = True,
+    ):
+        self.embedderType = embedderType
+        self.file = file
+        self.isHalf = isHalf
+        self.dev = dev
+        print("hubert initialize dev::::", self.dev, dev)
 
     def setHalf(self, isHalf: bool):
         self.isHalf = isHalf
@@ -59,3 +69,6 @@ class Embedder(Protocol):
         if self.model is not None:
             self.model = self.model.to(dev)
         return self
+
+    def printDevice(self):
+        print("embedder device:", self.model.device)

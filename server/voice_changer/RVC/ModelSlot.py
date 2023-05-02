@@ -1,5 +1,6 @@
+from const import EnumInferenceTypes, EnumEmbedderTypes
+
 from dataclasses import dataclass
-from voice_changer.RVC.const import RVC_MODEL_TYPE_RVC
 
 
 @dataclass
@@ -9,9 +10,10 @@ class ModelSlot:
     featureFile: str = ""
     indexFile: str = ""
     defaultTrans: int = 0
-    modelType: int = RVC_MODEL_TYPE_RVC
+    isONNX: bool = False
+    modelType: EnumInferenceTypes = EnumInferenceTypes.pyTorchRVC
     samplingRate: int = -1
     f0: bool = True
     embChannels: int = 256
     deprecated: bool = False
-    embedder: str = "hubert_base"  # "hubert_base",  "contentvec",  "distilhubert"
+    embedder: EnumEmbedderTypes = EnumEmbedderTypes.hubert

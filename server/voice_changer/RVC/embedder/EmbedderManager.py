@@ -16,7 +16,6 @@ class EmbedderManager:
     ) -> Embedder:
         if cls.currentEmbedder is None:
             print("[Voice Changer] generate new embedder. (no embedder)")
-            cls.loadEmbedder(embederType, file, isHalf, dev)
             cls.currentEmbedder = cls.loadEmbedder(embederType, file, isHalf, dev)
         elif cls.currentEmbedder.matchCondition(embederType, file) is False:
             print("[Voice Changer] generate new embedder. (not match)")
@@ -24,7 +23,6 @@ class EmbedderManager:
         else:
             cls.currentEmbedder.setDevice(dev)
             cls.currentEmbedder.setHalf(isHalf)
-        print("RETURN", cls.currentEmbedder)
         return cls.currentEmbedder
 
     @classmethod

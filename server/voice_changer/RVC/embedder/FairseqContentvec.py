@@ -7,5 +7,5 @@ from voice_changer.RVC.embedder.FairseqHubert import FairseqHubert
 class FairseqContentvec(FairseqHubert):
     def loadModel(self, file: str, dev: device, isHalf: bool = True) -> Embedder:
         super().loadModel(file, dev, isHalf)
-        self.embedderType = EnumEmbedderTypes.contentvec
+        super().setProps(EnumEmbedderTypes.contentvec, file, dev, isHalf)
         return self
