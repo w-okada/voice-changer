@@ -15,9 +15,6 @@ class RVCSettings:
     clusterInferRatio: float = 0.1
 
     framework: str = "PyTorch"  # PyTorch or ONNX
-    pyTorchModelFile: str = ""
-    onnxModelFile: str = ""
-    configFile: str = ""
     modelSlots: list[ModelSlot] = field(
         default_factory=lambda: [ModelSlot(), ModelSlot(), ModelSlot(), ModelSlot()]
     )

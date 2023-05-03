@@ -4,6 +4,7 @@ import torch
 from torch import device
 
 from const import EnumInferenceTypes
+import onnxruntime
 
 
 class Inferencer(Protocol):
@@ -12,7 +13,7 @@ class Inferencer(Protocol):
     isHalf: bool = True
     dev: device
 
-    model: Any | None = None
+    model: onnxruntime.InferenceSession | Any | None = None
 
     def loadModel(self, file: str, dev: device, isHalf: bool = True):
         ...
@@ -43,16 +44,11 @@ class Inferencer(Protocol):
         self.isHalf = isHalf
         if self.model is not None and isHalf:
             self.model = self.model.half()
+        elif self.model is not None and isHalf is False:
+            self.model = self.model.float()
 
     def setDevice(self, dev: device):
         self.dev = dev
         if self.model is not None:
             self.model = self.model.to(self.dev)
-
-    def to(self, dev: torch.device):
-        if self.model is not None:
-            self.model = self.model.to(dev)
         return self
-
-    def printDevice(self):
-        print("inferencer device:", self.model.device)

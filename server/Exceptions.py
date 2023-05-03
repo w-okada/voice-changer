@@ -8,6 +8,11 @@ class NoModeLoadedException(Exception):
         )
 
 
+class HalfPrecisionChangingException(Exception):
+    def __str__(self):
+        return repr("HalfPrecision related exception.")
+
+
 class ONNXInputArgumentException(Exception):
     def __str__(self):
         return repr("ONNX received invalid argument.")

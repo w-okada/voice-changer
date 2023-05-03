@@ -14,6 +14,8 @@ class WebUIInferencerNono(Inferencer):
 
         model.eval()
         model.load_state_dict(cpt["weight"], strict=False)
+
+        model = model.to(dev)
         if isHalf:
             model = model.half()
 

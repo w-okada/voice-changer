@@ -36,11 +36,14 @@ class Embedder(Protocol):
         self.isHalf = isHalf
         if self.model is not None and isHalf:
             self.model = self.model.half()
+        elif self.model is not None and isHalf is False:
+            self.model = self.model.float()
 
     def setDevice(self, dev: device):
         self.dev = dev
         if self.model is not None:
             self.model = self.model.to(self.dev)
+        return self
 
     def matchCondition(self, embedderType: EnumEmbedderTypes, file: str) -> bool:
         # Check Type
@@ -63,11 +66,3 @@ class Embedder(Protocol):
 
         else:
             return True
-
-    def to(self, dev: torch.device):
-        if self.model is not None:
-            self.model = self.model.to(dev)
-        return self
-
-    def printDevice(self):
-        print("embedder device:", self.model.device)

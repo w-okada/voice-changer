@@ -23,6 +23,8 @@ class EmbedderManager:
         else:
             cls.currentEmbedder.setDevice(dev)
             cls.currentEmbedder.setHalf(isHalf)
+            # print("[Voice Changer] generate new embedder. (ANYWAY)", isHalf)
+            # cls.currentEmbedder = cls.loadEmbedder(embederType, file, isHalf, dev)
         return cls.currentEmbedder
 
     @classmethod

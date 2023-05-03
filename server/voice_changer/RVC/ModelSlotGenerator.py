@@ -48,6 +48,15 @@ def _setInfoByPytorch(slot: ModelSlot, file: str):
         if slot.embedder.endswith("768"):
             slot.embedder = slot.embedder[:-3]
 
+        if slot.embedder == EnumEmbedderTypes.hubert.value:
+            slot.embedder = EnumEmbedderTypes.hubert
+        elif slot.embedder == EnumEmbedderTypes.contentvec.value:
+            slot.embedder = EnumEmbedderTypes.contentvec
+        elif slot.embedder == EnumEmbedderTypes.hubert_jp.value:
+            slot.embedder = EnumEmbedderTypes.hubert_jp
+        else:
+            raise RuntimeError("[Voice Changer][setInfoByONNX] unknown embedder")
+
     slot.samplingRate = cpt["config"][-1]
 
     del cpt
@@ -63,9 +72,18 @@ def _setInfoByONNX(slot: ModelSlot, file: str):
 
         slot.modelType = metadata["modelType"]
         slot.embChannels = metadata["embChannels"]
-        slot.embedder = (
-            metadata["embedder"] if "embedder" in metadata else EnumEmbedderTypes.hubert
-        )
+
+        if "embedder" not in metadata:
+            slot.embedder = EnumEmbedderTypes.hubert
+        elif metadata["embedder"] == EnumEmbedderTypes.hubert.value:
+            slot.embedder = EnumEmbedderTypes.hubert
+        elif metadata["embedder"] == EnumEmbedderTypes.contentvec.value:
+            slot.embedder = EnumEmbedderTypes.contentvec
+        elif metadata["embedder"] == EnumEmbedderTypes.hubert_jp.value:
+            slot.embedder = EnumEmbedderTypes.hubert_jp
+        else:
+            raise RuntimeError("[Voice Changer][setInfoByONNX] unknown embedder")
+
         slot.f0 = metadata["f0"]
         slot.modelType = (
             EnumInferenceTypes.onnxRVC if slot.f0 else EnumInferenceTypes.onnxRVCNono
@@ -73,7 +91,7 @@ def _setInfoByONNX(slot: ModelSlot, file: str):
         slot.samplingRate = metadata["samplingRate"]
         slot.deprecated = False
 
-    except:
+    except Exception as e:
         slot.modelType = EnumInferenceTypes.onnxRVC
         slot.embChannels = 256
         slot.embedder = EnumEmbedderTypes.hubert
@@ -81,6 +99,7 @@ def _setInfoByONNX(slot: ModelSlot, file: str):
         slot.samplingRate = 48000
         slot.deprecated = True
 
+        print("[Voice Changer] setInfoByONNX", e)
         print("[Voice Changer] ############## !!!! CAUTION !!!! ####################")
         print("[Voice Changer] This onnxfie is depricated. Please regenerate onnxfile.")
         print("[Voice Changer] ############## !!!! CAUTION !!!! ####################")

@@ -2,13 +2,14 @@ import torch
 from torch import device
 import onnxruntime
 from const import EnumInferenceTypes
-from voice_changer.RVC.inferencer.Inferencer import Inferencer
 import numpy as np
+
+from voice_changer.RVC.inferencer.OnnxRVCInferencer import OnnxRVCInferencer
 
 providers = ["CPUExecutionProvider"]
 
 
-class OnnxRVCInferenceNono(Inferencer):
+class OnnxRVCInferencerNono(OnnxRVCInferencer):
     def loadModel(self, file: str, dev: device, isHalf: bool = True):
         super().setProps(EnumInferenceTypes.onnxRVC, file, dev, isHalf)
         # ort_options = onnxruntime.SessionOptions()
@@ -56,16 +57,3 @@ class OnnxRVCInferenceNono(Inferencer):
             )
 
         return torch.tensor(np.array(audio1))
-
-    def setHalf(self, isHalf: bool):
-        raise RuntimeError("half-precision is not changable.", self.isHalf)
-
-    def setDevice(self, dev: device):
-        self.dev = dev
-        if self.model is not None:
-            self.model = self.model.to(self.dev)
-
-    def to(self, dev: torch.device):
-        if self.model is not None:
-            self.model = self.model.to(dev)
-        return self

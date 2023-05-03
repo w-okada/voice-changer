@@ -16,6 +16,8 @@ class RVCInferencer(Inferencer):
 
         model.eval()
         model.load_state_dict(cpt["weight"], strict=False)
+
+        model = model.to(dev)
         if isHalf:
             model = model.half()
 
@@ -26,8 +28,8 @@ class RVCInferencer(Inferencer):
         self,
         feats: torch.Tensor,
         pitch_length: torch.Tensor,
-        pitch: torch.Tensor | None,
-        pitchf: torch.Tensor | None,
+        pitch: torch.Tensor,
+        pitchf: torch.Tensor,
         sid: torch.Tensor,
     ) -> torch.Tensor:
         return self.model.infer(feats, pitch_length, pitch, pitchf, sid)

@@ -2,8 +2,8 @@ from torch import device
 
 from const import EnumInferenceTypes
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
-from voice_changer.RVC.inferencer.OnnxRVCInferencer import OnnxRVCInference
-from voice_changer.RVC.inferencer.OnnxRVCInferencerNono import OnnxRVCInferenceNono
+from voice_changer.RVC.inferencer.OnnxRVCInferencer import OnnxRVCInferencer
+from voice_changer.RVC.inferencer.OnnxRVCInferencerNono import OnnxRVCInferencerNono
 from voice_changer.RVC.inferencer.RVCInferencer import RVCInferencer
 from voice_changer.RVC.inferencer.RVCInferencerNono import RVCInferencerNono
 from voice_changer.RVC.inferencer.WebUIInferencer import WebUIInferencer
@@ -48,11 +48,11 @@ class InferencerManager:
             inferencerType == EnumInferenceTypes.onnxRVC
             or inferencerType == EnumInferenceTypes.onnxRVC.value
         ):
-            return OnnxRVCInference().loadModel(file, dev, isHalf)
+            return OnnxRVCInferencer().loadModel(file, dev, isHalf)
         elif (
             inferencerType == EnumInferenceTypes.onnxRVCNono
             or inferencerType == EnumInferenceTypes.onnxRVCNono.value
         ):
-            return OnnxRVCInferenceNono().loadModel(file, dev, isHalf)
+            return OnnxRVCInferencerNono().loadModel(file, dev, isHalf)
         else:
             raise RuntimeError("[Voice Changer] Inferencer not found", inferencerType)

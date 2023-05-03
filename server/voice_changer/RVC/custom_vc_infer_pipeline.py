@@ -3,6 +3,7 @@ import numpy as np
 # import parselmouth
 import torch
 import torch.nn.functional as F
+from Exceptions import HalfPrecisionChangingException
 
 from voice_changer.RVC.embedder.Embedder import Embedder
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
@@ -26,7 +27,6 @@ class VC(object):
         sid,
         audio,
         f0_up_key,
-        f0_method,
         index,
         big_npy,
         index_rate,
@@ -68,7 +68,13 @@ class VC(object):
 
         # embedding
         padding_mask = torch.BoolTensor(feats.shape).to(self.device).fill_(False)
-        feats = embedder.extractFeatures(feats, embChannels)
+        try:
+            feats = embedder.extractFeatures(feats, embChannels)
+        except RuntimeError as e:
+            if "HALF" in e.__str__().upper():
+                raise HalfPrecisionChangingException()
+            else:
+                raise e
 
         # Index - feature抽出
         if (
@@ -103,34 +109,46 @@ class VC(object):
 
         # 推論実行
         with torch.no_grad():
-            if pitch is not None:
-                audio1 = (
-                    (
-                        inferencer.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0]
-                        * 32768
-                    )
-                    .data.cpu()
-                    .float()
-                    .numpy()
-                    .astype(np.int16)
-                )
-            else:
-                if hasattr(inferencer, "infer_pitchless"):
-                    audio1 = (
-                        (inferencer.infer_pitchless(feats, p_len, sid)[0][0, 0] * 32768)
-                        .data.cpu()
-                        .float()
-                        .numpy()
-                        .astype(np.int16)
-                    )
-                else:
-                    audio1 = (
-                        (inferencer.infer(feats, p_len, sid)[0][0, 0] * 32768)
-                        .data.cpu()
-                        .float()
-                        .numpy()
-                        .astype(np.int16)
-                    )
+            audio1 = (
+                (inferencer.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0] * 32768)
+                .data.cpu()
+                .float()
+                .numpy()
+                .astype(np.int16)
+            )
+
+            # if pitch is not None:
+            #     print("INFERENCE 1 ")
+            #     audio1 = (
+            #         (
+            #             inferencer.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0]
+            #             * 32768
+            #         )
+            #         .data.cpu()
+            #         .float()
+            #         .numpy()
+            #         .astype(np.int16)
+            #     )
+            # else:
+            #     if hasattr(inferencer, "infer_pitchless"):
+            #         print("INFERENCE 2 ")
+
+            #         audio1 = (
+            #             (inferencer.infer_pitchless(feats, p_len, sid)[0][0, 0] * 32768)
+            #             .data.cpu()
+            #             .float()
+            #             .numpy()
+            #             .astype(np.int16)
+            #         )
+            #     else:
+            #         print("INFERENCE 3 ")
+            #         audio1 = (
+            #             (inferencer.infer(feats, p_len, sid)[0][0, 0] * 32768)
+            #             .data.cpu()
+            #             .float()
+            #             .numpy()
+            #             .astype(np.int16)
+            #         )
 
         del feats, p_len, padding_mask
         torch.cuda.empty_cache()

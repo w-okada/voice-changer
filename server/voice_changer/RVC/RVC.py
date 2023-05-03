@@ -1,5 +1,6 @@
 import sys
 import os
+from voice_changer.RVC.ModelSlot import ModelSlot
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
@@ -22,7 +23,6 @@ import resampy
 from voice_changer.RVC.MergeModel import merge_model
 from voice_changer.RVC.MergeModelRequest import MergeModelRequest
 from voice_changer.RVC.ModelSlotGenerator import generateModelSlot
-from Exceptions import NoModeLoadedException
 from voice_changer.RVC.RVCSettings import RVCSettings
 from voice_changer.RVC.embedder.Embedder import Embedder
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
@@ -42,7 +42,7 @@ import torch
 import traceback
 import faiss
 
-from const import TMP_DIR, UPLOAD_DIR
+from const import TMP_DIR, UPLOAD_DIR, EnumEmbedderTypes
 
 
 from voice_changer.RVC.custom_vc_infer_pipeline import VC
@@ -56,34 +56,29 @@ providers = [
 
 
 class RVC:
-    audio_buffer: AudioInOut | None = None
+    initialLoad: bool = True
+    settings: RVCSettings = RVCSettings()
+
     embedder: Embedder | None = None
     inferencer: Inferencer | None = None
+
     pitchExtractor: PitchExtractor | None = None
     deviceManager = DeviceManager.get_instance()
 
+    audio_buffer: AudioInOut | None = None
+    prevVol: float = 0
+    params: VoiceChangerParams
+    currentSlot: int = -1
+    needSwitch: bool = False
+
     def __init__(self, params: VoiceChangerParams):
-        self.initialLoad = True
-        self.settings = RVCSettings()
         self.pitchExtractor = PitchExtractorManager.getPitchExtractor(
             self.settings.f0Detector
         )
-
-        self.feature_file = None
-        self.index_file = None
-
-        self.prevVol = 0
         self.params = params
-
-        self.currentSlot = -1
         print("RVC initialization: ", params)
 
     def loadModel(self, props: LoadModelParams):
-        """
-        loadModelはスロットへのエントリ(推論向けにはロードしない)。
-        例外的に、まだ一つも推論向けにロードされていない場合と稼働中スロットの場合は、ロードする。
-        """
-        self.is_half = props.isHalf
         target_slot_idx = props.slot
         params_str = props.params
         params = json.loads(params_str)
@@ -94,167 +89,175 @@ class RVC:
             f"[Voice Changer] RVC new model is uploaded,{target_slot_idx}",
             asdict(modelSlot),
         )
+        """
+        [Voice Changer] RVC new model is uploaded,0 {'pyTorchModelFile': 'upload_dir/0/kurage.pth', 'onnxModelFile': None, 'featureFile': None, 'indexFile': None, 'defaultTrans': 16, 'isONNX': False, 'modelType': <EnumInferenceTypes.pyTorchWebUI: 'pyTorchWebUI'>, 'samplingRate': 48000, 'f0': True, 'embChannels': 768, 'deprecated': False, 'embedder': 'hubert-base-japanese'}        
+        """
 
         # 初回のみロード
-        if self.initialLoad or target_slot_idx == self.currentSlot:
+        if self.initialLoad:
             self.prepareModel(target_slot_idx)
             self.settings.modelSlotIndex = target_slot_idx
-            # self.currentSlot = self.settings.modelSlotIndex
             self.switchModel()
             self.initialLoad = False
+        elif target_slot_idx == self.currentSlot:
+            self.prepareModel(target_slot_idx)
+            self.needSwitch = True
 
         return self.get_info()
 
-    # def _getDevice(self):
-    #     if self.settings.gpu < 0 or (self.gpu_num == 0 and self.mps_enabled is False):
-    #         dev = torch.device("cpu")
-    #     elif self.mps_enabled:
-    #         dev = torch.device("mps")
-    #     else:
-    #         dev = torch.device("cuda", index=self.settings.gpu)
-    #     return dev
+    def createPipeline(self, modelSlot: ModelSlot):
+        dev = self.deviceManager.getDevice(self.settings.gpu)
+        half = self.deviceManager.halfPrecisionAvailable(self.settings.gpu)
+        # ファイル名特定(Inferencer)
+        inferencerFilename = (
+            modelSlot.onnxModelFile if modelSlot.isONNX else modelSlot.pyTorchModelFile
+        )
+        # ファイル名特定(embedder)
+        if modelSlot.embedder == EnumEmbedderTypes.hubert:
+            emmbedderFilename = self.params.hubert_base
+        elif modelSlot.embedder == EnumEmbedderTypes.contentvec:
+            emmbedderFilename = self.params.content_vec_500
+        elif modelSlot.embedder == EnumEmbedderTypes.hubert_jp:
+            emmbedderFilename = self.params.hubert_base_jp
+        else:
+            raise RuntimeError(
+                "[Voice Changer] Exception loading embedder failed. unknwon type:",
+                modelSlot.embedder,
+            )
+
+        # Inferencer 生成
+        try:
+            inferencer = InferencerManager.getInferencer(
+                modelSlot.modelType,
+                inferencerFilename,
+                half,
+                dev,
+            )
+        except Exception as e:
+            print("[Voice Changer] exception! loading inferencer", e)
+            traceback.print_exc()
+
+        # Embedder 生成
+        try:
+            print("AFASFDAFDAFDASDFASDFSADFASDFA", half, self.settings.gpu)
+            embedder = EmbedderManager.getEmbedder(
+                modelSlot.embedder,
+                emmbedderFilename,
+                half,
+                dev,
+            )
+        except Exception as e:
+            print("[Voice Changer]  exception! loading embedder", e)
+            traceback.print_exc()
+
+        return inferencer, embedder
+
+    def loadIndex(self, modelSlot: ModelSlot):
+        # Indexのロード
+        print("[Voice Changer] Loading index...")
+        # ファイル指定がない場合はNone
+        if modelSlot.featureFile is None or modelSlot.indexFile is None:
+            return None, None
+
+        # ファイル指定があってもファイルがない場合はNone
+        if (
+            os.path.exists(modelSlot.featureFile) is not True
+            or os.path.exists(modelSlot.indexFile) is not True
+        ):
+            return None, None
+
+        try:
+            index = faiss.read_index(modelSlot.indexFile)
+            feature = np.load(modelSlot.featureFile)
+        except:
+            print("[Voice Changer] load index failed. Use no index.")
+            traceback.print_exc()
+            return None, None
+
+        return index, feature
 
     def prepareModel(self, slot: int):
         if slot < 0:
             return self.get_info()
         print("[Voice Changer] Prepare Model of slot:", slot)
         modelSlot = self.settings.modelSlots[slot]
-        filename = (
-            modelSlot.onnxModelFile if modelSlot.isONNX else modelSlot.pyTorchModelFile
-        )
-        dev = self.deviceManager.getDevice(self.settings.gpu)
 
-        # Inferencerのロード
-        inferencer = InferencerManager.getInferencer(
-            modelSlot.modelType,
-            filename,
-            self.settings.isHalf,
-            dev,
-        )
+        # Inferencer, embedderのロード
+        inferencer, embedder = self.createPipeline(modelSlot)
+
         self.next_inferencer = inferencer
+        self.next_embedder = embedder
 
         # Indexのロード
-        print("[Voice Changer] Loading index...")
-        if modelSlot.featureFile is not None and modelSlot.indexFile is not None:
-            if (
-                os.path.exists(modelSlot.featureFile) is True
-                and os.path.exists(modelSlot.indexFile) is True
-            ):
-                try:
-                    self.next_index = faiss.read_index(modelSlot.indexFile)
-                    self.next_feature = np.load(modelSlot.featureFile)
-                except:
-                    print("[Voice Changer] load index failed. Use no index.")
-                    traceback.print_exc()
-                    self.next_index = self.next_feature = None
-            else:
-                print("[Voice Changer] Index file is not found. Use no index.")
-                self.next_index = self.next_feature = None
-        else:
-            self.next_index = self.next_feature = None
+        index, feature = self.loadIndex(modelSlot)
+        self.next_index = index
+        self.next_feature = feature
 
+        # その他の設定
         self.next_trans = modelSlot.defaultTrans
         self.next_samplingRate = modelSlot.samplingRate
-        self.next_embedder = modelSlot.embedder
         self.next_framework = "ONNX" if modelSlot.isONNX else "PyTorch"
+        self.needSwitch = True
         print("[Voice Changer] Prepare done.")
         return self.get_info()
 
     def switchModel(self):
         print("[Voice Changer] Switching model..")
-        dev = self.deviceManager.getDevice(self.settings.gpu)
-
-        # embedderはモデルによらず再利用できる可能性が高いので、Switchのタイミングでこちらで取得
-        try:
-            self.embedder = EmbedderManager.getEmbedder(
-                self.next_embedder,
-                self.params.hubert_base,
-                True,
-                dev,
-            )
-        except Exception as e:
-            print("[Voice Changer] load hubert error", e)
-            traceback.print_exc()
-
+        self.embedder = self.next_embedder
         self.inferencer = self.next_inferencer
         self.feature = self.next_feature
         self.index = self.next_index
         self.settings.tran = self.next_trans
-        self.settings.framework = self.next_framework
         self.settings.modelSamplingRate = self.next_samplingRate
+        self.settings.framework = self.next_framework
 
-        self.next_net_g = None
-        self.next_onnx_session = None
         print(
             "[Voice Changer] Switching model..done",
         )
 
     def update_settings(self, key: str, val: int | float | str):
-        # if key == "onnxExecutionProvider" and self.onnx_session is not None:
-        #     if val == "CUDAExecutionProvider":
-        #         if self.settings.gpu < 0 or self.settings.gpu >= self.gpu_num:
-        #             self.settings.gpu = 0
-        #         provider_options = [{"device_id": self.settings.gpu}]
-        #         self.onnx_session.set_providers(
-        #             providers=[val], provider_options=provider_options
-        #         )
-        #         if hasattr(self, "hubert_onnx"):
-        #             self.hubert_onnx.set_providers(
-        #                 providers=[val], provider_options=provider_options
-        #             )
-        #     else:
-        #         self.onnx_session.set_providers(providers=[val])
-        #         if hasattr(self, "hubert_onnx"):
-        #             self.hubert_onnx.set_providers(providers=[val])
-        # elif key == "onnxExecutionProvider" and self.onnx_session is None:
-        #     print("Onnx is not enabled. Please load model.")
-        #     return False
         if key in self.settings.intData:
+            # 設定前処理
             val = cast(int, val)
-            # if (
-            #     key == "gpu"
-            #     and val >= 0
-            #     and val < self.gpu_num
-            #     and self.onnx_session is not None
-            # ):
-            #     providers = self.onnx_session.get_providers()
-            #     print("Providers:", providers)
-            #     if "CUDAExecutionProvider" in providers:
-            #         provider_options = [{"device_id": self.settings.gpu}]
-            #         self.onnx_session.set_providers(
-            #             providers=["CUDAExecutionProvider"],
-            #             provider_options=provider_options,
-            #         )
             if key == "modelSlotIndex":
-                if int(val) < 0:
+                if val < 0:
                     return True
-                # self.switchModel(int(val))
-                val = int(val) % 1000  # Quick hack for same slot is selected
+                val = val % 1000  # Quick hack for same slot is selected
                 self.prepareModel(val)
-                self.currentSlot = -1
-            setattr(self.settings, key, int(val))
+                self.needSwitch = True
+
+            # 設定
+            setattr(self.settings, key, val)
+
+            if key == "gpu" and self.embedder is not None:
+                dev = self.deviceManager.getDevice(val)
+                half = self.deviceManager.halfPrecisionAvailable(val)
+
+                # half-precisionの使用可否が変わるときは作り直し
+                if (
+                    self.inferencer is not None
+                    and self.inferencer.isHalf == half
+                    and self.embedder.isHalf == half
+                ):
+                    print(
+                        "NOT NEED CHAGE TO NEW PIPELINE!!!!!!!!!!!!!!!!!!!!!!!!!!!",
+                        half,
+                    )
+                    self.embedder.setDevice(dev)
+                    self.inferencer.setDevice(dev)
+                else:
+                    print("CHAGE TO NEW PIPELINE!!!!!!!!!!!!!!!!!!!!!!!!!!!", half)
+                    self.prepareModel(self.settings.modelSlotIndex)
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
             setattr(self.settings, key, str(val))
         else:
             return False
-
         return True
 
     def get_info(self):
         data = asdict(self.settings)
-
-        # data["onnxExecutionProviders"] = (
-        #     self.onnx_session.get_providers() if self.onnx_session is not None else []
-        # )
-        files = ["configFile", "pyTorchModelFile", "onnxModelFile"]
-        for f in files:
-            if data[f] is not None and os.path.exists(data[f]):
-                data[f] = os.path.basename(data[f])
-            else:
-                data[f] = ""
-
         return data
 
     def get_processing_sampling_rate(self):
@@ -295,118 +298,6 @@ class RVC:
 
         return (self.audio_buffer, convertSize, vol)
 
-    def _onnx_inference(self, data):
-        if hasattr(self, "onnx_session") is False or self.onnx_session is None:
-            print("[Voice Changer] No onnx session.")
-            raise NoModeLoadedException("ONNX")
-
-        if self.settings.gpu < 0 or self.gpu_num == 0:
-            dev = torch.device("cpu")
-        else:
-            dev = torch.device("cuda", index=self.settings.gpu)
-
-        # self.hubert_model = self.hubert_model.to(dev)
-        self.embedder = self.embedder.to(dev)
-
-        audio = data[0]
-        convertSize = data[1]
-        vol = data[2]
-
-        audio = resampy.resample(audio, self.settings.modelSamplingRate, 16000)
-
-        if vol < self.settings.silentThreshold:
-            return np.zeros(convertSize).astype(np.int16)
-
-        with torch.no_grad():
-            repeat = 3 if self.is_half else 1
-            repeat *= self.settings.rvcQuality  # 0 or 3
-            vc = VC(
-                self.settings.modelSamplingRate,
-                torch.device("cuda:0"),
-                self.is_half,
-                repeat,
-            )
-            sid = 0
-            f0_up_key = self.settings.tran
-            f0_method = self.settings.f0Detector
-            index_rate = self.settings.indexRatio
-            if_f0 = 1 if self.settings.modelSlots[self.currentSlot].f0 else 0
-
-            embChannels = self.settings.modelSlots[self.currentSlot].embChannels
-            audio_out = vc.pipeline(
-                # self.hubert_model,
-                self.embedder,
-                self.onnx_session,
-                self.pitchExtractor,
-                sid,
-                audio,
-                f0_up_key,
-                f0_method,
-                self.index,
-                self.feature,
-                index_rate,
-                if_f0,
-                silence_front=self.settings.extraConvertSize
-                / self.settings.modelSamplingRate,
-                embChannels=embChannels,
-            )
-            result = audio_out * np.sqrt(vol)
-
-        return result
-
-    def _pyTorch_inference(self, data):
-        # if hasattr(self, "net_g") is False or self.net_g is None:
-        #     print(
-        #         "[Voice Changer] No pyTorch session.",
-        #         hasattr(self, "net_g"),
-        #         self.net_g,
-        #     )
-        #     raise NoModeLoadedException("pytorch")
-
-        dev = self.deviceManager.getDevice(self.settings.gpu)
-        self.embedder = self.embedder.to(dev)
-        self.inferencer = self.inferencer.to(dev)
-
-        audio = data[0]
-        convertSize = data[1]
-        vol = data[2]
-
-        audio = resampy.resample(audio, self.settings.modelSamplingRate, 16000)
-
-        if vol < self.settings.silentThreshold:
-            return np.zeros(convertSize).astype(np.int16)
-
-        repeat = 3 if self.is_half else 1
-        repeat *= self.settings.rvcQuality  # 0 or 3
-        vc = VC(self.settings.modelSamplingRate, dev, self.is_half, repeat)
-        sid = 0
-        f0_up_key = self.settings.tran
-        f0_method = self.settings.f0Detector
-        index_rate = self.settings.indexRatio
-        if_f0 = 1 if self.settings.modelSlots[self.currentSlot].f0 else 0
-
-        embChannels = self.settings.modelSlots[self.currentSlot].embChannels
-        audio_out = vc.pipeline(
-            self.embedder,
-            self.inferencer,
-            self.pitchExtractor,
-            sid,
-            audio,
-            f0_up_key,
-            f0_method,
-            self.index,
-            self.feature,
-            index_rate,
-            if_f0,
-            silence_front=self.settings.extraConvertSize
-            / self.settings.modelSamplingRate,
-            embChannels=embChannels,
-        )
-
-        result = audio_out * np.sqrt(vol)
-
-        return result
-
     def inference(self, data):
         if self.settings.modelSlotIndex < 0:
             print(
@@ -415,15 +306,17 @@ class RVC:
                 self.currentSlot,
             )
             raise NoModeLoadedException("model_common")
-
-        if self.currentSlot != self.settings.modelSlotIndex:
+        if self.needSwitch:
             print(f"Switch model {self.currentSlot} -> {self.settings.modelSlotIndex}")
             self.currentSlot = self.settings.modelSlotIndex
             self.switchModel()
+            self.needSwitch = False
 
         dev = self.deviceManager.getDevice(self.settings.gpu)
-        self.embedder = self.embedder.to(dev)
-        self.inferencer = self.inferencer.to(dev)
+        half = self.deviceManager.halfPrecisionAvailable(self.settings.gpu)
+
+        # self.embedder = self.embedder.setDevice(dev)
+        # self.inferencer = self.inferencer.setDevice(dev)
 
         audio = data[0]
         convertSize = data[1]
@@ -434,16 +327,16 @@ class RVC:
         if vol < self.settings.silentThreshold:
             return np.zeros(convertSize).astype(np.int16)
 
-        repeat = 3 if self.is_half else 1
+        repeat = 3 if half else 1
         repeat *= self.settings.rvcQuality  # 0 or 3
-        vc = VC(self.settings.modelSamplingRate, dev, self.is_half, repeat)
+        vc = VC(self.settings.modelSamplingRate, dev, half, repeat)
         sid = 0
         f0_up_key = self.settings.tran
-        f0_method = self.settings.f0Detector
         index_rate = self.settings.indexRatio
         if_f0 = 1 if self.settings.modelSlots[self.currentSlot].f0 else 0
 
         embChannels = self.settings.modelSlots[self.currentSlot].embChannels
+
         audio_out = vc.pipeline(
             self.embedder,
             self.inferencer,
@@ -451,7 +344,6 @@ class RVC:
             sid,
             audio,
             f0_up_key,
-            f0_method,
             self.index,
             self.feature,
             index_rate,

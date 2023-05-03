@@ -29,6 +29,9 @@ class DeviceManager(object):
     def halfPrecisionAvailable(self, id: int):
         if self.gpu_num == 0:
             return False
+        if id < 0:
+            return False
+
         gpuName = torch.cuda.get_device_name(id).upper()
 
         # original: https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI/blob/main/config.py
@@ -39,3 +42,5 @@ class DeviceManager(object):
             or "1080" in gpuName
         ):
             return False
+
+        return True
