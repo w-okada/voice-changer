@@ -1,5 +1,6 @@
 import sys
 import os
+from Exceptions import NoModeLoadedException
 from voice_changer.RVC.ModelSlot import ModelSlot
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 
@@ -42,7 +43,7 @@ import torch
 import traceback
 import faiss
 
-from const import TMP_DIR, UPLOAD_DIR, EnumEmbedderTypes
+from const import UPLOAD_DIR, EnumEmbedderTypes
 
 
 from voice_changer.RVC.custom_vc_infer_pipeline import VC
@@ -89,9 +90,6 @@ class RVC:
             f"[Voice Changer] RVC new model is uploaded,{target_slot_idx}",
             asdict(modelSlot),
         )
-        """
-        [Voice Changer] RVC new model is uploaded,0 {'pyTorchModelFile': 'upload_dir/0/kurage.pth', 'onnxModelFile': None, 'featureFile': None, 'indexFile': None, 'defaultTrans': 16, 'isONNX': False, 'modelType': <EnumInferenceTypes.pyTorchWebUI: 'pyTorchWebUI'>, 'samplingRate': 48000, 'f0': True, 'embChannels': 768, 'deprecated': False, 'embedder': 'hubert-base-japanese'}        
-        """
 
         # 初回のみロード
         if self.initialLoad:
@@ -139,7 +137,6 @@ class RVC:
 
         # Embedder 生成
         try:
-            print("AFASFDAFDAFDASDFASDFSADFASDFA", half, self.settings.gpu)
             embedder = EmbedderManager.getEmbedder(
                 modelSlot.embedder,
                 emmbedderFilename,
@@ -179,8 +176,14 @@ class RVC:
     def prepareModel(self, slot: int):
         if slot < 0:
             return self.get_info()
-        print("[Voice Changer] Prepare Model of slot:", slot)
         modelSlot = self.settings.modelSlots[slot]
+        inferencerFilename = (
+            modelSlot.onnxModelFile if modelSlot.isONNX else modelSlot.pyTorchModelFile
+        )
+        if inferencerFilename == "":
+            return self.get_info()
+
+        print("[Voice Changer] Prepare Model of slot:", slot)
 
         # Inferencer, embedderのロード
         inferencer, embedder = self.createPipeline(modelSlot)
@@ -240,13 +243,13 @@ class RVC:
                     and self.embedder.isHalf == half
                 ):
                     print(
-                        "NOT NEED CHAGE TO NEW PIPELINE!!!!!!!!!!!!!!!!!!!!!!!!!!!",
+                        "USE EXSISTING PIPELINE",
                         half,
                     )
                     self.embedder.setDevice(dev)
                     self.inferencer.setDevice(dev)
                 else:
-                    print("CHAGE TO NEW PIPELINE!!!!!!!!!!!!!!!!!!!!!!!!!!!", half)
+                    print("CHAGE TO NEW PIPELINE", half)
                     self.prepareModel(self.settings.modelSlotIndex)
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
@@ -307,7 +310,9 @@ class RVC:
             )
             raise NoModeLoadedException("model_common")
         if self.needSwitch:
-            print(f"Switch model {self.currentSlot} -> {self.settings.modelSlotIndex}")
+            print(
+                f"[Voice Changer] Switch model {self.currentSlot} -> {self.settings.modelSlotIndex}"
+            )
             self.currentSlot = self.settings.modelSlotIndex
             self.switchModel()
             self.needSwitch = False
@@ -363,8 +368,8 @@ class RVC:
         return result
 
     def __del__(self):
-        del self.net_g
-        del self.onnx_session
+        del self.inferencer
+        del self.embedder
 
         print("---------- REMOVING ---------------")
 
@@ -383,57 +388,17 @@ class RVC:
                 pass
 
     def export2onnx(self):
-        if hasattr(self, "net_g") is False or self.net_g is None:
-            print("[Voice Changer] export2onnx, No pyTorch session.")
-            return {"status": "ng", "path": ""}
+        modelSlot = self.settings.modelSlots[self.settings.modelSlotIndex]
+        pyTorchModelFile = modelSlot.pyTorchModelFile
 
-        pyTorchModelFile = self.settings.modelSlots[
-            self.settings.modelSlotIndex
-        ].pyTorchModelFile  # inference前にexportできるようにcurrentSlotではなくslot
-
-        if pyTorchModelFile is None:
+        # PyTorchのファイルが存在しない場合はエラーを返す
+        if pyTorchModelFile is None or pyTorchModelFile == "":
             print("[Voice Changer] export2onnx, No pyTorch filepath.")
             return {"status": "ng", "path": ""}
+
         import voice_changer.RVC.export2onnx as onnxExporter
 
-        output_file = os.path.splitext(os.path.basename(pyTorchModelFile))[0] + ".onnx"
-        output_file_simple = (
-            os.path.splitext(os.path.basename(pyTorchModelFile))[0] + "_simple.onnx"
-        )
-        output_path = os.path.join(TMP_DIR, output_file)
-        output_path_simple = os.path.join(TMP_DIR, output_file_simple)
-        print(
-            "embChannels",
-            self.settings.modelSlots[self.settings.modelSlotIndex].embChannels,
-        )
-        metadata = {
-            "application": "VC_CLIENT",
-            "version": "1",
-            "modelType": self.settings.modelSlots[
-                self.settings.modelSlotIndex
-            ].modelType,
-            "samplingRate": self.settings.modelSlots[
-                self.settings.modelSlotIndex
-            ].samplingRate,
-            "f0": self.settings.modelSlots[self.settings.modelSlotIndex].f0,
-            "embChannels": self.settings.modelSlots[
-                self.settings.modelSlotIndex
-            ].embChannels,
-            "embedder": self.settings.modelSlots[self.settings.modelSlotIndex].embedder,
-        }
-
-        if torch.cuda.device_count() > 0:
-            onnxExporter.export2onnx(
-                pyTorchModelFile, output_path, output_path_simple, True, metadata
-            )
-        else:
-            print(
-                "[Voice Changer] Warning!!! onnx export with float32. maybe size is doubled."
-            )
-            onnxExporter.export2onnx(
-                pyTorchModelFile, output_path, output_path_simple, False, metadata
-            )
-
+        output_file_simple = onnxExporter.export2onnx(modelSlot)
         return {
             "status": "ok",
             "path": f"/tmp/{output_file_simple}",

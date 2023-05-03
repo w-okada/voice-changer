@@ -70,7 +70,7 @@ def _setInfoByONNX(slot: ModelSlot, file: str):
     try:
         metadata = json.loads(modelmeta.custom_metadata_map["metadata"])
 
-        slot.modelType = metadata["modelType"]
+        # slot.modelType = metadata["modelType"]
         slot.embChannels = metadata["embChannels"]
 
         if "embedder" not in metadata:

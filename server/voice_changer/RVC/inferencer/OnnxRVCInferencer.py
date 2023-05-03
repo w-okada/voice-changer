@@ -24,6 +24,7 @@ class OnnxRVCInferencer(Inferencer):
             self.isHalf = True
 
         self.model = onnx_session
+        self.setDevice(dev)
         return self
 
     def infer(
@@ -37,9 +38,9 @@ class OnnxRVCInferencer(Inferencer):
         if pitch is None or pitchf is None:
             raise RuntimeError("[Voice Changer] Pitch or Pitchf is not found.")
 
-        print("INFER1", self.model.get_providers())
-        print("INFER2", self.model.get_provider_options())
-        print("INFER3", self.model.get_session_options())
+        # print("INFER1", self.model.get_providers())
+        # print("INFER2", self.model.get_provider_options())
+        # print("INFER3", self.model.get_session_options())
         if self.isHalf:
             audio1 = self.model.run(
                 ["audio"],

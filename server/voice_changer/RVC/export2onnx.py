@@ -1,7 +1,10 @@
+import os
 import json
 import torch
 from onnxsim import simplify
 import onnx
+from const import TMP_DIR, EnumInferenceTypes
+from voice_changer.RVC.ModelSlot import ModelSlot
 
 from voice_changer.RVC.onnx.SynthesizerTrnMs256NSFsid_ONNX import (
     SynthesizerTrnMs256NSFsid_ONNX,
@@ -15,24 +18,60 @@ from voice_changer.RVC.onnx.SynthesizerTrnMsNSFsidNono_webui_ONNX import (
 from voice_changer.RVC.onnx.SynthesizerTrnMsNSFsid_webui_ONNX import (
     SynthesizerTrnMsNSFsid_webui_ONNX,
 )
-from .const import RVC_MODEL_TYPE_RVC, RVC_MODEL_TYPE_WEBUI
 
 
-def export2onnx(input_model, output_model, output_model_simple, is_half, metadata):
+def export2onnx(modelSlot: ModelSlot):
+    pyTorchModelFile = modelSlot.pyTorchModelFile
+
+    output_file = os.path.splitext(os.path.basename(pyTorchModelFile))[0] + ".onnx"
+    output_file_simple = (
+        os.path.splitext(os.path.basename(pyTorchModelFile))[0] + "_simple.onnx"
+    )
+    output_path = os.path.join(TMP_DIR, output_file)
+    output_path_simple = os.path.join(TMP_DIR, output_file_simple)
+    metadata = {
+        "application": "VC_CLIENT",
+        "version": "2",
+        # ↓EnumInferenceTypesのままだとシリアライズできないのでテキスト化
+        "modelType": modelSlot.modelType.value,
+        "samplingRate": modelSlot.samplingRate,
+        "f0": modelSlot.f0,
+        "embChannels": modelSlot.embChannels,
+        "embedder": modelSlot.embedder.value,
+    }
+
+    if torch.cuda.device_count() > 0:
+        _export2onnx(pyTorchModelFile, output_path, output_path_simple, True, metadata)
+    else:
+        print(
+            "[Voice Changer] Warning!!! onnx export with float32. maybe size is doubled."
+        )
+        _export2onnx(pyTorchModelFile, output_path, output_path_simple, False, metadata)
+    return output_file_simple
+
+
+def _export2onnx(input_model, output_model, output_model_simple, is_half, metadata):
     cpt = torch.load(input_model, map_location="cpu")
     if is_half:
         dev = torch.device("cuda", index=0)
     else:
         dev = torch.device("cpu")
 
-    if metadata["f0"] is True and metadata["modelType"] == RVC_MODEL_TYPE_RVC:
+    # EnumInferenceTypesのままだとシリアライズできないのでテキスト化
+    if metadata["modelType"] == EnumInferenceTypes.pyTorchRVC.value:
         net_g_onnx = SynthesizerTrnMs256NSFsid_ONNX(*cpt["config"], is_half=is_half)
-    elif metadata["f0"] is True and metadata["modelType"] == RVC_MODEL_TYPE_WEBUI:
+    elif metadata["modelType"] == EnumInferenceTypes.pyTorchWebUI.value:
         net_g_onnx = SynthesizerTrnMsNSFsid_webui_ONNX(**cpt["params"], is_half=is_half)
-    elif metadata["f0"] is False and metadata["modelType"] == RVC_MODEL_TYPE_RVC:
+    elif metadata["modelType"] == EnumInferenceTypes.pyTorchRVCNono.value:
         net_g_onnx = SynthesizerTrnMs256NSFsid_nono_ONNX(*cpt["config"])
-    elif metadata["f0"] is False and metadata["modelType"] == RVC_MODEL_TYPE_WEBUI:
+    elif metadata["modelType"] == EnumInferenceTypes.pyTorchWebUINono.value:
         net_g_onnx = SynthesizerTrnMsNSFsidNono_webui_ONNX(**cpt["params"])
+    else:
+        print(
+            "unknwon::::: ",
+            metadata["modelType"],
+            EnumInferenceTypes.pyTorchWebUI.value,
+        )
 
     net_g_onnx.eval().to(dev)
     net_g_onnx.load_state_dict(cpt["weight"], strict=False)

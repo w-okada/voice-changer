@@ -11,6 +11,7 @@ from infer_pack.models import (  # type:ignore
 class RVCInferencer(Inferencer):
     def loadModel(self, file: str, dev: device, isHalf: bool = True):
         super().setProps(EnumInferenceTypes.pyTorchRVC, file, dev, isHalf)
+        print("load inf", file)
         cpt = torch.load(file, map_location="cpu")
         model = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=isHalf)
 
