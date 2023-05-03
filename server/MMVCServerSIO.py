@@ -169,8 +169,11 @@ if __name__ == "MMVCServerSIO":
                 "position": 1,
             }
         )
-    with ThreadPoolExecutor() as pool:
-        pool.map(download, downloadParams)
+
+    # with ThreadPoolExecutor() as pool:
+    #     pool.map(download, downloadParams)
+    for param in downloadParams:
+        download(param)
 
     if (
         os.path.exists(voiceChangerParams.hubert_base) is False

@@ -41,5 +41,6 @@ client/lib/worklet/dist
 docker/cudnn/
 
 server/weights/
+server/weights_/
 
 start_trainer.sh
