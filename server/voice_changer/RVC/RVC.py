@@ -398,7 +398,7 @@ class RVC:
 
         import voice_changer.RVC.export2onnx as onnxExporter
 
-        output_file_simple = onnxExporter.export2onnx(modelSlot)
+        output_file_simple = onnxExporter.export2onnx(self.settings.gpu, modelSlot)
         return {
             "status": "ok",
             "path": f"/tmp/{output_file_simple}",

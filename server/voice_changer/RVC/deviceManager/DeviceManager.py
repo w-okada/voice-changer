@@ -33,8 +33,6 @@ class DeviceManager(object):
             return False
 
         gpuName = torch.cuda.get_device_name(id).upper()
-
-        # original: https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI/blob/main/config.py
         if (
             ("16" in gpuName and "V100" not in gpuName)
             or "P40" in gpuName.upper()
@@ -44,3 +42,11 @@ class DeviceManager(object):
             return False
 
         return True
+
+    def getDeviceMemory(self, id: int):
+        try:
+            return torch.cuda.get_device_properties(id).total_memory
+            # except Exception as e:
+        except:
+            # print(e)
+            return 0

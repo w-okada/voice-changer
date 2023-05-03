@@ -5,6 +5,7 @@ from onnxsim import simplify
 import onnx
 from const import TMP_DIR, EnumInferenceTypes
 from voice_changer.RVC.ModelSlot import ModelSlot
+from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 
 from voice_changer.RVC.onnx.SynthesizerTrnMs256NSFsid_ONNX import (
     SynthesizerTrnMs256NSFsid_ONNX,
@@ -20,7 +21,7 @@ from voice_changer.RVC.onnx.SynthesizerTrnMsNSFsid_webui_ONNX import (
 )
 
 
-def export2onnx(modelSlot: ModelSlot):
+def export2onnx(gpu: int, modelSlot: ModelSlot):
     pyTorchModelFile = modelSlot.pyTorchModelFile
 
     output_file = os.path.splitext(os.path.basename(pyTorchModelFile))[0] + ".onnx"
@@ -39,8 +40,10 @@ def export2onnx(modelSlot: ModelSlot):
         "embChannels": modelSlot.embChannels,
         "embedder": modelSlot.embedder.value,
     }
+    gpuMomory = DeviceManager.get_instance().getDeviceMemory(gpu)
+    print(f"[Voice Changer] exporting onnx... gpu_id:{gpu} gpu_mem:{gpuMomory}")
 
-    if torch.cuda.device_count() > 0:
+    if gpuMomory > 0:
         _export2onnx(pyTorchModelFile, output_path, output_path_simple, True, metadata)
     else:
         print(
