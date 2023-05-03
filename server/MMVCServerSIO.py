@@ -115,7 +115,8 @@ def download(params):
     saveTo = params["saveTo"]
     position = params["position"]
     dirname = os.path.dirname(saveTo)
-    os.makedirs(dirname, exist_ok=True)
+    if dirname != "":
+        os.makedirs(dirname, exist_ok=True)
 
     try:
         req = requests.get(url, stream=True, allow_redirects=True)
