@@ -114,7 +114,8 @@ class RVC:
         if modelSlot.embedder == EnumEmbedderTypes.hubert:
             emmbedderFilename = self.params.hubert_base
         elif modelSlot.embedder == EnumEmbedderTypes.contentvec:
-            emmbedderFilename = self.params.content_vec_500
+            # emmbedderFilename = self.params.content_vec_500
+            emmbedderFilename = self.params.hubert_base
         elif modelSlot.embedder == EnumEmbedderTypes.hubert_jp:
             emmbedderFilename = self.params.hubert_base_jp
         else:
