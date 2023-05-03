@@ -196,3 +196,8 @@ Github Pages 上で実行できるため、ブラウザのみあれば様々な�
 [録音アプリ on Github Pages](https://w-okada.github.io/voice-changer/)
 
 [解説動画](https://youtu.be/s_GirFEGvaA)
+
+# test
+
+| | mac | ONNX(cpu), PyTorch(cpu,mps) | [通常](https://drive.google.com/uc?id=1qY4ZqsKgrqIPKaVy0xrhkBwp_bUK78VI&export=download)||784MB|
+| | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [通常](https://drive.google.com/uc?id=16wqbKi8F0tt2MqtgScA_STecpvaOgBIg&export=download)||2860MB|
