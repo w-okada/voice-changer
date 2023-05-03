@@ -7,7 +7,7 @@ import socket
 import platform
 import os
 import argparse
-import requests
+import requests  # type: ignore
 
 from tqdm import tqdm
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
@@ -170,10 +170,8 @@ if __name__ == "MMVCServerSIO":
             }
         )
 
-    # with ThreadPoolExecutor() as pool:
-    #     pool.map(download, downloadParams)
-    for param in downloadParams:
-        download(param)
+    with ThreadPoolExecutor() as pool:
+        pool.map(download, downloadParams)
 
     if (
         os.path.exists(voiceChangerParams.hubert_base) is False
