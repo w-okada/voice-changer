@@ -325,9 +325,6 @@ class RVC:
         dev = self.deviceManager.getDevice(self.settings.gpu)
         half = self.deviceManager.halfPrecisionAvailable(self.settings.gpu)
 
-        # self.embedder = self.embedder.setDevice(dev)
-        # self.inferencer = self.inferencer.setDevice(dev)
-
         audio = data[0]
         convertSize = data[1]
         vol = data[2]
@@ -364,11 +361,6 @@ class RVC:
         )
 
         result = audio_out * np.sqrt(vol)
-
-        # if self.settings.framework == "ONNX":
-        #     audio = self._onnx_inference(data)
-        # else:
-        #     audio = self._pyTorch_inference(data)
 
         return result
 
