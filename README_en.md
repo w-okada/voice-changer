@@ -4,6 +4,14 @@
 
 ## What's New!
 
+- v.1.5.2.8
+
+  - auto-downloader for weight of hubert.
+  - auto detect half-precision.
+  - auto detect onnx execution provider.
+  - force onnx export by cpu.
+  - support japanse hubert. (experimental)
+
 - v.1.5.2.7
 
   - New Feature: model merger.
@@ -84,10 +92,14 @@ We offer Windows and Mac versions.
 
 - Download (When you cannot download from google drive, try [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main))
 
-| Version   | OS  | フレームワーク                    | link                                                                                       | サポート VC                                                                   | サイズ |
-| --------- | --- | --------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- | ------ |
-| v.1.5.2.7 | mac | ONNX(cpu), PyTorch(cpu,mps)       | [normal](https://drive.google.com/uc?id=19GCHJWIMeWlORUJFU73WUW2QJZZBQ7WT&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 784MB  |
-|           | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1zeeFdRF_l-b69Sh3bhHCtrhR5pLX66DE&export=download) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2860MB |
+| Version   | OS  | フレームワーク                           | link                                                                                           | サポート VC                                                                   | サイズ |
+| --------- | --- | ---------------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------ |
+| v.1.5.2.8 | mac | ONNX(cpu), PyTorch(cpu,mps)              | [normal](https://drive.google.com/uc?id=1qY4ZqsKgrqIPKaVy0xrhkBwp_bUK78VI&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 784MB  |
+|           | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)        | [normal](https://drive.google.com/uc?id=16wqbKi8F0tt2MqtgScA_STecpvaOgBIg&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2860MB |
+|           | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda)\*2 | [normal](https://drive.google.com/uc?id=1u86sqfE4cYebtcxcaK3PAhSTKbnAkfex&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2744MB |
+
+(\*1) You can alson download from [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)
+(\*2) The developer does not have an AMD graphics card, so it has not been tested. This package only includes onnxruntime-directml.
 
 | Version    | OS                                    | Framework | link                                                                                               | VC Support | Size  |
 | ---------- | ------------------------------------- | --------- | -------------------------------------------------------------------------------------------------- | ---------- | ----- |
