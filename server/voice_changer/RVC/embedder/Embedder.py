@@ -45,22 +45,13 @@ class Embedder(Protocol):
             self.model = self.model.to(self.dev)
         return self
 
-    def matchCondition(self, embedderType: EnumEmbedderTypes, file: str) -> bool:
+    def matchCondition(self, embedderType: EnumEmbedderTypes) -> bool:
         # Check Type
         if self.embedderType != embedderType:
             print(
                 "[Voice Changer] embeder type is not match",
                 self.embedderType,
                 embedderType,
-            )
-            return False
-
-        # Check File Path
-        if self.file != file:
-            print(
-                "[Voice Changer] embeder file is not match",
-                self.file,
-                file,
             )
             return False
 

@@ -41,7 +41,7 @@ import torch
 import traceback
 import faiss
 
-from const import UPLOAD_DIR, EnumEmbedderTypes
+from const import UPLOAD_DIR
 
 
 from voice_changer.RVC.Pipeline import Pipeline
@@ -73,6 +73,7 @@ class RVC:
             self.settings.f0Detector
         )
         self.params = params
+        EmbedderManager.initialize(params)
         print("RVC initialization: ", params)
 
     def loadModel(self, props: LoadModelParams):
@@ -106,20 +107,7 @@ class RVC:
         inferencerFilename = (
             modelSlot.onnxModelFile if modelSlot.isONNX else modelSlot.pyTorchModelFile
         )
-        # ファイル名特定(embedder)
-        if modelSlot.embedder == EnumEmbedderTypes.hubert:
-            emmbedderFilename = self.params.hubert_base
-        elif modelSlot.embedder == EnumEmbedderTypes.contentvec:
-            # emmbedderFilename = self.params.content_vec_500
-            emmbedderFilename = self.params.hubert_base
-        elif modelSlot.embedder == EnumEmbedderTypes.hubert_jp:
-            emmbedderFilename = self.params.hubert_base_jp
-        else:
-            raise RuntimeError(
-                "[Voice Changer] Exception loading embedder failed. unknwon type:",
-                modelSlot.embedder,
-            )
-
+        
         # Inferencer 生成
         try:
             inferencer = InferencerManager.getInferencer(
@@ -136,7 +124,7 @@ class RVC:
         try:
             embedder = EmbedderManager.getEmbedder(
                 modelSlot.embedder,
-                emmbedderFilename,
+                # emmbedderFilename,
                 half,
                 dev,
             )
