@@ -9,7 +9,7 @@ class MMVC_SocketIOServer:
 
     @classmethod
     def get_instance(cls, voiceChangerManager: VoiceChangerManager):
-        if not hasattr(cls, "_instance"):
+        if cls._instance is None:
             sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins="*")
             namespace = MMVC_Namespace.get_instance(voiceChangerManager)
             sio.register_namespace(namespace)
