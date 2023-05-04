@@ -99,6 +99,8 @@ export const ServerSettingKey = {
     "enhancerTune": "enhancerTune",
 
     "inputSampleRate": "inputSampleRate",
+
+    "enableDirectML": "enableDirectML",
 } as const
 export type ServerSettingKey = typeof ServerSettingKey[keyof typeof ServerSettingKey]
 
@@ -136,6 +138,7 @@ export type VoiceChangerServerSetting = {
     enhancerTune: number // DDSP-SVC
 
     inputSampleRate: InputSampleRate
+    enableDirectML: number
 }
 
 type ModelSlot = {
@@ -204,7 +207,7 @@ export const DefaultServerSetting: ServerInfo = {
     enableEnhancer: 0,
     enhancerTune: 0,
 
-
+    enableDirectML: 0,
     // 
     status: "ok",
     configFile: "",

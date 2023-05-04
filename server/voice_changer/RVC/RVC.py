@@ -1,10 +1,12 @@
 import sys
 import os
-from Exceptions import NoModeLoadedException
-from voice_changer.RVC.ModelSlot import ModelSlot
-from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
+import json
+import resampy
+from dataclasses import asdict
+from typing import cast
+import numpy as np
+import torch
 
-from voice_changer.RVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
 
 # avoiding parse arg error in RVC
 sys.argv = ["MMVCServerSIO.py"]
@@ -18,33 +20,24 @@ if sys.platform.startswith("darwin"):
     sys.path.append(modulePath)
 else:
     sys.path.append("RVC")
-import json
-import resampy
+
 from voice_changer.RVC.modelMerger.MergeModel import merge_model
 from voice_changer.RVC.modelMerger.MergeModelRequest import MergeModelRequest
 from voice_changer.RVC.ModelSlotGenerator import generateModelSlot
 from voice_changer.RVC.RVCSettings import RVCSettings
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
-from voice_changer.RVC.inferencer.InferencerManager import InferencerManager
 from voice_changer.utils.LoadModelParams import FilePaths, LoadModelParams
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from voice_changer.RVC.onnxExporter.export2onnx import export2onnx
+from voice_changer.RVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
+from voice_changer.RVC.pipeline.PipelineGenerator import createPipeline
+from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
+from voice_changer.RVC.pipeline.Pipeline import Pipeline
 
-from dataclasses import asdict
-from typing import cast
-import numpy as np
-import torch
-
-
-# from fairseq import checkpoint_utils
-import traceback
-import faiss
-
+from Exceptions import NoModeLoadedException
 from const import UPLOAD_DIR
 
-
-from voice_changer.RVC.Pipeline import Pipeline
 
 providers = [
     "OpenVINOExecutionProvider",
@@ -96,120 +89,8 @@ class RVC:
             self.initialLoad = False
         elif target_slot_idx == self.currentSlot:
             self.prepareModel(target_slot_idx)
-            self.needSwitch = True
 
         return self.get_info()
-
-    def createPipeline(self, modelSlot: ModelSlot):
-        dev = self.deviceManager.getDevice(self.settings.gpu)
-        half = self.deviceManager.halfPrecisionAvailable(self.settings.gpu)
-        # ファイル名特定(Inferencer)
-        inferencerFilename = (
-            modelSlot.onnxModelFile if modelSlot.isONNX else modelSlot.pyTorchModelFile
-        )
-        
-        # Inferencer 生成
-        try:
-            inferencer = InferencerManager.getInferencer(
-                modelSlot.modelType,
-                inferencerFilename,
-                half,
-                dev,
-            )
-        except Exception as e:
-            print("[Voice Changer] exception! loading inferencer", e)
-            traceback.print_exc()
-
-        # Embedder 生成
-        try:
-            embedder = EmbedderManager.getEmbedder(
-                modelSlot.embedder,
-                # emmbedderFilename,
-                half,
-                dev,
-            )
-        except Exception as e:
-            print("[Voice Changer]  exception! loading embedder", e)
-            traceback.print_exc()
-
-        # pitchExtractor
-        pitchExtractor = PitchExtractorManager.getPitchExtractor(
-            self.settings.f0Detector
-        )
-
-        # index, feature
-        index, feature = self.loadIndex(modelSlot)
-
-        pipeline = Pipeline(
-            embedder,
-            inferencer,
-            pitchExtractor,
-            index,
-            feature,
-            modelSlot.samplingRate,
-            dev,
-            half,
-        )
-
-        return pipeline
-
-    def loadIndex(self, modelSlot: ModelSlot):
-        # Indexのロード
-        print("[Voice Changer] Loading index...")
-        # ファイル指定がない場合はNone
-        if modelSlot.featureFile is None or modelSlot.indexFile is None:
-            return None, None
-
-        # ファイル指定があってもファイルがない場合はNone
-        if (
-            os.path.exists(modelSlot.featureFile) is not True
-            or os.path.exists(modelSlot.indexFile) is not True
-        ):
-            return None, None
-
-        try:
-            index = faiss.read_index(modelSlot.indexFile)
-            feature = np.load(modelSlot.featureFile)
-        except:
-            print("[Voice Changer] load index failed. Use no index.")
-            traceback.print_exc()
-            return None, None
-
-        return index, feature
-
-    def prepareModel(self, slot: int):
-        if slot < 0:
-            return self.get_info()
-        modelSlot = self.settings.modelSlots[slot]
-        inferencerFilename = (
-            modelSlot.onnxModelFile if modelSlot.isONNX else modelSlot.pyTorchModelFile
-        )
-        if inferencerFilename == "":
-            return self.get_info()
-
-        print("[Voice Changer] Prepare Model of slot:", slot)
-
-        # pipelineの生成
-        self.next_pipeline = self.createPipeline(modelSlot)
-
-        # その他の設定
-        self.next_trans = modelSlot.defaultTrans
-        self.next_samplingRate = modelSlot.samplingRate
-        self.next_framework = "ONNX" if modelSlot.isONNX else "PyTorch"
-        self.needSwitch = True
-        print("[Voice Changer] Prepare done.")
-        return self.get_info()
-
-    def switchModel(self):
-        print("[Voice Changer] Switching model..")
-        self.pipeline = self.next_pipeline
-        self.settings.tran = self.next_trans
-        self.settings.modelSamplingRate = self.next_samplingRate
-        self.settings.framework = self.next_framework
-
-        print(
-            "[Voice Changer] Switching model..done",
-        )
 
     def update_settings(self, key: str, val: int | float | str):
         if key in self.settings.intData:
@@ -238,6 +119,12 @@ class RVC:
                 else:
                     print("CHAGE TO NEW PIPELINE", half)
                     self.prepareModel(self.settings.modelSlotIndex)
+            if key == "enableDirectML":
+                if self.pipeline is not None and val == 0:
+                    self.pipeline.setDirectMLEnable(False)
+                elif self.pipeline is not None and val == 1:
+                    self.pipeline.setDirectMLEnable(True)
+
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
@@ -250,6 +137,42 @@ class RVC:
         else:
             return False
         return True
+
+    def prepareModel(self, slot: int):
+        if slot < 0:
+            return self.get_info()
+        modelSlot = self.settings.modelSlots[slot]
+        inferencerFilename = (
+            modelSlot.onnxModelFile if modelSlot.isONNX else modelSlot.pyTorchModelFile
+        )
+        if inferencerFilename == "":
+            return self.get_info()
+
+        print("[Voice Changer] Prepare Model of slot:", slot)
+
+        # pipelineの生成
+        self.next_pipeline = createPipeline(
+            modelSlot, self.settings.gpu, self.settings.f0Detector
+        )
+
+        # その他の設定
+        self.next_trans = modelSlot.defaultTrans
+        self.next_samplingRate = modelSlot.samplingRate
+        self.next_framework = "ONNX" if modelSlot.isONNX else "PyTorch"
+        self.needSwitch = True
+        print("[Voice Changer] Prepare done.")
+        return self.get_info()
+
+    def switchModel(self):
+        print("[Voice Changer] Switching model..")
+        self.pipeline = self.next_pipeline
+        self.settings.tran = self.next_trans
+        self.settings.modelSamplingRate = self.next_samplingRate
+        self.settings.framework = self.next_framework
+
+        print(
+            "[Voice Changer] Switching model..done",
+        )
 
     def get_info(self):
         data = asdict(self.settings)

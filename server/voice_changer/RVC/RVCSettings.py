@@ -26,6 +26,7 @@ class RVCSettings:
 
     speakers: dict[str, int] = field(default_factory=lambda: {})
     isHalf: int = 1  # 0:off, 1:on
+    enableDirectML: int = 0  # 0:off, 1:on
     # ↓mutableな物だけ列挙
     intData = [
         "gpu",
@@ -37,6 +38,7 @@ class RVCSettings:
         "silenceFront",
         "modelSlotIndex",
         "isHalf",
+        "enableDirectML",
     ]
     floatData = ["silentThreshold", "indexRatio"]
     strData = ["framework", "f0Detector"]

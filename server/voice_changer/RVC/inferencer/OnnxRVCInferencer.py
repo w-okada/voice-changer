@@ -38,9 +38,9 @@ class OnnxRVCInferencer(Inferencer):
         if pitch is None or pitchf is None:
             raise RuntimeError("[Voice Changer] Pitch or Pitchf is not found.")
 
-        # print("INFER1", self.model.get_providers())
-        # print("INFER2", self.model.get_provider_options())
-        # print("INFER3", self.model.get_session_options())
+        print("INFER1", self.model.get_providers())
+        print("INFER2", self.model.get_provider_options())
+        print("INFER3", self.model.get_session_options())
         if self.isHalf:
             audio1 = self.model.run(
                 ["audio"],
@@ -86,3 +86,15 @@ class OnnxRVCInferencer(Inferencer):
             self.model.set_providers(providers=["CPUExecutionProvider"])
 
         return self
+
+    def setDirectMLEnable(self, enable: bool):
+        if "DmlExecutionProvider" not in onnxruntime.get_available_providers():
+            print("[Voice Changer] DML is not available.")
+            return
+
+        if enable:
+            self.model.set_providers(
+                providers=["DmlExecutionProvider", "CPUExecutionProvider"]
+            )
+        else:
+            self.model.set_providers(providers=["CPUExecutionProvider"])

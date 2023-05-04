@@ -45,6 +45,7 @@ import { ONNXExportRow, ONNXExportRowProps } from "./components/205_ONNXExportRo
 import { ONNXExecutorRow, ONNXExecutorRowProps } from "./components/206_ONNXExecutorRow"
 import { MergeLabRow, MergeLabRowProps } from "./components/a01_MergeLab.Row"
 import { ModelSwitchRow, ModelSwitchRowProps } from "./components/204v2_ModelSwitchRow"
+import { EnableDirectMLRow, EnableDirectMLRowProps } from "./components/813_EnableDirectMLRow"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
 
@@ -117,6 +118,9 @@ const initialize = () => {
     addToCatalog("trancateNumThreshold", (props: TrancateNumTresholdRowProps) => { return <TrancateNumTresholdRow {...props} /> })
     addToCatalog("rvcQuality", (props: RVCQualityRowProps) => { return <RVCQualityRow {...props} /> })
     addToCatalog("silenceFront", (props: SilenceFrontRowProps) => { return <SilenceFrontRow {...props} /> })
+    addToCatalog("enableDirectML", (props: EnableDirectMLRowProps) => { return <EnableDirectMLRow {...props} /> })
+
+
 
     addToCatalog("mergeLab", (props: MergeLabRowProps) => { return <MergeLabRow {...props} /> })
 
