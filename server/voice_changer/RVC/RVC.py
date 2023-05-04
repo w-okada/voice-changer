@@ -256,6 +256,10 @@ class RVC:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
             setattr(self.settings, key, str(val))
+            if key == "f0Detector":
+                self.pitchExtractor = PitchExtractorManager.getPitchExtractor(
+                    self.settings.f0Detector
+                )
         else:
             return False
         return True
