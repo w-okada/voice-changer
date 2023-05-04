@@ -32,6 +32,7 @@ from voice_changer.RVC.inferencer.InferencerManager import InferencerManager
 from voice_changer.utils.LoadModelParams import FilePaths, LoadModelParams
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
+from voice_changer.RVC.onnxExporter.export2onnx import export2onnx
 
 from dataclasses import asdict
 from typing import cast
@@ -46,7 +47,7 @@ import faiss
 from const import UPLOAD_DIR, EnumEmbedderTypes
 
 
-from voice_changer.RVC.custom_vc_infer_pipeline import VC
+from voice_changer.RVC.Pipeline import VC
 
 providers = [
     "OpenVINOExecutionProvider",
@@ -393,9 +394,7 @@ class RVC:
             print("[Voice Changer] export2onnx, No pyTorch filepath.")
             return {"status": "ng", "path": ""}
 
-        import voice_changer.RVC.onnx.export2onnx as onnxExporter
-
-        output_file_simple = onnxExporter.export2onnx(self.settings.gpu, modelSlot)
+        output_file_simple = export2onnx(self.settings.gpu, modelSlot)
         return {
             "status": "ok",
             "path": f"/tmp/{output_file_simple}",

@@ -6,19 +6,32 @@ import onnx
 from const import TMP_DIR, EnumInferenceTypes
 from voice_changer.RVC.ModelSlot import ModelSlot
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
-
-from voice_changer.RVC.onnx.SynthesizerTrnMs256NSFsid_ONNX import (
+from voice_changer.RVC.onnxExporter.SynthesizerTrnMs256NSFsid_ONNX import (
     SynthesizerTrnMs256NSFsid_ONNX,
 )
-from voice_changer.RVC.onnx.SynthesizerTrnMs256NSFsid_nono_ONNX import (
+from voice_changer.RVC.onnxExporter.SynthesizerTrnMs256NSFsid_nono_ONNX import (
     SynthesizerTrnMs256NSFsid_nono_ONNX,
 )
-from voice_changer.RVC.onnx.SynthesizerTrnMsNSFsidNono_webui_ONNX import (
+from voice_changer.RVC.onnxExporter.SynthesizerTrnMsNSFsidNono_webui_ONNX import (
     SynthesizerTrnMsNSFsidNono_webui_ONNX,
 )
-from voice_changer.RVC.onnx.SynthesizerTrnMsNSFsid_webui_ONNX import (
+from voice_changer.RVC.onnxExporter.SynthesizerTrnMsNSFsid_webui_ONNX import (
     SynthesizerTrnMsNSFsid_webui_ONNX,
 )
+
+
+# from voice_changer.RVC.onnx.SynthesizerTrnMs256NSFsid_ONNX import (
+#     SynthesizerTrnMs256NSFsid_ONNX,
+# )
+# from voice_changer.RVC.onnx.SynthesizerTrnMs256NSFsid_nono_ONNX import (
+#     SynthesizerTrnMs256NSFsid_nono_ONNX,
+# )
+# from voice_changer.RVC.onnx.SynthesizerTrnMsNSFsidNono_webui_ONNX import (
+#     SynthesizerTrnMsNSFsidNono_webui_ONNX,
+# )
+# from voice_changer.RVC.onnx.SynthesizerTrnMsNSFsid_webui_ONNX import (
+#     SynthesizerTrnMsNSFsid_webui_ONNX,
+# )
 
 
 def export2onnx(gpu: int, modelSlot: ModelSlot):
