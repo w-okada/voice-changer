@@ -82,8 +82,6 @@ We offer Windows and Mac versions.
 
 - Tsukuyomi-chan, Ami-taro, Kogane Mahiro, and Kogane Kaigetsu require the Content Vec model for their actions. Please download the ContentVec_legacy 500 model from [this repository](https://github.com/auspicious3000/contentvec) and place it in the same folder as startHttp.command or start_http.bat to execute it.
 
-- For the operation of RVC (Retrieval-based-Voice-Conversion) on so-vits-svc 4.0/so-vits-svc 4.0v2, a model of hubert is required. Please download `hubert_base.pt` from [this repository](https://huggingface.co/lj1995/VoiceConversionWebUI/tree/main) and store it in the folder where the batch files are located.
-
 - To run DDSP-SVC, you need to download the hubert-soft and enhancer models. Download hubert-soft from [this link](https://github.com/bshall/hubert/releases/download/v0.1/hubert-soft-0d54a1f4.pt) and store it in the folder with the batch files. Download nsf_hifigan_20221211.zip from [this site](https://github.com/openvpi/vocoders/releases/tag/nsf-hifigan-v1) for enhancer. After unzipping, store the nsf_hifigan folder in the folder with the batch files.
 
 - The encoder of DDPS-SVC only supports hubert-soft.
