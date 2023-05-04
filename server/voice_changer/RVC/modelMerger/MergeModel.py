@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from voice_changer.RVC.MergeModelRequest import MergeModelRequest
+from voice_changer.RVC.modelMerger.MergeModelRequest import MergeModelRequest
 from collections import OrderedDict
 import torch
 import tqdm

@@ -38,6 +38,7 @@ def export2onnx(gpu: int, modelSlot: ModelSlot):
         "samplingRate": modelSlot.samplingRate,
         "f0": modelSlot.f0,
         "embChannels": modelSlot.embChannels,
+        # ↓EnumEmbedderTypesのままだとシリアライズできないのでテキスト化
         "embedder": modelSlot.embedder.value,
     }
     gpuMomory = DeviceManager.get_instance().getDeviceMemory(gpu)

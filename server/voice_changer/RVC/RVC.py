@@ -21,8 +21,8 @@ else:
     sys.path.append("RVC")
 import json
 import resampy
-from voice_changer.RVC.MergeModel import merge_model
-from voice_changer.RVC.MergeModelRequest import MergeModelRequest
+from voice_changer.RVC.modelMerger.MergeModel import merge_model
+from voice_changer.RVC.modelMerger.MergeModelRequest import MergeModelRequest
 from voice_changer.RVC.ModelSlotGenerator import generateModelSlot
 from voice_changer.RVC.RVCSettings import RVCSettings
 from voice_changer.RVC.embedder.Embedder import Embedder
@@ -393,7 +393,7 @@ class RVC:
             print("[Voice Changer] export2onnx, No pyTorch filepath.")
             return {"status": "ng", "path": ""}
 
-        import voice_changer.RVC.export2onnx as onnxExporter
+        import voice_changer.RVC.onnx.export2onnx as onnxExporter
 
         output_file_simple = onnxExporter.export2onnx(self.settings.gpu, modelSlot)
         return {
