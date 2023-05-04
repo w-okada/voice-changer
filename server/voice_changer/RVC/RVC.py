@@ -4,7 +4,6 @@ from Exceptions import NoModeLoadedException
 from voice_changer.RVC.ModelSlot import ModelSlot
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 
-from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 from voice_changer.RVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
 
 # avoiding parse arg error in RVC
@@ -25,9 +24,7 @@ from voice_changer.RVC.modelMerger.MergeModel import merge_model
 from voice_changer.RVC.modelMerger.MergeModelRequest import MergeModelRequest
 from voice_changer.RVC.ModelSlotGenerator import generateModelSlot
 from voice_changer.RVC.RVCSettings import RVCSettings
-from voice_changer.RVC.embedder.Embedder import Embedder
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
-from voice_changer.RVC.inferencer.Inferencer import Inferencer
 from voice_changer.RVC.inferencer.InferencerManager import InferencerManager
 from voice_changer.utils.LoadModelParams import FilePaths, LoadModelParams
 from voice_changer.utils.VoiceChangerModel import AudioInOut
@@ -47,7 +44,7 @@ import faiss
 from const import UPLOAD_DIR, EnumEmbedderTypes
 
 
-from voice_changer.RVC.Pipeline import VC
+from voice_changer.RVC.Pipeline import Pipeline
 
 providers = [
     "OpenVINOExecutionProvider",
@@ -61,10 +58,8 @@ class RVC:
     initialLoad: bool = True
     settings: RVCSettings = RVCSettings()
 
-    embedder: Embedder | None = None
-    inferencer: Inferencer | None = None
+    pipeline: Pipeline | None = None
 
-    pitchExtractor: PitchExtractor | None = None
     deviceManager = DeviceManager.get_instance()
 
     audio_buffer: AudioInOut | None = None
@@ -149,7 +144,26 @@ class RVC:
             print("[Voice Changer]  exception! loading embedder", e)
             traceback.print_exc()
 
-        return inferencer, embedder
+        # pitchExtractor
+        pitchExtractor = PitchExtractorManager.getPitchExtractor(
+            self.settings.f0Detector
+        )
+
+        # index, feature
+        index, feature = self.loadIndex(modelSlot)
+
+        pipeline = Pipeline(
+            embedder,
+            inferencer,
+            pitchExtractor,
+            index,
+            feature,
+            modelSlot.samplingRate,
+            dev,
+            half,
+        )
+
+        return pipeline
 
     def loadIndex(self, modelSlot: ModelSlot):
         # Indexのロード
@@ -187,16 +201,8 @@ class RVC:
 
         print("[Voice Changer] Prepare Model of slot:", slot)
 
-        # Inferencer, embedderのロード
-        inferencer, embedder = self.createPipeline(modelSlot)
-
-        self.next_inferencer = inferencer
-        self.next_embedder = embedder
-
-        # Indexのロード
-        index, feature = self.loadIndex(modelSlot)
-        self.next_index = index
-        self.next_feature = feature
+        # pipelineの生成
+        self.next_pipeline = self.createPipeline(modelSlot)
 
         # その他の設定
         self.next_trans = modelSlot.defaultTrans
@@ -208,10 +214,7 @@ class RVC:
 
     def switchModel(self):
         print("[Voice Changer] Switching model..")
-        self.embedder = self.next_embedder
-        self.inferencer = self.next_inferencer
-        self.feature = self.next_feature
-        self.index = self.next_index
+        self.pipeline = self.next_pipeline
         self.settings.tran = self.next_trans
         self.settings.modelSamplingRate = self.next_samplingRate
         self.settings.framework = self.next_framework
@@ -229,27 +232,21 @@ class RVC:
                     return True
                 val = val % 1000  # Quick hack for same slot is selected
                 self.prepareModel(val)
-                self.needSwitch = True
 
             # 設定
             setattr(self.settings, key, val)
 
-            if key == "gpu" and self.embedder is not None:
+            if key == "gpu":
                 dev = self.deviceManager.getDevice(val)
                 half = self.deviceManager.halfPrecisionAvailable(val)
 
                 # half-precisionの使用可否が変わるときは作り直し
-                if (
-                    self.inferencer is not None
-                    and self.inferencer.isHalf == half
-                    and self.embedder.isHalf == half
-                ):
+                if self.pipeline is not None and self.pipeline.isHalf == half:
                     print(
                         "USE EXSISTING PIPELINE",
                         half,
                     )
-                    self.embedder.setDevice(dev)
-                    self.inferencer.setDevice(dev)
+                    self.pipeline.setDevice(dev)
                 else:
                     print("CHAGE TO NEW PIPELINE", half)
                     self.prepareModel(self.settings.modelSlotIndex)
@@ -257,10 +254,11 @@ class RVC:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
             setattr(self.settings, key, str(val))
-            if key == "f0Detector":
-                self.pitchExtractor = PitchExtractorManager.getPitchExtractor(
+            if key == "f0Detector" and self.pipeline is not None:
+                pitchExtractor = PitchExtractorManager.getPitchExtractor(
                     self.settings.f0Detector
                 )
+                self.pipeline.setPitchExtractor(pitchExtractor)
         else:
             return False
         return True
@@ -323,7 +321,6 @@ class RVC:
             self.switchModel()
             self.needSwitch = False
 
-        dev = self.deviceManager.getDevice(self.settings.gpu)
         half = self.deviceManager.halfPrecisionAvailable(self.settings.gpu)
 
         audio = data[0]
@@ -337,7 +334,6 @@ class RVC:
 
         repeat = 3 if half else 1
         repeat *= self.settings.rvcQuality  # 0 or 3
-        vc = VC(self.settings.modelSamplingRate, dev, half, repeat)
         sid = 0
         f0_up_key = self.settings.tran
         index_rate = self.settings.indexRatio
@@ -345,20 +341,15 @@ class RVC:
 
         embChannels = self.settings.modelSlots[self.currentSlot].embChannels
 
-        audio_out = vc.pipeline(
-            self.embedder,
-            self.inferencer,
-            self.pitchExtractor,
+        audio_out = self.pipeline.exec(
             sid,
             audio,
             f0_up_key,
-            self.index,
-            self.feature,
             index_rate,
             if_f0,
-            silence_front=self.settings.extraConvertSize
-            / self.settings.modelSamplingRate,
-            embChannels=embChannels,
+            self.settings.extraConvertSize / self.settings.modelSamplingRate,
+            embChannels,
+            repeat,
         )
 
         result = audio_out * np.sqrt(vol)
@@ -366,8 +357,7 @@ class RVC:
         return result
 
     def __del__(self):
-        del self.inferencer
-        del self.embedder
+        del self.pipeline
 
         print("---------- REMOVING ---------------")
 

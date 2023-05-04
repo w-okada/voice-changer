@@ -13,6 +13,16 @@ class HalfPrecisionChangingException(Exception):
         return repr("HalfPrecision related exception.")
 
 
+class DeviceChangingException(Exception):
+    def __str__(self):
+        return repr("Device changing...")
+
+
+class NotEnoughDataExtimateF0(Exception):
+    def __str__(self):
+        return repr("Not enough data to estimate f0.")
+
+
 class ONNXInputArgumentException(Exception):
     def __str__(self):
         return repr("ONNX received invalid argument.")

@@ -14,8 +14,10 @@ from voice_changer.utils.LoadModelParams import LoadModelParams
 from voice_changer.utils.Timer import Timer
 from voice_changer.utils.VoiceChangerModel import VoiceChangerModel, AudioInOut
 from Exceptions import (
+    DeviceChangingException,
     HalfPrecisionChangingException,
     NoModeLoadedException,
+    NotEnoughDataExtimateF0,
     ONNXInputArgumentException,
 )
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
@@ -347,6 +349,12 @@ class VoiceChanger:
             return np.zeros(1).astype(np.int16), [0, 0, 0]
         except HalfPrecisionChangingException as e:
             print("[Voice Changer] Switching model configuration....", e)
+            return np.zeros(1).astype(np.int16), [0, 0, 0]
+        except NotEnoughDataExtimateF0 as e:
+            print("[Voice Changer] not enough data", e)
+            return np.zeros(1).astype(np.int16), [0, 0, 0]
+        except DeviceChangingException as e:
+            print("[Voice Changer] embedder:", e)
             return np.zeros(1).astype(np.int16), [0, 0, 0]
         except Exception as e:
             print("VC PROCESSING!!!! EXCEPTION!!!", e)
