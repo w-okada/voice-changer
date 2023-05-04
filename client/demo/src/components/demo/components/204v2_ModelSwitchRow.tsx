@@ -45,7 +45,7 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
             const embedstr = x.embChannels
             const typestr = x.modelType == 0 ? "org" : "webui"
             const metadata = x.deprecated ? "[deprecated version]" : `[${f0str},${srstr},${embedstr},${typestr}]`
-            const displayName = `[${metadata}] ${filename}`
+            const displayName = `${metadata} ${filename}`
 
 
             return (
