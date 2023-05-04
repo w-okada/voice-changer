@@ -40,10 +40,11 @@ import { ModelSamplingRateRow, ModelSamplingRateRowProps } from "./components/30
 import { EnableEnhancerRow, EnableEnhancerRowProps } from "./components/610_EnableEnhancerRow"
 import { DstIdRow2, DstIdRow2Props } from "./components/602v2_DstIdRow2"
 import { SilenceFrontRow, SilenceFrontRowProps } from "./components/812_SilenceFrontRow"
-import { ModelSwitchRow, ModelSwitchRowProps } from "./components/204_ModelSwitchRow"
+// import { ModelSwitchRow, ModelSwitchRowProps } from "./components/204_ModelSwitchRow"
 import { ONNXExportRow, ONNXExportRowProps } from "./components/205_ONNXExportRow"
 import { ONNXExecutorRow, ONNXExecutorRowProps } from "./components/206_ONNXExecutorRow"
 import { MergeLabRow, MergeLabRowProps } from "./components/a01_MergeLab.Row"
+import { ModelSwitchRow, ModelSwitchRowProps } from "./components/204v2_ModelSwitchRow"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
 

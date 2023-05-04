@@ -36,14 +36,6 @@
             {
                 "name": "onnxExport",
                 "options": {}
-            },
-            {
-                "name": "onnxExecutor",
-                "options": {}
-            },
-            {
-                "name": "modelSamplingRate",
-                "options": {}
             }
         ],
         "modelSetting": [
@@ -61,7 +53,7 @@
 
                     "showFeature": true,
                     "showIndex": true,
-                    "showHalfPrecision": true,
+                    "showHalfPrecision": false,
                     "showPyTorchEnableCheckBox": false,
                     "defaultEnablePyTorch": true,
                     "onlySelectedFramework": true,

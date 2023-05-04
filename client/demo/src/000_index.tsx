@@ -68,8 +68,9 @@ const AppStateWrapper = () => {
             //     const modleKey = `${INDEXEDDB_KEY_MODEL_DATA}_${i}`
             //     await removeItem(modleKey)
             // }
-
-
+        }
+        const onReloadClicked = () => {
+            location.reload();
         }
         return (
             <div className="error-container">
@@ -80,6 +81,7 @@ const AppStateWrapper = () => {
                     <p>このアプリで管理している情報をクリアすると回復する場合があります。</p>
                     <p>下記のボタンを押して情報をクリアします。</p>
                     <p><button onClick={onClearCacheClicked}>アプリを初期化</button></p>
+                    <p><button onClick={onReloadClicked}>初期化せずリロード</button></p>
                 </div>
                 <div className="error-detail">
                     <div className="error-name">
