@@ -22,26 +22,37 @@ export const StartButtonRow = (_props: StartButtonRowProps) => {
 
     const startButtonRow = useMemo(() => {
         const onStartClicked = async () => {
-            if (!appState.initializedRef.current) {
-                while (true) {
-                    // console.log("wait 500ms")
-                    await new Promise<void>((resolve) => {
-                        setTimeout(resolve, 500)
-                    })
-                    // console.log("initiliazed", appState.initializedRef.current)
-                    if (appState.initializedRef.current) {
-                        break
+            if (appState.serverSetting.serverSetting.enableServerAudio == 0) {
+                if (!appState.initializedRef.current) {
+                    while (true) {
+                        // console.log("wait 500ms")
+                        await new Promise<void>((resolve) => {
+                            setTimeout(resolve, 500)
+                        })
+                        // console.log("initiliazed", appState.initializedRef.current)
+                        if (appState.initializedRef.current) {
+                            break
+                        }
                     }
+                    setStartWithAudioContextCreate(true)
+                } else {
+                    guiState.setIsConverting(true)
+                    await appState.clientSetting.start()
                 }
-                setStartWithAudioContextCreate(true)
             } else {
+                appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, serverAudioStated: 1 })
                 guiState.setIsConverting(true)
-                await appState.clientSetting.start()
             }
         }
         const onStopClicked = async () => {
-            guiState.setIsConverting(false)
-            await appState.clientSetting.stop()
+            if (appState.serverSetting.serverSetting.enableServerAudio == 0) {
+                guiState.setIsConverting(false)
+                await appState.clientSetting.stop()
+            } else {
+                guiState.setIsConverting(false)
+                console.log("Stop clicked", appState.serverSetting.serverSetting)
+                appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, serverAudioStated: 0 })
+            }
         }
         const startClassName = guiState.isConverting ? "body-button-active" : "body-button-stanby"
         const stopClassName = guiState.isConverting ? "body-button-stanby" : "body-button-active"
@@ -59,7 +70,7 @@ export const StartButtonRow = (_props: StartButtonRowProps) => {
                 </div>
             </div>
         )
-    }, [guiState.isConverting, appState.clientSetting.start, appState.clientSetting.stop])
+    }, [guiState.isConverting, appState.clientSetting.start, appState.clientSetting.stop, appState.serverSetting.serverSetting, , appState.serverSetting.updateServerSettings])
 
     return startButtonRow
 }

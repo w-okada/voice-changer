@@ -27,6 +27,20 @@ export class ServerConfigurator {
         return info
     }
 
+    getPerformance = async () => {
+        const url = this.serverUrl + "/performance"
+        const info = await new Promise<number[]>((resolve) => {
+            const request = new Request(url, {
+                method: 'GET',
+            });
+            fetch(request).then(async (response) => {
+                const json = await response.json() as number[]
+                resolve(json)
+            })
+        })
+        return info
+    }
+
     updateSettings = async (key: ServerSettingKey, val: string) => {
         const url = this.serverUrl + "/update_settings"
         const info = await new Promise<ServerInfo>(async (resolve) => {

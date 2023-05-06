@@ -1,4 +1,6 @@
 from typing import Any, Union, cast
+
+import socketio
 from const import TMP_DIR, ModelType
 import torch
 import os
@@ -9,6 +11,7 @@ import resampy
 
 
 from voice_changer.IORecorder import IORecorder
+from voice_changer.Local.AudioDeviceList import ServerAudioDevice, list_audio_device
 from voice_changer.utils.LoadModelParams import LoadModelParams
 
 from voice_changer.utils.Timer import Timer
@@ -21,6 +24,10 @@ from Exceptions import (
     ONNXInputArgumentException,
 )
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
+import pyaudio
+import threading
+import struct
+import time
 
 providers = [
     "OpenVINOExecutionProvider",
@@ -42,10 +49,38 @@ class VoiceChangerSettings:
     crossFadeOverlapSize: int = 4096
 
     recordIO: int = 0  # 0:off, 1:on
+    serverAudioInputDevices: list[ServerAudioDevice] = field(default_factory=lambda: [])
+    serverAudioOutputDevices: list[ServerAudioDevice] = field(
+        default_factory=lambda: []
+    )
+
+    enableServerAudio: int = 0  # 0:off, 1:on
+    serverAudioStated: int = 0  # 0:off, 1:on
+    serverInputAudioSampleRate: int = 48000
+    serverOutputAudioSampleRate: int = 48000
+    serverInputAudioBufferSize: int = 1024 * 24
+    serverOutputAudioBufferSize: int = 1024 * 24
+    serverInputDeviceId: int = -1
+    serverOutputDeviceId: int = -1
+    serverReadChunkSize: int = 256
+    performance: list[int] = field(default_factory=lambda: [0, 0, 0, 0])
 
     # ↓mutableな物だけ列挙
     intData: list[str] = field(
-        default_factory=lambda: ["inputSampleRate", "crossFadeOverlapSize", "recordIO"]
+        default_factory=lambda: [
+            "inputSampleRate",
+            "crossFadeOverlapSize",
+            "recordIO",
+            "enableServerAudio",
+            "serverAudioStated",
+            "serverInputAudioSampleRate",
+            "serverOutputAudioSampleRate",
+            "serverInputAudioBufferSize",
+            "serverOutputAudioBufferSize",
+            "serverInputDeviceId",
+            "serverOutputDeviceId",
+            "serverReadChunkSize",
+        ]
     )
     floatData: list[str] = field(
         default_factory=lambda: ["crossFadeOffsetRate", "crossFadeEndRate"]
@@ -53,11 +88,105 @@ class VoiceChangerSettings:
     strData: list[str] = field(default_factory=lambda: [])
 
 
+def serverLocal(_vc):
+    vc: VoiceChanger = _vc
+    audio = pyaudio.PyAudio()
+
+    def createAudioInput(deviceId: int, sampleRate: int, bufferSize: int):
+        audio_input_stream = audio.open(
+            format=pyaudio.paInt16,
+            channels=1,
+            rate=sampleRate,
+            # frames_per_buffer=32768,
+            frames_per_buffer=bufferSize,
+            input_device_index=deviceId,
+            input=True,
+        )
+        return audio_input_stream
+
+    def createAudioOutput(deviceId: int, sampleRate: int, bufferSize: int):
+        audio_output_stream = audio.open(
+            format=pyaudio.paInt16,
+            channels=1,
+            rate=sampleRate,
+            # frames_per_buffer=32768,
+            frames_per_buffer=bufferSize,
+            output_device_index=deviceId,
+            output=True,
+        )
+        return audio_output_stream
+
+    currentInputDeviceId = -1
+    currentInputSampleRate = -1
+    currentInputBufferSize = -1
+    currentOutputDeviceId = -1
+    currentOutputSampleRate = -1
+    currentOutputBufferSize = -1
+
+    audio_input_stream = None
+    audio_output_stream = None
+    while True:
+        if (
+            vc.settings.enableServerAudio == 0
+            or vc.settings.serverAudioStated == 0
+            or vc.settings.serverInputDeviceId == -1
+            or vc.settings.serverOutputDeviceId == -1
+        ):
+            time.sleep(2)
+        else:
+            if (
+                currentInputDeviceId != vc.settings.serverInputDeviceId
+                or currentInputSampleRate != vc.settings.serverInputAudioSampleRate
+                or currentInputBufferSize != vc.settings.serverInputAudioBufferSize
+            ):
+                currentInputDeviceId = vc.settings.serverInputDeviceId
+                currentInputSampleRate = vc.settings.serverInputAudioSampleRate
+                currentInputBufferSize = vc.settings.serverInputAudioBufferSize
+                if audio_input_stream is not None:
+                    audio_input_stream.close()
+                audio_input_stream = createAudioInput(
+                    currentInputDeviceId,
+                    currentInputSampleRate,
+                    currentInputBufferSize,
+                )
+
+            if (
+                currentOutputDeviceId != vc.settings.serverOutputDeviceId
+                or currentOutputSampleRate != vc.settings.serverOutputAudioSampleRate
+                or currentOutputBufferSize != vc.settings.serverOutputAudioBufferSize
+            ):
+                currentOutputDeviceId = vc.settings.serverOutputDeviceId
+                currentOutputSampleRate = vc.settings.serverOutputAudioSampleRate
+                currentOutputBufferSize = vc.settings.serverOutputAudioBufferSize
+                if audio_output_stream is not None:
+                    audio_output_stream.close()
+                audio_output_stream = createAudioOutput(
+                    currentOutputDeviceId,
+                    currentOutputSampleRate,
+                    currentOutputBufferSize,
+                )
+
+            in_wav = audio_input_stream.read(
+                vc.settings.serverReadChunkSize * 128, exception_on_overflow=False
+            )
+            unpackedData = np.array(
+                struct.unpack("<%sh" % (len(in_wav) // struct.calcsize("<h")), in_wav)
+            ).astype(np.int16)
+            with Timer("all_inference_time") as t:
+                out_wav, times = vc.on_request(unpackedData)
+            all_inference_time = t.secs
+            performance = [all_inference_time] + times
+            performance = [round(x, 2) * 1000 for x in performance]
+            vc.settings.performance = performance
+            audio_output_stream.write(out_wav.tobytes())
+
+
 class VoiceChanger:
     settings: VoiceChangerSettings
     voiceChanger: VoiceChangerModel
     ioRecorder: IORecorder
     sola_buffer: AudioInOut
+    namespace: socketio.AsyncNamespace | None = None
 
     def __init__(self, params: VoiceChangerParams):
         # 初期化
@@ -78,6 +207,12 @@ class VoiceChanger:
             and torch.backends.mps.is_available()
         )
 
+        audioinput, audiooutput = list_audio_device()
+        self.settings.serverAudioInputDevices = audioinput
+        self.settings.serverAudioOutputDevices = audiooutput
+
+        thread = threading.Thread(target=serverLocal, args=(self,))
+        thread.start()
         print(
             f"VoiceChanger Initialized (GPU_NUM:{self.gpu_num}, mps_enabled:{self.mps_enabled})"
         )
@@ -139,6 +274,9 @@ class VoiceChanger:
         if hasattr(self, "voiceChanger"):
             data.update(self.voiceChanger.get_info())
         return data
+
+    def get_performance(self):
+        return self.settings.performance
 
     def update_settings(self, key: str, val: Any):
         if key in self.settings.intData:

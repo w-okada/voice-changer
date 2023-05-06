@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { useAppState } from "../../../001_provider/001_AppStateProvider"
 
 export type PerformanceRowProps = {
@@ -31,7 +31,31 @@ export const PerformanceRow = (_props: PerformanceRowProps) => {
                 </div>
             </>
         )
-    }, [appState.volume, appState.bufferingTime, appState.performance, showPerformanceDetail])
+    }, [appState.volume, appState.bufferingTime, appState.performance, showPerformanceDetail, appState.serverSetting.serverSetting.enableServerAudio])
 
-    return performanceRow
+    useEffect(() => {
+        if (!appState.updatePerformance) {
+            return
+        }
+        if (appState.serverSetting.serverSetting.enableServerAudio != 1) {
+            return
+        }
+        let execNext = true
+        const updatePerformance = async () => {
+            await appState.updatePerformance()
+            if (execNext) {
+                setTimeout(updatePerformance, 1000 * 2)
+            }
+        }
+        updatePerformance()
+        return () => {
+            execNext = false
+        }
+    }, [appState.updatePerformance, appState.serverSetting.serverSetting.enableServerAudio])
+
+    return (
+        <>
+            {performanceRow}
+        </>
+    )
 }

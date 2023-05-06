@@ -46,6 +46,8 @@ import { ONNXExecutorRow, ONNXExecutorRowProps } from "./components/206_ONNXExec
 import { MergeLabRow, MergeLabRowProps } from "./components/a01_MergeLab.Row"
 import { ModelSwitchRow, ModelSwitchRowProps } from "./components/204v2_ModelSwitchRow"
 import { EnableDirectMLRow, EnableDirectMLRowProps } from "./components/813_EnableDirectMLRow"
+import { AudioDeviceModeRow, AudioDeviceModeRowProps } from "./components/410_AudioDeviceModeRow"
+import { IOBufferRow, IOBufferRowProps } from "./components/411_IOBufferRow"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
 
@@ -83,6 +85,10 @@ const initialize = () => {
 
     addToCatalog("audioInput", (props: AudioInputRowProps) => { return <AudioInputRow {...props} /> })
     addToCatalog("audioOutput", (props: AudioOutputRowProps) => { return <AudioOutputRow {...props} /> })
+    addToCatalog("audioDeviceMode", (props: AudioDeviceModeRowProps) => { return <AudioDeviceModeRow {...props} /> })
+
+
+
 
     addToCatalog("noiseControl", (props: NoiseControlRowProps) => { return <NoiseControlRow {...props} /> })
     addToCatalog("gainControl", (props: GainControlRowProps) => { return <GainControlRow {...props} /> })
@@ -105,7 +111,8 @@ const initialize = () => {
 
     addToCatalog("inputChunkNum", (props: InputChunkNumRowProps) => { return <InputChunkNumRow {...props} /> })
     addToCatalog("extraDataLength", (props: ExtraDataLengthRowProps) => { return <ExtraDataLengthRow {...props} /> })
-    addToCatalog("gpu", (props: GPURowProps) => { return < GPURow {...props} /> })
+    addToCatalog("gpu", (props: GPURowProps) => { return <GPURow {...props} /> })
+    addToCatalog("ioBuffer", (props: IOBufferRowProps) => { return <IOBufferRow {...props} /> })
 
     addToCatalog("serverURL", (props: ServerURLRowProps) => { return <ServerURLRow {...props} /> })
     addToCatalog("protocol", (props: ProtocolRowProps) => { return <ProtocolRow {...props} /> })

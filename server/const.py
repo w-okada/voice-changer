@@ -90,3 +90,8 @@ class EnumPitchExtractorTypes(Enum):
 class EnumFrameworkTypes(Enum):
     pyTorch = "pyTorch"
     onnx = "onnx"
+
+
+class ServerAudioDeviceTypes(Enum):
+    audioinput = "audioinput"
+    audiooutput = "audiooutput"

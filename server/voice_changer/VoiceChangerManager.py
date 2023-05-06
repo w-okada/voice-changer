@@ -33,6 +33,13 @@ class VoiceChangerManager(object):
         else:
             return {"status": "ERROR", "msg": "no model loaded"}
 
+    def get_performance(self):
+        if hasattr(self, "voiceChanger"):
+            info = self.voiceChanger.get_performance()
+            return info
+        else:
+            return {"status": "ERROR", "msg": "no model loaded"}
+
     def update_settings(self, key: str, val: str | int | float):
         if hasattr(self, "voiceChanger"):
             info = self.voiceChanger.update_settings(key, val)

@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from "react"
+import React, { useMemo, useEffect, useState } from "react"
 import { useIndexedDB } from "@dannadori/voice-changer-client-js"
 import { AudioOutputRecordRow } from "./402-1_AudioOutputRecordRow"
 import { useGuiState } from "../001_GuiStateProvider"
@@ -11,11 +11,12 @@ export type AudioOutputRowProps = {
 
 export const AudioOutputRow = (_props: AudioOutputRowProps) => {
     const { setAudioOutputElementId, initializedRef } = useAppState()
+    const appState = useAppState()
     const guiState = useGuiState()
     const { appGuiSettingState } = useAppRoot()
     const clientType = appGuiSettingState.appGuiSetting.id
     const { getItem, setItem } = useIndexedDB({ clientType: clientType })
-
+    const [hostApi, setHostApi] = useState<string>("")
 
     useEffect(() => {
         const loadCache = async () => {
@@ -34,7 +35,11 @@ export const AudioOutputRow = (_props: AudioOutputRowProps) => {
             [AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK].forEach(x => {
                 const audio = document.getElementById(x) as HTMLAudioElement
                 if (audio) {
-                    if (guiState.audioOutputForGUI == "none") {
+                    if (appState.serverSetting.serverSetting.enableServerAudio == 1) {
+
+                        // Server Audio を使う場合はElementから音は出さない。
+                        audio.volume = 0
+                    } else if (guiState.audioOutputForGUI == "none") {
                         // @ts-ignore
                         audio.setSinkId("")
                         if (x == AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK) {
@@ -51,6 +56,7 @@ export const AudioOutputRow = (_props: AudioOutputRowProps) => {
                         } else {
                             console.warn("No audio output device. use default")
                         }
+
                         if (x == AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK) {
                             audio.volume = guiState.fileInputEchoback ? 1 : 0
                         } else {
@@ -61,11 +67,15 @@ export const AudioOutputRow = (_props: AudioOutputRowProps) => {
             })
         }
         setAudioOutput()
-    }, [guiState.audioOutputForGUI, guiState.fileInputEchoback])
+    }, [guiState.audioOutputForGUI, guiState.fileInputEchoback, appState.serverSetting.serverSetting.enableServerAudio])
 
 
 
     const audioOutputRow = useMemo(() => {
+        if (appState.serverSetting.serverSetting.enableServerAudio == 1) {
+            return <></>
+        }
+
         return (
             <div className="body-row split-3-7 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">AudioOutput</div>
@@ -80,20 +90,52 @@ export const AudioOutputRow = (_props: AudioOutputRowProps) => {
                             })
                         }
                     </select>
-                    <audio hidden id={AUDIO_ELEMENT_FOR_PLAY_RESULT}></audio>
                 </div>
             </div>
         )
-    }, [guiState.outputAudioDeviceInfo, guiState.audioOutputForGUI])
+    }, [appState.serverSetting.serverSetting.enableServerAudio, guiState.outputAudioDeviceInfo, guiState.audioOutputForGUI])
 
     useEffect(() => {
         setAudioOutputElementId(AUDIO_ELEMENT_FOR_PLAY_RESULT)
     }, [initializedRef.current])
 
+
+    const serverAudioOutputRow = useMemo(() => {
+        if (appState.serverSetting.serverSetting.enableServerAudio == 0) {
+            return <></>
+        }
+        const devices = appState.serverSetting.serverSetting.serverAudioOutputDevices
+        const hostAPIs = new Set(devices.map(x => { return x.hostAPI }))
+        const hostAPIOptions = Array.from(hostAPIs).map((x, index) => { return <option value={x} key={index} >{x}</option> })
+
+        const filteredDevice = devices.filter(x => { return x.hostAPI == hostApi || hostApi == "" }).map((x, index) => { return <option value={x.index} key={index}>{x.name}</option> })
+
+        return (
+            <div className="body-row split-3-7 left-padding-1  guided">
+                <div className="body-item-title left-padding-1">AudioOutput</div>
+                <div className="body-select-container">
+                    <div className="body-select-container">
+                        <select name="kinds" id="kinds" value={hostApi} onChange={(e) => { setHostApi(e.target.value) }}>
+                            {hostAPIOptions}
+                        </select>
+                        <select className="body-select" value={appState.serverSetting.serverSetting.serverOutputDeviceId} onChange={(e) => {
+                            appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, serverOutputDeviceId: Number(e.target.value) })
+                        }}>
+                            {filteredDevice}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        )
+    }, [hostApi, appState.serverSetting.serverSetting, appState.serverSetting.updateServerSettings])
+
     return (
         <>
             {audioOutputRow}
-            <AudioOutputRecordRow />
+            {appState.serverSetting.serverSetting.enableServerAudio == 0 ? <AudioOutputRecordRow /> : <></>}
+
+            {serverAudioOutputRow}
+            <audio hidden id={AUDIO_ELEMENT_FOR_PLAY_RESULT}></audio>
         </>
     )
 }

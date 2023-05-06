@@ -82,6 +82,16 @@ export const ServerSettingKey = {
     "f0Detector": "f0Detector",
     "recordIO": "recordIO",
 
+    "enableServerAudio": "enableServerAudio",
+    "serverAudioStated": "serverAudioStated",
+    "serverInputAudioSampleRate": "serverInputAudioSampleRate",
+    "serverOutputAudioSampleRate": "serverOutputAudioSampleRate",
+    "serverInputAudioBufferSize": "serverInputAudioBufferSize",
+    "serverOutputAudioBufferSize": "serverOutputAudioBufferSize",
+    "serverInputDeviceId": "serverInputDeviceId",
+    "serverOutputDeviceId": "serverOutputDeviceId",
+    "serverReadChunkSize": "serverReadChunkSize",
+
     "tran": "tran",
     "noiseScale": "noiseScale",
     "predictF0": "predictF0",
@@ -121,6 +131,17 @@ export type VoiceChangerServerSetting = {
     f0Detector: F0Detector // dio or harvest
     recordIO: number // 0:off, 1:on
 
+    enableServerAudio: number // 0:off, 1:on
+    serverAudioStated: number // 0:off, 1:on
+    serverInputAudioSampleRate: number
+    serverOutputAudioSampleRate: number
+    serverInputAudioBufferSize: number
+    serverOutputAudioBufferSize: number
+    serverInputDeviceId: number
+    serverOutputDeviceId: number
+    serverReadChunkSize: number
+
+
     tran: number // so-vits-svc
     noiseScale: number // so-vits-svc
     predictF0: number // so-vits-svc
@@ -156,6 +177,13 @@ type ModelSlot = {
     deprecated: boolean
 }
 
+type ServerAudioDevice = {
+    kind: "audioinput" | "audiooutput",
+    index: number,
+    name: string
+    hostAPI: string
+}
+
 export type ServerInfo = VoiceChangerServerSetting & {
     status: string
     configFile: string,
@@ -163,6 +191,9 @@ export type ServerInfo = VoiceChangerServerSetting & {
     onnxModelFile: string,
     onnxExecutionProviders: OnnxExecutionProvider[]
     modelSlots: ModelSlot[]
+    serverAudioInputDevices: ServerAudioDevice[]
+    serverAudioOutputDevices: ServerAudioDevice[]
+
 }
 
 export type ServerInfoSoVitsSVC = ServerInfo & {
@@ -179,6 +210,15 @@ export const DefaultServerSetting: ServerInfo = {
 
     recordIO: 0,
 
+    enableServerAudio: 0,
+    serverAudioStated: 0,
+    serverInputAudioSampleRate: 48000,
+    serverOutputAudioSampleRate: 48000,
+    serverInputAudioBufferSize: 1024 * 24,
+    serverOutputAudioBufferSize: 1024 * 24,
+    serverInputDeviceId: -1,
+    serverOutputDeviceId: -1,
+    serverReadChunkSize: 256,
 
     // VC Specific
     srcId: 0,
@@ -214,7 +254,9 @@ export const DefaultServerSetting: ServerInfo = {
     pyTorchModelFile: "",
     onnxModelFile: "",
     onnxExecutionProviders: [],
-    modelSlots: []
+    modelSlots: [],
+    serverAudioInputDevices: [],
+    serverAudioOutputDevices: []
 }
 export const DefaultServerSetting_MMVCv15: ServerInfo = {
     ...DefaultServerSetting, dstId: 101,

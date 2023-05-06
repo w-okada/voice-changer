@@ -6,6 +6,7 @@ export type InputChunkNumRowProps = {
 }
 export const InputChunkNumRow = (props: InputChunkNumRowProps) => {
     const appState = useAppState()
+
     const inputChunkNumRow = useMemo(() => {
         let nums: number[]
         if (!props.nums) {
@@ -20,6 +21,7 @@ export const InputChunkNumRow = (props: InputChunkNumRowProps) => {
                     <select className="body-select" value={appState.workletNodeSetting.workletNodeSetting.inputChunkNum} onChange={(e) => {
                         appState.workletNodeSetting.updateWorkletNodeSetting({ ...appState.workletNodeSetting.workletNodeSetting, inputChunkNum: Number(e.target.value) })
                         appState.workletNodeSetting.trancateBuffer()
+                        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, serverReadChunkSize: Number(e.target.value) })
                     }}>
                         {
                             nums.map(x => {
@@ -35,7 +37,7 @@ export const InputChunkNumRow = (props: InputChunkNumRowProps) => {
 
             </div>
         )
-    }, [appState.workletNodeSetting.workletNodeSetting, appState.workletNodeSetting.updateWorkletNodeSetting])
+    }, [appState.workletNodeSetting.workletNodeSetting, appState.workletNodeSetting.updateWorkletNodeSetting, appState.serverSetting.serverSetting, appState.serverSetting.updateServerSettings])
 
     return inputChunkNumRow
 }

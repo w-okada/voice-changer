@@ -38,7 +38,7 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
             } else if (x.onnxModelFile && x.onnxModelFile.length > 0) {
                 filename = x.onnxModelFile.replace(/^.*[\\\/]/, '')
             } else {
-                return <div key={index} ></div>
+                return null
             }
             const f0str = x.f0 == true ? "f0" : "nof0"
             const srstr = Math.floor(x.samplingRate / 1000) + "K"
@@ -51,8 +51,8 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
             return (
                 <option key={index} value={index}>{displayName}</option>
             )
+        }).filter(x => { return x != null })
 
-        })
         return (
             <>
                 <div className="body-row split-3-7 left-padding-1 guided">
@@ -60,7 +60,6 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
                     <div className="body-input-container">
                         <select className="body-select" value={slot} onChange={(e) => {
                             onSwitchModelClicked(Number(e.target.value))
-                            appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, extraConvertSize: Number(e.target.value) })
                         }}>
                             {options}
                         </select>

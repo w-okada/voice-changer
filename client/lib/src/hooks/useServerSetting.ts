@@ -107,7 +107,11 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             const cachedServerSetting = await getItem(INDEXEDDB_KEY_SERVER)
             let initialSetting: ServerInfo
             if (cachedServerSetting) {
-                initialSetting = { ...defaultServerSetting, ...cachedServerSetting as ServerInfo, inputSampleRate: 48000 }// sample rateは時限措置
+                initialSetting = {
+                    ...defaultServerSetting, ...cachedServerSetting as ServerInfo,
+                    serverAudioStated: 0,
+                    inputSampleRate: 48000
+                }// sample rateは時限措置
             } else {
                 initialSetting = { ...defaultServerSetting }
             }

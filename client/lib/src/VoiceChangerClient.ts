@@ -331,6 +331,9 @@ export class VoiceChangerClient {
     getServerSettings = () => {
         return this.configurator.getSettings()
     }
+    getPerformance = () => {
+        return this.configurator.getPerformance()
+    }
 
     getSocketId = () => {
         return this.vcInNode.getSocketId()

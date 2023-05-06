@@ -25,7 +25,7 @@ export type ClientState = {
     bufferingTime: number;
     volume: number;
     performance: PerformanceData
-
+    updatePerformance: (() => Promise<void>) | null
     // setClientType: (val: ClientType) => void
 
     // 情報取得
@@ -77,6 +77,31 @@ export const useClient = (props: UseClientProps): ClientState => {
     const [bufferingTime, setBufferingTime] = useState<number>(0)
     const [performance, setPerformance] = useState<PerformanceData>(InitialPerformanceData)
     const [volume, setVolume] = useState<number>(0)
+
+    //// Server Audio Deviceを使うとき、モニタリングデータはpolling
+    const updatePerformance = useMemo(() => {
+        if (!voiceChangerClientRef.current) {
+            return null
+        }
+
+        return async () => {
+            if (voiceChangerClientRef.current) {
+                const performance = await voiceChangerClientRef.current!.getPerformance()
+                const responseTime = performance[0]
+                const preprocessTime = performance[1]
+                const mainprocessTime = performance[2]
+                const postprocessTime = performance[3]
+                setPerformance({ responseTime, preprocessTime, mainprocessTime, postprocessTime })
+            } else {
+                const responseTime = 0
+                const preprocessTime = 0
+                const mainprocessTime = 0
+                const postprocessTime = 0
+                setPerformance({ responseTime, preprocessTime, mainprocessTime, postprocessTime })
+            }
+        }
+    }, [voiceChangerClientRef.current])
+
 
 
     // (1-4) エラーステータス
@@ -168,6 +193,7 @@ export const useClient = (props: UseClientProps): ClientState => {
         bufferingTime,
         volume,
         performance,
+        updatePerformance,
 
         // setClientType,
 
