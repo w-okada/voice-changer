@@ -44,3 +44,6 @@ server/weights/
 server/weights_/
 
 start_trainer.sh
+
+# venv
+venv/
