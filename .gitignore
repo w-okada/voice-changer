@@ -40,7 +40,9 @@ client/lib/worklet/dist
 
 docker/cudnn/
 
+server/pretrain/
 server/weights/
 server/weights_/
+server/weights__/
 
 start_trainer.sh

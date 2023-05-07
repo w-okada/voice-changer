@@ -19,7 +19,7 @@ class ValidationErrorLoggingRoute(APIRoute):
         async def custom_route_handler(request: Request) -> Response:
             try:
                 return await original_route_handler(request)
-            except RequestValidationError as exc:
+            except RequestValidationError as exc:  # type: ignore
                 print("Exception", request.url, str(exc))
                 body = await request.body()
                 detail = {"errors": exc.errors(), "body": body.decode()}

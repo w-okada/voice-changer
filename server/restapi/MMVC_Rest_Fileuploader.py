@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 from typing import Union
@@ -49,10 +50,7 @@ class MMVC_Rest_Fileuploader:
     def post_concat_uploaded_file(
         self, filename: str = Form(...), filenameChunkNum: int = Form(...)
     ):
-        slot = 0
-        res = concat_file_chunks(
-            slot, UPLOAD_DIR, filename, filenameChunkNum, UPLOAD_DIR
-        )
+        res = concat_file_chunks(UPLOAD_DIR, filename, filenameChunkNum, UPLOAD_DIR)
         json_compatible_item_data = jsonable_encoder(res)
         return JSONResponse(content=json_compatible_item_data)
 
@@ -94,23 +92,38 @@ class MMVC_Rest_Fileuploader:
             featureFilename=featureFilename,
             indexFilename=indexFilename,
         )
-        props: LoadModelParams = LoadModelParams(
-            slot=slot, isHalf=isHalf, params=params, files=files
-        )
+
+        paramDict = json.loads(params)
+        print("paramDict", paramDict)
 
         # Change Filepath
-        for field in fields(props.files):
+        for field in fields(files):
             key = field.name
-            val = getattr(props.files, key)
+            val = getattr(files, key)
             if val != "-":
                 uploadPath = os.path.join(UPLOAD_DIR, val)
-                storeDir = os.path.join(UPLOAD_DIR, f"{slot}")
+                storePath = os.path.join(UPLOAD_DIR, f"{slot}", val)
+                storeDir = os.path.dirname(storePath)
                 os.makedirs(storeDir, exist_ok=True)
-                storePath = os.path.join(storeDir, val)
                 shutil.move(uploadPath, storePath)
-                setattr(props.files, key, storePath)
+                setattr(files, key, storePath)
             else:
-                setattr(props.files, key, None)
+                setattr(files, key, None)
+
+        newFilesDict = {}
+        for key, val in paramDict["files"].items():
+            if val != "-" and val != "":
+                uploadPath = os.path.join(UPLOAD_DIR, val)
+                storePath = os.path.join(UPLOAD_DIR, f"{slot}", val)
+                storeDir = os.path.dirname(storePath)
+                os.makedirs(storeDir, exist_ok=True)
+                shutil.move(uploadPath, storePath)
+                newFilesDict[key] = storePath
+        paramDict["files"] = newFilesDict
+
+        props: LoadModelParams = LoadModelParams(
+            slot=slot, isHalf=isHalf, params=paramDict, files=files
+        )
 
         info = self.voiceChangerManager.loadModel(props)
         json_compatible_item_data = jsonable_encoder(info)

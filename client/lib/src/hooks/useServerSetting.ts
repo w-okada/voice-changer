@@ -25,6 +25,11 @@ export type FileUploadSetting = {
     framework: Framework
     params: string
 
+    ddspSvcModel: ModelData | null
+    ddspSvcModelConfig: ModelData | null
+    ddspSvcDiffusion: ModelData | null
+    ddspSvcDiffusionConfig: ModelData | null
+
 }
 
 const InitialFileUploadSetting: FileUploadSetting = {
@@ -36,11 +41,17 @@ const InitialFileUploadSetting: FileUploadSetting = {
     feature: null,
     index: null,
 
+    ddspSvcModel: null,
+    ddspSvcModelConfig: null,
+    ddspSvcDiffusion: null,
+    ddspSvcDiffusionConfig: null,
+
     isHalf: true,
     uploaded: false,
     defaultTune: 0,
     framework: Framework.PyTorch,
-    params: "{}"
+    params: "{}",
+
 }
 
 export type UseServerSettingProps = {
@@ -191,22 +202,43 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
 
     // (e) モデルアップロード
     const _uploadFile = useMemo(() => {
-        return async (modelData: ModelData, onprogress: (progress: number, end: boolean) => void) => {
+        return async (modelData: ModelData, onprogress: (progress: number, end: boolean) => void, dir: string = "") => {
             if (!props.voiceChangerClient) return
-            const num = await props.voiceChangerClient.uploadFile(modelData.data!, modelData.filename!, onprogress)
-            const res = await props.voiceChangerClient.concatUploadedFile(modelData.filename!, num)
+            const num = await props.voiceChangerClient.uploadFile(modelData.data!, dir + modelData.filename!, onprogress)
+            const res = await props.voiceChangerClient.concatUploadedFile(dir + modelData.filename!, num)
             console.log("uploaded", num, res)
         }
     }, [props.voiceChangerClient])
+
+
     const loadModel = useMemo(() => {
         return async (slot: number) => {
-            if (!fileUploadSettings[slot].pyTorchModel && !fileUploadSettings[slot].onnxModel) {
-                alert("PyTorchモデルとONNXモデルのどちらか一つ以上指定する必要があります。")
-                return
-            }
-            if (!fileUploadSettings[slot].configFile && props.clientType != "RVC") {
-                alert("Configファイルを指定する必要があります。")
-                return
+            if (props.clientType == "DDSP-SVC") {
+                if (!fileUploadSettings[slot].ddspSvcModel) {
+                    alert("DDSPモデルを指定する必要があります。")
+                    return
+                }
+                if (!fileUploadSettings[slot].ddspSvcModelConfig) {
+                    alert("DDSP Configファイルを指定する必要があります。")
+                    return
+                }
+                if (!fileUploadSettings[slot].ddspSvcDiffusion) {
+                    alert("Diffusionモデルを指定する必要があります。")
+                    return
+                }
+                if (!fileUploadSettings[slot].ddspSvcDiffusionConfig) {
+                    alert("Diffusion Configファイルを指定する必要があります。")
+                    return
+                }
+            } else {
+                if (!fileUploadSettings[slot].pyTorchModel && !fileUploadSettings[slot].onnxModel) {
+                    alert("PyTorchモデルとONNXモデルのどちらか一つ以上指定する必要があります。")
+                    return
+                }
+                if (!fileUploadSettings[slot].configFile && props.clientType != "RVC") {
+                    alert("Configファイルを指定する必要があります。")
+                    return
+                }
             }
 
             if (!props.voiceChangerClient) return
@@ -272,21 +304,52 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 })
             }
 
-            const configFileName = fileUploadSetting.configFile ? fileUploadSetting.configFile.filename || "-" : "-"
+            // DDSP-SVC
+            const ddspSvcModels = [fileUploadSetting.ddspSvcModel, fileUploadSetting.ddspSvcModelConfig, fileUploadSetting.ddspSvcDiffusion, fileUploadSetting.ddspSvcDiffusionConfig].filter(x => { return x != null }) as ModelData[]
+            for (let i = 0; i < ddspSvcModels.length; i++) {
+                if (!ddspSvcModels[i].data) {
+                    ddspSvcModels[i].data = await ddspSvcModels[i].file!.arrayBuffer()
+                    ddspSvcModels[i].filename = await ddspSvcModels[i].file!.name
+                }
+            }
+            for (let i = 0; i < ddspSvcModels.length; i++) {
+                const progRate = 1 / ddspSvcModels.length
+                const progOffset = 100 * i * progRate
+                const dir = i == 0 || i == 1 ? "ddsp_mod/" : "ddsp_diff/"
+                await _uploadFile(ddspSvcModels[i], (progress: number, _end: boolean) => {
+                    setUploadProgress(progress * progRate + progOffset)
+                }, dir)
+            }
+
+            const configFileName = fileUploadSetting.configFile?.filename || "-"
             const params = JSON.stringify({
-                trans: fileUploadSetting.defaultTune || 0
+                trans: fileUploadSetting.defaultTune || 0,
+                files: {
+                    ddspSvcModel: fileUploadSetting.ddspSvcModel?.filename ? "ddsp_mod/" + fileUploadSetting.ddspSvcModel?.filename : "",
+                    ddspSvcModelConfig: fileUploadSetting.ddspSvcModelConfig?.filename ? "ddsp_mod/" + fileUploadSetting.ddspSvcModelConfig?.filename : "",
+                    ddspSvcDiffusion: fileUploadSetting.ddspSvcDiffusion?.filename ? "ddsp_diff/" + fileUploadSetting.ddspSvcDiffusion?.filename : "",
+                    ddspSvcDiffusionConfig: fileUploadSetting.ddspSvcDiffusionConfig?.filename ? "ddsp_diff/" + fileUploadSetting.ddspSvcDiffusionConfig.filename : "",
+                }
             })
             if (fileUploadSetting.isHalf == undefined) {
                 fileUploadSetting.isHalf = false
             }
+
+            const pyTorchModel = fileUploadSetting.pyTorchModel?.filename || null
+            const onnxModel = fileUploadSetting.onnxModel?.filename || null
+            const clusterTorchModel = fileUploadSetting.clusterTorchModel?.filename || null
+            const feature = fileUploadSetting.feature?.filename || null
+            const index = fileUploadSetting.index?.filename || null
+
+
             const loadPromise = props.voiceChangerClient.loadModel(
                 slot,
                 configFileName,
-                fileUploadSetting.pyTorchModel?.filename || null,
-                fileUploadSetting.onnxModel?.filename || null,
-                fileUploadSetting.clusterTorchModel?.filename || null,
-                fileUploadSetting.feature?.filename || null,
-                fileUploadSetting.index?.filename || null,
+                pyTorchModel,
+                onnxModel,
+                clusterTorchModel,
+                feature,
+                index,
                 fileUploadSetting.isHalf,
                 params,
             )
@@ -332,7 +395,11 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 uploaded: false, // キャッシュから読み込まれるときには、まだuploadされていないから。
                 defaultTune: fileUploadSetting.defaultTune,
                 framework: fileUploadSetting.framework,
-                params: fileUploadSetting.params
+                params: fileUploadSetting.params,
+                ddspSvcModel: fileUploadSetting.ddspSvcModel ? { data: fileUploadSetting.ddspSvcModel.data, filename: fileUploadSetting.ddspSvcModel.filename } : null,
+                ddspSvcModelConfig: fileUploadSetting.ddspSvcModelConfig ? { data: fileUploadSetting.ddspSvcModelConfig.data, filename: fileUploadSetting.ddspSvcModelConfig.filename } : null,
+                ddspSvcDiffusion: fileUploadSetting.ddspSvcDiffusion ? { data: fileUploadSetting.ddspSvcDiffusion.data, filename: fileUploadSetting.ddspSvcDiffusion.filename } : null,
+                ddspSvcDiffusionConfig: fileUploadSetting.ddspSvcDiffusionConfig ? { data: fileUploadSetting.ddspSvcDiffusionConfig.data, filename: fileUploadSetting.ddspSvcDiffusionConfig.filename } : null,
             }
             setItem(`${INDEXEDDB_KEY_MODEL_DATA}_${slot}`, saveData)
         } catch (e) {

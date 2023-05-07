@@ -8,7 +8,10 @@ from fastapi import UploadFile
 def upload_file(upload_dirname: str, file: UploadFile, filename: str):
     if file and filename:
         fileobj = file.file
-        upload_dir = open(os.path.join(upload_dirname, filename), 'wb+')
+        target_path = os.path.join(upload_dirname, filename)
+        target_dir = os.path.dirname(target_path)
+        os.makedirs(target_dir, exist_ok=True)
+        upload_dir = open(target_path, "wb+")
         shutil.copyfileobj(fileobj, upload_dir)
         upload_dir.close()
 
@@ -16,20 +19,21 @@ def upload_file(upload_dirname: str, file: UploadFile, filename: str):
     return {"status": "ERROR", "msg": "uploaded file is not found."}
 
 
-def concat_file_chunks(slot: int, upload_dirname: str, filename: str, chunkNum: int, dest_dirname: str):
-    # target_dir = os.path.join(dest_dirname, f"{slot}")
-    target_dir = os.path.join(dest_dirname)
+def concat_file_chunks(
+    upload_dirname: str, filename: str, chunkNum: int, dest_dirname: str
+):
+    target_path = os.path.join(upload_dirname, filename)
+    target_dir = os.path.dirname(target_path)
     os.makedirs(target_dir, exist_ok=True)
-    target_file_name = os.path.join(target_dir, filename)
-    if os.path.exists(target_file_name):
-        os.remove(target_file_name)
-    with open(target_file_name, "ab") as target_file:
+    if os.path.exists(target_path):
+        os.remove(target_path)
+    with open(target_path, "ab") as out:
         for i in range(chunkNum):
             chunkName = f"{filename}_{i}"
             chunk_file_path = os.path.join(upload_dirname, chunkName)
-            stored_chunk_file = open(chunk_file_path, 'rb')
-            target_file.write(stored_chunk_file.read())
+            stored_chunk_file = open(chunk_file_path, "rb")
+            out.write(stored_chunk_file.read())
             stored_chunk_file.close()
             os.remove(chunk_file_path)
-        target_file.close()
-    return {"status": "OK", "msg": f"concat files {target_file_name} "}
+        out.close()
+    return {"status": "OK", "msg": f"concat files {out} "}

@@ -9,7 +9,7 @@
     "editor.formatOnSave": true // ファイル保存時に自動フォーマット
   },
   "flake8.args": [
-    "--ignore=E501,E402,E722,E741,W503"
+    "--ignore=E501,E402,E722,E741,E203,W503"
     // "--max-line-length=150",
     // "--max-complexity=20"
   ]

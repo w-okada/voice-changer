@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass
@@ -16,4 +17,4 @@ class LoadModelParams:
     slot: int
     isHalf: bool
     files: FilePaths
-    params: str
+    params: Any

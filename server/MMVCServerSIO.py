@@ -170,6 +170,34 @@ if __name__ == "MMVCServerSIO":
                 "position": 1,
             }
         )
+    if os.path.exists(voiceChangerParams.hubert_soft) is False:
+        downloadParams.append(
+            {
+                "url": "https://huggingface.co/wok000/weights/resolve/main/ddsp-svc30/embedder/hubert-soft-0d54a1f4.pt",
+                "saveTo": voiceChangerParams.hubert_soft,
+                "position": 2,
+            }
+        )
+    if os.path.exists(voiceChangerParams.nsf_hifigan) is False:
+        downloadParams.append(
+            {
+                "url": "https://huggingface.co/wok000/weights/resolve/main/ddsp-svc30/nsf_hifigan_20221211/model.bin",
+                "saveTo": voiceChangerParams.nsf_hifigan,
+                "position": 3,
+            }
+        )
+    nsf_hifigan_config = os.path.join(
+        os.path.dirname(voiceChangerParams.nsf_hifigan), "config.json"
+    )
+
+    if os.path.exists(nsf_hifigan_config) is False:
+        downloadParams.append(
+            {
+                "url": "https://huggingface.co/wok000/weights/raw/main/ddsp-svc30/nsf_hifigan_20221211/config.json",
+                "saveTo": nsf_hifigan_config,
+                "position": 4,
+            }
+        )
 
     with ThreadPoolExecutor() as pool:
         pool.map(download, downloadParams)

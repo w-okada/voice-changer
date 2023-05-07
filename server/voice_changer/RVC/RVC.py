@@ -71,9 +71,8 @@ class RVC:
 
     def loadModel(self, props: LoadModelParams):
         target_slot_idx = props.slot
-        params_str = props.params
-        params = json.loads(params_str)
-
+        params = props.params
+        
         modelSlot = generateModelSlot(props.files, params)
         self.settings.modelSlots[target_slot_idx] = modelSlot
         print(

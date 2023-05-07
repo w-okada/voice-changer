@@ -54,11 +54,19 @@
 
         "deviceSetting": [
             {
+                "name": "audioDeviceMode",
+                "options": {}
+            },
+            {
                 "name": "audioInput",
                 "options": {}
             },
             {
                 "name": "audioOutput",
+                "options": {}
+            },
+            {
+                "name": "ioBuffer",
                 "options": {}
             }
         ],

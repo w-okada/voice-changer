@@ -20,7 +20,6 @@ def list_audio_device():
     audio = pyaudio.PyAudio()
     audio_input_devices: list[ServerAudioDevice] = []
     audio_output_devices: list[ServerAudioDevice] = []
-    # audio_devices = {}
     host_apis = []
 
     for api_index in range(audio.get_host_api_count()):

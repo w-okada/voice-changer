@@ -50,6 +50,42 @@
                 }
             },
             {
+                "name": "commonFileSelect",
+                "options": {
+                    "title": "Model(.pt,.pth)",
+                    "acceptExtentions": ["pt", "pth"],
+                    "fileKind": "ddspSvcModel"
+                }
+            },
+            {
+                "name": "commonFileSelect",
+                "options": {
+                    "title": "Model config(.yaml)",
+                    "acceptExtentions": ["yaml"],
+                    "fileKind": "ddspSvcModelConfig"
+                }
+            },
+            {
+                "name": "commonFileSelect",
+                "options": {
+                    "title": "Diff(.pt,.pth)",
+                    "acceptExtentions": ["pt", "pth"],
+                    "fileKind": "ddspSvcDiffusion"
+                }
+            },
+            {
+                "name": "commonFileSelect",
+                "options": {
+                    "title": "Diff config(.yaml)",
+                    "acceptExtentions": ["yaml"],
+                    "fileKind": "ddspSvcDiffusionConfig"
+                }
+            },
+            {
+                "name": "modelUploadButtonRow2",
+                "options": {}
+            },
+            {
                 "name": "framework",
                 "options": {
                     "showFramework": true
@@ -64,11 +100,19 @@
 
         "deviceSetting": [
             {
+                "name": "audioDeviceMode",
+                "options": {}
+            },
+            {
                 "name": "audioInput",
                 "options": {}
             },
             {
                 "name": "audioOutput",
+                "options": {}
+            },
+            {
+                "name": "ioBuffer",
                 "options": {}
             }
         ],
