@@ -32,22 +32,36 @@
         ],
         "modelSetting": [
             {
-                "name": "modelUploader",
+                "name": "modelUploaderv2",
+                "options": {}
+            },
+            {
+                "name": "commonFileSelect",
                 "options": {
-                    "showConfig": true,
-                    "showOnnx": false,
-                    "showPyTorch": true,
-                    "showCorrespondence": false,
-                    "showPyTorchCluster": true,
-                    "showPyTorchEnableCheckBox": true,
-                    "defaultEnablePyTorch": true
+                    "title": "Config(.json)",
+                    "acceptExtentions": ["json"],
+                    "fileKind": "soVitsSvc40Config"
                 }
             },
             {
-                "name": "framework",
+                "name": "commonFileSelect",
                 "options": {
-                    "showFramework": true
+                    "title": "Model(.pth, .pt)",
+                    "acceptExtentions": ["pth", "pt"],
+                    "fileKind": "soVitsSvc40Model"
                 }
+            },
+            {
+                "name": "commonFileSelect",
+                "options": {
+                    "title": "Cluster(.pth, .pt)",
+                    "acceptExtentions": ["pth", "pt"],
+                    "fileKind": "soVitsSvc40Cluster"
+                }
+            },
+            {
+                "name": "modelUploadButtonRow2",
+                "options": {}
             }
         ],
         "lab": [],

@@ -75,7 +75,7 @@ class MMVCv15:
         self.settings.configFile = params["files"]["mmvcv15Config"]
         self.hps = get_hparams_from_file(self.settings.configFile)
 
-        modelFile = params["files"]["mmvcv15Models"]
+        modelFile = params["files"]["mmvcv15Model"]
         if modelFile.endswith(".onnx"):
             self.settings.pyTorchModelFile = None
             self.settings.onnxModelFile = modelFile

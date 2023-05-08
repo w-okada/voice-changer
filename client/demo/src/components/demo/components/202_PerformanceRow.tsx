@@ -42,7 +42,7 @@ export const PerformanceRow = (_props: PerformanceRowProps) => {
         }
         let execNext = true
         const updatePerformance = async () => {
-            await appState.updatePerformance()
+            await appState.updatePerformance!()
             if (execNext) {
                 setTimeout(updatePerformance, 1000 * 2)
             }

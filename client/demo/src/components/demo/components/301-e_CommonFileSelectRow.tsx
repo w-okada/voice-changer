@@ -14,6 +14,11 @@ export const Filekinds = {
     "mmvcv13Model": "mmvcv13Model",
     "mmvcv15Config": "mmvcv15Config",
     "mmvcv15Model": "mmvcv15Model",
+
+    "soVitsSvc40Config": "soVitsSvc40Config",
+    "soVitsSvc40Model": "soVitsSvc40Model",
+    "soVitsSvc40Cluster": "soVitsSvc40Cluster",
+
     "ddspSvcModel": "ddspSvcModel",
     "ddspSvcModelConfig": "ddspSvcModelConfig",
     "ddspSvcDiffusion": "ddspSvcDiffusion",

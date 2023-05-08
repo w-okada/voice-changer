@@ -56,8 +56,8 @@ class SoVitsSvc40Settings:
     clusterInferRatio: float = 0.1
 
     framework: str = "PyTorch"  # PyTorch or ONNX
-    pyTorchModelFile: str = ""
-    onnxModelFile: str = ""
+    pyTorchModelFile: str | None = ""
+    onnxModelFile: str | None = ""
     configFile: str = ""
 
     speakers: dict[str, int] = field(default_factory=lambda: {})
@@ -84,13 +84,20 @@ class SoVitsSvc40:
 
     # def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, clusterTorchModel: str = None):
     def loadModel(self, props: LoadModelParams):
-        self.settings.configFile = props.files.configFilename
+        params = props.params
+        self.settings.configFile = params["files"]["soVitsSvc40Config"]
         self.hps = utils.get_hparams_from_file(self.settings.configFile)
         self.settings.speakers = self.hps.spk
 
-        self.settings.pyTorchModelFile = props.files.pyTorchModelFilename
-        self.settings.onnxModelFile = props.files.onnxModelFilename
-        clusterTorchModel = props.files.clusterTorchModelFilename
+        modelFile = params["files"]["soVitsSvc40Model"]
+        if modelFile.endswith(".onnx"):
+            self.settings.pyTorchModelFile = None
+            self.settings.onnxModelFile = modelFile
+        else:
+            self.settings.pyTorchModelFile = modelFile
+            self.settings.onnxModelFile = None
+
+        clusterTorchModel = params["files"]["soVitsSvc40Cluster"]
 
         content_vec_path = self.params.content_vec_500
         content_vec_onnx_path = self.params.content_vec_500_onnx
@@ -103,10 +110,11 @@ class SoVitsSvc40:
                 content_vec_path = hubert_base_path
 
             if content_vec_onnx_on is True:
-                ort_options = onnxruntime.SessionOptions()
-                ort_options.intra_op_num_threads = 8
+                providers, options = self.getOnnxExecutionProvider()
                 self.content_vec_onnx = onnxruntime.InferenceSession(
-                    content_vec_onnx_path, providers=providers
+                    content_vec_onnx_path,
+                    providers=providers,
+                    provider_options=options,
                 )
             else:
                 models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(
@@ -141,56 +149,52 @@ class SoVitsSvc40:
 
         # ONNXモデル生成
         if self.settings.onnxModelFile is not None:
-            ort_options = onnxruntime.SessionOptions()
-            ort_options.intra_op_num_threads = 8
+            providers, options = self.getOnnxExecutionProvider()
             self.onnx_session = onnxruntime.InferenceSession(
-                self.settings.onnxModelFile, providers=providers
+                self.settings.onnxModelFile,
+                providers=providers,
+                provider_options=options,
             )
-            # input_info = self.onnx_session.get_inputs()
-            # for i in input_info:
-            #     print("input", i)
-            # output_info = self.onnx_session.get_outputs()
-            # for i in output_info:
-            #     print("output", i)
         return self.get_info()
 
-    def update_settings(self, key: str, val: int | float | str):
-        if key == "onnxExecutionProvider" and self.onnx_session is not None:
-            if val == "CUDAExecutionProvider":
-                if self.settings.gpu < 0 or self.settings.gpu >= self.gpu_num:
-                    self.settings.gpu = 0
-                provider_options = [{"device_id": self.settings.gpu}]
-                self.onnx_session.set_providers(
-                    providers=[val], provider_options=provider_options
-                )
-                if hasattr(self, "content_vec_onnx"):
-                    self.content_vec_onnx.set_providers(
-                        providers=[val], provider_options=provider_options
-                    )
-            else:
-                self.onnx_session.set_providers(providers=[val])
-                if hasattr(self, "content_vec_onnx"):
-                    self.content_vec_onnx.set_providers(providers=[val])
-        elif key == "onnxExecutionProvider" and self.onnx_session is None:
-            print("Onnx is not enabled. Please load model.")
+    def getOnnxExecutionProvider(self):
+        if self.settings.gpu >= 0:
+            return ["CUDAExecutionProvider"], [{"device_id": self.settings.gpu}]
+        elif "DmlExecutionProvider" in onnxruntime.get_available_providers():
+            return ["DmlExecutionProvider"], []
+        else:
+            return ["CPUExecutionProvider"], [
+                {
+                    "intra_op_num_threads": 8,
+                    "execution_mode": onnxruntime.ExecutionMode.ORT_PARALLEL,
+                    "inter_op_num_threads": 8,
+                }
+            ]
+
+    def isOnnx(self):
+        if self.settings.onnxModelFile is not None:
+            return True
+        else:
             return False
-        elif key in self.settings.intData:
+
+    def update_settings(self, key: str, val: int | float | str):
+        if key in self.settings.intData:
             val = int(val)
             setattr(self.settings, key, val)
-            if (
-                key == "gpu"
-                and val >= 0
-                and val < self.gpu_num
-                and self.onnx_session is not None
-            ):
-                providers = self.onnx_session.get_providers()
-                print("Providers:", providers)
-                if "CUDAExecutionProvider" in providers:
-                    provider_options = [{"device_id": self.settings.gpu}]
+
+            if key == "gpu" and self.isOnnx():
+                providers, options = self.getOnnxExecutionProvider()
+                if self.onnx_session is not None:
                     self.onnx_session.set_providers(
-                        providers=["CUDAExecutionProvider"],
-                        provider_options=provider_options,
+                        providers=providers,
+                        provider_options=options,
                     )
+                if self.content_vec_onnx is not None:
+                    self.content_vec_onnx.set_providers(
+                        providers=providers,
+                        provider_options=options,
+                    )
+
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
@@ -441,7 +445,7 @@ class SoVitsSvc40:
         return result
 
     def inference(self, data):
-        if self.settings.framework == "ONNX":
+        if self.isOnnx():
             audio = self._onnx_inference(data)
         else:
             audio = self._pyTorch_inference(data)
