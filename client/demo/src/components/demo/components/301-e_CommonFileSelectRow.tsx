@@ -21,6 +21,9 @@ export const Filekinds = {
     "soVitsSvc40v2Config": "soVitsSvc40v2Config",
     "soVitsSvc40v2Model": "soVitsSvc40v2Model",
     "soVitsSvc40v2Cluster": "soVitsSvc40v2Cluster",
+    "rvcModel": "rvcModel",
+    "rvcFeature": "rvcFeature",
+    "rvcIndex": "rvcIndex",
 
     "ddspSvcModel": "ddspSvcModel",
     "ddspSvcModelConfig": "ddspSvcModelConfig",

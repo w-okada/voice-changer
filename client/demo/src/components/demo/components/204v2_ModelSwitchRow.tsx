@@ -13,18 +13,9 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
         const slot = appState.serverSetting.serverSetting.modelSlotIndex
 
         const onSwitchModelClicked = async (slot: number) => {
-            const modelSlot = appState.serverSetting.serverSetting.modelSlots[slot]
-            let filename = ""
-            if (modelSlot.pyTorchModelFile && modelSlot.pyTorchModelFile.length > 0) {
-                filename = modelSlot.pyTorchModelFile.replace(/^.*[\\\/]/, '')
-            } else {
-                filename = modelSlot.onnxModelFile.replace(/^.*[\\\/]/, '')
-            }
-            const framework: Framework = filename.endsWith(".onnx") ? "ONNX" : "PyTorch"
-
             // Quick hack for same slot is selected. 下３桁が実際のSlotID
             const dummyModelSlotIndex = (Math.floor(Date.now() / 1000)) * 1000 + slot
-            await appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, modelSlotIndex: dummyModelSlotIndex, framework: framework })
+            await appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, modelSlotIndex: dummyModelSlotIndex })
             setTimeout(() => { // quick hack
                 appState.getInfo()
             }, 1000 * 2)
@@ -33,10 +24,8 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
 
         const options = appState.serverSetting.serverSetting.modelSlots.map((x, index) => {
             let filename = ""
-            if (x.pyTorchModelFile && x.pyTorchModelFile.length > 0) {
-                filename = x.pyTorchModelFile.replace(/^.*[\\\/]/, '')
-            } else if (x.onnxModelFile && x.onnxModelFile.length > 0) {
-                filename = x.onnxModelFile.replace(/^.*[\\\/]/, '')
+            if (x.modelFile && x.modelFile.length > 0) {
+                filename = x.modelFile.replace(/^.*[\\\/]/, '')
             } else {
                 return null
             }

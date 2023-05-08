@@ -16,13 +16,13 @@ export const MergeLabRow = (_props: MergeLabRowProps) => {
     const newSlotChangeKey = useMemo(() => {
         console.log("appState.serverSetting.serverSetting.modelSlots", appState.serverSetting.serverSetting.modelSlots)
         return appState.serverSetting.serverSetting.modelSlots.reduce((prev, cur) => {
-            return prev + "_" + cur.pyTorchModelFile
+            return prev + "_" + cur.modelFile
         }, "")
     }, [appState.serverSetting.serverSetting.modelSlots])
 
     useEffect(() => {
         // PyTorchモデルだけフィルタリング
-        const models = appState.serverSetting.serverSetting.modelSlots.filter(x => { return x.pyTorchModelFile && x.pyTorchModelFile.length > 0 })
+        const models = appState.serverSetting.serverSetting.modelSlots.filter(x => { return x.modelFile && x.modelFile.endsWith("onnx") == false })
         if (models.length == 0) {
             setMergeElements([])
             return
@@ -37,7 +37,7 @@ export const MergeLabRow = (_props: MergeLabRowProps) => {
         ) {
 
             const newMergeElements = models.map((x) => {
-                const elem: MergeElement = { filename: x.pyTorchModelFile, strength: 100 }
+                const elem: MergeElement = { filename: x.modelFile, strength: 100 }
                 return elem
             })
             setMergeElements(newMergeElements)

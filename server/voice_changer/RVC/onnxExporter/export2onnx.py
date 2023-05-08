@@ -20,26 +20,12 @@ from voice_changer.RVC.onnxExporter.SynthesizerTrnMsNSFsid_webui_ONNX import (
 )
 
 
-# from voice_changer.RVC.onnx.SynthesizerTrnMs256NSFsid_ONNX import (
-#     SynthesizerTrnMs256NSFsid_ONNX,
-# )
-# from voice_changer.RVC.onnx.SynthesizerTrnMs256NSFsid_nono_ONNX import (
-#     SynthesizerTrnMs256NSFsid_nono_ONNX,
-# )
-# from voice_changer.RVC.onnx.SynthesizerTrnMsNSFsidNono_webui_ONNX import (
-#     SynthesizerTrnMsNSFsidNono_webui_ONNX,
-# )
-# from voice_changer.RVC.onnx.SynthesizerTrnMsNSFsid_webui_ONNX import (
-#     SynthesizerTrnMsNSFsid_webui_ONNX,
-# )
-
-
 def export2onnx(gpu: int, modelSlot: ModelSlot):
-    pyTorchModelFile = modelSlot.pyTorchModelFile
+    modelFile = modelSlot.modelFile
 
-    output_file = os.path.splitext(os.path.basename(pyTorchModelFile))[0] + ".onnx"
+    output_file = os.path.splitext(os.path.basename(modelFile))[0] + ".onnx"
     output_file_simple = (
-        os.path.splitext(os.path.basename(pyTorchModelFile))[0] + "_simple.onnx"
+        os.path.splitext(os.path.basename(modelFile))[0] + "_simple.onnx"
     )
     output_path = os.path.join(TMP_DIR, output_file)
     output_path_simple = os.path.join(TMP_DIR, output_file_simple)
@@ -58,12 +44,12 @@ def export2onnx(gpu: int, modelSlot: ModelSlot):
     print(f"[Voice Changer] exporting onnx... gpu_id:{gpu} gpu_mem:{gpuMomory}")
 
     if gpuMomory > 0:
-        _export2onnx(pyTorchModelFile, output_path, output_path_simple, True, metadata)
+        _export2onnx(modelFile, output_path, output_path_simple, True, metadata)
     else:
         print(
             "[Voice Changer] Warning!!! onnx export with float32. maybe size is doubled."
         )
-        _export2onnx(pyTorchModelFile, output_path, output_path_simple, False, metadata)
+        _export2onnx(modelFile, output_path, output_path_simple, False, metadata)
     return output_file_simple
 
 

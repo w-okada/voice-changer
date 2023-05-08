@@ -163,8 +163,7 @@ export type VoiceChangerServerSetting = {
 }
 
 type ModelSlot = {
-    onnxModelFile: string,
-    pyTorchModelFile: string
+    modelFile: string
     featureFile: string,
     indexFile: string,
 

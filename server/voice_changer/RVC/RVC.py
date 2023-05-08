@@ -1,6 +1,5 @@
 import sys
 import os
-import json
 import resampy
 from dataclasses import asdict
 from typing import cast
@@ -72,8 +71,8 @@ class RVC:
     def loadModel(self, props: LoadModelParams):
         target_slot_idx = props.slot
         params = props.params
-        
-        modelSlot = generateModelSlot(props.files, params)
+
+        modelSlot = generateModelSlot(params)
         self.settings.modelSlots[target_slot_idx] = modelSlot
         print(
             f"[Voice Changer] RVC new model is uploaded,{target_slot_idx}",
@@ -141,11 +140,6 @@ class RVC:
         if slot < 0:
             return self.get_info()
         modelSlot = self.settings.modelSlots[slot]
-        inferencerFilename = (
-            modelSlot.onnxModelFile if modelSlot.isONNX else modelSlot.pyTorchModelFile
-        )
-        if inferencerFilename == "":
-            return self.get_info()
 
         print("[Voice Changer] Prepare Model of slot:", slot)
 
@@ -287,10 +281,8 @@ class RVC:
 
     def export2onnx(self):
         modelSlot = self.settings.modelSlots[self.settings.modelSlotIndex]
-        pyTorchModelFile = modelSlot.pyTorchModelFile
 
-        # PyTorchのファイルが存在しない場合はエラーを返す
-        if pyTorchModelFile is None or pyTorchModelFile == "":
+        if modelSlot.isONNX:
             print("[Voice Changer] export2onnx, No pyTorch filepath.")
             return {"status": "ng", "path": ""}
 
@@ -318,19 +310,18 @@ class RVC:
         torch.save(merged, storeFile)
 
         filePaths: FilePaths = FilePaths(
-            pyTorchModelFilename=storeFile,
+            pyTorchModelFilename=None,
             configFilename=None,
             onnxModelFilename=None,
             featureFilename=None,
             indexFilename=None,
             clusterTorchModelFilename=None,
         )
-        params = {"trans": req.defaultTrans}
+        params = {"trans": req.defaultTrans, "files": {"rvcModel": storeFile}}
         props: LoadModelParams = LoadModelParams(
-            slot=targetSlot, isHalf=True, files=filePaths, params=json.dumps(params)
+            slot=targetSlot, isHalf=True, files=filePaths, params=params
         )
         self.loadModel(props)
         self.prepareModel(targetSlot)
         self.settings.modelSlotIndex = targetSlot
         self.currentSlot = self.settings.modelSlotIndex
-        # self.settings.tran = req.defaultTrans

@@ -35,7 +35,9 @@ export type FileUploadSetting = {
     soVitsSvc40v2Config: ModelData | null
     soVitsSvc40v2Model: ModelData | null
     soVitsSvc40v2Cluster: ModelData | null
-
+    rvcModel: ModelData | null
+    rvcFeature: ModelData | null
+    rvcIndex: ModelData | null
 
     ddspSvcModel: ModelData | null
     ddspSvcModelConfig: ModelData | null
@@ -69,6 +71,9 @@ const InitialFileUploadSetting: FileUploadSetting = {
     soVitsSvc40v2Config: null,
     soVitsSvc40v2Model: null,
     soVitsSvc40v2Cluster: null,
+    rvcModel: null,
+    rvcFeature: null,
+    rvcIndex: null,
 
     ddspSvcModel: null,
     ddspSvcModelConfig: null,
@@ -273,6 +278,11 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                     alert("モデルファイルを指定する必要があります。")
                     return
                 }
+            } else if (props.clientType == "RVC") {
+                if (!fileUploadSettings[slot].rvcModel) {
+                    alert("モデルファイルを指定する必要があります。")
+                    return
+                }
             } else if (props.clientType == "DDSP-SVC") {
                 if (!fileUploadSettings[slot].ddspSvcModel) {
                     alert("DDSPモデルを指定する必要があります。")
@@ -291,14 +301,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                     return
                 }
             } else {
-                if (!fileUploadSettings[slot].pyTorchModel && !fileUploadSettings[slot].onnxModel) {
-                    alert("PyTorchモデルとONNXモデルのどちらか一つ以上指定する必要があります。")
-                    return
-                }
-                if (!fileUploadSettings[slot].configFile && props.clientType != "RVC") {
-                    alert("Configファイルを指定する必要があります。")
-                    return
-                }
             }
 
             if (!props.voiceChangerClient) return
@@ -375,7 +377,11 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 fileUploadSetting.soVitsSvc40Cluster,
                 fileUploadSetting.soVitsSvc40v2Config,
                 fileUploadSetting.soVitsSvc40v2Model,
-                fileUploadSetting.soVitsSvc40v2Cluster
+                fileUploadSetting.soVitsSvc40v2Cluster,
+                fileUploadSetting.rvcModel,
+                fileUploadSetting.rvcIndex,
+                fileUploadSetting.rvcFeature,
+
             ].filter(x => { return x != null }) as ModelData[]
             for (let i = 0; i < normalModels.length; i++) {
                 if (!normalModels[i].data) {
@@ -422,6 +428,10 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                     soVitsSvc40v2Config: fileUploadSetting.soVitsSvc40v2Config?.filename || "",
                     soVitsSvc40v2Model: fileUploadSetting.soVitsSvc40v2Model?.filename || "",
                     soVitsSvc40v2Cluster: fileUploadSetting.soVitsSvc40v2Cluster?.filename || "",
+                    rvcModel: fileUploadSetting.rvcModel?.filename || "",
+                    rvcIndex: fileUploadSetting.rvcIndex?.filename || "",
+                    rvcFeature: fileUploadSetting.rvcFeature?.filename || "",
+
 
                     ddspSvcModel: fileUploadSetting.ddspSvcModel?.filename ? "ddsp_mod/" + fileUploadSetting.ddspSvcModel?.filename : "",
                     ddspSvcModelConfig: fileUploadSetting.ddspSvcModelConfig?.filename ? "ddsp_mod/" + fileUploadSetting.ddspSvcModelConfig?.filename : "",
@@ -505,6 +515,9 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 soVitsSvc40v2Config: fileUploadSetting.soVitsSvc40v2Config ? { data: fileUploadSetting.soVitsSvc40v2Config.data, filename: fileUploadSetting.soVitsSvc40v2Config.filename } : null,
                 soVitsSvc40v2Model: fileUploadSetting.soVitsSvc40v2Model ? { data: fileUploadSetting.soVitsSvc40v2Model.data, filename: fileUploadSetting.soVitsSvc40v2Model.filename } : null,
                 soVitsSvc40v2Cluster: fileUploadSetting.soVitsSvc40v2Cluster ? { data: fileUploadSetting.soVitsSvc40v2Cluster.data, filename: fileUploadSetting.soVitsSvc40v2Cluster.filename } : null,
+                rvcModel: fileUploadSetting.rvcModel ? { data: fileUploadSetting.rvcModel.data, filename: fileUploadSetting.rvcModel.filename } : null,
+                rvcIndex: fileUploadSetting.rvcIndex ? { data: fileUploadSetting.rvcIndex.data, filename: fileUploadSetting.rvcIndex.filename } : null,
+                rvcFeature: fileUploadSetting.rvcFeature ? { data: fileUploadSetting.rvcFeature.data, filename: fileUploadSetting.rvcFeature.filename } : null,
 
                 ddspSvcModel: fileUploadSetting.ddspSvcModel ? { data: fileUploadSetting.ddspSvcModel.data, filename: fileUploadSetting.ddspSvcModel.filename } : null,
                 ddspSvcModelConfig: fileUploadSetting.ddspSvcModelConfig ? { data: fileUploadSetting.ddspSvcModelConfig.data, filename: fileUploadSetting.ddspSvcModelConfig.filename } : null,

@@ -5,8 +5,9 @@ from dataclasses import dataclass
 
 @dataclass
 class ModelSlot:
-    pyTorchModelFile: str = ""
-    onnxModelFile: str = ""
+    # pyTorchModelFile: str = ""
+    # onnxModelFile: str = ""
+    modelFile: str = ""
     featureFile: str = ""
     indexFile: str = ""
     defaultTrans: int = 0

@@ -52,6 +52,8 @@ import { CommonFileSelectRow, CommonFileSelectRowProps } from "./components/301-
 import { ModelUploadButtonRow2, ModelUploadButtonRow2Props } from "./components/301-f_ModelUploadButtonRow"
 import { ModelUploaderRowv2, ModelUploaderRowv2Props } from "./components/301_ModelUploaderRowv2"
 import { CorrespondenceSelectRow2, CorrespondenceSelectRow2Props } from "./components/301-g_CorrespondenceSelectRow2"
+import { ModelSlotRow2, ModelSlotRow2Props } from "./components/301-h_ModelSlotRowv2"
+import { DefaultTuneRow2, DefaultTuneRow2Props } from "./components/301-i_DefaultTuneRowv2"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
 
@@ -89,6 +91,8 @@ const initialize = () => {
     addToCatalog("commonFileSelect", (props: CommonFileSelectRowProps) => { return <CommonFileSelectRow  {...props} /> })
     addToCatalog("modelUploadButtonRow2", (props: ModelUploadButtonRow2Props) => { return <ModelUploadButtonRow2  {...props} /> })
     addToCatalog("correspondenceSelectRow2", (props: CorrespondenceSelectRow2Props) => { return <CorrespondenceSelectRow2  {...props} /> })
+    addToCatalog("modelSlotRow2", (props: ModelSlotRow2Props) => { return <ModelSlotRow2  {...props} /> })
+    addToCatalog("defaultTuneRow2", (props: DefaultTuneRow2Props) => { return <DefaultTuneRow2  {...props} /> })
 
 
 

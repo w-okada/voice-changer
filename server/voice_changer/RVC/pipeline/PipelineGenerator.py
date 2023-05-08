@@ -14,16 +14,16 @@ from voice_changer.RVC.pitchExtractor.PitchExtractorManager import PitchExtracto
 def createPipeline(modelSlot: ModelSlot, gpu: int, f0Detector: str):
     dev = DeviceManager.get_instance().getDevice(gpu)
     half = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
-    # ファイル名特定(Inferencer)
-    inferencerFilename = (
-        modelSlot.onnxModelFile if modelSlot.isONNX else modelSlot.pyTorchModelFile
-    )
+    # # ファイル名特定(Inferencer)
+    # inferencerFilename = (
+    #     modelSlot.onnxModelFile if modelSlot.isONNX else modelSlot.pyTorchModelFile
+    # )
 
     # Inferencer 生成
     try:
         inferencer = InferencerManager.getInferencer(
             modelSlot.modelType,
-            inferencerFilename,
+            modelSlot.modelFile,
             half,
             dev,
         )

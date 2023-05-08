@@ -1,31 +1,35 @@
 from const import EnumEmbedderTypes, EnumInferenceTypes
 from voice_changer.RVC.ModelSlot import ModelSlot
 
-from voice_changer.utils.LoadModelParams import FilePaths
 import torch
 import onnxruntime
 import json
 
 
-def generateModelSlot(files: FilePaths, params):
+def generateModelSlot(params):
     modelSlot = ModelSlot()
-    modelSlot.pyTorchModelFile = files.pyTorchModelFilename
-    modelSlot.onnxModelFile = files.onnxModelFilename
-    modelSlot.featureFile = files.featureFilename
-    modelSlot.indexFile = files.indexFilename
+
+    modelSlot.modelFile = params["files"]["rvcModel"]
+    modelSlot.featureFile = (
+        params["files"]["rvcFeature"] if "rvcFeature" in params["files"] else None
+    )
+    modelSlot.indexFile = (
+        params["files"]["rvcIndex"] if "rvcIndex" in params["files"] else None
+    )
+
     modelSlot.defaultTrans = params["trans"] if "trans" in params else 0
 
-    modelSlot.isONNX = True if modelSlot.onnxModelFile is not None else False
+    modelSlot.isONNX = modelSlot.modelFile.endswith(".onnx")
 
     if modelSlot.isONNX:
-        _setInfoByONNX(modelSlot, modelSlot.onnxModelFile)
+        _setInfoByONNX(modelSlot)
     else:
-        _setInfoByPytorch(modelSlot, modelSlot.pyTorchModelFile)
+        _setInfoByPytorch(modelSlot)
     return modelSlot
 
 
-def _setInfoByPytorch(slot: ModelSlot, file: str):
-    cpt = torch.load(file, map_location="cpu")
+def _setInfoByPytorch(slot: ModelSlot):
+    cpt = torch.load(slot.modelFile, map_location="cpu")
     config_len = len(cpt["config"])
     if config_len == 18:
         slot.f0 = True if cpt["f0"] == 1 else False
@@ -62,9 +66,9 @@ def _setInfoByPytorch(slot: ModelSlot, file: str):
     del cpt
 
 
-def _setInfoByONNX(slot: ModelSlot, file: str):
+def _setInfoByONNX(slot: ModelSlot):
     tmp_onnx_session = onnxruntime.InferenceSession(
-        file, providers=["CPUExecutionProvider"]
+        slot.modelFile, providers=["CPUExecutionProvider"]
     )
     modelmeta = tmp_onnx_session.get_modelmeta()
     try:
