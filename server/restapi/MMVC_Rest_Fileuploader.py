@@ -11,9 +11,8 @@ from restapi.mods.FileUploader import upload_file, concat_file_chunks
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 
 from const import MODEL_DIR, UPLOAD_DIR, ModelType
-from voice_changer.utils.LoadModelParams import FilePaths, LoadModelParams
+from voice_changer.utils.LoadModelParams import LoadModelParams
 
-from dataclasses import fields
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(MODEL_DIR, exist_ok=True)
@@ -75,41 +74,13 @@ class MMVC_Rest_Fileuploader:
     def post_load_model(
         self,
         slot: int = Form(...),
-        pyTorchModelFilename: str = Form(...),
-        onnxModelFilename: str = Form(...),
-        configFilename: str = Form(...),
-        clusterTorchModelFilename: str = Form(...),
-        featureFilename: str = Form(...),
-        indexFilename: str = Form(...),
         isHalf: bool = Form(...),
         params: str = Form(...),
     ):
-        files = FilePaths(
-            configFilename=configFilename,
-            pyTorchModelFilename=pyTorchModelFilename,
-            onnxModelFilename=onnxModelFilename,
-            clusterTorchModelFilename=clusterTorchModelFilename,
-            featureFilename=featureFilename,
-            indexFilename=indexFilename,
-        )
-
         paramDict = json.loads(params)
         print("paramDict", paramDict)
 
         # Change Filepath
-        for field in fields(files):
-            key = field.name
-            val = getattr(files, key)
-            if val != "-":
-                uploadPath = os.path.join(UPLOAD_DIR, val)
-                storePath = os.path.join(UPLOAD_DIR, f"{slot}", val)
-                storeDir = os.path.dirname(storePath)
-                os.makedirs(storeDir, exist_ok=True)
-                shutil.move(uploadPath, storePath)
-                setattr(files, key, storePath)
-            else:
-                setattr(files, key, None)
-
         newFilesDict = {}
         for key, val in paramDict["files"].items():
             if val != "-" and val != "":
@@ -122,7 +93,7 @@ class MMVC_Rest_Fileuploader:
         paramDict["files"] = newFilesDict
 
         props: LoadModelParams = LoadModelParams(
-            slot=slot, isHalf=isHalf, params=paramDict, files=files
+            slot=slot, isHalf=isHalf, params=paramDict
         )
 
         info = self.voiceChangerManager.loadModel(props)

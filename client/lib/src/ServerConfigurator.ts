@@ -123,7 +123,7 @@ export class ServerConfigurator {
         })
     }
 
-    loadModel = async (slot: number, configFilename: string, pyTorchModelFilename: string | null, onnxModelFilename: string | null, clusterTorchModelFilename: string | null, featureFilename: string | null, indexFilename: string | null, isHalf: boolean, params: string = "{}") => {
+    loadModel = async (slot: number, isHalf: boolean, params: string = "{}") => {
         if (isHalf == undefined || isHalf == null) {
             console.warn("isHalf is invalid value", isHalf)
             isHalf = false
@@ -131,14 +131,7 @@ export class ServerConfigurator {
         const url = this.serverUrl + "/load_model"
         const info = new Promise<ServerInfo>(async (resolve) => {
             const formData = new FormData();
-            // formData.append("slot", "" + slot);
             formData.append("slot", "" + slot);
-            formData.append("pyTorchModelFilename", pyTorchModelFilename || "-");
-            formData.append("onnxModelFilename", onnxModelFilename || "-");
-            formData.append("configFilename", configFilename);
-            formData.append("clusterTorchModelFilename", clusterTorchModelFilename || "-");
-            formData.append("featureFilename", featureFilename || "-");
-            formData.append("indexFilename", indexFilename || "-");
             formData.append("isHalf", "" + isHalf);
             formData.append("params", params);
 

@@ -288,16 +288,10 @@ export class VoiceChangerClient {
     }
     loadModel = (
         slot: number,
-        configFilename: string,
-        pyTorchModelFilename: string | null,
-        onnxModelFilename: string | null,
-        clusterTorchModelFilename: string | null,
-        featureFilename: string | null,
-        indexFilename: string | null,
         isHalf: boolean,
         params: string,
     ) => {
-        return this.configurator.loadModel(slot, configFilename, pyTorchModelFilename, onnxModelFilename, clusterTorchModelFilename, featureFilename, indexFilename, isHalf, params)
+        return this.configurator.loadModel(slot, isHalf, params)
     }
 
     //##  Worklet ##//

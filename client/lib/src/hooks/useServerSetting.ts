@@ -11,14 +11,6 @@ type ModelData = {
 }
 
 export type FileUploadSetting = {
-    pyTorchModel: ModelData | null
-    onnxModel: ModelData | null
-    configFile: ModelData | null
-    clusterTorchModel: ModelData | null
-
-    feature: ModelData | null //RVC
-    index: ModelData | null   //RVC
-
     isHalf: boolean
     uploaded: boolean
     defaultTune: number
@@ -47,14 +39,6 @@ export type FileUploadSetting = {
 }
 
 const InitialFileUploadSetting: FileUploadSetting = {
-    pyTorchModel: null,
-    configFile: null,
-    onnxModel: null,
-    clusterTorchModel: null,
-
-    feature: null,
-    index: null,
-
     isHalf: true,
     uploaded: false,
     defaultTune: 0,
@@ -308,63 +292,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             setUploadProgress(0)
             setIsUploading(true)
 
-            // ファイルをメモリにロード(dataがある場合は、キャッシュから読まれていると想定しスキップ)
             const fileUploadSetting = fileUploadSettings[slot]
-            if (fileUploadSetting.onnxModel && !fileUploadSetting.onnxModel.data) {
-                fileUploadSetting.onnxModel.data = await fileUploadSetting.onnxModel.file!.arrayBuffer()
-                fileUploadSetting.onnxModel.filename = await fileUploadSetting.onnxModel.file!.name
-            }
-            if (fileUploadSetting.pyTorchModel && !fileUploadSetting.pyTorchModel.data) {
-                fileUploadSetting.pyTorchModel.data = await fileUploadSetting.pyTorchModel.file!.arrayBuffer()
-                fileUploadSetting.pyTorchModel.filename = await fileUploadSetting.pyTorchModel.file!.name
-            }
-            if (fileUploadSetting.configFile && !fileUploadSetting.configFile.data) {
-                fileUploadSetting.configFile.data = await fileUploadSetting.configFile.file!.arrayBuffer()
-                fileUploadSetting.configFile.filename = await fileUploadSetting.configFile.file!.name
-            }
-
-            if (fileUploadSetting.clusterTorchModel) {
-                if ((props.clientType == "so-vits-svc-40v2" || props.clientType == "so-vits-svc-40") && !fileUploadSetting.clusterTorchModel!.data) {
-                    fileUploadSetting.clusterTorchModel!.data = await fileUploadSetting.clusterTorchModel!.file!.arrayBuffer()
-                    fileUploadSetting.clusterTorchModel!.filename = await fileUploadSetting.clusterTorchModel!.file!.name
-                }
-            }
-
-            if (fileUploadSetting.feature) {
-                if ((props.clientType == "RVC") && !fileUploadSetting.feature!.data) {
-                    fileUploadSetting.feature!.data = await fileUploadSetting.feature!.file!.arrayBuffer()
-                    fileUploadSetting.feature!.filename = await fileUploadSetting.feature!.file!.name
-                }
-            }
-            if (fileUploadSetting.index) {
-                if ((props.clientType == "RVC") && !fileUploadSetting.index!.data) {
-                    fileUploadSetting.index!.data = await fileUploadSetting.index!.file!.arrayBuffer()
-                    fileUploadSetting.index!.filename = await fileUploadSetting.index!.file!.name
-                }
-            }
-
-            // ファイルをサーバにアップロード
-            const models = [
-                fileUploadSetting.onnxModel,
-                fileUploadSetting.pyTorchModel,
-                fileUploadSetting.clusterTorchModel,
-                fileUploadSetting.feature,
-                fileUploadSetting.index,
-            ].filter(x => { return x != null }) as ModelData[]
-            for (let i = 0; i < models.length; i++) {
-                const progRate = 1 / models.length
-                const progOffset = 100 * i * progRate
-                await _uploadFile(models[i], (progress: number, _end: boolean) => {
-                    // console.log(progress * progRate + progOffset, end, progRate,)
-                    setUploadProgress(progress * progRate + progOffset)
-                })
-            }
-
-            if (fileUploadSetting.configFile) {
-                await _uploadFile(fileUploadSetting.configFile, (progress: number, end: boolean) => {
-                    console.log(progress, end)
-                })
-            }
 
             // MMVCv13
             const normalModels = [
@@ -414,7 +342,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 }, dir)
             }
 
-            const configFileName = fileUploadSetting.configFile?.filename || "-"
+            // const configFileName = fileUploadSetting.configFile?.filename || "-"
             const params = JSON.stringify({
                 trans: fileUploadSetting.defaultTune || 0,
                 files: {
@@ -443,21 +371,8 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 fileUploadSetting.isHalf = false
             }
 
-            const pyTorchModel = fileUploadSetting.pyTorchModel?.filename || null
-            const onnxModel = fileUploadSetting.onnxModel?.filename || null
-            const clusterTorchModel = fileUploadSetting.clusterTorchModel?.filename || null
-            const feature = fileUploadSetting.feature?.filename || null
-            const index = fileUploadSetting.index?.filename || null
-
-
             const loadPromise = props.voiceChangerClient.loadModel(
                 slot,
-                configFileName,
-                pyTorchModel,
-                onnxModel,
-                clusterTorchModel,
-                feature,
-                index,
                 fileUploadSetting.isHalf,
                 params,
             )
@@ -478,27 +393,9 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
     }, [fileUploadSettings, props.voiceChangerClient, props.clientType])
 
 
-    // const updateDefaultTune = (slot: number, tune: number) => {
-    //     fileUploadSettings[slot].defaultTune = tune
-    //     storeToCache(slot, fileUploadSettings[slot])
-    //     setFileUploadSettings([...fileUploadSettings])
-    // }
-
     const storeToCache = (slot: number, fileUploadSetting: FileUploadSetting) => {
         try {
             const saveData: FileUploadSetting = {
-                pyTorchModel: fileUploadSetting.pyTorchModel ? { data: fileUploadSetting.pyTorchModel.data, filename: fileUploadSetting.pyTorchModel.filename } : null,
-                onnxModel: fileUploadSetting.onnxModel ? { data: fileUploadSetting.onnxModel.data, filename: fileUploadSetting.onnxModel.filename } : null,
-                configFile: fileUploadSetting.configFile ? { data: fileUploadSetting.configFile.data, filename: fileUploadSetting.configFile.filename } : null,
-                clusterTorchModel: fileUploadSetting.clusterTorchModel ? {
-                    data: fileUploadSetting.clusterTorchModel.data, filename: fileUploadSetting.clusterTorchModel.filename
-                } : null,
-                feature: fileUploadSetting.feature ? {
-                    data: fileUploadSetting.feature.data, filename: fileUploadSetting.feature.filename
-                } : null,
-                index: fileUploadSetting.index ? {
-                    data: fileUploadSetting.index.data, filename: fileUploadSetting.index.filename
-                } : null,
                 isHalf: fileUploadSetting.isHalf, // キャッシュとしては不使用。guiで上書きされる。
                 uploaded: false, // キャッシュから読み込まれるときには、まだuploadされていないから。
                 defaultTune: fileUploadSetting.defaultTune,

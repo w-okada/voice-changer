@@ -1,4 +1,3 @@
-import { Framework } from "@dannadori/voice-changer-client-js"
 import React, { useMemo } from "react"
 import { useAppState } from "../../../001_provider/001_AppStateProvider"
 

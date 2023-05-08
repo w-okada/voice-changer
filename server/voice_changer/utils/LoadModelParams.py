@@ -16,5 +16,4 @@ class FilePaths:
 class LoadModelParams:
     slot: int
     isHalf: bool
-    files: FilePaths
     params: Any
