@@ -133,8 +133,8 @@
             {
                 "name": "dstId",
                 "options": {
-                    "showF0": true,
-                    "useServerInfo": false
+                    "dstIdDisplayType": "ddspsvc",
+                    "staticIds": [1]
                 }
             },
             {

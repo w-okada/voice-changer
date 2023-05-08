@@ -5,20 +5,27 @@ import { ServerInfoSoVitsSVC } from "@dannadori/voice-changer-client-js";
 export type DstIdRowProps = {
     showF0: boolean
     useServerInfo: boolean
+    dstIdDisplayType: DstIdDisplayType
+    staticIds: number[]
 }
+
+export const DstIdDisplayType = {
+    "MMVCv13": "MMVCv13",
+    "MMVCv15": "MMVCv15",
+    "sovitsvc40": "sovitsvc40",
+    "sovitsvc40v2": "sovitsvc40v2",
+    "rvc": "rvc",
+    "ddspsvc": "ddspsvc",
+} as const
+export type DstIdDisplayType = typeof DstIdDisplayType[keyof typeof DstIdDisplayType]
 
 export const DstIdRow = (props: DstIdRowProps) => {
     const appState = useAppState()
 
     const dstIdRow = useMemo(() => {
-        if (!props.showF0 && !props.useServerInfo) {
-            // mmvc v.1.3ではない
-            // noop
-        } else {
-            // mmvc v.1.3ではない
+        if (props.dstIdDisplayType != "MMVCv13") {
             return <></>
         }
-
         return (
             <div className="body-row split-3-2-1-4 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Destination Speaker Id</div>
@@ -42,11 +49,7 @@ export const DstIdRow = (props: DstIdRowProps) => {
     }, [appState.serverSetting.serverSetting, appState.clientSetting.clientSetting.speakers, appState.serverSetting.updateServerSettings])
 
     const dstIdRowWithF0 = useMemo(() => {
-        if (props.showF0) {
-            // mmvc v.15
-            // noop
-        } else {
-            // mmvc v.1.5ではない
+        if (props.dstIdDisplayType != "MMVCv15") {
             return <></>
         }
 
@@ -79,11 +82,7 @@ export const DstIdRow = (props: DstIdRowProps) => {
     }, [appState.serverSetting.serverSetting, appState.serverSetting.updateServerSettings, appState.clientSetting.clientSetting.correspondences])
 
     const dstIdRowFromServer = useMemo(() => {
-        if (props.useServerInfo) {
-            // not mmvc v1.3 or v.15
-            // noop
-        } else {
-            // mmvc v1.3 or v.15
+        if (props.dstIdDisplayType != "sovitsvc40" && props.dstIdDisplayType != "sovitsvc40v2") {
             return <></>
         }
 
@@ -118,11 +117,50 @@ export const DstIdRow = (props: DstIdRowProps) => {
         )
     }, [appState.serverSetting.serverSetting, appState.serverSetting.updateServerSettings, appState.clientSetting.clientSetting.correspondences])
 
+    const dstIdRowStatic = useMemo(() => {
+        if (props.dstIdDisplayType != "rvc" && props.dstIdDisplayType != "ddspsvc") {
+            return <></>
+        }
+
+        // const settings = appState.serverSetting.serverSetting as ServerInfoSoVitsSVC
+        // const speakers = settings.speakers
+        // if (!speakers) {
+        //     return <></>
+        // }
+
+        const currentValue = Object.values(props.staticIds).includes(appState.serverSetting.serverSetting.dstId) ? appState.serverSetting.serverSetting.dstId : -1
+
+        return (
+            <div className="body-row split-3-2-1-4 left-padding-1 guided">
+                <div className="body-item-title left-padding-1">Destination Speaker Id</div>
+                <div className="body-select-container">
+                    <select className="body-select" value={currentValue} onChange={(e) => {
+                        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, dstId: Number(e.target.value) })
+
+                    }}>
+                        <option key="unknown" value={0}>default(0)</option>
+                        {
+                            Object.keys(props.staticIds).map(x => {
+                                return <option key={x} value={x}>{x}</option>
+                            })
+                        }
+                    </select>
+                </div>
+                <div className="body-item-text">
+                </div>
+                <div className="body-item-text"></div>
+            </div>
+        )
+    }, [appState.serverSetting.serverSetting, appState.serverSetting.updateServerSettings])
+
+
+
     return (
         <>
             {dstIdRow}
             {dstIdRowWithF0}
             {dstIdRowFromServer}
+            {dstIdRowStatic}
         </>
     )
 }

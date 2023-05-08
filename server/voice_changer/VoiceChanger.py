@@ -125,6 +125,7 @@ def serverLocal(_vc):
 
     audio_input_stream = None
     audio_output_stream = None
+    showPerformanceTime = 0
     while True:
         if (
             vc.settings.enableServerAudio == 0
@@ -165,19 +166,23 @@ def serverLocal(_vc):
                     currentOutputSampleRate,
                     currentOutputBufferSize,
                 )
-
-            in_wav = audio_input_stream.read(
-                vc.settings.serverReadChunkSize * 128, exception_on_overflow=False
+            sampleNum = vc.settings.serverReadChunkSize * 128
+            in_wav = audio_input_stream.read(sampleNum, exception_on_overflow=False)
+            readNum = len(in_wav) // struct.calcsize("<h")
+            unpackedData = np.array(struct.unpack("<%sh" % readNum, in_wav)).astype(
+                np.int16
             )
-            unpackedData = np.array(
-                struct.unpack("<%sh" % (len(in_wav) // struct.calcsize("<h")), in_wav)
-            ).astype(np.int16)
             with Timer("all_inference_time") as t:
                 out_wav, times = vc.on_request(unpackedData)
             all_inference_time = t.secs
             performance = [all_inference_time] + times
-            performance = [round(x, 2) * 1000 for x in performance]
+            performance = [round(x * 1000) for x in performance]
             vc.settings.performance = performance
+            currentTime = time.time()
+            if currentTime - showPerformanceTime > 5:
+                print(sampleNum, readNum, performance)
+                showPerformanceTime = currentTime
+
             audio_output_stream.write(out_wav.tobytes())
 
 

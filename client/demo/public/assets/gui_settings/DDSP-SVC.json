@@ -118,9 +118,10 @@
         ],
         "speakerSetting": [
             {
-                "name": "dstId2",
+                "name": "dstId",
                 "options": {
-                    "selectableIds": [1, 2]
+                    "dstIdDisplayType": "ddspsvc",
+                    "staticIds": [1]
                 }
             },
             {
@@ -128,15 +129,15 @@
                 "options": {}
             },
             {
-                "name": "indexRatio",
-                "options": {}
-            },
-            {
                 "name": "silentThreshold",
                 "options": {}
             },
             {
-                "name": "enableEnhancer",
+                "name": "diffEnablerRow",
+                "options": {}
+            },
+            {
+                "name": "diffSettingRow",
                 "options": {}
             }
         ],

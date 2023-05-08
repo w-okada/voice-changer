@@ -177,12 +177,12 @@ class DDSP_SVC:
         _audio, _model_sr = self.svc_model.infer(
             input_wav,
             self.svc_model.args.data.sampling_rate,
-            spk_id=1,
-            threhold=-45,
+            spk_id=self.settings.dstId,
+            threhold=self.settings.threshold,
             pitch_adjust=self.settings.tran,
             use_spk_mix=False,
             spk_mix_dict=None,
-            use_enhancer=False,
+            use_enhancer=True if self.settings.useEnhancer == 1 else False,
             pitch_extractor_type=self.settings.f0Detector,
             f0_min=50,
             f0_max=1100,
@@ -190,12 +190,14 @@ class DDSP_SVC:
             safe_prefix_pad_length=self.settings.extraConvertSize
             / self.svc_model.args.data.sampling_rate,
             diff_model=self.diff_model,
-            diff_acc=20,  # TBD なにこれ？
-            diff_spk_id=1,
-            diff_use=True,
-            diff_use_dpm=False,  # TBD なにこれ？
-            k_step=120,  # TBD なにこれ？
-            diff_silence=False,  # TBD なにこれ？
+            diff_acc=self.settings.diffAcc,  # TBD なにこれ？
+            diff_spk_id=self.settings.diffSpkId,
+            diff_use=True if self.settings.useDiff == 1 else False,
+            diff_use_dpm=True if self.settings.useDiffDpm == 1 else False,  # TBD なにこれ？
+            k_step=self.settings.kStep,  # TBD なにこれ？
+            diff_silence=True
+            if self.settings.useDiffSilence == 1
+            else False,  # TBD なにこれ？
         )
 
         return _audio.cpu().numpy() * 32768.0

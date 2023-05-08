@@ -103,7 +103,8 @@
                 "name": "dstId",
                 "options": {
                     "showF0": false,
-                    "useServerInfo": true
+                    "useServerInfo": true,
+                    "dstIdDisplayType": "sovitsvc40v2"
                 }
             },
             {

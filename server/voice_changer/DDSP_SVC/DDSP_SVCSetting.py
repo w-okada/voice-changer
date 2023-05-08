@@ -13,8 +13,14 @@ class DDSP_SVCSettings:
     silentThreshold: float = 0.00001
     extraConvertSize: int = 1024 * 32
 
-    enableEnhancer: int = 0
-    enhancerTune: int = 0
+    useEnhancer: int = 0
+    useDiff: int = 1
+    useDiffDpm: int = 0
+    useDiffSilence: int = 0
+    diffAcc: int = 20
+    diffSpkId: int = 1
+    kStep: int = 120
+    threshold: int = -45
 
     framework: str = "PyTorch"  # PyTorch or ONNX
     pyTorchModelFile: str = ""
@@ -30,8 +36,13 @@ class DDSP_SVCSettings:
         "dstId",
         "tran",
         "extraConvertSize",
-        "enableEnhancer",
-        "enhancerTune",
+        "useEnhancer",
+        "useDiff",
+        "useDiffDpm",
+        "useDiffSilence",
+        "diffAcc",
+        "diffSpkId",
+        "kStep",
     ]
     floatData = ["silentThreshold"]
     strData = ["framework", "f0Detector"]

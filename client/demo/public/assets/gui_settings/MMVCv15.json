@@ -113,7 +113,8 @@
                 "name": "dstId",
                 "options": {
                     "showF0": true,
-                    "useServerInfo": false
+                    "useServerInfo": false,
+                    "dstIdDisplayType": "MMVCv15"
                 }
             },
             {

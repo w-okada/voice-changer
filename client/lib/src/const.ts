@@ -105,11 +105,16 @@ export const ServerSettingKey = {
     "silenceFront": "silenceFront",
     "modelSlotIndex": "modelSlotIndex",
 
-    "enableEnhancer": "enableEnhancer",
-    "enhancerTune": "enhancerTune",
+    "useEnhancer": "useEnhancer",
+    "useDiff": "useDiff",
+    "useDiffDpm": "useDiffDpm",
+    "useDiffSilence": "useDiffSilence",
+    "diffAcc": "diffAcc",
+    "diffSpkId": "diffSpkId",
+    "kStep": "kStep",
+    "threshold": "threshold",
 
     "inputSampleRate": "inputSampleRate",
-
     "enableDirectML": "enableDirectML",
 } as const
 export type ServerSettingKey = typeof ServerSettingKey[keyof typeof ServerSettingKey]
@@ -155,8 +160,14 @@ export type VoiceChangerServerSetting = {
     modelSamplingRate: ModelSamplingRate // 32000,40000,48000
     modelSlotIndex: number,
 
-    enableEnhancer: number // DDSP-SVC
-    enhancerTune: number // DDSP-SVC
+    useEnhancer: number// DDSP-SVC
+    useDiff: number// DDSP-SVC
+    useDiffDpm: number// DDSP-SVC
+    useDiffSilence: number// DDSP-SVC
+    diffAcc: number// DDSP-SVC
+    diffSpkId: number// DDSP-SVC
+    kStep: number// DDSP-SVC
+    threshold: number// DDSP-SVC
 
     inputSampleRate: InputSampleRate
     enableDirectML: number
@@ -243,8 +254,14 @@ export const DefaultServerSetting: ServerInfo = {
     silenceFront: 1,
     modelSlotIndex: 0,
 
-    enableEnhancer: 0,
-    enhancerTune: 0,
+    useEnhancer: 0,
+    useDiff: 1,
+    useDiffDpm: 0,
+    useDiffSilence: 0,
+    diffAcc: 20,
+    diffSpkId: 1,
+    kStep: 120,
+    threshold: -45,
 
     enableDirectML: 0,
     // 
@@ -276,7 +293,7 @@ export const DefaultServerSetting_so_vits_svc_40v2: ServerInfo = {
 }
 
 export const DefaultServerSetting_DDSP_SVC: ServerInfo = {
-    ...DefaultServerSetting, dstId: 1, tran: 10, extraConvertSize: 1024 * 32, clusterInferRatio: 0.1, enableEnhancer: 1
+    ...DefaultServerSetting, dstId: 1, tran: 10, extraConvertSize: 1024 * 32
 }
 
 

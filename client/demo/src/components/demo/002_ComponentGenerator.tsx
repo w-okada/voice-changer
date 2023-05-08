@@ -35,11 +35,8 @@ import { TrancateNumTresholdRow, TrancateNumTresholdRowProps } from "./component
 import { IndexRatioRow, IndexRatioRowProps } from "./components/609_IndexRatioRow"
 import { RVCQualityRow, RVCQualityRowProps } from "./components/810_RVCQualityRow"
 import { ModelSamplingRateRow, ModelSamplingRateRowProps } from "./components/303_ModelSamplingRateRow"
-// import { OnnxExportRow, OnnxExportRowProps } from "./components/304_OnnxExportRow"
-import { EnableEnhancerRow, EnableEnhancerRowProps } from "./components/610_EnableEnhancerRow"
 import { DstIdRow2, DstIdRow2Props } from "./components/602v2_DstIdRow2"
 import { SilenceFrontRow, SilenceFrontRowProps } from "./components/812_SilenceFrontRow"
-// import { ModelSwitchRow, ModelSwitchRowProps } from "./components/204_ModelSwitchRow"
 import { ONNXExportRow, ONNXExportRowProps } from "./components/205_ONNXExportRow"
 import { ONNXExecutorRow, ONNXExecutorRowProps } from "./components/206_ONNXExecutorRow"
 import { MergeLabRow, MergeLabRowProps } from "./components/a01_MergeLab.Row"
@@ -53,6 +50,8 @@ import { ModelUploaderRowv2, ModelUploaderRowv2Props } from "./components/301_Mo
 import { CorrespondenceSelectRow2, CorrespondenceSelectRow2Props } from "./components/301-g_CorrespondenceSelectRow2"
 import { ModelSlotRow2, ModelSlotRow2Props } from "./components/301-h_ModelSlotRowv2"
 import { DefaultTuneRow2, DefaultTuneRow2Props } from "./components/301-i_DefaultTuneRowv2"
+import { DiffEnablerRow, DiffEnablerRowProps } from "./components/611_DiffEnablerRow"
+import { DiffSettingRow, DiffSettingRowProps } from "./components/612_DiffSettingRow"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
 
@@ -115,7 +114,8 @@ const initialize = () => {
     addToCatalog("noiseScale", (props: NoiseScaleRowProps) => { return <NoiseScaleRow {...props} /> })
     addToCatalog("silentThreshold", (props: SilentThresholdRowProps) => { return <SilentThresholdRow {...props} /> })
     addToCatalog("indexRatio", (props: IndexRatioRowProps) => { return <IndexRatioRow {...props} /> })
-    addToCatalog("enableEnhancer", (props: EnableEnhancerRowProps) => { return <EnableEnhancerRow {...props} /> })
+    addToCatalog("diffEnablerRow", (props: DiffEnablerRowProps) => { return <DiffEnablerRow {...props} /> })
+    addToCatalog("diffSettingRow", (props: DiffSettingRowProps) => { return <DiffSettingRow {...props} /> })
 
 
 

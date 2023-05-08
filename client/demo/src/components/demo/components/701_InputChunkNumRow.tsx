@@ -15,7 +15,7 @@ export const InputChunkNumRow = (props: InputChunkNumRowProps) => {
             nums = props.nums
         }
         return (
-            <div className="body-row split-3-2-1-4 left-padding-1 guided">
+            <div className="body-row split-3-2-2-3 left-padding-1 guided">
                 <div className="body-item-title left-padding-1">Input Chunk Num(128sample/chunk)</div>
                 <div className="body-input-container">
                     <select className="body-select" value={appState.workletNodeSetting.workletNodeSetting.inputChunkNum} onChange={(e) => {
@@ -33,7 +33,9 @@ export const InputChunkNumRow = (props: InputChunkNumRowProps) => {
                 <div className="body-item-text">
                     <div>buff: {(appState.workletNodeSetting.workletNodeSetting.inputChunkNum * 128 * 1000 / 48000).toFixed(1)}ms</div>
                 </div>
-                <div className="body-item-text"></div>
+                <div className="body-item-text">
+                    <div>sample: {(appState.workletNodeSetting.workletNodeSetting.inputChunkNum * 128)}</div>
+                </div>
 
             </div>
         )

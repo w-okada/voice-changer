@@ -105,7 +105,8 @@
                 "name": "dstId",
                 "options": {
                     "showF0": false,
-                    "useServerInfo": false
+                    "useServerInfo": false,
+                    "dstIdDisplayType": "MMVCv13"
                 }
             },
             {
