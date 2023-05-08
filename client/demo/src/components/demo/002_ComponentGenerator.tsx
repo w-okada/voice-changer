@@ -51,6 +51,7 @@ import { IOBufferRow, IOBufferRowProps } from "./components/411_IOBufferRow"
 import { CommonFileSelectRow, CommonFileSelectRowProps } from "./components/301-e_CommonFileSelectRow"
 import { ModelUploadButtonRow2, ModelUploadButtonRow2Props } from "./components/301-f_ModelUploadButtonRow"
 import { ModelUploaderRowv2, ModelUploaderRowv2Props } from "./components/301_ModelUploaderRowv2"
+import { CorrespondenceSelectRow2, CorrespondenceSelectRow2Props } from "./components/301-g_CorrespondenceSelectRow2"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
 
@@ -87,6 +88,7 @@ const initialize = () => {
     addToCatalog("modelSamplingRate", (props: ModelSamplingRateRowProps) => { return <ModelSamplingRateRow {...props} /> })
     addToCatalog("commonFileSelect", (props: CommonFileSelectRowProps) => { return <CommonFileSelectRow  {...props} /> })
     addToCatalog("modelUploadButtonRow2", (props: ModelUploadButtonRow2Props) => { return <ModelUploadButtonRow2  {...props} /> })
+    addToCatalog("correspondenceSelectRow2", (props: CorrespondenceSelectRow2Props) => { return <CorrespondenceSelectRow2  {...props} /> })
 
 
 

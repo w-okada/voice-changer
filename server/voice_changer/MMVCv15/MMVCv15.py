@@ -70,11 +70,18 @@ class MMVCv15:
         self.gpu_num = torch.cuda.device_count()
 
     def loadModel(self, props: LoadModelParams):
-        self.settings.configFile = props.files.configFilename
+        params = props.params
+
+        self.settings.configFile = params["files"]["mmvcv15Config"]
         self.hps = get_hparams_from_file(self.settings.configFile)
 
-        self.settings.pyTorchModelFile = props.files.pyTorchModelFilename
-        self.settings.onnxModelFile = props.files.onnxModelFilename
+        modelFile = params["files"]["mmvcv15Models"]
+        if modelFile.endswith(".onnx"):
+            self.settings.pyTorchModelFile = None
+            self.settings.onnxModelFile = modelFile
+        else:
+            self.settings.pyTorchModelFile = modelFile
+            self.settings.onnxModelFile = None
 
         # PyTorchモデル生成
         self.net_g = SynthesizerTrn(
@@ -102,10 +109,11 @@ class MMVCv15:
         # ONNXモデル生成
         self.onxx_input_length = 8192
         if self.settings.onnxModelFile is not None:
-            ort_options = onnxruntime.SessionOptions()
-            ort_options.intra_op_num_threads = 8
+            providers, options = self.getOnnxExecutionProvider()
             self.onnx_session = onnxruntime.InferenceSession(
-                self.settings.onnxModelFile, providers=providers
+                self.settings.onnxModelFile,
+                providers=providers,
+                provider_options=options,
             )
             inputs_info = self.onnx_session.get_inputs()
             for i in inputs_info:
@@ -114,39 +122,41 @@ class MMVCv15:
                     self.onxx_input_length = i.shape[2]
         return self.get_info()
 
+    def getOnnxExecutionProvider(self):
+        if self.settings.gpu >= 0:
+            return ["CUDAExecutionProvider"], [{"device_id": self.settings.gpu}]
+        elif "DmlExecutionProvider" in onnxruntime.get_available_providers():
+            return ["DmlExecutionProvider"], []
+        else:
+            return ["CPUExecutionProvider"], [
+                {
+                    "intra_op_num_threads": 8,
+                    "execution_mode": onnxruntime.ExecutionMode.ORT_PARALLEL,
+                    "inter_op_num_threads": 8,
+                }
+            ]
+
+    def isOnnx(self):
+        if self.settings.onnxModelFile is not None:
+            return True
+        else:
+            return False
+
     def update_settings(self, key: str, val: int | float | str):
-        if (
-            key == "onnxExecutionProvider"
-            and self.settings.onnxModelFile != ""
-            and self.settings.onnxModelFile is not None
-        ):
-            if val == "CUDAExecutionProvider":
-                if self.settings.gpu < 0 or self.settings.gpu >= self.gpu_num:
-                    self.settings.gpu = 0
-                provider_options = [{"device_id": self.settings.gpu}]
-                self.onnx_session.set_providers(
-                    providers=[val], provider_options=provider_options
-                )
-            else:
-                self.onnx_session.set_providers(providers=[val])
-        elif key in self.settings.intData:
+        if key in self.settings.intData:
             val = int(val)
             setattr(self.settings, key, val)
-            if (
-                key == "gpu"
-                and val >= 0
-                and val < self.gpu_num
-                and self.settings.onnxModelFile != ""
-                and self.settings.onnxModelFile is not None
-            ):
-                providers = self.onnx_session.get_providers()
-                print("Providers:", providers)
-                if "CUDAExecutionProvider" in providers:
-                    provider_options = [{"device_id": self.settings.gpu}]
-                    self.onnx_session.set_providers(
-                        providers=["CUDAExecutionProvider"],
-                        provider_options=provider_options,
-                    )
+            if key == "gpu" and self.isOnnx():
+                providers, options = self.getOnnxExecutionProvider()
+                self.onnx_session = onnxruntime.InferenceSession(
+                    self.settings.onnxModelFile,
+                    providers=providers,
+                    provider_options=options,
+                )
+                inputs_info = self.onnx_session.get_inputs()
+                for i in inputs_info:
+                    if i.name == "sin":
+                        self.onxx_input_length = i.shape[2]
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
@@ -314,7 +324,7 @@ class MMVCv15:
 
     def inference(self, data):
         try:
-            if self.settings.framework == "ONNX":
+            if self.isOnnx():
                 audio = self._onnx_inference(data)
             else:
                 audio = self._pyTorch_inference(data)

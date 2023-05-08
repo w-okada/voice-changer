@@ -27,6 +27,8 @@ export type FileUploadSetting = {
 
     mmvcv13Config: ModelData | null
     mmvcv13Model: ModelData | null
+    mmvcv15Config: ModelData | null
+    mmvcv15Model: ModelData | null
 
     ddspSvcModel: ModelData | null
     ddspSvcModelConfig: ModelData | null
@@ -52,6 +54,8 @@ const InitialFileUploadSetting: FileUploadSetting = {
 
     mmvcv13Config: null,
     mmvcv13Model: null,
+    mmvcv15Config: null,
+    mmvcv15Model: null,
 
     ddspSvcModel: null,
     ddspSvcModelConfig: null,
@@ -229,6 +233,15 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                     alert("モデルファイルを指定する必要があります。")
                     return
                 }
+            } else if (props.clientType == "MMVCv15") {
+                if (!fileUploadSettings[slot].mmvcv15Config) {
+                    alert("Configファイルを指定する必要があります。")
+                    return
+                }
+                if (!fileUploadSettings[slot].mmvcv15Model) {
+                    alert("モデルファイルを指定する必要があります。")
+                    return
+                }
             } else if (props.clientType == "DDSP-SVC") {
                 if (!fileUploadSettings[slot].ddspSvcModel) {
                     alert("DDSPモデルを指定する必要があります。")
@@ -321,17 +334,22 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             }
 
             // MMVCv13
-            const mmvcv13Models = [fileUploadSetting.mmvcv13Config, fileUploadSetting.mmvcv13Model].filter(x => { return x != null }) as ModelData[]
-            for (let i = 0; i < mmvcv13Models.length; i++) {
-                if (!mmvcv13Models[i].data) {
-                    mmvcv13Models[i].data = await mmvcv13Models[i].file!.arrayBuffer()
-                    mmvcv13Models[i].filename = await mmvcv13Models[i].file!.name
+            const normalModels = [
+                fileUploadSetting.mmvcv13Config,
+                fileUploadSetting.mmvcv13Model,
+                fileUploadSetting.mmvcv15Config,
+                fileUploadSetting.mmvcv15Model
+            ].filter(x => { return x != null }) as ModelData[]
+            for (let i = 0; i < normalModels.length; i++) {
+                if (!normalModels[i].data) {
+                    normalModels[i].data = await normalModels[i].file!.arrayBuffer()
+                    normalModels[i].filename = await normalModels[i].file!.name
                 }
             }
-            for (let i = 0; i < mmvcv13Models.length; i++) {
-                const progRate = 1 / mmvcv13Models.length
+            for (let i = 0; i < normalModels.length; i++) {
+                const progRate = 1 / normalModels.length
                 const progOffset = 100 * i * progRate
-                await _uploadFile(mmvcv13Models[i], (progress: number, _end: boolean) => {
+                await _uploadFile(normalModels[i], (progress: number, _end: boolean) => {
                     setUploadProgress(progress * progRate + progOffset)
                 })
             }
@@ -359,6 +377,9 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 files: {
                     mmvcv13Config: fileUploadSetting.mmvcv13Config?.filename || "",
                     mmvcv13Models: fileUploadSetting.mmvcv13Model?.filename || "",
+                    mmvcv15Config: fileUploadSetting.mmvcv15Config?.filename || "",
+                    mmvcv15Models: fileUploadSetting.mmvcv15Model?.filename || "",
+
                     ddspSvcModel: fileUploadSetting.ddspSvcModel?.filename ? "ddsp_mod/" + fileUploadSetting.ddspSvcModel?.filename : "",
                     ddspSvcModelConfig: fileUploadSetting.ddspSvcModelConfig?.filename ? "ddsp_mod/" + fileUploadSetting.ddspSvcModelConfig?.filename : "",
                     ddspSvcDiffusion: fileUploadSetting.ddspSvcDiffusion?.filename ? "ddsp_diff/" + fileUploadSetting.ddspSvcDiffusion?.filename : "",
@@ -433,6 +454,8 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
 
                 mmvcv13Config: fileUploadSetting.mmvcv13Config ? { data: fileUploadSetting.mmvcv13Config.data, filename: fileUploadSetting.mmvcv13Config.filename } : null,
                 mmvcv13Model: fileUploadSetting.mmvcv13Model ? { data: fileUploadSetting.mmvcv13Model.data, filename: fileUploadSetting.mmvcv13Model.filename } : null,
+                mmvcv15Config: fileUploadSetting.mmvcv15Config ? { data: fileUploadSetting.mmvcv15Config.data, filename: fileUploadSetting.mmvcv15Config.filename } : null,
+                mmvcv15Model: fileUploadSetting.mmvcv15Model ? { data: fileUploadSetting.mmvcv15Model.data, filename: fileUploadSetting.mmvcv15Model.filename } : null,
 
                 ddspSvcModel: fileUploadSetting.ddspSvcModel ? { data: fileUploadSetting.ddspSvcModel.data, filename: fileUploadSetting.ddspSvcModel.filename } : null,
                 ddspSvcModelConfig: fileUploadSetting.ddspSvcModelConfig ? { data: fileUploadSetting.ddspSvcModelConfig.data, filename: fileUploadSetting.ddspSvcModelConfig.filename } : null,

@@ -12,6 +12,8 @@ export type CommonFileSelectRowProps = {
 export const Filekinds = {
     "mmvcv13Config": "mmvcv13Config",
     "mmvcv13Model": "mmvcv13Model",
+    "mmvcv15Config": "mmvcv15Config",
+    "mmvcv15Model": "mmvcv15Model",
     "ddspSvcModel": "ddspSvcModel",
     "ddspSvcModelConfig": "ddspSvcModelConfig",
     "ddspSvcDiffusion": "ddspSvcDiffusion",
