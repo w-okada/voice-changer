@@ -43,7 +43,7 @@ import { SilenceFrontRow, SilenceFrontRowProps } from "./components/812_SilenceF
 import { ONNXExportRow, ONNXExportRowProps } from "./components/205_ONNXExportRow"
 import { ONNXExecutorRow, ONNXExecutorRowProps } from "./components/206_ONNXExecutorRow"
 import { MergeLabRow, MergeLabRowProps } from "./components/a01_MergeLab.Row"
-import { ModelSwitchRow, ModelSwitchRowProps } from "./components/204v2_ModelSwitchRow"
+import { ModelSwitchRow, ModelSwitchRowProps } from "./components/204_ModelSwitchRow"
 import { EnableDirectMLRow, EnableDirectMLRowProps } from "./components/813_EnableDirectMLRow"
 import { AudioDeviceModeRow, AudioDeviceModeRowProps } from "./components/410_AudioDeviceModeRow"
 import { IOBufferRow, IOBufferRowProps } from "./components/411_IOBufferRow"

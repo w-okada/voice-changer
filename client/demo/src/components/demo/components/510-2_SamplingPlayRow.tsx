@@ -23,8 +23,11 @@ export const SamplingPlayRow = () => {
                     }}>
                         {
                             guiState.outputAudioDeviceInfo.map(x => {
+                                if (x.deviceId == "none") {
+                                    return null
+                                }
                                 return <option key={x.deviceId} value={x.deviceId}>{x.label}</option>
-                            })
+                            }).filter(x => { return x != null })
                         }
                     </select>
                 </div>
