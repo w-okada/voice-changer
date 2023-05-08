@@ -4,7 +4,6 @@ import { Title, TitleProps } from "./components/101_Title"
 import { StartButtonRow, StartButtonRowProps } from "./components/201_StartButtonRow"
 import { PerformanceRow, PerformanceRowProps } from "./components/202_PerformanceRow"
 import { ServerInfoRow, ServerInfoRowProps } from "./components/203_ServerInfoRow"
-import { ModelUploaderRow, ModelUploaderRowProps } from "./components/301_ModelUploaderRow"
 import { FrameworkRow, FrameworkRowProps } from "./components/302_FrameworkRow"
 import { AudioInputRow, AudioInputRowProps } from "./components/401_AudioInputRow"
 import { AudioOutputRow, AudioOutputRowProps } from "./components/402_AudioOutputRow"
@@ -83,8 +82,6 @@ const initialize = () => {
     addToCatalog("onnxExecutor", (props: ONNXExecutorRowProps) => { return <ONNXExecutorRow {...props} /> })
 
 
-
-    addToCatalog("modelUploader", (props: ModelUploaderRowProps) => { return <ModelUploaderRow {...props} /> })
     addToCatalog("modelUploaderv2", (props: ModelUploaderRowv2Props) => { return <ModelUploaderRowv2 {...props} /> })
     addToCatalog("framework", (props: FrameworkRowProps) => { return <FrameworkRow {...props} /> })
     addToCatalog("modelSamplingRate", (props: ModelSamplingRateRowProps) => { return <ModelSamplingRateRow {...props} /> })
