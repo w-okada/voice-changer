@@ -32,22 +32,8 @@
         ],
         "modelSetting": [
             {
-                "name": "modelUploader",
-                "options": {
-                    "showConfig": true,
-                    "showOnnx": false,
-                    "showPyTorch": true,
-                    "showCorrespondence": false,
-                    "showPyTorchCluster": false,
-
-                    "showFeature": false,
-                    "showIndex": false,
-                    "showHalfPrecision": false,
-                    "showPyTorchEnableCheckBox": true,
-                    "defaultEnablePyTorch": true,
-
-                    "showOnnxExportButton": false
-                }
+                "name": "modelUploaderv2",
+                "options": {}
             },
             {
                 "name": "commonFileSelect",
@@ -83,16 +69,6 @@
             },
             {
                 "name": "modelUploadButtonRow2",
-                "options": {}
-            },
-            {
-                "name": "framework",
-                "options": {
-                    "showFramework": true
-                }
-            },
-            {
-                "name": "modelSamplingRate",
                 "options": {}
             }
         ],

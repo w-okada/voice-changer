@@ -50,6 +50,7 @@ import { AudioDeviceModeRow, AudioDeviceModeRowProps } from "./components/410_Au
 import { IOBufferRow, IOBufferRowProps } from "./components/411_IOBufferRow"
 import { CommonFileSelectRow, CommonFileSelectRowProps } from "./components/301-e_CommonFileSelectRow"
 import { ModelUploadButtonRow2, ModelUploadButtonRow2Props } from "./components/301-f_ModelUploadButtonRow"
+import { ModelUploaderRowv2, ModelUploaderRowv2Props } from "./components/301_ModelUploaderRowv2"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
 
@@ -81,6 +82,7 @@ const initialize = () => {
 
 
     addToCatalog("modelUploader", (props: ModelUploaderRowProps) => { return <ModelUploaderRow {...props} /> })
+    addToCatalog("modelUploaderv2", (props: ModelUploaderRowv2Props) => { return <ModelUploaderRowv2 {...props} /> })
     addToCatalog("framework", (props: FrameworkRowProps) => { return <FrameworkRow {...props} /> })
     addToCatalog("modelSamplingRate", (props: ModelSamplingRateRowProps) => { return <ModelSamplingRateRow {...props} /> })
     addToCatalog("commonFileSelect", (props: CommonFileSelectRowProps) => { return <CommonFileSelectRow  {...props} /> })

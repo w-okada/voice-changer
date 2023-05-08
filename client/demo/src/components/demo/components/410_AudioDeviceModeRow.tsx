@@ -31,7 +31,7 @@ export const AudioDeviceModeRow = (_props: AudioDeviceModeRowProps) => {
                     </div>
                     <div className="left-padding-1">
                         <input className="left-padding-1" type="radio" id="server-device" name="device-mode" checked={serverChecked} onChange={() => { onDeviceModeChanged(1) }} />
-                        <label htmlFor="server-device">server device</label>
+                        <label htmlFor="server-device">server device(exp.)</label>
                     </div>
                 </div>
                 <div></div>

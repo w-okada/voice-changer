@@ -21,8 +21,8 @@ class SvcDDSP:
     def setVCParams(self, params: VoiceChangerParams):
         self.params = params
 
-    def update_model(self, model_path):
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+    def update_model(self, model_path: str, device: torch.device):
+        self.device = device
 
         # load ddsp model
         if self.model is None or self.model_path != model_path:
@@ -42,35 +42,33 @@ class SvcDDSP:
                 else:
                     cnhubertsoft_gate = 10
 
-                # if self.args.data.encoder == "hubertsoft":
-                #     encoderPath = self.params.hubert_soft
-                # elif self.args.data.encoder == "hubertbase":
-                #     encoderPath = self.params.hubert_base
-                # elif self.args.data.encoder == "hubertbase768":
-                #     encoderPath = self.params.hubert_base
-                # elif self.args.data.encoder == "hubertbase768l12":
-                #     encoderPath = self.params.hubert_base
-                # elif self.args.data.encoder == "hubertlarge1024l24":
-                #     encoderPath = self.params.hubert_base
-                # elif self.args.data.encoder == "contentvec":
-                #     encoderPath = self.params.hubert_base
-                # elif self.args.data.encoder == "contentvec768":
-                #     encoderPath = self.params.hubert_base
-                # elif self.args.data.encoder == "contentvec768l12":
-                #     encoderPath = self.params.hubert_base
+                if self.args.data.encoder == "hubertsoft":
+                    encoderPath = self.params.hubert_soft
+                elif self.args.data.encoder == "hubertbase":
+                    encoderPath = self.params.hubert_base
+                elif self.args.data.encoder == "hubertbase768":
+                    encoderPath = self.params.hubert_base
+                elif self.args.data.encoder == "hubertbase768l12":
+                    encoderPath = self.params.hubert_base
+                elif self.args.data.encoder == "hubertlarge1024l24":
+                    encoderPath = self.params.hubert_base
+                elif self.args.data.encoder == "contentvec":
+                    encoderPath = self.params.hubert_base
+                elif self.args.data.encoder == "contentvec768":
+                    encoderPath = self.params.hubert_base
+                elif self.args.data.encoder == "contentvec768l12":
+                    encoderPath = self.params.hubert_base
 
                 self.units_encoder = Units_Encoder(
                     self.args.data.encoder,
-                    # encoderPath,
-                    self.args.data.encoder_ckpt,
+                    encoderPath,
                     self.args.data.encoder_sample_rate,
                     self.args.data.encoder_hop_size,
                     cnhubertsoft_gate=cnhubertsoft_gate,
                     device=self.device,
                 )
                 self.encoder_type = self.args.data.encoder
-                # self.encoder_ckpt = encoderPath
-                self.encoder_ckpt = self.args.data.encoder_ckpt
+                self.encoder_ckpt = encoderPath
 
         # load enhancer
         if (
@@ -109,8 +107,8 @@ class SvcDDSP:
         diff_silence=False,
         audio_alignment=False,
     ):
-        print("Infering...")
-        print("audio", audio)
+        # print("Infering...")
+        # print("audio", audio)
         # load input
         # audio, sample_rate = librosa.load(input_wav, sr=None, mono=True)
         hop_size = (

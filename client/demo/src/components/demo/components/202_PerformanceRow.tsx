@@ -47,7 +47,7 @@ export const PerformanceRow = (_props: PerformanceRowProps) => {
                 setTimeout(updatePerformance, 1000 * 2)
             }
         }
-        updatePerformance()
+        // updatePerformance()
         return () => {
             execNext = false
         }

@@ -32,23 +32,28 @@
         ],
         "modelSetting": [
             {
-                "name": "modelUploader",
+                "name": "modelUploaderv2",
+                "options": {}
+            },
+            {
+                "name": "commonFileSelect",
                 "options": {
-                    "showConfig": true,
-                    "showOnnx": true,
-                    "showPyTorch": true,
-                    "showCorrespondence": false,
-                    "showPyTorchCluster": false,
-
-                    "showPyTorchEnableCheckBox": true,
-                    "defaultEnablePyTorch": false
+                    "title": "Config(.json)",
+                    "acceptExtentions": ["json"],
+                    "fileKind": "mmvcv13Config"
                 }
             },
             {
-                "name": "framework",
+                "name": "commonFileSelect",
                 "options": {
-                    "showFramework": true
+                    "title": "Model(.pt,.pth,.onxx)",
+                    "acceptExtentions": ["pt", "pth", "onnx"],
+                    "fileKind": "mmvcv13Model"
                 }
+            },
+            {
+                "name": "modelUploadButtonRow2",
+                "options": {}
             }
         ],
         "lab": [],
