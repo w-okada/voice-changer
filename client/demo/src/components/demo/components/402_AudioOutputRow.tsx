@@ -108,7 +108,12 @@ export const AudioOutputRow = (_props: AudioOutputRowProps) => {
         const hostAPIs = new Set(devices.map(x => { return x.hostAPI }))
         const hostAPIOptions = Array.from(hostAPIs).map((x, index) => { return <option value={x} key={index} >{x}</option> })
 
-        const filteredDevice = devices.filter(x => { return x.hostAPI == hostApi || hostApi == "" }).map((x, index) => { return <option value={x.index} key={index}>{x.name}</option> })
+        // const filteredDevice = devices.filter(x => { return x.hostAPI == hostApi || hostApi == "" }).map((x, index) => { return <option value={x.index} key={index}>{x.name}</option> })
+        const filteredDevice = devices.map((x, index) => {
+            const className = (x.hostAPI == hostApi || hostApi == "") ? "select-option-red" : ""
+            return <option className={className} value={x.index} key={index}>{x.name}</option>
+
+        })
 
         return (
             <div className="body-row split-3-7 left-padding-1  guided">

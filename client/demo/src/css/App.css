@@ -636,6 +636,10 @@ body {
     max-width: 50%;
     height: 1.5rem;
 }
+.select-option-red {
+    color: #f66;
+    font-weight: 700;
+}
 
 .body-image-container,
 .body-wav-container {
