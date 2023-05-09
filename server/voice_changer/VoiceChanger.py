@@ -209,41 +209,46 @@ class VoiceChanger:
         )
 
     def switchModelType(self, modelType: ModelType):
-        if hasattr(self, "voiceChanger") and self.voiceChanger is not None:
-            # return {"status": "ERROR", "msg": "vc is already selected. currently re-select is not implemented"}
-            del self.voiceChanger
-            self.voiceChanger = None
+        try:
+            print("switch model type", 1)
+            if hasattr(self, "voiceChanger") and self.voiceChanger is not None:
+                # return {"status": "ERROR", "msg": "vc is already selected. currently re-select is not implemented"}
+                del self.voiceChanger
+                self.voiceChanger = None
 
-        self.modelType = modelType
-        if self.modelType == "MMVCv15":
-            from voice_changer.MMVCv15.MMVCv15 import MMVCv15
+            self.modelType = modelType
+            if self.modelType == "MMVCv15":
+                from voice_changer.MMVCv15.MMVCv15 import MMVCv15
 
-            self.voiceChanger = MMVCv15()  # type: ignore
-        elif self.modelType == "MMVCv13":
-            from voice_changer.MMVCv13.MMVCv13 import MMVCv13
+                self.voiceChanger = MMVCv15()  # type: ignore
+            elif self.modelType == "MMVCv13":
+                from voice_changer.MMVCv13.MMVCv13 import MMVCv13
 
-            self.voiceChanger = MMVCv13()
-        elif self.modelType == "so-vits-svc-40v2":
-            from voice_changer.SoVitsSvc40v2.SoVitsSvc40v2 import SoVitsSvc40v2
+                self.voiceChanger = MMVCv13()
+            elif self.modelType == "so-vits-svc-40v2":
+                from voice_changer.SoVitsSvc40v2.SoVitsSvc40v2 import SoVitsSvc40v2
 
-            self.voiceChanger = SoVitsSvc40v2(self.params)
-        elif self.modelType == "so-vits-svc-40" or self.modelType == "so-vits-svc-40_c":
-            from voice_changer.SoVitsSvc40.SoVitsSvc40 import SoVitsSvc40
+                self.voiceChanger = SoVitsSvc40v2(self.params)
+            elif self.modelType == "so-vits-svc-40" or self.modelType == "so-vits-svc-40_c":
+                from voice_changer.SoVitsSvc40.SoVitsSvc40 import SoVitsSvc40
 
-            self.voiceChanger = SoVitsSvc40(self.params)
-        elif self.modelType == "DDSP-SVC":
-            from voice_changer.DDSP_SVC.DDSP_SVC import DDSP_SVC
+                self.voiceChanger = SoVitsSvc40(self.params)
+            elif self.modelType == "DDSP-SVC":
+                print("switch model type", 2)
+                from voice_changer.DDSP_SVC.DDSP_SVC import DDSP_SVC
 
-            self.voiceChanger = DDSP_SVC(self.params)
-        elif self.modelType == "RVC":
-            from voice_changer.RVC.RVC import RVC
+                self.voiceChanger = DDSP_SVC(self.params)
+            elif self.modelType == "RVC":
+                from voice_changer.RVC.RVC import RVC
 
-            self.voiceChanger = RVC(self.params)
-        else:
-            from voice_changer.MMVCv13.MMVCv13 import MMVCv13
+                self.voiceChanger = RVC(self.params)
+            else:
+                from voice_changer.MMVCv13.MMVCv13 import MMVCv13
 
-            self.voiceChanger = MMVCv13()
-
+                self.voiceChanger = MMVCv13()
+        except Exception as e:
+            print(e)
+            print(traceback.format_exc())
         return {"status": "OK", "msg": "vc is switched."}
 
     def getModelType(self):
