@@ -1,7 +1,13 @@
 # original from: https://raw.githubusercontent.com/yxlllc/DDSP-SVC/master/gui_diff.py
 
 import torch
-from ddsp.vocoder import load_model, F0_Extractor, Volume_Extractor, Units_Encoder  # type: ignore
+
+try:
+    from ddsp.vocoder import load_model, F0_Extractor, Volume_Extractor, Units_Encoder  # type: ignore
+except Exception as e:
+    print(e)
+    from ddsp.vocoder import load_model, F0_Extractor, Volume_Extractor, Units_Encoder  # type: ignore
+
 from ddsp.core import upsample  # type: ignore
 from enhancer import Enhancer  # type: ignore
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
