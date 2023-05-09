@@ -97,6 +97,8 @@ class VoiceChanger:
     sola_buffer: AudioInOut
     namespace: socketio.AsyncNamespace | None = None
 
+    localPerformanceShowTime = 0
+
     def audio_callback(
         self, indata: np.ndarray, outdata: np.ndarray, frames, times, status
     ):
@@ -109,6 +111,15 @@ class VoiceChanger:
             all_inference_time = t.secs
             performance = [all_inference_time] + times
             performance = [round(x * 1000) for x in performance]
+
+            currentTime = time.time()
+            if currentTime - self.localPerformanceShowTime > 2:
+                print(
+                    "[Voice Changer] server audio",
+                    self.settings.performance,
+                )
+                self.localPerformanceShowTime = currentTime
+
         except Exception as e:
             print(e)
 
