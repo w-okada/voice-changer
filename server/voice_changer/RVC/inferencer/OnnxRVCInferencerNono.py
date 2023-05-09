@@ -15,12 +15,10 @@ class OnnxRVCInferencerNono(OnnxRVCInferencer):
         # ort_options = onnxruntime.SessionOptions()
         # ort_options.intra_op_num_threads = 8
 
-        onnx_session = onnxruntime.InferenceSession(
-            self.onnx_model, providers=providers
-        )
+        onnx_session = onnxruntime.InferenceSession(file, providers=providers)
 
         # check half-precision
-        first_input_type = self.onnx_session.get_inputs()[0].type
+        first_input_type = onnx_session.get_inputs()[0].type
         if first_input_type == "tensor(float)":
             self.isHalf = False
         else:
