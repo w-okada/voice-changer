@@ -229,7 +229,10 @@ class VoiceChanger:
                 from voice_changer.SoVitsSvc40v2.SoVitsSvc40v2 import SoVitsSvc40v2
 
                 self.voiceChanger = SoVitsSvc40v2(self.params)
-            elif self.modelType == "so-vits-svc-40" or self.modelType == "so-vits-svc-40_c":
+            elif (
+                self.modelType == "so-vits-svc-40"
+                or self.modelType == "so-vits-svc-40_c"
+            ):
                 from voice_changer.SoVitsSvc40.SoVitsSvc40 import SoVitsSvc40
 
                 self.voiceChanger = SoVitsSvc40(self.params)
@@ -443,11 +446,11 @@ class VoiceChanger:
             with Timer("post-process") as t:
                 result = result.astype(np.int16)
                 if self.settings.inputSampleRate != processing_sampling_rate:
-                    print(
-                        "samplingrate",
-                        self.settings.inputSampleRate,
-                        processing_sampling_rate,
-                    )
+                    # print(
+                    #     "samplingrate",
+                    #     self.settings.inputSampleRate,
+                    #     processing_sampling_rate,
+                    # )
                     outputData = cast(
                         AudioInOut,
                         resampy.resample(
@@ -468,9 +471,9 @@ class VoiceChanger:
                     self.ioRecorder.writeOutput(outputData.tobytes())
 
                 if receivedData.shape[0] != outputData.shape[0]:
-                    print(
-                        f"Padding, in:{receivedData.shape[0]} out:{outputData.shape[0]}"
-                    )
+                    # print(
+                    #     f"Padding, in:{receivedData.shape[0]} out:{outputData.shape[0]}"
+                    # )
                     outputData = pad_array(outputData, receivedData.shape[0])
                     # print_convert_processing(
                     #     f" Padded!, Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
