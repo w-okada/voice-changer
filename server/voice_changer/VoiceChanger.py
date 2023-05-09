@@ -24,10 +24,10 @@ from Exceptions import (
     ONNXInputArgumentException,
 )
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
-import pyaudio
 import threading
-import struct
 import time
+import sounddevice as sd
+import librosa
 
 providers = [
     "OpenVINOExecutionProvider",
@@ -56,8 +56,10 @@ class VoiceChangerSettings:
 
     enableServerAudio: int = 0  # 0:off, 1:on
     serverAudioStated: int = 0  # 0:off, 1:on
-    serverInputAudioSampleRate: int = 48000
-    serverOutputAudioSampleRate: int = 48000
+    # serverInputAudioSampleRate: int = 48000
+    # serverOutputAudioSampleRate: int = 48000
+    serverInputAudioSampleRate: int = 44100
+    serverOutputAudioSampleRate: int = 44100
     serverInputAudioBufferSize: int = 1024 * 24
     serverOutputAudioBufferSize: int = 1024 * 24
     serverInputDeviceId: int = -1
@@ -88,110 +90,94 @@ class VoiceChangerSettings:
     strData: list[str] = field(default_factory=lambda: [])
 
 
-def serverLocal(_vc):
-    vc: VoiceChanger = _vc
-    audio = pyaudio.PyAudio()
-
-    def createAudioInput(deviceId: int, sampleRate: int, bufferSize: int):
-        audio_input_stream = audio.open(
-            format=pyaudio.paInt16,
-            channels=1,
-            rate=sampleRate,
-            # frames_per_buffer=32768,
-            frames_per_buffer=bufferSize,
-            input_device_index=deviceId,
-            input=True,
-        )
-        return audio_input_stream
-
-    def createAudioOutput(deviceId: int, sampleRate: int, bufferSize: int):
-        audio_output_stream = audio.open(
-            format=pyaudio.paInt16,
-            channels=1,
-            rate=sampleRate,
-            # frames_per_buffer=32768,
-            frames_per_buffer=bufferSize,
-            output_device_index=deviceId,
-            output=True,
-        )
-        return audio_output_stream
-
-    currentInputDeviceId = -1
-    currentInputSampleRate = -1
-    currentInputBufferSize = -1
-    currentOutputDeviceId = -1
-    currentOutputSampleRate = -1
-    currentOutputBufferSize = -1
-
-    audio_input_stream = None
-    audio_output_stream = None
-    showPerformanceTime = 0
-    while True:
-        if (
-            vc.settings.enableServerAudio == 0
-            or vc.settings.serverAudioStated == 0
-            or vc.settings.serverInputDeviceId == -1
-            or vc.settings.serverOutputDeviceId == -1
-        ):
-            time.sleep(2)
-        else:
-            if (
-                currentInputDeviceId != vc.settings.serverInputDeviceId
-                or currentInputSampleRate != vc.settings.serverInputAudioSampleRate
-                or currentInputBufferSize != vc.settings.serverInputAudioBufferSize
-            ):
-                currentInputDeviceId = vc.settings.serverInputDeviceId
-                currentInputSampleRate = vc.settings.serverInputAudioSampleRate
-                currentInputBufferSize = vc.settings.serverInputAudioBufferSize
-                if audio_input_stream is not None:
-                    audio_input_stream.close()
-                audio_input_stream = createAudioInput(
-                    currentInputDeviceId,
-                    currentInputSampleRate,
-                    currentInputBufferSize,
-                )
-
-            if (
-                currentOutputDeviceId != vc.settings.serverOutputDeviceId
-                or currentOutputSampleRate != vc.settings.serverOutputAudioSampleRate
-                or currentOutputBufferSize != vc.settings.serverOutputAudioBufferSize
-            ):
-                currentOutputDeviceId = vc.settings.serverOutputDeviceId
-                currentOutputSampleRate = vc.settings.serverOutputAudioSampleRate
-                currentOutputBufferSize = vc.settings.serverOutputAudioBufferSize
-                if audio_output_stream is not None:
-                    audio_output_stream.close()
-                audio_output_stream = createAudioOutput(
-                    currentOutputDeviceId,
-                    currentOutputSampleRate,
-                    currentOutputBufferSize,
-                )
-            sampleNum = vc.settings.serverReadChunkSize * 128
-            in_wav = audio_input_stream.read(sampleNum, exception_on_overflow=False)
-            readNum = len(in_wav) // struct.calcsize("<h")
-            unpackedData = np.array(struct.unpack("<%sh" % readNum, in_wav)).astype(
-                np.int16
-            )
-            with Timer("all_inference_time") as t:
-                out_wav, times = vc.on_request(unpackedData)
-            all_inference_time = t.secs
-            performance = [all_inference_time] + times
-            performance = [round(x * 1000) for x in performance]
-            vc.settings.performance = performance
-            currentTime = time.time()
-            if currentTime - showPerformanceTime > 5:
-                print(sampleNum, readNum, performance)
-                showPerformanceTime = currentTime
-
-            audio_output_stream.write(out_wav.tobytes())
-
-
 class VoiceChanger:
     settings: VoiceChangerSettings
     voiceChanger: VoiceChangerModel
     ioRecorder: IORecorder
     sola_buffer: AudioInOut
     namespace: socketio.AsyncNamespace | None = None
+
+    def audio_callback(
+        self, indata: np.ndarray, outdata: np.ndarray, frames, times, status
+    ):
+        # print(indata)
+        try:
+            with Timer("all_inference_time") as t:
+                unpackedData = librosa.to_mono(indata.T) * 32768.0
+                out_wav, times = self.on_request(unpackedData)
+                outdata[:] = np.repeat(out_wav, 2).reshape(-1, 2) / 32768.0
+            all_inference_time = t.secs
+            performance = [all_inference_time] + times
+            performance = [round(x * 1000) for x in performance]
+        except Exception as e:
+            print(e)
+
+    def serverLocal(self, _vc):
+        vc: VoiceChanger = _vc
+
+        currentInputDeviceId = -1
+        currentInputSampleRate = -1
+        currentOutputDeviceId = -1
+        currentInputChunkNum = -1
+        while True:
+            if (
+                vc.settings.serverAudioStated == 0
+                or vc.settings.serverInputDeviceId == -1
+            ):
+                vc.settings.inputSampleRate = 48000
+                time.sleep(2)
+            else:
+                sd._terminate()
+                sd._initialize()
+                if currentInputDeviceId != vc.settings.serverInputDeviceId:
+                    sd.default.device[0] = vc.settings.serverInputDeviceId
+                    currentInputDeviceId = vc.settings.serverInputDeviceId
+                if currentOutputDeviceId != vc.settings.serverOutputDeviceId:
+                    sd.default.device[1] = vc.settings.serverOutputDeviceId
+                    currentOutputDeviceId = vc.settings.serverOutputDeviceId
+
+                currentInputSampleRate = vc.settings.serverInputAudioSampleRate
+                currentInputChunkNum = vc.settings.serverReadChunkSize
+                block_frame = currentInputChunkNum * 128
+                try:
+                    with sd.Stream(
+                        callback=self.audio_callback,
+                        blocksize=block_frame,
+                        samplerate=currentInputSampleRate,
+                        dtype="float32",
+                    ):
+                        while (
+                            vc.settings.serverAudioStated == 1
+                            and currentInputDeviceId == vc.settings.serverInputDeviceId
+                            and currentOutputDeviceId
+                            == vc.settings.serverOutputDeviceId
+                            and currentInputSampleRate
+                            == vc.settings.serverInputAudioSampleRate
+                            and currentInputChunkNum == vc.settings.serverReadChunkSize
+                        ):
+                            vc.settings.serverInputAudioSampleRate = (
+                                self.voiceChanger.get_processing_sampling_rate()
+                            )
+                            vc.settings.inputSampleRate = (
+                                vc.settings.serverInputAudioSampleRate
+                            )
+                            time.sleep(2)
+                            print(
+                                "[Voice Changer] server audio",
+                                self.settings.performance,
+                            )
+                            print(
+                                "[Voice Changer] info:",
+                                vc.settings.serverAudioStated,
+                                currentInputDeviceId,
+                                currentOutputDeviceId,
+                                currentInputSampleRate,
+                                currentInputChunkNum,
+                            )
+
+                except Exception as e:
+                    print(e)
+                    time.sleep(2)
 
     def __init__(self, params: VoiceChangerParams):
         # 初期化
@@ -216,7 +202,7 @@ class VoiceChanger:
         self.settings.serverAudioInputDevices = audioinput
         self.settings.serverAudioOutputDevices = audiooutput
 
-        thread = threading.Thread(target=serverLocal, args=(self,))
+        thread = threading.Thread(target=self.serverLocal, args=(self,))
         thread.start()
         print(
             f"VoiceChanger Initialized (GPU_NUM:{self.gpu_num}, mps_enabled:{self.mps_enabled})"
@@ -452,6 +438,11 @@ class VoiceChanger:
             with Timer("post-process") as t:
                 result = result.astype(np.int16)
                 if self.settings.inputSampleRate != processing_sampling_rate:
+                    print(
+                        "samplingrate",
+                        self.settings.inputSampleRate,
+                        processing_sampling_rate,
+                    )
                     outputData = cast(
                         AudioInOut,
                         resampy.resample(
@@ -471,11 +462,13 @@ class VoiceChanger:
                     self.ioRecorder.writeInput(receivedData)
                     self.ioRecorder.writeOutput(outputData.tobytes())
 
-                # if receivedData.shape[0] != outputData.shape[0]:
-                #     print(f"Padding, in:{receivedData.shape[0]} out:{outputData.shape[0]}")
-                #     outputData = pad_array(outputData, receivedData.shape[0])
-                #     # print_convert_processing(
-                #     #     f" Padded!, Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
+                if receivedData.shape[0] != outputData.shape[0]:
+                    print(
+                        f"Padding, in:{receivedData.shape[0]} out:{outputData.shape[0]}"
+                    )
+                    outputData = pad_array(outputData, receivedData.shape[0])
+                    # print_convert_processing(
+                    #     f" Padded!, Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
             postprocess_time = t.secs
 
             print_convert_processing(

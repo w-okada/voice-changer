@@ -86,10 +86,6 @@
             {
                 "name": "audioOutput",
                 "options": {}
-            },
-            {
-                "name": "ioBuffer",
-                "options": {}
             }
         ],
         "qualityControl": [
