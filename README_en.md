@@ -4,6 +4,11 @@
 
 ## What's New!
 
+- v.1.5.2.9a
+
+  - fix: ServerDeviceMode Channel Setting
+  - fix: model merge issue
+
 - v.1.5.2.9
 
   - Support DDSP-SVC 3.0 (Ph.1)
@@ -82,13 +87,13 @@ We offer Windows and Mac versions.
 
 - Download (When you cannot download from google drive, try [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main))
 
-| Version   | OS  | Framework                                | link                                                                                           | support VC                                                                    | size   |
-| --------- | --- | ---------------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------ |
-| v.1.5.2.9 | mac | ONNX(cpu), PyTorch(cpu,mps)              | [normal](https://drive.google.com/uc?id=1krIz6zhdBrpDppSaGCjsyh2aSPTVIXMj&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 796MB  |
-|           | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)        | [normal](https://drive.google.com/uc?id=1c7dAvPg259u4fd_LdMb-bKz4A3uMR9qq&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2872MB |
-| v.1.5.2.8 | mac | ONNX(cpu), PyTorch(cpu,mps)              | [normal](https://drive.google.com/uc?id=1qY4ZqsKgrqIPKaVy0xrhkBwp_bUK78VI&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 784MB  |
-|           | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)        | [normal](https://drive.google.com/uc?id=16wqbKi8F0tt2MqtgScA_STecpvaOgBIg&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2860MB |
-|           | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda)\*2 | [normal](https://drive.google.com/uc?id=1u86sqfE4cYebtcxcaK3PAhSTKbnAkfex&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2744MB |
+| Version    | OS  | Framework                                | link                                                                                           | support VC                                                                    | size   |
+| ---------- | --- | ---------------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------ |
+| v.1.5.2.9a | mac | ONNX(cpu), PyTorch(cpu,mps)              | [normal](https://drive.google.com/uc?id=1RY0PetSlDe3A6HizCYngRpgMltZV7_oH&export=download)\*1  | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 796MB  |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)        | [normal](https://drive.google.com/uc?id=1JKt38Dvx8A5hw_ZsbF7dh8mYTy7o1YFJ&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2872MB |
+| v.1.5.2.8  | mac | ONNX(cpu), PyTorch(cpu,mps)              | [normal](https://drive.google.com/uc?id=1qY4ZqsKgrqIPKaVy0xrhkBwp_bUK78VI&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 784MB  |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)        | [normal](https://drive.google.com/uc?id=16wqbKi8F0tt2MqtgScA_STecpvaOgBIg&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2860MB |
+|            | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda)\*2 | [normal](https://drive.google.com/uc?id=1u86sqfE4cYebtcxcaK3PAhSTKbnAkfex&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2744MB |
 
 (\*1) You can alson download from [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)
 (\*2) The developer does not have an AMD graphics card, so it has not been tested. This package only includes onnxruntime-directml.

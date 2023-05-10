@@ -4,6 +4,11 @@
 
 ## What's New!
 
+- v.1.5.2.9a
+
+  - fix: ServerDeviceMode Channel Setting
+  - fix: model merge issue
+
 - v.1.5.2.9
 
   - Support DDSP-SVC 3.0 (Ph.1)
@@ -81,10 +86,10 @@ Windows 版と Mac 版を提供しています。
 
 - ダウンロードはこちらから。
 
-| Version   | OS  | フレームワーク                    | link                                                                                          | サポート VC                                                                   | サイズ |
-| --------- | --- | --------------------------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------ |
-| v.1.5.2.9 | mac | ONNX(cpu), PyTorch(cpu,mps)       | [normal](https://drive.google.com/uc?id=1krIz6zhdBrpDppSaGCjsyh2aSPTVIXMj&export=download)\*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 796MB  |
-|           | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1c7dAvPg259u4fd_LdMb-bKz4A3uMR9qq&export=download)\*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2872MB |
+| Version    | OS  | フレームワーク                    | link                                                                                           | サポート VC                                                                   | サイズ |
+| ---------- | --- | --------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------ |
+| v.1.5.2.9a | mac | ONNX(cpu), PyTorch(cpu,mps)       | [normal](https://drive.google.com/uc?id=1RY0PetSlDe3A6HizCYngRpgMltZV7_oH&export=download)\*1  | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 796MB  |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1JKt38Dvx8A5hw_ZsbF7dh8mYTy7o1YFJ&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2872MB |
 
 (\*1) Google Drive からダウンロードできない方は[hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)からダウンロードしてみてください
 (\*2) 開発者が AMD のグラフィックボードを持っていないので動作確認していません。onnxruntime-directml を同梱しただけのものです。
