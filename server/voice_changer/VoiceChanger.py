@@ -138,6 +138,9 @@ class VoiceChanger:
                     sd.default.device[1] = vc.settings.serverOutputDeviceId
                     currentOutputDeviceId = vc.settings.serverOutputDeviceId
 
+                vc.settings.serverInputAudioSampleRate = (
+                    self.voiceChanger.get_processing_sampling_rate()
+                )
                 currentInputSampleRate = vc.settings.serverInputAudioSampleRate
                 currentInputChunkNum = vc.settings.serverReadChunkSize
                 block_frame = currentInputChunkNum * 128
@@ -179,6 +182,7 @@ class VoiceChanger:
 
                 except Exception as e:
                     print(e)
+                    print()
                     time.sleep(2)
 
     def __init__(self, params: VoiceChangerParams):
