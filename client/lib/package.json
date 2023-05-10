@@ -7,12 +7,12 @@
     "lib": "lib"
   },
   "scripts": {
-    "clean:worklet": "rimraf worklet/dist/*",
+    "clean:worklet": "rimraf worklet/dist/",
     "webpack:worklet:dev": "webpack --config webpack.worklet.dev.js",
     "webpack:worklet:prod": "webpack --config webpack.worklet.prod.js",
     "build:worklet:dev": "npm-run-all clean:worklet webpack:worklet:dev",
     "build:worklet:prod": "npm-run-all clean:worklet webpack:worklet:prod",
-    "clean": "rimraf dist/*",
+    "clean": "rimraf dist/",
     "webpack:dev": "webpack --config webpack.dev.js",
     "webpack:prod": "webpack --config webpack.prod.js",
     "build:dev": "npm-run-all build:worklet:dev clean webpack:dev",
