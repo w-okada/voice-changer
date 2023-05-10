@@ -150,6 +150,7 @@ class VoiceChanger:
                         blocksize=block_frame,
                         samplerate=currentInputSampleRate,
                         dtype="float32",
+                        channels=1,
                     ):
                         while (
                             vc.settings.serverAudioStated == 1
