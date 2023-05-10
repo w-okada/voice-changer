@@ -309,17 +309,9 @@ class RVC:
         storeFile = os.path.join(storeDir, "merged.pth")
         torch.save(merged, storeFile)
 
-        filePaths: FilePaths = FilePaths(
-            pyTorchModelFilename=None,
-            configFilename=None,
-            onnxModelFilename=None,
-            featureFilename=None,
-            indexFilename=None,
-            clusterTorchModelFilename=None,
-        )
         params = {"trans": req.defaultTrans, "files": {"rvcModel": storeFile}}
         props: LoadModelParams = LoadModelParams(
-            slot=targetSlot, isHalf=True, files=filePaths, params=params
+            slot=targetSlot, isHalf=True, params=params
         )
         self.loadModel(props)
         self.prepareModel(targetSlot)
