@@ -2,7 +2,6 @@ from typing import Dict, Any
 from voice_changer.RVC.modelMerger.MergeModelRequest import MergeModelRequest
 from collections import OrderedDict
 import torch
-import tqdm
 
 
 def merge_model(request: MergeModelRequest):
@@ -50,7 +49,7 @@ def merge_model(request: MergeModelRequest):
     merged: Dict[str, Any] = OrderedDict()
     merged["weight"] = {}
     print("merge start.")
-    for key in tqdm.tqdm(weights[0].keys()):
+    for key in weights[0].keys():
         merged["weight"][key] = 0
         for i, weight in enumerate(weights):
             merged["weight"][key] += weight[key] * alphas[i]

@@ -92,93 +92,6 @@ def printMessage(message, level=0):
             print(f"\033[47m    {message}\033[0m")
 
 
-def downloadWeight():
-    voiceChangerParams = VoiceChangerParams(
-        content_vec_500=args.content_vec_500,
-        content_vec_500_onnx=args.content_vec_500_onnx,
-        content_vec_500_onnx_on=args.content_vec_500_onnx_on,
-        hubert_base=args.hubert_base,
-        hubert_base_jp=args.hubert_base_jp,
-        hubert_soft=args.hubert_soft,
-        nsf_hifigan=args.nsf_hifigan,
-    )
-
-    # file exists check (currently only for rvc)
-    downloadParams = []
-    if os.path.exists(voiceChangerParams.hubert_base) is False:
-        downloadParams.append(
-            {
-                "url": "https://huggingface.co/ddPn08/rvc-webui-models/resolve/main/embeddings/hubert_base.pt",
-                "saveTo": voiceChangerParams.hubert_base,
-                "position": 0,
-            }
-        )
-    if os.path.exists(voiceChangerParams.hubert_base_jp) is False:
-        downloadParams.append(
-            {
-                "url": "https://huggingface.co/rinna/japanese-hubert-base/resolve/main/fairseq/model.pt",
-                "saveTo": voiceChangerParams.hubert_base_jp,
-                "position": 1,
-            }
-        )
-    if os.path.exists(voiceChangerParams.hubert_soft) is False:
-        downloadParams.append(
-            {
-                "url": "https://huggingface.co/wok000/weights/resolve/main/ddsp-svc30/embedder/hubert-soft-0d54a1f4.pt",
-                "saveTo": voiceChangerParams.hubert_soft,
-                "position": 2,
-            }
-        )
-    if os.path.exists(voiceChangerParams.nsf_hifigan) is False:
-        downloadParams.append(
-            {
-                "url": "https://huggingface.co/wok000/weights/resolve/main/ddsp-svc30/nsf_hifigan_20221211/model.bin",
-                "saveTo": voiceChangerParams.nsf_hifigan,
-                "position": 3,
-            }
-        )
-    nsf_hifigan_config = os.path.join(
-        os.path.dirname(voiceChangerParams.nsf_hifigan), "config.json"
-    )
-
-    if os.path.exists(nsf_hifigan_config) is False:
-        downloadParams.append(
-            {
-                "url": "https://huggingface.co/wok000/weights/raw/main/ddsp-svc30/nsf_hifigan_20221211/config.json",
-                "saveTo": nsf_hifigan_config,
-                "position": 4,
-            }
-        )
-
-    with ThreadPoolExecutor() as pool:
-        pool.map(download, downloadParams)
-
-    if (
-        os.path.exists(voiceChangerParams.hubert_base) is False
-        or os.path.exists(voiceChangerParams.hubert_base_jp) is False
-    ):
-        printMessage("RVC用のモデルファイルのダウンロードに失敗しました。", level=2)
-        printMessage("failed to download weight for rvc", level=2)
-
-
-parser = setupArgParser()
-args, unknown = parser.parse_known_args()
-
-printMessage(f"Booting PHASE :{__name__}", level=2)
-
-PORT = args.p
-
-
-def localServer():
-    uvicorn.run(
-        f"{os.path.basename(__file__)[:-3]}:app_socketio",
-        host="0.0.0.0",
-        port=int(PORT),
-        reload=False if hasattr(sys, "_MEIPASS") else True,
-        log_level="warning",
-    )
-
-
 def download(params):
     url = params["url"]
     saveTo = params["saveTo"]
@@ -210,54 +123,50 @@ def download(params):
         print(e)
 
 
-if __name__ == "MMVCServerSIO":
-    voiceChangerParams = VoiceChangerParams(
-        content_vec_500=args.content_vec_500,
-        content_vec_500_onnx=args.content_vec_500_onnx,
-        content_vec_500_onnx_on=args.content_vec_500_onnx_on,
-        hubert_base=args.hubert_base,
-        hubert_base_jp=args.hubert_base_jp,
-        hubert_soft=args.hubert_soft,
-        nsf_hifigan=args.nsf_hifigan,
-    )
+def downloadWeight():
+    # content_vec_500 = (args.content_vec_500,)
+    # content_vec_500_onnx = (args.content_vec_500_onnx,)
+    # content_vec_500_onnx_on = (args.content_vec_500_onnx_on,)
+    hubert_base = args.hubert_base
+    hubert_base_jp = args.hubert_base_jp
+    hubert_soft = args.hubert_soft
+    nsf_hifigan = args.nsf_hifigan
 
     # file exists check (currently only for rvc)
     downloadParams = []
-    if os.path.exists(voiceChangerParams.hubert_base) is False:
+    if os.path.exists(hubert_base) is False:
         downloadParams.append(
             {
                 "url": "https://huggingface.co/ddPn08/rvc-webui-models/resolve/main/embeddings/hubert_base.pt",
-                "saveTo": voiceChangerParams.hubert_base,
+                "saveTo": hubert_base,
                 "position": 0,
             }
         )
-    if os.path.exists(voiceChangerParams.hubert_base_jp) is False:
+    if os.path.exists(hubert_base_jp) is False:
         downloadParams.append(
             {
                 "url": "https://huggingface.co/rinna/japanese-hubert-base/resolve/main/fairseq/model.pt",
-                "saveTo": voiceChangerParams.hubert_base_jp,
+                "saveTo": hubert_base_jp,
                 "position": 1,
             }
         )
-    if os.path.exists(voiceChangerParams.hubert_soft) is False:
+    if os.path.exists(hubert_soft) is False:
         downloadParams.append(
             {
                 "url": "https://huggingface.co/wok000/weights/resolve/main/ddsp-svc30/embedder/hubert-soft-0d54a1f4.pt",
-                "saveTo": voiceChangerParams.hubert_soft,
+                "saveTo": hubert_soft,
                 "position": 2,
             }
         )
-    if os.path.exists(voiceChangerParams.nsf_hifigan) is False:
+    if os.path.exists(nsf_hifigan) is False:
         downloadParams.append(
             {
                 "url": "https://huggingface.co/wok000/weights/resolve/main/ddsp-svc30/nsf_hifigan_20221211/model.bin",
-                "saveTo": voiceChangerParams.nsf_hifigan,
+                "saveTo": nsf_hifigan,
                 "position": 3,
             }
         )
-    nsf_hifigan_config = os.path.join(
-        os.path.dirname(voiceChangerParams.nsf_hifigan), "config.json"
-    )
+    nsf_hifigan_config = os.path.join(os.path.dirname(nsf_hifigan), "config.json")
 
     if os.path.exists(nsf_hifigan_config) is False:
         downloadParams.append(
@@ -270,6 +179,47 @@ if __name__ == "MMVCServerSIO":
 
     with ThreadPoolExecutor() as pool:
         pool.map(download, downloadParams)
+
+    if (
+        os.path.exists(hubert_base) is False
+        or os.path.exists(hubert_base_jp) is False
+        or os.path.exists(hubert_soft) is False
+        or os.path.exists(nsf_hifigan) is False
+        or os.path.exists(nsf_hifigan_config) is False
+    ):
+        printMessage("RVC用のモデルファイルのダウンロードに失敗しました。", level=2)
+        printMessage("failed to download weight for rvc", level=2)
+
+
+parser = setupArgParser()
+args, unknown = parser.parse_known_args()
+
+printMessage(f"Booting PHASE :{__name__}", level=2)
+
+PORT = args.p
+
+
+def localServer():
+    uvicorn.run(
+        f"{os.path.basename(__file__)[:-3]}:app_socketio",
+        host="0.0.0.0",
+        port=int(PORT),
+        reload=False if hasattr(sys, "_MEIPASS") else True,
+        log_level="warning",
+    )
+
+
+if __name__ == "MMVCServerSIO":
+    mp.freeze_support()
+    voiceChangerParams = VoiceChangerParams(
+        content_vec_500=args.content_vec_500,
+        content_vec_500_onnx=args.content_vec_500_onnx,
+        content_vec_500_onnx_on=args.content_vec_500_onnx_on,
+        hubert_base=args.hubert_base,
+        hubert_base_jp=args.hubert_base_jp,
+        hubert_soft=args.hubert_soft,
+        nsf_hifigan=args.nsf_hifigan,
+    )
 
     if (
         os.path.exists(voiceChangerParams.hubert_base) is False
