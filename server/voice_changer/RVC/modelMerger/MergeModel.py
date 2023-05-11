@@ -49,10 +49,12 @@ def merge_model(request: MergeModelRequest):
 
     merged: Dict[str, Any] = OrderedDict()
     merged["weight"] = {}
+    print("merge start.")
     for key in tqdm.tqdm(weights[0].keys()):
         merged["weight"][key] = 0
         for i, weight in enumerate(weights):
             merged["weight"][key] += weight[key] * alphas[i]
+    print("merge done. write metadata.")
 
     merged["config"] = state_dict["config"]
     merged["params"] = state_dict["params"] if "params" in state_dict else None
@@ -62,4 +64,5 @@ def merge_model(request: MergeModelRequest):
     merged["embedder_name"] = (
         state_dict["embedder_name"] if "embedder_name" in state_dict else None
     )
+    print("write metadata done.")
     return merged
