@@ -25,7 +25,7 @@ from voice_changer.RVC.modelMerger.MergeModelRequest import MergeModelRequest
 from voice_changer.RVC.ModelSlotGenerator import generateModelSlot
 from voice_changer.RVC.RVCSettings import RVCSettings
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
-from voice_changer.utils.LoadModelParams import FilePaths, LoadModelParams
+from voice_changer.utils.LoadModelParams import LoadModelParams
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from voice_changer.RVC.onnxExporter.export2onnx import export2onnx
@@ -98,6 +98,9 @@ class RVC:
                 if val < 0:
                     return True
                 val = val % 1000  # Quick hack for same slot is selected
+                if self.settings.modelSlots[val]:
+                    print("[Voice Changer] slot does not have model.")
+                    return True
                 self.prepareModel(val)
 
             # 設定
