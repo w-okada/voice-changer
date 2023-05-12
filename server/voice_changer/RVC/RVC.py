@@ -98,7 +98,10 @@ class RVC:
                 if val < 0:
                     return True
                 val = val % 1000  # Quick hack for same slot is selected
-                if self.settings.modelSlots[val]:
+                if (
+                    self.settings.modelSlots[val].modelFile is None
+                    or self.settings.modelSlots[val].modelFile == ""
+                ):
                     print("[Voice Changer] slot does not have model.")
                     return True
                 self.prepareModel(val)
