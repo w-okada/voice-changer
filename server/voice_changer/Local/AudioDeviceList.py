@@ -1,10 +1,5 @@
-import pyaudio
-
-# import json
-
-
+import sounddevice as sd
 from dataclasses import dataclass
-
 from const import ServerAudioDeviceTypes
 
 
@@ -14,44 +9,42 @@ class ServerAudioDevice:
     index: int = 0
     name: str = ""
     hostAPI: str = ""
+    maxInputChannels: int = 0
+    maxOutputChannels: int = 0
 
 
 def list_audio_device():
-    audio = pyaudio.PyAudio()
-    audio_input_devices: list[ServerAudioDevice] = []
-    audio_output_devices: list[ServerAudioDevice] = []
-    host_apis = []
+    audioDeviceList = sd.query_devices()
 
-    for api_index in range(audio.get_host_api_count()):
-        host_apis.append(audio.get_host_api_info_by_index(api_index)["name"])
+    inputAudioDeviceList = [d for d in audioDeviceList if d["max_input_channels"] > 0]
+    outputDeviceList = [d for d in audioDeviceList if d["max_output_channels"] > 0]
+    hostapis = sd.query_hostapis()
 
-    for x in range(0, audio.get_device_count()):
-        device = audio.get_device_info_by_index(x)
-        try:
-            deviceName = device["name"].encode("shift-jis").decode("utf-8")
-        except (UnicodeDecodeError, UnicodeEncodeError):
-            deviceName = device["name"]
+    print("input:", inputAudioDeviceList)
+    print("output:", outputDeviceList)
+    print("hostapis", hostapis)
 
-        deviceIndex = device["index"]
-        hostAPI = host_apis[device["hostApi"]]
+    serverAudioInputDevices = []
+    serverAudioOutputDevices = []
+    for d in inputAudioDeviceList:
+        serverInputAudioDevice: ServerAudioDevice = ServerAudioDevice(
+            kind=ServerAudioDeviceTypes.audioinput,
+            index=d["index"],
+            name=d["name"],
+            hostAPI=hostapis[d["hostapi"]]["name"],
+            maxInputChannels=d["max_input_channels"],
+            maxOutputChannels=d["max_output_channels"],
+        )
+        serverAudioInputDevices.append(serverInputAudioDevice)
+    for d in outputDeviceList:
+        serverOutputAudioDevice: ServerAudioDevice = ServerAudioDevice(
+            kind=ServerAudioDeviceTypes.audiooutput,
+            index=d["index"],
+            name=d["name"],
+            hostAPI=hostapis[d["hostapi"]]["name"],
+            maxInputChannels=d["max_input_channels"],
+            maxOutputChannels=d["max_output_channels"],
+        )
+        serverAudioOutputDevices.append(serverOutputAudioDevice)
 
-        if device["maxInputChannels"] > 0:
-            audio_input_devices.append(
-                ServerAudioDevice(
-                    kind=ServerAudioDeviceTypes.audioinput,
-                    index=deviceIndex,
-                    name=deviceName,
-                    hostAPI=hostAPI,
-                )
-            )
-        if device["maxOutputChannels"] > 0:
-            audio_output_devices.append(
-                ServerAudioDevice(
-                    kind=ServerAudioDeviceTypes.audiooutput,
-                    index=deviceIndex,
-                    name=deviceName,
-                    hostAPI=hostAPI,
-                )
-            )
-
-    return audio_input_devices, audio_output_devices
+    return serverAudioInputDevices, serverAudioOutputDevices

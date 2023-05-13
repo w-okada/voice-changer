@@ -102,17 +102,29 @@ class VoiceChanger:
     def audio_callback(
         self, indata: np.ndarray, outdata: np.ndarray, frames, times, status
     ):
-        # print(indata)
         try:
             with Timer("all_inference_time") as t:
                 unpackedData = librosa.to_mono(indata.T) * 32768.0
                 out_wav, times = self.on_request(unpackedData)
-                outdata[:] = np.repeat(out_wav, 2).reshape(-1, 2) / 32768.0
+                outputChunnels = outdata.shape[1]
+                outdata[:] = (
+                    np.repeat(out_wav, outputChunnels).reshape(-1, outputChunnels)
+                    / 32768.0
+                )
             all_inference_time = t.secs
             performance = [all_inference_time] + times
             self.settings.performance = [round(x * 1000) for x in performance]
         except Exception as e:
-            print(e)
+            print("[Voice Changer] ex:", e)
+
+    def getServerAudioDevice(
+        self, audioDeviceList: list[ServerAudioDevice], index: int
+    ):
+        serverAudioDevice = [x for x in audioDeviceList if x.index == index]
+        if len(serverAudioDevice) > 0:
+            return serverAudioDevice[0]
+        else:
+            return None
 
     def serverLocal(self, _vc):
         vc: VoiceChanger = _vc
@@ -131,12 +143,28 @@ class VoiceChanger:
             else:
                 sd._terminate()
                 sd._initialize()
-                if currentInputDeviceId != vc.settings.serverInputDeviceId:
-                    sd.default.device[0] = vc.settings.serverInputDeviceId
-                    currentInputDeviceId = vc.settings.serverInputDeviceId
-                if currentOutputDeviceId != vc.settings.serverOutputDeviceId:
-                    sd.default.device[1] = vc.settings.serverOutputDeviceId
-                    currentOutputDeviceId = vc.settings.serverOutputDeviceId
+
+                sd.default.device[0] = vc.settings.serverInputDeviceId
+                currentInputDeviceId = vc.settings.serverInputDeviceId
+                sd.default.device[1] = vc.settings.serverOutputDeviceId
+                currentOutputDeviceId = vc.settings.serverOutputDeviceId
+
+                currentInputChannelNum = vc.settings.serverAudioInputDevices
+
+                serverInputAudioDevice = self.getServerAudioDevice(
+                    vc.settings.serverAudioInputDevices, currentInputDeviceId
+                )
+                serverOutputAudioDevice = self.getServerAudioDevice(
+                    vc.settings.serverAudioOutputDevices, currentOutputDeviceId
+                )
+                print(serverInputAudioDevice, serverOutputAudioDevice)
+                if serverInputAudioDevice is None or serverOutputAudioDevice is None:
+                    time.sleep(2)
+                    print("serverInputAudioDevice or serverOutputAudioDevice is None")
+                    continue
+
+                currentInputChannelNum = serverInputAudioDevice.maxInputChannels
+                currentOutputChannelNum = serverInputAudioDevice.maxOutputChannels
 
                 vc.settings.serverInputAudioSampleRate = (
                     self.voiceChanger.get_processing_sampling_rate()
@@ -144,14 +172,16 @@ class VoiceChanger:
                 currentInputSampleRate = vc.settings.serverInputAudioSampleRate
                 currentInputChunkNum = vc.settings.serverReadChunkSize
                 block_frame = currentInputChunkNum * 128
+
                 try:
                     with sd.Stream(
                         callback=self.audio_callback,
                         blocksize=block_frame,
                         samplerate=currentInputSampleRate,
                         dtype="float32",
-                        channels=1,
+                        channels=[currentInputChannelNum, currentOutputChannelNum],
                     ):
+                        print()
                         while (
                             vc.settings.serverAudioStated == 1
                             and currentInputDeviceId == vc.settings.serverInputDeviceId
@@ -182,8 +212,7 @@ class VoiceChanger:
                             )
 
                 except Exception as e:
-                    print(e)
-                    print()
+                    print("[Voice Changer] ex:", e)
                     time.sleep(2)
 
     def __init__(self, params: VoiceChangerParams):
