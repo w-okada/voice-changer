@@ -140,7 +140,7 @@ export const DstIdRow = (props: DstIdRowProps) => {
                     }}>
                         <option key="unknown" value={0}>default(0)</option>
                         {
-                            Object.keys(props.staticIds).map(x => {
+                            Object.values(props.staticIds).map(x => {
                                 return <option key={x} value={x}>{x}</option>
                             })
                         }

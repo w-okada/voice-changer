@@ -24,15 +24,11 @@ export const DiffEnablerRow = (_props: DiffEnablerRowProps) => {
                     }} /> Diff
                 </div>
                 <div>
-                    <input type="checkbox" checked={appState.serverSetting.serverSetting.useDiffDpm == 1} onChange={(e) => {
-                        appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, useDiffDpm: e.target.checked ? 1 : 0 })
-                    }} /> DiffDpm
-                </div>
-                <div>
                     <input type="checkbox" checked={appState.serverSetting.serverSetting.useDiffSilence == 1} onChange={(e) => {
                         appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, useDiffSilence: e.target.checked ? 1 : 0 })
                     }} /> Silence
                 </div>
+                <div></div>
             </div>
         )
     }, [

@@ -78,7 +78,7 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
                 console.log(`[SIO] ${this.socket?.id}`)
             });
             this.socket.on('response', (response: any[]) => {
-                console.log("response:", response)
+                // console.log("response:", response)
                 const cur = Date.now()
                 const responseTime = cur - response[0]
                 const result = response[1] as ArrayBuffer

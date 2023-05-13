@@ -129,11 +129,15 @@
                 "options": {}
             },
             {
-                "name": "diffEnablerRow",
+                "name": "diffEnabler",
                 "options": {}
             },
             {
-                "name": "diffSettingRow",
+                "name": "diffMethod",
+                "options": {}
+            },
+            {
+                "name": "diffSetting",
                 "options": {}
             }
         ],

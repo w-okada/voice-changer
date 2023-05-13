@@ -52,6 +52,7 @@ import { ModelSlotRow2, ModelSlotRow2Props } from "./components/301-h_ModelSlotR
 import { DefaultTuneRow2, DefaultTuneRow2Props } from "./components/301-i_DefaultTuneRowv2"
 import { DiffEnablerRow, DiffEnablerRowProps } from "./components/611_DiffEnablerRow"
 import { DiffSettingRow, DiffSettingRowProps } from "./components/612_DiffSettingRow"
+import { DiffMethodRow, DiffMethodRowProps } from "./components/613_DiffMethodRow"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
 
@@ -114,8 +115,10 @@ const initialize = () => {
     addToCatalog("noiseScale", (props: NoiseScaleRowProps) => { return <NoiseScaleRow {...props} /> })
     addToCatalog("silentThreshold", (props: SilentThresholdRowProps) => { return <SilentThresholdRow {...props} /> })
     addToCatalog("indexRatio", (props: IndexRatioRowProps) => { return <IndexRatioRow {...props} /> })
-    addToCatalog("diffEnablerRow", (props: DiffEnablerRowProps) => { return <DiffEnablerRow {...props} /> })
-    addToCatalog("diffSettingRow", (props: DiffSettingRowProps) => { return <DiffSettingRow {...props} /> })
+    addToCatalog("diffEnabler", (props: DiffEnablerRowProps) => { return <DiffEnablerRow {...props} /> })
+    addToCatalog("diffSetting", (props: DiffSettingRowProps) => { return <DiffSettingRow {...props} /> })
+    addToCatalog("diffMethod", (props: DiffMethodRowProps) => { return <DiffMethodRow {...props} /> })
+
 
 
 

@@ -64,6 +64,11 @@ export const F0Detector = {
 } as const
 export type F0Detector = typeof F0Detector[keyof typeof F0Detector]
 
+export const DiffMethod = {
+    "pndm": "pndm",
+    "dpm-solver": "dpm-solver",
+} as const
+export type DiffMethod = typeof DiffMethod[keyof typeof DiffMethod]
 
 
 export const ServerSettingKey = {
@@ -107,7 +112,8 @@ export const ServerSettingKey = {
 
     "useEnhancer": "useEnhancer",
     "useDiff": "useDiff",
-    "useDiffDpm": "useDiffDpm",
+    // "useDiffDpm": "useDiffDpm",
+    "diffMethod": "diffMethod",
     "useDiffSilence": "useDiffSilence",
     "diffAcc": "diffAcc",
     "diffSpkId": "diffSpkId",
@@ -162,7 +168,8 @@ export type VoiceChangerServerSetting = {
 
     useEnhancer: number// DDSP-SVC
     useDiff: number// DDSP-SVC
-    useDiffDpm: number// DDSP-SVC
+    // useDiffDpm: number// DDSP-SVC
+    diffMethod: DiffMethod, // DDSP-SVC
     useDiffSilence: number// DDSP-SVC
     diffAcc: number// DDSP-SVC
     diffSpkId: number// DDSP-SVC
@@ -256,7 +263,7 @@ export const DefaultServerSetting: ServerInfo = {
 
     useEnhancer: 0,
     useDiff: 1,
-    useDiffDpm: 0,
+    diffMethod: "dpm-solver",
     useDiffSilence: 0,
     diffAcc: 20,
     diffSpkId: 1,

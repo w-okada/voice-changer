@@ -193,7 +193,8 @@ class DDSP_SVC:
             diff_acc=self.settings.diffAcc,  # TBD なにこれ？
             diff_spk_id=self.settings.diffSpkId,
             diff_use=True if self.settings.useDiff == 1 else False,
-            diff_use_dpm=True if self.settings.useDiffDpm == 1 else False,  # TBD なにこれ？
+            # diff_use_dpm=True if self.settings.useDiffDpm == 1 else False,  # TBD なにこれ？
+            method=self.settings.diffMethod,
             k_step=self.settings.kStep,  # TBD なにこれ？
             diff_silence=True
             if self.settings.useDiffSilence == 1
