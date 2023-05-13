@@ -164,7 +164,7 @@ class VoiceChanger:
                     continue
 
                 currentInputChannelNum = serverInputAudioDevice.maxInputChannels
-                currentOutputChannelNum = serverInputAudioDevice.maxOutputChannels
+                currentOutputChannelNum = serverOutputAudioDevice.maxOutputChannels
 
                 vc.settings.serverInputAudioSampleRate = (
                     self.voiceChanger.get_processing_sampling_rate()
