@@ -246,7 +246,6 @@ class VoiceChanger:
 
     def switchModelType(self, modelType: ModelType):
         try:
-            print("switch model type", 1)
             if hasattr(self, "voiceChanger") and self.voiceChanger is not None:
                 # return {"status": "ERROR", "msg": "vc is already selected. currently re-select is not implemented"}
                 del self.voiceChanger
@@ -273,7 +272,6 @@ class VoiceChanger:
 
                 self.voiceChanger = SoVitsSvc40(self.params)
             elif self.modelType == "DDSP-SVC":
-                print("switch model type", 2)
                 from voice_changer.DDSP_SVC.DDSP_SVC import DDSP_SVC
 
                 self.voiceChanger = DDSP_SVC(self.params)
@@ -502,10 +500,6 @@ class VoiceChanger:
                     f" Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz"
                 )
 
-                if self.settings.recordIO == 1:
-                    self.ioRecorder.writeInput(receivedData)
-                    self.ioRecorder.writeOutput(outputData.tobytes())
-
                 if receivedData.shape[0] != outputData.shape[0]:
                     # print(
                     #     f"Padding, in:{receivedData.shape[0]} out:{outputData.shape[0]}"
@@ -513,6 +507,12 @@ class VoiceChanger:
                     outputData = pad_array(outputData, receivedData.shape[0])
                     # print_convert_processing(
                     #     f" Padded!, Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
+                    pass
+
+                if self.settings.recordIO == 1:
+                    self.ioRecorder.writeInput(receivedData)
+                    self.ioRecorder.writeOutput(outputData.tobytes())
+
             postprocess_time = t.secs
 
             print_convert_processing(
@@ -568,7 +568,8 @@ def pad_array(arr: AudioInOut, target_length: int):
         pad_width = target_length - current_length
         pad_left = pad_width // 2
         pad_right = pad_width - pad_left
-        padded_arr = np.pad(
-            arr, (pad_left, pad_right), "constant", constant_values=(0, 0)
-        )
+        # padded_arr = np.pad(
+        #     arr, (pad_left, pad_right), "constant", constant_values=(0, 0)
+        # )
+        padded_arr = np.pad(arr, (pad_left, pad_right), "edge")
         return padded_arr
