@@ -41,6 +41,7 @@ def setupArgParser():
         default=True,
         help="generate self-signed certificate",
     )
+    parser.add_argument("--model_dir", type=str, help="path to model files")
 
     parser.add_argument(
         "--content_vec_500", type=str, help="path to content_vec_500 model(pytorch)"
@@ -212,6 +213,7 @@ def localServer():
 if __name__ == "MMVCServerSIO":
     mp.freeze_support()
     voiceChangerParams = VoiceChangerParams(
+        model_dir=args.model_dir,
         content_vec_500=args.content_vec_500,
         content_vec_500_onnx=args.content_vec_500_onnx,
         content_vec_500_onnx_on=args.content_vec_500_onnx_on,

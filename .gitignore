@@ -44,7 +44,7 @@ server/pretrain/
 server/weights/
 server/weights_/
 server/weights__/
-
+server/models/
 start_trainer.sh
 
 # venv

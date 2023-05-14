@@ -4,9 +4,10 @@ from voice_changer.RVC.ModelSlot import ModelSlot
 import torch
 import onnxruntime
 import json
+import os
 
 
-def generateModelSlot(params):
+def generateModelSlot_(params):
     modelSlot = ModelSlot()
 
     modelSlot.modelFile = params["files"]["rvcModel"]
@@ -16,6 +17,41 @@ def generateModelSlot(params):
     modelSlot.indexFile = (
         params["files"]["rvcIndex"] if "rvcIndex" in params["files"] else None
     )
+
+    modelSlot.defaultTrans = params["trans"] if "trans" in params else 0
+
+    modelSlot.isONNX = modelSlot.modelFile.endswith(".onnx")
+
+    if modelSlot.isONNX:
+        _setInfoByONNX(modelSlot)
+    else:
+        _setInfoByPytorch(modelSlot)
+    return modelSlot
+
+
+def generateModelSlot(slotDir: str):
+    modelSlot = ModelSlot()
+    if os.path.exists(slotDir) == False:
+        return modelSlot
+    paramFile = os.path.join(slotDir, "params.json")
+    with open(paramFile, "r") as f:
+        params = json.load(f)
+
+    modelSlot.modelFile = os.path.join(
+        slotDir, os.path.basename(params["files"]["rvcModel"])
+    )
+    if "rvcFeature" in params["files"]:
+        modelSlot.featureFile = os.path.join(
+            slotDir, os.path.basename(params["files"]["rvcFeature"])
+        )
+    else:
+        modelSlot.featureFile = None
+    if "rvcIndex" in params["files"]:
+        modelSlot.indexFile = os.path.join(
+            slotDir, os.path.basename(params["files"]["rvcIndex"])
+        )
+    else:
+        modelSlot.indexFile = None
 
     modelSlot.defaultTrans = params["trans"] if "trans" in params else 0
 

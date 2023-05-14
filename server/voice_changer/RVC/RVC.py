@@ -36,7 +36,8 @@ from voice_changer.RVC.pipeline.Pipeline import Pipeline
 
 from Exceptions import NoModeLoadedException
 from const import UPLOAD_DIR
-
+import shutil
+import json
 
 providers = [
     "OpenVINOExecutionProvider",
@@ -44,6 +45,9 @@ providers = [
     "DmlExecutionProvider",
     "CPUExecutionProvider",
 ]
+
+RVC_MODEL_DIRNAME = "rvc"
+RVC_MAX_SLOT_NUM = 6
 
 
 class RVC:
@@ -66,29 +70,63 @@ class RVC:
         )
         self.params = params
         EmbedderManager.initialize(params)
+        self.loadSlots()
         print("RVC initialization: ", params)
 
     def loadModel(self, props: LoadModelParams):
         target_slot_idx = props.slot
         params = props.params
 
-        modelSlot = generateModelSlot(params)
-        self.settings.modelSlots[target_slot_idx] = modelSlot
-        print(
-            f"[Voice Changer] RVC new model is uploaded,{target_slot_idx}",
-            asdict(modelSlot),
+        # modelName = os.path.splitext(os.path.basename(params["files"]["rvcModel"]))[0]
+        slotDir = os.path.join(
+            self.params.model_dir, RVC_MODEL_DIRNAME, str(target_slot_idx)
         )
+        files = [params["files"]["rvcModel"]]
+        if "rvcFeature" in params["files"]:
+            files.append(params["files"]["rvcFeature"])
+        if "rvcIndex" in params["files"]:
+            files.append(params["files"]["rvcIndex"])
 
-        # 初回のみロード
-        if self.initialLoad:
-            self.prepareModel(target_slot_idx)
-            self.settings.modelSlotIndex = target_slot_idx
-            self.switchModel()
-            self.initialLoad = False
-        elif target_slot_idx == self.currentSlot:
-            self.prepareModel(target_slot_idx)
-
+        os.makedirs(slotDir, exist_ok=True)
+        for f in files:
+            dst = os.path.join(slotDir, os.path.basename(f))
+            if os.path.exists(dst):
+                os.remove(dst)
+            shutil.move(f, dst)
+        json.dump(params, open(os.path.join(slotDir, "params.json"), "w"))
+        self.loadSlots()
         return self.get_info()
+
+    def loadSlots(self):
+        dirname = os.path.join(self.params.model_dir, RVC_MODEL_DIRNAME)
+        self.settings.modelSlots = []
+        if not os.path.exists(dirname):
+            return
+
+        for slot_idx in range(RVC_MAX_SLOT_NUM):
+            slotDir = os.path.join(
+                self.params.model_dir, RVC_MODEL_DIRNAME, str(slot_idx)
+            )
+            modelSlot = generateModelSlot(slotDir)
+            self.settings.modelSlots.append(modelSlot)
+
+        # modelSlot = generateModelSlot(params)
+        # self.settings.modelSlots[target_slot_idx] = modelSlot
+        # print(
+        #     f"[Voice Changer] RVC new model is uploaded,{target_slot_idx}",
+        #     asdict(modelSlot),
+        # )
+
+        # # 初回のみロード
+        # if self.initialLoad:
+        #     self.prepareModel(target_slot_idx)
+        #     self.settings.modelSlotIndex = target_slot_idx
+        #     self.switchModel()
+        #     self.initialLoad = False
+        # elif target_slot_idx == self.currentSlot:
+        #     self.prepareModel(target_slot_idx)
+
+        # return self.get_info()
 
     def update_settings(self, key: str, val: int | float | str):
         if key in self.settings.intData:

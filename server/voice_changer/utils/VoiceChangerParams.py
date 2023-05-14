@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class VoiceChangerParams:
+    model_dir: str
     content_vec_500: str
     content_vec_500_onnx: str
     content_vec_500_onnx_on: bool

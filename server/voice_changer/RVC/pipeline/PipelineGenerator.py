@@ -68,6 +68,7 @@ def _loadIndex(modelSlot: ModelSlot):
     print("[Voice Changer] Loading index...")
     # ファイル指定がない場合はNone
     if modelSlot.featureFile is None or modelSlot.indexFile is None:
+        print("[Voice Changer] Index is None, not used")
         return None, None
 
     # ファイル指定があってもファイルがない場合はNone

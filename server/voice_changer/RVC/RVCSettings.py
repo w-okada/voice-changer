@@ -16,7 +16,14 @@ class RVCSettings:
 
     framework: str = "PyTorch"  # PyTorch or ONNX
     modelSlots: list[ModelSlot] = field(
-        default_factory=lambda: [ModelSlot(), ModelSlot(), ModelSlot(), ModelSlot()]
+        default_factory=lambda: [
+            ModelSlot(),  # 1
+            ModelSlot(),  # 2
+            ModelSlot(),  # 3
+            ModelSlot(),  # 4
+            ModelSlot(),  # 5
+            ModelSlot(),  # 6(merged)
+        ]
     )
     indexRatio: float = 0
     rvcQuality: int = 0
