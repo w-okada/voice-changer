@@ -36,11 +36,7 @@ export const ONNXExportRow = (_props: ONNXExportRowProps) => {
             const model = appState.serverSetting.serverSetting.modelSlots[slot]
 
             const a = document.createElement("a")
-            if (model.pyTorchModelFile && model.pyTorchModelFile.length > 0) {
-                a.href = model.pyTorchModelFile
-            } else {
-                a.href = model.onnxModelFile
-            }
+            a.href = model.modelFile
             a.download = a.href.replace(/^.*[\\\/]/, '');
             document.body.appendChild(a);
             a.click();

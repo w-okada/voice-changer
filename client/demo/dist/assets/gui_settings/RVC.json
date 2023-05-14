@@ -26,16 +26,16 @@
                 "options": {}
             },
             {
-                "name": "serverInfo",
-                "options": {}
-            },
-            {
                 "name": "modelSwitch",
                 "options": {}
             },
             {
-                "name": "onnxExport",
-                "options": {}
+                "name": "serverOperation",
+                "options": {
+                    "showDownload": true,
+                    "showExportOnnx": true,
+                    "showReload": true
+                }
             }
         ],
         "modelSetting": [
@@ -126,13 +126,6 @@
             }
         ],
         "speakerSetting": [
-            {
-                "name": "dstId",
-                "options": {
-                    "dstIdDisplayType": "ddspsvc",
-                    "staticIds": [1]
-                }
-            },
             {
                 "name": "tune",
                 "options": {}

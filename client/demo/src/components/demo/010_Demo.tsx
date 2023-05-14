@@ -10,25 +10,24 @@ import { SpeakerSetting } from "./600_SpeakerSetting";
 import { ConverterSetting } from "./700_ConverterSetting";
 import { AdvancedSetting } from "./800_AdvancedSetting";
 import { Lab } from "./a00_Lab";
+import { useAppRoot } from "../../001_provider/001_AppRootProvider";
 
 export const Demo = () => {
+
     return (
         <GuiStateProvider>
             <div className="main-body">
                 <Dialogs />
-
                 <TitleArea />
                 <ServerControl />
                 <ModelSetting />
-                <Lab></Lab>
-                <DeviceSetting />
-                <QualityControl />
                 <SpeakerSetting />
                 <ConverterSetting />
+                <DeviceSetting />
+                <Lab />
+                <QualityControl />
                 <AdvancedSetting />
             </div>
         </GuiStateProvider>
-
     )
-
 }

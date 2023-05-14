@@ -7,31 +7,9 @@ import json
 import os
 
 
-def generateModelSlot_(params):
-    modelSlot = ModelSlot()
-
-    modelSlot.modelFile = params["files"]["rvcModel"]
-    modelSlot.featureFile = (
-        params["files"]["rvcFeature"] if "rvcFeature" in params["files"] else None
-    )
-    modelSlot.indexFile = (
-        params["files"]["rvcIndex"] if "rvcIndex" in params["files"] else None
-    )
-
-    modelSlot.defaultTrans = params["trans"] if "trans" in params else 0
-
-    modelSlot.isONNX = modelSlot.modelFile.endswith(".onnx")
-
-    if modelSlot.isONNX:
-        _setInfoByONNX(modelSlot)
-    else:
-        _setInfoByPytorch(modelSlot)
-    return modelSlot
-
-
 def generateModelSlot(slotDir: str):
     modelSlot = ModelSlot()
-    if os.path.exists(slotDir) == False:
+    if os.path.exists(slotDir) is False:
         return modelSlot
     paramFile = os.path.join(slotDir, "params.json")
     with open(paramFile, "r") as f:

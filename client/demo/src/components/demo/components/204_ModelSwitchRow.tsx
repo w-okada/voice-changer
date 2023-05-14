@@ -28,12 +28,16 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
             } else {
                 return null
             }
+
             const f0str = x.f0 == true ? "f0" : "nof0"
             const srstr = Math.floor(x.samplingRate / 1000) + "K"
             const embedstr = x.embChannels
             const typestr = x.modelType == 0 ? "org" : "webui"
-            const metadata = x.deprecated ? "[deprecated version]" : `[${f0str},${srstr},${embedstr},${typestr}]`
-            const displayName = `${metadata} ${filename}`
+            const metadata = x.deprecated ? `[${index}]  [deprecated version]` : `[${index}]  [${f0str},${srstr},${embedstr},${typestr}]`
+            const tuning = `tune:${x.defaultTrans}`
+            const useIndex = x.indexFile != null && x.featureFile != null ? `index:true` : `index:false`
+            const subMetadata = `(${tuning},${useIndex})`
+            const displayName = `${metadata} ${filename}  ${subMetadata}`
 
 
             return (
@@ -44,7 +48,7 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
         return (
             <>
                 <div className="body-row split-3-7 left-padding-1 guided">
-                    <div className="body-item-title left-padding-1">Swicth Model</div>
+                    <div className="body-item-title left-padding-1">Switch Model</div>
                     <div className="body-input-container">
                         <select className="body-select" value={slot} onChange={(e) => {
                             onSwitchModelClicked(Number(e.target.value))

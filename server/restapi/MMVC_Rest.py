@@ -67,6 +67,7 @@ class MMVC_Rest:
             app_fastapi.mount(
                 "/upload_dir", StaticFiles(directory=f"{UPLOAD_DIR}"), name="static"
             )
+            app_fastapi.mount("/models", StaticFiles(directory="models"), name="static")
 
             restHello = MMVC_Rest_Hello()
             app_fastapi.include_router(restHello.router)

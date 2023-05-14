@@ -151,12 +151,14 @@ export const GuiStateProvider = ({ children }: Props) => {
 
     useEffect(() => {
         openServerControlCheckbox.updateState(true)
-        openModelSettingCheckbox.updateState(true)
+        openModelSettingCheckbox.updateState(false)
         openDeviceSettingCheckbox.updateState(true)
         openSpeakerSettingCheckbox.updateState(true)
         openConverterSettingCheckbox.updateState(true)
-        openQualityControlCheckbox.updateState(true)
-        openLabCheckbox.updateState(true)
+        openQualityControlCheckbox.updateState(false)
+        openLabCheckbox.updateState(false)
+        openAdvancedSettingCheckbox.updateState(false)
+
 
         showLicenseCheckbox.updateState(false)
         showWaitingCheckbox.updateState(false)

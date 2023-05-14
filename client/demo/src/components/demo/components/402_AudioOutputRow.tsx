@@ -112,7 +112,6 @@ export const AudioOutputRow = (_props: AudioOutputRowProps) => {
         const filteredDevice = devices.map((x, index) => {
             const className = (x.hostAPI == hostApi || hostApi == "") ? "select-option-red" : ""
             return <option className={className} value={x.index} key={index}>[{x.hostAPI}]{x.name}</option>
-
         })
 
         return (

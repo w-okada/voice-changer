@@ -53,6 +53,7 @@ import { DefaultTuneRow2, DefaultTuneRow2Props } from "./components/301-i_Defaul
 import { DiffEnablerRow, DiffEnablerRowProps } from "./components/611_DiffEnablerRow"
 import { DiffSettingRow, DiffSettingRowProps } from "./components/612_DiffSettingRow"
 import { DiffMethodRow, DiffMethodRowProps } from "./components/613_DiffMethodRow"
+import { ServerOpertationRow, ServerOpertationRowProps } from "./components/207_ServerOpertationRow"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
 
@@ -80,6 +81,7 @@ const initialize = () => {
     addToCatalog("modelSwitch", (props: ModelSwitchRowProps) => { return <ModelSwitchRow {...props} /> })
     addToCatalog("onnxExport", (props: ONNXExportRowProps) => { return <ONNXExportRow {...props} /> })
     addToCatalog("onnxExecutor", (props: ONNXExecutorRowProps) => { return <ONNXExecutorRow {...props} /> })
+    addToCatalog("serverOperation", (props: ServerOpertationRowProps) => { return <ServerOpertationRow {...props} /> })
 
 
     addToCatalog("modelUploaderv2", (props: ModelUploaderRowv2Props) => { return <ModelUploaderRowv2 {...props} /> })
