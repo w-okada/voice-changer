@@ -131,6 +131,28 @@ def download(params):
         print(e)
 
 
+def download_no_tqdm(params):
+    url = params["url"]
+    saveTo = params["saveTo"]
+    dirname = os.path.dirname(saveTo)
+    if dirname != "":
+        os.makedirs(dirname, exist_ok=True)
+    try:
+        req = requests.get(url, stream=True, allow_redirects=True)
+        with open(saveTo, "wb") as f:
+            countToDot = 0
+            for chunk in req.iter_content(chunk_size=1024):
+                if chunk:
+                    f.write(chunk)
+                    countToDot += 1
+                    if countToDot % 1024 == 0:
+                        print(".", end="")
+
+        print("+", end="")
+    except Exception as e:
+        print(e)
+
+
 def downloadWeight():
     # content_vec_500 = (args.content_vec_500,)
     # content_vec_500_onnx = (args.content_vec_500_onnx,)
@@ -232,7 +254,7 @@ if __name__ == "MMVCServerSIO":
     )
 
     try:
-        download({"url": SAMPLES_JSON, "saveTo": args.samples, "position": 0})
+        download_no_tqdm({"url": SAMPLES_JSON, "saveTo": args.samples, "position": 0})
     except Exception as e:
         print("[Voice Changer] loading sample failed", e)
 

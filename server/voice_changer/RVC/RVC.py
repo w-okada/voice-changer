@@ -6,7 +6,7 @@ from dataclasses import asdict
 from typing import cast
 import numpy as np
 import torch
-from MMVCServerSIO import download
+from MMVCServerSIO import download_no_tqdm
 from ModelSample import RVCModelSample, getModelSamples
 
 
@@ -130,8 +130,11 @@ class RVC:
                     "position": 2,
                 }
             )
+        
+        print("[Voice Changer] Downloading model files...", end="")
         with ThreadPoolExecutor() as pool:
-            pool.map(download, downloadParams)
+            pool.map(download_no_tqdm, downloadParams)
+        print("")
         return modelPath, indexPath, featurePath
 
     def loadModel(self, props: LoadModelParams):
