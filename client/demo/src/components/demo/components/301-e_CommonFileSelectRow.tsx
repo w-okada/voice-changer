@@ -38,8 +38,14 @@ export const CommonFileSelectRow = (props: CommonFileSelectRowProps) => {
     const guiState = useGuiState()
 
     const commonFileSelectRow = useMemo(() => {
-
         const slot = guiState.modelSlotNum
+        if (!appState.serverSetting.fileUploadSettings[slot]) {
+            return <></>
+        }
+        if (appState.serverSetting.fileUploadSettings[slot].isSampleMode == true) {
+            return <></>
+        }
+
 
         const getTargetModelData = () => {
             const targetSlot = appState.serverSetting.fileUploadSettings[slot]
@@ -66,12 +72,14 @@ export const CommonFileSelectRow = (props: CommonFileSelectRowProps) => {
                 return
             }
             appState.serverSetting.fileUploadSettings[slot][props.fileKind]! = { file: file }
+            appState.serverSetting.fileUploadSettings[slot].sampleId = null
             appState.serverSetting.setFileUploadSetting(slot, {
                 ...appState.serverSetting.fileUploadSettings[slot]
             })
         }
         const onFileClearClicked = () => {
             appState.serverSetting.fileUploadSettings[slot][props.fileKind] = null
+            appState.serverSetting.fileUploadSettings[slot].sampleId = null
             appState.serverSetting.setFileUploadSetting(slot, {
                 ...appState.serverSetting.fileUploadSettings[slot],
             })

@@ -32,6 +32,12 @@ def generateModelSlot(slotDir: str):
         modelSlot.indexFile = None
 
     modelSlot.defaultTrans = params["trans"] if "trans" in params else 0
+    modelSlot.name = params["name"] if "name" in params else None
+    modelSlot.description = params["description"] if "description" in params else None
+    modelSlot.credit = params["credit"] if "credit" in params else None
+    modelSlot.termsOfUseUrl = (
+        params["termsOfUseUrl"] if "termsOfUseUrl" in params else None
+    )
 
     modelSlot.isONNX = modelSlot.modelFile.endswith(".onnx")
 

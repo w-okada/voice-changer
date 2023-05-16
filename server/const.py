@@ -95,3 +95,6 @@ class EnumFrameworkTypes(Enum):
 class ServerAudioDeviceTypes(Enum):
     audioinput = "audioinput"
     audiooutput = "audiooutput"
+
+
+SAMPLES_JSON = "https://huggingface.co/wok000/vcclient_model/raw/main/samples.json"

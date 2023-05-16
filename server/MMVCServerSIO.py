@@ -17,7 +17,12 @@ from mods.ssl import create_self_signed_cert
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 from sio.MMVC_SocketIOApp import MMVC_SocketIOApp
 from restapi.MMVC_Rest import MMVC_Rest
-from const import NATIVE_CLIENT_FILE_MAC, NATIVE_CLIENT_FILE_WIN, SSL_KEY_DIR
+from const import (
+    NATIVE_CLIENT_FILE_MAC,
+    NATIVE_CLIENT_FILE_WIN,
+    SAMPLES_JSON,
+    SSL_KEY_DIR,
+)
 import subprocess
 import multiprocessing as mp
 from misc.log_control import setup_loggers
@@ -41,6 +46,8 @@ def setupArgParser():
         default=True,
         help="generate self-signed certificate",
     )
+
+    parser.add_argument("--samples", type=str, help="path to samples")
     parser.add_argument("--model_dir", type=str, help="path to model files")
 
     parser.add_argument(
@@ -214,6 +221,7 @@ if __name__ == "MMVCServerSIO":
     mp.freeze_support()
     voiceChangerParams = VoiceChangerParams(
         model_dir=args.model_dir,
+        samples=args.samples,
         content_vec_500=args.content_vec_500,
         content_vec_500_onnx=args.content_vec_500_onnx,
         content_vec_500_onnx_on=args.content_vec_500_onnx_on,
@@ -222,6 +230,11 @@ if __name__ == "MMVCServerSIO":
         hubert_soft=args.hubert_soft,
         nsf_hifigan=args.nsf_hifigan,
     )
+
+    try:
+        download({"url": SAMPLES_JSON, "saveTo": args.samples, "position": 0})
+    except Exception as e:
+        print("[Voice Changer] loading sample failed", e)
 
     if (
         os.path.exists(voiceChangerParams.hubert_base) is False
@@ -244,6 +257,7 @@ if __name__ == "__main__":
     printMessage("Voice Changerを起動しています。", level=2)
 
     downloadWeight()
+    os.makedirs(args.model_dir, exist_ok=True)
 
     PORT = args.p
 

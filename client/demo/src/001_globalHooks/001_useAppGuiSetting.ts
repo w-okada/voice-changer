@@ -22,6 +22,21 @@ export type AppGuiDemoSetting = {
     }
 }
 
+// export type AppGuiDemoSetting2 = {
+//     type: "demo",
+//     id: ClientType,
+//     front: GuiSectionSetting[],
+//     dialogs: {
+//         "license": { title: string, auther: string, contact: string, url: string, license: string }[]
+//     }
+// }
+
+
+// export type GuiSectionSetting = {
+//     "title": string,
+//     "components": GuiComponentSetting[]
+// }
+
 export type GuiComponentSetting = {
     "name": string,
     "options": any

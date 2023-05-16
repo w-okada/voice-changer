@@ -20,9 +20,9 @@ def list_audio_device():
     outputDeviceList = [d for d in audioDeviceList if d["max_output_channels"] > 0]
     hostapis = sd.query_hostapis()
 
-    print("input:", inputAudioDeviceList)
-    print("output:", outputDeviceList)
-    print("hostapis", hostapis)
+    # print("input:", inputAudioDeviceList)
+    # print("output:", outputDeviceList)
+    # print("hostapis", hostapis)
 
     serverAudioInputDevices = []
     serverAudioOutputDevices = []

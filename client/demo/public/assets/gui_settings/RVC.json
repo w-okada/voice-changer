@@ -72,6 +72,10 @@
                 }
             },
             {
+                "name": "sampleModelSelect",
+                "options": {}
+            },
+            {
                 "name": "defaultTuneRow2",
                 "options": {}
             },

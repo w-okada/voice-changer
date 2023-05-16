@@ -192,6 +192,12 @@ type ModelSlot = {
     f0: boolean,
     samplingRate: number
     deprecated: boolean
+
+
+    name: string,
+    description: string,
+    credit: string,
+    termsOfUseUrl: string,
 }
 
 type ServerAudioDevice = {
@@ -210,11 +216,23 @@ export type ServerInfo = VoiceChangerServerSetting & {
     modelSlots: ModelSlot[]
     serverAudioInputDevices: ServerAudioDevice[]
     serverAudioOutputDevices: ServerAudioDevice[]
+    sampleModels: RVCSampleModel[]
 
 }
 
 export type ServerInfoSoVitsSVC = ServerInfo & {
     speakers: { [key: string]: number }
+}
+
+export type RVCSampleModel = {
+    id: string
+    name: string
+    modelUrl: string
+    indexUrl: string
+    featureUrl: string
+    termOfUseUrl: string
+    credit: string
+    description: string
 }
 
 export const DefaultServerSetting: ServerInfo = {
@@ -260,6 +278,7 @@ export const DefaultServerSetting: ServerInfo = {
     modelSamplingRate: 48000,
     silenceFront: 1,
     modelSlotIndex: 0,
+    sampleModels: [],
 
     useEnhancer: 0,
     useDiff: 1,

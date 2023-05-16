@@ -11,15 +11,20 @@ export const ModelUploadButtonRow2 = (_props: ModelUploadButtonRow2Props) => {
     const guiState = useGuiState()
     const modelUploadButtonRow = useMemo(() => {
         const slot = guiState.modelSlotNum
+        if (!appState.serverSetting.fileUploadSettings[slot]) {
+            return <></>
+        }
         const onModelUploadClicked = async () => {
             appState.serverSetting.loadModel(slot)
         }
 
+        const buttonText = appState.serverSetting.fileUploadSettings[slot].isSampleMode ? "select" : "upload"
+
         const uploadButtonClassName = appState.serverSetting.isUploading ? "body-button-disabled" : "body-button"
         const uploadButtonAction = appState.serverSetting.isUploading ? () => { } : onModelUploadClicked
-        const uploadButtonLabel = appState.serverSetting.isUploading ? "wait..." : "upload"
+        const uploadButtonLabel = appState.serverSetting.isUploading ? "wait..." : buttonText
         const uploadingStatus = appState.serverSetting.isUploading ?
-            appState.serverSetting.uploadProgress == 0 ? `loading model...(wait about 20sec)` : `uploading.... ${appState.serverSetting.uploadProgress.toFixed(1)}%` : ""
+            appState.serverSetting.uploadProgress == 0 ? `loading model...(wait about 20sec)` : `processing.... ${appState.serverSetting.uploadProgress.toFixed(1)}%` : ""
 
 
         const uploadedText = appState.serverSetting.fileUploadSettings[slot] == undefined ? "" : appState.serverSetting.fileUploadSettings[slot].uploaded ? "" : "not uploaded"

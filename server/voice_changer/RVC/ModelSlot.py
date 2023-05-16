@@ -18,3 +18,8 @@ class ModelSlot:
     embChannels: int = 256
     deprecated: bool = False
     embedder: EnumEmbedderTypes = EnumEmbedderTypes.hubert
+
+    name: str = ""
+    description: str = ""
+    credit: str = ""
+    termsOfUseUrl: str = ""

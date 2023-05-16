@@ -54,6 +54,7 @@ import { DiffEnablerRow, DiffEnablerRowProps } from "./components/611_DiffEnable
 import { DiffSettingRow, DiffSettingRowProps } from "./components/612_DiffSettingRow"
 import { DiffMethodRow, DiffMethodRowProps } from "./components/613_DiffMethodRow"
 import { ServerOpertationRow, ServerOpertationRowProps } from "./components/207_ServerOpertationRow"
+import { SampleModelSelectRow, SampleModelSelectRowProps } from "./components/301-j_SampleModelSelectRow"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
 
@@ -92,6 +93,8 @@ const initialize = () => {
     addToCatalog("correspondenceSelectRow2", (props: CorrespondenceSelectRow2Props) => { return <CorrespondenceSelectRow2  {...props} /> })
     addToCatalog("modelSlotRow2", (props: ModelSlotRow2Props) => { return <ModelSlotRow2  {...props} /> })
     addToCatalog("defaultTuneRow2", (props: DefaultTuneRow2Props) => { return <DefaultTuneRow2  {...props} /> })
+    addToCatalog("sampleModelSelect", (props: SampleModelSelectRowProps) => { return <SampleModelSelectRow  {...props} /> })
+
 
 
 

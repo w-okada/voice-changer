@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from ModelSample import RVCModelSample
 
 from voice_changer.RVC.ModelSlot import ModelSlot
 
@@ -25,6 +26,8 @@ class RVCSettings:
             ModelSlot(),  # 6(merged)
         ]
     )
+    sampleModels: list[RVCModelSample] = field(default_factory=lambda: [])
+
     indexRatio: float = 0
     rvcQuality: int = 0
     silenceFront: int = 1  # 0:off, 1:on

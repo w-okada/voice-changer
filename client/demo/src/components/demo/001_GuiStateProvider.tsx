@@ -58,6 +58,7 @@ type GuiStateAndMethod = {
 
     modelSlotNum: number
     setModelSlotNum: (val: number) => void
+
 }
 
 const GuiStateContext = React.createContext<GuiStateAndMethod | null>(null);
@@ -84,7 +85,6 @@ export const GuiStateProvider = ({ children }: Props) => {
     const [audioOutputForGUI, setAudioOutputForGUI] = useState<string>("none")
     const [fileInputEchoback, setFileInputEchoback] = useState<boolean>(false)//最初のmuteが有効になるように。undefined <-- ??? falseしておけばよさそう。undefinedだとwarningがでる。
     const [audioOutputForAnalyzer, setAudioOutputForAnalyzer] = useState<string>("default")
-
 
     const reloadDeviceInfo = async () => {
         try {
@@ -208,7 +208,8 @@ export const GuiStateProvider = ({ children }: Props) => {
         setAudioOutputForAnalyzer,
 
         modelSlotNum,
-        setModelSlotNum
+        setModelSlotNum,
+
     };
     return <GuiStateContext.Provider value={providerValue}>{children}</GuiStateContext.Provider>;
 };

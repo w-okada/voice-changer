@@ -17,7 +17,7 @@ export const DefaultTuneRow2 = (_props: DefaultTuneRow2Props) => {
         const onDefaultTuneChanged = (val: number) => {
             appState.serverSetting.setFileUploadSetting(slot, {
                 ...appState.serverSetting.fileUploadSettings[slot],
-                defaultTune: val
+                defaultTune: val,
             })
         }
 

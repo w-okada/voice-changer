@@ -31,6 +31,9 @@ export type FileUploadSetting = {
     rvcFeature: ModelData | null
     rvcIndex: ModelData | null
 
+    isSampleMode: boolean
+    sampleId: string | null
+
     ddspSvcModel: ModelData | null
     ddspSvcModelConfig: ModelData | null
     ddspSvcDiffusion: ModelData | null
@@ -58,6 +61,9 @@ const InitialFileUploadSetting: FileUploadSetting = {
     rvcModel: null,
     rvcFeature: null,
     rvcIndex: null,
+
+    isSampleMode: false,
+    sampleId: null,
 
     ddspSvcModel: null,
     ddspSvcModelConfig: null,
@@ -226,73 +232,84 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
 
     const loadModel = useMemo(() => {
         return async (slot: number) => {
-            if (props.clientType == "MMVCv13") {
-                if (!fileUploadSettings[slot].mmvcv13Config) {
-                    alert("Configファイルを指定する必要があります。")
+            const fileUploadSetting = fileUploadSettings[slot]
+
+            if (fileUploadSetting.isSampleMode == false) {
+                if (props.clientType == "MMVCv13") {
+                    if (!fileUploadSetting.mmvcv13Config) {
+                        alert("Configファイルを指定する必要があります。")
+                        return
+                    }
+                    if (!fileUploadSetting.mmvcv13Model) {
+                        alert("モデルファイルを指定する必要があります。")
+                        return
+                    }
+                } else if (props.clientType == "MMVCv15") {
+                    if (!fileUploadSetting.mmvcv15Config) {
+                        alert("Configファイルを指定する必要があります。")
+                        return
+                    }
+                    if (!fileUploadSetting.mmvcv15Model) {
+                        alert("モデルファイルを指定する必要があります。")
+                        return
+                    }
+                } else if (props.clientType == "so-vits-svc-40") {
+                    if (!fileUploadSetting.soVitsSvc40Config) {
+                        alert("Configファイルを指定する必要があります。")
+                        return
+                    }
+                    if (!fileUploadSetting.soVitsSvc40Model) {
+                        alert("モデルファイルを指定する必要があります。")
+                        return
+                    }
+                } else if (props.clientType == "so-vits-svc-40v2") {
+                    if (!fileUploadSetting.soVitsSvc40v2Config) {
+                        alert("Configファイルを指定する必要があります。")
+                        return
+                    }
+                    if (!fileUploadSetting.soVitsSvc40v2Model) {
+                        alert("モデルファイルを指定する必要があります。")
+                        return
+                    }
+                } else if (props.clientType == "RVC") {
+                    if (!fileUploadSetting.rvcModel) {
+                        alert("モデルファイルを指定する必要があります。")
+                        return
+                    }
+                } else if (props.clientType == "DDSP-SVC") {
+                    if (!fileUploadSetting.ddspSvcModel) {
+                        alert("DDSPモデルを指定する必要があります。")
+                        return
+                    }
+                    if (!fileUploadSetting.ddspSvcModelConfig) {
+                        alert("DDSP Configファイルを指定する必要があります。")
+                        return
+                    }
+                    if (!fileUploadSetting.ddspSvcDiffusion) {
+                        alert("Diffusionモデルを指定する必要があります。")
+                        return
+                    }
+                    if (!fileUploadSetting.ddspSvcDiffusionConfig) {
+                        alert("Diffusion Configファイルを指定する必要があります。")
+                        return
+                    }
+                } else {
+                }
+            } else {//Sampleモード
+                if (!fileUploadSetting.sampleId) {
+                    alert("Sample IDを指定する必要があります。")
                     return
                 }
-                if (!fileUploadSettings[slot].mmvcv13Model) {
-                    alert("モデルファイルを指定する必要があります。")
-                    return
-                }
-            } else if (props.clientType == "MMVCv15") {
-                if (!fileUploadSettings[slot].mmvcv15Config) {
-                    alert("Configファイルを指定する必要があります。")
-                    return
-                }
-                if (!fileUploadSettings[slot].mmvcv15Model) {
-                    alert("モデルファイルを指定する必要があります。")
-                    return
-                }
-            } else if (props.clientType == "so-vits-svc-40") {
-                if (!fileUploadSettings[slot].soVitsSvc40Config) {
-                    alert("Configファイルを指定する必要があります。")
-                    return
-                }
-                if (!fileUploadSettings[slot].soVitsSvc40Model) {
-                    alert("モデルファイルを指定する必要があります。")
-                    return
-                }
-            } else if (props.clientType == "so-vits-svc-40v2") {
-                if (!fileUploadSettings[slot].soVitsSvc40v2Config) {
-                    alert("Configファイルを指定する必要があります。")
-                    return
-                }
-                if (!fileUploadSettings[slot].soVitsSvc40v2Model) {
-                    alert("モデルファイルを指定する必要があります。")
-                    return
-                }
-            } else if (props.clientType == "RVC") {
-                if (!fileUploadSettings[slot].rvcModel) {
-                    alert("モデルファイルを指定する必要があります。")
-                    return
-                }
-            } else if (props.clientType == "DDSP-SVC") {
-                if (!fileUploadSettings[slot].ddspSvcModel) {
-                    alert("DDSPモデルを指定する必要があります。")
-                    return
-                }
-                if (!fileUploadSettings[slot].ddspSvcModelConfig) {
-                    alert("DDSP Configファイルを指定する必要があります。")
-                    return
-                }
-                if (!fileUploadSettings[slot].ddspSvcDiffusion) {
-                    alert("Diffusionモデルを指定する必要があります。")
-                    return
-                }
-                if (!fileUploadSettings[slot].ddspSvcDiffusionConfig) {
-                    alert("Diffusion Configファイルを指定する必要があります。")
-                    return
-                }
-            } else {
+
             }
+
 
             if (!props.voiceChangerClient) return
 
             setUploadProgress(0)
             setIsUploading(true)
 
-            const fileUploadSetting = fileUploadSettings[slot]
+
 
             // MMVCv13
             const normalModels = [
@@ -317,12 +334,14 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                     normalModels[i].filename = await normalModels[i].file!.name
                 }
             }
-            for (let i = 0; i < normalModels.length; i++) {
-                const progRate = 1 / normalModels.length
-                const progOffset = 100 * i * progRate
-                await _uploadFile(normalModels[i], (progress: number, _end: boolean) => {
-                    setUploadProgress(progress * progRate + progOffset)
-                })
+            if (fileUploadSetting.isSampleMode == false) {
+                for (let i = 0; i < normalModels.length; i++) {
+                    const progRate = 1 / normalModels.length
+                    const progOffset = 100 * i * progRate
+                    await _uploadFile(normalModels[i], (progress: number, _end: boolean) => {
+                        setUploadProgress(progress * progRate + progOffset)
+                    })
+                }
             }
 
             // DDSP-SVC
@@ -333,19 +352,22 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                     ddspSvcModels[i].filename = await ddspSvcModels[i].file!.name
                 }
             }
-            for (let i = 0; i < ddspSvcModels.length; i++) {
-                const progRate = 1 / ddspSvcModels.length
-                const progOffset = 100 * i * progRate
-                const dir = i == 0 || i == 1 ? "ddsp_mod/" : "ddsp_diff/"
-                await _uploadFile(ddspSvcModels[i], (progress: number, _end: boolean) => {
-                    setUploadProgress(progress * progRate + progOffset)
-                }, dir)
+            if (fileUploadSetting.isSampleMode == false) {
+                for (let i = 0; i < ddspSvcModels.length; i++) {
+                    const progRate = 1 / ddspSvcModels.length
+                    const progOffset = 100 * i * progRate
+                    const dir = i == 0 || i == 1 ? "ddsp_mod/" : "ddsp_diff/"
+                    await _uploadFile(ddspSvcModels[i], (progress: number, _end: boolean) => {
+                        setUploadProgress(progress * progRate + progOffset)
+                    }, dir)
+                }
             }
 
             // const configFileName = fileUploadSetting.configFile?.filename || "-"
             const params = JSON.stringify({
                 trans: fileUploadSetting.defaultTune || 0,
-                files: {
+                sampleId: fileUploadSetting.isSampleMode ? fileUploadSetting.sampleId || "" : "",
+                files: fileUploadSetting.isSampleMode ? {} : {
                     mmvcv13Config: fileUploadSetting.mmvcv13Config?.filename || "",
                     mmvcv13Model: fileUploadSetting.mmvcv13Model?.filename || "",
                     mmvcv15Config: fileUploadSetting.mmvcv15Config?.filename || "",
@@ -360,16 +382,18 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                     rvcIndex: fileUploadSetting.rvcIndex?.filename || "",
                     rvcFeature: fileUploadSetting.rvcFeature?.filename || "",
 
-
                     ddspSvcModel: fileUploadSetting.ddspSvcModel?.filename ? "ddsp_mod/" + fileUploadSetting.ddspSvcModel?.filename : "",
                     ddspSvcModelConfig: fileUploadSetting.ddspSvcModelConfig?.filename ? "ddsp_mod/" + fileUploadSetting.ddspSvcModelConfig?.filename : "",
                     ddspSvcDiffusion: fileUploadSetting.ddspSvcDiffusion?.filename ? "ddsp_diff/" + fileUploadSetting.ddspSvcDiffusion?.filename : "",
                     ddspSvcDiffusionConfig: fileUploadSetting.ddspSvcDiffusionConfig?.filename ? "ddsp_diff/" + fileUploadSetting.ddspSvcDiffusionConfig.filename : "",
                 }
             })
+
             if (fileUploadSetting.isHalf == undefined) {
                 fileUploadSetting.isHalf = false
             }
+
+            console.log("PARAMS:", params)
 
             const loadPromise = props.voiceChangerClient.loadModel(
                 slot,
@@ -377,14 +401,15 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 params,
             )
 
+
             // サーバでロード中にキャッシュにセーブ
             storeToCache(slot, fileUploadSetting)
-
             await loadPromise
 
             fileUploadSetting.uploaded = true
             fileUploadSettings[slot] = fileUploadSetting
             setFileUploadSettings([...fileUploadSettings])
+
 
             setUploadProgress(0)
             setIsUploading(false)
@@ -420,6 +445,9 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 ddspSvcModelConfig: fileUploadSetting.ddspSvcModelConfig ? { data: fileUploadSetting.ddspSvcModelConfig.data, filename: fileUploadSetting.ddspSvcModelConfig.filename } : null,
                 ddspSvcDiffusion: fileUploadSetting.ddspSvcDiffusion ? { data: fileUploadSetting.ddspSvcDiffusion.data, filename: fileUploadSetting.ddspSvcDiffusion.filename } : null,
                 ddspSvcDiffusionConfig: fileUploadSetting.ddspSvcDiffusionConfig ? { data: fileUploadSetting.ddspSvcDiffusionConfig.data, filename: fileUploadSetting.ddspSvcDiffusionConfig.filename } : null,
+
+                isSampleMode: fileUploadSetting.isSampleMode,
+                sampleId: fileUploadSetting.sampleId,
             }
             setItem(`${INDEXEDDB_KEY_MODEL_DATA}_${slot}`, saveData)
         } catch (e) {

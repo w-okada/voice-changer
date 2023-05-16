@@ -37,7 +37,7 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
             const tuning = `tune:${x.defaultTrans}`
             const useIndex = x.indexFile != null && x.featureFile != null ? `index:true` : `index:false`
             const subMetadata = `(${tuning},${useIndex})`
-            const displayName = `${metadata} ${filename}  ${subMetadata}`
+            const displayName = `${metadata} ${x.name || filename}  ${subMetadata}`
 
 
             return (

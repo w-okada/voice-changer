@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 import sys
 import os
 import resampy
@@ -5,6 +6,8 @@ from dataclasses import asdict
 from typing import cast
 import numpy as np
 import torch
+from MMVCServerSIO import download
+from ModelSample import RVCModelSample, getModelSamples
 
 
 # avoiding parse arg error in RVC
@@ -35,7 +38,7 @@ from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.pipeline.Pipeline import Pipeline
 
 from Exceptions import NoModeLoadedException
-from const import UPLOAD_DIR
+from const import TMP_DIR, UPLOAD_DIR
 import shutil
 import json
 
@@ -73,11 +76,86 @@ class RVC:
         self.loadSlots()
         print("RVC initialization: ", params)
 
+        sampleModels = getModelSamples(params.samples, "RVC")
+        if sampleModels is not None:
+            self.settings.sampleModels = sampleModels
+
+        # 起動時にスロットにモデルがある場合はロードしておく
+        if len(self.settings.modelSlots) > 0:
+            for i, slot in enumerate(self.settings.modelSlots):
+                if len(slot.modelFile) > 0:
+                    self.prepareModel(i)
+                    self.settings.modelSlotIndex = i
+                    self.switchModel()
+                    self.initialLoad = False
+                    break
+
+    def getSampleInfo(self, id: str):
+        sampleInfos = list(filter(lambda x: x.id == id, self.settings.sampleModels))
+        if len(sampleInfos) > 0:
+            return sampleInfos[0]
+        else:
+            None
+
+    def downloadModelFiles(self, sampleInfo: RVCModelSample):
+        downloadParams = []
+
+        modelPath = os.path.join(TMP_DIR, os.path.basename(sampleInfo.modelUrl))
+        downloadParams.append(
+            {
+                "url": sampleInfo.modelUrl,
+                "saveTo": modelPath,
+                "position": 0,
+            }
+        )
+
+        indexPath = None
+        if hasattr(sampleInfo, "indexUrl") and sampleInfo.indexUrl != "":
+            indexPath = os.path.join(TMP_DIR, os.path.basename(sampleInfo.indexUrl))
+            downloadParams.append(
+                {
+                    "url": sampleInfo.indexUrl,
+                    "saveTo": indexPath,
+                    "position": 1,
+                }
+            )
+
+        featurePath = None
+        if hasattr(sampleInfo, "featureUrl") or sampleInfo.featureUrl != "":
+            featurePath = os.path.join(TMP_DIR, os.path.basename(sampleInfo.featureUrl))
+            downloadParams.append(
+                {
+                    "url": sampleInfo.featureUrl,
+                    "saveTo": featurePath,
+                    "position": 2,
+                }
+            )
+        with ThreadPoolExecutor() as pool:
+            pool.map(download, downloadParams)
+        return modelPath, indexPath, featurePath
+
     def loadModel(self, props: LoadModelParams):
         target_slot_idx = props.slot
         params = props.params
 
-        # modelName = os.path.splitext(os.path.basename(params["files"]["rvcModel"]))[0]
+        print("loadModel", params)
+        if len(params["sampleId"]) > 0:
+            sampleInfo = self.getSampleInfo(params["sampleId"])
+            if sampleInfo is None:
+                print("[Voice Changer] sampleInfo is None")
+                return
+            modelPath, indexPath, featurePath = self.downloadModelFiles(sampleInfo)
+            params["files"]["rvcModel"] = modelPath
+            if indexPath is not None:
+                params["files"]["rvcIndex"] = indexPath
+            if featurePath is not None:
+                params["files"]["rvcFeature"] = featurePath
+            params["credit"] = sampleInfo.credit
+            params["description"] = sampleInfo.description
+            params["name"] = sampleInfo.name
+            params["sampleId"] = sampleInfo.id
+            params["termOfUseUrl"] = sampleInfo.termOfUseUrl
+
         slotDir = os.path.join(
             self.params.model_dir, RVC_MODEL_DIRNAME, str(target_slot_idx)
         )
@@ -95,6 +173,16 @@ class RVC:
             shutil.move(f, dst)
         json.dump(params, open(os.path.join(slotDir, "params.json"), "w"))
         self.loadSlots()
+
+        # 初回のみロード(起動時にスロットにモデルがあった場合はinitialLoadはFalseになっている)
+        if self.initialLoad:
+            self.prepareModel(target_slot_idx)
+            self.settings.modelSlotIndex = target_slot_idx
+            self.switchModel()
+            self.initialLoad = False
+        elif target_slot_idx == self.currentSlot:
+            self.prepareModel(target_slot_idx)
+
         return self.get_info()
 
     def loadSlots(self):
@@ -109,24 +197,6 @@ class RVC:
             )
             modelSlot = generateModelSlot(slotDir)
             self.settings.modelSlots.append(modelSlot)
-
-        # modelSlot = generateModelSlot(params)
-        # self.settings.modelSlots[target_slot_idx] = modelSlot
-        # print(
-        #     f"[Voice Changer] RVC new model is uploaded,{target_slot_idx}",
-        #     asdict(modelSlot),
-        # )
-
-        # # 初回のみロード
-        # if self.initialLoad:
-        #     self.prepareModel(target_slot_idx)
-        #     self.settings.modelSlotIndex = target_slot_idx
-        #     self.switchModel()
-        #     self.initialLoad = False
-        # elif target_slot_idx == self.currentSlot:
-        #     self.prepareModel(target_slot_idx)
-
-        # return self.get_info()
 
     def update_settings(self, key: str, val: int | float | str):
         if key in self.settings.intData:

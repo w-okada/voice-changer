@@ -494,6 +494,9 @@ body {
 .underline {
     border-bottom: 3px solid #333;
 }
+.left-padding-05 {
+    padding-left: 0.5rem;
+}
 .left-padding-1 {
     padding-left: 1rem;
 }
