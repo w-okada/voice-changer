@@ -7,6 +7,8 @@ from const import ModelType
 @dataclass
 class RVCModelSample:
     id: str = ""
+    lang: str = ""
+    tag: str = ""
     name: str = ""
     modelUrl: str = ""
     indexUrl: str = ""

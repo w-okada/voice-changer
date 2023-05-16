@@ -92,7 +92,9 @@ class RVC:
 
     def getSampleInfo(self, id: str):
         sampleInfos = list(filter(lambda x: x.id == id, self.settings.sampleModels))
+        print("SAMPLE INFOS 1:", sampleInfos)
         if len(sampleInfos) > 0:
+            print("SAMPLE INFOS 2:", sampleInfos)
             return sampleInfos[0]
         else:
             None
@@ -130,7 +132,7 @@ class RVC:
                     "position": 2,
                 }
             )
-        
+
         print("[Voice Changer] Downloading model files...", end="")
         with ThreadPoolExecutor() as pool:
             pool.map(download_no_tqdm, downloadParams)

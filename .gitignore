@@ -45,6 +45,7 @@ server/weights/
 server/weights_/
 server/weights__/
 server/models/
+server/samples.json
 start_trainer.sh
 
 # venv

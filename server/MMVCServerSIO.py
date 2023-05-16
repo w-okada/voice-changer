@@ -146,9 +146,9 @@ def download_no_tqdm(params):
                     f.write(chunk)
                     countToDot += 1
                     if countToDot % 1024 == 0:
-                        print(".", end="")
+                        print(".", end="", flush=True)
 
-        print("+", end="")
+        print("+", end="", flush=True)
     except Exception as e:
         print(e)
 
