@@ -10,7 +10,7 @@ export type MergeLabRowProps = {
 export const MergeLabRow = (_props: MergeLabRowProps) => {
     const [mergeElements, setMergeElements] = useState<MergeElement[]>([])
     const appState = useAppState()
-    const [defaultTrans, setDefaultTrans] = useState<number>(0)
+    const [defaultTune, setDefaultTune] = useState<number>(0)
 
     // スロットが変更されたときの初期化処理
     const newSlotChangeKey = useMemo(() => {
@@ -52,7 +52,8 @@ export const MergeLabRow = (_props: MergeLabRowProps) => {
         const onMergeClicked = async () => {
             appState.serverSetting.mergeModel({
                 command: "mix",
-                defaultTrans: defaultTrans,
+                defaultTune: defaultTune,
+                defaultIndexRatio: 1,
                 files: mergeElements
             })
         }
@@ -98,10 +99,10 @@ export const MergeLabRow = (_props: MergeLabRowProps) => {
                     <div className="merge-field">
                         <div className="merge-field-elem grey-bold">Default Tune</div>
                         <div className="merge-field-elem">
-                            <input type="range" className="body-item-input-slider-2nd" min="-50" max="50" step="1" value={defaultTrans} onChange={(e) => {
-                                setDefaultTrans(Number(e.target.value))
+                            <input type="range" className="body-item-input-slider-2nd" min="-50" max="50" step="1" value={defaultTune} onChange={(e) => {
+                                setDefaultTune(Number(e.target.value))
                             }}></input>
-                            <span className="body-item-input-slider-val">{defaultTrans}</span>
+                            <span className="body-item-input-slider-val">{defaultTune}</span>
                         </div>
                     </div >
 
@@ -112,7 +113,7 @@ export const MergeLabRow = (_props: MergeLabRowProps) => {
                 </div>
             </div>
         )
-    }, [mergeElements, appState.serverSetting.serverSetting, defaultTrans])
+    }, [mergeElements, appState.serverSetting.serverSetting, defaultTune])
 
     return mergeLabRow
 

@@ -10,7 +10,8 @@ class ModelSlot:
     modelFile: str = ""
     featureFile: str = ""
     indexFile: str = ""
-    defaultTrans: int = 0
+    defaultTune: int = 0
+    defaultIndexRatio: int = 1
     isONNX: bool = False
     modelType: EnumInferenceTypes = EnumInferenceTypes.pyTorchRVC
     samplingRate: int = -1

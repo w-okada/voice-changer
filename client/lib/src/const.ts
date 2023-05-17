@@ -501,6 +501,7 @@ export type MergeElement = {
 }
 export type MergeModelRequest = {
     command: "mix",
-    defaultTrans: number,
+    defaultTune: number,
+    defaultIndexRatio: number,
     files: MergeElement[]
 }

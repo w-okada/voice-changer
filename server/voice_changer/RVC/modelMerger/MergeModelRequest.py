@@ -15,5 +15,6 @@ class MergeFile:
 class MergeModelRequest:
     command: str = ""
     slot: int = -1
-    defaultTrans: int = 0
+    defaultTune: int = 0
+    defaultIndexRatio: int = 1
     files: List[MergeFile] = field(default_factory=lambda: [])

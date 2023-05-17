@@ -92,9 +92,7 @@ class RVC:
 
     def getSampleInfo(self, id: str):
         sampleInfos = list(filter(lambda x: x.id == id, self.settings.sampleModels))
-        print("SAMPLE INFOS 1:", sampleInfos)
         if len(sampleInfos) > 0:
-            print("SAMPLE INFOS 2:", sampleInfos)
             return sampleInfos[0]
         else:
             None
@@ -268,7 +266,8 @@ class RVC:
         )
 
         # その他の設定
-        self.next_trans = modelSlot.defaultTrans
+        self.next_trans = modelSlot.defaultTune
+        self.next_index_ratio = modelSlot.defaultIndexRatio
         self.next_samplingRate = modelSlot.samplingRate
         self.next_framework = "ONNX" if modelSlot.isONNX else "PyTorch"
         self.needSwitch = True
@@ -279,6 +278,7 @@ class RVC:
         print("[Voice Changer] Switching model..")
         self.pipeline = self.next_pipeline
         self.settings.tran = self.next_trans
+        self.settings.indexRatio = self.next_index_ratio
         self.settings.modelSamplingRate = self.next_samplingRate
         self.settings.framework = self.next_framework
 
@@ -428,7 +428,12 @@ class RVC:
         storeFile = os.path.join(storeDir, "merged.pth")
         torch.save(merged, storeFile)
 
-        params = {"trans": req.defaultTrans, "files": {"rvcModel": storeFile}}
+        params = {
+            "defaultTune": req.defaultTune,
+            "defaultIndexRatio": req.defaultIndexRatio,
+            "sampleId": "",
+            "files": {"rvcModel": storeFile},
+        }
         props: LoadModelParams = LoadModelParams(
             slot=targetSlot, isHalf=True, params=params
         )

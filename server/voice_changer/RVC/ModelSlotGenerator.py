@@ -31,7 +31,10 @@ def generateModelSlot(slotDir: str):
     else:
         modelSlot.indexFile = None
 
-    modelSlot.defaultTrans = params["trans"] if "trans" in params else 0
+    modelSlot.defaultTune = params["defaultTune"] if "defaultTune" in params else 0
+    modelSlot.defaultIndexRatio = (
+        params["defaultIndexRatio"] if "defaultIndexRatio" in params else 0
+    )
     modelSlot.name = params["name"] if "name" in params else None
     modelSlot.description = params["description"] if "description" in params else None
     modelSlot.credit = params["credit"] if "credit" in params else None

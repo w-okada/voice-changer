@@ -32,7 +32,7 @@
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/kikoto_mahiro_song/KikotoMahiro_Song.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/kikoto_mahiro_song/added_IVF3621_Flat_nprobe_11.index.bin",
       "featureUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/kikoto_mahiro_song/total_fea.npy",
-      "termOfUseUrl": "https://huggingface.co/wok000/vcclient_model/blob/main/rvc/kikoto_mahiro_song/term_of_use.txt",
+      "termOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/kikoto_mahiro_song/term_of_use.txt",
       "credit": "黄琴まひろ",
       "description": ""
     },
@@ -92,8 +92,20 @@
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_tylor/amitaro_hubertjp_768_tylor-100.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_tylor/amitaro_hubertjp_768_tylor.0.index.bin",
       "featureUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_tylor/amitaro_hubertjp_768_tylor.0.big.npy",
-      "termOfUseUrl": "https://huggingface.co/wok000/vcclient_model/blob/main/rvc/amitaro_hubertjp_768_tylor/term_of_use.txt",
+      "termOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/amitaro_hubertjp_768_tylor/term_of_use.txt",
       "credit": "あみたろ",
+      "description": ""
+    },
+    {
+      "id": "Tsukuyomi-chan",
+      "lang": "ja-JP",
+      "tag": "",
+      "name": "つくよみちゃん",
+      "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tsukuyomi-chan_hubertjp_768_default/tsukuyomi_hubertjp_768_def-100.pth",
+      "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tsukuyomi-chan_hubertjp_768_default/tsukuyomi_hubertjp_768_def.0.index.bin",
+      "featureUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tsukuyomi-chan_hubertjp_768_default/tsukuyomi_hubertjp_768_def.0.big.npy",
+      "termOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/tsukuyomi-chan_hubertjp_768_default/term_of_use.txt",
+      "credit": "つくよみちゃん",
       "description": ""
     }
   ]

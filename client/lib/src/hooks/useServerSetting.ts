@@ -14,6 +14,7 @@ export type FileUploadSetting = {
     isHalf: boolean
     uploaded: boolean
     defaultTune: number
+    defaultIndexRatio: number
     framework: Framework
     params: string
 
@@ -45,6 +46,7 @@ const InitialFileUploadSetting: FileUploadSetting = {
     isHalf: true,
     uploaded: false,
     defaultTune: 0,
+    defaultIndexRatio: 1,
     framework: Framework.PyTorch,
     params: "{}",
 
@@ -365,7 +367,8 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
 
             // const configFileName = fileUploadSetting.configFile?.filename || "-"
             const params = JSON.stringify({
-                trans: fileUploadSetting.defaultTune || 0,
+                defaultTune: fileUploadSetting.defaultTune || 0,
+                defaultIndexRatio: fileUploadSetting.defaultIndexRatio || 1,
                 sampleId: fileUploadSetting.isSampleMode ? fileUploadSetting.sampleId || "" : "",
                 files: fileUploadSetting.isSampleMode ? {} : {
                     mmvcv13Config: fileUploadSetting.mmvcv13Config?.filename || "",
@@ -424,6 +427,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 isHalf: fileUploadSetting.isHalf, // キャッシュとしては不使用。guiで上書きされる。
                 uploaded: false, // キャッシュから読み込まれるときには、まだuploadされていないから。
                 defaultTune: fileUploadSetting.defaultTune,
+                defaultIndexRatio: fileUploadSetting.defaultIndexRatio,
                 framework: fileUploadSetting.framework,
                 params: fileUploadSetting.params,
 
