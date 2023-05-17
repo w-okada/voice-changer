@@ -46,6 +46,10 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
             )
         }).filter(x => { return x != null })
 
+        const selectedTermOfUseUrl = appState.serverSetting.serverSetting.modelSlots[slot]?.termsOfUseUrl || null
+        const selectedTermOfUseUrlLink = selectedTermOfUseUrl ? <a href={selectedTermOfUseUrl} target="_blank" rel="noopener noreferrer" className="body-item-text-small">[terms of use]</a> : <></>
+        console.log("selectedTermOfUseUrl", selectedTermOfUseUrl)
+
         return (
             <>
                 <div className="body-row split-3-7 left-padding-1 guided">
@@ -56,6 +60,7 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
                         }}>
                             {options}
                         </select>
+                        {selectedTermOfUseUrlLink}
                     </div>
                 </div>
             </>

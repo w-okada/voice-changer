@@ -8,7 +8,7 @@
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/kikoto_kurage_song/KikotoKurage_Song.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/kikoto_kurage_song/added_IVF2252_Flat_nprobe_10.index.bin",
       "featureUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/kikoto_kurage_song/total_fea.npy",
-      "termOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/kikoto_kurage_song/term_of_use.txt",
+      "termsOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/kikoto_kurage_song/term_of_use.txt",
       "credit": "黄琴海月",
       "description": ""
     },
@@ -20,7 +20,7 @@
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/kikoto_kurage_talk/KikotoKurage_Talk.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/kikoto_kurage_talk/added_IVF1022_Flat_nprobe_7.index.bin",
       "featureUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/kikoto_kurage_talk/total_fea.npy",
-      "termOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/kikoto_kurage_talk/term_of_use.txt",
+      "termsOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/kikoto_kurage_talk/term_of_use.txt",
       "credit": "黄琴海月",
       "description": ""
     },
@@ -32,7 +32,7 @@
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/kikoto_mahiro_song/KikotoMahiro_Song.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/kikoto_mahiro_song/added_IVF3621_Flat_nprobe_11.index.bin",
       "featureUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/kikoto_mahiro_song/total_fea.npy",
-      "termOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/kikoto_mahiro_song/term_of_use.txt",
+      "termsOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/kikoto_mahiro_song/term_of_use.txt",
       "credit": "黄琴まひろ",
       "description": ""
     },
@@ -44,7 +44,7 @@
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/kikoto_mahiro_talk/KikotoMahiro_Talk.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/kikoto_mahiro_talk/added_IVF1591_Flat_nprobe_9.index.bin",
       "featureUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/kikoto_mahiro_talk/total_fea.npy",
-      "termOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/kikoto_mahiro_talk/term_of_use.txt",
+      "termsOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/kikoto_mahiro_talk/term_of_use.txt",
       "credit": "黄琴まひろ",
       "description": ""
     },
@@ -56,7 +56,7 @@
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tokina_sigure/Shigure.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tokina_sigure/added_IVF1572_Flat_nprobe_9.index.bin",
       "featureUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tokina_sigure/total_fea.npy",
-      "termOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/tokina_sigure/term_of_use.txt",
+      "termsOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/tokina_sigure/term_of_use.txt",
       "credit": "刻鳴時雨",
       "description": "https://huggingface.co/yasyune/Shigure_Tokina_RVC"
     },
@@ -68,7 +68,7 @@
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_default/amitaro_hubertjp_768_def-100.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_default/amitaro_hubertjp_768_def.0.index.bin",
       "featureUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_default/amitaro_hubertjp_768_def.0.big.npy",
-      "termOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/amitaro_hubertjp_768_default/term_of_use.txt",
+      "termsOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/amitaro_hubertjp_768_default/term_of_use.txt",
       "credit": "あみたろ",
       "description": ""
     },
@@ -80,7 +80,7 @@
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_nadare/amitaro_hubert_jp-100.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_nadare/amitaro_hubert_jp.0.index.bin",
       "featureUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_nadare/amitaro_hubert_jp.0.big.npy",
-      "termOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/amitaro_hubertjp_768_nadare/term_of_use.txt",
+      "termsOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/amitaro_hubertjp_768_nadare/term_of_use.txt",
       "credit": "あみたろ",
       "description": ""
     },
@@ -92,7 +92,7 @@
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_tylor/amitaro_hubertjp_768_tylor-100.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_tylor/amitaro_hubertjp_768_tylor.0.index.bin",
       "featureUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_tylor/amitaro_hubertjp_768_tylor.0.big.npy",
-      "termOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/amitaro_hubertjp_768_tylor/term_of_use.txt",
+      "termsOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/amitaro_hubertjp_768_tylor/term_of_use.txt",
       "credit": "あみたろ",
       "description": ""
     },
@@ -104,7 +104,7 @@
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tsukuyomi-chan_hubertjp_768_default/tsukuyomi_hubertjp_768_def-100.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tsukuyomi-chan_hubertjp_768_default/tsukuyomi_hubertjp_768_def.0.index.bin",
       "featureUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tsukuyomi-chan_hubertjp_768_default/tsukuyomi_hubertjp_768_def.0.big.npy",
-      "termOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/tsukuyomi-chan_hubertjp_768_default/term_of_use.txt",
+      "termsOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/tsukuyomi-chan_hubertjp_768_default/term_of_use.txt",
       "credit": "つくよみちゃん",
       "description": ""
     }

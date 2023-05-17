@@ -165,7 +165,7 @@ class RVC:
             params["description"] = sampleInfo.description
             params["name"] = sampleInfo.name
             params["sampleId"] = sampleInfo.id
-            params["termOfUseUrl"] = sampleInfo.termOfUseUrl
+            params["termsOfUseUrl"] = sampleInfo.termsOfUseUrl
 
         # メタデータを見て、永続化モデルフォルダに移動させる
         # その際に、メタデータのファイル格納場所も書き換える

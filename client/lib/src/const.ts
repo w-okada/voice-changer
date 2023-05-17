@@ -231,7 +231,7 @@ export type RVCSampleModel = {
     modelUrl: string
     indexUrl: string
     featureUrl: string
-    termOfUseUrl: string
+    termsOfUseUrl: string
     credit: string
     description: string
 }

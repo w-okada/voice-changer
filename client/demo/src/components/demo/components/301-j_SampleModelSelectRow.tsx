@@ -24,7 +24,7 @@ export const SampleModelSelectRow = (_props: SampleModelSelectRowProps) => {
 
         const selectedSample = appState.serverSetting.serverSetting.sampleModels.find(x => { return x.id == fileUploadSetting.sampleId })
         const creditText = selectedSample ? `credit:${selectedSample.credit}` : ""
-        const termOfUseLink = selectedSample ? <a href={selectedSample.termOfUseUrl} target="_blank" rel="noopener noreferrer" className="body-item-text-small">[term of use]</a> : <></>
+        const termOfUseLink = selectedSample ? <a href={selectedSample.termsOfUseUrl} target="_blank" rel="noopener noreferrer" className="body-item-text-small">[terms of use]</a> : <></>
 
         const onModelSelected = (val: string) => {
             appState.serverSetting.setFileUploadSetting(slot, {
