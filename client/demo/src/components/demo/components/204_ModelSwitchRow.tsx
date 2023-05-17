@@ -34,9 +34,10 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
             const embedstr = x.embChannels
             const typestr = x.modelType == 0 ? "org" : "webui"
             const metadata = x.deprecated ? `[${index}]  [deprecated version]` : `[${index}]  [${f0str},${srstr},${embedstr},${typestr}]`
-            const tuning = `tune:${x.defaultTrans}`
-            const useIndex = x.indexFile != null && x.featureFile != null ? `index:true` : `index:false`
-            const subMetadata = `(${tuning},${useIndex})`
+            const tuning = `t:${x.defaultTune}`
+            const useIndex = x.indexFile != null && x.featureFile != null ? `i:true` : `i:false`
+            const defaultIndexRatio = `ir:${x.defaultIndexRatio}`
+            const subMetadata = `(${tuning},${useIndex},${defaultIndexRatio})`
             const displayName = `${metadata} ${x.name || filename}  ${subMetadata}`
 
 

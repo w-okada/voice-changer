@@ -185,7 +185,8 @@ type ModelSlot = {
     featureFile: string,
     indexFile: string,
 
-    defaultTrans: number,
+    defaultTune: number,
+    defaultIndexRatio: number,
 
     modelType: number,
     embChannels: number,
