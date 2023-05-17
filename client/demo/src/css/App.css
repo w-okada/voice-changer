@@ -137,6 +137,20 @@ body {
 }
 /* ROW */
 
+.split-8-2 {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 80%;
+    }
+    & > div:nth-child(2) {
+        left: 80%;
+        width: 20%;
+    }
+}
 .split-6-4 {
     display: flex;
     width: 100%;
@@ -803,7 +817,6 @@ body {
         flex-direction: row;
         .merge-field-elem {
             padding-left: 5px;
-            width: 100%;
         }
         .red {
             color: #f00;

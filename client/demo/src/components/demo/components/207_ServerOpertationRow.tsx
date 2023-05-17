@@ -44,7 +44,6 @@ export const ServerOpertationRow = (props: ServerOpertationRowProps) => {
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            guiState.stateControls.showWaitingCheckbox.updateState(false)
         }
         const onReloadClicked = async () => {
             const info = await appState.getInfo()
