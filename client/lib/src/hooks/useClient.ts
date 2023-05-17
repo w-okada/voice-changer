@@ -170,7 +170,7 @@ export const useClient = (props: UseClientProps): ClientState => {
             await clientSetting.reloadClientSetting() // 実質的な処理の意味はない
             await serverSetting.reloadServerInfo()
         }
-    }, [clientSetting, serverSetting])
+    }, [clientSetting.reloadClientSetting, serverSetting.reloadServerInfo])
 
 
     const clearSetting = async () => {

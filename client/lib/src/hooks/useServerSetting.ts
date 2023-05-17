@@ -463,7 +463,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
 
     const reloadServerInfo = useMemo(() => {
         return async () => {
-            console.log("reload server info")
 
             if (!props.voiceChangerClient) return
             const res = await props.voiceChangerClient.getServerSettings()

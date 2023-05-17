@@ -493,7 +493,7 @@ export type OnnxExporterInfo = {
 }
 
 
-export const MAX_MODEL_SLOT_NUM = 3
+export const MAX_MODEL_SLOT_NUM = 4
 
 // Merge
 export type MergeElement = {

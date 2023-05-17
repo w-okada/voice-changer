@@ -1,4 +1,3 @@
-from concurrent.futures import ThreadPoolExecutor
 import sys
 import os
 import resampy
@@ -6,8 +5,8 @@ from dataclasses import asdict
 from typing import cast
 import numpy as np
 import torch
-from MMVCServerSIO import download_no_tqdm
-from ModelSample import RVCModelSample, getModelSamples
+from ModelSample import getModelSamples
+from voice_changer.RVC.SampleDownloader import downloadModelFiles
 
 
 # avoiding parse arg error in RVC
@@ -38,7 +37,7 @@ from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.pipeline.Pipeline import Pipeline
 
 from Exceptions import NoModeLoadedException
-from const import TMP_DIR, UPLOAD_DIR
+from const import RVC_MAX_SLOT_NUM, RVC_MODEL_DIRNAME, UPLOAD_DIR
 import shutil
 import json
 
@@ -48,9 +47,6 @@ providers = [
     "DmlExecutionProvider",
     "CPUExecutionProvider",
 ]
-
-RVC_MODEL_DIRNAME = "rvc"
-RVC_MAX_SLOT_NUM = 6
 
 
 class RVC:
@@ -97,46 +93,6 @@ class RVC:
         else:
             None
 
-    def downloadModelFiles(self, sampleInfo: RVCModelSample):
-        downloadParams = []
-
-        modelPath = os.path.join(TMP_DIR, os.path.basename(sampleInfo.modelUrl))
-        downloadParams.append(
-            {
-                "url": sampleInfo.modelUrl,
-                "saveTo": modelPath,
-                "position": 0,
-            }
-        )
-
-        indexPath = None
-        if hasattr(sampleInfo, "indexUrl") and sampleInfo.indexUrl != "":
-            indexPath = os.path.join(TMP_DIR, os.path.basename(sampleInfo.indexUrl))
-            downloadParams.append(
-                {
-                    "url": sampleInfo.indexUrl,
-                    "saveTo": indexPath,
-                    "position": 1,
-                }
-            )
-
-        featurePath = None
-        if hasattr(sampleInfo, "featureUrl") or sampleInfo.featureUrl != "":
-            featurePath = os.path.join(TMP_DIR, os.path.basename(sampleInfo.featureUrl))
-            downloadParams.append(
-                {
-                    "url": sampleInfo.featureUrl,
-                    "saveTo": featurePath,
-                    "position": 2,
-                }
-            )
-
-        print("[Voice Changer] Downloading model files...", end="")
-        with ThreadPoolExecutor() as pool:
-            pool.map(download_no_tqdm, downloadParams)
-        print("")
-        return modelPath, indexPath, featurePath
-
     def moveToModelDir(self, file: str, dstDir: str):
         dst = os.path.join(dstDir, os.path.basename(file))
         if os.path.exists(dst):
@@ -155,7 +111,7 @@ class RVC:
             if sampleInfo is None:
                 print("[Voice Changer] sampleInfo is None")
                 return
-            modelPath, indexPath, featurePath = self.downloadModelFiles(sampleInfo)
+            modelPath, indexPath, featurePath = downloadModelFiles(sampleInfo)
             params["files"]["rvcModel"] = modelPath
             if indexPath is not None:
                 params["files"]["rvcIndex"] = indexPath

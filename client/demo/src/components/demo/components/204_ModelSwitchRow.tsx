@@ -10,7 +10,6 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
 
     const modelSwitchRow = useMemo(() => {
         const slot = appState.serverSetting.serverSetting.modelSlotIndex
-
         const onSwitchModelClicked = async (slot: number) => {
             // Quick hack for same slot is selected. 下３桁が実際のSlotID
             const dummyModelSlotIndex = (Math.floor(Date.now() / 1000)) * 1000 + slot
@@ -48,7 +47,6 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
 
         const selectedTermOfUseUrl = appState.serverSetting.serverSetting.modelSlots[slot]?.termsOfUseUrl || null
         const selectedTermOfUseUrlLink = selectedTermOfUseUrl ? <a href={selectedTermOfUseUrl} target="_blank" rel="noopener noreferrer" className="body-item-text-small">[terms of use]</a> : <></>
-        console.log("selectedTermOfUseUrl", selectedTermOfUseUrl)
 
         return (
             <>

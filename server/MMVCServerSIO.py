@@ -7,9 +7,12 @@ import socket
 import platform
 import os
 import argparse
-import requests  # type: ignore
+from Downloader import download, download_no_tqdm
+from voice_changer.RVC.SampleDownloader import (
+    checkRvcModelExist,
+    downloadInitialSampleModels,
+)
 
-from tqdm import tqdm
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 
 import uvicorn
@@ -98,59 +101,6 @@ def printMessage(message, level=0):
             print(f"\033[32m    {message}\033[0m")
         else:
             print(f"\033[47m    {message}\033[0m")
-
-
-def download(params):
-    url = params["url"]
-    saveTo = params["saveTo"]
-    position = params["position"]
-    dirname = os.path.dirname(saveTo)
-    if dirname != "":
-        os.makedirs(dirname, exist_ok=True)
-
-    try:
-        req = requests.get(url, stream=True, allow_redirects=True)
-        content_length = req.headers.get("content-length")
-        progress_bar = tqdm(
-            total=int(content_length) if content_length is not None else None,
-            leave=False,
-            unit="B",
-            unit_scale=True,
-            unit_divisor=1024,
-            position=position,
-        )
-
-        # with tqdm
-        with open(saveTo, "wb") as f:
-            for chunk in req.iter_content(chunk_size=1024):
-                if chunk:
-                    progress_bar.update(len(chunk))
-                    f.write(chunk)
-
-    except Exception as e:
-        print(e)
-
-
-def download_no_tqdm(params):
-    url = params["url"]
-    saveTo = params["saveTo"]
-    dirname = os.path.dirname(saveTo)
-    if dirname != "":
-        os.makedirs(dirname, exist_ok=True)
-    try:
-        req = requests.get(url, stream=True, allow_redirects=True)
-        with open(saveTo, "wb") as f:
-            countToDot = 0
-            for chunk in req.iter_content(chunk_size=1024):
-                if chunk:
-                    f.write(chunk)
-                    countToDot += 1
-                    if countToDot % 1024 == 0:
-                        print(".", end="", flush=True)
-
-        print("+", end="", flush=True)
-    except Exception as e:
-        print(e)
 
 
 def downloadWeight():
@@ -253,11 +203,6 @@ if __name__ == "MMVCServerSIO":
         nsf_hifigan=args.nsf_hifigan,
     )
 
-    try:
-        download_no_tqdm({"url": SAMPLES_JSON, "saveTo": args.samples, "position": 0})
-    except Exception as e:
-        print("[Voice Changer] loading sample failed", e)
-
     if (
         os.path.exists(voiceChangerParams.hubert_base) is False
         or os.path.exists(voiceChangerParams.hubert_base_jp) is False
@@ -278,8 +223,17 @@ if __name__ == "__main__":
 
     printMessage("Voice Changerを起動しています。", level=2)
 
+    # ダウンロード
     downloadWeight()
     os.makedirs(args.model_dir, exist_ok=True)
+
+    try:
+        download_no_tqdm({"url": SAMPLES_JSON, "saveTo": args.samples, "position": 0})
+    except Exception as e:
+        print("[Voice Changer] loading sample failed", e)
+
+    if checkRvcModelExist(args.model_dir) is False:
+        downloadInitialSampleModels(args.samples, args.model_dir)
 
     PORT = args.p
 

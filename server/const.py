@@ -98,3 +98,5 @@ class ServerAudioDeviceTypes(Enum):
 
 
 SAMPLES_JSON = "https://huggingface.co/wok000/vcclient_model/raw/main/samples.json"
+RVC_MODEL_DIRNAME = "rvc"
+RVC_MAX_SLOT_NUM = 5
