@@ -234,6 +234,8 @@ export type RVCSampleModel = {
     termsOfUseUrl: string
     credit: string
     description: string
+    lang: string
+    tag: string
 }
 
 export const DefaultServerSetting: ServerInfo = {
