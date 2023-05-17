@@ -137,11 +137,19 @@ class RVC:
         print("")
         return modelPath, indexPath, featurePath
 
+    def moveToModelDir(self, file: str, dstDir: str):
+        dst = os.path.join(dstDir, os.path.basename(file))
+        if os.path.exists(dst):
+            os.remove(dst)
+        shutil.move(file, dst)
+        return dst
+
     def loadModel(self, props: LoadModelParams):
         target_slot_idx = props.slot
         params = props.params
 
         print("loadModel", params)
+        # サンプルが指定されたときはダウンロードしてメタデータをでっちあげる
         if len(params["sampleId"]) > 0:
             sampleInfo = self.getSampleInfo(params["sampleId"])
             if sampleInfo is None:
@@ -159,21 +167,22 @@ class RVC:
             params["sampleId"] = sampleInfo.id
             params["termOfUseUrl"] = sampleInfo.termOfUseUrl
 
+        # メタデータを見て、永続化モデルフォルダに移動させる
+        # その際に、メタデータのファイル格納場所も書き換える
         slotDir = os.path.join(
             self.params.model_dir, RVC_MODEL_DIRNAME, str(target_slot_idx)
         )
-        files = [params["files"]["rvcModel"]]
-        if "rvcFeature" in params["files"]:
-            files.append(params["files"]["rvcFeature"])
-        if "rvcIndex" in params["files"]:
-            files.append(params["files"]["rvcIndex"])
-
         os.makedirs(slotDir, exist_ok=True)
-        for f in files:
-            dst = os.path.join(slotDir, os.path.basename(f))
-            if os.path.exists(dst):
-                os.remove(dst)
-            shutil.move(f, dst)
+
+        modelDst = self.moveToModelDir(params["files"]["rvcModel"], slotDir)
+        params["files"]["rvcModel"] = modelDst
+        if "rvcFeature" in params["files"]:
+            featureDst = self.moveToModelDir(params["files"]["rvcFeature"], slotDir)
+            params["files"]["rvcFeature"] = featureDst
+        if "rvcIndex" in params["files"]:
+            indexDst = self.moveToModelDir(params["files"]["rvcIndex"], slotDir)
+            params["files"]["rvcIndex"] = indexDst
+
         json.dump(params, open(os.path.join(slotDir, "params.json"), "w"))
         self.loadSlots()
 
@@ -422,12 +431,15 @@ class RVC:
         else:
             targetSlot = req.slot
 
+        # いったんは、アップロードフォルダに格納する。（歴史的経緯）
+        # 後続のloadmodelを呼び出すことで永続化モデルフォルダに移動させられる。
         storeDir = os.path.join(UPLOAD_DIR, f"{targetSlot}")
         print("[Voice Changer] store merged model to:", storeDir)
         os.makedirs(storeDir, exist_ok=True)
         storeFile = os.path.join(storeDir, "merged.pth")
         torch.save(merged, storeFile)
 
+        # loadmodelを呼び出して永続化モデルフォルダに移動させる。
         params = {
             "defaultTune": req.defaultTune,
             "defaultIndexRatio": req.defaultIndexRatio,
