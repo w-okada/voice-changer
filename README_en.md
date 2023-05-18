@@ -45,28 +45,14 @@
 
 # usage
 
-Details are summarized [here](https://zenn.dev/wok/books/0004_vc-client-v_1_5_1_x).
-
 This is an app for performing voice changes with MMVC and so-vits-svc.
 
-It can be used in three main ways, in order of difficulty:
+It can be used in two main ways, in order of difficulty:
 
-- Using Google Colaboratory (MMVC only)
 - Using a pre-built binary
 - Setting up an environment with Docker or Anaconda and using it
 
-For those who are not familiar with this software or MMVC, it is recommended to gradually get used to it from the top.
-
-## (1) Use on Google Colaboratory (MMVC only)
-
-You can run it on Google's machine learning platform, Colaboratory. If you have already used Colaboratory, you do not need to prepare anything as the training of MMVC model has been completed. However, the voice changer may have a large time lag depending on the network environment or the situation of Colaboratory.
-
-- [Simple version](https://github.com/w-okada/voice-changer/blob/master/VoiceChangerDemo_Simple.ipynb): You can run it from Colab without any prior setup.
-- [Normal version](https://github.com/w-okada/voice-changer/blob/master/VoiceChangerDemo.ipynb): You can load the model by cooperating with Google Drive.
-
-[Explanation video](https://youtu.be/TogfMzXH1T0)
-
-## (2) Usage with pre-built binaries
+## (1) Usage with pre-built binaries
 
 You can download and run executable binaries.
 We offer Windows and Mac versions.
@@ -76,10 +62,6 @@ We offer Windows and Mac versions.
 - For Mac version, after unzipping the downloaded file, double-click the `startHttp.command` file corresponding to your VC. If a message indicating that the developer cannot be verified is displayed, please press the control key and click to run it again (or right-click to run it).
 
 - If you are connecting remotely, please use the `.command` file (Mac) or `.bat` file (Windows) with https instead of http.
-
-- Tsukuyomi-chan, Ami-taro, Kogane Mahiro, and Kogane Kaigetsu require the Content Vec model for their actions. Please download the ContentVec_legacy 500 model from [this repository](https://github.com/auspicious3000/contentvec) and place it in the same folder as startHttp.command or start_http.bat to execute it.
-
-- To run DDSP-SVC, you need to download the hubert-soft and enhancer models. Download hubert-soft from [this link](https://github.com/bshall/hubert/releases/download/v0.1/hubert-soft-0d54a1f4.pt) and store it in the folder with the batch files. Download nsf_hifigan_20221211.zip from [this site](https://github.com/openvpi/vocoders/releases/tag/nsf-hifigan-v1) for enhancer. After unzipping, store the nsf_hifigan folder in the folder with the batch files.
 
 - The encoder of DDPS-SVC only supports hubert-soft.
 
@@ -97,23 +79,9 @@ We offer Windows and Mac versions.
 
 (\*1) You can alson download from [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)
 (\*2) The developer does not have an AMD graphics card, so it has not been tested. This package only includes onnxruntime-directml.
+(\*3) If unpacking or starting is slow, there is a possibility that virus checking is running on your antivirus software. Please try running it with the file or folder excluded from the target. (At your own risk)
 
-| Version    | OS                                    | Framework | link                                                                                               | VC Support | Size  |
-| ---------- | ------------------------------------- | --------- | -------------------------------------------------------------------------------------------------- | ---------- | ----- |
-| v.1.5.1.14 | <span style="color: red;">mac</span>  | -         | [Tsukuyomi-chan](https://drive.google.com/uc?id=1ysTt0xOkWFSxyXfFm2GD7i5o22jce4B8&export=download) | -          | 874MB |
-|            | <span style="color: red;">mac</span>  | -         | [Kikoto Mahiro](https://drive.google.com/uc?id=1uZW-PSHttQuGXZf9vU7ZGufbYl-nIRs6&export=download)  | -          | 872MB |
-|            | <span style="color: red;">mac</span>  | -         | [Amitaro](https://drive.google.com/uc?id=1jc6YXcvt0_z1GezKSvqHQPYFmtZU2KaV&export=download)        | -          | 872MB |
-|            | <span style="color: red;">mac</span>  | -         | [Kikoto Kurage](https://drive.google.com/uc?id=1ruaTdhrIJVdz__sDwZEeovzwxrk2ufLT&export=download)  | -          | 873MB |
-|            | <span style="color: blue;">win</span> | -         | [Tsukuyomi-chan](https://drive.google.com/uc?id=1QdeotmYP6nnoZt438kB8wvFbYF-C0bhq&export=download) | -          | 823MB |
-|            | <span style="color: blue;">win</span> | -         | [Kikoto Mahiro](https://drive.google.com/uc?id=1IJJQj6CHcbyvTwZ5LF6GZSk7FLs5OK6o&export=download)  | -          | 821MB |
-|            | <span style="color: blue;">win</span> | -         | [Kikoto Kurage](https://drive.google.com/uc?id=1fiymPcoYzwE1yxyIfC_FTPiFfGEC2jA8&export=download)  | -          | 823MB |
-|            | <span style="color: blue;">win</span> | -         | [Amitaro](https://drive.google.com/uc?id=1Vt4WBEOAz0EhIWs3ZRFIcg7ELtSHnYfe&export=download)        | -          | 821MB |
-
-\*1 Tsukuyo Michan uses free character "Tsukuyo Michan" voice data that is publicly available for free. (Details such as terms of use are at the end of the document)
-
-\*2 If unpacking or starting is slow, there is a possibility that virus checking is running on your antivirus software. Please try running it with the file or folder excluded from the target. (At your own risk)
-
-## (2-3) Usage after setting up the environment such as Docker or Anaconda
+## (2) Usage after setting up the environment such as Docker or Anaconda
 
 Clone this repository and use it. Setting up WSL2 is essential for Windows. Additionally, setting up virtual environments such as Docker or Anaconda on WSL2 is also required. On Mac, setting up Python virtual environments such as Anaconda is necessary. Although preparation is required, this method works the fastest in many environments. **<font color="red"> Even without a GPU, it may work well enough with a reasonably new CPU </font>(refer to the section on real-time performance below)**.
 

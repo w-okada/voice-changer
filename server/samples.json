@@ -61,6 +61,18 @@
       "description": "https://huggingface.co/yasyune/Shigure_Tokina_RVC"
     },
     {
+      "id": "Amitaro",
+      "lang": "ja-JP",
+      "tag": "",
+      "name": "あみたろ",
+      "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_contentvec_256/amitaro48k-100.pth",
+      "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_contentvec_256/amitaro48k.0.index.bin",
+      "featureUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_contentvec_256/amitaro48k.0.big.npy",
+      "termsOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/amitaro_contentvec_256/term_of_use.txt",
+      "credit": "あみたろ",
+      "description": ""
+    },
+    {
       "id": "Amitaro_d",
       "lang": "ja-JP",
       "tag": "",
@@ -70,7 +82,7 @@
       "featureUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_default/amitaro_hubertjp_768_def.0.big.npy",
       "termsOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/amitaro_hubertjp_768_default/term_of_use.txt",
       "credit": "あみたろ",
-      "description": ""
+      "description": "rinna hubertjpを使用した768次元埋め込み版。デフォルトの事前学習モデルを使用"
     },
     {
       "id": "Amitaro_n",
@@ -82,7 +94,7 @@
       "featureUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_nadare/amitaro_hubert_jp.0.big.npy",
       "termsOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/amitaro_hubertjp_768_nadare/term_of_use.txt",
       "credit": "あみたろ",
-      "description": ""
+      "description": "rinna hubertjpを使用した768次元埋め込み版。nadare様作成の事前学習モデルを使用"
     },
     {
       "id": "Amitaro_t",
@@ -94,17 +106,29 @@
       "featureUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_tylor/amitaro_hubertjp_768_tylor.0.big.npy",
       "termsOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/amitaro_hubertjp_768_tylor/term_of_use.txt",
       "credit": "あみたろ",
-      "description": ""
+      "description": "rinna hubertjpを使用した768次元埋め込み版。tylor様作成の事前学習モデルを使用"
+    },
+    {
+      "id": "Tsukuyomi-chan_d",
+      "lang": "ja-JP",
+      "tag": "",
+      "name": "つくよみちゃん(d)",
+      "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tsukuyomi-chan_hubertjp_768_default/tsukuyomi_hubertjp_768_def-100.pth",
+      "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tsukuyomi-chan_hubertjp_768_default/tsukuyomi_hubertjp_768_def.0.index.bin",
+      "featureUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tsukuyomi-chan_hubertjp_768_default/tsukuyomi_hubertjp_768_def.0.big.npy",
+      "termsOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/tsukuyomi-chan_hubertjp_768_default/term_of_use.txt",
+      "credit": "つくよみちゃん",
+      "description": "rinna hubertjpを使用した768次元埋め込み版。デフォルトの事前学習モデルを使用"
     },
     {
       "id": "Tsukuyomi-chan",
       "lang": "ja-JP",
       "tag": "",
       "name": "つくよみちゃん",
-      "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tsukuyomi-chan_hubertjp_768_default/tsukuyomi_hubertjp_768_def-100.pth",
-      "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tsukuyomi-chan_hubertjp_768_default/tsukuyomi_hubertjp_768_def.0.index.bin",
-      "featureUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tsukuyomi-chan_hubertjp_768_default/tsukuyomi_hubertjp_768_def.0.big.npy",
-      "termsOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/tsukuyomi-chan_hubertjp_768_default/term_of_use.txt",
+      "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tsukuyomi_contentvec_256/tsukuyomi48k-75.pth",
+      "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tsukuyomi_contentvec_256/tsukuyomi48k.0.index.bin",
+      "featureUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tsukuyomi_contentvec_256/tsukuyomi48k.0.big.npy",
+      "termsOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/tsukuyomi_contentvec_256/term_of_use.txt",
       "credit": "つくよみちゃん",
       "description": ""
     }

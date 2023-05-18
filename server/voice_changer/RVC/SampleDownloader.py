@@ -18,7 +18,7 @@ def downloadInitialSampleModels(sampleJson: str, model_dir: str):
     sampleModelIds = [
         "KikotoMahiro_Song",
         "TokinaShigure",
-        "Amitaro_n",
+        "Amitaro",
         "Tsukuyomi-chan",
     ]
     sampleModels = getModelSamples(sampleJson, "RVC")

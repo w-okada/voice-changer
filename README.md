@@ -48,25 +48,14 @@
 
 <!-- 詳細は[こちら](https://zenn.dev/wok/books/0004_vc-client-v_1_5_1_x)に纏まっています。 -->
 
-大きく 3 つの方法でご利用できます。難易度順に次の通りです。
+大きく 2 つの方法でご利用できます。難易度順に次の通りです。
 
-- Google Colaboratory での利用(MMVC のみ)
 - 事前ビルド済みの Binary での利用
 - Docker や Anaconda など環境構築を行った上での利用
 
 本ソフトウェアや MMVC になじみの薄い方は上から徐々に慣れていくとよいと思います。
 
-## (1) Google Colaboratory での利用(MMVC のみ)
-
-Google が提供している機械学習プラットフォーム Colaboratory 上で実行できます。
-MMVC のモデルをトレーニングが完了している場合、既に Colaboratory を利用していると思いますので、事前準備は必要ありません。ただし、ネットワーク環境や Colaboratory の状況によってボイスチェンジャのタイムラグが大きくなる傾向があります。
-
-- [超簡単バージョン](https://github.com/w-okada/voice-changer/blob/master/VoiceChangerDemo_Simple.ipynb): 事前設定なしで Colab から実行できます。
-- [普通バージョン](https://github.com/w-okada/voice-changer/blob/master/VoiceChangerDemo.ipynb): Google Drive と連携してモデルを読み込むことができます。
-
-[解説動画](https://youtu.be/TogfMzXH1T0)
-
-## (2) 事前ビルド済みの Binary での利用
+## (1) 事前ビルド済みの Binary での利用
 
 実行形式のバイナリをダウンロードして実行することができます。
 Windows 版と Mac 版を提供しています。
@@ -75,11 +64,10 @@ Windows 版と Mac 版を提供しています。
 
 - Mac 版はダウンロードファイルを解凍したのちに、`startHttp.command`を実行してください。開発元を検証できない旨が示される場合は、再度コントロールキーを押してクリックして実行してください(or 右クリックから実行してください)。
 
+- 初回起動時は各種データをダウンロードします。ダウンロードに時間がかかる可能性があります。ダウンロードが完了すると、ブラウザが立ち上がります。
+
 - リモートから接続する場合は、`.bat`ファイル(win)、`.command`ファイル(mac)の http が https に置き換わっているものを使用してください。
 
-- つくよみちゃん、あみたろ、黄琴まひろ、黄琴海月、の動作には content vec のモデルが必要となります。こちらの[リポジトリ](https://github.com/auspicious3000/contentvec)から、ContentVec_legacy 500 のモデルをダウンロードして、実行する`startHttp.command`や`start_http.bat`と同じフォルダに配置してください。
-
-- DDSP-SVC の動作には、hubert-soft と enhancer のモデルが必要です。hubert-soft は[このリンク](https://github.com/bshall/hubert/releases/download/v0.1/hubert-soft-0d54a1f4.pt)からダウンロードして、バッチファイルがあるフォルダに格納してください。enhancer は[このサイト](https://github.com/openvpi/vocoders/releases/tag/nsf-hifigan-v1)から`nsf_hifigan_20221211.zip`ダウンロードして下さい。解凍すると出てくる`nsf_hifigan`というフォルダをバッチファイルがあるフォルダに格納してください。
 - DDPS-SVC の encoder は hubert-soft のみ対応です。
 
 - RVC で使用する場合の GUI の各項目説明は[こちら](tutorials/tutorial_rvc_ja_latest.md)をご覧ください
@@ -93,24 +81,9 @@ Windows 版と Mac 版を提供しています。
 
 (\*1) Google Drive からダウンロードできない方は[hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)からダウンロードしてみてください
 (\*2) 開発者が AMD のグラフィックボードを持っていないので動作確認していません。onnxruntime-directml を同梱しただけのものです。
+(\*3) 解凍や起動が遅い場合、ウィルス対策ソフトのチェックが走っている可能性があります。ファイルやフォルダを対象外にして実行してみてください。（自己責任です）
 
-- 各キャラクター専用(近々 RVC 版として提供予定)
-
-| Version    | OS                                    | フレームワーク | link                                                                                               | サポート VC | サイズ |
-| ---------- | ------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------- | ----------- | ------ |
-| v.1.5.1.14 | <span style="color: red;">mac</span>  | -              | [黄琴まひろ](https://drive.google.com/uc?id=1uZW-PSHttQuGXZf9vU7ZGufbYl-nIRs6&export=download)     | -           | 872MB  |
-|            | <span style="color: red;">mac</span>  | -              | [あみたろ](https://drive.google.com/uc?id=1jc6YXcvt0_z1GezKSvqHQPYFmtZU2KaV&export=download)       | -           | 872MB  |
-|            | <span style="color: red;">mac</span>  | -              | [黄琴海月](https://drive.google.com/uc?id=1ruaTdhrIJVdz__sDwZEeovzwxrk2ufLT&export=download)       | -           | 873MB  |
-|            | <span style="color: blue;">win</span> | -              | [つくよみちゃん](https://drive.google.com/uc?id=1QdeotmYP6nnoZt438kB8wvFbYF-C0bhq&export=download) | -           | 823MB  |
-|            | <span style="color: blue;">win</span> | -              | [黄琴まひろ](https://drive.google.com/uc?id=1IJJQj6CHcbyvTwZ5LF6GZSk7FLs5OK6o&export=download)     | -           | 821MB  |
-|            | <span style="color: blue;">win</span> | -              | [黄琴海月](https://drive.google.com/uc?id=1fiymPcoYzwE1yxyIfC_FTPiFfGEC2jA8&export=download)       | -           | 823MB  |
-|            | <span style="color: blue;">win</span> | -              | [あみたろ](https://drive.google.com/uc?id=1Vt4WBEOAz0EhIWs3ZRFIcg7ELtSHnYfe&export=download)       | -           | 821MB  |
-
-\*1 つくよみちゃんはフリー素材キャラクター「つくよみちゃん」が無料公開している音声データを使用しています。（利用規約など、詳細は文末）
-
-\*2 解凍や起動が遅い場合、ウィルス対策ソフトのチェックが走っている可能性があります。ファイルやフォルダを対象外にして実行してみてください。（自己責任です）
-
-## (3) Docker や Anaconda など環境構築を行った上での利用
+## (2) Docker や Anaconda など環境構築を行った上での利用
 
 本リポジトリをクローンして利用します。Windows では WSL2 の環境構築が必須になります。また、WSL2 上で Docker もしくは Anaconda などの仮想環境の構築が必要となります。Mac では Anaconda などの Python の仮想環境の構築が必要となります。事前準備が必要となりますが、多くの環境においてこの方法が一番高速で動きます。**<font color="red"> GPU が無くてもそこそこ新しい CPU であれば十分動く可能性があります </font>（下記のリアルタイム性の節を参照）**。
 

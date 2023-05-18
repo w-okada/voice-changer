@@ -1,3 +1,6 @@
+import os
+import sys
+
 from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.routing import APIRoute
 from fastapi.middleware.cors import CORSMiddleware
@@ -67,7 +70,20 @@ class MMVC_Rest:
             app_fastapi.mount(
                 "/upload_dir", StaticFiles(directory=f"{UPLOAD_DIR}"), name="static"
             )
-            app_fastapi.mount("/models", StaticFiles(directory="models"), name="static")
+
+            if sys.platform.startswith("darwin"):
+                p1 = os.path.dirname(sys._MEIPASS)
+                p2 = os.path.dirname(p1)
+                p3 = os.path.dirname(p2)
+                model_dir = os.path.join(p3, "models")
+                print("mac model_dir:", model_dir)
+                app_fastapi.mount(
+                    "/models", StaticFiles(directory=model_dir), name="static"
+                )
+            else:
+                app_fastapi.mount(
+                    "/models", StaticFiles(directory="models"), name="static"
+                )
 
             restHello = MMVC_Rest_Hello()
             app_fastapi.include_router(restHello.router)
