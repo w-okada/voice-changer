@@ -4,6 +4,11 @@
 
 ## What's New!
 
+- v.1.5.3.1
+
+  - support sample models
+  - store uploaded models
+
 - v.1.5.2.9a
 
   - fix: ServerDeviceMode Channel Setting
@@ -71,6 +76,8 @@ We offer Windows and Mac versions.
 
 | Version    | OS  | Framework                                | link                                                                                           | support VC                                                                    | size   |
 | ---------- | --- | ---------------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------ |
+| v.1.5.3.1  | mac | ONNX(cpu), PyTorch(cpu,mps)              | [normal](https://drive.google.com/uc?id=1oswF72q_cQQeXhIn6W275qLnoBAmcrR_&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 796MB  |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)        | [normal](https://drive.google.com/uc?id=1AWjDhW4w2Uljp1-9P8YUJBZsIlnhkJX2&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2872MB |
 | v.1.5.2.9e | mac | ONNX(cpu), PyTorch(cpu,mps)              | [normal](https://drive.google.com/uc?id=1W0d7I7619PcO7kjb1SPXp6MmH5Unvd78&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 796MB  |
 |            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)        | [normal](https://drive.google.com/uc?id=1tmTMJRRggS2Sb4goU-eHlRvUBR88RZDl&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2872MB |
 | v.1.5.2.8  | mac | ONNX(cpu), PyTorch(cpu,mps)              | [normal](https://drive.google.com/uc?id=1qY4ZqsKgrqIPKaVy0xrhkBwp_bUK78VI&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 784MB  |
