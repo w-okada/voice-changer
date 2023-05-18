@@ -19,18 +19,6 @@
   - Support DDSP-SVC 3.0 (Ph.1)
   - Server Device Mode (experimental)
 
-- v.1.5.2.8
-
-  - auto-downloader for weight of hubert.
-  - auto detect half-precision.
-  - auto detect onnx execution provider.
-  - force onnx export by cpu.
-  - support japanse hubert. (experimental)
-
-- v.1.5.2.7
-
-  - New Feature: model merger.
-
 # What is VC Client
 
 1. This is a client software for performing real-time voice conversion using various Voice Conversion (VC) AI. The supported AI for voice conversion are as follows.

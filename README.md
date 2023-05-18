@@ -19,18 +19,6 @@
   - Support DDSP-SVC 3.0 (Ph.1)
   - Server Device Mode (experimental)
 
-- v.1.5.2.8
-
-  - auto-downloader for weight of hubert.
-  - auto detect half-precision.
-  - auto detect onnx execution provider.
-  - force onnx export by cpu.
-  - support japanse hubert. (experimental)
-
-- v.1.5.2.7
-
-  - New Feature: model merger.
-
 # VC Client とは
 
 1. 各種音声変換 AI(VC, Voice Conversion)を用いてリアルタイム音声変換を行うためのクライアントソフトウェアです。サポートしている音声変換 AI は次のものになります。
