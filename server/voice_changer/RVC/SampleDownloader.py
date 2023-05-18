@@ -16,7 +16,7 @@ def checkRvcModelExist(model_dir: str):
 
 def downloadInitialSampleModels(sampleJson: str, model_dir: str):
     sampleModelIds = [
-        "KikotoMahiro_Song",
+        "KikotoMahiro",
         "TokinaShigure",
         "Amitaro",
         "Tsukuyomi-chan",
