@@ -64,6 +64,31 @@ GUI で設定できる項目は下図のようなセクションに分かれて�
 
 ![image](https://github.com/w-okada/voice-changer/assets/48346627/a5eab90c-c0af-42cd-abfb-e897d333d1ff)
 
+## Title
+
+![image](https://github.com/w-okada/rvc-trainer-docker/assets/48346627/0ea2106d-9da9-493b-aee0-8320fa58e273)
+
+タイトル横のアイコンはリンクになっています。
+
+| アイコン                                                                                                                                     | リンク                           |
+| :------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------- |
+| <img src="https://github.com/w-okada/rvc-trainer-docker/assets/48346627/97c18ca5-eee5-4be2-92a7-8092fff960f2" width="32"> Octocat            | github のリポジトリへのリンク    |
+| <img src="https://github.com/w-okada/rvc-trainer-docker/assets/48346627/751164e4-7b7d-4d7e-b49c-1ad660bf7439" width="32"> クエスションマーク | マニュアル へのリンク            |
+| <img src="https://github.com/w-okada/rvc-trainer-docker/assets/48346627/7bc188db-3aae-43eb-98a1-34aacc16173d" width="32"> スパナ             | 各種便利ツールへのリンク         |
+| <img src="https://github.com/w-okada/rvc-trainer-docker/assets/48346627/5db16acc-e901-40d2-8fc2-1fb9fd67f59c" width="32"> コーヒー           | 開発者へ**寄付**するためのリンク |
+
+### claer setting
+
+設定を初期化します。
+
+### reload
+
+強制的に画面をリロードします
+
+### re-select vc
+
+ランチャー画面に戻ります
+
 ## server control
 
 ### start
