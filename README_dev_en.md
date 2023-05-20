@@ -38,45 +38,27 @@ git clone https://github.com/yxlllc/DDSP-SVC.git DDSP-SVC
 git clone https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI.git RVC
 ```
 
-2. Copy weights
-
-copy weights of emmbedding or vocoder. These file path can be set as parameter when invoke server.
-
-(1) hubert_base.pt
-
-download from [here](https://huggingface.co/lj1995/VoiceConversionWebUI/tree/main)
-
-(2) content vec
-
-download ContentVec_legacy_500 from [here](https://github.com/auspicious3000/contentvec)
-
-(3) hubert_soft
-
-download from [here](https://github.com/bshall/hubert/releases/download/v0.1/hubert-soft-0d54a1f4.pt)
-
-(4) vocorder
-
-download nsf_hifigan_20221211.zip from [here](https://github.com/openvpi/vocoders/releases/tag/nsf-hifigan-v1) and expand it.
-
-3. Install requirements
+2. Install requirements
 
 ```
 $ pip install -r requirements.txt
 ```
 
-4. Run server
+3. Run server
 
 Run server with the below command. You can replace the path to each weight.
 
 ```
 $ python3 MMVCServerSIO.py -p 18888 --https true \
-  --content_vec_500 weights/checkpoint_best_legacy_500.pt \
-  --hubert_base weights/hubert_base.pt \
-  --hubert_soft weights/hubert-soft-0d54a1f4.pt \
-  --nsf_hifigan weights/nsf_hifigan/model
+ --content_vec_500 pretrain/checkpoint_best_legacy_500.pt  \
+ --hubert_base pretrain/hubert_base.pt \
+ --hubert_soft pretrain/hubert/hubert-soft-0d54a1f4.pt \
+ --nsf_hifigan pretrain/nsf_hifigan/model \
+ --hubert_base_jp pretrain/rinna_hubert_base_jp.pt \
+ --model_dir models
 ```
 
-5. Enjoy developing.
+4. Enjoy developing.
 
 ## For Client Developer
 

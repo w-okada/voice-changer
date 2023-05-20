@@ -38,45 +38,27 @@ git clone https://github.com/yxlllc/DDSP-SVC.git DDSP-SVC
 git clone https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI.git RVC
 ```
 
-2. 外部のモデルの重みを配置する
-
-エンコーダやボコーダなどの外部のモデルの重みを入手して配置する。
-
-(1) hubert_base.pt
-
-download from [here](https://huggingface.co/lj1995/VoiceConversionWebUI/tree/main)
-
-(2) content vec
-
-download ContentVec_legacy_500 from [here](https://github.com/auspicious3000/contentvec)
-
-(3) hubert_soft
-
-download from [here](https://github.com/bshall/hubert/releases/download/v0.1/hubert-soft-0d54a1f4.pt)
-
-(4) vocorder
-
-download nsf_hifigan_20221211.zip from [here](https://github.com/openvpi/vocoders/releases/tag/nsf-hifigan-v1) and expand it.
-
-3. モジュールをインストールする
+2. モジュールをインストールする
 
 ```
 $ pip install -r requirements.txt
 ```
 
-4. サーバを起動する
+3. サーバを起動する
 
 次のコマンドで起動します。各種重みについてのパスは環境に合わせて変えてください。
 
 ```
 $ python3 MMVCServerSIO.py -p 18888 --https true \
-  --content_vec_500 weights/checkpoint_best_legacy_500.pt \
-  --hubert_base weights/hubert_base.pt \
-  --hubert_soft weights/hubert-soft-0d54a1f4.pt \
-  --nsf_hifigan weights/nsf_hifigan/model
+ --content_vec_500 pretrain/checkpoint_best_legacy_500.pt  \
+ --hubert_base pretrain/hubert_base.pt \
+ --hubert_soft pretrain/hubert/hubert-soft-0d54a1f4.pt \
+ --nsf_hifigan pretrain/nsf_hifigan/model \
+ --hubert_base_jp pretrain/rinna_hubert_base_jp.pt \
+ --model_dir models
 ```
 
-1. 開発しましょう
+4. 開発しましょう
 
 ## クライアント開発者向け
 
