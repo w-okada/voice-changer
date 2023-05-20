@@ -416,3 +416,17 @@ class RVC:
         self.prepareModel(targetSlot)
         self.settings.modelSlotIndex = targetSlot
         self.currentSlot = self.settings.modelSlotIndex
+
+    def update_model_default(self):
+        print("[voiceeeeee] UPDATE MODEL DEFAULT!!")
+        slotDir = os.path.join(
+            self.params.model_dir, RVC_MODEL_DIRNAME, str(self.currentSlot)
+        )
+        params = json.load(
+            open(os.path.join(slotDir, "params.json"), "r", encoding="utf-8")
+        )
+        params["defaultTune"] = self.settings.tran
+        params["defaultIndexRatio"] = self.settings.indexRatio
+
+        json.dump(params, open(os.path.join(slotDir, "params.json"), "w"))
+        self.loadSlots()

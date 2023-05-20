@@ -94,7 +94,7 @@ export type ServerSettingState = {
 
     getOnnx: () => Promise<OnnxExporterInfo>
     mergeModel: (request: MergeModelRequest) => Promise<ServerInfo>
-    // updateDefaultTune: (slot: number, tune: number) => void
+    updateModelDefault: () => Promise<ServerInfo>
 
 }
 
@@ -493,6 +493,12 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         return serverInfo
     }
 
+    const updateModelDefault = async () => {
+        const serverInfo = await props.voiceChangerClient!.updateModelDefault()
+        setServerSetting(serverInfo)
+        return serverInfo
+    }
+
     return {
         serverSetting,
         updateServerSettings,
@@ -506,6 +512,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         isUploading,
         getOnnx,
         mergeModel,
-        // updateDefaultTune,
+        updateModelDefault,
     }
 }

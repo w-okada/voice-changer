@@ -202,4 +202,18 @@ export class ServerConfigurator {
         return await info
     }
 
+    updateModelDefault = async () => {
+        const url = this.serverUrl + "/update_model_default"
+        const info = new Promise<ServerInfo>(async (resolve) => {
+            const request = new Request(url, {
+                method: 'POST',
+            });
+            const res = await (await fetch(request)).json() as ServerInfo
+            console.log("RESPONSE", res)
+            resolve(res)
+        })
+        return await info
+    }
+
+
 }

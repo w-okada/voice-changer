@@ -12,6 +12,12 @@ from voice_changer.RVC.onnxExporter.SynthesizerTrnMs256NSFsid_ONNX import (
 from voice_changer.RVC.onnxExporter.SynthesizerTrnMs256NSFsid_nono_ONNX import (
     SynthesizerTrnMs256NSFsid_nono_ONNX,
 )
+from voice_changer.RVC.onnxExporter.SynthesizerTrnMs768NSFsid_ONNX import (
+    SynthesizerTrnMs768NSFsid_ONNX,
+)
+from voice_changer.RVC.onnxExporter.SynthesizerTrnMs768NSFsid_nono_ONNX import (
+    SynthesizerTrnMs768NSFsid_nono_ONNX,
+)
 from voice_changer.RVC.onnxExporter.SynthesizerTrnMsNSFsidNono_webui_ONNX import (
     SynthesizerTrnMsNSFsidNono_webui_ONNX,
 )
@@ -69,11 +75,15 @@ def _export2onnx(input_model, output_model, output_model_simple, is_half, metada
         net_g_onnx = SynthesizerTrnMs256NSFsid_nono_ONNX(*cpt["config"])
     elif metadata["modelType"] == EnumInferenceTypes.pyTorchWebUINono.value:
         net_g_onnx = SynthesizerTrnMsNSFsidNono_webui_ONNX(**cpt["params"])
+    elif metadata["modelType"] == EnumInferenceTypes.pyTorchRVCv2.value:
+        net_g_onnx = SynthesizerTrnMs768NSFsid_ONNX(*cpt["config"], is_half=is_half)
+    elif metadata["modelType"] == EnumInferenceTypes.pyTorchRVCv2Nono.value:
+        net_g_onnx = SynthesizerTrnMs768NSFsid_nono_ONNX(*cpt["config"])
     else:
         print(
             "unknwon::::: ",
             metadata["modelType"],
-            EnumInferenceTypes.pyTorchWebUI.value,
+            EnumInferenceTypes.pyTorchRVCv2.value,
         )
 
     net_g_onnx.eval().to(dev)

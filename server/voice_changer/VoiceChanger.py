@@ -550,6 +550,10 @@ class VoiceChanger:
         self.voiceChanger.merge_models(request)
         return self.get_info()
 
+    def update_model_default(self):
+        self.voiceChanger.update_model_default()
+        return self.get_info()
+
 
 PRINT_CONVERT_PROCESSING: bool = False
 # PRINT_CONVERT_PROCESSING = True

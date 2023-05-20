@@ -276,6 +276,9 @@ export class VoiceChangerClient {
     mergeModel = async (req: MergeModelRequest) => {
         return this.configurator.mergeModel(req)
     }
+    updateModelDefault = async () => {
+        return this.configurator.updateModelDefault()
+    }
 
     updateServerSettings = (key: ServerSettingKey, val: string) => {
         return this.configurator.updateSettings(key, val)

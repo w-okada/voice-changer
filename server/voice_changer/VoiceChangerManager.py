@@ -66,3 +66,6 @@ class VoiceChangerManager(object):
 
     def merge_models(self, request: str):
         return self.voiceChanger.merge_models(request)
+
+    def update_model_default(self):
+        return self.voiceChanger.update_model_default()

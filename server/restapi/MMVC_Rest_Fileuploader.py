@@ -40,6 +40,9 @@ class MMVC_Rest_Fileuploader:
         self.router.add_api_route(
             "/merge_model", self.post_merge_models, methods=["POST"]
         )
+        self.router.add_api_route(
+            "/update_model_default", self.post_update_model_default, methods=["POST"]
+        )
 
     def post_upload_file(self, file: UploadFile = File(...), filename: str = Form(...)):
         res = upload_file(UPLOAD_DIR, file, filename)
@@ -118,5 +121,10 @@ class MMVC_Rest_Fileuploader:
     def post_merge_models(self, request: str = Form(...)):
         print(request)
         info = self.voiceChangerManager.merge_models(request)
+        json_compatible_item_data = jsonable_encoder(info)
+        return JSONResponse(content=json_compatible_item_data)
+
+    def post_update_model_default(self):
+        info = self.voiceChangerManager.update_model_default()
         json_compatible_item_data = jsonable_encoder(info)
         return JSONResponse(content=json_compatible_item_data)
