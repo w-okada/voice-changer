@@ -23,7 +23,7 @@ from restapi.MMVC_Rest import MMVC_Rest
 from const import (
     NATIVE_CLIENT_FILE_MAC,
     NATIVE_CLIENT_FILE_WIN,
-    SAMPLES_JSON,
+    SAMPLES_JSONS,
     SSL_KEY_DIR,
 )
 import subprocess
@@ -50,7 +50,6 @@ def setupArgParser():
         help="generate self-signed certificate",
     )
 
-    parser.add_argument("--samples", type=str, help="path to samples")
     parser.add_argument("--model_dir", type=str, help="path to model files")
 
     parser.add_argument(
@@ -193,7 +192,6 @@ if __name__ == "MMVCServerSIO":
     mp.freeze_support()
     voiceChangerParams = VoiceChangerParams(
         model_dir=args.model_dir,
-        samples=args.samples,
         content_vec_500=args.content_vec_500,
         content_vec_500_onnx=args.content_vec_500_onnx,
         content_vec_500_onnx_on=args.content_vec_500_onnx_on,
@@ -228,12 +226,15 @@ if __name__ == "__main__":
     os.makedirs(args.model_dir, exist_ok=True)
 
     try:
-        download_no_tqdm({"url": SAMPLES_JSON, "saveTo": args.samples, "position": 0})
+        sampleJsons = []
+        for url in SAMPLES_JSONS:
+            filename = os.path.basename(url)
+            download_no_tqdm({"url": url, "saveTo": filename, "position": 0})
+            sampleJsons.append(filename)
+        if checkRvcModelExist(args.model_dir) is False:
+            downloadInitialSampleModels(sampleJsons, args.model_dir)
     except Exception as e:
         print("[Voice Changer] loading sample failed", e)
-
-    if checkRvcModelExist(args.model_dir) is False:
-        downloadInitialSampleModels(args.samples, args.model_dir)
 
     PORT = args.p
 

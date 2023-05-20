@@ -37,7 +37,7 @@ from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.pipeline.Pipeline import Pipeline
 
 from Exceptions import NoModeLoadedException
-from const import RVC_MAX_SLOT_NUM, RVC_MODEL_DIRNAME, UPLOAD_DIR
+from const import RVC_MAX_SLOT_NUM, RVC_MODEL_DIRNAME, SAMPLES_JSONS, UPLOAD_DIR
 import shutil
 import json
 
@@ -60,7 +60,7 @@ class RVC:
     audio_buffer: AudioInOut | None = None
     prevVol: float = 0
     params: VoiceChangerParams
-    currentSlot: int = -1
+    currentSlot: int = 0
     needSwitch: bool = False
 
     def __init__(self, params: VoiceChangerParams):
@@ -72,7 +72,11 @@ class RVC:
         self.loadSlots()
         print("RVC initialization: ", params)
 
-        sampleModels = getModelSamples(params.samples, "RVC")
+        sampleJsons: list[str] = []
+        for url in SAMPLES_JSONS:
+            filename = os.path.basename(url)
+            sampleJsons.append(filename)
+        sampleModels = getModelSamples(sampleJsons, "RVC")
         if sampleModels is not None:
             self.settings.sampleModels = sampleModels
 
@@ -122,7 +126,9 @@ class RVC:
             params["name"] = sampleInfo.name
             params["sampleId"] = sampleInfo.id
             params["termsOfUseUrl"] = sampleInfo.termsOfUseUrl
-
+            params["sampleRate"] = sampleInfo.sampleRate
+            params["modelType"] = sampleInfo.modelType
+            params["f0"] = sampleInfo.f0
         # メタデータを見て、永続化モデルフォルダに移動させる
         # その際に、メタデータのファイル格納場所も書き換える
         slotDir = os.path.join(
@@ -220,6 +226,7 @@ class RVC:
 
     def prepareModel(self, slot: int):
         if slot < 0:
+            print("[Voice Changer] Prepare Model of slot skip:", slot)
             return self.get_info()
         modelSlot = self.settings.modelSlots[slot]
 

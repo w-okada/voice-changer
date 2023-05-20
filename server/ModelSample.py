@@ -17,22 +17,28 @@ class RVCModelSample:
     credit: str = ""
     description: str = ""
 
+    sampleRate: int = 48000
+    modelType: str = ""
+    f0: bool = True
 
-def getModelSamples(jsonPath: str, modelType: ModelType):
+
+def getModelSamples(jsonFiles: list[str], modelType: ModelType):
     try:
-        with open(jsonPath, "r", encoding="utf-8") as f:
-            jsonDict = json.load(f)
+        samples: list[RVCModelSample] = []
+        for file in jsonFiles:
+            with open(file, "r", encoding="utf-8") as f:
+                jsonDict = json.load(f)
 
-        modelList = jsonDict[modelType]
-        if modelType == "RVC":
-            samples: list[RVCModelSample] = []
-            for s in modelList:
-                modelSample = RVCModelSample(**s)
-                samples.append(modelSample)
-            return samples
+            modelList = jsonDict[modelType]
+            if modelType == "RVC":
+                for s in modelList:
+                    modelSample = RVCModelSample(**s)
+                    samples.append(modelSample)
 
-        else:
-            raise RuntimeError(f"Unknown model type {modelType}")
+            else:
+                raise RuntimeError(f"Unknown model type {modelType}")
+        return samples
+
     except Exception as e:
         print("[Voice Changer] loading sample info error:", e)
         return None

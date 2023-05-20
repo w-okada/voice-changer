@@ -76,6 +76,8 @@ class EnumEmbedderTypes(Enum):
 class EnumInferenceTypes(Enum):
     pyTorchRVC = "pyTorchRVC"
     pyTorchRVCNono = "pyTorchRVCNono"
+    pyTorchRVCv2 = "pyTorchRVCv2"
+    pyTorchRVCv2Nono = "pyTorchRVCv2Nono"
     pyTorchWebUI = "pyTorchWebUI"
     pyTorchWebUINono = "pyTorchWebUINono"
     onnxRVC = "onnxRVC"
@@ -97,6 +99,9 @@ class ServerAudioDeviceTypes(Enum):
     audiooutput = "audiooutput"
 
 
-SAMPLES_JSON = "https://huggingface.co/wok000/vcclient_model/raw/main/samples.json"
+SAMPLES_JSONS = [
+    "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0001.json",
+    "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0002.json",
+]
 RVC_MODEL_DIRNAME = "rvc"
 RVC_MAX_SLOT_NUM = 5

@@ -8,7 +8,7 @@ from .models import SynthesizerTrnMsNSFsidNono
 
 class WebUIInferencerNono(Inferencer):
     def loadModel(self, file: str, dev: device, isHalf: bool = True):
-        super().setProps(EnumInferenceTypes.pyTorchRVC, file, dev, isHalf)
+        super().setProps(EnumInferenceTypes.pyTorchWebUINono, file, dev, isHalf)
         cpt = torch.load(file, map_location="cpu")
         model = SynthesizerTrnMsNSFsidNono(**cpt["params"], is_half=isHalf)
 

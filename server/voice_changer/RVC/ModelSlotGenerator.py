@@ -56,13 +56,24 @@ def _setInfoByPytorch(slot: ModelSlot):
     config_len = len(cpt["config"])
     if config_len == 18:
         slot.f0 = True if cpt["f0"] == 1 else False
-        slot.modelType = (
-            EnumInferenceTypes.pyTorchRVC
-            if slot.f0
-            else EnumInferenceTypes.pyTorchRVCNono
-        )
-        slot.embChannels = 256
-        slot.embedder = EnumEmbedderTypes.hubert
+        version = cpt.get("version", "v1")
+        if version == "v1":
+            slot.modelType = (
+                EnumInferenceTypes.pyTorchRVC
+                if slot.f0
+                else EnumInferenceTypes.pyTorchRVCNono
+            )
+            slot.embChannels = 256
+            slot.embedder = EnumEmbedderTypes.hubert
+        else:
+            slot.modelType = (
+                EnumInferenceTypes.pyTorchRVCv2
+                if slot.f0
+                else EnumInferenceTypes.pyTorchRVCv2Nono
+            )
+            slot.embChannels = 768
+            slot.embedder = EnumEmbedderTypes.hubert
+
     else:
         slot.f0 = True if cpt["f0"] == 1 else False
         slot.modelType = (

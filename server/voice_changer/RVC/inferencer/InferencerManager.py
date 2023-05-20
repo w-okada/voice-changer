@@ -6,6 +6,8 @@ from voice_changer.RVC.inferencer.OnnxRVCInferencer import OnnxRVCInferencer
 from voice_changer.RVC.inferencer.OnnxRVCInferencerNono import OnnxRVCInferencerNono
 from voice_changer.RVC.inferencer.RVCInferencer import RVCInferencer
 from voice_changer.RVC.inferencer.RVCInferencerNono import RVCInferencerNono
+from voice_changer.RVC.inferencer.RVCInferencerv2 import RVCInferencerv2
+from voice_changer.RVC.inferencer.RVCInferencerv2Nono import RVCInferencerv2Nono
 from voice_changer.RVC.inferencer.WebUIInferencer import WebUIInferencer
 from voice_changer.RVC.inferencer.WebUIInferencerNono import WebUIInferencerNono
 
@@ -34,6 +36,16 @@ class InferencerManager:
             or inferencerType == EnumInferenceTypes.pyTorchRVCNono.value
         ):
             return RVCInferencerNono().loadModel(file, dev, isHalf)
+        elif (
+            inferencerType == EnumInferenceTypes.pyTorchRVCv2
+            or inferencerType == EnumInferenceTypes.pyTorchRVCv2.value
+        ):
+            return RVCInferencerv2().loadModel(file, dev, isHalf)
+        elif (
+            inferencerType == EnumInferenceTypes.pyTorchRVCv2Nono
+            or inferencerType == EnumInferenceTypes.pyTorchRVCv2Nono.value
+        ):
+            return RVCInferencerv2Nono().loadModel(file, dev, isHalf)
         elif (
             inferencerType == EnumInferenceTypes.pyTorchWebUI
             or inferencerType == EnumInferenceTypes.pyTorchWebUI.value

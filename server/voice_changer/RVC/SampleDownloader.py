@@ -14,14 +14,14 @@ def checkRvcModelExist(model_dir: str):
     return True
 
 
-def downloadInitialSampleModels(sampleJson: str, model_dir: str):
+def downloadInitialSampleModels(sampleJsons: list[str], model_dir: str):
     sampleModelIds = [
         "KikotoMahiro",
         "TokinaShigure",
         "Amitaro",
         "Tsukuyomi-chan",
     ]
-    sampleModels = getModelSamples(sampleJson, "RVC")
+    sampleModels = getModelSamples(sampleJsons, "RVC")
     if sampleModels is None:
         return
 
@@ -87,6 +87,10 @@ def downloadInitialSampleModels(sampleJson: str, model_dir: str):
             sampleParams["name"] = sample.name
             sampleParams["sampleId"] = sample.id
             sampleParams["termsOfUseUrl"] = sample.termsOfUseUrl
+            sampleParams["sampleRate"] = sample.sampleRate
+            sampleParams["modelType"] = sample.modelType
+            sampleParams["f0"] = sample.f0
+
             jsonFilePath = os.path.join(slotDir, "params.json")
             json.dump(sampleParams, open(jsonFilePath, "w"))
             slot_count += 1

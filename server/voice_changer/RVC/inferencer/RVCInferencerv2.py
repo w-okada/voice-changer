@@ -3,14 +3,17 @@ from torch import device
 
 from const import EnumInferenceTypes
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
-from .models import SynthesizerTrnMsNSFsid
+from infer_pack.models import (  # type:ignore
+    SynthesizerTrnMs768NSFsid,
+)
 
 
-class WebUIInferencer(Inferencer):
+class RVCInferencerv2(Inferencer):
     def loadModel(self, file: str, dev: device, isHalf: bool = True):
-        super().setProps(EnumInferenceTypes.pyTorchWebUI, file, dev, isHalf)
+        super().setProps(EnumInferenceTypes.pyTorchRVCv2, file, dev, isHalf)
+        print("load inf", file)
         cpt = torch.load(file, map_location="cpu")
-        model = SynthesizerTrnMsNSFsid(**cpt["params"], is_half=isHalf)
+        model = SynthesizerTrnMs768NSFsid(*cpt["config"], is_half=isHalf)
 
         model.eval()
         model.load_state_dict(cpt["weight"], strict=False)

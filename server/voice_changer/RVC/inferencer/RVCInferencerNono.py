@@ -10,7 +10,7 @@ from infer_pack.models import (  # type:ignore
 
 class RVCInferencerNono(Inferencer):
     def loadModel(self, file: str, dev: device, isHalf: bool = True):
-        super().setProps(EnumInferenceTypes.pyTorchRVC, file, dev, isHalf)
+        super().setProps(EnumInferenceTypes.pyTorchRVCNono, file, dev, isHalf)
         cpt = torch.load(file, map_location="cpu")
         model = SynthesizerTrnMs256NSFsid_nono(*cpt["config"], is_half=isHalf)
 
