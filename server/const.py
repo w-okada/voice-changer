@@ -87,6 +87,7 @@ class EnumInferenceTypes(Enum):
 class EnumPitchExtractorTypes(Enum):
     harvest = "harvest"
     dio = "dio"
+    crepe = "crepe"
 
 
 class EnumFrameworkTypes(Enum):
