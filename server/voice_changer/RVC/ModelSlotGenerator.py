@@ -57,7 +57,8 @@ def _setInfoByPytorch(slot: ModelSlot):
     if config_len == 18:
         slot.f0 = True if cpt["f0"] == 1 else False
         version = cpt.get("version", "v1")
-        if version == "v1":
+        print("version..............", version)
+        if version is None or version == "v1":
             slot.modelType = (
                 EnumInferenceTypes.pyTorchRVC
                 if slot.f0
@@ -74,6 +75,7 @@ def _setInfoByPytorch(slot: ModelSlot):
             slot.embChannels = 768
             slot.embedder = EnumEmbedderTypes.hubert
 
+        print("model slot ORG", slot)
     else:
         slot.f0 = True if cpt["f0"] == 1 else False
         slot.modelType = (
@@ -94,6 +96,8 @@ def _setInfoByPytorch(slot: ModelSlot):
             slot.embedder = EnumEmbedderTypes.hubert_jp
         else:
             raise RuntimeError("[Voice Changer][setInfoByONNX] unknown embedder")
+
+        print("model slot DADAPAN", slot)
 
     slot.samplingRate = cpt["config"][-1]
 

@@ -57,6 +57,7 @@ def merge_model(request: MergeModelRequest):
 
     merged["config"] = state_dict["config"]
     merged["params"] = state_dict["params"] if "params" in state_dict else None
+    merged["version"] = state_dict["version"] if "version" in state_dict else None
     merged["sr"] = state_dict["sr"]
     merged["f0"] = state_dict["f0"]
     merged["info"] = state_dict["info"]

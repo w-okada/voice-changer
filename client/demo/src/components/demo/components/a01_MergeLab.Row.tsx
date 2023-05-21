@@ -83,6 +83,9 @@ export const MergeLabRow = (_props: MergeLabRowProps) => {
                 srcSample.modelType != tgtSample.modelType
             ) {
                 alert("current selected model is not same as the other selected.")
+                console.log("current selected model is not same as the other selected.", srcSample.samplingRate, tgtSample.samplingRate,
+                    srcSample.embChannels, tgtSample.embChannels,
+                    srcSample.modelType, tgtSample.modelType)
                 return
             }
 
@@ -114,7 +117,18 @@ export const MergeLabRow = (_props: MergeLabRowProps) => {
             const f0str = modelInfo.f0 == true ? "f0" : "nof0"
             const srstr = Math.floor(modelInfo.samplingRate / 1000) + "K"
             const embedstr = modelInfo.embChannels
-            const typestr = modelInfo.modelType == 0 ? "org" : "webui"
+            const typestr = (() => {
+                if (modelInfo.modelType == "pyTorchRVC" || modelInfo.modelType == "pyTorchRVCNono") {
+                    return "org"
+                } else if (modelInfo.modelType == "pyTorchRVCv2" || modelInfo.modelType == "pyTorchRVCv2Nono") {
+                    return "orv_v2"
+                } else if (modelInfo.modelType == "pyTorchWebUI" || modelInfo.modelType == "pyTorchWebUINono") {
+                    return "webui"
+                } else {
+                    return "unknown"
+                }
+            })()
+
             const metadata = `[${f0str},${srstr},${embedstr},${typestr}]`
 
 

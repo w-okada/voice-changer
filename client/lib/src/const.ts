@@ -70,6 +70,17 @@ export const DiffMethod = {
 } as const
 export type DiffMethod = typeof DiffMethod[keyof typeof DiffMethod]
 
+export const ModelType = {
+    "pyTorchRVC": "pyTorchRVC",
+    "pyTorchRVCNono": "pyTorchRVCNono",
+    "pyTorchRVCv2": "pyTorchRVCv2",
+    "pyTorchRVCv2Nono": "pyTorchRVCv2Nono",
+    "pyTorchWebUI": "pyTorchWebUI",
+    "pyTorchWebUINono": "pyTorchWebUINono",
+    "onnxRVC": "onnxRVC",
+    "onnxRVCNono": "onnxRVCNono",
+} as const
+export type ModelType = typeof ModelType[keyof typeof ModelType]
 
 export const ServerSettingKey = {
     "srcId": "srcId",
@@ -188,7 +199,7 @@ type ModelSlot = {
     defaultTune: number,
     defaultIndexRatio: number,
 
-    modelType: number,
+    modelType: ModelType,
     embChannels: number,
     f0: boolean,
     samplingRate: number

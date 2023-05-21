@@ -35,7 +35,18 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
             const f0str = x.f0 == true ? "f0" : "nof0"
             const srstr = Math.floor(x.samplingRate / 1000) + "K"
             const embedstr = x.embChannels
-            const typestr = x.modelType == 0 ? "org" : "webui"
+            const typestr = (() => {
+                if (x.modelType == "pyTorchRVC" || x.modelType == "pyTorchRVCNono") {
+                    return "org"
+                } else if (x.modelType == "pyTorchRVCv2" || x.modelType == "pyTorchRVCv2Nono") {
+                    return "orv_v2"
+                } else if (x.modelType == "pyTorchWebUI" || x.modelType == "pyTorchWebUINono") {
+                    return "webui"
+                } else {
+                    return "unknown"
+                }
+            })()
+
             const metadata = x.deprecated ? `[${index}]  [deprecated version]` : `[${index}]  [${f0str},${srstr},${embedstr},${typestr}]`
             const tuning = `t:${x.defaultTune}`
             const useIndex = x.indexFile != null && x.featureFile != null ? `i:true` : `i:false`
