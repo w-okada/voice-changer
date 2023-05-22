@@ -198,7 +198,7 @@ class RVC:
                 # half-precisionの使用可否が変わるときは作り直し
                 if self.pipeline is not None and self.pipeline.isHalf == half:
                     print(
-                        "USE EXSISTING PIPELINE",
+                        "USE EXISTING PIPELINE",
                         half,
                     )
                     self.pipeline.setDevice(dev)
