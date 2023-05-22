@@ -117,7 +117,7 @@
             {
                 "name": "f0Detector",
                 "options": {
-                    "detectors": ["dio", "harvest"]
+                    "detectors": ["dio", "harvest", "crepe"]
                 }
             },
             {
