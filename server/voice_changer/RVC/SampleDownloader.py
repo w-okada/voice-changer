@@ -16,10 +16,10 @@ def checkRvcModelExist(model_dir: str):
 
 def downloadInitialSampleModels(sampleJsons: list[str], model_dir: str):
     sampleModelIds = [
-        "KikotoMahiro",
-        "TokinaShigure",
-        "Amitaro",
-        "Tsukuyomi-chan",
+        "KikotoMahiro_o",
+        "TokinaShigure_o",
+        "Amitaro_o",
+        "Tsukuyomi-chan_o",
     ]
     sampleModels = getModelSamples(sampleJsons, "RVC")
     if sampleModels is None:
@@ -60,23 +60,7 @@ def downloadInitialSampleModels(sampleJsons: list[str], model_dir: str):
                         "position": line_num,
                     }
                 )
-                sampleParams["files"]["rvcIndex"] = modelFilePath
-                line_num += 1
-
-            featurePath = None
-            if hasattr(sample, "featureUrl") or sample.featureUrl != "":
-                featurePath = os.path.join(
-                    slotDir,
-                    os.path.basename(sample.featureUrl),
-                )
-                downloadParams.append(
-                    {
-                        "url": sample.featureUrl,
-                        "saveTo": featurePath,
-                        "position": line_num,
-                    }
-                )
-                sampleParams["files"]["rvcFeatur"] = modelFilePath
+                sampleParams["files"]["rvcIndex"] = indexPath
                 line_num += 1
 
             sampleParams["sampleId"] = sample.id
@@ -123,19 +107,8 @@ def downloadModelFiles(sampleInfo: RVCModelSample):
             }
         )
 
-    featurePath = None
-    if hasattr(sampleInfo, "featureUrl") or sampleInfo.featureUrl != "":
-        featurePath = os.path.join(TMP_DIR, os.path.basename(sampleInfo.featureUrl))
-        downloadParams.append(
-            {
-                "url": sampleInfo.featureUrl,
-                "saveTo": featurePath,
-                "position": 2,
-            }
-        )
-
     print("[Voice Changer] Downloading model files...", end="")
     with ThreadPoolExecutor() as pool:
         pool.map(download_no_tqdm, downloadParams)
     print("")
-    return modelPath, indexPath, featurePath
+    return modelPath, indexPath

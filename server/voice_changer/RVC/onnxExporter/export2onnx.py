@@ -45,6 +45,8 @@ def export2onnx(gpu: int, modelSlot: ModelSlot):
         "embChannels": modelSlot.embChannels,
         # ↓EnumEmbedderTypesのままだとシリアライズできないのでテキスト化
         "embedder": modelSlot.embedder.value,
+        "embOutputLayer": modelSlot.embOutputLayer,
+        "useFinalProj": modelSlot.useFinalProj,
     }
     gpuMomory = DeviceManager.get_instance().getDeviceMemory(gpu)
     print(f"[Voice Changer] exporting onnx... gpu_id:{gpu} gpu_mem:{gpuMomory}")

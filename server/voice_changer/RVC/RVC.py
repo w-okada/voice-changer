@@ -86,7 +86,7 @@ class RVC:
                 if len(slot.modelFile) > 0:
                     self.prepareModel(i)
                     self.settings.modelSlotIndex = i
-                    self.switchModel()
+                    self.switchModel(self.settings.modelSlotIndex)
                     self.initialLoad = False
                     break
 
@@ -115,12 +115,10 @@ class RVC:
             if sampleInfo is None:
                 print("[Voice Changer] sampleInfo is None")
                 return
-            modelPath, indexPath, featurePath = downloadModelFiles(sampleInfo)
+            modelPath, indexPath = downloadModelFiles(sampleInfo)
             params["files"]["rvcModel"] = modelPath
             if indexPath is not None:
                 params["files"]["rvcIndex"] = indexPath
-            if featurePath is not None:
-                params["files"]["rvcFeature"] = featurePath
             params["credit"] = sampleInfo.credit
             params["description"] = sampleInfo.description
             params["name"] = sampleInfo.name
@@ -152,7 +150,7 @@ class RVC:
         if self.initialLoad:
             self.prepareModel(target_slot_idx)
             self.settings.modelSlotIndex = target_slot_idx
-            self.switchModel()
+            self.switchModel(self.settings.modelSlotIndex)
             self.initialLoad = False
         elif target_slot_idx == self.currentSlot:
             self.prepareModel(target_slot_idx)
@@ -242,11 +240,12 @@ class RVC:
         self.next_index_ratio = modelSlot.defaultIndexRatio
         self.next_samplingRate = modelSlot.samplingRate
         self.next_framework = "ONNX" if modelSlot.isONNX else "PyTorch"
-        self.needSwitch = True
+        # self.needSwitch = True
         print("[Voice Changer] Prepare done.")
+        self.switchModel(slot)
         return self.get_info()
 
-    def switchModel(self):
+    def switchModel(self, slot: int):
         print("[Voice Changer] Switching model..")
         self.pipeline = self.next_pipeline
         self.settings.tran = self.next_trans
@@ -254,6 +253,8 @@ class RVC:
         self.settings.modelSamplingRate = self.next_samplingRate
         self.settings.framework = self.next_framework
 
+        # self.currentSlot = self.settings.modelSlotIndex # prepareModelから呼ばれるということはupdate_settingsの中で呼ばれるということなので、まだmodelSlotIndexは更新されていない
+        self.currentSlot = slot
         print(
             "[Voice Changer] Switching model..done",
         )
@@ -308,13 +309,12 @@ class RVC:
                 self.currentSlot,
             )
             raise NoModeLoadedException("model_common")
-        if self.needSwitch:
-            print(
-                f"[Voice Changer] Switch model {self.currentSlot} -> {self.settings.modelSlotIndex}"
-            )
-            self.currentSlot = self.settings.modelSlotIndex
-            self.switchModel()
-            self.needSwitch = False
+        # if self.needSwitch:
+        #     print(
+        #         f"[Voice Changer] Switch model {self.currentSlot} -> {self.settings.modelSlotIndex}"
+        #     )
+        #     self.switchModel()
+        #     self.needSwitch = False
 
         half = self.deviceManager.halfPrecisionAvailable(self.settings.gpu)
 
@@ -333,7 +333,7 @@ class RVC:
         f0_up_key = self.settings.tran
         index_rate = self.settings.indexRatio
         if_f0 = 1 if self.settings.modelSlots[self.currentSlot].f0 else 0
-        embOutputLayer = self.settings.modelSlots[self.currentSlot].embOutputLayter
+        embOutputLayer = self.settings.modelSlots[self.currentSlot].embOutputLayer
         useFinalProj = self.settings.modelSlots[self.currentSlot].useFinalProj
 
         audio_out = self.pipeline.exec(

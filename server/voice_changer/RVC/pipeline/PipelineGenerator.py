@@ -74,6 +74,7 @@ def _loadIndex(modelSlot: ModelSlot):
         return None
 
     try:
+        print("Try loading...", modelSlot.indexFile)
         index = faiss.read_index(modelSlot.indexFile)
     except:
         print("[Voice Changer] load index failed. Use no index.")

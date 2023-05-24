@@ -39,7 +39,7 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
                 if (x.modelType == "pyTorchRVC" || x.modelType == "pyTorchRVCNono") {
                     return "org"
                 } else if (x.modelType == "pyTorchRVCv2" || x.modelType == "pyTorchRVCv2Nono") {
-                    return "orv_v2"
+                    return "org_v2"
                 } else if (x.modelType == "pyTorchWebUI" || x.modelType == "pyTorchWebUINono") {
                     return "webui"
                 } else {

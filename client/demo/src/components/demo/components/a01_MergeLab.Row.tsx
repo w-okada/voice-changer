@@ -121,7 +121,7 @@ export const MergeLabRow = (_props: MergeLabRowProps) => {
                 if (modelInfo.modelType == "pyTorchRVC" || modelInfo.modelType == "pyTorchRVCNono") {
                     return "org"
                 } else if (modelInfo.modelType == "pyTorchRVCv2" || modelInfo.modelType == "pyTorchRVCv2Nono") {
-                    return "orv_v2"
+                    return "g_v2"
                 } else if (modelInfo.modelType == "pyTorchWebUI" || modelInfo.modelType == "pyTorchWebUINono") {
                     return "webui"
                 } else {

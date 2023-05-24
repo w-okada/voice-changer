@@ -64,5 +64,10 @@ def merge_model(request: MergeModelRequest):
     merged["embedder_name"] = (
         state_dict["embedder_name"] if "embedder_name" in state_dict else None
     )
+    merged["embedder_output_layer"] = (
+        state_dict["embedder_output_layer"]
+        if "embedder_output_layer" in state_dict
+        else None
+    )
     print("write metadata done.")
     return merged

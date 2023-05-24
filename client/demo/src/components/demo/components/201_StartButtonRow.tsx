@@ -70,7 +70,7 @@ export const StartButtonRow = (_props: StartButtonRowProps) => {
                 </div>
             </div>
         )
-    }, [guiState.isConverting, appState.clientSetting.start, appState.clientSetting.stop, appState.serverSetting.serverSetting, , appState.serverSetting.updateServerSettings])
+    }, [guiState.isConverting, appState.clientSetting.start, appState.clientSetting.stop, appState.serverSetting.serverSetting, appState.serverSetting.updateServerSettings])
 
     return startButtonRow
 }
