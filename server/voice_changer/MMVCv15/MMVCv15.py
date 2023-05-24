@@ -242,8 +242,8 @@ class MMVCv15:
 
         convertSize = inputSize + crossfadeSize + solaSearchFrame
 
-        if convertSize < 8192:
-            convertSize = 8192
+        # if convertSize < 8192:
+        #     convertSize = 8192
         if convertSize % self.hps.data.hop_length != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
             convertSize = convertSize + (
                 self.hps.data.hop_length - (convertSize % self.hps.data.hop_length)
