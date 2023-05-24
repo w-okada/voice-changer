@@ -58,14 +58,6 @@
             {
                 "name": "commonFileSelect",
                 "options": {
-                    "title": "feature(.npy)",
-                    "acceptExtentions": ["npy"],
-                    "fileKind": "rvcFeature"
-                }
-            },
-            {
-                "name": "commonFileSelect",
-                "options": {
                     "title": "index(.index)",
                     "acceptExtentions": ["index"],
                     "fileKind": "rvcIndex"

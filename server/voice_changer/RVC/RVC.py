@@ -418,7 +418,7 @@ class RVC:
         self.currentSlot = self.settings.modelSlotIndex
 
     def update_model_default(self):
-        print("[voiceeeeee] UPDATE MODEL DEFAULT!!")
+        print("[Voice Changer] UPDATE MODEL DEFAULT!!")
         slotDir = os.path.join(
             self.params.model_dir, RVC_MODEL_DIRNAME, str(self.currentSlot)
         )

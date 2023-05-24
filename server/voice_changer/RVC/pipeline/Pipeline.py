@@ -24,7 +24,8 @@ class Pipeline(object):
     pitchExtractor: PitchExtractor
 
     index: Any | None
-    feature: Any | None
+    big_npy: Any | None
+    # feature: Any | None
 
     targetSR: int
     device: torch.device
@@ -36,7 +37,7 @@ class Pipeline(object):
         inferencer: Inferencer,
         pitchExtractor: PitchExtractor,
         index: Any | None,
-        feature: Any | None,
+        # feature: Any | None,
         targetSR,
         device,
         isHalf,
@@ -46,7 +47,10 @@ class Pipeline(object):
         self.pitchExtractor = pitchExtractor
 
         self.index = index
-        self.feature = feature
+        self.big_npy = (
+            index.reconstruct_n(0, index.ntotal) if index is not None else None
+        )
+        # self.feature = feature
 
         self.targetSR = targetSR
         self.device = device
@@ -133,12 +137,20 @@ class Pipeline(object):
                 raise e
 
         # Index - feature抽出
-        if self.index is not None and self.feature is not None and index_rate != 0:
+        # if self.index is not None and self.feature is not None and index_rate != 0:
+        if self.index is not None and self.big_npy is not None and index_rate != 0:
             npy = feats[0].cpu().numpy()
             if self.isHalf is True:
                 npy = npy.astype("float32")
-            D, I = self.index.search(npy, 1)
-            npy = self.feature[I.squeeze()]
+            # D, I = self.index.search(npy, 1)
+            # npy = self.feature[I.squeeze()]
+
+            score, ix = self.index.search(npy, k=8)
+            weight = np.square(1 / score)
+            weight /= weight.sum(axis=1, keepdims=True)
+
+            npy = np.sum(self.big_npy[ix] * np.expand_dims(weight, axis=2), axis=1)
+
             if self.isHalf is True:
                 npy = npy.astype("float16")
 
