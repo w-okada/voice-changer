@@ -17,6 +17,8 @@ class ModelSlot:
     samplingRate: int = -1
     f0: bool = True
     embChannels: int = 256
+    embOutputLayter: int = 9
+    useFinalProj: bool = True
     deprecated: bool = False
     embedder: EnumEmbedderTypes = EnumEmbedderTypes.hubert
 

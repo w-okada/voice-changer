@@ -54,7 +54,9 @@ def generateModelSlot(slotDir: str):
 def _setInfoByPytorch(slot: ModelSlot):
     cpt = torch.load(slot.modelFile, map_location="cpu")
     config_len = len(cpt["config"])
+
     if config_len == 18:
+        # Original RVC
         slot.f0 = True if cpt["f0"] == 1 else False
         version = cpt.get("version", "v1")
         if version is None or version == "v1":
@@ -64,6 +66,8 @@ def _setInfoByPytorch(slot: ModelSlot):
                 else EnumInferenceTypes.pyTorchRVCNono
             )
             slot.embChannels = 256
+            slot.embOutputLayter = 9
+            slot.useFinalProj = True
             slot.embedder = EnumEmbedderTypes.hubert
         else:
             slot.modelType = (
@@ -72,9 +76,12 @@ def _setInfoByPytorch(slot: ModelSlot):
                 else EnumInferenceTypes.pyTorchRVCv2Nono
             )
             slot.embChannels = 768
+            slot.embOutputLayter = 12
+            slot.useFinalProj = False
             slot.embedder = EnumEmbedderTypes.hubert
 
     else:
+        # DDPN RVC
         slot.f0 = True if cpt["f0"] == 1 else False
         slot.modelType = (
             EnumInferenceTypes.pyTorchWebUI
@@ -82,6 +89,32 @@ def _setInfoByPytorch(slot: ModelSlot):
             else EnumInferenceTypes.pyTorchWebUINono
         )
         slot.embChannels = cpt["config"][17]
+        slot.embOutputLayter = (
+            cpt["embedder_output_layer"] if "embedder_output_layer" in cpt else 9
+        )
+        if slot.embChannels == 256:
+            slot.useFinalProj = True
+        else:
+            slot.useFinalProj = False
+
+        # DDPNモデルの情報を表示
+        if (
+            slot.embChannels == 256
+            and slot.embOutputLayter == 9
+            and slot.useFinalProj is True
+        ):
+            print("[Voice Changer] DDPN Model: Original v1 like")
+        elif (
+            slot.embChannels == 768
+            and slot.embOutputLayter == 12
+            and slot.useFinalProj is False
+        ):
+            print("[Voice Changer] DDPN Model: Original v2 like")
+        else:
+            print(
+                f"[Voice Changer] DDPN Model: ch:{slot.embChannels}, L:{slot.embOutputLayter}, FP:{slot.useFinalProj}"
+            )
+
         slot.embedder = cpt["embedder_name"]
         if slot.embedder.endswith("768"):
             slot.embedder = slot.embedder[:-3]
@@ -110,6 +143,19 @@ def _setInfoByONNX(slot: ModelSlot):
 
         # slot.modelType = metadata["modelType"]
         slot.embChannels = metadata["embChannels"]
+
+        slot.embOutputLayter = (
+            metadata["embedder_output_layer"]
+            if "embedder_output_layer" in metadata
+            else 9
+        )
+
+        if slot.embChannels == 256:
+            slot.useFinalProj = True
+        else:
+            slot.useFinalProj = False
+
+        print("ONNX", slot)
 
         if "embedder" not in metadata:
             slot.embedder = EnumEmbedderTypes.hubert

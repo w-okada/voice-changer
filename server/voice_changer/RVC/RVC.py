@@ -333,8 +333,8 @@ class RVC:
         f0_up_key = self.settings.tran
         index_rate = self.settings.indexRatio
         if_f0 = 1 if self.settings.modelSlots[self.currentSlot].f0 else 0
-
-        embChannels = self.settings.modelSlots[self.currentSlot].embChannels
+        embOutputLayer = self.settings.modelSlots[self.currentSlot].embOutputLayter
+        useFinalProj = self.settings.modelSlots[self.currentSlot].useFinalProj
 
         audio_out = self.pipeline.exec(
             sid,
@@ -343,7 +343,8 @@ class RVC:
             index_rate,
             if_f0,
             self.settings.extraConvertSize / self.settings.modelSamplingRate,
-            embChannels,
+            embOutputLayer,
+            useFinalProj,
             repeat,
         )
 

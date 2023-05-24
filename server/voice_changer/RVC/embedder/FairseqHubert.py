@@ -23,23 +23,23 @@ class FairseqHubert(Embedder):
         self.model = model
         return self
 
-    def extractFeatures(self, feats: torch.Tensor, embChannels=256) -> torch.Tensor:
+    def extractFeatures(
+        self, feats: torch.Tensor, embOutputLayer=9, useFinalProj=True
+    ) -> torch.Tensor:
         padding_mask = torch.BoolTensor(feats.shape).to(self.dev).fill_(False)
-        if embChannels == 256:
-            inputs = {
-                "source": feats.to(self.dev),
-                "padding_mask": padding_mask,
-                "output_layer": 9,  # layer 9
-            }
-        else:
-            inputs = {
-                "source": feats.to(self.dev),
-                "padding_mask": padding_mask,
-            }
+
+        # オリジナル_v1は L9にfinal_projをかけていた。(-> 256)
+        # オリジナル_v2は L12にfinal_projをかけない。(-> 768)
+
+        inputs = {
+            "source": feats.to(self.dev),
+            "padding_mask": padding_mask,
+            "output_layer": embOutputLayer,  # 9 or 12
+        }
 
         with torch.no_grad():
             logits = self.model.extract_features(**inputs)
-            if embChannels == 256:
+            if useFinalProj:
                 feats = self.model.final_proj(logits[0])
             else:
                 feats = logits[0]

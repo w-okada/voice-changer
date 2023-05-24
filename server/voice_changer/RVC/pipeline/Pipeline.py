@@ -82,7 +82,8 @@ class Pipeline(object):
         index_rate,
         if_f0,
         silence_front,
-        embChannels,
+        embOutputLayer,
+        useFinalProj,
         repeat,
     ):
         self.t_pad = self.sr * repeat
@@ -127,7 +128,7 @@ class Pipeline(object):
         # embedding
         padding_mask = torch.BoolTensor(feats.shape).to(self.device).fill_(False)
         try:
-            feats = self.embedder.extractFeatures(feats, embChannels)
+            feats = self.embedder.extractFeatures(feats, embOutputLayer, useFinalProj)
         except RuntimeError as e:
             if "HALF" in e.__str__().upper():
                 raise HalfPrecisionChangingException()
