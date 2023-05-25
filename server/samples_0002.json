@@ -3,7 +3,7 @@
     {
       "id": "KikotoKurage_v2",
       "lang": "ja-JP",
-      "tag": "",
+      "tag": ["torch", "test"],
       "name": "黄琴海月_v2",
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc_v2_alpha/kikoto_kurage/kikoto_kurage_v2_40k_e100.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc_v2_alpha/kikoto_kurage/added_IVF5181_Flat_nprobe_1_v2.index.bin",
@@ -18,7 +18,7 @@
     {
       "id": "KikotoMahiro_v2",
       "lang": "ja-JP",
-      "tag": "",
+      "tag": ["torch", "test"],
       "name": "黄琴まひろ_v2",
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc_v2_alpha/kikoto_mahiro/kikoto_mahiro_v2_40k.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc_v2_alpha/kikoto_mahiro/added_IVF6881_Flat_nprobe_1_v2.index.bin",
@@ -33,7 +33,7 @@
     {
       "id": "TokinaShigure_v2",
       "lang": "ja-JP",
-      "tag": "",
+      "tag": ["torch", "test"],
       "name": "刻鳴時雨_v2",
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc_v2_alpha/tokina_shigure/tokina_shigure_v2_40k_e100.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc_v2_alpha/tokina_shigure/added_IVF2736_Flat_nprobe_1_v2.index.bin",
@@ -48,7 +48,7 @@
     {
       "id": "Amitaro_v2",
       "lang": "ja-JP",
-      "tag": "",
+      "tag": ["torch", "test"],
       "name": "あみたろ_v2",
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc_v2_alpha/amitaro/amitaro_v2_40k_e100.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc_v2_alpha/amitaro/added_IVF3139_Flat_nprobe_1_v2.index.bin",
@@ -63,7 +63,7 @@
     {
       "id": "Tsukuyomi-chan_v2",
       "lang": "ja-JP",
-      "tag": "",
+      "tag": ["torch", "test"],
       "name": "つくよみちゃん_v2",
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc_v2_alpha/tsukuyomi-chan/tsukuyomi_v2_40k_e100.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc_v2_alpha/tsukuyomi-chan/added_IVF7852_Flat_nprobe_1_v2.index.bin",

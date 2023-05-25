@@ -68,6 +68,10 @@
                 "options": {}
             },
             {
+                "name": "sampleDownloadControlRow",
+                "options": {}
+            },
+            {
                 "name": "defaultTuneRow2",
                 "options": {}
             },

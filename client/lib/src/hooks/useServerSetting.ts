@@ -34,6 +34,7 @@ export type FileUploadSetting = {
 
     isSampleMode: boolean
     sampleId: string | null
+    rvcIndexDownload: boolean
 
     ddspSvcModel: ModelData | null
     ddspSvcModelConfig: ModelData | null
@@ -66,6 +67,8 @@ const InitialFileUploadSetting: FileUploadSetting = {
 
     isSampleMode: false,
     sampleId: null,
+    rvcIndexDownload: true,
+
 
     ddspSvcModel: null,
     ddspSvcModelConfig: null,
@@ -370,6 +373,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 defaultTune: fileUploadSetting.defaultTune || 0,
                 defaultIndexRatio: fileUploadSetting.defaultIndexRatio || 1,
                 sampleId: fileUploadSetting.isSampleMode ? fileUploadSetting.sampleId || "" : "",
+                rvcIndexDownload: fileUploadSetting.rvcIndexDownload || false,
                 files: fileUploadSetting.isSampleMode ? {} : {
                     mmvcv13Config: fileUploadSetting.mmvcv13Config?.filename || "",
                     mmvcv13Model: fileUploadSetting.mmvcv13Model?.filename || "",
@@ -452,6 +456,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
 
                 isSampleMode: fileUploadSetting.isSampleMode,
                 sampleId: fileUploadSetting.sampleId,
+                rvcIndexDownload: fileUploadSetting.rvcIndexDownload,
             }
             setItem(`${INDEXEDDB_KEY_MODEL_DATA}_${slot}`, saveData)
         } catch (e) {

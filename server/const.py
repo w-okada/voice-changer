@@ -101,6 +101,8 @@ class ServerAudioDeviceTypes(Enum):
 
 
 SAMPLES_JSONS = [
+    # "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0001.json",
+    # "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0002.json",
     "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0003_t.json",
     "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0003_o.json",
 ]

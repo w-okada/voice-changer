@@ -111,11 +111,14 @@ class RVC:
         print("loadModel", params)
         # サンプルが指定されたときはダウンロードしてメタデータをでっちあげる
         if len(params["sampleId"]) > 0:
-            sampleInfo = self.getSampleInfo(params["sampleId"])
+            sampleId = params["sampleId"]
+            sampleInfo = self.getSampleInfo(sampleId)
+            useIndex = params["rvcIndexDownload"]
+
             if sampleInfo is None:
                 print("[Voice Changer] sampleInfo is None")
                 return
-            modelPath, indexPath = downloadModelFiles(sampleInfo)
+            modelPath, indexPath = downloadModelFiles(sampleInfo, useIndex)
             params["files"]["rvcModel"] = modelPath
             if indexPath is not None:
                 params["files"]["rvcIndex"] = indexPath

@@ -3,7 +3,7 @@
     {
       "id": "KikotoKurage",
       "lang": "ja-JP",
-      "tag": "",
+      "tag": ["torch", "test"],
       "name": "黄琴海月",
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/kikoto_kurage_48k_256/kikoto_kurage.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/kikoto_kurage_48k_256/added_IVF2997_Flat_nprobe_11.index.bin",
@@ -18,7 +18,7 @@
     {
       "id": "KikotoMahiro",
       "lang": "ja-JP",
-      "tag": "",
+      "tag": ["torch", "test"],
       "name": "黄琴まひろ",
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/kikoto_mahiro_48k_256/kikoto_mahiro.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/kikoto_mahiro_48k_256/added_IVF4833_Flat_nprobe_12.index.bin",
@@ -33,7 +33,7 @@
     {
       "id": "TokinaShigure",
       "lang": "ja-JP",
-      "tag": "",
+      "tag": ["torch", "test"],
       "name": "刻鳴時雨",
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tokina_sigure/Shigure.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tokina_sigure/added_IVF1572_Flat_nprobe_9.index.bin",
@@ -48,7 +48,7 @@
     {
       "id": "Amitaro",
       "lang": "ja-JP",
-      "tag": "",
+      "tag": ["torch", "test"],
       "name": "あみたろ",
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_contentvec_256/amitaro48k-100.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_contentvec_256/amitaro48k.0.index.bin",
@@ -63,7 +63,7 @@
     {
       "id": "Amitaro_768d",
       "lang": "ja-JP",
-      "tag": "",
+      "tag": ["torch", "test"],
       "name": "あみたろ(768d)",
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_default/amitaro_hubertjp_768_def-100.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_default/amitaro_hubertjp_768_def.0.index.bin",
@@ -78,7 +78,7 @@
     {
       "id": "Amitaro_768n",
       "lang": "ja-JP",
-      "tag": "",
+      "tag": ["torch", "test"],
       "name": "あみたろ(768n)",
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_nadare/amitaro_hubert_jp-100.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_nadare/amitaro_hubert_jp.0.index.bin",
@@ -93,7 +93,7 @@
     {
       "id": "Amitaro_768t",
       "lang": "ja-JP",
-      "tag": "",
+      "tag": ["torch", "test"],
       "name": "あみたろ(768t)",
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_tylor/amitaro_hubertjp_768_tylor-100.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/amitaro_hubertjp_768_tylor/amitaro_hubertjp_768_tylor.0.index.bin",
@@ -108,7 +108,7 @@
     {
       "id": "Tsukuyomi-chan_768d",
       "lang": "ja-JP",
-      "tag": "",
+      "tag": ["torch", "test"],
       "name": "つくよみちゃん(768d)",
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tsukuyomi-chan_hubertjp_768_default/tsukuyomi_hubertjp_768_def-100.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tsukuyomi-chan_hubertjp_768_default/tsukuyomi_hubertjp_768_def.0.index.bin",
@@ -123,7 +123,7 @@
     {
       "id": "Tsukuyomi-chan",
       "lang": "ja-JP",
-      "tag": "",
+      "tag": ["torch", "test"],
       "name": "つくよみちゃん",
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tsukuyomi_contentvec_256/tsukuyomi48k-100.pth",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc/tsukuyomi_contentvec_256/tsukuyomi48k.0.index.bin",

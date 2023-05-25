@@ -16,10 +16,10 @@ def checkRvcModelExist(model_dir: str):
 
 def downloadInitialSampleModels(sampleJsons: list[str], model_dir: str):
     sampleModelIds = [
-        "KikotoMahiro_o",
-        "TokinaShigure_o",
-        "Amitaro_o",
-        "Tsukuyomi-chan_o",
+        ("TokinaShigure_o", True),
+        ("KikotoMahiro_o", False),
+        ("Amitaro_o", False),
+        ("Tsukuyomi-chan_o", False),
     ]
     sampleModels = getModelSamples(sampleJsons, "RVC")
     if sampleModels is None:
@@ -28,63 +28,78 @@ def downloadInitialSampleModels(sampleJsons: list[str], model_dir: str):
     downloadParams = []
     slot_count = 0
     line_num = 0
-    for sample in sampleModels:
-        if sample.id in sampleModelIds:
-            sampleParams: Any = {"files": {}}
+    for initSampleId in sampleModelIds:
+        print(initSampleId)
+        # 初期サンプルをサーチ
+        match = False
+        for sample in sampleModels:
+            if sample.id == initSampleId[0]:
+                match = True
+                break
+        if match is False:
+            print(f"[Voice Changer] initiail sample not found. {initSampleId[0]}")
+            continue
 
-            slotDir = os.path.join(model_dir, RVC_MODEL_DIRNAME, str(slot_count))
-            os.makedirs(slotDir, exist_ok=True)
-            modelFilePath = os.path.join(
+        # 検出されたら、、、
+        sampleParams: Any = {"files": {}}
+
+        slotDir = os.path.join(model_dir, RVC_MODEL_DIRNAME, str(slot_count))
+        os.makedirs(slotDir, exist_ok=True)
+        modelFilePath = os.path.join(
+            slotDir,
+            os.path.basename(sample.modelUrl),
+        )
+        downloadParams.append(
+            {
+                "url": sample.modelUrl,
+                "saveTo": modelFilePath,
+                "position": line_num,
+            }
+        )
+        sampleParams["files"]["rvcModel"] = modelFilePath
+        line_num += 1
+
+        if (
+            initSampleId[1] is True
+            and hasattr(sample, "indexUrl")
+            and sample.indexUrl != ""
+        ):
+            indexPath = os.path.join(
                 slotDir,
-                os.path.basename(sample.modelUrl),
+                os.path.basename(sample.indexUrl),
             )
             downloadParams.append(
                 {
-                    "url": sample.modelUrl,
-                    "saveTo": modelFilePath,
+                    "url": sample.indexUrl,
+                    "saveTo": indexPath,
                     "position": line_num,
                 }
             )
-            sampleParams["files"]["rvcModel"] = modelFilePath
+            sampleParams["files"]["rvcIndex"] = indexPath
             line_num += 1
 
-            if hasattr(sample, "indexUrl") and sample.indexUrl != "":
-                indexPath = os.path.join(
-                    slotDir,
-                    os.path.basename(sample.indexUrl),
-                )
-                downloadParams.append(
-                    {
-                        "url": sample.indexUrl,
-                        "saveTo": indexPath,
-                        "position": line_num,
-                    }
-                )
-                sampleParams["files"]["rvcIndex"] = indexPath
-                line_num += 1
+        sampleParams["sampleId"] = sample.id
+        sampleParams["defaultTune"] = 0
+        sampleParams["defaultIndexRatio"] = 1
+        sampleParams["credit"] = sample.credit
+        sampleParams["description"] = sample.description
+        sampleParams["name"] = sample.name
+        sampleParams["sampleId"] = sample.id
+        sampleParams["termsOfUseUrl"] = sample.termsOfUseUrl
+        sampleParams["sampleRate"] = sample.sampleRate
+        sampleParams["modelType"] = sample.modelType
+        sampleParams["f0"] = sample.f0
 
-            sampleParams["sampleId"] = sample.id
-            sampleParams["defaultTune"] = 0
-            sampleParams["defaultIndexRatio"] = 1
-            sampleParams["credit"] = sample.credit
-            sampleParams["description"] = sample.description
-            sampleParams["name"] = sample.name
-            sampleParams["sampleId"] = sample.id
-            sampleParams["termsOfUseUrl"] = sample.termsOfUseUrl
-            sampleParams["sampleRate"] = sample.sampleRate
-            sampleParams["modelType"] = sample.modelType
-            sampleParams["f0"] = sample.f0
-
-            jsonFilePath = os.path.join(slotDir, "params.json")
-            json.dump(sampleParams, open(jsonFilePath, "w"))
-            slot_count += 1
+        jsonFilePath = os.path.join(slotDir, "params.json")
+        json.dump(sampleParams, open(jsonFilePath, "w"))
+        slot_count += 1
 
     print("[Voice Changer] Downloading model files...")
     with ThreadPoolExecutor() as pool:
         pool.map(download, downloadParams)
 
 
-def downloadModelFiles(sampleInfo: RVCModelSample):
+def downloadModelFiles(sampleInfo: RVCModelSample, useIndex: bool = True):
     downloadParams = []
 
     modelPath = os.path.join(TMP_DIR, os.path.basename(sampleInfo.modelUrl))
@@ -97,7 +112,12 @@ def downloadModelFiles(sampleInfo: RVCModelSample):
     )
 
     indexPath = None
-    if hasattr(sampleInfo, "indexUrl") and sampleInfo.indexUrl != "":
+    if (
+        useIndex is True
+        and hasattr(sampleInfo, "indexUrl")
+        and sampleInfo.indexUrl != ""
+    ):
+        print("[Voice Changer] Download sample with index.")
         indexPath = os.path.join(TMP_DIR, os.path.basename(sampleInfo.indexUrl))
         downloadParams.append(
             {
