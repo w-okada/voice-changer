@@ -1,4 +1,4 @@
-# Realtime Voice Changer Client for RVC チュートリアル(v.1.5.3.3)
+# Realtime Voice Changer Client for RVC チュートリアル(v.1.5.3.1)
 
 # はじめに
 
@@ -165,6 +165,15 @@ ONNX 形式(.onnx)か PyTorch 形式(.pth)のいずれかを選択可能です�
 - [orginal-RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)で学習させた場合、`/logs/weights`に入っています。
 - [ddPn08RVC](https://github.com/ddPn08/rvc-webui)で学習させた場合、`/models/checkpoints`に入っています。
 
+#### feature(.npy)
+
+ファイルから読み込む設定にした場合に表示されます。
+
+HuBERT で抽出した特徴を訓練データに近づける追加機能です。index(.index)とペアで使用します。
+
+- [orginal-RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)で学習させた場合、`/logs/実験名/total_fea.npy`という名前で保存されています。(2023/04/26 に total_fea.npy を省略するアップデートが入ったので今後不要になる可能性があります)
+- [ddPn08RVC](https://github.com/ddPn08/rvc-webui)で学習させた場合、`/models/checkpoints/モデル名_index/モデル名.0.big.npy`という名前で保存されています。
+
 #### index(.index)
 
 ファイルから読み込む設定にした場合に表示されます。
@@ -283,7 +292,6 @@ start をおしてから stop を押すまでの音声が記録されます。
 
 - 軽量な`pm`
 - 高精度な`harvest`
-- GPU を使用する `crepe`
 
 ### Analyzer(Experimental)
 

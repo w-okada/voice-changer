@@ -1,4 +1,4 @@
-# Realtime Voice Changer Client for RVC Tutorial (v.1.5.3.3)
+# Realtime Voice Changer Client for RVC Tutorial (v.1.5.3.1)
 
 # Introduction
 
@@ -155,6 +155,15 @@ You can choose either ONNX format (.onnx) or PyTorch format (.pth).
 - If trained with [orginal-RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI), it is in `/logs/weights`.
 - If trained with [ddPn08-RVC](https://github.com/ddPn08/rvc-webui), it is in `/models/checkpoints`.
 
+#### feature(.npy)
+
+If you set it to load from a file, it will be displayed.
+
+This is an additional function that brings the features extracted by HuBERT closer to the training data. Used in pairs with index(.index).
+
+- If trained with [orginal-RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI), it is in `/logs/your-expetiment-name/total_fea.npy`.
+- If trained with [ddPn08-RVC](https://github.com/ddPn08/rvc-webui), it is in `/models/checkpoints/your-model-name_index/your-model-name.0.big.npy`.
+
 #### index(.index)
 
 If you set it to load from a file, it will be displayed.
@@ -262,9 +271,8 @@ On/Off of the browser's built-in noise removal function.
 
 Choose an algorithm for extracting the pitch. You can choose from the following two types.
 
-- Lightweight `dio`
+- Lightweight `pm`
 - Highly accurate `harvest`
-- Middle accurate with gpu `crepe`
 
 ### Analyzer(Experimental)
 
