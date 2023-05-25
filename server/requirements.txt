@@ -25,3 +25,6 @@ gin_config==0.5.0
 einops==0.6.0
 local_attention==1.8.5
 websockets==11.0.2
+sounddevice==0.4.6
+dataclasses_json==0.5.7
+onnxsim==0.4.28
