@@ -97,7 +97,11 @@ class SoVitsSvc40:
             self.settings.pyTorchModelFile = modelFile
             self.settings.onnxModelFile = None
 
-        clusterTorchModel = params["files"]["soVitsSvc40Cluster"]
+        clusterTorchModel = (
+            params["files"]["soVitsSvc40Cluster"]
+            if "soVitsSvc40Cluster" in params["files"]
+            else None
+        )
 
         content_vec_path = self.params.content_vec_500
         content_vec_onnx_path = self.params.content_vec_500_onnx
