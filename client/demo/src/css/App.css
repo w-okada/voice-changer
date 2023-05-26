@@ -81,6 +81,10 @@ body {
             font-size: 1.2rem;
             background: linear-gradient(transparent 60%, yellow 30%);
         }
+        .top-title-version-number {
+            margin-left: 0.3rem;
+            font-size: 0.8rem;
+        }
         .belongings {
             margin-left: 1rem;
             margin-right: 1rem;

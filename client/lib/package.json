@@ -1,6 +1,6 @@
 {
   "name": "@dannadori/voice-changer-client-js",
-  "version": "1.0.133",
+  "version": "1.0.134",
   "description": "",
   "main": "dist/index.js",
   "directories": {
@@ -27,8 +27,8 @@
   "license": "ISC",
   "devDependencies": {
     "@types/audioworklet": "^0.0.46",
-    "@types/node": "^20.2.3",
-    "@types/react": "18.2.6",
+    "@types/node": "^20.2.4",
+    "@types/react": "18.2.7",
     "@types/react-dom": "18.2.4",
     "eslint": "^8.41.0",
     "eslint-config-prettier": "^8.8.0",
@@ -41,7 +41,7 @@
     "rimraf": "^5.0.1",
     "ts-loader": "^9.4.3",
     "typescript": "^5.0.4",
-    "webpack": "^5.83.1",
+    "webpack": "^5.84.1",
     "webpack-cli": "^5.1.1",
     "webpack-dev-server": "^4.15.0"
   },

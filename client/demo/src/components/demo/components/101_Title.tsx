@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { isDesktopApp } from "../../../const";
 import { useGuiState } from "../001_GuiStateProvider";
+import { useAppRoot } from "../../../001_provider/001_AppRootProvider";
 
 
 export type TitleProps = {
@@ -11,6 +12,7 @@ export type TitleProps = {
 
 export const Title = (props: TitleProps) => {
     const guiState = useGuiState()
+    const appRootState = useAppRoot()
     const githubLink = useMemo(() => {
         return isDesktopApp() ?
             (
@@ -137,6 +139,7 @@ export const Title = (props: TitleProps) => {
                 <div className="top-title">
                     <span className="title">{props.mainTitle}</span>
                     <span className="top-title-version">{props.subTitle}</span>
+                    <span className="top-title-version-number">{appRootState.appGuiSettingState.version}</span>
                     <span className="belongings">
                         {githubLink}
                         {manualLink}
@@ -149,7 +152,7 @@ export const Title = (props: TitleProps) => {
                 </div>
             )
         }
-    }, [props.subTitle, props.mainTitle, props.lineNum])
+    }, [props.subTitle, props.mainTitle, props.lineNum, appRootState.appGuiSettingState.version])
 
     return titleRow
 };

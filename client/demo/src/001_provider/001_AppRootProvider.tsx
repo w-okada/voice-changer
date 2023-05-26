@@ -1,7 +1,7 @@
 import { ClientType } from "@dannadori/voice-changer-client-js";
 import React, { useContext, useEffect, useState } from "react";
 import { ReactNode } from "react";
-import { AppGuiSettingStateAndMethod, userAppGuiSetting } from "../001_globalHooks/001_useAppGuiSetting";
+import { AppGuiSettingStateAndMethod, useAppGuiSetting } from "../001_globalHooks/001_useAppGuiSetting";
 import { AudioConfigState, useAudioConfig } from "../001_globalHooks/001_useAudioConfig";
 
 type Props = {
@@ -26,7 +26,7 @@ export const useAppRoot = (): AppRootValue => {
 
 export const AppRootProvider = ({ children }: Props) => {
     const audioContextState = useAudioConfig()
-    const appGuiSettingState = userAppGuiSetting()
+    const appGuiSettingState = useAppGuiSetting()
     const [clientType, setClientType] = useState<ClientType | null>(null)
 
     useEffect(() => {
