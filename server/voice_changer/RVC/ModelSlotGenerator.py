@@ -8,47 +8,51 @@ import os
 
 
 def generateModelSlot(slotDir: str):
-    modelSlot = ModelSlot()
-    if os.path.exists(slotDir) is False:
+    try:
+        modelSlot = ModelSlot()
+        if os.path.exists(slotDir) is False:
+            return modelSlot
+        paramFile = os.path.join(slotDir, "params.json")
+        with open(paramFile, "r") as f:
+            params = json.load(f)
+
+        modelSlot.modelFile = os.path.join(
+            slotDir, os.path.basename(params["files"]["rvcModel"])
+        )
+        if "rvcFeature" in params["files"]:
+            modelSlot.featureFile = os.path.join(
+                slotDir, os.path.basename(params["files"]["rvcFeature"])
+            )
+        else:
+            modelSlot.featureFile = None
+        if "rvcIndex" in params["files"]:
+            modelSlot.indexFile = os.path.join(
+                slotDir, os.path.basename(params["files"]["rvcIndex"])
+            )
+        else:
+            modelSlot.indexFile = None
+
+        modelSlot.defaultTune = params["defaultTune"] if "defaultTune" in params else 0
+        modelSlot.defaultIndexRatio = (
+            params["defaultIndexRatio"] if "defaultIndexRatio" in params else 0
+        )
+        modelSlot.name = params["name"] if "name" in params else None
+        modelSlot.description = params["description"] if "description" in params else None
+        modelSlot.credit = params["credit"] if "credit" in params else None
+        modelSlot.termsOfUseUrl = (
+            params["termsOfUseUrl"] if "termsOfUseUrl" in params else None
+        )
+
+        modelSlot.isONNX = modelSlot.modelFile.endswith(".onnx")
+
+        if modelSlot.isONNX:
+            _setInfoByONNX(modelSlot)
+        else:
+            _setInfoByPytorch(modelSlot)
         return modelSlot
-    paramFile = os.path.join(slotDir, "params.json")
-    with open(paramFile, "r") as f:
-        params = json.load(f)
-
-    modelSlot.modelFile = os.path.join(
-        slotDir, os.path.basename(params["files"]["rvcModel"])
-    )
-    if "rvcFeature" in params["files"]:
-        modelSlot.featureFile = os.path.join(
-            slotDir, os.path.basename(params["files"]["rvcFeature"])
-        )
-    else:
-        modelSlot.featureFile = None
-    if "rvcIndex" in params["files"]:
-        modelSlot.indexFile = os.path.join(
-            slotDir, os.path.basename(params["files"]["rvcIndex"])
-        )
-    else:
-        modelSlot.indexFile = None
-
-    modelSlot.defaultTune = params["defaultTune"] if "defaultTune" in params else 0
-    modelSlot.defaultIndexRatio = (
-        params["defaultIndexRatio"] if "defaultIndexRatio" in params else 0
-    )
-    modelSlot.name = params["name"] if "name" in params else None
-    modelSlot.description = params["description"] if "description" in params else None
-    modelSlot.credit = params["credit"] if "credit" in params else None
-    modelSlot.termsOfUseUrl = (
-        params["termsOfUseUrl"] if "termsOfUseUrl" in params else None
-    )
-
-    modelSlot.isONNX = modelSlot.modelFile.endswith(".onnx")
-
-    if modelSlot.isONNX:
-        _setInfoByONNX(modelSlot)
-    else:
-        _setInfoByPytorch(modelSlot)
-    return modelSlot
+    except Exception as e:
+        print(f"[Voice Changer] faild to generate slot: {e}")
+        return ModelSlot()
 
 
 def _setInfoByPytorch(slot: ModelSlot):

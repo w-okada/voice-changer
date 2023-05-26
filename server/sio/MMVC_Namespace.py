@@ -43,7 +43,6 @@ class MMVC_Namespace(socketio.AsyncNamespace):
 
     async def on_request_message(self, sid, msg):
         self.sid = sid
-        await self.asynctest("on req")
         timestamp = int(msg[0])
         data = msg[1]
         if isinstance(data, str):

@@ -92,7 +92,7 @@ class VoiceChangerSettings:
 
 class VoiceChanger:
     settings: VoiceChangerSettings
-    voiceChanger: VoiceChangerModel
+    voiceChanger: VoiceChangerModel | None = None
     ioRecorder: IORecorder
     sola_buffer: AudioInOut
     namespace: socketio.AsyncNamespace | None = None
@@ -142,6 +142,7 @@ class VoiceChanger:
             if (
                 vc.settings.serverAudioStated == 0
                 or vc.settings.serverInputDeviceId == -1
+                or vc.voiceChanger is None
             ):
                 vc.settings.inputSampleRate = 48000
                 time.sleep(2)
@@ -270,7 +271,7 @@ class VoiceChanger:
 
     def switchModelType(self, modelType: ModelType):
         try:
-            if hasattr(self, "voiceChanger") and self.voiceChanger is not None:
+            if self.voiceChanger is not None:
                 # return {"status": "ERROR", "msg": "vc is already selected. currently re-select is not implemented"}
                 del self.voiceChanger
                 self.voiceChanger = None
@@ -320,6 +321,8 @@ class VoiceChanger:
 
     def loadModel(self, props: LoadModelParams):
         try:
+            if self.voiceChanger is None:
+                raise RuntimeError("Voice Changer is not selected.")
             return self.voiceChanger.loadModel(props)
         except Exception as e:
             print(traceback.format_exc())
@@ -328,7 +331,7 @@ class VoiceChanger:
 
     def get_info(self):
         data = asdict(self.settings)
-        if hasattr(self, "voiceChanger"):
+        if self.voiceChanger is not None:
             data.update(self.voiceChanger.get_info())
         return data
 
@@ -336,6 +339,10 @@ class VoiceChanger:
         return self.settings.performance
 
     def update_settings(self, key: str, val: Any):
+        if self.voiceChanger is None:
+            print("[Voice Changer] Voice Changer is not selected.")
+            return
+
         if key in self.settings.intData:
             setattr(self.settings, key, int(val))
             if key == "crossFadeOffsetRate" or key == "crossFadeEndRate":
@@ -359,12 +366,9 @@ class VoiceChanger:
         elif key in self.settings.strData:
             setattr(self.settings, key, str(val))
         else:
-            if hasattr(self, "voiceChanger"):
-                ret = self.voiceChanger.update_settings(key, val)
-                if ret is False:
-                    print(f"{key} is not mutable variable or unknown variable!")
-            else:
-                print("voice changer is not initialized!")
+            ret = self.voiceChanger.update_settings(key, val)
+            if ret is False:
+                print(f"{key} is not mutable variable or unknown variable!")
         return self.get_info()
 
     def _generate_strength(self, crossfadeSize: int):
@@ -422,6 +426,9 @@ class VoiceChanger:
         self, receivedData: AudioInOut
     ) -> tuple[AudioInOut, list[Union[int, float]]]:
         try:
+            if self.voiceChanger is None:
+                raise RuntimeError("Voice Changer is not selected.")
+
             processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
 
             # 前処理
@@ -571,10 +578,16 @@ class VoiceChanger:
         ##############
 
     def merge_models(self, request: str):
+        if self.voiceChanger is None:
+            print("[Voice Changer] Voice Changer is not selected.")
+            return
         self.voiceChanger.merge_models(request)
         return self.get_info()
 
     def update_model_default(self):
+        if self.voiceChanger is None:
+            print("[Voice Changer] Voice Changer is not selected.")
+            return
         self.voiceChanger.update_model_default()
         return self.get_info()
 
