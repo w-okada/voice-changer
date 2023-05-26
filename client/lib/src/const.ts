@@ -107,6 +107,8 @@ export const ServerSettingKey = {
     "serverInputDeviceId": "serverInputDeviceId",
     "serverOutputDeviceId": "serverOutputDeviceId",
     "serverReadChunkSize": "serverReadChunkSize",
+    "serverInputAudioGain": "serverInputAudioGain",
+    "serverOutputAudioGain": "serverOutputAudioGain",
 
     "tran": "tran",
     "noiseScale": "noiseScale",
@@ -162,6 +164,8 @@ export type VoiceChangerServerSetting = {
     serverInputDeviceId: number
     serverOutputDeviceId: number
     serverReadChunkSize: number
+    serverInputAudioGain: number
+    serverOutputAudioGain: number
 
 
     tran: number // so-vits-svc
@@ -268,6 +272,8 @@ export const DefaultServerSetting: ServerInfo = {
     serverInputDeviceId: -1,
     serverOutputDeviceId: -1,
     serverReadChunkSize: 256,
+    serverInputAudioGain: 1.0,
+    serverOutputAudioGain: 1.0,
 
     // VC Specific
     srcId: 0,

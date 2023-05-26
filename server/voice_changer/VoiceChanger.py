@@ -60,11 +60,13 @@ class VoiceChangerSettings:
     # serverOutputAudioSampleRate: int = 48000
     serverInputAudioSampleRate: int = 44100
     serverOutputAudioSampleRate: int = 44100
-    serverInputAudioBufferSize: int = 1024 * 24
-    serverOutputAudioBufferSize: int = 1024 * 24
+    # serverInputAudioBufferSize: int = 1024 * 24
+    # serverOutputAudioBufferSize: int = 1024 * 24
     serverInputDeviceId: int = -1
     serverOutputDeviceId: int = -1
     serverReadChunkSize: int = 256
+    serverInputAudioGain: float = 1.0
+    serverOutputAudioGain: float = 1.0
     performance: list[int] = field(default_factory=lambda: [0, 0, 0, 0])
 
     # ↓mutableな物だけ列挙
@@ -77,15 +79,20 @@ class VoiceChangerSettings:
             "serverAudioStated",
             "serverInputAudioSampleRate",
             "serverOutputAudioSampleRate",
-            "serverInputAudioBufferSize",
-            "serverOutputAudioBufferSize",
+            # "serverInputAudioBufferSize",
+            # "serverOutputAudioBufferSize",
             "serverInputDeviceId",
             "serverOutputDeviceId",
             "serverReadChunkSize",
         ]
     )
     floatData: list[str] = field(
-        default_factory=lambda: ["crossFadeOffsetRate", "crossFadeEndRate"]
+        default_factory=lambda: [
+            "crossFadeOffsetRate",
+            "crossFadeEndRate",
+            "serverInputAudioGain",
+            "serverOutputAudioGain",
+        ]
     )
     strData: list[str] = field(default_factory=lambda: [])
 
@@ -105,6 +112,7 @@ class VoiceChanger:
         self, indata: np.ndarray, outdata: np.ndarray, frames, times, status
     ):
         try:
+            indata = indata * self.settings.serverInputAudioGain
             with Timer("all_inference_time") as t:
                 unpackedData = librosa.to_mono(indata.T) * 32768.0
                 out_wav, times = self.on_request(unpackedData)
@@ -113,6 +121,7 @@ class VoiceChanger:
                     np.repeat(out_wav, outputChunnels).reshape(-1, outputChunnels)
                     / 32768.0
                 )
+                outdata[:] = outdata * self.settings.serverOutputAudioGain
             all_inference_time = t.secs
             performance = [all_inference_time] + times
             if self.emitTo is not None:
