@@ -15,7 +15,6 @@ export const ServerOpertationRow = (props: ServerOpertationRowProps) => {
     const guiState = useGuiState()
 
     const serverOpertationRow = useMemo(() => {
-        console.log("UPDATE OPERATION ROW:::::::::::::::::::::::")
 
         const onnxExportButtonAction = async () => {
 

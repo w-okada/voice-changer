@@ -11,13 +11,14 @@ class ServerAudioDevice:
     hostAPI: str = ""
     maxInputChannels: int = 0
     maxOutputChannels: int = 0
+    default_samplerate: int = 0
 
 
 def list_audio_device():
     audioDeviceList = sd.query_devices()
 
     inputAudioDeviceList = [d for d in audioDeviceList if d["max_input_channels"] > 0]
-    outputDeviceList = [d for d in audioDeviceList if d["max_output_channels"] > 0]
+    outputAudioDeviceList = [d for d in audioDeviceList if d["max_output_channels"] > 0]
     hostapis = sd.query_hostapis()
 
     # print("input:", inputAudioDeviceList)
@@ -34,9 +35,10 @@ def list_audio_device():
             hostAPI=hostapis[d["hostapi"]]["name"],
             maxInputChannels=d["max_input_channels"],
             maxOutputChannels=d["max_output_channels"],
+            default_samplerate=d["default_samplerate"],
         )
         serverAudioInputDevices.append(serverInputAudioDevice)
-    for d in outputDeviceList:
+    for d in outputAudioDeviceList:
         serverOutputAudioDevice: ServerAudioDevice = ServerAudioDevice(
             kind=ServerAudioDeviceTypes.audiooutput,
             index=d["index"],
@@ -44,6 +46,7 @@ def list_audio_device():
             hostAPI=hostapis[d["hostapi"]]["name"],
             maxInputChannels=d["max_input_channels"],
             maxOutputChannels=d["max_output_channels"],
+            default_samplerate=d["default_samplerate"],
         )
         serverAudioOutputDevices.append(serverOutputAudioDevice)
 

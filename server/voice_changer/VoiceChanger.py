@@ -99,6 +99,8 @@ class VoiceChanger:
 
     localPerformanceShowTime = 0.0
 
+    emitTo = None
+
     def audio_callback(
         self, indata: np.ndarray, outdata: np.ndarray, frames, times, status
     ):
@@ -113,6 +115,8 @@ class VoiceChanger:
                 )
             all_inference_time = t.secs
             performance = [all_inference_time] + times
+            if self.emitTo is not None:
+                self.emitTo(performance)
             self.settings.performance = [round(x * 1000) for x in performance]
         except Exception as e:
             print("[Voice Changer] ex:", e)
@@ -131,6 +135,7 @@ class VoiceChanger:
 
         currentInputDeviceId = -1
         currentInputSampleRate = -1
+        model_sampling_rate = -1
         currentOutputDeviceId = -1
         currentInputChunkNum = -1
         while True:
@@ -166,13 +171,33 @@ class VoiceChanger:
                 currentInputChannelNum = serverInputAudioDevice.maxInputChannels
                 currentOutputChannelNum = serverOutputAudioDevice.maxOutputChannels
 
-                vc.settings.serverInputAudioSampleRate = (
-                    self.voiceChanger.get_processing_sampling_rate()
-                )
-                currentInputSampleRate = vc.settings.serverInputAudioSampleRate
                 currentInputChunkNum = vc.settings.serverReadChunkSize
                 block_frame = currentInputChunkNum * 128
 
+                # sample rate precheck(alsa cannot use 40000?)
+                model_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
+                try:
+                    with sd.Stream(
+                        callback=self.audio_callback,
+                        blocksize=block_frame,
+                        samplerate=model_sampling_rate,
+                        dtype="float32",
+                        channels=[currentInputChannelNum, currentOutputChannelNum],
+                    ):
+                        pass
+                    currentInputSampleRate = model_sampling_rate
+                    vc.settings.serverInputAudioSampleRate = model_sampling_rate
+                    print(f"[Voice Changer] sample rate {model_sampling_rate}")
+                except Exception as e:
+                    print(
+                        "[Voice Changer] ex: fallback to device default samplerate", e
+                    )
+                    currentInputSampleRate = serverInputAudioDevice.default_samplerate
+                    vc.settings.serverInputAudioSampleRate = (
+                        serverInputAudioDevice.default_samplerate
+                    )
+
+                # main loop
                 try:
                     with sd.Stream(
                         callback=self.audio_callback,
@@ -181,14 +206,13 @@ class VoiceChanger:
                         dtype="float32",
                         channels=[currentInputChannelNum, currentOutputChannelNum],
                     ):
-                        print()
                         while (
                             vc.settings.serverAudioStated == 1
                             and currentInputDeviceId == vc.settings.serverInputDeviceId
                             and currentOutputDeviceId
                             == vc.settings.serverOutputDeviceId
-                            and currentInputSampleRate
-                            == vc.settings.serverInputAudioSampleRate
+                            and model_sampling_rate
+                            == self.voiceChanger.get_processing_sampling_rate()
                             and currentInputChunkNum == vc.settings.serverReadChunkSize
                         ):
                             vc.settings.serverInputAudioSampleRate = (

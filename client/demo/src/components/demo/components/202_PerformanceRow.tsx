@@ -9,14 +9,14 @@ export const PerformanceRow = (_props: PerformanceRowProps) => {
     const [showPerformanceDetail, setShowPerformanceDetail] = useState<boolean>(false)
 
     const performanceRow = useMemo(() => {
-        if (appState.serverSetting.serverSetting.enableServerAudio) {
-            return (
-                <div className="body-row split-3-7 left-padding-1 guided">
-                    <div className="body-item-title left-padding-1">monitor:</div>
-                    <div className="body-item-text">server device mode. refer console.</div>
-                </div>
-            )
-        }
+        // if (appState.serverSetting.serverSetting.enableServerAudio) {
+        //     return (
+        //         <div className="body-row split-3-7 left-padding-1 guided">
+        //             <div className="body-item-title left-padding-1">monitor:</div>
+        //             <div className="body-item-text">server device mode. refer console.</div>
+        //         </div>
+        //     )
+        // }
         const performanceDetailLabel = showPerformanceDetail ? "[pre, main, post] <<" : "more >>"
         const performanceData = showPerformanceDetail ? `[${appState.performance.preprocessTime}, ${appState.performance.mainprocessTime},${appState.performance.postprocessTime}]` : ""
         return (

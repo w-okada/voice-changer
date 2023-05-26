@@ -18,7 +18,7 @@ export const SampleDownloadControlRow = (_props: SampleDownloadControlRowProps) 
         }
         return (
             <div className="body-row split-3-3-4 left-padding-1 guided">
-                <div className="body-item-title left-padding-1 ">Advanced Configuration</div>
+                <div className="body-item-title left-padding-2 ">Advanced Configuration</div>
                 <div>
                     <input type="checkbox" checked={fileUploadSetting.rvcIndexDownload} onChange={(e) => {
                         appState.serverSetting.setFileUploadSetting(slot, { ...fileUploadSetting, rvcIndexDownload: e.target.checked })

@@ -74,15 +74,32 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
                 this.listener.notifyException(VOICE_CHANGER_CLIENT_EXCEPTION.ERR_SIO_CONNECT_FAILED, `[SIO] rconnection failed ${err}`)
             })
             this.socket.on('connect', () => {
-                console.log(`[SIO] sonnect to ${this.setting.serverUrl}`)
+                console.log(`[SIO] connect to ${this.setting.serverUrl}`)
                 console.log(`[SIO] ${this.socket?.id}`)
             });
+            this.socket.on('close', function (socket) {
+                console.log(`[SIO] close ${socket.id}`)
+            });
+
+
+            this.socket.on('message', (response: any[]) => {
+                console.log("message:", response)
+            });
+
             this.socket.on('response', (response: any[]) => {
-                // console.log("response:", response)
+
                 const cur = Date.now()
                 const responseTime = cur - response[0]
                 const result = response[1] as ArrayBuffer
                 const perf = response[2]
+
+                // Quick hack for server device mode
+                if (response[0] == 0) {
+                    this.listener.notifyResponseTime(Math.round(perf[0] * 1000), perf.slice(1, 4))
+                    return
+                }
+
+
                 if (result.byteLength < 128 * 2) {
                     this.listener.notifyException(VOICE_CHANGER_CLIENT_EXCEPTION.ERR_SIO_INVALID_RESPONSE, `[SIO] recevied data is too short ${result.byteLength}`)
                 } else {
