@@ -4,6 +4,10 @@
 
 ## What's New!
 
+- v.1.5.3.3a
+
+  - Some bugfixs
+
 - v.1.5.3.3
 
   - RVC: support Crepe
@@ -76,10 +80,12 @@ We offer Windows and Mac versions.
 
 | Version    | OS  | Framework                         | link                                                                                           | support VC                                                                    | size   |
 | ---------- | --- | --------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------ |
+| v.1.5.3.3a | mac | ONNX(cpu), PyTorch(cpu,mps)       | [normal](https://drive.google.com/uc?id=1cEFYbfPe7VyGxgx_D_2aTmz17GSBKFXF&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 797MB  |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1FmvX9OyYeD0QoDyZenJ8tqf1_fUR1jXg&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2873MB |
 | v.1.5.3.3  | mac | ONNX(cpu), PyTorch(cpu,mps)       | [normal](https://drive.google.com/uc?id=1FVk3uYmeexSkhxm7N19bUO4eZpMiauo4&export=download)\*1  | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 797MB  |
 |            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1OuWgtNVAPBpA-lqNtr-KhsWA77QTK6OU&export=download)\*1  | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2873MB |
-| v.1.5.3.2  | mac | ONNX(cpu), PyTorch(cpu,mps)       | [normal](https://drive.google.com/uc?id=1K0oO6UbDUgtiZ59CUHB1VItsG_6ztSHS&export=download)     | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 797MB  |
-|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1m791W_wEx6TO135mEPNGngYBL4RLQvDO&export=download)     | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2873MB |
+| v.1.5.3.2  | mac | ONNX(cpu), PyTorch(cpu,mps)       | [normal](https://drive.google.com/uc?id=1K0oO6UbDUgtiZ59CUHB1VItsG_6ztSHS&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 797MB  |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1m791W_wEx6TO135mEPNGngYBL4RLQvDO&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2873MB |
 | v.1.5.2.9e | mac | ONNX(cpu), PyTorch(cpu,mps)       | [normal](https://drive.google.com/uc?id=1W0d7I7619PcO7kjb1SPXp6MmH5Unvd78&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 796MB  |
 |            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1tmTMJRRggS2Sb4goU-eHlRvUBR88RZDl&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2872MB |
 
