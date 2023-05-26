@@ -103,12 +103,14 @@ class MMVCv15:
             requires_grad_dec=self.hps.requires_grad.dec,
         )
         if self.settings.pyTorchModelFile is not None:
+            self.settings.framework = "PyTorch"
             self.net_g.eval()
             load_checkpoint(self.settings.pyTorchModelFile, self.net_g, None)
 
         # ONNXモデル生成
         self.onxx_input_length = 8192
         if self.settings.onnxModelFile is not None:
+            self.settings.framework = "ONNX"
             providers, options = self.getOnnxExecutionProvider()
             self.onnx_session = onnxruntime.InferenceSession(
                 self.settings.onnxModelFile,

@@ -134,8 +134,7 @@ class VoiceChanger:
         vc: VoiceChanger = _vc
 
         currentInputDeviceId = -1
-        currentInputSampleRate = -1
-        model_sampling_rate = -1
+        currentModelSamplingRate = -1
         currentOutputDeviceId = -1
         currentInputChunkNum = -1
         while True:
@@ -176,34 +175,43 @@ class VoiceChanger:
                 block_frame = currentInputChunkNum * 128
 
                 # sample rate precheck(alsa cannot use 40000?)
-                model_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
+                try:
+                    currentModelSamplingRate = (
+                        self.voiceChanger.get_processing_sampling_rate()
+                    )
+                except Exception as e:
+                    print("[Voice Changer] ex: get_processing_sampling_rate", e)
+                    continue
                 try:
                     with sd.Stream(
                         callback=self.audio_callback,
                         blocksize=block_frame,
-                        samplerate=model_sampling_rate,
+                        samplerate=currentModelSamplingRate,
                         dtype="float32",
                         channels=[currentInputChannelNum, currentOutputChannelNum],
                     ):
                         pass
-                    currentInputSampleRate = model_sampling_rate
-                    vc.settings.serverInputAudioSampleRate = model_sampling_rate
-                    print(f"[Voice Changer] sample rate {model_sampling_rate}")
+                    vc.settings.serverInputAudioSampleRate = currentModelSamplingRate
+                    vc.settings.inputSampleRate = currentModelSamplingRate
+                    print(
+                        f"[Voice Changer] sample rate {vc.settings.serverInputAudioSampleRate}"
+                    )
                 except Exception as e:
                     print(
-                        "[Voice Changer] ex: fallback to device default samplerate", e
+                        "[Voice Changer] ex: fallback to device default samplerate",
+                        e,
                     )
-                    currentInputSampleRate = serverInputAudioDevice.default_samplerate
                     vc.settings.serverInputAudioSampleRate = (
                         serverInputAudioDevice.default_samplerate
                     )
+                    vc.settings.inputSampleRate = vc.settings.serverInputAudioSampleRate
 
                 # main loop
                 try:
                     with sd.Stream(
                         callback=self.audio_callback,
                         blocksize=block_frame,
-                        samplerate=currentInputSampleRate,
+                        samplerate=vc.settings.serverInputAudioSampleRate,
                         dtype="float32",
                         channels=[currentInputChannelNum, currentOutputChannelNum],
                     ):
@@ -212,16 +220,10 @@ class VoiceChanger:
                             and currentInputDeviceId == vc.settings.serverInputDeviceId
                             and currentOutputDeviceId
                             == vc.settings.serverOutputDeviceId
-                            and model_sampling_rate
+                            and currentModelSamplingRate
                             == self.voiceChanger.get_processing_sampling_rate()
                             and currentInputChunkNum == vc.settings.serverReadChunkSize
                         ):
-                            vc.settings.serverInputAudioSampleRate = (
-                                self.voiceChanger.get_processing_sampling_rate()
-                            )
-                            vc.settings.inputSampleRate = (
-                                vc.settings.serverInputAudioSampleRate
-                            )
                             time.sleep(2)
                             print(
                                 "[Voice Changer] server audio",
@@ -232,7 +234,7 @@ class VoiceChanger:
                                 vc.settings.serverAudioStated,
                                 currentInputDeviceId,
                                 currentOutputDeviceId,
-                                currentInputSampleRate,
+                                vc.settings.serverInputAudioSampleRate,
                                 currentInputChunkNum,
                             )
 
