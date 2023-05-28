@@ -180,7 +180,7 @@ class Pipeline(object):
             with torch.no_grad():
                 audio1 = (
                     (
-                    torch.clip(self.inferencer.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0], -1., 1.) * 32767.5 - .5
+                    torch.clip(self.inferencer.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0].to(dtype=torch.float32), -1., 1.) * 32767.5 - .5
                     )
                     .data
                     .to(dtype=torch.int16)

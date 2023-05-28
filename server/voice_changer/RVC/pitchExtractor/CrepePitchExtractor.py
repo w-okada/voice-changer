@@ -27,7 +27,7 @@ class CrepePitchExtractor(PitchExtractor):
         f0_mel_max = 1127 * np.log(1 + f0_max / 700)
 
         f0 = torchcrepe.predict(
-            torch.tensor(audio).unsqueeze(0),
+            audio.unsqueeze(0),
             sr,
             hop_length=window,
             fmin=f0_min,
