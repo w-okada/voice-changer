@@ -13,6 +13,7 @@ from restapi.MMVC_Rest_Hello import MMVC_Rest_Hello
 from restapi.MMVC_Rest_VoiceChanger import MMVC_Rest_VoiceChanger
 from restapi.MMVC_Rest_Fileuploader import MMVC_Rest_Fileuploader
 from const import UPLOAD_DIR, getFrontendPath, TMP_DIR
+from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 
 
 class ValidationErrorLoggingRoute(APIRoute):
@@ -35,7 +36,11 @@ class MMVC_Rest:
     _instance = None
 
     @classmethod
-    def get_instance(cls, voiceChangerManager: VoiceChangerManager):
+    def get_instance(
+        cls,
+        voiceChangerManager: VoiceChangerManager,
+        voiceChangerParams: VoiceChangerParams,
+    ):
         if cls._instance is None:
             app_fastapi = FastAPI()
             app_fastapi.router.route_class = ValidationErrorLoggingRoute
@@ -75,14 +80,18 @@ class MMVC_Rest:
                 p1 = os.path.dirname(sys._MEIPASS)
                 p2 = os.path.dirname(p1)
                 p3 = os.path.dirname(p2)
-                model_dir = os.path.join(p3, "models")
+                model_dir = os.path.join(p3, voiceChangerParams.model_dir)
                 print("mac model_dir:", model_dir)
                 app_fastapi.mount(
-                    "/models", StaticFiles(directory=model_dir), name="static"
+                    f"/{voiceChangerParams.model_dir}",
+                    StaticFiles(directory=model_dir),
+                    name="static",
                 )
             else:
                 app_fastapi.mount(
-                    "/models", StaticFiles(directory="models"), name="static"
+                    f"/{voiceChangerParams.model_dir}",
+                    StaticFiles(directory=voiceChangerParams.model_dir),
+                    name="static",
                 )
 
             restHello = MMVC_Rest_Hello()

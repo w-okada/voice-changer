@@ -209,7 +209,7 @@ if __name__ == "MMVCServerSIO":
         printMessage("failed to download weight for rvc", level=2)
 
     voiceChangerManager = VoiceChangerManager.get_instance(voiceChangerParams)
-    app_fastapi = MMVC_Rest.get_instance(voiceChangerManager)
+    app_fastapi = MMVC_Rest.get_instance(voiceChangerManager, voiceChangerParams)
     app_socketio = MMVC_SocketIOApp.get_instance(app_fastapi, voiceChangerManager)
 
 
