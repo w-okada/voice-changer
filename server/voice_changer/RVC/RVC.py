@@ -1,10 +1,10 @@
 import sys
 import os
-import resampy
 from dataclasses import asdict
 from typing import cast
 import numpy as np
 import torch
+import torchaudio
 from ModelSample import getModelSamples
 from voice_changer.RVC.SampleDownloader import downloadModelFiles
 
@@ -89,6 +89,7 @@ class RVC:
                     self.switchModel(self.settings.modelSlotIndex)
                     self.initialLoad = False
                     break
+        self.prevVol = 0.
 
     def getSampleInfo(self, id: str):
         sampleInfos = list(filter(lambda x: x.id == id, self.settings.sampleModels))
@@ -293,16 +294,17 @@ class RVC:
 
         convertOffset = -1 * convertSize
         self.audio_buffer = self.audio_buffer[convertOffset:]  # 変換対象の部分だけ抽出
+        audio_buffer = torch.from_numpy(self.audio_buffer).to(device=self.pipeline.device, dtype=torch.float32)
 
         # 出力部分だけ切り出して音量を確認。(TODO:段階的消音にする)
         cropOffset = -1 * (inputSize + crossfadeSize)
         cropEnd = -1 * (crossfadeSize)
-        crop = self.audio_buffer[cropOffset:cropEnd]
-        rms = np.sqrt(np.square(crop).mean(axis=0))
-        vol = max(rms, self.prevVol * 0.0)
+        crop = audio_buffer[cropOffset:cropEnd]
+        vol = torch.sqrt(torch.square(crop).mean(axis=0)).detach().cpu().numpy()
+        vol = max(vol, self.prevVol * 0.0)
         self.prevVol = vol
 
-        return (self.audio_buffer, convertSize, vol)
+        return (audio_buffer, convertSize, vol)
 
     def inference(self, data):
         if self.settings.modelSlotIndex < 0:
@@ -325,11 +327,10 @@ class RVC:
         convertSize = data[1]
         vol = data[2]
 
-        audio = resampy.resample(audio, self.settings.modelSamplingRate, 16000)
-
         if vol < self.settings.silentThreshold:
             return np.zeros(convertSize).astype(np.int16)
 
+        audio = torchaudio.functional.resample(audio, self.settings.modelSamplingRate, 16000, rolloff=0.99)
         repeat = 3 if half else 1
         repeat *= self.settings.rvcQuality  # 0 or 3
         sid = 0
@@ -351,7 +352,7 @@ class RVC:
             repeat,
         )
 
-        result = audio_out * np.sqrt(vol)
+        result = audio_out.detach().cpu().numpy() * np.sqrt(vol)
 
         return result
 
