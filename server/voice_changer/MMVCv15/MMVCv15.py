@@ -331,8 +331,8 @@ class MMVCv15:
             else:
                 audio = self._pyTorch_inference(data)
             return audio
-        except onnxruntime.capi.onnxruntime_pybind11_state.InvalidArgument as e:
-            print(e)
+        except onnxruntime.capi.onnxruntime_pybind11_state.InvalidArgument as _e:
+            print(_e)
             raise ONNXInputArgumentException()
 
     def __del__(self):

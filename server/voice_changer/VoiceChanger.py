@@ -98,7 +98,7 @@ class VoiceChangerSettings:
 
 
 class VoiceChanger:
-    settings: VoiceChangerSettings
+    settings: VoiceChangerSettings = VoiceChangerSettings()
     voiceChanger: VoiceChangerModel | None = None
     ioRecorder: IORecorder
     sola_buffer: AudioInOut
@@ -352,7 +352,7 @@ class VoiceChanger:
     def update_settings(self, key: str, val: Any):
         if self.voiceChanger is None:
             print("[Voice Changer] Voice Changer is not selected.")
-            return
+            return self.get_info()
 
         if key in self.settings.intData:
             setattr(self.settings, key, int(val))
@@ -567,7 +567,7 @@ class VoiceChanger:
             print("[Voice Changer] [Exception]", e)
             return np.zeros(1).astype(np.int16), [0, 0, 0]
         except ONNXInputArgumentException as e:
-            print("[Voice Changer] [Exception]", e)
+            print("[Voice Changer] [Exception] onnx are waiting valid input.", e)
             return np.zeros(1).astype(np.int16), [0, 0, 0]
         except HalfPrecisionChangingException as e:
             print("[Voice Changer] Switching model configuration....", e)
