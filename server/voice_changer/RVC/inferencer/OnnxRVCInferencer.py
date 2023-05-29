@@ -1,20 +1,20 @@
 import torch
-from torch import device
 import onnxruntime
-from const import EnumInferenceTypes
+from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
 import numpy as np
 
-providers = ["CPUExecutionProvider"]
-
 
 class OnnxRVCInferencer(Inferencer):
-    def loadModel(self, file: str, dev: device, isHalf: bool = True):
-        super().setProps(EnumInferenceTypes.onnxRVC, file, dev, isHalf)
-        # ort_options = onnxruntime.SessionOptions()
-        # ort_options.intra_op_num_threads = 8
+    def loadModel(self, file: str, gpu: int):
+        (
+            onnxProviders,
+            onnxProviderOptions,
+        ) = DeviceManager.get_instance().getOnnxExecutionProvider(gpu)
 
-        onnx_session = onnxruntime.InferenceSession(file, providers=providers)
+        onnx_session = onnxruntime.InferenceSession(
+            file, providers=onnxProviders, provider_options=onnxProviderOptions
+        )
 
         # check half-precision
         first_input_type = onnx_session.get_inputs()[0].type
@@ -24,7 +24,6 @@ class OnnxRVCInferencer(Inferencer):
             self.isHalf = True
 
         self.model = onnx_session
-        self.setDevice(dev)
         return self
 
     def infer(
@@ -66,36 +65,3 @@ class OnnxRVCInferencer(Inferencer):
             )
 
         return torch.tensor(np.array(audio1))
-
-    def setHalf(self, isHalf: bool):
-        self.isHalf = isHalf
-        pass
-        # raise RuntimeError("half-precision is not changable.", self.isHalf)
-
-    def setDevice(self, dev: device):
-        index = dev.index
-        type = dev.type
-        if type == "cpu":
-            self.model.set_providers(providers=["CPUExecutionProvider"])
-        elif type == "cuda":
-            provider_options = [{"device_id": index}]
-            self.model.set_providers(
-                providers=["CUDAExecutionProvider"],
-                provider_options=provider_options,
-            )
-        else:
-            self.model.set_providers(providers=["CPUExecutionProvider"])
-
-        return self
-
-    def setDirectMLEnable(self, enable: bool):
-        if "DmlExecutionProvider" not in onnxruntime.get_available_providers():
-            print("[Voice Changer] DML is not available.")
-            return
-
-        if enable:
-            self.model.set_providers(
-                providers=["DmlExecutionProvider", "CPUExecutionProvider"]
-            )
-        else:
-            self.model.set_providers(providers=["CPUExecutionProvider"])

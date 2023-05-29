@@ -125,10 +125,11 @@ class MMVCv15:
         return self.get_info()
 
     def getOnnxExecutionProvider(self):
-        if self.settings.gpu >= 0:
+        availableProviders = onnxruntime.get_available_providers()
+        if self.settings.gpu >= 0 and "CUDAExecutionProvider" in availableProviders:
             return ["CUDAExecutionProvider"], [{"device_id": self.settings.gpu}]
-        elif "DmlExecutionProvider" in onnxruntime.get_available_providers():
-            return ["DmlExecutionProvider"], []
+        elif self.settings.gpu >= 0 and "DmlExecutionProvider" in availableProviders:
+            return ["DmlExecutionProvider"], [{}]
         else:
             return ["CPUExecutionProvider"], [
                 {

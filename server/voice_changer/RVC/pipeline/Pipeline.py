@@ -59,14 +59,6 @@ class Pipeline(object):
         self.sr = 16000
         self.window = 160
 
-        self.device = device
-        self.isHalf = isHalf
-
-    def setDevice(self, device: torch.device):
-        self.device = device
-        self.embedder.setDevice(device)
-        self.inferencer.setDevice(device)
-
     def setDirectMLEnable(self, enable: bool):
         if hasattr(self.inferencer, "setDirectMLEnable"):
             self.inferencer.setDirectMLEnable(enable)

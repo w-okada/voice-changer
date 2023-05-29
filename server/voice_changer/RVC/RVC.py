@@ -41,13 +41,6 @@ from const import RVC_MAX_SLOT_NUM, RVC_MODEL_DIRNAME, SAMPLES_JSONS, UPLOAD_DIR
 import shutil
 import json
 
-providers = [
-    "OpenVINOExecutionProvider",
-    "CUDAExecutionProvider",
-    "DmlExecutionProvider",
-    "CPUExecutionProvider",
-]
-
 
 class RVC:
     initialLoad: bool = True
@@ -193,19 +186,8 @@ class RVC:
             setattr(self.settings, key, val)
 
             if key == "gpu":
-                dev = self.deviceManager.getDevice(val)
-                half = self.deviceManager.halfPrecisionAvailable(val)
+                self.prepareModel(self.settings.modelSlotIndex)
 
-                # half-precisionの使用可否が変わるときは作り直し
-                if self.pipeline is not None and self.pipeline.isHalf == half:
-                    print(
-                        "USE EXISTING PIPELINE",
-                        half,
-                    )
-                    self.pipeline.setDevice(dev)
-                else:
-                    print("CHAGE TO NEW PIPELINE", half)
-                    self.prepareModel(self.settings.modelSlotIndex)
             if key == "enableDirectML":
                 if self.pipeline is not None and val == 0:
                     self.pipeline.setDirectMLEnable(False)

@@ -1,21 +1,18 @@
 from typing import Any, Protocol
-
 import torch
-from torch import device
-
-from const import EnumInferenceTypes
 import onnxruntime
 
 
 class Inferencer(Protocol):
-    inferencerType: EnumInferenceTypes = EnumInferenceTypes.pyTorchRVC
-    file: str
-    isHalf: bool = True
-    dev: device
-
+    # inferencerType: EnumInferenceTypes = EnumInferenceTypes.pyTorchRVC
+    # file: str
+    # isHalf: bool = True
+    # dev: device | None
+    # onnxProviders: list[str] | None
+    # onnxProviderOptions: Any | None
     model: onnxruntime.InferenceSession | Any | None = None
 
-    def loadModel(self, file: str, dev: device, isHalf: bool = True):
+    def loadModel(self, file: str, gpu: int):
         ...
 
     def infer(
@@ -28,27 +25,18 @@ class Inferencer(Protocol):
     ) -> torch.Tensor:
         ...
 
-    def setProps(
-        self,
-        inferencerType: EnumInferenceTypes,
-        file: str,
-        dev: device,
-        isHalf: bool = True,
-    ):
-        self.inferencerType = inferencerType
-        self.file = file
-        self.isHalf = isHalf
-        self.dev = dev
-
-    def setHalf(self, isHalf: bool):
-        self.isHalf = isHalf
-        if self.model is not None and isHalf:
-            self.model = self.model.half()
-        elif self.model is not None and isHalf is False:
-            self.model = self.model.float()
-
-    def setDevice(self, dev: device):
-        self.dev = dev
-        if self.model is not None:
-            self.model = self.model.to(self.dev)
-        return self
+    # def setProps(
+    #     self,
+    #     inferencerType: EnumInferenceTypes,
+    #     file: str,
+    #     dev: device | None,
+    #     onnxProviders: list[str] | None,
+    #     onnxProviderOptions: Any | None,
+    #     isHalf: bool = True,
+    # ):
+    #     self.inferencerType = inferencerType
+    #     self.file = file
+    #     self.isHalf = isHalf
+    #     self.dev = dev
+    #     self.onnxProviders = onnxProviders
+    #     self.onnxProviderOptions = onnxProviderOptions

@@ -1,7 +1,6 @@
 import torch
-from torch import device
 
-from const import EnumInferenceTypes
+from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
 from infer_pack.models import (  # type:ignore
     SynthesizerTrnMs768NSFsid_nono,
@@ -9,8 +8,10 @@ from infer_pack.models import (  # type:ignore
 
 
 class RVCInferencerv2Nono(Inferencer):
-    def loadModel(self, file: str, dev: device, isHalf: bool = True):
-        super().setProps(EnumInferenceTypes.pyTorchRVCv2Nono, file, dev, isHalf)
+    def loadModel(self, file: str, gpu: int):
+        dev = DeviceManager.get_instance().getDevice(gpu)
+        isHalf = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
+
         cpt = torch.load(file, map_location="cpu")
         model = SynthesizerTrnMs768NSFsid_nono(*cpt["config"], is_half=isHalf)
 

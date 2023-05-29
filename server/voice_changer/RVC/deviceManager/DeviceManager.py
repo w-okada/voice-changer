@@ -1,4 +1,5 @@
 import torch
+import onnxruntime
 
 
 class DeviceManager(object):
@@ -25,6 +26,21 @@ class DeviceManager(object):
         else:
             dev = torch.device("cuda", index=id)
         return dev
+
+    def getOnnxExecutionProvider(self, gpu: int):
+        availableProviders = onnxruntime.get_available_providers()
+        if gpu >= 0 and "CUDAExecutionProvider" in availableProviders:
+            return ["CUDAExecutionProvider"], [{"device_id": gpu}]
+        elif gpu >= 0 and "DmlExecutionProvider" in availableProviders:
+            return ["DmlExecutionProvider"], [{}]
+        else:
+            return ["CPUExecutionProvider"], [
+                {
+                    "intra_op_num_threads": 8,
+                    "execution_mode": onnxruntime.ExecutionMode.ORT_PARALLEL,
+                    "inter_op_num_threads": 8,
+                }
+            ]
 
     def halfPrecisionAvailable(self, id: int):
         if self.gpu_num == 0:

@@ -29,13 +29,6 @@ import time
 import sounddevice as sd
 import librosa
 
-providers = [
-    "OpenVINOExecutionProvider",
-    "CUDAExecutionProvider",
-    "DmlExecutionProvider",
-    "CPUExecutionProvider",
-]
-
 STREAM_INPUT_FILE = os.path.join(TMP_DIR, "in.wav")
 STREAM_OUTPUT_FILE = os.path.join(TMP_DIR, "out.wav")
 
@@ -379,7 +372,7 @@ class VoiceChanger:
         else:
             ret = self.voiceChanger.update_settings(key, val)
             if ret is False:
-                print(f"{key} is not mutable variable or unknown variable!")
+                print(f"({key} is not mutable variable or unknown variable)")
         return self.get_info()
 
     def _generate_strength(self, crossfadeSize: int):
