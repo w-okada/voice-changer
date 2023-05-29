@@ -89,7 +89,7 @@ class Pipeline(object):
         self.t_pad = self.sr * repeat
         self.t_pad_tgt = self.targetSR * repeat
 
-        audio_pad = np.pad(audio, (self.t_pad, self.t_pad), mode="reflect")
+        audio_pad = F.pad(audio.unsqueeze(0), (self.t_pad, self.t_pad), mode="reflect").squeeze(0)
         p_len = audio_pad.shape[0] // self.window
         sid = torch.tensor(sid, device=self.device).unsqueeze(0).long()
 
@@ -115,7 +115,7 @@ class Pipeline(object):
             raise NotEnoughDataExtimateF0()
 
         # tensor型調整
-        feats = torch.from_numpy(audio_pad)
+        feats = audio_pad
         if self.isHalf is True:
             feats = feats.half()
         else:
@@ -180,13 +180,10 @@ class Pipeline(object):
             with torch.no_grad():
                 audio1 = (
                     (
-                        self.inferencer.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0]
-                        * 32768
+                    torch.clip(self.inferencer.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0].to(dtype=torch.float32), -1., 1.) * 32767.5 - .5
                     )
-                    .data.cpu()
-                    .float()
-                    .numpy()
-                    .astype(np.int16)
+                    .data
+                    .to(dtype=torch.int16)
                 )
         except RuntimeError as e:
             if "HALF" in e.__str__().upper():
