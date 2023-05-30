@@ -6,6 +6,7 @@ import numpy as np
 import torch
 import torchaudio
 from ModelSample import getModelSamples
+from voice_changer.RVC.ModelSlot import ModelSlot
 from voice_changer.RVC.SampleDownloader import downloadModelFiles
 
 
@@ -24,7 +25,10 @@ else:
 
 from voice_changer.RVC.modelMerger.MergeModel import merge_model
 from voice_changer.RVC.modelMerger.MergeModelRequest import MergeModelRequest
-from voice_changer.RVC.ModelSlotGenerator import generateModelSlot
+from voice_changer.RVC.ModelSlotGenerator import (
+    _setInfoByONNX,
+    _setInfoByPytorch,
+)
 from voice_changer.RVC.RVCSettings import RVCSettings
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 from voice_changer.utils.LoadModelParams import LoadModelParams
@@ -37,7 +41,7 @@ from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.pipeline.Pipeline import Pipeline
 
 from Exceptions import NoModeLoadedException
-from const import RVC_MAX_SLOT_NUM, RVC_MODEL_DIRNAME, SAMPLES_JSONS, UPLOAD_DIR
+from const import RVC_MODEL_DIRNAME, SAMPLES_JSONS, UPLOAD_DIR
 import shutil
 import json
 
@@ -65,6 +69,7 @@ class RVC:
         self.loadSlots()
         print("RVC initialization: ", params)
 
+        # サンプルカタログ作成
         sampleJsons: list[str] = []
         for url in SAMPLES_JSONS:
             filename = os.path.basename(url)
@@ -82,7 +87,7 @@ class RVC:
                     self.switchModel(self.settings.modelSlotIndex)
                     self.initialLoad = False
                     break
-        self.prevVol = 0.
+        self.prevVol = 0.0
 
     def getSampleInfo(self, id: str):
         sampleInfos = list(filter(lambda x: x.id == id, self.settings.sampleModels))
@@ -101,6 +106,7 @@ class RVC:
     def loadModel(self, props: LoadModelParams):
         target_slot_idx = props.slot
         params = props.params
+        slotInfo: ModelSlot = ModelSlot()
 
         print("loadModel", params)
         # サンプルが指定されたときはダウンロードしてメタデータをでっちあげる
@@ -113,34 +119,43 @@ class RVC:
                 print("[Voice Changer] sampleInfo is None")
                 return
             modelPath, indexPath = downloadModelFiles(sampleInfo, useIndex)
-            params["files"]["rvcModel"] = modelPath
+            slotInfo.modelFile = modelPath
             if indexPath is not None:
-                params["files"]["rvcIndex"] = indexPath
-            params["credit"] = sampleInfo.credit
-            params["description"] = sampleInfo.description
-            params["name"] = sampleInfo.name
-            params["sampleId"] = sampleInfo.id
-            params["termsOfUseUrl"] = sampleInfo.termsOfUseUrl
-            params["sampleRate"] = sampleInfo.sampleRate
-            params["modelType"] = sampleInfo.modelType
-            params["f0"] = sampleInfo.f0
+                slotInfo.indexFile = indexPath
+
+            slotInfo.sampleId = sampleInfo.id
+            slotInfo.credit = sampleInfo.credit
+            slotInfo.description = sampleInfo.description
+            slotInfo.name = sampleInfo.name
+            slotInfo.termsOfUseUrl = sampleInfo.termsOfUseUrl
+            # slotInfo.samplingRate = sampleInfo.sampleRate
+            # slotInfo.modelType = sampleInfo.modelType
+            # slotInfo.f0 = sampleInfo.f0
+        else:
+            slotInfo.modelFile = params["files"]["rvcModel"]
+            slotInfo.indexFile = (
+                params["files"]["rvcIndex"] if "rvcIndex" in params["files"] else None
+            )
+
+        slotInfo.defaultTune = params["defaultTune"]
+        slotInfo.defaultIndexRatio = params["defaultIndexRatio"]
+        slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
+
+        if slotInfo.isONNX:
+            _setInfoByONNX(slotInfo)
+        else:
+            _setInfoByPytorch(slotInfo)
+
         # メタデータを見て、永続化モデルフォルダに移動させる
         # その際に、メタデータのファイル格納場所も書き換える
         slotDir = os.path.join(
             self.params.model_dir, RVC_MODEL_DIRNAME, str(target_slot_idx)
         )
         os.makedirs(slotDir, exist_ok=True)
-
-        modelDst = self.moveToModelDir(params["files"]["rvcModel"], slotDir)
-        params["files"]["rvcModel"] = modelDst
-        if "rvcFeature" in params["files"]:
-            featureDst = self.moveToModelDir(params["files"]["rvcFeature"], slotDir)
-            params["files"]["rvcFeature"] = featureDst
-        if "rvcIndex" in params["files"]:
-            indexDst = self.moveToModelDir(params["files"]["rvcIndex"], slotDir)
-            params["files"]["rvcIndex"] = indexDst
-
-        json.dump(params, open(os.path.join(slotDir, "params.json"), "w"))
+        slotInfo.modelFile = self.moveToModelDir(slotInfo.modelFile, slotDir)
+        if slotInfo.indexFile is not None:
+            slotInfo.indexFile = self.moveToModelDir(slotInfo.indexFile, slotDir)
+        json.dump(asdict(slotInfo), open(os.path.join(slotDir, "params.json"), "w"))
         self.loadSlots()
 
         # 初回のみロード(起動時にスロットにモデルがあった場合はinitialLoadはFalseになっている)
@@ -156,16 +171,22 @@ class RVC:
 
     def loadSlots(self):
         dirname = os.path.join(self.params.model_dir, RVC_MODEL_DIRNAME)
-        self.settings.modelSlots = []
         if not os.path.exists(dirname):
             return
 
-        for slot_idx in range(RVC_MAX_SLOT_NUM):
+        modelSlots: list[ModelSlot] = []
+        for slot_idx in range(len(self.settings.modelSlots)):
             slotDir = os.path.join(
                 self.params.model_dir, RVC_MODEL_DIRNAME, str(slot_idx)
             )
-            modelSlot = generateModelSlot(slotDir)
-            self.settings.modelSlots.append(modelSlot)
+            jsonDict = os.path.join(slotDir, "params.json")
+            if os.path.exists(jsonDict):
+                jsonDict = json.load(open(os.path.join(slotDir, "params.json")))
+                slotInfo = ModelSlot(**jsonDict)
+            else:
+                slotInfo = ModelSlot()
+            modelSlots.append(slotInfo)
+        self.settings.modelSlots = modelSlots
 
     def update_settings(self, key: str, val: int | float | str):
         if key in self.settings.intData:
@@ -276,13 +297,21 @@ class RVC:
 
         convertOffset = -1 * convertSize
         self.audio_buffer = self.audio_buffer[convertOffset:]  # 変換対象の部分だけ抽出
-        audio_buffer = torch.from_numpy(self.audio_buffer).to(device=self.pipeline.device, dtype=torch.float32)
+
+        if self.pipeline is not None:
+            device = self.pipeline.device
+        else:
+            device = torch.device("cpu")
+
+        audio_buffer = torch.from_numpy(self.audio_buffer).to(
+            device=device, dtype=torch.float32
+        )
 
         # 出力部分だけ切り出して音量を確認。(TODO:段階的消音にする)
         cropOffset = -1 * (inputSize + crossfadeSize)
         cropEnd = -1 * (crossfadeSize)
         crop = audio_buffer[cropOffset:cropEnd]
-        vol = torch.sqrt(torch.square(crop).mean(axis=0)).detach().cpu().numpy()
+        vol = torch.sqrt(torch.square(crop).mean()).detach().cpu().numpy()
         vol = max(vol, self.prevVol * 0.0)
         self.prevVol = vol
 
@@ -312,7 +341,9 @@ class RVC:
         if vol < self.settings.silentThreshold:
             return np.zeros(convertSize).astype(np.int16)
 
-        audio = torchaudio.functional.resample(audio, self.settings.modelSamplingRate, 16000, rolloff=0.99)
+        audio = torchaudio.functional.resample(
+            audio, self.settings.modelSamplingRate, 16000, rolloff=0.99
+        )
         repeat = 3 if half else 1
         repeat *= self.settings.rvcQuality  # 0 or 3
         sid = 0
@@ -341,7 +372,7 @@ class RVC:
     def __del__(self):
         del self.pipeline
 
-        print("---------- REMOVING ---------------")
+        # print("---------- REMOVING ---------------")
 
         remove_path = os.path.join("RVC")
         sys.path = [x for x in sys.path if x.endswith(remove_path) is False]
@@ -351,7 +382,7 @@ class RVC:
             try:
                 file_path = val.__file__
                 if file_path.find("RVC" + os.path.sep) >= 0:
-                    print("remove", key, file_path)
+                    # print("remove", key, file_path)
                     sys.modules.pop(key)
             except Exception:  # type:ignore
                 # print(e)

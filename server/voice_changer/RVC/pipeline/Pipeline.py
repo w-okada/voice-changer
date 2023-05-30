@@ -81,7 +81,9 @@ class Pipeline(object):
         self.t_pad = self.sr * repeat
         self.t_pad_tgt = self.targetSR * repeat
 
-        audio_pad = F.pad(audio.unsqueeze(0), (self.t_pad, self.t_pad), mode="reflect").squeeze(0)
+        audio_pad = F.pad(
+            audio.unsqueeze(0), (self.t_pad, self.t_pad), mode="reflect"
+        ).squeeze(0)
         p_len = audio_pad.shape[0] // self.window
         sid = torch.tensor(sid, device=self.device).unsqueeze(0).long()
 
@@ -102,8 +104,8 @@ class Pipeline(object):
                 pitchf = torch.tensor(
                     pitchf, device=self.device, dtype=torch.float
                 ).unsqueeze(0)
-        except IndexError as e:
-            print(e)
+        except IndexError:
+            # print(e)
             raise NotEnoughDataExtimateF0()
 
         # tensor型調整
@@ -142,7 +144,7 @@ class Pipeline(object):
             k = 1
             if k == 1:
                 _, ix = self.index.search(npy, 1)
-                npy = self.big_npy[ix.squeeze()]               
+                npy = self.big_npy[ix.squeeze()]
             else:
                 score, ix = self.index.search(npy, k=8)
                 weight = np.square(1 / score)
@@ -171,12 +173,16 @@ class Pipeline(object):
         try:
             with torch.no_grad():
                 audio1 = (
-                    (
-                    torch.clip(self.inferencer.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0].to(dtype=torch.float32), -1., 1.) * 32767.5 - .5
+                    torch.clip(
+                        self.inferencer.infer(feats, p_len, pitch, pitchf, sid)[0][
+                            0, 0
+                        ].to(dtype=torch.float32),
+                        -1.0,
+                        1.0,
                     )
-                    .data
-                    .to(dtype=torch.int16)
-                )
+                    * 32767.5
+                    - 0.5
+                ).data.to(dtype=torch.int16)
         except RuntimeError as e:
             if "HALF" in e.__str__().upper():
                 raise HalfPrecisionChangingException()

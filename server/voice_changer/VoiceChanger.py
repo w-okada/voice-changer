@@ -495,7 +495,7 @@ class VoiceChanger:
 
                     result = output_wav
                 else:
-                    print("[Voice Changer] no sola buffer. (You can ignore this.)")
+                    print("[Voice Changer] warming up... generating sola buffer.")
                     result = np.zeros(4096).astype(np.int16)
 
                 if (
@@ -562,11 +562,11 @@ class VoiceChanger:
         except ONNXInputArgumentException as e:
             print("[Voice Changer] [Exception] onnx are waiting valid input.", e)
             return np.zeros(1).astype(np.int16), [0, 0, 0]
-        except HalfPrecisionChangingException as e:
-            print("[Voice Changer] Switching model configuration....", e)
+        except HalfPrecisionChangingException:
+            print("[Voice Changer] Switching model configuration....")
             return np.zeros(1).astype(np.int16), [0, 0, 0]
-        except NotEnoughDataExtimateF0 as e:
-            print("[Voice Changer] not enough data", e)
+        except NotEnoughDataExtimateF0:
+            print("[Voice Changer] warming up... waiting more data.")
             return np.zeros(1).astype(np.int16), [0, 0, 0]
         except DeviceChangingException as e:
             print("[Voice Changer] embedder:", e)

@@ -42,6 +42,7 @@ docker/cudnn/
 
 server/pretrain/
 server/weights/
+server/model_dir/
 server/weights_/
 server/weights__/
 server/models/

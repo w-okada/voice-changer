@@ -468,7 +468,7 @@ class SoVitsSvc40:
             try:
                 file_path = val.__file__
                 if file_path.find("so-vits-svc-40" + os.path.sep) >= 0:
-                    print("remove", key, file_path)
+                    # print("remove", key, file_path)
                     sys.modules.pop(key)
             except Exception:  # type:ignore
                 pass

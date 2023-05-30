@@ -226,7 +226,7 @@ class DDSP_SVC:
             try:
                 file_path = val.__file__
                 if file_path.find("DDSP-SVC" + os.path.sep) >= 0:
-                    print("remove", key, file_path)
+                    # print("remove", key, file_path)
                     sys.modules.pop(key)
             except:  # type:ignore
                 pass

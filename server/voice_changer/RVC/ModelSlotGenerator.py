@@ -4,55 +4,6 @@ from voice_changer.RVC.ModelSlot import ModelSlot
 import torch
 import onnxruntime
 import json
-import os
-
-
-def generateModelSlot(slotDir: str):
-    try:
-        modelSlot = ModelSlot()
-        if os.path.exists(slotDir) is False:
-            return modelSlot
-        paramFile = os.path.join(slotDir, "params.json")
-        with open(paramFile, "r") as f:
-            params = json.load(f)
-
-        modelSlot.modelFile = os.path.join(
-            slotDir, os.path.basename(params["files"]["rvcModel"])
-        )
-        if "rvcFeature" in params["files"]:
-            modelSlot.featureFile = os.path.join(
-                slotDir, os.path.basename(params["files"]["rvcFeature"])
-            )
-        else:
-            modelSlot.featureFile = None
-        if "rvcIndex" in params["files"]:
-            modelSlot.indexFile = os.path.join(
-                slotDir, os.path.basename(params["files"]["rvcIndex"])
-            )
-        else:
-            modelSlot.indexFile = None
-
-        modelSlot.defaultTune = params["defaultTune"] if "defaultTune" in params else 0
-        modelSlot.defaultIndexRatio = (
-            params["defaultIndexRatio"] if "defaultIndexRatio" in params else 0
-        )
-        modelSlot.name = params["name"] if "name" in params else None
-        modelSlot.description = params["description"] if "description" in params else None
-        modelSlot.credit = params["credit"] if "credit" in params else None
-        modelSlot.termsOfUseUrl = (
-            params["termsOfUseUrl"] if "termsOfUseUrl" in params else None
-        )
-
-        modelSlot.isONNX = modelSlot.modelFile.endswith(".onnx")
-
-        if modelSlot.isONNX:
-            _setInfoByONNX(modelSlot)
-        else:
-            _setInfoByPytorch(modelSlot)
-        return modelSlot
-    except Exception as e:
-        print(f"[Voice Changer] faild to generate slot: {e}")
-        return ModelSlot()
 
 
 def _setInfoByPytorch(slot: ModelSlot):
@@ -65,32 +16,34 @@ def _setInfoByPytorch(slot: ModelSlot):
         version = cpt.get("version", "v1")
         if version is None or version == "v1":
             slot.modelType = (
-                EnumInferenceTypes.pyTorchRVC
+                EnumInferenceTypes.pyTorchRVC.value
                 if slot.f0
-                else EnumInferenceTypes.pyTorchRVCNono
+                else EnumInferenceTypes.pyTorchRVCNono.value
             )
             slot.embChannels = 256
             slot.embOutputLayer = 9
             slot.useFinalProj = True
-            slot.embedder = EnumEmbedderTypes.hubert
+            slot.embedder = EnumEmbedderTypes.hubert.value
+            print("[Voice Changer] Official Model(pyTorch) : v1")
         else:
             slot.modelType = (
-                EnumInferenceTypes.pyTorchRVCv2
+                EnumInferenceTypes.pyTorchRVCv2.value
                 if slot.f0
-                else EnumInferenceTypes.pyTorchRVCv2Nono
+                else EnumInferenceTypes.pyTorchRVCv2Nono.value
             )
             slot.embChannels = 768
             slot.embOutputLayer = 12
             slot.useFinalProj = False
-            slot.embedder = EnumEmbedderTypes.hubert
+            slot.embedder = EnumEmbedderTypes.hubert.value
+            print("[Voice Changer] Official Model(pyTorch) : v2")
 
     else:
         # DDPN RVC
         slot.f0 = True if cpt["f0"] == 1 else False
         slot.modelType = (
-            EnumInferenceTypes.pyTorchWebUI
+            EnumInferenceTypes.pyTorchWebUI.value
             if slot.f0
-            else EnumInferenceTypes.pyTorchWebUINono
+            else EnumInferenceTypes.pyTorchWebUINono.value
         )
         slot.embChannels = cpt["config"][17]
         slot.embOutputLayer = (
@@ -107,30 +60,30 @@ def _setInfoByPytorch(slot: ModelSlot):
             and slot.embOutputLayer == 9
             and slot.useFinalProj is True
         ):
-            print("[Voice Changer] DDPN Model: Original v1 like")
+            print("[Voice Changer] DDPN Model(pyTorch) : Official v1 like")
         elif (
             slot.embChannels == 768
             and slot.embOutputLayer == 12
             and slot.useFinalProj is False
         ):
-            print("[Voice Changer] DDPN Model: Original v2 like")
+            print("[Voice Changer] DDPN Model(pyTorch): Official v2 like")
         else:
             print(
-                f"[Voice Changer] DDPN Model: ch:{slot.embChannels}, L:{slot.embOutputLayer}, FP:{slot.useFinalProj}"
+                f"[Voice Changer] DDPN Model(pyTorch): ch:{slot.embChannels}, L:{slot.embOutputLayer}, FP:{slot.useFinalProj}"
             )
 
         slot.embedder = cpt["embedder_name"]
         if slot.embedder.endswith("768"):
             slot.embedder = slot.embedder[:-3]
 
-        if slot.embedder == EnumEmbedderTypes.hubert.value:
-            slot.embedder = EnumEmbedderTypes.hubert
-        elif slot.embedder == EnumEmbedderTypes.contentvec.value:
-            slot.embedder = EnumEmbedderTypes.contentvec
-        elif slot.embedder == EnumEmbedderTypes.hubert_jp.value:
-            slot.embedder = EnumEmbedderTypes.hubert_jp
-        else:
-            raise RuntimeError("[Voice Changer][setInfoByONNX] unknown embedder")
+        # if slot.embedder == EnumEmbedderTypes.hubert.value:
+        #     slot.embedder = EnumEmbedderTypes.hubert
+        # elif slot.embedder == EnumEmbedderTypes.contentvec.value:
+        #     slot.embedder = EnumEmbedderTypes.contentvec
+        # elif slot.embedder == EnumEmbedderTypes.hubert_jp.value:
+        #     slot.embedder = EnumEmbedderTypes.hubert_jp
+        # else:
+        #     raise RuntimeError("[Voice Changer][setInfoByONNX] unknown embedder")
 
     slot.samplingRate = cpt["config"][-1]
 
@@ -170,40 +123,44 @@ def _setInfoByONNX(slot: ModelSlot):
             and slot.embOutputLayer == 9
             and slot.useFinalProj is True
         ):
-            print("[Voice Changer] ONNX Model: Original v1 like")
+            print("[Voice Changer] ONNX Model: Official v1 like")
         elif (
             slot.embChannels == 768
             and slot.embOutputLayer == 12
             and slot.useFinalProj is False
         ):
-            print("[Voice Changer] ONNX Model: Original v2 like")
+            print("[Voice Changer] ONNX Model: Official v2 like")
         else:
             print(
                 f"[Voice Changer] ONNX Model: ch:{slot.embChannels}, L:{slot.embOutputLayer}, FP:{slot.useFinalProj}"
             )
 
         if "embedder" not in metadata:
-            slot.embedder = EnumEmbedderTypes.hubert
-        elif metadata["embedder"] == EnumEmbedderTypes.hubert.value:
-            slot.embedder = EnumEmbedderTypes.hubert
-        elif metadata["embedder"] == EnumEmbedderTypes.contentvec.value:
-            slot.embedder = EnumEmbedderTypes.contentvec
-        elif metadata["embedder"] == EnumEmbedderTypes.hubert_jp.value:
-            slot.embedder = EnumEmbedderTypes.hubert_jp
+            slot.embedder = EnumEmbedderTypes.hubert.value
         else:
-            raise RuntimeError("[Voice Changer][setInfoByONNX] unknown embedder")
+            slot.embedder = metadata["embedder"]
+        # elif metadata["embedder"] == EnumEmbedderTypes.hubert.value:
+        #     slot.embedder = EnumEmbedderTypes.hubert
+        # elif metadata["embedder"] == EnumEmbedderTypes.contentvec.value:
+        #     slot.embedder = EnumEmbedderTypes.contentvec
+        # elif metadata["embedder"] == EnumEmbedderTypes.hubert_jp.value:
+        #     slot.embedder = EnumEmbedderTypes.hubert_jp
+        # else:
+        #     raise RuntimeError("[Voice Changer][setInfoByONNX] unknown embedder")
 
         slot.f0 = metadata["f0"]
         slot.modelType = (
-            EnumInferenceTypes.onnxRVC if slot.f0 else EnumInferenceTypes.onnxRVCNono
+            EnumInferenceTypes.onnxRVC.value
+            if slot.f0
+            else EnumInferenceTypes.onnxRVCNono.value
         )
         slot.samplingRate = metadata["samplingRate"]
         slot.deprecated = False
 
     except Exception as e:
-        slot.modelType = EnumInferenceTypes.onnxRVC
+        slot.modelType = EnumInferenceTypes.onnxRVC.value
         slot.embChannels = 256
-        slot.embedder = EnumEmbedderTypes.hubert
+        slot.embedder = EnumEmbedderTypes.hubert.value
         slot.f0 = True
         slot.samplingRate = 48000
         slot.deprecated = True

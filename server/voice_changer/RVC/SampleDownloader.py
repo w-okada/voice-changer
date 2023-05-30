@@ -1,10 +1,13 @@
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import asdict
 import os
 from const import RVC_MODEL_DIRNAME, TMP_DIR
 from Downloader import download, download_no_tqdm
 from ModelSample import RVCModelSample, getModelSamples
-from typing import Any
 import json
+
+from voice_changer.RVC.ModelSlot import ModelSlot
+from voice_changer.RVC.ModelSlotGenerator import _setInfoByONNX, _setInfoByPytorch
 
 
 def checkRvcModelExist(model_dir: str):
@@ -15,12 +18,38 @@ def checkRvcModelExist(model_dir: str):
 
 
 def downloadInitialSampleModels(sampleJsons: list[str], model_dir: str):
+    # sampleModelIds = [
+    #     ("TokinaShigure_o", True),
+    #     ("KikotoMahiro_o", False),
+    #     ("Amitaro_o", False),
+    #     ("Tsukuyomi-chan_o", False),
+    # ]
     sampleModelIds = [
-        ("TokinaShigure_o", True),
-        ("KikotoMahiro_o", False),
-        ("Amitaro_o", False),
-        ("Tsukuyomi-chan_o", False),
+        # オフィシャルモデルテスト
+        # ("test-official-v1-f0-48k-l9-hubert_t", True),
+        # ("test-official-v1-nof0-48k-l9-hubert_t", False),
+        # ("test-official-v2-f0-40k-l12-hubert_t", False),
+        # ("test-official-v2-nof0-40k-l12-hubert_t", False),
+        # ("test-official-v1-f0-48k-l9-hubert_o", True),
+        # ("test-official-v1-nof0-48k-l9-hubert_o", False),
+        # ("test-official-v2-f0-40k-l12-hubert_o", False),
+        # ("test-official-v2-nof0-40k-l12-hubert_o", False),
+        # DDPNモデルテスト(torch)
+        # ("test-ddpn-v1-f0-48k-l9-hubert_t", False),
+        # ("test-ddpn-v1-nof0-48k-l9-hubert_t", False),
+        # ("test-ddpn-v2-f0-40k-l12-hubert_t", False),
+        # ("test-ddpn-v2-nof0-40k-l12-hubert_t", False),
+        # ("test-ddpn-v2-f0-40k-l12-hubert_jp_t", False),
+        # ("test-ddpn-v2-nof0-40k-l12-hubert_jp_t", False),
+        # DDPNモデルテスト(onnx)
+        ("test-ddpn-v1-f0-48k-l9-hubert_o", False),
+        ("test-ddpn-v1-nof0-48k-l9-hubert_o", False),
+        ("test-ddpn-v2-f0-40k-l12-hubert_o", False),
+        ("test-ddpn-v2-nof0-40k-l12-hubert_o", False),
+        ("test-ddpn-v2-f0-40k-l12-hubert_jp_o", False),
+        ("test-ddpn-v2-nof0-40k-l12-hubert_jp_o", False),
     ]
+
     sampleModels = getModelSamples(sampleJsons, "RVC")
     if sampleModels is None:
         return
@@ -29,7 +58,6 @@ def downloadInitialSampleModels(sampleJsons: list[str], model_dir: str):
     slot_count = 0
     line_num = 0
     for initSampleId in sampleModelIds:
-        print(initSampleId)
         # 初期サンプルをサーチ
         match = False
         for sample in sampleModels:
@@ -41,7 +69,8 @@ def downloadInitialSampleModels(sampleJsons: list[str], model_dir: str):
             continue
 
         # 検出されたら、、、
-        sampleParams: Any = {"files": {}}
+        slotInfo: ModelSlot = ModelSlot()
+        # sampleParams: Any = {"files": {}}
 
         slotDir = os.path.join(model_dir, RVC_MODEL_DIRNAME, str(slot_count))
         os.makedirs(slotDir, exist_ok=True)
@@ -56,7 +85,7 @@ def downloadInitialSampleModels(sampleJsons: list[str], model_dir: str):
                 "position": line_num,
             }
         )
-        sampleParams["files"]["rvcModel"] = modelFilePath
+        slotInfo.modelFile = modelFilePath
         line_num += 1
 
         if (
@@ -75,28 +104,44 @@ def downloadInitialSampleModels(sampleJsons: list[str], model_dir: str):
                     "position": line_num,
                 }
             )
-            sampleParams["files"]["rvcIndex"] = indexPath
+            slotInfo.indexFile = indexPath
             line_num += 1
 
-        sampleParams["sampleId"] = sample.id
-        sampleParams["defaultTune"] = 0
-        sampleParams["defaultIndexRatio"] = 1
-        sampleParams["credit"] = sample.credit
-        sampleParams["description"] = sample.description
-        sampleParams["name"] = sample.name
-        sampleParams["sampleId"] = sample.id
-        sampleParams["termsOfUseUrl"] = sample.termsOfUseUrl
-        sampleParams["sampleRate"] = sample.sampleRate
-        sampleParams["modelType"] = sample.modelType
-        sampleParams["f0"] = sample.f0
+        slotInfo.sampleId = sample.id
+        slotInfo.credit = sample.credit
+        slotInfo.description = sample.description
+        slotInfo.name = sample.name
+        slotInfo.termsOfUseUrl = sample.termsOfUseUrl
 
-        jsonFilePath = os.path.join(slotDir, "params.json")
-        json.dump(sampleParams, open(jsonFilePath, "w"))
+        slotInfo.defaultTune = 0
+        slotInfo.defaultIndexRatio = 1
+        slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
+
+        # この時点ではまだファイルはダウンロードされていない
+        # if slotInfo.isONNX:
+        #     _setInfoByONNX(slotInfo)
+        # else:
+        #     _setInfoByPytorch(slotInfo)
+
+        json.dump(asdict(slotInfo), open(os.path.join(slotDir, "params.json"), "w"))
         slot_count += 1
 
+    # ダウンロード
     print("[Voice Changer] Downloading model files...")
     with ThreadPoolExecutor() as pool:
         pool.map(download, downloadParams)
+
+    # メタデータ作成
+    print("[Voice Changer] Generating metadata...")
+    for slotId in range(slot_count):
+        slotDir = os.path.join(model_dir, RVC_MODEL_DIRNAME, str(slotId))
+        jsonDict = json.load(open(os.path.join(slotDir, "params.json")))
+        slotInfo = ModelSlot(**jsonDict)
+        if slotInfo.isONNX:
+            _setInfoByONNX(slotInfo)
+        else:
+            _setInfoByPytorch(slotInfo)
+        json.dump(asdict(slotInfo), open(os.path.join(slotDir, "params.json"), "w"))
 
 
 def downloadModelFiles(sampleInfo: RVCModelSample, useIndex: bool = True):
