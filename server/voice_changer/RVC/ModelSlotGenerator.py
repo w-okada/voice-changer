@@ -36,6 +36,9 @@ def generateModelSlot(slotDir: str):
         modelSlot.defaultIndexRatio = (
             params["defaultIndexRatio"] if "defaultIndexRatio" in params else 0
         )
+        # modelSlot.defaultProtect = (
+        #     params["defaultProtect"] if "defaultProtect" in params else 0.5
+        # )
         modelSlot.name = params["name"] if "name" in params else None
         modelSlot.description = params["description"] if "description" in params else None
         modelSlot.credit = params["credit"] if "credit" in params else None

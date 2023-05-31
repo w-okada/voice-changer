@@ -81,6 +81,7 @@ def downloadInitialSampleModels(sampleJsons: list[str], model_dir: str):
         sampleParams["sampleId"] = sample.id
         sampleParams["defaultTune"] = 0
         sampleParams["defaultIndexRatio"] = 1
+        # sampleParams["defaultProtect"] = 0.5
         sampleParams["credit"] = sample.credit
         sampleParams["description"] = sample.description
         sampleParams["name"] = sample.name

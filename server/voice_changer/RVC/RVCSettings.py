@@ -29,6 +29,7 @@ class RVCSettings:
     sampleModels: list[RVCModelSample] = field(default_factory=lambda: [])
 
     indexRatio: float = 0
+    # protect: float = 0.5
     rvcQuality: int = 0
     silenceFront: int = 1  # 0:off, 1:on
     modelSamplingRate: int = 48000
@@ -50,5 +51,5 @@ class RVCSettings:
         "isHalf",
         "enableDirectML",
     ]
-    floatData = ["silentThreshold", "indexRatio"]
+    floatData = ["silentThreshold", "indexRatio"]  # , "protect"]
     strData = ["framework", "f0Detector"]
