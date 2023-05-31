@@ -127,7 +127,7 @@ export const Title = (props: TitleProps) => {
                             {manualLink}
                             {toolLink}
                             {coffeeLink}
-                            {licenseButton}
+                            {/* {licenseButton} */}
                         </span>
                     </div>
                 </>
@@ -146,7 +146,7 @@ export const Title = (props: TitleProps) => {
                         {manualLink}
                         {toolLink}
                         {coffeeLink}
-                        {licenseButton}
+                        {/* {licenseButton} */}
                     </span>
                     <span className="belongings">
                     </span>

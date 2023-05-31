@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { GuiStateProvider } from "./001_GuiStateProvider";
 import { Dialogs } from "./900_Dialogs";
 import { TitleArea } from "./100_TitleArea";
@@ -12,7 +12,6 @@ import { AdvancedSetting } from "./800_AdvancedSetting";
 import { Lab } from "./a00_Lab";
 
 export const Demo = () => {
-
     return (
         <GuiStateProvider>
             <div className="main-body">

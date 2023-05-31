@@ -14,6 +14,7 @@ export const OpenLabCheckbox = "open-lab-checkbox"
 
 export const OpenLicenseDialogCheckbox = "open-license-dialog-checkbox"
 export const OpenWaitingDialogCheckbox = "open-waiting-dialog-checkbox"
+export const OpenStartingNoticeDialogCheckbox = "open-starting-notice-dialog-checkbox"
 
 type Props = {
     children: ReactNode;
@@ -31,6 +32,7 @@ export type StateControls = {
 
     showLicenseCheckbox: StateControlCheckbox
     showWaitingCheckbox: StateControlCheckbox
+    showStartingNoticeCheckbox: StateControlCheckbox
 
 }
 
@@ -71,7 +73,7 @@ export const useGuiState = (): GuiStateAndMethod => {
 };
 
 export const GuiStateProvider = ({ children }: Props) => {
-    const { clientType } = useAppRoot()
+    const { clientType, appGuiSettingState } = useAppRoot()
     const [isConverting, setIsConverting] = useState<boolean>(false)
     const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false)
     const [modelSlotNum, setModelSlotNum] = useState<number>(0)
@@ -148,6 +150,7 @@ export const GuiStateProvider = ({ children }: Props) => {
 
     const showLicenseCheckbox = useStateControlCheckbox(OpenLicenseDialogCheckbox);
     const showWaitingCheckbox = useStateControlCheckbox(OpenWaitingDialogCheckbox);
+    const showStartingNoticeCheckbox = useStateControlCheckbox(OpenStartingNoticeDialogCheckbox);
 
     useEffect(() => {
         openServerControlCheckbox.updateState(true)
@@ -163,7 +166,24 @@ export const GuiStateProvider = ({ children }: Props) => {
         showLicenseCheckbox.updateState(false)
         showWaitingCheckbox.updateState(false)
 
+
+        showStartingNoticeCheckbox.updateState(false)
     }, [])
+
+    useEffect(() => {
+        const show = () => {
+            // const lang = window.navigator.language
+            // const edition = appGuiSettingState.edition
+            // console.log("appGuiSettingState.edition", appGuiSettingState.edition, lang)
+            // if ((edition == "onnxdirectML-cuda" || edition == "") && lang == "ja") {
+            //     return
+            // }
+
+            document.getElementById("dialog")?.classList.add("dialog-container-show")
+            showStartingNoticeCheckbox.updateState(true)
+        }
+        setTimeout(show)
+    }, [appGuiSettingState.edition])
 
 
     useEffect(() => {
@@ -183,7 +203,8 @@ export const GuiStateProvider = ({ children }: Props) => {
             openLabCheckbox,
 
             showLicenseCheckbox,
-            showWaitingCheckbox
+            showWaitingCheckbox,
+            showStartingNoticeCheckbox
         },
         isConverting,
         setIsConverting,

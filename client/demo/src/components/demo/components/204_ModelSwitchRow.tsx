@@ -42,6 +42,8 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
                     return "org_v2"
                 } else if (x.modelType == "pyTorchWebUI" || x.modelType == "pyTorchWebUINono") {
                     return "webui"
+                } else if (x.modelType == "onnxRVC" || x.modelType == "onnxRVCNono") {
+                    return "onnx"
                 } else {
                     return "unknown"
                 }
