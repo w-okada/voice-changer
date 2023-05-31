@@ -181,10 +181,6 @@
             {
                 "name": "silenceFront",
                 "options": {}
-            },
-            {
-                "name": "enableDirectML",
-                "options": {}
             }
         ]
     },
