@@ -85,7 +85,9 @@ class Pipeline(object):
         embOutputLayer,
         useFinalProj,
         repeat,
+        protect=0.5,
     ):
+        search_index = self.index is not None and self.big_npy is not None and index_rate != 0
         self.t_pad = self.sr * repeat
         self.t_pad_tgt = self.targetSR * repeat
 
@@ -136,10 +138,12 @@ class Pipeline(object):
                 raise DeviceChangingException()
             else:
                 raise e
+        if protect < 0.5 and search_index:
+             feats0 = feats.clone()   
 
         # Index - feature抽出
         # if self.index is not None and self.feature is not None and index_rate != 0:
-        if self.index is not None and self.big_npy is not None and index_rate != 0:
+        if search_index:
             npy = feats[0].cpu().numpy()
             if self.isHalf is True:
                 npy = npy.astype("float32")
@@ -165,7 +169,10 @@ class Pipeline(object):
                 + (1 - index_rate) * feats
             )
         feats = F.interpolate(feats.permute(0, 2, 1), scale_factor=2).permute(0, 2, 1)
-
+        if protect < 0.5 and search_index:
+            feats0 = F.interpolate(feats0.permute(0, 2, 1), scale_factor=2).permute(
+                0, 2, 1
+            )
         # ピッチサイズ調整
         p_len = audio_pad.shape[0] // self.window
         if feats.shape[1] < p_len:
@@ -173,6 +180,15 @@ class Pipeline(object):
             if pitch is not None and pitchf is not None:
                 pitch = pitch[:, :p_len]
                 pitchf = pitchf[:, :p_len]
+
+        # pitchの推定が上手くいかない(pitchf=0)場合、検索前の特徴を混ぜる
+        if protect < 0.5 and search_index:
+            pitchff = pitchf.clone()
+            pitchff[pitchf > 0] = 1
+            pitchff[pitchf < 1] = protect
+            pitchff = pitchff.unsqueeze(-1)
+            feats = feats * pitchff + feats0 * (1 - pitchff)
+            feats = feats.to(feats0.dtype)
         p_len = torch.tensor([p_len], device=self.device).long()
 
         # 推論実行

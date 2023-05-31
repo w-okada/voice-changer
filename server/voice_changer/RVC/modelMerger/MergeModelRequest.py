@@ -17,4 +17,5 @@ class MergeModelRequest:
     slot: int = -1
     defaultTune: int = 0
     defaultIndexRatio: int = 1
+    # defaultProtect: float = .5
     files: List[MergeFile] = field(default_factory=lambda: [])

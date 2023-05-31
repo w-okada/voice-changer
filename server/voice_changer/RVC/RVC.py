@@ -242,6 +242,7 @@ class RVC:
         # その他の設定
         self.next_trans = modelSlot.defaultTune
         self.next_index_ratio = modelSlot.defaultIndexRatio
+        # self.next_protect = modelSlot.defaultProtect
         self.next_samplingRate = modelSlot.samplingRate
         self.next_framework = "ONNX" if modelSlot.isONNX else "PyTorch"
         # self.needSwitch = True
@@ -254,6 +255,7 @@ class RVC:
         self.pipeline = self.next_pipeline
         self.settings.tran = self.next_trans
         self.settings.indexRatio = self.next_index_ratio
+        # self.settings.protect = self.next_protect
         self.settings.modelSamplingRate = self.next_samplingRate
         self.settings.framework = self.next_framework
 
@@ -336,6 +338,7 @@ class RVC:
         sid = 0
         f0_up_key = self.settings.tran
         index_rate = self.settings.indexRatio
+        protect = .5# self.settings.protect
         if_f0 = 1 if self.settings.modelSlots[self.currentSlot].f0 else 0
         embOutputLayer = self.settings.modelSlots[self.currentSlot].embOutputLayer
         useFinalProj = self.settings.modelSlots[self.currentSlot].useFinalProj
@@ -350,6 +353,7 @@ class RVC:
             embOutputLayer,
             useFinalProj,
             repeat,
+            protect
         )
 
         result = audio_out.detach().cpu().numpy() * np.sqrt(vol)
@@ -411,6 +415,7 @@ class RVC:
         params = {
             "defaultTune": req.defaultTune,
             "defaultIndexRatio": req.defaultIndexRatio,
+            # "defaultProtect": req.defaultProtect
             "sampleId": "",
             "files": {"rvcModel": storeFile},
         }
@@ -432,6 +437,7 @@ class RVC:
         )
         params["defaultTune"] = self.settings.tran
         params["defaultIndexRatio"] = self.settings.indexRatio
+        # params["defaultProtect"] = self.settings.protect
 
         json.dump(params, open(os.path.join(slotDir, "params.json"), "w"))
         self.loadSlots()

@@ -26,7 +26,7 @@ class CrepePitchExtractor(PitchExtractor):
         f0_mel_min = 1127 * np.log(1 + f0_min / 700)
         f0_mel_max = 1127 * np.log(1 + f0_max / 700)
 
-        f0 = torchcrepe.predict(
+        f0, pd = torchcrepe.predict(
             audio.unsqueeze(0),
             sr,
             hop_length=window,
@@ -37,8 +37,11 @@ class CrepePitchExtractor(PitchExtractor):
             batch_size=256,
             decoder=torchcrepe.decode.weighted_argmax,
             device=self.device,
+            return_periodicity=True,
         )
-        f0 = torchcrepe.filter.median(f0, 3)
+        f0 = torchcrepe.filter.median(f0, 3) # 本家だとmeanですが、harvestに合わせmedianフィルタ
+        pd = torchcrepe.filter.median(pd, 3)
+        f0[pd < 0.1] = 0
         f0 = f0.squeeze()
 
         f0 = torch.nn.functional.pad(
