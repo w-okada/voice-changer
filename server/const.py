@@ -104,9 +104,41 @@ SAMPLES_JSONS = [
     # "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0001.json",
     # "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0002.json",
     # "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0003_t.json",
-    # "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0003_o.json",
-    "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_official_v1_v2.jsona",
-    "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_ddpn_v1_v2.jsona",
+    "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0003_o.json",
+    # "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_official_v1_v2.json",
+    # "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_ddpn_v1_v2.json",
 ]
+
+SAMPLE_MODEL_IDS = [
+    ("TokinaShigure_o", True),
+    ("KikotoMahiro_o", False),
+    ("Amitaro_o", False),
+    ("Tsukuyomi-chan_o", False),
+    # オフィシャルモデルテスト
+    # ("test-official-v1-f0-48k-l9-hubert_t", True),
+    # ("test-official-v1-nof0-48k-l9-hubert_t", False),
+    # ("test-official-v2-f0-40k-l12-hubert_t", False),
+    # ("test-official-v2-nof0-40k-l12-hubert_t", False),
+    # ("test-official-v1-f0-48k-l9-hubert_o", True),
+    # ("test-official-v1-nof0-48k-l9-hubert_o", False),
+    # ("test-official-v2-f0-40k-l12-hubert_o", False),
+    # ("test-official-v2-nof0-40k-l12-hubert_o", False),
+    # DDPNモデルテスト(torch)
+    # ("test-ddpn-v1-f0-48k-l9-hubert_t", False),
+    # ("test-ddpn-v1-nof0-48k-l9-hubert_t", False),
+    # ("test-ddpn-v2-f0-40k-l12-hubert_t", False),
+    # ("test-ddpn-v2-nof0-40k-l12-hubert_t", False),
+    # ("test-ddpn-v2-f0-40k-l12-hubert_jp_t", False),
+    # ("test-ddpn-v2-nof0-40k-l12-hubert_jp_t", False),
+    # DDPNモデルテスト(onnx)
+    # ("test-ddpn-v1-f0-48k-l9-hubert_o", False),
+    # ("test-ddpn-v1-nof0-48k-l9-hubert_o", False),
+    # ("test-ddpn-v2-f0-40k-l12-hubert_o", False),
+    # ("test-ddpn-v2-nof0-40k-l12-hubert_o", False),
+    # ("test-ddpn-v2-f0-40k-l12-hubert_jp_o", False),
+    # ("test-ddpn-v2-nof0-40k-l12-hubert_jp_o", False),
+]
+
+
 RVC_MODEL_DIRNAME = "rvc"
 RVC_MAX_SLOT_NUM = 10

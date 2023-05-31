@@ -140,6 +140,7 @@ export const Title = (props: TitleProps) => {
                     <span className="title">{props.mainTitle}</span>
                     <span className="top-title-version">{props.subTitle}</span>
                     <span className="top-title-version-number">{appRootState.appGuiSettingState.version}</span>
+                    <span className="top-title-version-number">{appRootState.appGuiSettingState.edition}</span>
                     <span className="belongings">
                         {githubLink}
                         {manualLink}
@@ -152,7 +153,7 @@ export const Title = (props: TitleProps) => {
                 </div>
             )
         }
-    }, [props.subTitle, props.mainTitle, props.lineNum, appRootState.appGuiSettingState.version])
+    }, [props.subTitle, props.mainTitle, props.lineNum, appRootState.appGuiSettingState.version, appRootState.appGuiSettingState.edition])
 
     return titleRow
 };

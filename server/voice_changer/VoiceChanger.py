@@ -372,7 +372,8 @@ class VoiceChanger:
         else:
             ret = self.voiceChanger.update_settings(key, val)
             if ret is False:
-                print(f"({key} is not mutable variable or unknown variable)")
+                pass
+                # print(f"({key} is not mutable variable or unknown variable)")
         return self.get_info()
 
     def _generate_strength(self, crossfadeSize: int):

@@ -1,5 +1,6 @@
 import torch
 import onnxruntime
+from const import EnumInferenceTypes
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
 import numpy as np
@@ -7,6 +8,7 @@ import numpy as np
 
 class OnnxRVCInferencer(Inferencer):
     def loadModel(self, file: str, gpu: int):
+        self.setProps(EnumInferenceTypes.onnxRVC, file, True, gpu)
         (
             onnxProviders,
             onnxProviderOptions,
@@ -65,3 +67,8 @@ class OnnxRVCInferencer(Inferencer):
             )
 
         return torch.tensor(np.array(audio1))
+
+    def getInferencerInfo(self):
+        inferencer = super().getInferencerInfo()
+        inferencer["onnxExecutionProvider"] = self.model.get_providers()
+        return inferencer

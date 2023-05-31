@@ -70,7 +70,7 @@ class DDSP_SVC:
         self.params = params
         self.svc_model.setVCParams(params)
         EmbedderManager.initialize(params)
-        print("DDSP-SVC initialization:", params)
+        print("[Voice Changer] DDSP-SVC initialization:", params)
 
     def loadModel(self, props: LoadModelParams):
         target_slot_idx = props.slot

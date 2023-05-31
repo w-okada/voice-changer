@@ -2,14 +2,15 @@ from typing import Any, Protocol
 import torch
 import onnxruntime
 
+from const import EnumInferenceTypes
+
 
 class Inferencer(Protocol):
-    # inferencerType: EnumInferenceTypes = EnumInferenceTypes.pyTorchRVC
-    # file: str
-    # isHalf: bool = True
-    # dev: device | None
-    # onnxProviders: list[str] | None
-    # onnxProviderOptions: Any | None
+    inferencerType: EnumInferenceTypes = EnumInferenceTypes.pyTorchRVC
+    file: str
+    isHalf: bool = True
+    gpu: int = 0
+
     model: onnxruntime.InferenceSession | Any | None = None
 
     def loadModel(self, file: str, gpu: int):
@@ -25,18 +26,22 @@ class Inferencer(Protocol):
     ) -> torch.Tensor:
         ...
 
-    # def setProps(
-    #     self,
-    #     inferencerType: EnumInferenceTypes,
-    #     file: str,
-    #     dev: device | None,
-    #     onnxProviders: list[str] | None,
-    #     onnxProviderOptions: Any | None,
-    #     isHalf: bool = True,
-    # ):
-    #     self.inferencerType = inferencerType
-    #     self.file = file
-    #     self.isHalf = isHalf
-    #     self.dev = dev
-    #     self.onnxProviders = onnxProviders
-    #     self.onnxProviderOptions = onnxProviderOptions
+    def setProps(
+        self,
+        inferencerType: EnumInferenceTypes,
+        file: str,
+        isHalf: bool,
+        gpu: int,
+    ):
+        self.inferencerType = inferencerType
+        self.file = file
+        self.isHalf = isHalf
+        self.gpu = gpu
+
+    def getInferencerInfo(self):
+        return {
+            "inferencerType": self.inferencerType.value,
+            "file": self.file,
+            "isHalf": self.isHalf,
+            "gpu": self.gpu,
+        }

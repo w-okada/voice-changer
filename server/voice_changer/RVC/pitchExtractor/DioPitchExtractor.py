@@ -1,10 +1,13 @@
 import pyworld
 import numpy as np
+from const import EnumPitchExtractorTypes
 
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 
 
 class DioPitchExtractor(PitchExtractor):
+    pitchExtractorType: EnumPitchExtractorTypes = EnumPitchExtractorTypes.dio
+
     def extract(self, audio, f0_up_key, sr, window, silence_front=0):
         audio = audio.detach().cpu().numpy()
         n_frames = int(len(audio) // window) + 1

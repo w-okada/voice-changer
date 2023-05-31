@@ -22,6 +22,15 @@ class Embedder(Protocol):
     ) -> torch.Tensor:
         ...
 
+    def getEmbedderInfo(self):
+        return {
+            "embedderType": self.embedderType.value,
+            "file": self.file,
+            "isHalf": self.isHalf,
+            "devType": self.dev.type,
+            "devIndex": self.dev.index,
+        }
+
     def setProps(
         self,
         embedderType: EnumEmbedderTypes,

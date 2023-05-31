@@ -69,7 +69,7 @@ class MMVC_Rest_Fileuploader:
     def post_update_settings(
         self, key: str = Form(...), val: Union[int, str, float] = Form(...)
     ):
-        print("[Voice Changer] update configuration:", key, val)
+        # print("[Voice Changer] update configuration:", key, val)
         info = self.voiceChangerManager.update_settings(key, val)
         json_compatible_item_data = jsonable_encoder(info)
         return JSONResponse(content=json_compatible_item_data)

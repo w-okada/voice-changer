@@ -80,7 +80,7 @@ class SoVitsSvc40:
         self.gpu_num = torch.cuda.device_count()
         self.prevVol = 0
         self.params = params
-        print("so-vits-svc40 initialization:", params)
+        print("[Voice Changer] so-vits-svc40 initialization:", params)
 
     # def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, clusterTorchModel: str = None):
     def loadModel(self, props: LoadModelParams):

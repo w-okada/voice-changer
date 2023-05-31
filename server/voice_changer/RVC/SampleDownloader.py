@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict
 import os
-from const import RVC_MODEL_DIRNAME, TMP_DIR
+from const import RVC_MODEL_DIRNAME, SAMPLE_MODEL_IDS, TMP_DIR
 from Downloader import download, download_no_tqdm
 from ModelSample import RVCModelSample, getModelSamples
 import json
@@ -18,37 +18,7 @@ def checkRvcModelExist(model_dir: str):
 
 
 def downloadInitialSampleModels(sampleJsons: list[str], model_dir: str):
-    # sampleModelIds = [
-    #     ("TokinaShigure_o", True),
-    #     ("KikotoMahiro_o", False),
-    #     ("Amitaro_o", False),
-    #     ("Tsukuyomi-chan_o", False),
-    # ]
-    sampleModelIds = [
-        # オフィシャルモデルテスト
-        # ("test-official-v1-f0-48k-l9-hubert_t", True),
-        # ("test-official-v1-nof0-48k-l9-hubert_t", False),
-        # ("test-official-v2-f0-40k-l12-hubert_t", False),
-        # ("test-official-v2-nof0-40k-l12-hubert_t", False),
-        # ("test-official-v1-f0-48k-l9-hubert_o", True),
-        # ("test-official-v1-nof0-48k-l9-hubert_o", False),
-        # ("test-official-v2-f0-40k-l12-hubert_o", False),
-        # ("test-official-v2-nof0-40k-l12-hubert_o", False),
-        # DDPNモデルテスト(torch)
-        # ("test-ddpn-v1-f0-48k-l9-hubert_t", False),
-        # ("test-ddpn-v1-nof0-48k-l9-hubert_t", False),
-        # ("test-ddpn-v2-f0-40k-l12-hubert_t", False),
-        # ("test-ddpn-v2-nof0-40k-l12-hubert_t", False),
-        # ("test-ddpn-v2-f0-40k-l12-hubert_jp_t", False),
-        # ("test-ddpn-v2-nof0-40k-l12-hubert_jp_t", False),
-        # DDPNモデルテスト(onnx)
-        ("test-ddpn-v1-f0-48k-l9-hubert_o", False),
-        ("test-ddpn-v1-nof0-48k-l9-hubert_o", False),
-        ("test-ddpn-v2-f0-40k-l12-hubert_o", False),
-        ("test-ddpn-v2-nof0-40k-l12-hubert_o", False),
-        ("test-ddpn-v2-f0-40k-l12-hubert_jp_o", False),
-        ("test-ddpn-v2-nof0-40k-l12-hubert_jp_o", False),
-    ]
+    sampleModelIds = SAMPLE_MODEL_IDS
 
     sampleModels = getModelSamples(sampleJsons, "RVC")
     if sampleModels is None:

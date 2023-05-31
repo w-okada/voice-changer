@@ -328,23 +328,23 @@ export const DefaultServerSetting_MMVCv13: ServerInfo = {
 }
 
 export const DefaultServerSetting_so_vits_svc_40: ServerInfo = {
-    ...DefaultServerSetting, tran: 10, noiseScale: 0.3, extraConvertSize: 1024 * 32, clusterInferRatio: 0.1,
+    ...DefaultServerSetting, tran: 10, noiseScale: 0.3, extraConvertSize: 1024 * 8, clusterInferRatio: 0.1,
 }
 
 export const DefaultServerSetting_so_vits_svc_40_c: ServerInfo = {
-    ...DefaultServerSetting, tran: 10, noiseScale: 0.3, extraConvertSize: 1024 * 32, clusterInferRatio: 0.1,
+    ...DefaultServerSetting, tran: 10, noiseScale: 0.3, extraConvertSize: 1024 * 8, clusterInferRatio: 0.1,
 }
 export const DefaultServerSetting_so_vits_svc_40v2: ServerInfo = {
-    ...DefaultServerSetting, tran: 10, noiseScale: 0.3, extraConvertSize: 1024 * 32, clusterInferRatio: 0.1,
+    ...DefaultServerSetting, tran: 10, noiseScale: 0.3, extraConvertSize: 1024 * 8, clusterInferRatio: 0.1,
 }
 
 export const DefaultServerSetting_DDSP_SVC: ServerInfo = {
-    ...DefaultServerSetting, dstId: 1, tran: 10, extraConvertSize: 1024 * 32
+    ...DefaultServerSetting, dstId: 1, tran: 10, extraConvertSize: 1024 * 8
 }
 
 
 export const DefaultServerSetting_RVC: ServerInfo = {
-    ...DefaultServerSetting, tran: 10, extraConvertSize: 1024 * 32, f0Detector: F0Detector.harvest
+    ...DefaultServerSetting, tran: 10, extraConvertSize: 1024 * 8, f0Detector: F0Detector.harvest
 }
 
 ///////////////////////

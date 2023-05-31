@@ -10,8 +10,8 @@ import { far } from "@fortawesome/free-regular-svg-icons";
 import { fab } from "@fortawesome/free-brands-svg-icons";
 import { AppRootProvider, useAppRoot } from "./001_provider/001_AppRootProvider";
 import ErrorBoundary from "./001_provider/900_ErrorBoundary";
-import { ClientType, INDEXEDDB_KEY_CLIENT, INDEXEDDB_KEY_MODEL_DATA, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_WORKLET, INDEXEDDB_KEY_WORKLETNODE, MAX_MODEL_SLOT_NUM, useIndexedDB } from "@dannadori/voice-changer-client-js";
-import { INDEXEDDB_KEY_AUDIO_OUTPUT, INDEXEDDB_KEY_DEFAULT_MODEL_TYPE } from "./const";
+import { ClientType, useIndexedDB } from "@dannadori/voice-changer-client-js";
+import { INDEXEDDB_KEY_DEFAULT_MODEL_TYPE } from "./const";
 import { Demo } from "./components/demo/010_Demo";
 import { ClientSelector } from "./001_ClientSelector";
 
@@ -42,7 +42,6 @@ const AppStateWrapper = () => {
     const { appGuiSettingState, clientType, setClientType } = useAppRoot()
     // エラーバウンダリー設定
     const [error, setError] = useState<{ error: Error, errorInfo: ErrorInfo }>()
-    const { removeItem } = useIndexedDB({ clientType: clientType })
     const { getItem, removeDB } = useIndexedDB({ clientType: null })
     const errorComponent = useMemo(() => {
         const errorName = error?.error.name || "no error name"
@@ -52,22 +51,6 @@ const AppStateWrapper = () => {
         const onClearCacheClicked = async () => {
             await removeDB()
             location.reload();
-
-            // const indexedDBKeys = [
-            //     INDEXEDDB_KEY_CLIENT,
-            //     INDEXEDDB_KEY_SERVER,
-            //     INDEXEDDB_KEY_WORKLETNODE,
-            //     INDEXEDDB_KEY_WORKLET,
-            //     INDEXEDDB_KEY_AUDIO_OUTPUT
-            // ]
-            // for (const k of indexedDBKeys) {
-            //     await removeItem(k)
-            // }
-
-            // for (let i = 0; i < MAX_MODEL_SLOT_NUM; i++) {
-            //     const modleKey = `${INDEXEDDB_KEY_MODEL_DATA}_${i}`
-            //     await removeItem(modleKey)
-            // }
         }
         const onReloadClicked = () => {
             location.reload();

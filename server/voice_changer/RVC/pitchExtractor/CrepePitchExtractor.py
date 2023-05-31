@@ -1,11 +1,14 @@
 import torchcrepe
 import torch
 import numpy as np
+from const import EnumPitchExtractorTypes
 
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 
 
 class CrepePitchExtractor(PitchExtractor):
+    pitchExtractorType: EnumPitchExtractorTypes = EnumPitchExtractorTypes.crepe
+
     def __init__(self):
         super().__init__()
         if torch.cuda.is_available():

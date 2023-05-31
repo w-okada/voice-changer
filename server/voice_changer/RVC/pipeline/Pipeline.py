@@ -59,9 +59,15 @@ class Pipeline(object):
         self.sr = 16000
         self.window = 160
 
-    def setDirectMLEnable(self, enable: bool):
-        if hasattr(self.inferencer, "setDirectMLEnable"):
-            self.inferencer.setDirectMLEnable(enable)
+    def getPipelineInfo(self):
+        inferencerInfo = self.inferencer.getInferencerInfo() if self.inferencer else {}
+        embedderInfo = self.embedder.getEmbedderInfo()
+        pitchExtractorInfo = self.pitchExtractor.getPitchExtractorInfo()
+        return {
+            "inferencer": inferencerInfo,
+            "embedder": embedderInfo,
+            "pitchExtractor": pitchExtractorInfo,
+        }
 
     def setPitchExtractor(self, pitchExtractor: PitchExtractor):
         self.pitchExtractor = pitchExtractor

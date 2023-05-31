@@ -1,4 +1,5 @@
 import torch
+from const import EnumInferenceTypes
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
 from infer_pack.models import (  # type:ignore
@@ -8,6 +9,8 @@ from infer_pack.models import (  # type:ignore
 
 class RVCInferencerv2(Inferencer):
     def loadModel(self, file: str, gpu: int):
+        self.setProps(EnumInferenceTypes.pyTorchRVCv2, file, True, gpu)
+
         dev = DeviceManager.get_instance().getDevice(gpu)
         isHalf = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
 

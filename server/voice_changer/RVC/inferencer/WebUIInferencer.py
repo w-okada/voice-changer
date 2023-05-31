@@ -1,4 +1,5 @@
 import torch
+from const import EnumInferenceTypes
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
@@ -7,6 +8,8 @@ from .models import SynthesizerTrnMsNSFsid
 
 class WebUIInferencer(Inferencer):
     def loadModel(self, file: str, gpu: int):
+        self.setProps(EnumInferenceTypes.pyTorchWebUI, file, True, gpu)
+
         dev = DeviceManager.get_instance().getDevice(gpu)
         isHalf = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
 

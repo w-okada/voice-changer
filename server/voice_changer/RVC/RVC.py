@@ -67,7 +67,7 @@ class RVC:
         self.params = params
         EmbedderManager.initialize(params)
         self.loadSlots()
-        print("RVC initialization: ", params)
+        print("[Voice Changer] RVC initialization: ", params)
 
         # サンプルカタログ作成
         sampleJsons: list[str] = []
@@ -210,12 +210,6 @@ class RVC:
             if key == "gpu":
                 self.prepareModel(self.settings.modelSlotIndex)
 
-            if key == "enableDirectML":
-                if self.pipeline is not None and val == 0:
-                    self.pipeline.setDirectMLEnable(False)
-                elif self.pipeline is not None and val == 1:
-                    self.pipeline.setDirectMLEnable(True)
-
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
@@ -268,6 +262,9 @@ class RVC:
 
     def get_info(self):
         data = asdict(self.settings)
+        if self.pipeline is not None:
+            pipelineInfo = self.pipeline.getPipelineInfo()
+            data["pipelineInfo"] = pipelineInfo
         return data
 
     def get_processing_sampling_rate(self):
