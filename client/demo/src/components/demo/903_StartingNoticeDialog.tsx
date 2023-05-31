@@ -76,8 +76,8 @@ export const StartingNoticeDialog = () => {
         const edition = appGuiSettingState.edition
         const content = (
             <div className="body-row">
-                {lang != "ja" || edition == "onnxdirectML-cuda" ? donationMessage : <></>}
-                {lang != "ja" || edition == "onnxdirectML-cuda" ? directMLMessage : <></>}
+                {lang != "ja" || edition.indexOf("onnxdirectML-cuda") >= 0 ? donationMessage : <></>}
+                {lang != "ja" || edition.indexOf("onnxdirectML-cuda") >= 0 ? directMLMessage : <></>}
                 {clickToStartMessage}
             </div>
         )
