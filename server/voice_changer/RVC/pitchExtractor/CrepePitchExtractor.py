@@ -54,6 +54,6 @@ class CrepePitchExtractor(PitchExtractor):
         f0_mel = torch.clip(
             (f0_mel - f0_mel_min) * 254.0 / (f0_mel_max - f0_mel_min) + 1.0, 1.0, 255.0
         )
-        f0_coarse = f0_mel.round().detach().cpu().numpy().astype(np.int)
+        f0_coarse = f0_mel.round().detach().cpu().numpy().astype(int)
 
         return f0_coarse, f0bak
