@@ -4,6 +4,14 @@
 
 ## What's New!
 
+- v.1.5.3.4
+
+  - Update framework pyTorch v1.x -> v.2.x
+  - Update framework ONNX v1.13.x -> v.15.x
+  - remove support of so-vits-svc 4.0v2
+  - experimental support onnx-directml
+  -
+
 - v.1.5.3.3b
 
   - Support server device mode gain
