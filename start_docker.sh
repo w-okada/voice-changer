@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-DOCKER_IMAGE=dannadori/vcclient:20230429_071012
+DOCKER_IMAGE=dannadori/vcclient:20230602_014557
 #DOCKER_IMAGE=vcclient
 
 ### DEFAULT VAR ###
@@ -28,10 +28,12 @@ if [ "${USE_GPU}" = "on" ]; then
     -e LOCAL_GID=$(id -g $USER) \
     -p ${EX_PORT}:18888 \
     $DOCKER_IMAGE -p 18888 --https true \
-    --content_vec_500 checkpoint_best_legacy_500.pt \
-    --hubert_base hubert_base.pt \
-    --hubert_soft hubert-soft-0d54a1f4.pt \
-    --nsf_hifigan nsf_hifigan/model 
+        --content_vec_500 pretrain/checkpoint_best_legacy_500.pt  \
+        --hubert_base pretrain/hubert_base.pt \
+        --hubert_soft pretrain/hubert/hubert-soft-0d54a1f4.pt \
+        --nsf_hifigan pretrain/nsf_hifigan/model \
+        --hubert_base_jp pretrain/rinna_hubert_base_jp.pt \
+        --model_dir model_dir
 else
     echo "VC Client start...(cpu)"
     docker run -it --rm --shm-size=1024M \
@@ -42,10 +44,12 @@ else
     -e LOCAL_GID=$(id -g $USER) \
     -p ${EX_PORT}:18888 \
     $DOCKER_IMAGE -p 18888 --https true \
-    --content_vec_500 checkpoint_best_legacy_500.pt \
-    --hubert_base hubert_base.pt \
-    --hubert_soft hubert-soft-0d54a1f4.pt \
-    --nsf_hifigan nsf_hifigan/model
+        --content_vec_500 pretrain/checkpoint_best_legacy_500.pt  \
+        --hubert_base pretrain/hubert_base.pt \
+        --hubert_soft pretrain/hubert/hubert-soft-0d54a1f4.pt \
+        --nsf_hifigan pretrain/nsf_hifigan/model \
+        --hubert_base_jp pretrain/rinna_hubert_base_jp.pt \
+        --model_dir model_dir
 fi
 
 
