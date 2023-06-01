@@ -85,7 +85,9 @@ class Pipeline(object):
         repeat,
         protect=0.5,
     ):
-        search_index = self.index is not None and self.big_npy is not None and index_rate != 0
+        search_index = (
+            self.index is not None and self.big_npy is not None and index_rate != 0
+        )
         self.t_pad = self.sr * repeat
         self.t_pad_tgt = self.targetSR * repeat
 
@@ -139,7 +141,7 @@ class Pipeline(object):
             else:
                 raise e
         if protect < 0.5 and search_index:
-             feats0 = feats.clone()   
+            feats0 = feats.clone()
 
         # Index - feature抽出
         # if self.index is not None and self.feature is not None and index_rate != 0:
@@ -182,6 +184,8 @@ class Pipeline(object):
                 pitchf = pitchf[:, :p_len]
 
         # pitchの推定が上手くいかない(pitchf=0)場合、検索前の特徴を混ぜる
+        # pitchffの作り方の疑問はあるが、本家通りなので、このまま使うことにする。
+        # https://github.com/w-okada/voice-changer/pull/276#issuecomment-1571336929
         if protect < 0.5 and search_index:
             pitchff = pitchf.clone()
             pitchff[pitchf > 0] = 1
