@@ -9,6 +9,7 @@ class ModelSlot:
     indexFile: str = ""
     defaultTune: int = 0
     defaultIndexRatio: int = 1
+    defaultProtect: float = 0.5
     isONNX: bool = False
     modelType: str = EnumInferenceTypes.pyTorchRVC.value
     samplingRate: int = -1

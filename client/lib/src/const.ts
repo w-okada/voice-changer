@@ -118,6 +118,7 @@ export const ServerSettingKey = {
     "clusterInferRatio": "clusterInferRatio",
 
     "indexRatio": "indexRatio",
+    "protect": "protect",
     "rvcQuality": "rvcQuality",
     "modelSamplingRate": "modelSamplingRate",
     "silenceFront": "silenceFront",
@@ -176,6 +177,7 @@ export type VoiceChangerServerSetting = {
     clusterInferRatio: number // so-vits-svc
 
     indexRatio: number // RVC
+    protect: number // RVC
     rvcQuality: number // 0:low, 1:high
     silenceFront: number // 0:off, 1:on
     modelSamplingRate: ModelSamplingRate // 32000,40000,48000
@@ -202,6 +204,7 @@ type ModelSlot = {
 
     defaultTune: number,
     defaultIndexRatio: number,
+    defaultProtect: number,
 
     modelType: ModelType,
     embChannels: number,
@@ -294,6 +297,7 @@ export const DefaultServerSetting: ServerInfo = {
     clusterInferRatio: 0,
 
     indexRatio: 0,
+    protect: 0.5,
     rvcQuality: 0,
     modelSamplingRate: 48000,
     silenceFront: 1,
@@ -523,5 +527,6 @@ export type MergeModelRequest = {
     command: "mix",
     defaultTune: number,
     defaultIndexRatio: number,
+    defaultProtect: number,
     files: MergeElement[]
 }

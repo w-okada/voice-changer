@@ -82,9 +82,9 @@ def downloadInitialSampleModels(sampleJsons: list[str], model_dir: str):
         slotInfo.description = sample.description
         slotInfo.name = sample.name
         slotInfo.termsOfUseUrl = sample.termsOfUseUrl
-
         slotInfo.defaultTune = 0
         slotInfo.defaultIndexRatio = 1
+        slotInfo.defaultProtect = 0.5
         slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
 
         # この時点ではまだファイルはダウンロードされていない

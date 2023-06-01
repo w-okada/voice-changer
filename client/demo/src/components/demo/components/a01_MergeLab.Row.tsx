@@ -15,6 +15,9 @@ export const MergeLabRow = (_props: MergeLabRowProps) => {
 
     // スロットが変更されたときの初期化処理
     const newSlotChangeKey = useMemo(() => {
+        if (!appState.serverSetting.serverSetting.modelSlots) {
+            return ""
+        }
         return appState.serverSetting.serverSetting.modelSlots.reduce((prev, cur) => {
             return prev + "_" + cur.modelFile
         }, "")
@@ -50,6 +53,7 @@ export const MergeLabRow = (_props: MergeLabRowProps) => {
                 command: "mix",
                 defaultTune: defaultTune,
                 defaultIndexRatio: 1,
+                defaultProtect: 0.5,
                 files: mergeElements
             })
         }

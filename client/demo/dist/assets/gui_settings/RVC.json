@@ -175,11 +175,11 @@
                 "options": {}
             },
             {
-                "name": "rvcQuality",
+                "name": "silenceFront",
                 "options": {}
             },
             {
-                "name": "silenceFront",
+                "name": "protect",
                 "options": {}
             }
         ]

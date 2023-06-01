@@ -24,45 +24,50 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
         }
 
 
-        const options = appState.serverSetting.serverSetting.modelSlots.map((x, index) => {
-            let filename = ""
-            if (x.modelFile && x.modelFile.length > 0) {
-                filename = x.modelFile.replace(/^.*[\\\/]/, '')
-            } else {
-                return null
-            }
-
-            const f0str = x.f0 == true ? "f0" : "nof0"
-            const srstr = Math.floor(x.samplingRate / 1000) + "K"
-            const embedstr = x.embChannels
-            const typestr = (() => {
-                if (x.modelType == "pyTorchRVC" || x.modelType == "pyTorchRVCNono") {
-                    return "org"
-                } else if (x.modelType == "pyTorchRVCv2" || x.modelType == "pyTorchRVCv2Nono") {
-                    return "org_v2"
-                } else if (x.modelType == "pyTorchWebUI" || x.modelType == "pyTorchWebUINono") {
-                    return "webui"
-                } else if (x.modelType == "onnxRVC" || x.modelType == "onnxRVCNono") {
-                    return "onnx"
+        const modelSlots = appState.serverSetting.serverSetting.modelSlots
+        let options: React.JSX.Element[] = []
+        if (modelSlots) {
+            options = modelSlots.map((x, index) => {
+                let filename = ""
+                if (x.modelFile && x.modelFile.length > 0) {
+                    filename = x.modelFile.replace(/^.*[\\\/]/, '')
                 } else {
-                    return "unknown"
+                    return null
                 }
-            })()
 
-            const metadata = x.deprecated ? `[${index}]  [deprecated version]` : `[${index}]  [${f0str},${srstr},${embedstr},${typestr}]`
-            const tuning = `t:${x.defaultTune}`
-            const useIndex = x.indexFile != null ? `i:true` : `i:false`
-            const defaultIndexRatio = `ir:${x.defaultIndexRatio}`
-            const subMetadata = `(${tuning},${useIndex},${defaultIndexRatio})`
-            const displayName = `${metadata} ${x.name || filename}  ${subMetadata}`
+                const f0str = x.f0 == true ? "f0" : "nof0"
+                const srstr = Math.floor(x.samplingRate / 1000) + "K"
+                const embedstr = x.embChannels
+                const typestr = (() => {
+                    if (x.modelType == "pyTorchRVC" || x.modelType == "pyTorchRVCNono") {
+                        return "org"
+                    } else if (x.modelType == "pyTorchRVCv2" || x.modelType == "pyTorchRVCv2Nono") {
+                        return "org_v2"
+                    } else if (x.modelType == "pyTorchWebUI" || x.modelType == "pyTorchWebUINono") {
+                        return "webui"
+                    } else if (x.modelType == "onnxRVC" || x.modelType == "onnxRVCNono") {
+                        return "onnx"
+                    } else {
+                        return "unknown"
+                    }
+                })()
+
+                const metadata = x.deprecated ? `[${index}]  [deprecated version]` : `[${index}]  [${f0str},${srstr},${embedstr},${typestr}]`
+                const tuning = `t:${x.defaultTune}`
+                const useIndex = x.indexFile != null ? `i:true` : `i:false`
+                const defaultIndexRatio = `ir:${x.defaultIndexRatio}`
+                const defaultProtect = `p:${x.defaultProtect}`
+                const subMetadata = `(${tuning},${useIndex},${defaultIndexRatio},${defaultProtect})`
+                const displayName = `${metadata} ${x.name || filename}  ${subMetadata}`
 
 
-            return (
-                <option key={index} value={index}>{displayName}</option>
-            )
-        }).filter(x => { return x != null })
+                return (
+                    <option key={index} value={index}>{displayName}</option>
+                )
+            }).filter(x => { return x != null }) as React.JSX.Element[]
+        }
 
-        const selectedTermOfUseUrl = appState.serverSetting.serverSetting.modelSlots[slot]?.termsOfUseUrl || null
+        const selectedTermOfUseUrl = modelSlots ? modelSlots[slot]?.termsOfUseUrl || null : null
         const selectedTermOfUseUrlLink = selectedTermOfUseUrl ? <a href={selectedTermOfUseUrl} target="_blank" rel="noopener noreferrer" className="body-item-text-small">[terms of use]</a> : <></>
 
         return (

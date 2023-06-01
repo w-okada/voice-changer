@@ -15,6 +15,7 @@ export type FileUploadSetting = {
     uploaded: boolean
     defaultTune: number
     defaultIndexRatio: number
+    defaultProtect: number
     framework: Framework
     params: string
 
@@ -48,6 +49,7 @@ const InitialFileUploadSetting: FileUploadSetting = {
     uploaded: false,
     defaultTune: 0,
     defaultIndexRatio: 1,
+    defaultProtect: 0.5,
     framework: Framework.PyTorch,
     params: "{}",
 
@@ -372,6 +374,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             const params = JSON.stringify({
                 defaultTune: fileUploadSetting.defaultTune || 0,
                 defaultIndexRatio: fileUploadSetting.defaultIndexRatio || 1,
+                defaultProtect: fileUploadSetting.defaultProtect || 0.5,
                 sampleId: fileUploadSetting.isSampleMode ? fileUploadSetting.sampleId || "" : "",
                 rvcIndexDownload: fileUploadSetting.rvcIndexDownload || false,
                 files: fileUploadSetting.isSampleMode ? {} : {
@@ -432,6 +435,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 uploaded: false, // キャッシュから読み込まれるときには、まだuploadされていないから。
                 defaultTune: fileUploadSetting.defaultTune,
                 defaultIndexRatio: fileUploadSetting.defaultIndexRatio,
+                defaultProtect: fileUploadSetting.defaultProtect,
                 framework: fileUploadSetting.framework,
                 params: fileUploadSetting.params,
 
