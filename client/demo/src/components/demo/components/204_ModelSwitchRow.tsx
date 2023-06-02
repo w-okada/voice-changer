@@ -54,7 +54,7 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
 
                 const metadata = x.deprecated ? `[${index}]  [deprecated version]` : `[${index}]  [${f0str},${srstr},${embedstr},${typestr}]`
                 const tuning = `t:${x.defaultTune}`
-                const useIndex = x.indexFile != null ? `i:true` : `i:false`
+                const useIndex = x.indexFile != null && x.indexFile.length > 0 ? `i:true` : `i:false`
                 const defaultIndexRatio = `ir:${x.defaultIndexRatio}`
                 const defaultProtect = `p:${x.defaultProtect}`
                 const subMetadata = `(${tuning},${useIndex},${defaultIndexRatio},${defaultProtect})`

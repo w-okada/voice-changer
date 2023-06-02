@@ -348,7 +348,7 @@ export const DefaultServerSetting_DDSP_SVC: ServerInfo = {
 
 
 export const DefaultServerSetting_RVC: ServerInfo = {
-    ...DefaultServerSetting, tran: 10, extraConvertSize: 1024 * 8, f0Detector: F0Detector.harvest
+    ...DefaultServerSetting, tran: 10, extraConvertSize: 1024 * 4, f0Detector: F0Detector.harvest
 }
 
 ///////////////////////
