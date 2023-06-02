@@ -435,7 +435,7 @@ class VoiceChanger:
                 raise RuntimeError("Voice Changer is not selected.")
 
             processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
-
+            print("original frame", receivedData.shape[0])
             # 前処理
             with Timer("pre-process") as t:
                 if self.settings.inputSampleRate != processing_sampling_rate:
@@ -453,6 +453,7 @@ class VoiceChanger:
                 sola_search_frame = int(0.012 * processing_sampling_rate)
                 # sola_search_frame = 0
                 block_frame = newData.shape[0]
+                print("block frame", newData.shape[0])
                 crossfade_frame = min(self.settings.crossFadeOverlapSize, block_frame)
                 self._generate_strength(crossfade_frame)
 
@@ -472,8 +473,7 @@ class VoiceChanger:
                         sola_search_frame + crossfade_frame + block_frame
                     )
                     audio = audio[audio_offset:]
-                    a = 0
-                    audio = audio[a:]
+
                     # SOLA algorithm from https://github.com/yxlllc/DDSP-SVC, https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI
                     cor_nom = np.convolve(
                         audio[: crossfade_frame + sola_search_frame],

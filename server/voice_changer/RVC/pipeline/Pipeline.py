@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Any
-
+import math
 import torch
 import torch.nn.functional as F
 from Exceptions import (
@@ -90,7 +90,7 @@ class Pipeline(object):
         )
         self.t_pad = self.sr * repeat
         self.t_pad_tgt = self.targetSR * repeat
-
+        print("Audio Feature1", audio.shape)  # 16000のサンプリングレートで入ってきている。以降この世界は16000で処理。
         audio_pad = F.pad(
             audio.unsqueeze(0), (self.t_pad, self.t_pad), mode="reflect"
         ).squeeze(0)
@@ -130,9 +130,21 @@ class Pipeline(object):
         feats = feats.view(1, -1)
 
         # embedding
+        print("audio feature", feats.shape)
         padding_mask = torch.BoolTensor(feats.shape).to(self.device).fill_(False)
         try:
+            # testFeat = feats.clone()
+            # while True:
+            #     print("embedding audio;", testFeat.shape)
+            #     testFeatOut = self.embedder.extractFeatures(
+            #         testFeat, embOutputLayer, useFinalProj
+            #     )
+            #     testFeat = testFeat[:, 1:]
+            #     print("embedding vector;", testFeatOut.shape)
+
+            print("embedding audio;", feats.shape)
             feats = self.embedder.extractFeatures(feats, embOutputLayer, useFinalProj)
+            print("embedding vector;", feats.shape)
         except RuntimeError as e:
             if "HALF" in e.__str__().upper():
                 raise HalfPrecisionChangingException()
@@ -147,6 +159,20 @@ class Pipeline(object):
         # if self.index is not None and self.feature is not None and index_rate != 0:
         if search_index:
             npy = feats[0].cpu().numpy()
+            print("npy shape", npy.shape, npy.shape[0] * 16000)
+            npyOffset = math.floor(silence_front * 16000) // 360
+            print(
+                "npyOffset",
+                silence_front,
+                self.targetSR,
+                (silence_front * self.targetSR),
+                npyOffset,
+            )
+            npy = npy[npyOffset:]
+            print(
+                "npy trimmed shape",
+                npy.shape,
+            )
             if self.isHalf is True:
                 npy = npy.astype("float32")
             # D, I = self.index.search(npy, 1)
@@ -156,6 +182,7 @@ class Pipeline(object):
             k = 1
             if k == 1:
                 _, ix = self.index.search(npy, 1)
+                print("ix  shape", ix.shape)
                 npy = self.big_npy[ix.squeeze()]
             else:
                 score, ix = self.index.search(npy, k=8)
@@ -166,6 +193,11 @@ class Pipeline(object):
             if self.isHalf is True:
                 npy = npy.astype("float16")
 
+            npy = np.concatenate([np.zeros([npyOffset, npy.shape[1]]), npy])
+            print(
+                "npy last shape",
+                npy.shape,
+            )
             feats = (
                 torch.from_numpy(npy).unsqueeze(0).to(self.device) * index_rate
                 + (1 - index_rate) * feats
@@ -195,6 +227,22 @@ class Pipeline(object):
             feats = feats.to(feats0.dtype)
         p_len = torch.tensor([p_len], device=self.device).long()
 
+        npyOffset = math.floor(silence_front * 16000) // 360
+        print(
+            "npy last shape2",
+            feats.shape,
+        )
+        feats = feats[:, npyOffset * 2 :, :]
+        feats_len = feats.shape[1]
+        pitch = pitch[:, -feats_len:]
+        pitchf = pitchf[:, -feats_len:]
+        p_len = torch.tensor([feats_len], device=self.device).long()
+
+        print(
+            "npy last shape3",
+            feats.shape,
+            feats_len,
+        )
         # 推論実行
         try:
             with torch.no_grad():

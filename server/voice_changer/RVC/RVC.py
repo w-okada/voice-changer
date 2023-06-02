@@ -280,8 +280,11 @@ class RVC:
         crossfadeSize: int,
         solaSearchFrame: int = 0,
     ):
-        newData = newData.astype(np.float32) / 32768.0
+        newData = (
+            newData.astype(np.float32) / 32768.0
+        )  # RVCのモデルのサンプリングレートで入ってきている。（extraDataLength, Crossfade等も同じSRで処理）(★１)
 
+        print("newData", newData.shape, crossfadeSize, solaSearchFrame)
         if self.audio_buffer is not None:
             # 過去のデータに連結
             self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)
@@ -292,8 +295,10 @@ class RVC:
             inputSize + crossfadeSize + solaSearchFrame + self.settings.extraConvertSize
         )
 
+        print("convertSize1", convertSize)
         if convertSize % 128 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
             convertSize = convertSize + (128 - (convertSize % 128))
+        print("convertSize2", convertSize)
 
         convertOffset = -1 * convertSize
         self.audio_buffer = self.audio_buffer[convertOffset:]  # 変換対象の部分だけ抽出
@@ -314,6 +319,7 @@ class RVC:
         vol = torch.sqrt(torch.square(crop).mean()).detach().cpu().numpy()
         vol = max(vol, self.prevVol * 0.0)
         self.prevVol = vol
+        print("inf0 : ", audio_buffer.shape, convertSize)
 
         return (audio_buffer, convertSize, vol)
 
@@ -341,6 +347,7 @@ class RVC:
         if vol < self.settings.silentThreshold:
             return np.zeros(convertSize).astype(np.int16)
 
+        print("inf1 : ", audio.shape)
         audio = torchaudio.functional.resample(
             audio, self.settings.modelSamplingRate, 16000, rolloff=0.99
         )
@@ -360,7 +367,8 @@ class RVC:
             f0_up_key,
             index_rate,
             if_f0,
-            self.settings.extraConvertSize / self.settings.modelSamplingRate,
+            self.settings.extraConvertSize
+            / self.settings.modelSamplingRate,  # extaraDataSizeの秒数。RVCのモデルのサンプリングレートで処理(★１)。
             embOutputLayer,
             useFinalProj,
             repeat,
