@@ -154,7 +154,7 @@ class RVC:
         )
         os.makedirs(slotDir, exist_ok=True)
         slotInfo.modelFile = self.moveToModelDir(slotInfo.modelFile, slotDir)
-        if slotInfo.indexFile is not None:
+        if slotInfo.indexFile is not None and len(slotInfo.indexFile) > 0:
             slotInfo.indexFile = self.moveToModelDir(slotInfo.indexFile, slotDir)
         json.dump(asdict(slotInfo), open(os.path.join(slotDir, "params.json"), "w"))
         self.loadSlots()
