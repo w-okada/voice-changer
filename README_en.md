@@ -4,6 +4,11 @@
 
 ## What's New!
 
+- v.1.5.3.4b
+
+  - some bugfix
+  - some performance improvements
+
 - v.1.5.3.4
 
   - Update framework pyTorch v1.x -> v.2.x
