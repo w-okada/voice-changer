@@ -26,3 +26,8 @@ class NotEnoughDataExtimateF0(Exception):
 class ONNXInputArgumentException(Exception):
     def __str__(self):
         return repr("ONNX received invalid argument.")
+
+
+class DeviceCannotSupportHalfPrecisionException(Exception):
+    def __str__(self):
+        return repr("Device cannot support half precision.")

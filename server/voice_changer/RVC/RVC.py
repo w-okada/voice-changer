@@ -40,7 +40,7 @@ from voice_changer.RVC.pipeline.PipelineGenerator import createPipeline
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.pipeline.Pipeline import Pipeline
 
-from Exceptions import NoModeLoadedException
+from Exceptions import DeviceCannotSupportHalfPrecisionException, NoModeLoadedException
 from const import RVC_MODEL_DIRNAME, SAMPLES_JSONS, UPLOAD_DIR
 import shutil
 import json
@@ -209,6 +209,7 @@ class RVC:
             setattr(self.settings, key, val)
 
             if key == "gpu":
+                self.deviceManager.setForceTensor(False)
                 self.prepareModel(self.settings.modelSlotIndex)
 
         elif key in self.settings.floatData:
@@ -340,7 +341,8 @@ class RVC:
         #     self.switchModel()
         #     self.needSwitch = False
 
-        half = self.deviceManager.halfPrecisionAvailable(self.settings.gpu)
+        # half = self.deviceManager.halfPrecisionAvailable(self.settings.gpu)
+        half = self.pipeline.isHalf
 
         audio = data[0]
         convertSize = data[1]
@@ -361,20 +363,26 @@ class RVC:
         if_f0 = 1 if self.settings.modelSlots[self.currentSlot].f0 else 0
         embOutputLayer = self.settings.modelSlots[self.currentSlot].embOutputLayer
         useFinalProj = self.settings.modelSlots[self.currentSlot].useFinalProj
-
-        audio_out = self.pipeline.exec(
-            sid,
-            audio,
-            f0_up_key,
-            index_rate,
-            if_f0,
-            self.settings.extraConvertSize
-            / self.settings.modelSamplingRate,  # extaraDataSizeの秒数。RVCのモデルのサンプリングレートで処理(★１)。
-            embOutputLayer,
-            useFinalProj,
-            repeat,
-            protect,
-        )
+        try:
+            audio_out = self.pipeline.exec(
+                sid,
+                audio,
+                f0_up_key,
+                index_rate,
+                if_f0,
+                self.settings.extraConvertSize
+                / self.settings.modelSamplingRate,  # extaraDataSizeの秒数。RVCのモデルのサンプリングレートで処理(★１)。
+                embOutputLayer,
+                useFinalProj,
+                repeat,
+                protect,
+            )
+        except DeviceCannotSupportHalfPrecisionException:
+            print(
+                "[Device Manager] Device cannot support half precision. Fallback to float...."
+            )
+            self.deviceManager.setForceTensor(True)
+            self.prepareModel(self.settings.modelSlotIndex)
 
         result = audio_out.detach().cpu().numpy() * np.sqrt(vol)
 
