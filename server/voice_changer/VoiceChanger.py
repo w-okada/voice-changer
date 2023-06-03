@@ -22,6 +22,7 @@ from Exceptions import (
     NoModeLoadedException,
     NotEnoughDataExtimateF0,
     ONNXInputArgumentException,
+    VoiceChangerIsNotSelectedException,
 )
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 import threading
@@ -326,7 +327,9 @@ class VoiceChanger:
     def loadModel(self, props: LoadModelParams):
         try:
             if self.voiceChanger is None:
-                raise RuntimeError("Voice Changer is not selected.")
+                raise VoiceChangerIsNotSelectedException(
+                    "Voice Changer is not selected."
+                )
             return self.voiceChanger.loadModel(props)
         except Exception as e:
             print(traceback.format_exc())
@@ -432,7 +435,9 @@ class VoiceChanger:
     ) -> tuple[AudioInOut, list[Union[int, float]]]:
         try:
             if self.voiceChanger is None:
-                raise RuntimeError("Voice Changer is not selected.")
+                raise VoiceChangerIsNotSelectedException(
+                    "Voice Changer is not selected."
+                )
 
             processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
             # 前処理
@@ -570,8 +575,11 @@ class VoiceChanger:
         except DeviceChangingException as e:
             print("[Voice Changer] embedder:", e)
             return np.zeros(1).astype(np.int16), [0, 0, 0]
+        except VoiceChangerIsNotSelectedException:
+            print("[Voice Changer] Voice Changer is not selected. please re-select vc.")
+            return np.zeros(1).astype(np.int16), [0, 0, 0]
         except Exception as e:
-            print("VC PROCESSING!!!! EXCEPTION!!!", e)
+            print("[Voice Changer] VC PROCESSING EXCEPTION!!!", e)
             print(traceback.format_exc())
             return np.zeros(1).astype(np.int16), [0, 0, 0]
 

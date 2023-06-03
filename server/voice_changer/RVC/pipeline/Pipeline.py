@@ -131,7 +131,7 @@ class Pipeline(object):
         padding_mask = torch.BoolTensor(feats.shape).to(self.device).fill_(False)
         try:
             feats = self.embedder.extractFeatures(feats, embOutputLayer, useFinalProj)
-            if all(i is None for i in feats):
+            if torch.isnan(feats).all():
                 raise DeviceCannotSupportHalfPrecisionException()
         except RuntimeError as e:
             if "HALF" in e.__str__().upper():
