@@ -377,16 +377,18 @@ class RVC:
                 repeat,
                 protect,
             )
-        except DeviceCannotSupportHalfPrecisionException:
+            result = audio_out.detach().cpu().numpy() * np.sqrt(vol)
+
+            return result
+        except DeviceCannotSupportHalfPrecisionException as e:
             print(
                 "[Device Manager] Device cannot support half precision. Fallback to float...."
             )
             self.deviceManager.setForceTensor(True)
             self.prepareModel(self.settings.modelSlotIndex)
+            raise e
 
-        result = audio_out.detach().cpu().numpy() * np.sqrt(vol)
-
-        return result
+        return
 
     def __del__(self):
         del self.pipeline

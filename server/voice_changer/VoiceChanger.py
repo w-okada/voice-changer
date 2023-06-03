@@ -17,6 +17,7 @@ from voice_changer.utils.LoadModelParams import LoadModelParams
 from voice_changer.utils.Timer import Timer
 from voice_changer.utils.VoiceChangerModel import VoiceChangerModel, AudioInOut
 from Exceptions import (
+    DeviceCannotSupportHalfPrecisionException,
     DeviceChangingException,
     HalfPrecisionChangingException,
     NoModeLoadedException,
@@ -579,6 +580,9 @@ class VoiceChanger:
             print(
                 "[Voice Changer] Voice Changer is not selected. Wait a bit and if there is no improvement, please re-select vc."
             )
+            return np.zeros(1).astype(np.int16), [0, 0, 0]
+        except DeviceCannotSupportHalfPrecisionException:
+            # RVC.pyでfallback処理をするので、ここはダミーデータ返すだけ。
             return np.zeros(1).astype(np.int16), [0, 0, 0]
         except Exception as e:
             print("[Voice Changer] VC PROCESSING EXCEPTION!!!", e)
