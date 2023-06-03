@@ -576,7 +576,9 @@ class VoiceChanger:
             print("[Voice Changer] embedder:", e)
             return np.zeros(1).astype(np.int16), [0, 0, 0]
         except VoiceChangerIsNotSelectedException:
-            print("[Voice Changer] Voice Changer is not selected. please re-select vc.")
+            print(
+                "[Voice Changer] Voice Changer is not selected. Wait a bit and if there is no improvement, please re-select vc."
+            )
             return np.zeros(1).astype(np.int16), [0, 0, 0]
         except Exception as e:
             print("[Voice Changer] VC PROCESSING EXCEPTION!!!", e)
