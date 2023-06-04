@@ -4,6 +4,12 @@
 
 ## What's New!
 
+- v.1.5.3.4c
+
+  - some bugfix
+    - M1 Mac: mps cannot support float64
+    - All: nof0 onnx model doesn't work
+
 - v.1.5.3.4b
 
   - some bugfix
@@ -16,41 +22,6 @@
   - remove support of so-vits-svc 4.0v2
   - experimental support onnx-directml
   -
-
-- v.1.5.3.3b
-
-  - Support server device mode gain
-
-- v.1.5.3.3a
-
-  - Some bugfixs
-
-- v.1.5.3.3
-
-  - RVC: Crepe 対応
-  - RVC: [DDPN RVC](https://github.com/ddPn08/rvc-webui)対応
-  - RVC: reconstruct .npy
-  - Some bugfixs
-
-- v.1.5.3.2
-
-  - support rvc v2
-  - update setting of stored models
-
-- v.1.5.3.1
-
-  - support sample models
-  - store uploaded models
-
-- v.1.5.2.9a
-
-  - fix: ServerDeviceMode Channel Setting
-  - fix: model merge issue
-
-- v.1.5.2.9
-
-  - Support DDSP-SVC 3.0 (Ph.1)
-  - Server Device Mode (experimental)
 
 # VC Client とは
 
@@ -100,13 +71,13 @@ Windows 版と Mac 版を提供しています。
 
 - ダウンロードはこちらから。
 
-| Version    | OS  | フレームワーク                           | link                                                                                           | サポート VC                                                                   | サイズ |
-| ---------- | --- | ---------------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------ |
-| v.1.5.3.4b | mac | ONNX(cpu), PyTorch(cpu,mps)              | [normal](https://drive.google.com/uc?id=1fBuQZbAMSVFjIqjMWPVpz50tYzdI4D93&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 797MB  |
-|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)        | [normal](https://drive.google.com/uc?id=1M2WmKnBlSH_J1fmtszxKWzA3Ci2uZ1cZ&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC                    | 3243MB |
-|            | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda)\*2 | [normal](https://drive.google.com/uc?id=17AVhvUZDOjixVZZOYkjC9i7vWIsYbhTg&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC                    | 3121MB |
-| v.1.5.3.3b | mac | ONNX(cpu), PyTorch(cpu,mps)              | [normal](https://drive.google.com/uc?id=14_STxl6lYwhTahcgMGfsjnwpoHmN0svf&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 797MB  |
-|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)        | [normal](https://drive.google.com/uc?id=1VpMSF5lE3VrUeb_TusWQi22_Hx8JoPhC&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2872MB |
+| Version    | OS  | フレームワーク                            | link                                                                                           | サポート VC                                                                   | サイズ |
+| ---------- | --- | ----------------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------ |
+| v.1.5.3.4c | mac | ONNX(cpu), PyTorch(cpu,mps)               | [normal](https://drive.google.com/uc?id=1x17OMQNMp2GpQzjSrkmFlMtjx09iKoCI&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 797MB  |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)         | [normal](https://drive.google.com/uc?id=1s_bWt9EZlVhNSgamz38SOL8yI0nTz2PM&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC                    | 3243MB |
+|            | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) \*2 | [normal](https://drive.google.com/uc?id=1Npcpptt9B6zoE2CIfyDyPegQExLaAEhq&export=download)\*1  | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC                    | 3121MB |
+| v.1.5.3.3b | mac | ONNX(cpu), PyTorch(cpu,mps)               | [normal](https://drive.google.com/uc?id=14_STxl6lYwhTahcgMGfsjnwpoHmN0svf&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 797MB  |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)         | [normal](https://drive.google.com/uc?id=1VpMSF5lE3VrUeb_TusWQi22_Hx8JoPhC&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2872MB |
 
 (\*1) Google Drive からダウンロードできない方は[hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)からダウンロードしてみてください
 (\*2) 開発者が AMD のグラフィックボードを持っていないので動作確認していません。onnxruntime-directml を同梱しただけのものです。
