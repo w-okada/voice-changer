@@ -166,7 +166,7 @@ class Pipeline(object):
                 npy = np.sum(self.big_npy[ix] * np.expand_dims(weight, axis=2), axis=1)
 
             # recover silient font
-            npy = np.concatenate([np.zeros([npyOffset, npy.shape[1]]), npy])
+            npy = np.concatenate([np.zeros([npyOffset, npy.shape[1]]).astype("float32"), npy])
             if self.isHalf is True:
                 npy = npy.astype("float16")
 
