@@ -9,6 +9,7 @@ class OnnxRVCInferencerNono(OnnxRVCInferencer):
     def loadModel(self, file: str, gpu: int):
         super().loadModel(file, gpu)
         self.setProps(EnumInferenceTypes.onnxRVCNono, file, True, gpu)
+        return self
 
     def infer(
         self,

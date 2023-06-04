@@ -42,6 +42,7 @@ class Pipeline(object):
         self.embedder = embedder
         self.inferencer = inferencer
         self.pitchExtractor = pitchExtractor
+        print("GENERATE INFERENCER:::", self.inferencer)
 
         self.index = index
         self.big_npy = (
@@ -166,7 +167,9 @@ class Pipeline(object):
                 npy = np.sum(self.big_npy[ix] * np.expand_dims(weight, axis=2), axis=1)
 
             # recover silient font
-            npy = np.concatenate([np.zeros([npyOffset, npy.shape[1]]).astype("float32"), npy])
+            npy = np.concatenate(
+                [np.zeros([npyOffset, npy.shape[1]]).astype("float32"), npy]
+            )
             if self.isHalf is True:
                 npy = npy.astype("float16")
 
@@ -204,8 +207,9 @@ class Pipeline(object):
         npyOffset = math.floor(silence_front * 16000) // 360
         feats = feats[:, npyOffset * 2 :, :]
         feats_len = feats.shape[1]
-        pitch = pitch[:, -feats_len:]
-        pitchf = pitchf[:, -feats_len:]
+        if pitch is not None and pitchf is not None:
+            pitch = pitch[:, -feats_len:]
+            pitchf = pitchf[:, -feats_len:]
         p_len = torch.tensor([feats_len], device=self.device).long()
 
         # 推論実行
