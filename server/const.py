@@ -137,6 +137,17 @@ SAMPLE_MODEL_IDS = [
     # ("test-ddpn-v2-nof0-40k-l12-hubert_o", False),
     # ("test-ddpn-v2-f0-40k-l12-hubert_jp_o", False),
     # ("test-ddpn-v2-nof0-40k-l12-hubert_jp_o", False),
+    # ONNX FULLテスト(onnx)
+    # ("test-official-v1-f0-48k-l9-hubert_o_full", False),
+    # ("test-official-v1-nof0-48k-l9-hubert_o_full", False),
+    # ("test-official-v2-f0-40k-l12-hubert_o_full", False),
+    # ("test-official-v2-nof0-40k-l12-hubert_o_full", False),
+    # ("test-ddpn-v1-f0-48k-l9-hubert_o_full", False),
+    # ("test-ddpn-v1-nof0-48k-l9-hubert_o_full", False),
+    # ("test-ddpn-v2-f0-40k-l12-hubert_o_full", False),
+    # ("test-ddpn-v2-nof0-40k-l12-hubert_o_full", False),
+    # ("test-ddpn-v2-f0-40k-l12-hubert_jp_o_full", False),
+    # ("test-ddpn-v2-nof0-40k-l12-hubert_jp_o_full", False),
 ]
 
 
