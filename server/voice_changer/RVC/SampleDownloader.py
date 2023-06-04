@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict
 import os
-from const import RVC_MODEL_DIRNAME, SAMPLE_MODEL_IDS, TMP_DIR
+from const import RVC_MODEL_DIRNAME, TMP_DIR
 from Downloader import download, download_no_tqdm
 from ModelSample import RVCModelSample, getModelSamples
 import json
@@ -17,9 +17,9 @@ def checkRvcModelExist(model_dir: str):
     return True
 
 
-def downloadInitialSampleModels(sampleJsons: list[str], model_dir: str):
-    sampleModelIds = SAMPLE_MODEL_IDS
-
+def downloadInitialSampleModels(
+    sampleJsons: list[str], sampleModelIds: list[str], model_dir: str
+):
     sampleModels = getModelSamples(sampleJsons, "RVC")
     if sampleModels is None:
         return

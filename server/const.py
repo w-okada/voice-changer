@@ -100,55 +100,83 @@ class ServerAudioDeviceTypes(Enum):
     audiooutput = "audiooutput"
 
 
-SAMPLES_JSONS = [
-    # "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0001.json",
-    # "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0002.json",
-    "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0003_t.json",
-    "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0003_o.json",
-    # "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_official_v1_v2.json",
-    # "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_ddpn_v1_v2.json",
-]
+class RVCSampleMode(Enum):
+    production = "production"
+    testOfficial = "testOfficial"
+    testDDPNTorch = "testDDPNTorch"
+    testDDPNONNX = "testDDPNONNX"
+    testONNXFull = "testONNXFull"
 
-SAMPLE_MODEL_IDS = [
-    ("TokinaShigure_o", True),
-    ("KikotoMahiro_o", False),
-    ("Amitaro_o", False),
-    ("Tsukuyomi-chan_o", False),
-    # オフィシャルモデルテスト
-    # ("test-official-v1-f0-48k-l9-hubert_t", True),
-    # ("test-official-v1-nof0-48k-l9-hubert_t", False),
-    # ("test-official-v2-f0-40k-l12-hubert_t", False),
-    # ("test-official-v2-nof0-40k-l12-hubert_t", False),
-    # ("test-official-v1-f0-48k-l9-hubert_o", True),
-    # ("test-official-v1-nof0-48k-l9-hubert_o", False),
-    # ("test-official-v2-f0-40k-l12-hubert_o", False),
-    # ("test-official-v2-nof0-40k-l12-hubert_o", False),
-    # DDPNモデルテスト(torch)
-    # ("test-ddpn-v1-f0-48k-l9-hubert_t", False),
-    # ("test-ddpn-v1-nof0-48k-l9-hubert_t", False),
-    # ("test-ddpn-v2-f0-40k-l12-hubert_t", False),
-    # ("test-ddpn-v2-nof0-40k-l12-hubert_t", False),
-    # ("test-ddpn-v2-f0-40k-l12-hubert_jp_t", False),
-    # ("test-ddpn-v2-nof0-40k-l12-hubert_jp_t", False),
-    # DDPNモデルテスト(onnx)
-    # ("test-ddpn-v1-f0-48k-l9-hubert_o", False),
-    # ("test-ddpn-v1-nof0-48k-l9-hubert_o", False),
-    # ("test-ddpn-v2-f0-40k-l12-hubert_o", False),
-    # ("test-ddpn-v2-nof0-40k-l12-hubert_o", False),
-    # ("test-ddpn-v2-f0-40k-l12-hubert_jp_o", False),
-    # ("test-ddpn-v2-nof0-40k-l12-hubert_jp_o", False),
-    # ONNX FULLテスト(onnx)
-    # ("test-official-v1-f0-48k-l9-hubert_o_full", False),
-    # ("test-official-v1-nof0-48k-l9-hubert_o_full", False),
-    # ("test-official-v2-f0-40k-l12-hubert_o_full", False),
-    # ("test-official-v2-nof0-40k-l12-hubert_o_full", False),
-    # ("test-ddpn-v1-f0-48k-l9-hubert_o_full", False),
-    # ("test-ddpn-v1-nof0-48k-l9-hubert_o_full", False),
-    # ("test-ddpn-v2-f0-40k-l12-hubert_o_full", False),
-    # ("test-ddpn-v2-nof0-40k-l12-hubert_o_full", False),
-    # ("test-ddpn-v2-f0-40k-l12-hubert_jp_o_full", False),
-    # ("test-ddpn-v2-nof0-40k-l12-hubert_jp_o_full", False),
-]
+
+def getRVCSampleJsonAndModelIds(mode: RVCSampleMode):
+    if mode == RVCSampleMode.production.value:
+        return [
+            # "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0001.json",
+            # "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0002.json",
+            "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0003_t.json",
+            "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0003_o.json",
+        ], [
+            ("TokinaShigure_o", True),
+            ("KikotoMahiro_o", False),
+            ("Amitaro_o", False),
+            ("Tsukuyomi-chan_o", False),
+        ]
+    elif mode == RVCSampleMode.testOfficial.value:
+        return [
+            "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_official_v1_v2.json",
+            "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_ddpn_v1_v2.json",
+        ], [
+            ("test-official-v1-f0-48k-l9-hubert_t", True),
+            ("test-official-v1-nof0-48k-l9-hubert_t", False),
+            ("test-official-v2-f0-40k-l12-hubert_t", False),
+            ("test-official-v2-nof0-40k-l12-hubert_t", False),
+            ("test-official-v1-f0-48k-l9-hubert_o", True),
+            ("test-official-v1-nof0-48k-l9-hubert_o", False),
+            ("test-official-v2-f0-40k-l12-hubert_o", False),
+            ("test-official-v2-nof0-40k-l12-hubert_o", False),
+        ]
+    elif mode == RVCSampleMode.testDDPNTorch.value:
+        return [
+            "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_official_v1_v2.json",
+            "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_ddpn_v1_v2.json",
+        ], [
+            ("test-ddpn-v1-f0-48k-l9-hubert_t", False),
+            ("test-ddpn-v1-nof0-48k-l9-hubert_t", False),
+            ("test-ddpn-v2-f0-40k-l12-hubert_t", False),
+            ("test-ddpn-v2-nof0-40k-l12-hubert_t", False),
+            ("test-ddpn-v2-f0-40k-l12-hubert_jp_t", False),
+            ("test-ddpn-v2-nof0-40k-l12-hubert_jp_t", False),
+        ]
+    elif mode == RVCSampleMode.testDDPNONNX.value:
+        return [
+            "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_official_v1_v2.json",
+            "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_ddpn_v1_v2.json",
+        ], [
+            ("test-ddpn-v1-f0-48k-l9-hubert_o", False),
+            ("test-ddpn-v1-nof0-48k-l9-hubert_o", False),
+            ("test-ddpn-v2-f0-40k-l12-hubert_o", False),
+            ("test-ddpn-v2-nof0-40k-l12-hubert_o", False),
+            ("test-ddpn-v2-f0-40k-l12-hubert_jp_o", False),
+            ("test-ddpn-v2-nof0-40k-l12-hubert_jp_o", False),
+        ]
+    elif mode == RVCSampleMode.testONNXFull.value:
+        return [
+            "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_official_v1_v2.json",
+            "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_ddpn_v1_v2.json",
+        ], [
+            ("test-official-v1-f0-48k-l9-hubert_o_full", False),
+            ("test-official-v1-nof0-48k-l9-hubert_o_full", False),
+            ("test-official-v2-f0-40k-l12-hubert_o_full", False),
+            ("test-official-v2-nof0-40k-l12-hubert_o_full", False),
+            ("test-ddpn-v1-f0-48k-l9-hubert_o_full", False),
+            ("test-ddpn-v1-nof0-48k-l9-hubert_o_full", False),
+            ("test-ddpn-v2-f0-40k-l12-hubert_o_full", False),
+            ("test-ddpn-v2-nof0-40k-l12-hubert_o_full", False),
+            ("test-ddpn-v2-f0-40k-l12-hubert_jp_o_full", False),
+            ("test-ddpn-v2-nof0-40k-l12-hubert_jp_o_full", False),
+        ]
+    else:
+        return [], []
 
 
 RVC_MODEL_DIRNAME = "rvc"

@@ -41,7 +41,11 @@ from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.pipeline.Pipeline import Pipeline
 
 from Exceptions import DeviceCannotSupportHalfPrecisionException, NoModeLoadedException
-from const import RVC_MODEL_DIRNAME, SAMPLES_JSONS, UPLOAD_DIR
+from const import (
+    RVC_MODEL_DIRNAME,
+    UPLOAD_DIR,
+    getRVCSampleJsonAndModelIds,
+)
 import shutil
 import json
 
@@ -71,7 +75,10 @@ class RVC:
 
         # サンプルカタログ作成
         sampleJsons: list[str] = []
-        for url in SAMPLES_JSONS:
+        sampleJsonUrls, _sampleModels = getRVCSampleJsonAndModelIds(
+            params.rvc_sample_mode
+        )
+        for url in sampleJsonUrls:
             filename = os.path.basename(url)
             sampleJsons.append(filename)
         sampleModels = getModelSamples(sampleJsons, "RVC")
