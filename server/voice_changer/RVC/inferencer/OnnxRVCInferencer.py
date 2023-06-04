@@ -42,7 +42,6 @@ class OnnxRVCInferencer(Inferencer):
         # print("INFER1", self.model.get_providers())
         # print("INFER2", self.model.get_provider_options())
         # print("INFER3", self.model.get_session_options())
-
         if self.isHalf:
             audio1 = self.model.run(
                 ["audio"],

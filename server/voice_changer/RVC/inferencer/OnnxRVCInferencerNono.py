@@ -8,7 +8,7 @@ from voice_changer.RVC.inferencer.OnnxRVCInferencer import OnnxRVCInferencer
 class OnnxRVCInferencerNono(OnnxRVCInferencer):
     def loadModel(self, file: str, gpu: int):
         super().loadModel(file, gpu)
-        self.setProps(EnumInferenceTypes.onnxRVCNono, file, True, gpu)
+        self.setProps(EnumInferenceTypes.onnxRVCNono, file, self.isHalf, gpu)
         return self
 
     def infer(

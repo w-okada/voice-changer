@@ -42,7 +42,9 @@ class Pipeline(object):
         self.embedder = embedder
         self.inferencer = inferencer
         self.pitchExtractor = pitchExtractor
-        print("GENERATE INFERENCER:::", self.inferencer)
+        print("GENERATE INFERENCER", self.inferencer)
+        print("GENERATE EMBEDDER", self.embedder)
+        print("GENERATE PITCH EXTRACTOR", self.pitchExtractor)
 
         self.index = index
         self.big_npy = (
