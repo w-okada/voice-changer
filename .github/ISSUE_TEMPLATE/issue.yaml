@@ -41,34 +41,31 @@ body:
     attributes:
       label: Clear setting
       description: Have you tried clear setting?
-      multiple: true
       options:
         - "yes"
         - "no"
     validations:
       required: true
-  # - type: dropdown
-  #   id: sample-model
-  #   attributes:
-  #     label: Sample model
-  #     description: Sample model work fine
-  #     multiple: true
-  #     options:
-  #       - YES
-  #       - NO
-  #   validations:
-  #     required: true
-  # - type: dropdown
-  #   id: input-chunk-num
-  #   attributes:
-  #     label: Input chunk num
-  #     description: Have you tried to change input chunk num?
-  #     multiple: true
-  #     options:
-  #       - YES
-  #       - NO
-  #   validations:
-  #     required: true
+  - type: dropdown
+    id: sample-model
+    attributes:
+      label: Sample model
+      description: Sample model work fine
+      options:
+        - "yes"
+        - "no"
+    validations:
+      required: true
+  - type: dropdown
+    id: input-chunk-num
+    attributes:
+      label: Input chunk num
+      description: Have you tried to change input chunk num?
+      options:
+        - "yes"
+        - "no"
+    validations:
+      required: true
   # - type: input
   #   id: vc-type
   #   attributes:
