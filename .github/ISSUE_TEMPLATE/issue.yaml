@@ -47,17 +47,17 @@ body:
         - NO
     validations:
       required: true
-  - type: dropdown
-    id: sample-model
-    attributes:
-      label: Sample model
-      description: Sample model work fine
-      multiple: true
-      options:
-        - YES
-        - NO
-    validations:
-      required: true
+  # - type: dropdown
+  #   id: sample-model
+  #   attributes:
+  #     label: Sample model
+  #     description: Sample model work fine
+  #     multiple: true
+  #     options:
+  #       - YES
+  #       - NO
+  #   validations:
+  #     required: true
   # - type: dropdown
   #   id: input-chunk-num
   #   attributes:
