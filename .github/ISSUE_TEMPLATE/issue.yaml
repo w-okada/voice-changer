@@ -27,7 +27,6 @@ body:
     attributes:
       label: OS
       description: OS name and version. e.g. Windows 10, Ubuntu 20.04, if you use mac, M1 or Intel.(Intel is not supported)
-      placeholder:
     validations:
       required: true
   - type: input
@@ -35,7 +34,6 @@ body:
     attributes:
       label: GPU
       description: GPU. If you have no gpu, please input none.
-      placeholder:
     validations:
       required: true
   - type: dropdown
