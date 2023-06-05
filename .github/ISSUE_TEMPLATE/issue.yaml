@@ -36,17 +36,17 @@ body:
       description: GPU. If you have no gpu, please input none.
     validations:
       required: true
-  - type: dropdown
-    id: clear-setting
-    attributes:
-      label: Clear setting
-      description: Have you tried clear setting?
-      multiple: true
-      options:
-        - YES
-        - NO
-    validations:
-      required: true
+  # - type: dropdown
+  #   id: clear-setting
+  #   attributes:
+  #     label: Clear setting
+  #     description: Have you tried clear setting?
+  #     multiple: true
+  #     options:
+  #       - YES
+  #       - NO
+  #   validations:
+  #     required: true
   # - type: dropdown
   #   id: sample-model
   #   attributes:
