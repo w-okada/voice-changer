@@ -42,8 +42,8 @@ body:
       label: Clear setting
       description: Have you tried clear setting?
       options:
-        - "yes"
         - "no"
+        - "yes"
     validations:
       required: true
   - type: dropdown
@@ -52,8 +52,8 @@ body:
       label: Sample model
       description: Sample model work fine
       options:
-        - "yes"
         - "no"
+        - "yes"
     validations:
       required: true
   - type: dropdown
@@ -62,29 +62,29 @@ body:
       label: Input chunk num
       description: Have you tried to change input chunk num?
       options:
-        - "yes"
         - "no"
+        - "yes"
     validations:
       required: true
-  # - type: input
-  #   id: vc-type
-  #   attributes:
-  #     label: Voice Changer type
-  #     description: Which type of voice changer you use? e.g. MMVC v1.3, RVC
-  #     placeholder: RVC
-  #   validations:
-  #     required: true
-  # - type: input
-  #   id: model-type
-  #   attributes:
-  #     label: Model type
-  #     description: List up the type of model you use? e.g. pyTorch, ONNX, f0, no f0
-  #   validations:
-  #     required: true
-  # - type: textarea
-  #   id: issue
-  #   attributes:
-  #     label: Situation
-  #     description: Please input your issue
-  #   validations:
-  #     required: true
+  - type: input
+    id: vc-type
+    attributes:
+      label: Voice Changer type
+      description: Which type of voice changer you use? e.g. MMVC v1.3, RVC
+      placeholder: RVC
+    validations:
+      required: true
+  - type: input
+    id: model-type
+    attributes:
+      label: Model type
+      description: List up the type of model you use? e.g. pyTorch, ONNX, f0, no f0
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: Situation
+      description: Please input your issue
+    validations:
+      required: true
