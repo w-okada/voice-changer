@@ -43,8 +43,8 @@ body:
       description: Have you tried clear setting?
       multiple: true
       options:
-        - YES
-        - NO
+        - "yes"
+        - "no"
     validations:
       required: true
   # - type: dropdown
