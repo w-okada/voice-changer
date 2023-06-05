@@ -14,80 +14,80 @@ body:
         - Bug Report
     validations:
       required: true
-  - type: input
-    id: vc-client-version
-    attributes:
-      label: vc client version number
-      description: The version number of vc client used. Or download the filename
-      placeholder: x.x.x.x
-    validations:
-      required: true
-  - type: input
-    id: OS
-    attributes:
-      label: OS
-      description: OS name and version. e.g. Windows 10, Ubuntu 20.04, if you use mac, M1 or Intel.(Intel is not supported)
-    validations:
-      required: true
-  - type: input
-    id: GPU
-    attributes:
-      label: GPU
-      description: GPU. If you have no gpu, please input none.
-    validations:
-      required: true
-  - type: dropdown
-    id: clear-setting
-    attributes:
-      label: Clear setting
-      description: Have you tried clear setting?
-      multiple: true
-      options:
-        - YES
-        - NO
-    validations:
-      required: true
-  - type: dropdown
-    id: sample-model
-    attributes:
-      label: Sample model
-      description: Sample model work fine
-      multiple: true
-      options:
-        - YES
-        - NO
-    validations:
-      required: true
-  - type: dropdown
-    id: input-chunk-num
-    attributes:
-      label: Input chunk num
-      description: Have you tried to change input chunk num?
-      multiple: true
-      options:
-        - YES
-        - NO
-    validations:
-      required: true
-  - type: input
-    id: vc-type
-    attributes:
-      label: Voice Changer type
-      description: Which type of voice changer you use? e.g. MMVC v1.3, RVC
-      placeholder: RVC
-    validations:
-      required: true
-  - type: input
-    id: model-type
-    attributes:
-      label: Model type
-      description: List up the type of model you use? e.g. pyTorch, ONNX, f0, no f0
-    validations:
-      required: true
-  - type: textarea
-    id: issue
-    attributes:
-      label: Situation
-      description: Please input your issue
-    validations:
-      required: true
+  # - type: input
+  #   id: vc-client-version
+  #   attributes:
+  #     label: vc client version number
+  #     description: The version number of vc client used. Or download the filename
+  #     placeholder: x.x.x.x
+  #   validations:
+  #     required: true
+  # - type: input
+  #   id: OS
+  #   attributes:
+  #     label: OS
+  #     description: OS name and version. e.g. Windows 10, Ubuntu 20.04, if you use mac, M1 or Intel.(Intel is not supported)
+  #   validations:
+  #     required: true
+  # - type: input
+  #   id: GPU
+  #   attributes:
+  #     label: GPU
+  #     description: GPU. If you have no gpu, please input none.
+  #   validations:
+  #     required: true
+  # - type: dropdown
+  #   id: clear-setting
+  #   attributes:
+  #     label: Clear setting
+  #     description: Have you tried clear setting?
+  #     multiple: true
+  #     options:
+  #       - YES
+  #       - NO
+  #   validations:
+  #     required: true
+  # - type: dropdown
+  #   id: sample-model
+  #   attributes:
+  #     label: Sample model
+  #     description: Sample model work fine
+  #     multiple: true
+  #     options:
+  #       - YES
+  #       - NO
+  #   validations:
+  #     required: true
+  # - type: dropdown
+  #   id: input-chunk-num
+  #   attributes:
+  #     label: Input chunk num
+  #     description: Have you tried to change input chunk num?
+  #     multiple: true
+  #     options:
+  #       - YES
+  #       - NO
+  #   validations:
+  #     required: true
+  # - type: input
+  #   id: vc-type
+  #   attributes:
+  #     label: Voice Changer type
+  #     description: Which type of voice changer you use? e.g. MMVC v1.3, RVC
+  #     placeholder: RVC
+  #   validations:
+  #     required: true
+  # - type: input
+  #   id: model-type
+  #   attributes:
+  #     label: Model type
+  #     description: List up the type of model you use? e.g. pyTorch, ONNX, f0, no f0
+  #   validations:
+  #     required: true
+  # - type: textarea
+  #   id: issue
+  #   attributes:
+  #     label: Situation
+  #     description: Please input your issue
+  #   validations:
+  #     required: true
