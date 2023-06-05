@@ -1,5 +1,5 @@
 name: Issue
-about: Please provide as much detail as possible to convey the history of your problem.
+description: Please provide as much detail as possible to convey the history of your problem.
 body:
   - type: dropdown
     id: issue-type
