@@ -76,6 +76,20 @@ def downloadInitialSampleModels(
             )
             slotInfo.indexFile = indexPath
             line_num += 1
+        if hasattr(sample, "icon") and sample.icon != "":
+            iconPath = os.path.join(
+                slotDir,
+                os.path.basename(sample.icon),
+            )
+            downloadParams.append(
+                {
+                    "url": sample.icon,
+                    "saveTo": iconPath,
+                    "position": line_num,
+                }
+            )
+            slotInfo.iconFile = iconPath
+            line_num += 1
 
         slotInfo.sampleId = sample.id
         slotInfo.credit = sample.credit

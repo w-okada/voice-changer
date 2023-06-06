@@ -44,7 +44,7 @@ export type FileUploadSetting = {
 
 }
 
-const InitialFileUploadSetting: FileUploadSetting = {
+export const InitialFileUploadSetting: FileUploadSetting = {
     isHalf: true,
     uploaded: false,
     defaultTune: 0,
@@ -236,6 +236,16 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         }
     }, [props.voiceChangerClient])
 
+    const _uploadFile2 = useMemo(() => {
+        return async (file: File, onprogress: (progress: number, end: boolean) => void, dir: string = "") => {
+            if (!props.voiceChangerClient) return
+            console.log("uploading...", file.name)
+            const num = await props.voiceChangerClient.uploadFile2(file, onprogress)
+            const res = await props.voiceChangerClient.concatUploadedFile(dir + file.name, num)
+            console.log("uploaded", num, res)
+        }
+    }, [props.voiceChangerClient])
+
 
     const loadModel = useMemo(() => {
         return async (slot: number) => {
@@ -307,7 +317,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                     alert("Sample IDを指定する必要があります。")
                     return
                 }
-
             }
 
 
@@ -316,9 +325,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             setUploadProgress(0)
             setIsUploading(true)
 
-
-
-            // MMVCv13
+            // normal models(MMVC13,15, so-vits-svc, RVC)
             const normalModels = [
                 fileUploadSetting.mmvcv13Config,
                 fileUploadSetting.mmvcv13Model,
@@ -330,13 +337,11 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 fileUploadSetting.soVitsSvc40v2Config,
                 fileUploadSetting.soVitsSvc40v2Model,
                 fileUploadSetting.soVitsSvc40v2Cluster,
-                fileUploadSetting.rvcModel,
-                fileUploadSetting.rvcIndex,
-                fileUploadSetting.rvcFeature,
 
             ].filter(x => { return x != null }) as ModelData[]
             for (let i = 0; i < normalModels.length; i++) {
                 if (!normalModels[i].data) {
+                    // const fileSize = normalModels[i].file!.size / 1024 / 1024
                     normalModels[i].data = await normalModels[i].file!.arrayBuffer()
                     normalModels[i].filename = await normalModels[i].file!.name
                 }
@@ -345,13 +350,39 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 for (let i = 0; i < normalModels.length; i++) {
                     const progRate = 1 / normalModels.length
                     const progOffset = 100 * i * progRate
-                    await _uploadFile(normalModels[i], (progress: number, _end: boolean) => {
+                    // await _uploadFile(normalModels[i], (progress: number, _end: boolean) => {
+                    //     setUploadProgress(progress * progRate + progOffset)
+                    // })
+                    await _uploadFile2(normalModels[i].file!, (progress: number, _end: boolean) => {
                         setUploadProgress(progress * progRate + progOffset)
                     })
                 }
             }
 
-            // DDSP-SVC
+            // slotModel ローカルキャッシュ無効(RVC)
+            const slotModels = [
+                fileUploadSetting.rvcModel,
+                fileUploadSetting.rvcIndex,
+
+            ].filter(x => { return x != null }) as ModelData[]
+            for (let i = 0; i < slotModels.length; i++) {
+                if (!slotModels[i].data) {
+                    slotModels[i].filename = await slotModels[i].file!.name
+                }
+            }
+            if (fileUploadSetting.isSampleMode == false) {
+                for (let i = 0; i < slotModels.length; i++) {
+                    const progRate = 1 / slotModels.length
+                    const progOffset = 100 * i * progRate
+                    await _uploadFile2(slotModels[i].file!, (progress: number, _end: boolean) => {
+                        setUploadProgress(progress * progRate + progOffset)
+                    })
+                }
+            }
+
+
+
+            // DDSP-SVC (ファイル名（config）が被る可能性があるため、アップロードフォルダを分ける必要がある)
             const ddspSvcModels = [fileUploadSetting.ddspSvcModel, fileUploadSetting.ddspSvcModelConfig, fileUploadSetting.ddspSvcDiffusion, fileUploadSetting.ddspSvcDiffusionConfig].filter(x => { return x != null }) as ModelData[]
             for (let i = 0; i < ddspSvcModels.length; i++) {
                 if (!ddspSvcModels[i].data) {

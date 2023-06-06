@@ -45,6 +45,9 @@ export const ServerOpertationRow = (props: ServerOpertationRowProps) => {
             a.click();
             document.body.removeChild(a);
         }
+        const onModelSlotEditClicked = () => {
+            guiState.stateControls.showModelSlotManagerCheckbox.updateState(true)
+        }
         const onReloadClicked = async () => {
             const info = await appState.getInfo()
             console.log("info", info)
@@ -60,6 +63,11 @@ export const ServerOpertationRow = (props: ServerOpertationRowProps) => {
                 onDownloadClicked()
             }}>download</div> : <></>
         )
+        const edit = (
+            props.showDownload ? <div className="body-button left-margin-1" onClick={() => {
+                onModelSlotEditClicked()
+            }}>edit</div> : <></>
+        )
         const reload = (
             props.showReload ? <div className="body-button-container">
                 <div className="body-button" onClick={onReloadClicked}>reload</div>
@@ -73,6 +81,7 @@ export const ServerOpertationRow = (props: ServerOpertationRowProps) => {
                     <div className="body-button-container">
                         {exportOnnx}
                         {download}
+                        {edit}
                         {reload}
                     </div>
                 </div>

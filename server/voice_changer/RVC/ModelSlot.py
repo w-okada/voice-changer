@@ -25,3 +25,4 @@ class ModelSlot:
     credit: str = ""
     termsOfUseUrl: str = ""
     sampleId: str = ""
+    iconFile: str = ""

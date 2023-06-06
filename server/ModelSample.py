@@ -13,6 +13,7 @@ class RVCModelSample:
     modelUrl: str = ""
     indexUrl: str = ""
     termsOfUseUrl: str = ""
+    icon: str = ""
     credit: str = ""
     description: str = ""
 

@@ -43,7 +43,6 @@ export const ONNXExportRow = (_props: ONNXExportRowProps) => {
             document.body.removeChild(a);
             guiState.stateControls.showWaitingCheckbox.updateState(false)
         }
-
         const exportOnnx = appState.serverSetting.serverSetting.framework == "PyTorch" ? (
             <div className="body-button left-margin-1" onClick={onnxExportButtonAction}>export onnx</div>
         ) : <></>

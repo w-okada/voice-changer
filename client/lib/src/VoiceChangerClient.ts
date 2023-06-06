@@ -286,6 +286,9 @@ export class VoiceChangerClient {
     uploadFile = (buf: ArrayBuffer, filename: string, onprogress: (progress: number, end: boolean) => void) => {
         return this.configurator.uploadFile(buf, filename, onprogress)
     }
+    uploadFile2 = (file: File, onprogress: (progress: number, end: boolean) => void) => {
+        return this.configurator.uploadFile2(file, onprogress)
+    }
     concatUploadedFile = (filename: string, chunkNum: number) => {
         return this.configurator.concatUploadedFile(filename, chunkNum)
     }

@@ -217,6 +217,7 @@ type ModelSlot = {
     description: string,
     credit: string,
     termsOfUseUrl: string,
+    iconFile: string
 }
 
 type ServerAudioDevice = {
@@ -254,6 +255,7 @@ export type RVCSampleModel = {
     description: string
     lang: string
     tag: string
+    icon: string
 }
 
 export const DefaultServerSetting: ServerInfo = {

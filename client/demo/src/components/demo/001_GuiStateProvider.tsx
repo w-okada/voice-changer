@@ -15,6 +15,7 @@ export const OpenLabCheckbox = "open-lab-checkbox"
 export const OpenLicenseDialogCheckbox = "open-license-dialog-checkbox"
 export const OpenWaitingDialogCheckbox = "open-waiting-dialog-checkbox"
 export const OpenStartingNoticeDialogCheckbox = "open-starting-notice-dialog-checkbox"
+export const OpenModelSlotManagerDialogCheckbox = "open-model-slot-manager-dialog-checkbox"
 
 type Props = {
     children: ReactNode;
@@ -33,6 +34,7 @@ export type StateControls = {
     showLicenseCheckbox: StateControlCheckbox
     showWaitingCheckbox: StateControlCheckbox
     showStartingNoticeCheckbox: StateControlCheckbox
+    showModelSlotManagerCheckbox: StateControlCheckbox
 
 }
 
@@ -151,6 +153,7 @@ export const GuiStateProvider = ({ children }: Props) => {
     const showLicenseCheckbox = useStateControlCheckbox(OpenLicenseDialogCheckbox);
     const showWaitingCheckbox = useStateControlCheckbox(OpenWaitingDialogCheckbox);
     const showStartingNoticeCheckbox = useStateControlCheckbox(OpenStartingNoticeDialogCheckbox);
+    const showModelSlotManagerCheckbox = useStateControlCheckbox(OpenModelSlotManagerDialogCheckbox);
 
     useEffect(() => {
         openServerControlCheckbox.updateState(true)
@@ -168,6 +171,7 @@ export const GuiStateProvider = ({ children }: Props) => {
 
 
         showStartingNoticeCheckbox.updateState(false)
+        showModelSlotManagerCheckbox.updateState(false)
     }, [])
 
     useEffect(() => {
@@ -204,7 +208,8 @@ export const GuiStateProvider = ({ children }: Props) => {
 
             showLicenseCheckbox,
             showWaitingCheckbox,
-            showStartingNoticeCheckbox
+            showStartingNoticeCheckbox,
+            showModelSlotManagerCheckbox
         },
         isConverting,
         setIsConverting,

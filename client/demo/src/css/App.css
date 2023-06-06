@@ -695,6 +695,7 @@ body {
     .dialog-frame {
         color: var(--company-color2);
         width: 40rem;
+        max-height: 80vh;
         border: 2px solid var(--dialog-border-color);
         border-radius: 20px;
         flex-direction: column;
@@ -720,6 +721,95 @@ body {
             .dialog-content-part {
                 margin-top: 1rem;
                 margin-bottom: 1rem;
+            }
+        }
+        .dialog-fixed-size-content {
+            width: 90%;
+            max-height: 70vh;
+            .model-slot-container {
+                max-height: 60vh;
+                width: 100%;
+                overflow-y: scroll;
+                .model-slot {
+                    height: 5rem;
+                    display: flex;
+                    flex-direction: row;
+                    .model-slot-icon {
+                        width: 5rem;
+                        height: 5rem;
+                    }
+                    .model-slot-detail {
+                        display: flex;
+                        flex-direction: column;
+                        font-size: 0.8rem;
+                        border-bottom: solid 1px #aaa;
+                        width: 80%;
+                        .model-slot-detail-row {
+                            display: flex;
+                            flex-direction: row;
+                            .model-slot-detail-row-label {
+                                width: 15%;
+                            }
+                            .model-slot-detail-row-value {
+                                width: 60%;
+                                white-space: nowrap;
+                            }
+                            .model-slot-detail-row-value-edit {
+                                width: 60%;
+                                font-weight: 700;
+                                color: #f00;
+                                white-space: nowrap;
+                            }
+                            .model-slot-detail-row-button {
+                                width: 15%;
+                                height: 90%;
+                            }
+                        }
+                    }
+                    .model-slot-buttons {
+                        display: flex;
+                        flex-direction: column;
+                        border-bottom: solid 1px #a00;
+                        width: 20%;
+                        font-size: 0.8rem;
+                        padding: 4px;
+                    }
+                    .model-slot-button {
+                        user-select: none;
+                        border: solid 1px #999;
+                        border-radius: 2px;
+                        cursor: pointer;
+                        vertical-align: middle;
+                        text-align: center;
+                        padding: 1px;
+                        &:hover {
+                            border: solid 1px #000;
+                        }
+                    }
+                    .model-slot-button-disabled {
+                        user-select: none;
+                        border: solid 1px #999;
+                        border-radius: 2px;
+                        vertical-align: middle;
+                        background: #ddd;
+                    }
+                    .model-slot-button-active {
+                        user-select: none;
+                        border: solid 1px #333;
+                        border-radius: 2px;
+                        background: #ada;
+                    }
+                    .model-slot-button-stanby {
+                        user-select: none;
+                        border: solid 1px #999;
+                        border-radius: 2px;
+                        background: #aba;
+                        cursor: pointer;
+                        &:hover {
+                            border: solid 1px #000;
+                        }
+                    }
+                }
             }
         }
     }
