@@ -43,6 +43,12 @@ class MMVC_Rest_Fileuploader:
         self.router.add_api_route(
             "/update_model_default", self.post_update_model_default, methods=["POST"]
         )
+        self.router.add_api_route(
+            "/update_model_info", self.post_update_model_info, methods=["POST"]
+        )
+        self.router.add_api_route(
+            "/upload_model_assets", self.post_upload_model_assets, methods=["POST"]
+        )
 
     def post_upload_file(self, file: UploadFile = File(...), filename: str = Form(...)):
         res = upload_file(UPLOAD_DIR, file, filename)
@@ -126,5 +132,15 @@ class MMVC_Rest_Fileuploader:
 
     def post_update_model_default(self):
         info = self.voiceChangerManager.update_model_default()
+        json_compatible_item_data = jsonable_encoder(info)
+        return JSONResponse(content=json_compatible_item_data)
+
+    def post_update_model_info(self, newData: str = Form(...)):
+        info = self.voiceChangerManager.update_model_info(newData)
+        json_compatible_item_data = jsonable_encoder(info)
+        return JSONResponse(content=json_compatible_item_data)
+
+    def post_upload_model_assets(self, params: str = Form(...)):
+        info = self.voiceChangerManager.upload_model_assets(params)
         json_compatible_item_data = jsonable_encoder(info)
         return JSONResponse(content=json_compatible_item_data)

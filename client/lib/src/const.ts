@@ -254,8 +254,11 @@ export type RVCSampleModel = {
     credit: string
     description: string
     lang: string
-    tag: string
+    tag: string[]
     icon: string
+    f0: boolean
+    sampleRate: number
+    modelType: string
 }
 
 export const DefaultServerSetting: ServerInfo = {

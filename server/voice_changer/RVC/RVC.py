@@ -478,3 +478,44 @@ class RVC:
 
         json.dump(params, open(os.path.join(slotDir, "params.json"), "w"))
         self.loadSlots()
+
+    def update_model_info(self, newData: str):
+        print("[Voice Changer] UPDATE MODEL INFO", newData)
+        newDataDict = json.loads(newData)
+        try:
+            slotDir = os.path.join(
+                self.params.model_dir, RVC_MODEL_DIRNAME, str(newDataDict["slot"])
+            )
+        except Exception as e:
+            print("Exception::::", e)
+        params = json.load(
+            open(os.path.join(slotDir, "params.json"), "r", encoding="utf-8")
+        )
+        params[newDataDict["key"]] = newDataDict["val"]
+        json.dump(params, open(os.path.join(slotDir, "params.json"), "w"))
+        self.loadSlots()
+
+    def upload_model_assets(self, params: str):
+        print("[Voice Changer] UPLOAD ASSETS", params)
+        paramsDict = json.loads(params)
+        uploadPath = os.path.join(UPLOAD_DIR, paramsDict["file"])
+        storeDir = os.path.join(
+            self.params.model_dir, RVC_MODEL_DIRNAME, str(paramsDict["slot"])
+        )
+        storePath = os.path.join(
+            storeDir,
+            paramsDict["file"],
+        )
+        storeJson = os.path.join(
+            storeDir,
+            "params.json",
+        )
+        try:
+            shutil.move(uploadPath, storePath)
+            params = json.load(open(storeJson, "r", encoding="utf-8"))
+            params[paramsDict["name"]] = storePath
+            json.dump(params, open(storeJson, "w"))
+        except Exception as e:
+            print("Exception::::", e)
+
+        self.loadSlots()

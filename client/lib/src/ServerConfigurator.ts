@@ -188,6 +188,22 @@ export class ServerConfigurator {
         return await info
     }
 
+    uploadAssets = async (params: string) => {
+        const url = this.serverUrl + "/upload_model_assets"
+        const info = new Promise<ServerInfo>(async (resolve) => {
+            const formData = new FormData();
+            formData.append("params", params);
+
+            const request = new Request(url, {
+                method: 'POST',
+                body: formData,
+            });
+            const res = await (await fetch(request)).json() as ServerInfo
+            resolve(res)
+        })
+        return await info
+    }
+
     switchModelType = async (clinetType: ClientType) => {
         const url = this.serverUrl + "/model_type"
         const info = new Promise<ServerInfo>(async (resolve) => {
@@ -258,5 +274,23 @@ export class ServerConfigurator {
         return await info
     }
 
+    updateModelInfo = async (slot: number, key: string, val: string) => {
+        const url = this.serverUrl + "/update_model_info"
+        const newData = { slot, key, val }
+
+        const info = new Promise<ServerInfo>(async (resolve) => {
+            const formData = new FormData();
+            formData.append("newData", JSON.stringify(newData));
+
+            const request = new Request(url, {
+                method: 'POST',
+                body: formData,
+            });
+            const res = await (await fetch(request)).json() as ServerInfo
+            console.log("RESPONSE", res)
+            resolve(res)
+        })
+        return await info
+    }
 
 }

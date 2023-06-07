@@ -28,6 +28,10 @@ export const ModelSlotManagerDialog = () => {
     const [lang, setLang] = useState<string>("All")
     const [sampleId, setSampleId] = useState<string>("")
 
+
+    /////////////////////////////////////////
+    // Slot Manager
+    /////////////////////////////////////////
     const localFileContent = useMemo(() => {
         if (mode != "localFile") {
             return <></>
@@ -125,39 +129,71 @@ export const ModelSlotManagerDialog = () => {
                 }
             }
 
+
+            const isRegisterd = modelFileName.length > 0 ? true : false
+            const name = x.name && x.name.length > 0 ? x.name : isRegisterd ? modelFileName : "blank"
             const termOfUseUrlLink = x.termsOfUseUrl.length > 0 ? <a href={x.termsOfUseUrl} target="_blank" rel="noopener noreferrer" className="body-item-text-small">[terms of use]</a> : <></>
 
-            const fileValueClass = (uploadData?.slot == index) ? "model-slot-detail-row-value-edit" : "model-slot-detail-row-value"
+            const nameValueClass = isRegisterd ? "model-slot-detail-row-value-pointable" : "model-slot-detail-row-value"
+            const nameValueAction = isRegisterd ? async (index: number) => {
+                const name = window.prompt("input new name", "");
+                if (!name) {
+                    return
+                }
+                await serverSetting.updateModelInfo(index, "name", name)
+                console.log(name)
+            } : async (_index: number) => { }
+            const iconClass = isRegisterd ? "model-slot-icon-pointable" : "model-slot-icon"
+            const iconAction = isRegisterd ? async (index: number) => {
+                const file = await fileSelector("")
+                if (checkExtention(file.name, ["png", "jpg", "jpeg", "gif"]) == false) {
+                    alert(`モデルファイルの拡張子は".png", ".jpg", ".jpeg", ".gif"である必要があります。`)
+                    return
+                }
+                await serverSetting.uploadAssets(index, "iconFile", file)
+            } : async (_index: number) => { }
+
+            const fileValueClass = (uploadData?.slot == index) ? "model-slot-detail-row-value-edit" : isRegisterd ? "model-slot-detail-row-value-download" : "model-slot-detail-row-value"
+            const fileValueAction = (uploadData?.slot == index) ? (url: string) => {
+            } : (url: string) => {
+                const link = document.createElement("a")
+                link.href = url
+                link.download = url.replace(/^.*[\\\/]/, '')
+                link.click()
+            }
 
             const iconUrl = x.modelFile && x.modelFile.length > 0 ? (x.iconFile && x.iconFile.length > 0 ? x.iconFile : "/assets/icons/noimage.png") : "/assets/icons/blank.png"
 
             return (
                 <div key={index} className="model-slot">
-                    <img src={iconUrl} className="model-slot-icon"></img>
+                    <img src={iconUrl} className={iconClass} onClick={() => { iconAction(index) }}></img>
                     <div className="model-slot-detail">
                         <div className="model-slot-detail-row">
                             <div className="model-slot-detail-row-label">[{index}]</div>
-                            <div className="model-slot-detail-row-value">{x.name}</div>
+                            <div className={nameValueClass} onClick={() => { nameValueAction(index) }}>{name}</div>
                             <div className="">{termOfUseUrlLink}</div>
                         </div>
                         <div className="model-slot-detail-row">
                             <div className="model-slot-detail-row-label">model:</div>
-                            <div className={fileValueClass}>{modelFileName}</div>
+                            <div className={fileValueClass} onClick={() => { fileValueAction(x.modelFile) }}>{modelFileName}</div>
                             <div className="model-slot-button  model-slot-detail-row-button" onClick={() => { onRVCModelLoadClicked(index) }}>select</div>
                         </div>
                         <div className="model-slot-detail-row">
                             <div className="model-slot-detail-row-label">index:</div>
-                            <div className={fileValueClass}>{indexFileName}</div>
+                            <div className={fileValueClass} onClick={() => { fileValueAction(x.indexFile) }}>{indexFileName}</div>
                             <div className="model-slot-button model-slot-detail-row-button" onClick={() => { onRVCIndexLoadClicked(index) }}>select</div>
                         </div>
                         <div className="model-slot-detail-row">
                             <div className="model-slot-detail-row-label">info: </div>
-                            <div className="model-slot-detail-row-value">f0, 40k, 768, onnx, tune, i-rate, p-rate</div>
+                            <div className="model-slot-detail-row-value">{x.f0 ? "f0" : "nof0"}, {x.samplingRate}, {x.embChannels}, {x.modelType}, {x.defaultTune}, {x.defaultIndexRatio}, {x.defaultProtect}</div>
                             <div className=""></div>
                         </div>
                     </div>
                     <div className="model-slot-buttons">
-                        <div className="model-slot-button" onClick={() => { onOpenSampleDownloadDialog(index) }}>from net</div>
+                        {(uploadData?.slot == index) && (uploadData.model != null) ?
+                            <div></div> :
+                            <div className="model-slot-button" onClick={() => { onOpenSampleDownloadDialog(index) }}>DL sample&gt;&gt; </div>
+                        }
 
                         {(uploadData?.slot == index) && (uploadData.model != null) ?
                             <div className="model-slot-button" onClick={onUploadClicked}>upload</div> : <div></div>
@@ -166,7 +202,7 @@ export const ModelSlotManagerDialog = () => {
                             <div className="model-slot-button" onClick={onClearClicked}>clear</div> : <div></div>
                         }
                         {(uploadData?.slot == index) && (uploadData.model != null) ?
-                            <div>%</div> : <div></div>
+                            <div>{serverSetting.uploadProgress.toFixed(1)}%</div> : <div></div>
                         }
 
 
@@ -185,14 +221,16 @@ export const ModelSlotManagerDialog = () => {
         mode,
         serverSetting.serverSetting.modelSlots,
         serverSetting.fileUploadSettings,
+        serverSetting.uploadProgress,
         serverSetting.setFileUploadSetting,
         serverSetting.loadModel,
         uploadData
     ])
 
 
-
-
+    /////////////////////////////////////////
+    // Sample Downloader
+    /////////////////////////////////////////
     const fromNetContent = useMemo(() => {
         if (mode != "fromNet") {
             return <></>
@@ -236,7 +274,7 @@ export const ModelSlotManagerDialog = () => {
                             </div>
                             <div className="model-slot-detail-row">
                                 <div className="model-slot-detail-row-label">info: </div>
-                                <div className="model-slot-detail-row-value">f0, 40k, 768, onnx, tune, i-rate, p-rate</div>
+                                <div className="model-slot-detail-row-value">{x.modelType},{x.f0 ? "f0" : "nof0"},{x.sampleRate}</div>
                                 <div className=""></div>
                             </div>
                         </div>
@@ -249,8 +287,8 @@ export const ModelSlotManagerDialog = () => {
         )
 
         return (
-            <div>
-                <div>Select Sample for Slot[{fromNetTargetIndex}]  <span onClick={() => { setMode("localFile") }}>back</span></div>
+            <div className="">
+                <div className="model-slot-header">Select Sample for Slot[{fromNetTargetIndex}]  <span onClick={() => { setMode("localFile") }} className="model-slot-header-button">&lt;&lt;back</span></div>
                 <div>Lang:
                     <select value={lang} onChange={(e) => { setLang(e.target.value) }}>
                         {langOptions}

@@ -726,6 +726,23 @@ body {
         .dialog-fixed-size-content {
             width: 90%;
             max-height: 70vh;
+            .model-slot-header {
+                font-weight: 700;
+                .model-slot-header-button {
+                    font-weight: 400;
+                    font-size: 0.8rem;
+                    user-select: none;
+                    border: solid 1px #999;
+                    border-radius: 2px;
+                    cursor: pointer;
+                    vertical-align: middle;
+                    text-align: center;
+                    padding: 1px;
+                    &:hover {
+                        border: solid 1px #000;
+                    }
+                }
+            }
             .model-slot-container {
                 max-height: 60vh;
                 width: 100%;
@@ -737,6 +754,11 @@ body {
                     .model-slot-icon {
                         width: 5rem;
                         height: 5rem;
+                    }
+                    .model-slot-icon-pointable {
+                        width: 5rem;
+                        height: 5rem;
+                        cursor: pointer;
                     }
                     .model-slot-detail {
                         display: flex;
@@ -753,6 +775,16 @@ body {
                             .model-slot-detail-row-value {
                                 width: 60%;
                                 white-space: nowrap;
+                            }
+                            .model-slot-detail-row-value-download {
+                                width: 60%;
+                                white-space: nowrap;
+                                cursor: pointer;
+                            }
+                            .model-slot-detail-row-value-pointable {
+                                width: 60%;
+                                white-space: nowrap;
+                                cursor: pointer;
                             }
                             .model-slot-detail-row-value-edit {
                                 width: 60%;

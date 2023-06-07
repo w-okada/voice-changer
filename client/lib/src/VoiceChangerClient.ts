@@ -279,6 +279,9 @@ export class VoiceChangerClient {
     updateModelDefault = async () => {
         return this.configurator.updateModelDefault()
     }
+    updateModelInfo = async (slot: number, key: string, val: string) => {
+        return this.configurator.updateModelInfo(slot, key, val)
+    }
 
     updateServerSettings = (key: ServerSettingKey, val: string) => {
         return this.configurator.updateSettings(key, val)
@@ -298,6 +301,9 @@ export class VoiceChangerClient {
         params: string,
     ) => {
         return this.configurator.loadModel(slot, isHalf, params)
+    }
+    uploadAssets = (params: string) => {
+        return this.configurator.uploadAssets(params)
     }
 
     //##  Worklet ##//

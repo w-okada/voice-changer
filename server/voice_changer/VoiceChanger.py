@@ -608,6 +608,20 @@ class VoiceChanger:
         self.voiceChanger.update_model_default()
         return self.get_info()
 
+    def update_model_info(self, newData: str):
+        if self.voiceChanger is None:
+            print("[Voice Changer] Voice Changer is not selected.")
+            return
+        self.voiceChanger.update_model_info(newData)
+        return self.get_info()
+
+    def upload_model_assets(self, params: str):
+        if self.voiceChanger is None:
+            print("[Voice Changer] Voice Changer is not selected.")
+            return
+        self.voiceChanger.upload_model_assets(params)
+        return self.get_info()
+
 
 PRINT_CONVERT_PROCESSING: bool = False
 # PRINT_CONVERT_PROCESSING = True

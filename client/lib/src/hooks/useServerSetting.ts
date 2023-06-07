@@ -10,6 +10,12 @@ type ModelData = {
     filename?: string
 }
 
+export const ModelAssetName = {
+    iconFile: "iconFile"
+} as const
+export type ModelAssetName = typeof ModelAssetName[keyof typeof ModelAssetName]
+
+
 export type FileUploadSetting = {
     isHalf: boolean
     uploaded: boolean
@@ -76,8 +82,12 @@ export const InitialFileUploadSetting: FileUploadSetting = {
     ddspSvcModelConfig: null,
     ddspSvcDiffusion: null,
     ddspSvcDiffusionConfig: null,
+}
 
-
+type AssetUploadSetting = {
+    slot: number
+    name: ModelAssetName
+    file: string
 }
 
 export type UseServerSettingProps = {
@@ -100,7 +110,8 @@ export type ServerSettingState = {
     getOnnx: () => Promise<OnnxExporterInfo>
     mergeModel: (request: MergeModelRequest) => Promise<ServerInfo>
     updateModelDefault: () => Promise<ServerInfo>
-
+    updateModelInfo: (slot: number, key: string, val: string) => Promise<ServerInfo>
+    uploadAssets: (slot: number, name: ModelAssetName, file: File) => Promise<void>
 }
 
 export const useServerSetting = (props: UseServerSettingProps): ServerSettingState => {
@@ -501,6 +512,25 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
 
 
 
+    const uploadAssets = useMemo(() => {
+        return async (slot: number, name: ModelAssetName, file: File) => {
+            if (!props.voiceChangerClient) return
+
+            await _uploadFile2(file, (progress: number, _end: boolean) => {
+                console.log(progress, _end)
+            })
+            const assetUploadSetting: AssetUploadSetting = {
+                slot,
+                name,
+                file: file.name
+            }
+            await props.voiceChangerClient.uploadAssets(JSON.stringify(assetUploadSetting))
+            reloadServerInfo()
+        }
+    }, [fileUploadSettings, props.voiceChangerClient, props.clientType])
+
+
+
     const reloadServerInfo = useMemo(() => {
         return async () => {
 
@@ -538,6 +568,11 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         setServerSetting(serverInfo)
         return serverInfo
     }
+    const updateModelInfo = async (slot: number, key: string, val: string) => {
+        const serverInfo = await props.voiceChangerClient!.updateModelInfo(slot, key, val)
+        setServerSetting(serverInfo)
+        return serverInfo
+    }
 
     return {
         serverSetting,
@@ -553,5 +588,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         getOnnx,
         mergeModel,
         updateModelDefault,
+        updateModelInfo,
+        uploadAssets
     }
 }

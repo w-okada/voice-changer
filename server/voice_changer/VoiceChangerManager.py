@@ -69,3 +69,9 @@ class VoiceChangerManager(object):
 
     def update_model_default(self):
         return self.voiceChanger.update_model_default()
+
+    def update_model_info(self, newData: str):
+        return self.voiceChanger.update_model_info(newData)
+
+    def upload_model_assets(self, params: str):
+        return self.voiceChanger.upload_model_assets(params)
