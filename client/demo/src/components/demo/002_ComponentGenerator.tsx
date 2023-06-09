@@ -57,6 +57,9 @@ import { SampleModelSelectRow, SampleModelSelectRowProps } from "./components/30
 import { SampleDownloadControlRow, SampleDownloadControlRowProps } from "./components/301-k_SampleDownloadControl"
 import { IndexRatioRow, IndexRatioRowProps } from "./components/609_IndexRatioRow copy"
 import { ProtectRow, ProtectRowProps } from "./components/610_ProtectRow"
+import { ModelSlotArea, ModelSlotAreaProps } from "./components2/100_ModelSlotArea"
+import { CharacterArea, CharacterAreaProps } from "./components2/101_CharacterArea"
+import { ConfigArea, ConfigAreaProps } from "./components2/102_ConfigArea"
 
 export const catalog: { [key: string]: (props: any) => JSX.Element } = {}
 
@@ -152,6 +155,10 @@ const initialize = () => {
 
 
     addToCatalog("mergeLab", (props: MergeLabRowProps) => { return <MergeLabRow {...props} /> })
+    addToCatalog("modelSlotArea", (props: ModelSlotAreaProps) => { return <ModelSlotArea {...props} /> })
+    addToCatalog("characterArea", (props: CharacterAreaProps) => { return <CharacterArea {...props} /> })
+    addToCatalog("configArea", (props: ConfigAreaProps) => { return <ConfigArea {...props} /> })
+
 
 }
 

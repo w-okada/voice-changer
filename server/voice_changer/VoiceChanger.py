@@ -341,6 +341,15 @@ class VoiceChanger:
         data = asdict(self.settings)
         if self.voiceChanger is not None:
             data.update(self.voiceChanger.get_info())
+
+        devCount = torch.cuda.device_count()
+        gpus = []
+        for id in range(devCount):
+            name = torch.cuda.get_device_name(id)
+            memory = torch.cuda.get_device_properties(id).total_memory
+            gpu = {"id": id, "name": name, "memory": memory}
+            gpus.append(gpu)
+        data["gpus"] = gpus
         return data
 
     def get_performance(self):

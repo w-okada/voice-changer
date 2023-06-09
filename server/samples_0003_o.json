@@ -38,7 +38,7 @@
       "modelUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc_v2_alpha/tokina_shigure/tokina_shigure_v2_40k_e100_simple.onnx",
       "indexUrl": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc_v2_alpha/tokina_shigure/added_IVF2736_Flat_nprobe_1_v2.index.bin",
       "termsOfUseUrl": "https://huggingface.co/wok000/vcclient_model/raw/main/rvc_v2_alpha/tokina_shigure/terms_of_use.txt",
-      "icon": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc_v2_alpha/tokina_shigure/dummy.png",
+      "icon": "https://huggingface.co/wok000/vcclient_model/resolve/main/rvc_v2_alpha/tokina_shigure/tokina_shigure.png",
       "credit": "刻鳴時雨",
       "description": "",
       "sampleRate": 40000,

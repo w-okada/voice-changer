@@ -960,3 +960,341 @@ body {
         }
     }
 }
+.model-slot-area {
+    display: inline-block;
+    background: var(--company-color2);
+    border-radius: 10px;
+    padding: 20px;
+    .model-slot-panel {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+        .model-slot-tiles-container {
+            display: flex;
+            flex-direction: row;
+            gap: 2px;
+            flex-wrap: wrap;
+            /* width: calc(30rem + 40px + 10px); */
+        }
+
+        .model-slot-buttons {
+            display: flex;
+            flex-direction: column-reverse;
+            .model-slot-button {
+                border: solid 2px #999;
+                color: white;
+                font-size: 0.8rem;
+                border-radius: 2px;
+                background: #333;
+                cursor: pointer;
+                padding: 5px;
+            }
+            .model-slot-button:hover {
+                border: solid 2px #faa;
+            }
+        }
+    }
+}
+.model-slot-tile-container,
+.model-slot-tile-container-selected {
+    width: 6rem;
+    height: 6rem;
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.model-slot-tile-container-selected {
+    background: #43030c;
+}
+.model-slot-tile-container:hover {
+    background: #43030c;
+}
+
+.model-slot-tile-icon-div {
+    width: 5rem;
+    height: 5rem;
+    padding-top: 4px;
+}
+.model-slot-tile-icon {
+    width: 5rem;
+    height: 5rem;
+    object-fit: contain;
+    border-radius: 10px;
+}
+.model-slot-tile-icon-no-entry {
+    color: gray;
+}
+.model-slot-tile-dscription {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: navajowhite;
+    padding-top: 4px;
+}
+
+.character-area {
+    display: flex;
+    gap: 5px;
+    padding: 20px;
+    .portrait-area {
+        width: 20rem;
+        height: 20rem;
+        .portrait-container {
+            position: relative;
+            width: 20rem;
+            height: 20rem;
+            .portrait {
+                width: 20rem;
+                height: 20rem;
+                object-fit: contain;
+                border-radius: 10px;
+                position: absolute;
+            }
+            .portrait-area-status {
+                width: 5rem;
+                background: rgba(100, 100, 100, 0.5);
+                color: white;
+                position: absolute;
+                paddig: 2px;
+                font-size: 0.7rem;
+                left: 5px;
+                top: 5px;
+                border-radius: 2px;
+            }
+            .portrait-area-terms-of-use {
+                width: 5rem;
+                background: rgba(100, 100, 100, 0.5);
+                color: white;
+                position: absolute;
+                paddig: 2px;
+                font-size: 0.7rem;
+                right: 5px;
+                bottom: 5px;
+                .portrait-area-terms-of-use-link {
+                    color: white;
+                }
+            }
+        }
+    }
+    .character-area-control-area {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        .character-area-control {
+            display: flex;
+            gap: 3px;
+            .character-area-control-buttons {
+                display: flex;
+                flex-direction: row;
+                gap: 10px;
+                .character-area-control-button-active {
+                    width: 5rem;
+                    border: solid 1px #333;
+                    border-radius: 2px;
+                    background: #ada;
+                    font-weight: 700;
+                    text-align: center;
+                }
+                .character-area-control-button-stanby {
+                    width: 5rem;
+                    border: solid 1px #999;
+                    border-radius: 2px;
+                    background: #aba;
+                    cursor: pointer;
+                    font-weight: 700;
+                    text-align: center;
+                    &:hover {
+                        border: solid 1px #000;
+                    }
+                }
+            }
+            .character-area-control-title {
+                width: 3rem;
+                font-weight: 700;
+            }
+            .character-area-control-field {
+                /* width: 20rem; */
+                display: flex;
+                flex-direction: column;
+
+                .character-area-slider-control {
+                    display: flex;
+                    flex-direction: row;
+                    .character-area-slider-control-kind {
+                        width: 2rem;
+                    }
+                    .character-area-slider-control-slider {
+                        width: 10rem;
+                    }
+                    .character-area-slider-control-val {
+                        width: 3rem;
+                    }
+                }
+                .character-area-buuttons {
+                    display: flex;
+                    flex-direction: row;
+                    gap: 5px;
+                    .character-area-buutton {
+                        border: solid 2px #999;
+                        color: white;
+                        font-size: 0.8rem;
+                        border-radius: 2px;
+                        background: #666;
+                        cursor: pointer;
+                        padding: 5px;
+                    }
+                    .character-area-buutton:hover {
+                        border: solid 2px #faa;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* audio::-webkit-media-controls-play-button,
+audio::-webkit-media-controls-panel {
+    background-color: #ff0;
+    height: 1rem;
+}
+audio::-webkit-media-controls-enclosure {
+    max-height: 1rem;
+}
+audio::-webkit-media-controls {
+    justify-content: start;
+}
+audio::-webkit-media-controls-overlay-enclosure{
+    height: 1rem;
+} */
+
+.config-area {
+    display: flex;
+    gap: 5px;
+    padding: 20px;
+    .config-sub-area {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        .config-sub-area-control {
+            display: flex;
+            .config-sub-area-control-title {
+                width: 5rem;
+                font-weight: 700;
+            }
+            .config-sub-area-control-title-long {
+                width: 20rem;
+                font-weight: 700;
+            }
+            .config-sub-area-control-field {
+                width: 15rem;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                .config-sub-area-noise-container {
+                    display: flex;
+                    gap: 10px;
+                    .config-sub-area-noise-checkbox-container {
+                        display: flex;
+                        gap: 5px;
+                    }
+                }
+
+                .config-sub-area-slider-control {
+                    display: flex;
+                    flex-direction: row;
+                    .config-sub-area-slider-control-kind {
+                        width: 1rem;
+                    }
+                    .config-sub-area-slider-control-slider {
+                        width: 10rem;
+                    }
+                    .config-sub-area-slider-control-val {
+                        width: 3rem;
+                    }
+                }
+                .config-sub-area-buuttons {
+                    display: flex;
+                    flex-direction: row;
+                    gap: 5px;
+                    align-items: center;
+                    .config-sub-area-buutton {
+                        border: solid 2px #999;
+                        color: white;
+                        background: #666;
+
+                        cursor: pointer;
+
+                        font-size: 0.8rem;
+                        border-radius: 5px;
+                        height: 1.2rem;
+                        padding-left: 2px;
+                        padding-right: 2px;
+                    }
+                    .config-sub-area-buutton:hover {
+                        border: solid 2px #faa;
+                    }
+                    .config-sub-area-buutton-active {
+                        border: solid 2px #999;
+                        color: white;
+                        background: #844;
+
+                        cursor: pointer;
+
+                        font-size: 0.8rem;
+                        border-radius: 5px;
+                        height: 1.2rem;
+                        padding-left: 2px;
+                        padding-right: 2px;
+                    }
+                }
+                .config-sub-area-control-field-auido-io {
+                    display: flex;
+                    flex-direction: row;
+                    .config-sub-area-control-field-auido-io-filter {
+                        max-width: 30%;
+                    }
+                    .config-sub-area-control-field-auido-io-select {
+                        max-width: 70%;
+                    }
+                }
+                .config-sub-area-control-field-wav-file {
+                    display: flex;
+                    flex-direction: row;
+                    gap: 5px;
+                    .config-sub-area-control-field-wav-file-audio-container {
+                        height: 1rem;
+                        .config-sub-area-control-field-wav-file-audio {
+                            height: 1rem;
+                            width: 15rem;
+                        }
+                    }
+                    .config-sub-area-control-field-wav-file-folder {
+                        height: 1rem;
+                        width: 1rem;
+                        cursor: pointer;
+                    }
+                    .config-sub-area-control-field-wav-file-echoback-button {
+                        border: solid 1px #333;
+                        background: #fff;
+                        font-size: 0.8rem;
+                        border-radius: 5px;
+                        height: 1.2rem;
+                        padding-left: 2px;
+                        padding-right: 2px;
+                        cursor: pointer;
+                    }
+                    .config-sub-area-control-field-wav-file-echoback-button-active {
+                        font-size: 0.8rem;
+                        border: solid 1px #333;
+                        border-radius: 5px;
+                        background: #ada;
+                        height: 1.2rem;
+                        padding-left: 2px;
+                        padding-right: 2px;
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
+    }
+}

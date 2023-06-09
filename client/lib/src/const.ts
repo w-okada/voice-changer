@@ -237,6 +237,11 @@ export type ServerInfo = VoiceChangerServerSetting & {
     serverAudioInputDevices: ServerAudioDevice[]
     serverAudioOutputDevices: ServerAudioDevice[]
     sampleModels: RVCSampleModel[]
+    gpus: {
+        id: number,
+        name: string,
+        memory: number,
+    }[]
 
 }
 
@@ -308,6 +313,7 @@ export const DefaultServerSetting: ServerInfo = {
     silenceFront: 1,
     modelSlotIndex: 0,
     sampleModels: [],
+    gpus: [],
 
     useEnhancer: 0,
     useDiff: 1,

@@ -16,70 +16,8 @@
                 "options": {}
             }
         ],
-        "serverControl": [
-            {
-                "name": "startButton",
-                "options": {}
-            },
-            {
-                "name": "performance",
-                "options": {}
-            },
-            {
-                "name": "modelSwitch",
-                "options": {}
-            },
-            {
-                "name": "serverOperation",
-                "options": {
-                    "showDownload": true,
-                    "showExportOnnx": true,
-                    "showReload": true
-                }
-            }
-        ],
-        "modelSetting": [
-            {
-                "name": "modelUploaderv2",
-                "options": {}
-            },
-            {
-                "name": "modelSlotRow2",
-                "options": {}
-            },
-            {
-                "name": "commonFileSelect",
-                "options": {
-                    "title": "Model(.onnx, .pt, pth)",
-                    "acceptExtentions": ["onnx", "pth", "pt"],
-                    "fileKind": "rvcModel"
-                }
-            },
-            {
-                "name": "commonFileSelect",
-                "options": {
-                    "title": "index(.index)",
-                    "acceptExtentions": ["index"],
-                    "fileKind": "rvcIndex"
-                }
-            },
-            {
-                "name": "sampleModelSelect",
-                "options": {}
-            },
-            {
-                "name": "sampleDownloadControlRow",
-                "options": {}
-            },
-            {
-                "name": "defaultTuneRow2",
-                "options": {}
-            },
-            {
-                "name": "modelUploadButtonRow2",
-                "options": {}
-            }
-        ],
+        "serverControl": [],
+        "modelSetting": [],
         "lab": [
             {
                 "name": "mergeLab",
@@ -87,72 +25,10 @@
             }
         ],
 
-        "deviceSetting": [
-            {
-                "name": "audioDeviceMode",
-                "options": {}
-            },
-            {
-                "name": "audioInput",
-                "options": {}
-            },
-            {
-                "name": "audioOutput",
-                "options": {}
-            }
-        ],
-        "qualityControl": [
-            {
-                "name": "noiseControl",
-                "options": {}
-            },
-            {
-                "name": "gainControl",
-                "options": {}
-            },
-            {
-                "name": "f0Detector",
-                "options": {
-                    "detectors": ["dio", "harvest", "crepe"]
-                }
-            },
-            {
-                "name": "divider",
-                "options": {}
-            },
-            {
-                "name": "analyzer",
-                "options": {}
-            }
-        ],
-        "speakerSetting": [
-            {
-                "name": "tune",
-                "options": {}
-            },
-            {
-                "name": "indexRatio",
-                "options": {}
-            },
-            {
-                "name": "silentThreshold",
-                "options": {}
-            }
-        ],
-        "converterSetting": [
-            {
-                "name": "inputChunkNum",
-                "options": {}
-            },
-            {
-                "name": "extraDataLength",
-                "options": {}
-            },
-            {
-                "name": "gpu",
-                "options": {}
-            }
-        ],
+        "deviceSetting": [],
+        "qualityControl": [],
+        "speakerSetting": [],
+        "converterSetting": [],
         "advancedSetting": [
             {
                 "name": "protocol",
@@ -181,6 +57,23 @@
             {
                 "name": "protect",
                 "options": {}
+            }
+        ],
+        "modelSlotControl": [
+            {
+                "name": "modelSlotArea",
+                "options": {}
+            },
+            {
+                "name": "characterArea",
+                "options": {}
+            },
+            {
+                "name": "configArea",
+                "options": {
+                    "detectors": ["dio", "harvest", "crepe"],
+                    "inputChunkNums": [8, 16, 24, 32, 40, 48, 64, 80, 96, 112, 128, 192, 256, 320, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960, 1024, 2048]
+                }
             }
         ]
     },

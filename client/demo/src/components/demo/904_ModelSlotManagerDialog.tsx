@@ -1,8 +1,5 @@
 import React, { useMemo, useState } from "react";
 import { useGuiState } from "./001_GuiStateProvider";
-import { getMessage } from "./messages/MessageBuilder";
-import { isDesktopApp } from "../../const";
-import { useAppRoot } from "../../001_provider/001_AppRootProvider";
 import { useAppState } from "../../001_provider/001_AppStateProvider";
 import { InitialFileUploadSetting, fileSelector } from "@dannadori/voice-changer-client-js";
 
@@ -26,7 +23,6 @@ export const ModelSlotManagerDialog = () => {
     const [mode, setMode] = useState<Mode>("localFile")
     const [fromNetTargetIndex, setFromNetTargetIndex] = useState<number>(0)
     const [lang, setLang] = useState<string>("All")
-    const [sampleId, setSampleId] = useState<string>("")
 
 
     /////////////////////////////////////////
@@ -34,6 +30,9 @@ export const ModelSlotManagerDialog = () => {
     /////////////////////////////////////////
     const localFileContent = useMemo(() => {
         if (mode != "localFile") {
+            return <></>
+        }
+        if (!serverSetting.serverSetting.modelSlots) {
             return <></>
         }
 
@@ -154,13 +153,13 @@ export const ModelSlotManagerDialog = () => {
             } : async (_index: number) => { }
 
             const fileValueClass = (uploadData?.slot == index) ? "model-slot-detail-row-value-edit" : isRegisterd ? "model-slot-detail-row-value-download" : "model-slot-detail-row-value"
-            const fileValueAction = (uploadData?.slot == index) ? (url: string) => {
-            } : (url: string) => {
+            const fileValueAction = (uploadData?.slot == index) ? (_url: string) => {
+            } : isRegisterd ? (url: string) => {
                 const link = document.createElement("a")
                 link.href = url
                 link.download = url.replace(/^.*[\\\/]/, '')
                 link.click()
-            }
+            } : (_url: string) => { }
 
             const iconUrl = x.modelFile && x.modelFile.length > 0 ? (x.iconFile && x.iconFile.length > 0 ? x.iconFile : "/assets/icons/noimage.png") : "/assets/icons/blank.png"
 

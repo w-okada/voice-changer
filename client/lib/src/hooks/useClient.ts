@@ -159,8 +159,10 @@ export const useClient = (props: UseClientProps): ClientState => {
             return
         }
         const audio = document.getElementById(elemId) as HTMLAudioElement
-        audio.srcObject = voiceChangerClientRef.current.stream
-        audio.play()
+        if (audio.paused) {
+            audio.srcObject = voiceChangerClientRef.current.stream
+            audio.play()
+        }
     }
 
     // (2-2) 情報リロード

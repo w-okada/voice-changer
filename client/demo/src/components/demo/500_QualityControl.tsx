@@ -22,6 +22,9 @@ export const QualityControl = () => {
     }, []);
 
     const deviceSetting = useMemo(() => {
+        if (componentSettings.length == 0) {
+            return <></>
+        }
         const components = componentSettings.map((x, index) => {
             const c = generateComponent(x.name, x.options)
             return <div key={`${x.name}_${index}`}>{c}</div>

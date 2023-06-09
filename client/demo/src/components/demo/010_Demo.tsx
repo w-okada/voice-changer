@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { GuiStateProvider } from "./001_GuiStateProvider";
 import { Dialogs } from "./900_Dialogs";
 import { TitleArea } from "./100_TitleArea";
@@ -10,6 +10,7 @@ import { SpeakerSetting } from "./600_SpeakerSetting";
 import { ConverterSetting } from "./700_ConverterSetting";
 import { AdvancedSetting } from "./800_AdvancedSetting";
 import { Lab } from "./a00_Lab";
+import { ModelSlotControl } from "./b00_ModelSlotControl";
 
 export const Demo = () => {
     return (
@@ -17,6 +18,7 @@ export const Demo = () => {
             <div className="main-body">
                 <Dialogs />
                 <TitleArea />
+                <ModelSlotControl></ModelSlotControl>
                 <ServerControl />
                 <ModelSetting />
                 <SpeakerSetting />

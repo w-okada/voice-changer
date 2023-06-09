@@ -28,6 +28,10 @@ class MMVC_SocketIOApp:
                         "filename": f"{getFrontendPath()}/assets/icons/tool.svg",
                         "content_type": "image/svg+xml",
                     },
+                    "/assets/icons/folder.svg": {
+                        "filename": f"{getFrontendPath()}/assets/icons/folder.svg",
+                        "content_type": "image/svg+xml",
+                    },
                     "/buymeacoffee.png": {
                         "filename": f"{getFrontendPath()}/assets/buymeacoffee.png",
                         "content_type": "image/png",
