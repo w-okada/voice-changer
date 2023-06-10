@@ -11,7 +11,8 @@ export type DeviceAreaProps = {
 export const DeviceArea = (_props: DeviceAreaProps) => {
     const { clientSetting, serverSetting, workletNodeSetting, audioContext, setAudioOutputElementId, initializedRef } = useAppState()
     const { isConverting, audioInputForGUI, inputAudioDeviceInfo, setAudioInputForGUI, fileInputEchoback, setFileInputEchoback, setAudioOutputForGUI, audioOutputForGUI, outputAudioDeviceInfo } = useGuiState()
-    const [hostApi, setHostApi] = useState<string>("ALL")
+    const [inputHostApi, setInputHostApi] = useState<string>("ALL")
+    const [outputHostApi, setOutputHostApi] = useState<string>("ALL")
     const audioSrcNode = useRef<MediaElementAudioSourceNode>()
     const { appGuiSettingState } = useAppRoot()
     const clientType = appGuiSettingState.appGuiSetting.id
@@ -111,7 +112,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
         const hostAPIOptions = Array.from(hostAPIs).map((x, index) => { return <option value={x} key={index} >{x}</option> })
 
         const filteredDevice = devices.map((x, index) => {
-            if (hostApi != "ALL" && x.hostAPI != hostApi) {
+            if (inputHostApi != "ALL" && x.hostAPI != inputHostApi) {
                 return null
             }
             return <option value={x.index} key={index}>[{x.hostAPI}]{x.name}</option>
@@ -122,7 +123,8 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                 <div className="config-sub-area-control-title left-padding-1">input</div>
                 <div className="config-sub-area-control-field">
                     <div className="config-sub-area-control-field-auido-io">
-                        <select className="config-sub-area-control-field-auido-io-filter" name="kinds" id="kinds" value={hostApi} onChange={(e) => { setHostApi(e.target.value) }}>
+                        <select className="config-sub-area-control-field-auido-io-filter" name="kinds" id="kinds" value={inputHostApi} onChange={(e) => { setInputHostApi(e.target.value) }}>
+                            <option value="ALL" key="ALL" >ALL</option>
                             {hostAPIOptions}
                         </select>
                         <select className="config-sub-area-control-field-auido-io-select" value={serverSetting.serverSetting.serverInputDeviceId} onChange={(e) => {
@@ -136,7 +138,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
             </div>
         )
 
-    }, [hostApi, serverSetting.serverSetting, serverSetting.updateServerSettings, serverSetting.serverSetting.enableServerAudio])
+    }, [inputHostApi, serverSetting.serverSetting, serverSetting.updateServerSettings, serverSetting.serverSetting.enableServerAudio])
 
     // (2-3) File
     useEffect(() => {
@@ -306,23 +308,24 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
         const hostAPIs = new Set(devices.map(x => { return x.hostAPI }))
         const hostAPIOptions = Array.from(hostAPIs).map((x, index) => { return <option value={x} key={index} >{x}</option> })
 
-        // const filteredDevice = devices.filter(x => { return x.hostAPI == hostApi || hostApi == "" }).map((x, index) => { return <option value={x.index} key={index}>{x.name}</option> })
         const filteredDevice = devices.map((x, index) => {
-            const className = (x.hostAPI == hostApi || hostApi == "") ? "select-option-red" : ""
-            return <option className={className} value={x.index} key={index}>[{x.hostAPI}]{x.name}</option>
-        })
+            if (outputHostApi != "ALL" && x.hostAPI != outputHostApi) {
+                return null
+            }
+            return <option value={x.index} key={index}>[{x.hostAPI}]{x.name}</option>
+        }).filter(x => x != null)
 
         return (
             <div className="config-sub-area-control">
                 <div className="config-sub-area-control-title left-padding-1">output</div>
                 <div className="config-sub-area-control-field">
                     <div className="config-sub-area-control-field-auido-io">
-                        <select className="config-sub-area-control-field-auido-io-filter" name="kinds" id="kinds" value={hostApi} onChange={(e) => { setHostApi(e.target.value) }}>
+                        <select className="config-sub-area-control-field-auido-io-filter" name="kinds" id="kinds" value={outputHostApi} onChange={(e) => { setOutputHostApi(e.target.value) }}>
+                            <option value="ALL" key="ALL" >ALL</option>
                             {hostAPIOptions}
                         </select>
                         <select className="config-sub-area-control-field-auido-io-select" value={serverSetting.serverSetting.serverOutputDeviceId} onChange={(e) => {
                             serverSetting.updateServerSettings({ ...serverSetting.serverSetting, serverOutputDeviceId: Number(e.target.value) })
-
                         }}>
                             {filteredDevice}
                         </select>
@@ -330,7 +333,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                 </div>
             </div>
         )
-    }, [hostApi, serverSetting.serverSetting, serverSetting.updateServerSettings, serverSetting.serverSetting.enableServerAudio])
+    }, [outputHostApi, serverSetting.serverSetting, serverSetting.updateServerSettings, serverSetting.serverSetting.enableServerAudio])
 
 
     // (4) レコーダー
