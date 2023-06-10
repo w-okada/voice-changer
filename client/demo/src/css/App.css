@@ -682,7 +682,8 @@ body {
 }
 
 /* Dialog */
-.dialog-container {
+.dialog-container,
+.dialog-container2 {
     justify-content: center;
     align-items: center;
     position: absolute;
@@ -721,6 +722,11 @@ body {
             .dialog-content-part {
                 margin-top: 1rem;
                 margin-bottom: 1rem;
+            }
+            .input-text-container {
+                display: flex;
+                flex-direction: row;
+                margin: 20px;
             }
         }
         .dialog-fixed-size-content {
@@ -899,6 +905,58 @@ body {
     to {
         opacity: 1;
         z-index: 200;
+    }
+}
+
+.state-control-checkbox:checked ~ .dialog-container2 {
+    background: rgba(200, 200, 200, 0.4);
+    animation-name: dialog-show2;
+    animation-duration: 0.4s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+    animation-direction: normal;
+}
+.state-control-checkbox ~ .dialog-container2 {
+    background: rgba(100, 100, 100, 0.4);
+    animation-name: dialog-hide2;
+    animation-duration: 0.4s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+    animation-direction: normal;
+}
+/* .state-control-checkbox:checked + .dialog-frame {
+    display: flex;
+}
+.state-control-checkbox + .dialog-frame {
+    display: none;
+} */
+
+@keyframes dialog-hide2 {
+    from {
+        opacity: 1;
+        z-index: 400;
+    }
+    90% {
+        opacity: 0;
+        z-index: -1;
+    }
+    to {
+        opacity: 0;
+        z-index: -1;
+    }
+}
+
+@keyframes dialog-show2 {
+    from {
+        opacity: 0;
+        z-index: -1;
+    }
+    10% {
+        z-index: 400;
+    }
+    to {
+        opacity: 1;
+        z-index: 400;
     }
 }
 

@@ -19,6 +19,7 @@ export const OpenModelSlotManagerDialogCheckbox = "open-model-slot-manager-dialo
 export const OpenMergeLabDialogCheckbox = "open-merge-lab-dialog-checkbox"
 export const OpenAdvancedSettingDialogCheckbox = "open-advanced-setting-dialog-checkbox"
 
+export const OpenTextInputDialogCheckbox = "open-text-input-dialog-checkbox"
 type Props = {
     children: ReactNode;
 };
@@ -41,6 +42,7 @@ export type StateControls = {
     showMergeLabCheckbox: StateControlCheckbox
     showAdvancedSettingCheckbox: StateControlCheckbox
 
+    showTextInputCheckbox: StateControlCheckbox
 }
 
 type GuiStateAndMethod = {
@@ -68,6 +70,8 @@ type GuiStateAndMethod = {
     modelSlotNum: number
     setModelSlotNum: (val: number) => void
 
+    textInputResolve: TextInputResolveType | null
+    setTextInputResolve: (val: TextInputResolveType | null) => void
 }
 
 const GuiStateContext = React.createContext<GuiStateAndMethod | null>(null);
@@ -78,6 +82,10 @@ export const useGuiState = (): GuiStateAndMethod => {
     }
     return state;
 };
+
+type TextInputResolveType = {
+    resolve: ((value: string | PromiseLike<string>) => void) | null
+}
 
 export const GuiStateProvider = ({ children }: Props) => {
     const { clientType, appGuiSettingState } = useAppRoot()
@@ -94,6 +102,8 @@ export const GuiStateProvider = ({ children }: Props) => {
     const [audioOutputForGUI, setAudioOutputForGUI] = useState<string>("none")
     const [fileInputEchoback, setFileInputEchoback] = useState<boolean>(false)//最初のmuteが有効になるように。undefined <-- ??? falseしておけばよさそう。undefinedだとwarningがでる。
     const [audioOutputForAnalyzer, setAudioOutputForAnalyzer] = useState<string>("default")
+
+    const [textInputResolve, setTextInputResolve] = useState<TextInputResolveType | null>(null)
 
     const reloadDeviceInfo = async () => {
         try {
@@ -162,6 +172,10 @@ export const GuiStateProvider = ({ children }: Props) => {
     const showMergeLabCheckbox = useStateControlCheckbox(OpenMergeLabDialogCheckbox);
     const showAdvancedSettingCheckbox = useStateControlCheckbox(OpenAdvancedSettingDialogCheckbox);
 
+
+    const showTextInputCheckbox = useStateControlCheckbox(OpenTextInputDialogCheckbox);
+
+
     useEffect(() => {
         openServerControlCheckbox.updateState(true)
         openModelSettingCheckbox.updateState(false)
@@ -182,6 +196,8 @@ export const GuiStateProvider = ({ children }: Props) => {
         showMergeLabCheckbox.updateState(false)
         showAdvancedSettingCheckbox.updateState(false)
 
+        showTextInputCheckbox.updateState(false)
+
     }, [])
 
     useEffect(() => {
@@ -195,6 +211,7 @@ export const GuiStateProvider = ({ children }: Props) => {
 
             document.getElementById("dialog")?.classList.add("dialog-container-show")
             showStartingNoticeCheckbox.updateState(true)
+            document.getElementById("dialog2")?.classList.add("dialog-container-show")
         }
         setTimeout(show)
     }, [appGuiSettingState.edition])
@@ -222,7 +239,9 @@ export const GuiStateProvider = ({ children }: Props) => {
             showModelSlotManagerCheckbox,
 
             showMergeLabCheckbox,
-            showAdvancedSettingCheckbox
+            showAdvancedSettingCheckbox,
+
+            showTextInputCheckbox
 
         },
         isConverting,
@@ -249,6 +268,10 @@ export const GuiStateProvider = ({ children }: Props) => {
 
         modelSlotNum,
         setModelSlotNum,
+
+
+        textInputResolve,
+        setTextInputResolve
 
     };
     return <GuiStateContext.Provider value={providerValue}>{children}</GuiStateContext.Provider>;

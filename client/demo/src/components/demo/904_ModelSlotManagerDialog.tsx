@@ -135,12 +135,16 @@ export const ModelSlotManagerDialog = () => {
 
             const nameValueClass = isRegisterd ? "model-slot-detail-row-value-pointable" : "model-slot-detail-row-value"
             const nameValueAction = isRegisterd ? async (index: number) => {
-                const name = window.prompt("input new name", "");
-                if (!name) {
-                    return
+                const p = new Promise<string>((resolve) => {
+                    guiState.setTextInputResolve({ resolve: resolve })
+                })
+
+                guiState.stateControls.showTextInputCheckbox.updateState(true)
+                const text = await p;
+                if (text.length > 0) {
+                    console.log("input text:", text)
+                    await serverSetting.updateModelInfo(index, "name", text)
                 }
-                await serverSetting.updateModelInfo(index, "name", name)
-                console.log(name)
             } : async (_index: number) => { }
             const iconClass = isRegisterd ? "model-slot-icon-pointable" : "model-slot-icon"
             const iconAction = isRegisterd ? async (index: number) => {

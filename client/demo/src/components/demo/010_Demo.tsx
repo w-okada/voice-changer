@@ -11,11 +11,13 @@ import { ConverterSetting } from "./700_ConverterSetting";
 import { AdvancedSetting } from "./800_AdvancedSetting";
 import { Lab } from "./a00_Lab";
 import { ModelSlotControl } from "./b00_ModelSlotControl";
+import { Dialogs2 } from "./910_Dialogs2";
 
 export const Demo = () => {
     return (
         <GuiStateProvider>
             <div className="main-body">
+                <Dialogs2 />
                 <Dialogs />
                 <TitleArea />
                 <ModelSlotControl></ModelSlotControl>
