@@ -46,8 +46,8 @@ export const ModelSlotManagerDialog = () => {
 
         const onRVCModelLoadClicked = async (slot: number) => {
             const file = await fileSelector("")
-            if (checkExtention(file.name, ["pth"]) == false) {
-                alert(`モデルファイルの拡張子は".pth"である必要があります。`)
+            if (checkExtention(file.name, ["pth", "onnx"]) == false) {
+                alert(`モデルファイルの拡張子は".pth", ".onnx"である必要があります。`)
                 return
             }
             if (uploadData?.slot == slot) {
@@ -113,9 +113,9 @@ export const ModelSlotManagerDialog = () => {
                 modelFileName = (uploadData.model?.name || "").replace(/^.*[\\\/]/, '')
             } else if (x.modelFile && x.modelFile.length > 0) {
                 modelFileName = x.modelFile.replace(/^.*[\\\/]/, '')
-                if (modelFileName.length > 20) {
-                    modelFileName = modelFileName.substring(0, 20) + "..."
-                }
+            }
+            if (modelFileName.length > 20) {
+                modelFileName = modelFileName.substring(0, 20) + "..."
             }
 
             let indexFileName = ""
@@ -123,11 +123,10 @@ export const ModelSlotManagerDialog = () => {
                 indexFileName = (uploadData.index?.name || "").replace(/^.*[\\\/]/, '')
             } else if (x.indexFile && x.indexFile.length > 0) {
                 indexFileName = x.indexFile.replace(/^.*[\\\/]/, '')
-                if (indexFileName.length > 20) {
-                    indexFileName = indexFileName.substring(0, 20) + "..."
-                }
             }
-
+            if (indexFileName.length > 20) {
+                indexFileName = indexFileName.substring(0, 20) + "..."
+            }
 
             const isRegisterd = modelFileName.length > 0 ? true : false
             const name = x.name && x.name.length > 0 ? x.name : isRegisterd ? modelFileName : "blank"
@@ -201,7 +200,7 @@ export const ModelSlotManagerDialog = () => {
                         {(uploadData?.slot == index) && (uploadData.model != null) ?
                             <div className="model-slot-button" onClick={onUploadClicked}>upload</div> : <div></div>
                         }
-                        {(uploadData?.slot == index) && (uploadData.model != null) ?
+                        {(uploadData?.slot == index) && (uploadData.model != null || uploadData.index != null) ?
                             <div className="model-slot-button" onClick={onClearClicked}>clear</div> : <div></div>
                         }
                         {(uploadData?.slot == index) && (uploadData.model != null) ?
