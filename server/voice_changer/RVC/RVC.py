@@ -125,16 +125,19 @@ class RVC:
             if sampleInfo is None:
                 print("[Voice Changer] sampleInfo is None")
                 return
-            modelPath, indexPath = downloadModelFiles(sampleInfo, useIndex)
+            modelPath, indexPath, iconPath = downloadModelFiles(sampleInfo, useIndex)
             slotInfo.modelFile = modelPath
             if indexPath is not None:
                 slotInfo.indexFile = indexPath
+            if iconPath is not None:
+                slotInfo.iconFile = iconPath
 
             slotInfo.sampleId = sampleInfo.id
             slotInfo.credit = sampleInfo.credit
             slotInfo.description = sampleInfo.description
             slotInfo.name = sampleInfo.name
             slotInfo.termsOfUseUrl = sampleInfo.termsOfUseUrl
+
             # slotInfo.samplingRate = sampleInfo.sampleRate
             # slotInfo.modelType = sampleInfo.modelType
             # slotInfo.f0 = sampleInfo.f0
@@ -163,6 +166,8 @@ class RVC:
         slotInfo.modelFile = self.moveToModelDir(slotInfo.modelFile, slotDir)
         if slotInfo.indexFile is not None and len(slotInfo.indexFile) > 0:
             slotInfo.indexFile = self.moveToModelDir(slotInfo.indexFile, slotDir)
+        if slotInfo.iconFile is not None and len(slotInfo.iconFile) > 0:
+            slotInfo.iconFile = self.moveToModelDir(slotInfo.iconFile, slotDir)
         json.dump(asdict(slotInfo), open(os.path.join(slotDir, "params.json"), "w"))
         self.loadSlots()
 
@@ -197,13 +202,9 @@ class RVC:
         self.settings.modelSlots = modelSlots
 
     def update_settings(self, key: str, val: int | float | str):
-        print("update", key, val)
         if key in self.settings.intData:
             # 設定前処理
-            print("update(int)1", type(val), type(self.settings.tran))
             val = cast(int, val)
-            print("update(int)2", type(val), type(self.settings.tran))
-            print("update(int)3", key, val)
             if key == "modelSlotIndex":
                 if val < 0:
                     return True
@@ -217,9 +218,7 @@ class RVC:
                 self.prepareModel(val)
 
             # 設定
-            print("update(int)4", key, val)
             setattr(self.settings, key, val)
-            print("update(int)5", type(val), type(self.settings.tran))
 
             if key == "gpu":
                 self.deviceManager.setForceTensor(False)
@@ -228,7 +227,6 @@ class RVC:
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
-            print("update(str)", key, val)
             setattr(self.settings, key, str(val))
             if key == "f0Detector" and self.pipeline is not None:
                 pitchExtractor = PitchExtractorManager.getPitchExtractor(

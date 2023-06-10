@@ -2,64 +2,24 @@
     "type": "demo",
     "id": "RVC",
     "front": {
-        "title": [
-            {
-                "name": "title",
-                "options": {
-                    "mainTitle": "Realtime Voice Changer Client",
-                    "subTitle": "for RVC",
-                    "lineNum": 1
-                }
-            },
-            {
-                "name": "clearSetting",
-                "options": {}
-            }
-        ],
+        "title": [],
         "serverControl": [],
         "modelSetting": [],
-        "lab": [
-            {
-                "name": "mergeLab",
-                "options": {}
-            }
-        ],
+        "lab": [],
 
         "deviceSetting": [],
         "qualityControl": [],
         "speakerSetting": [],
         "converterSetting": [],
-        "advancedSetting": [
-            {
-                "name": "protocol",
-                "options": {}
-            },
-            {
-                "name": "crossFadeOverlapSize",
-                "options": {}
-            },
-            {
-                "name": "crossFadeOffsetRate",
-                "options": {}
-            },
-            {
-                "name": "crossFadeEndRate",
-                "options": {}
-            },
-            {
-                "name": "trancateNumThreshold",
-                "options": {}
-            },
-            {
-                "name": "silenceFront",
-                "options": {}
-            },
-            {
-                "name": "protect",
-                "options": {}
-            }
-        ],
+        "advancedSetting": [],
         "modelSlotControl": [
+            {
+                "name": "headerArea",
+                "options": {
+                    "mainTitle": "Realtime Voice Changer Client",
+                    "subTitle": "for RVC"
+                }
+            },
             {
                 "name": "modelSlotArea",
                 "options": {}

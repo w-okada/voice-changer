@@ -144,6 +144,8 @@ export class VoiceChangerClient {
                 }
             } catch (e) {
                 console.warn(e)
+                this.vcInNode.stop()
+                await this.unlock(lockNum)
                 throw e
             }
             // this.currentMediaStream.getAudioTracks().forEach((x) => {
@@ -219,8 +221,7 @@ export class VoiceChangerClient {
         this.configurator.setServerUrl(url)
     }
 
-    updateClientSetting = (setting: VoiceChangerClientSetting) => {
-        console.log(`[VoiceChangerClient] Updating Client Setting,`, this.setting, setting)
+    updateClientSetting = async (setting: VoiceChangerClientSetting) => {
         let reconstructInputRequired = false
         if (
             this.setting.audioInput != setting.audioInput ||
@@ -241,7 +242,7 @@ export class VoiceChangerClient {
 
         this.setting = setting
         if (reconstructInputRequired) {
-            this.setup()
+            await this.setup()
         }
     }
 

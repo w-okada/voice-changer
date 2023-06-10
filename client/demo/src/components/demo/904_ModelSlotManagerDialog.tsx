@@ -131,7 +131,7 @@ export const ModelSlotManagerDialog = () => {
 
             const isRegisterd = modelFileName.length > 0 ? true : false
             const name = x.name && x.name.length > 0 ? x.name : isRegisterd ? modelFileName : "blank"
-            const termOfUseUrlLink = x.termsOfUseUrl.length > 0 ? <a href={x.termsOfUseUrl} target="_blank" rel="noopener noreferrer" className="body-item-text-small">[terms of use]</a> : <></>
+            const termOfUseUrlLink = x.termsOfUseUrl && x.termsOfUseUrl.length > 0 ? <a href={x.termsOfUseUrl} target="_blank" rel="noopener noreferrer" className="body-item-text-small">[terms of use]</a> : <></>
 
             const nameValueClass = isRegisterd ? "model-slot-detail-row-value-pointable" : "model-slot-detail-row-value"
             const nameValueAction = isRegisterd ? async (index: number) => {
@@ -260,7 +260,7 @@ export const ModelSlotManagerDialog = () => {
         }
         const options = (
             serverSetting.serverSetting.sampleModels.filter(x => { return lang == "All" ? true : x.lang == lang }).map((x, index) => {
-                const termOfUseUrlLink = x.termsOfUseUrl.length > 0 ? <a href={x.termsOfUseUrl} target="_blank" rel="noopener noreferrer" className="body-item-text-small">[terms of use]</a> : <></>
+                const termOfUseUrlLink = x.termsOfUseUrl && x.termsOfUseUrl.length > 0 ? <a href={x.termsOfUseUrl} target="_blank" rel="noopener noreferrer" className="body-item-text-small">[terms of use]</a> : <></>
 
                 return (
                     <div key={index} className="model-slot">

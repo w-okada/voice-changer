@@ -13,7 +13,11 @@ export const SampleRateRow = (_props: SampleRateRowProps) => {
                 <div className="body-item-title left-padding-1">Sample Rate</div>
                 <div className="body-select-container">
                     <select className="body-select" value={appState.clientSetting.clientSetting.sampleRate} onChange={(e) => {
-                        appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, sampleRate: Number(e.target.value) as SampleRate })
+                        try {
+                            appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, sampleRate: Number(e.target.value) as SampleRate })
+                        } catch (e) {
+                            console.error(e)
+                        }
                     }}>
                         {
                             Object.values(SampleRate).map(x => {

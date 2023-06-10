@@ -65,7 +65,7 @@ export const ConvertArea = (props: ConvertProps) => {
                         }}>
                             {
                                 gpusEntry.map(x => {
-                                    return <option key={x.id} value={x.id}>{x.name}({(x.memory / 1024 / 1024 / 1024).toFixed(0)}GB) </option>
+                                    return <option key={x.id} value={x.id}>{x.name}{x.name == "cpu" ? "" : `(${(x.memory / 1024 / 1024 / 1024).toFixed(0)})GB`} </option>
                                 })
                             }
                         </select>

@@ -16,6 +16,8 @@ export const OpenLicenseDialogCheckbox = "open-license-dialog-checkbox"
 export const OpenWaitingDialogCheckbox = "open-waiting-dialog-checkbox"
 export const OpenStartingNoticeDialogCheckbox = "open-starting-notice-dialog-checkbox"
 export const OpenModelSlotManagerDialogCheckbox = "open-model-slot-manager-dialog-checkbox"
+export const OpenMergeLabDialogCheckbox = "open-merge-lab-dialog-checkbox"
+export const OpenAdvancedSettingDialogCheckbox = "open-advanced-setting-dialog-checkbox"
 
 type Props = {
     children: ReactNode;
@@ -35,6 +37,9 @@ export type StateControls = {
     showWaitingCheckbox: StateControlCheckbox
     showStartingNoticeCheckbox: StateControlCheckbox
     showModelSlotManagerCheckbox: StateControlCheckbox
+
+    showMergeLabCheckbox: StateControlCheckbox
+    showAdvancedSettingCheckbox: StateControlCheckbox
 
 }
 
@@ -154,6 +159,8 @@ export const GuiStateProvider = ({ children }: Props) => {
     const showWaitingCheckbox = useStateControlCheckbox(OpenWaitingDialogCheckbox);
     const showStartingNoticeCheckbox = useStateControlCheckbox(OpenStartingNoticeDialogCheckbox);
     const showModelSlotManagerCheckbox = useStateControlCheckbox(OpenModelSlotManagerDialogCheckbox);
+    const showMergeLabCheckbox = useStateControlCheckbox(OpenMergeLabDialogCheckbox);
+    const showAdvancedSettingCheckbox = useStateControlCheckbox(OpenAdvancedSettingDialogCheckbox);
 
     useEffect(() => {
         openServerControlCheckbox.updateState(true)
@@ -172,6 +179,9 @@ export const GuiStateProvider = ({ children }: Props) => {
 
         showStartingNoticeCheckbox.updateState(false)
         showModelSlotManagerCheckbox.updateState(false)
+        showMergeLabCheckbox.updateState(false)
+        showAdvancedSettingCheckbox.updateState(false)
+
     }, [])
 
     useEffect(() => {
@@ -209,7 +219,11 @@ export const GuiStateProvider = ({ children }: Props) => {
             showLicenseCheckbox,
             showWaitingCheckbox,
             showStartingNoticeCheckbox,
-            showModelSlotManagerCheckbox
+            showModelSlotManagerCheckbox,
+
+            showMergeLabCheckbox,
+            showAdvancedSettingCheckbox
+
         },
         isConverting,
         setIsConverting,

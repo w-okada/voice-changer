@@ -14,17 +14,29 @@ export const NoiseControlRow = (_props: NoiseControlRowProps) => {
                 <div className="body-item-title left-padding-1 ">Noise Suppression</div>
                 <div>
                     <input type="checkbox" checked={appState.clientSetting.clientSetting.echoCancel} onChange={(e) => {
-                        appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, echoCancel: e.target.checked })
+                        try {
+                            appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, echoCancel: e.target.checked })
+                        } catch (e) {
+                            console.error(e)
+                        }
                     }} /> echo cancel
                 </div>
                 <div>
                     <input type="checkbox" checked={appState.clientSetting.clientSetting.noiseSuppression} onChange={(e) => {
-                        appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, noiseSuppression: e.target.checked })
+                        try {
+                            appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, noiseSuppression: e.target.checked })
+                        } catch (e) {
+                            console.error(e)
+                        }
                     }} /> suppression1
                 </div>
                 <div>
                     <input type="checkbox" checked={appState.clientSetting.clientSetting.noiseSuppression2} onChange={(e) => {
-                        appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, noiseSuppression2: e.target.checked })
+                        try {
+                            appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, noiseSuppression2: e.target.checked })
+                        } catch (e) {
+                            console.error(e)
+                        }
                     }} /> suppression2
                 </div>
                 <div className="body-button-container">

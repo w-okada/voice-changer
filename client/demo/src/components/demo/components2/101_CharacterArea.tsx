@@ -253,7 +253,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
         }
 
         const exportOnnx = selected.modelFile.endsWith("pth") ? (
-            <div className="character-area-buutton" onClick={onnxExportButtonAction}>export onnx</div>
+            <div className="character-area-button" onClick={onnxExportButtonAction}>export onnx</div>
         ) : <></>
         return (
             <div className="character-area-control">
@@ -261,8 +261,8 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
 
                 </div>
                 <div className="character-area-control-field">
-                    <div className="character-area-buuttons">
-                        <div className="character-area-buutton" onClick={onUpdateDefaultClicked}>save default</div>
+                    <div className="character-area-buttons">
+                        <div className="character-area-button" onClick={onUpdateDefaultClicked}>save default</div>
                         {exportOnnx}
                     </div>
                 </div>

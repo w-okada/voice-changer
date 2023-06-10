@@ -12,17 +12,6 @@ export const RecorderArea = (_props: RecorderAreaProps) => {
 
     const [serverIORecording, setServerIORecording] = useState<boolean>(false)
 
-    // const recorderRow = useMemo(() => {
-    //     return (
-    //         <div className="config-sub-area-control">
-    //             <div className="config-sub-area-control-title">RECORD:</div>
-    //             <div className="config-sub-area-control-field">
-    //             </div>
-    //         </div>
-    //     )
-    // }, [serverSetting.serverSetting, serverSetting.updateServerSettings])
-
-
 
     const serverIORecorderRow = useMemo(() => {
         const onServerIORecordStartClicked = async () => {
@@ -48,8 +37,8 @@ export const RecorderArea = (_props: RecorderAreaProps) => {
             wavOutput.setSinkId(audioOutputForAnalyzer)
         }
 
-        const startClassName = serverIORecording ? "config-sub-area-buutton-active" : "config-sub-area-buutton"
-        const stopClassName = serverIORecording ? "config-sub-area-buutton" : "config-sub-area-buutton-active"
+        const startClassName = serverIORecording ? "config-sub-area-button-active" : "config-sub-area-button"
+        const stopClassName = serverIORecording ? "config-sub-area-button" : "config-sub-area-button-active"
         return (
             <>
                 <div className="config-sub-area-control">
@@ -59,7 +48,7 @@ export const RecorderArea = (_props: RecorderAreaProps) => {
                 <div className="config-sub-area-control left-padding-1">
                     <div className="config-sub-area-control-title">SIO rec.</div>
                     <div className="config-sub-area-control-field">
-                        <div className="config-sub-area-buuttons">
+                        <div className="config-sub-area-buttons">
                             <div onClick={onServerIORecordStartClicked} className={startClassName}>start</div>
                             <div onClick={onServerIORecordStopClicked} className={stopClassName}>stop</div>
                         </div>

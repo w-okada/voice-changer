@@ -45,8 +45,15 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
     }, [])
     // 初期化 その２ クライアントに設定
     useEffect(() => {
-        if (!props.voiceChangerClient) return
-        props.voiceChangerClient.updateClientSetting(clientSetting)
+        const initialSetup = async () => {
+            if (!props.voiceChangerClient) return
+            try {
+                await props.voiceChangerClient.updateClientSetting(clientSetting)
+            } catch (e) {
+                console.error(e)
+            }
+        }
+        initialSetup()
     }, [props.voiceChangerClient])
 
 
@@ -67,14 +74,14 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
     // 設定
     /////////////
     const updateClientSetting = useMemo(() => {
-        return (_clientSetting: VoiceChangerClientSetting) => {
+        return async (_clientSetting: VoiceChangerClientSetting) => {
             if (!props.voiceChangerClient) return
             for (let k in _clientSetting) {
                 const cur_v = clientSetting[k as keyof VoiceChangerClientSetting]
                 const new_v = _clientSetting[k as keyof VoiceChangerClientSetting]
                 if (cur_v != new_v) {
                     storeSetting(_clientSetting)
-                    props.voiceChangerClient.updateClientSetting(_clientSetting)
+                    await props.voiceChangerClient.updateClientSetting(_clientSetting)
                     break
                 }
             }

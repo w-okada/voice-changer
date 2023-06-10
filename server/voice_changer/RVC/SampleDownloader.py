@@ -156,8 +156,19 @@ def downloadModelFiles(sampleInfo: RVCModelSample, useIndex: bool = True):
             }
         )
 
+    iconPath = None
+    if hasattr(sampleInfo, "icon") and sampleInfo.icon != "":
+        iconPath = os.path.join(TMP_DIR, os.path.basename(sampleInfo.icon))
+        downloadParams.append(
+            {
+                "url": sampleInfo.icon,
+                "saveTo": iconPath,
+                "position": 2,
+            }
+        )
+
     print("[Voice Changer] Downloading model files...", end="")
     with ThreadPoolExecutor() as pool:
         pool.map(download_no_tqdm, downloadParams)
     print("")
-    return modelPath, indexPath
+    return modelPath, indexPath, iconPath

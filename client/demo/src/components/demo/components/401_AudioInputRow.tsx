@@ -36,7 +36,11 @@ export const AudioInputRow = (_props: AudioInputRowProps) => {
                     <select className="body-select" value={guiState.audioInputForGUI} onChange={(e) => {
                         guiState.setAudioInputForGUI(e.target.value)
                         if (guiState.audioInputForGUI != "file") {
-                            appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, audioInput: e.target.value })
+                            try {
+                                appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, audioInput: e.target.value })
+                            } catch (e) {
+                                console.error(e)
+                            }
                         }
                     }}>
                         {

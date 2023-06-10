@@ -75,10 +75,17 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
             <div className="config-sub-area-control">
                 <div className="config-sub-area-control-title left-padding-1">input</div>
                 <div className="config-sub-area-control-field">
-                    <select className="body-select" value={audioInputForGUI} onChange={(e) => {
+                    <select className="body-select" value={audioInputForGUI} onChange={async (e) => {
                         setAudioInputForGUI(e.target.value)
                         if (audioInputForGUI != "file") {
-                            clientSetting.updateClientSetting({ ...clientSetting.clientSetting, audioInput: e.target.value })
+                            try {
+                                await clientSetting.updateClientSetting({ ...clientSetting.clientSetting, audioInput: e.target.value })
+                            } catch (e) {
+                                alert(e)
+                                console.error(e)
+                                setAudioInputForGUI("none")
+                                await clientSetting.updateClientSetting({ ...clientSetting.clientSetting, audioInput: null })
+                            }
                         }
                     }}>
                         {
@@ -164,7 +171,11 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
 
             const dst = audioContext.createMediaStreamDestination()
             audioSrcNode.current.connect(dst)
-            clientSetting.updateClientSetting({ ...clientSetting.clientSetting, audioInput: dst.stream })
+            try {
+                clientSetting.updateClientSetting({ ...clientSetting.clientSetting, audioInput: dst.stream })
+            } catch (e) {
+                console.error(e)
+            }
 
             const audio_echo = document.getElementById(AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK) as HTMLAudioElement
             audio_echo.srcObject = dst.stream
@@ -325,6 +336,9 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
 
     // (4) レコーダー
     const outputRecorderRow = useMemo(() => {
+        if (serverSetting.serverSetting.enableServerAudio == 1) {
+            return <></>
+        }
         const onOutputRecordStartClicked = async () => {
             setOutputRecordingStarted(true)
             await workletNodeSetting.startOutputRecording()
@@ -335,13 +349,13 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
             downloadRecord(record)
         }
 
-        const startClassName = outputRecordingStarted ? "config-sub-area-buutton-active" : "config-sub-area-buutton"
-        const stopClassName = outputRecordingStarted ? "config-sub-area-buutton" : "config-sub-area-buutton-active"
+        const startClassName = outputRecordingStarted ? "config-sub-area-button-active" : "config-sub-area-button"
+        const stopClassName = outputRecordingStarted ? "config-sub-area-button" : "config-sub-area-button-active"
         return (
             <div className="config-sub-area-control">
                 <div className="config-sub-area-control-title">REC.</div>
                 <div className="config-sub-area-control-field">
-                    <div className="config-sub-area-buuttons">
+                    <div className="config-sub-area-buttons">
                         <div onClick={onOutputRecordStartClicked} className={startClassName}>start</div>
                         <div onClick={onOutputRecordStopClicked} className={stopClassName}>stop</div>
                     </div>

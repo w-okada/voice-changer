@@ -41,7 +41,11 @@ export const AudioInputMediaRow = () => {
 
             const dst = appState.audioContext.createMediaStreamDestination()
             audioSrcNode.current.connect(dst)
-            appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, audioInput: dst.stream })
+            try {
+                appState.clientSetting.updateClientSetting({ ...appState.clientSetting.clientSetting, audioInput: dst.stream })
+            } catch (e) {
+                console.error(e)
+            }
 
             const audio_echo = document.getElementById(AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK) as HTMLAudioElement
             audio_echo.srcObject = dst.stream

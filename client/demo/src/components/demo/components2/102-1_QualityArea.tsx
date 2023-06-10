@@ -20,19 +20,31 @@ export const QualityArea = (props: QualityAreaProps) => {
                         <div className="config-sub-area-noise-container">
                             <div className="config-sub-area-noise-checkbox-container">
                                 <input type="checkbox" disabled={serverSetting.serverSetting.enableServerAudio != 0} checked={clientSetting.clientSetting.echoCancel} onChange={(e) => {
-                                    clientSetting.updateClientSetting({ ...clientSetting.clientSetting, echoCancel: e.target.checked })
+                                    try {
+                                        clientSetting.updateClientSetting({ ...clientSetting.clientSetting, echoCancel: e.target.checked })
+                                    } catch (e) {
+                                        console.error(e)
+                                    }
                                 }} /> <span>Echo</span>
 
                             </div>
                             <div className="config-sub-area-noise-checkbox-container">
                                 <input type="checkbox" disabled={serverSetting.serverSetting.enableServerAudio != 0} checked={clientSetting.clientSetting.noiseSuppression} onChange={(e) => {
-                                    clientSetting.updateClientSetting({ ...clientSetting.clientSetting, noiseSuppression: e.target.checked })
+                                    try {
+                                        clientSetting.updateClientSetting({ ...clientSetting.clientSetting, noiseSuppression: e.target.checked })
+                                    } catch (e) {
+                                        console.error(e)
+                                    }
                                 }} /> <span>Sup1</span>
 
                             </div>
                             <div className="config-sub-area-noise-checkbox-container">
                                 <input type="checkbox" disabled={serverSetting.serverSetting.enableServerAudio != 0} checked={clientSetting.clientSetting.noiseSuppression2} onChange={(e) => {
-                                    clientSetting.updateClientSetting({ ...clientSetting.clientSetting, noiseSuppression2: e.target.checked })
+                                    try {
+                                        clientSetting.updateClientSetting({ ...clientSetting.clientSetting, noiseSuppression2: e.target.checked })
+                                    } catch (e) {
+                                        console.error(e)
+                                    }
                                 }} />  <span>Sup2</span>
                             </div>
                         </div>
