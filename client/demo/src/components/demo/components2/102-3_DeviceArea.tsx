@@ -136,7 +136,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
             </div>
         )
 
-    }, [clientSetting.updateClientSetting, clientSetting.clientSetting, inputAudioDeviceInfo, audioInputForGUI, serverSetting.serverSetting.enableServerAudio])
+    }, [hostApi, serverSetting.serverSetting, serverSetting.updateServerSettings, serverSetting.serverSetting.enableServerAudio])
 
     // (2-3) File
     useEffect(() => {
@@ -330,8 +330,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                 </div>
             </div>
         )
-    }, [hostApi, serverSetting.serverSetting, serverSetting.updateServerSettings])
-
+    }, [hostApi, serverSetting.serverSetting, serverSetting.updateServerSettings, serverSetting.serverSetting.enableServerAudio])
 
 
     // (4) レコーダー

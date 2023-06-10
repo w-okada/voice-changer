@@ -23,7 +23,6 @@ export const TextInputDialog = () => {
                     }} >ok</div>
                     <div className="body-button" onClick={() => {
                         const inputText = document.getElementById("input-text") as HTMLInputElement
-                        const text = inputText.value
                         inputText.value = ""
                         if (guiState.textInputResolve) {
                             guiState.textInputResolve.resolve!("")
