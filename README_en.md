@@ -4,6 +4,10 @@
 
 ## What's New!
 
+- v.1.5.3.5
+
+  - RVC: new GUI released. Other VCs will be migrated to the new GUI in stages.
+
 - v.1.5.3.4d
 
   - some bugfix
