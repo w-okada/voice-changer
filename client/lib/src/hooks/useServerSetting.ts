@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react"
 import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc_40v2, DefaultServerSetting_so_vits_svc_40, DefaultServerSetting_so_vits_svc_40_c, DefaultServerSetting_RVC, OnnxExporterInfo, DefaultServerSetting_DDSP_SVC, MAX_MODEL_SLOT_NUM, Framework, MergeModelRequest } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
+import { ModelLoadException } from "../exceptions"
 
 
 type ModelData = {
@@ -265,68 +266,54 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             if (fileUploadSetting.isSampleMode == false) {
                 if (props.clientType == "MMVCv13") {
                     if (!fileUploadSetting.mmvcv13Config) {
-                        alert("Configファイルを指定する必要があります。")
-                        return
+                        throw new ModelLoadException("Config")
                     }
                     if (!fileUploadSetting.mmvcv13Model) {
-                        alert("モデルファイルを指定する必要があります。")
-                        return
+                        throw new ModelLoadException("Model")
                     }
                 } else if (props.clientType == "MMVCv15") {
                     if (!fileUploadSetting.mmvcv15Config) {
-                        alert("Configファイルを指定する必要があります。")
-                        return
+                        throw new ModelLoadException("Config")
                     }
                     if (!fileUploadSetting.mmvcv15Model) {
-                        alert("モデルファイルを指定する必要があります。")
-                        return
+                        throw new ModelLoadException("Model")
                     }
                 } else if (props.clientType == "so-vits-svc-40") {
                     if (!fileUploadSetting.soVitsSvc40Config) {
-                        alert("Configファイルを指定する必要があります。")
-                        return
+                        throw new ModelLoadException("Config")
                     }
                     if (!fileUploadSetting.soVitsSvc40Model) {
-                        alert("モデルファイルを指定する必要があります。")
-                        return
+                        throw new ModelLoadException("Model")
                     }
                 } else if (props.clientType == "so-vits-svc-40v2") {
                     if (!fileUploadSetting.soVitsSvc40v2Config) {
-                        alert("Configファイルを指定する必要があります。")
-                        return
+                        throw new ModelLoadException("Config")
                     }
                     if (!fileUploadSetting.soVitsSvc40v2Model) {
-                        alert("モデルファイルを指定する必要があります。")
-                        return
+                        throw new ModelLoadException("Model")
                     }
                 } else if (props.clientType == "RVC") {
                     if (!fileUploadSetting.rvcModel) {
-                        alert("モデルファイルを指定する必要があります。")
-                        return
+                        throw new ModelLoadException("Model")
                     }
                 } else if (props.clientType == "DDSP-SVC") {
                     if (!fileUploadSetting.ddspSvcModel) {
-                        alert("DDSPモデルを指定する必要があります。")
-                        return
+                        throw new ModelLoadException("DDSP-Model")
                     }
                     if (!fileUploadSetting.ddspSvcModelConfig) {
-                        alert("DDSP Configファイルを指定する必要があります。")
-                        return
+                        throw new ModelLoadException("DDSP-Config")
                     }
                     if (!fileUploadSetting.ddspSvcDiffusion) {
-                        alert("Diffusionモデルを指定する必要があります。")
-                        return
+                        throw new ModelLoadException("Diff-Model")
                     }
                     if (!fileUploadSetting.ddspSvcDiffusionConfig) {
-                        alert("Diffusion Configファイルを指定する必要があります。")
-                        return
+                        throw new ModelLoadException("Diff-Config")
                     }
                 } else {
                 }
             } else {//Sampleモード
                 if (!fileUploadSetting.sampleId) {
-                    alert("Sample IDを指定する必要があります。")
-                    return
+                    throw new ModelLoadException("SampleId")
                 }
             }
 

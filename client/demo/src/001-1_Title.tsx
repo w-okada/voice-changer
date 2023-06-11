@@ -10,7 +10,6 @@ export type TitleProps = {
 
 export const Title = (props: TitleProps) => {
 
-
     const githubLink = useMemo(() => {
         return isDesktopApp() ?
             (

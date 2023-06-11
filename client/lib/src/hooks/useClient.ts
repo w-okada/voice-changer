@@ -34,6 +34,9 @@ export type ClientState = {
     clearSetting: () => Promise<void>
     // AudioOutputElement  設定
     setAudioOutputElementId: (elemId: string) => void
+
+    ioErrorCount: number
+    resetIoErrorCount: () => void
 }
 
 export type PerformanceData = {
@@ -77,6 +80,7 @@ export const useClient = (props: UseClientProps): ClientState => {
     const [bufferingTime, setBufferingTime] = useState<number>(0)
     const [performance, setPerformance] = useState<PerformanceData>(InitialPerformanceData)
     const [volume, setVolume] = useState<number>(0)
+    const [ioErrorCount, setIoErrorCount] = useState<number>(0)
 
     //// Server Audio Deviceを使うとき、モニタリングデータはpolling
     const updatePerformance = useMemo(() => {
@@ -105,7 +109,11 @@ export const useClient = (props: UseClientProps): ClientState => {
 
 
     // (1-4) エラーステータス
-    const errorCountRef = useRef<number>(0)
+    const ioErrorCountRef = useRef<number>(0)
+    const resetIoErrorCount = () => {
+        ioErrorCountRef.current = 0
+        setIoErrorCount(ioErrorCountRef.current)
+    }
 
     // (2-1) 初期化処理
     useEffect(() => {
@@ -127,11 +135,8 @@ export const useClient = (props: UseClientProps): ClientState => {
                 notifyException: (mes: string) => {
                     if (mes.length > 0) {
                         console.log(`error:${mes}`)
-                        errorCountRef.current += 1
-                        if (errorCountRef.current > 100) {
-                            alert("エラーが頻発しています。対象としているフレームワークのモデルがロードされているか確認してください。")
-                            errorCountRef.current = 0
-                        }
+                        ioErrorCountRef.current += 1
+                        setIoErrorCount(ioErrorCountRef.current)
                     }
                 },
                 notifyVolume: (vol: number) => {
@@ -207,5 +212,8 @@ export const useClient = (props: UseClientProps): ClientState => {
 
         // AudioOutputElement  設定
         setAudioOutputElementId,
+
+        ioErrorCount,
+        resetIoErrorCount
     }
 }

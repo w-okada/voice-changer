@@ -15,7 +15,12 @@ export const ModelUploadButtonRow2 = (_props: ModelUploadButtonRow2Props) => {
             return <></>
         }
         const onModelUploadClicked = async () => {
-            appState.serverSetting.loadModel(slot)
+            try {
+                await appState.serverSetting.loadModel(slot)
+            } catch (e) {
+                console.log(e)
+                alert(e)
+            }
         }
 
         const buttonText = appState.serverSetting.fileUploadSettings[slot].isSampleMode ? "select" : "upload"

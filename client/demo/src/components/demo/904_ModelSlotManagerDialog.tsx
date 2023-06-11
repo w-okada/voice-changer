@@ -258,7 +258,11 @@ export const ModelSlotManagerDialog = () => {
                 sampleId: id,
                 isSampleMode: true
             }
-            await serverSetting.loadModel(fromNetTargetIndex)
+            try {
+                await serverSetting.loadModel(fromNetTargetIndex)
+            } catch (e) {
+                alert(e)
+            }
             setMode("localFile")
         }
         const options = (

@@ -58,6 +58,13 @@ export const AppStateProvider = ({ children }: Props) => {
         }
     }, [clientState.clientState.initialized])
 
+    useEffect(() => {
+        if (clientState.clientState.ioErrorCount > 100) {
+            alert("エラーが頻発しています。対象としているフレームワークのモデルがロードされているか確認してください。")
+            clientState.clientState.resetIoErrorCount()
+        }
+
+    }, [clientState.clientState.ioErrorCount])
 
 
     const providerValue: AppStateValue = {
