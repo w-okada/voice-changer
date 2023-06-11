@@ -57,7 +57,7 @@ export const RecorderArea = (_props: RecorderAreaProps) => {
 
 
                 <div className="config-sub-area-control left-padding-1">
-                    <div className="config-sub-area-control-title">dev</div>
+                    <div className="config-sub-area-control-title">output</div>
                     <div className="config-sub-area-control-field">
                         <div className="config-sub-area-control-field-auido-io">
                             <select className="body-select" value={audioOutputForAnalyzer} onChange={(e) => {

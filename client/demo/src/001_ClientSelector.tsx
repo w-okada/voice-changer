@@ -12,8 +12,6 @@ export const ClientSelector = () => {
         setItem(INDEXEDDB_KEY_DEFAULT_MODEL_TYPE, clientType)
     }
 
-
-
     const selectableClientTypes = useMemo(() => {
         const ua = window.navigator.userAgent.toLowerCase();
         if (ua.indexOf("mac os x") !== -1) {

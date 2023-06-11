@@ -14,6 +14,7 @@ import { ClientType, useIndexedDB } from "@dannadori/voice-changer-client-js";
 import { INDEXEDDB_KEY_DEFAULT_MODEL_TYPE } from "./const";
 import { Demo } from "./components/demo/010_Demo";
 import { ClientSelector } from "./001_ClientSelector";
+import { useMessageBuilder } from "./hooks/useMessageBuilder";
 
 library.add(fas, far, fab);
 
@@ -40,9 +41,21 @@ const App = () => {
 
 const AppStateWrapper = () => {
     const { appGuiSettingState, clientType, setClientType } = useAppRoot()
+    const messageBuilderState = useMessageBuilder()
+    // エラーメッセージ登録
+    useMemo(() => {
+        messageBuilderState.setMessage(__filename, "Problem", { "ja": "ちょっと問題が起きたみたいです。", "en": "Looks like there's a bit of a problem." })
+        messageBuilderState.setMessage(__filename, "Problem-sub1", { "ja": "このアプリで管理している情報をクリアすると回復する場合があります。", "en": "" })
+        messageBuilderState.setMessage(__filename, "Problem-sub2", { "ja": "下記のボタンを押して情報をクリアします。", "en": "If you clear the information being managed by this app, it may be recoverable." })
+        messageBuilderState.setMessage(__filename, "Problem-action1", { "ja": "アプリを初期化", "en": "Initialize" })
+        messageBuilderState.setMessage(__filename, "Problem-action2", { "ja": "初期化せずリロード", "en": "Reload without initialize" })
+    }, [])
+
     // エラーバウンダリー設定
     const [error, setError] = useState<{ error: Error, errorInfo: ErrorInfo }>()
     const { getItem, removeDB } = useIndexedDB({ clientType: null })
+
+
     const errorComponent = useMemo(() => {
         const errorName = error?.error.name || "no error name"
         const errorMessage = error?.error.message || "no error message"
@@ -58,13 +71,13 @@ const AppStateWrapper = () => {
         return (
             <div className="error-container">
                 <div className="top-error-message">
-                    ちょっと問題が起きたみたいです。
+                    {messageBuilderState.getMessage(__filename, "Problem")}
                 </div>
                 <div className="top-error-description">
-                    <p>このアプリで管理している情報をクリアすると回復する場合があります。</p>
-                    <p>下記のボタンを押して情報をクリアします。</p>
-                    <p><button onClick={onClearCacheClicked}>アプリを初期化</button></p>
-                    <p><button onClick={onReloadClicked}>初期化せずリロード</button></p>
+                    <p> {messageBuilderState.getMessage(__filename, "Problem-sub1")}</p>
+                    <p> {messageBuilderState.getMessage(__filename, "Problem-sub2")}</p>
+                    <p><button onClick={onClearCacheClicked}>{messageBuilderState.getMessage(__filename, "Problem-action1")}</button></p>
+                    <p><button onClick={onReloadClicked}>{messageBuilderState.getMessage(__filename, "Problem-action2")}</button></p>
                 </div>
                 <div className="error-detail">
                     <div className="error-name">

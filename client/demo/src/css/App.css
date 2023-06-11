@@ -974,7 +974,12 @@ body {
 .tooltip-text-100px {
     width: 100px;
 }
-
+.tooltip-text-thin {
+    line-height: 1rem;
+}
+.tooltip-text-right {
+    line-height: 1rem;
+}
 .tooltip-text:before {
     content: "";
     position: absolute;
@@ -987,6 +992,11 @@ body {
 .tooltip:hover .tooltip-text {
     display: inline-block;
     top: 30px;
+    left: 0px;
+}
+.tooltip:hover .tooltip-text-lower {
+    display: inline-block;
+    top: 60px;
     left: 0px;
 }
 

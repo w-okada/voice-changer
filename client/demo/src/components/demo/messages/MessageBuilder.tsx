@@ -1,5 +1,5 @@
 
-const messages: {
+const messages_: {
     [id: string]: {
         [lang: string]: string
     }
@@ -23,15 +23,15 @@ const messages: {
 
 }
 
-export const getMessage = (id: string) => {
+export const getMessage_ = (id: string) => {
     let lang = window.navigator.language
     if (lang != "ja") {
         lang = "en"
     }
 
-    if (!messages[id]) {
+    if (!messages_[id]) {
         return "undefined message."
     }
 
-    return messages[id][lang]
+    return messages_[id][lang]
 }

@@ -1,6 +1,7 @@
 import React, { useMemo } from "react"
 import { useAppState } from "../../../001_provider/001_AppStateProvider"
 import { useGuiState } from "../001_GuiStateProvider"
+import { useMessageBuilder } from "../../../hooks/useMessageBuilder"
 
 export type ModelSlotAreaProps = {
 }
@@ -9,6 +10,13 @@ export type ModelSlotAreaProps = {
 export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
     const { serverSetting, getInfo } = useAppState()
     const guiState = useGuiState()
+    const messageBuilderState = useMessageBuilder()
+
+    useMemo(() => {
+        messageBuilderState.setMessage(__filename, "edit", { "ja": "編集", "en": "edit" })
+    }, [])
+
+
     const modelTiles = useMemo(() => {
         if (!serverSetting.serverSetting.modelSlots) {
             return []
@@ -21,7 +29,7 @@ export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
             const name = x.name.length > 8 ? x.name.substring(0, 7) + "..." : x.name
             const iconElem = x.iconFile.length > 0 ?
                 <img className="model-slot-tile-icon" src={x.iconFile} alt={x.name} /> :
-                <div className="model-slot-tile-icon-no-entry">no entry.</div>
+                <div className="model-slot-tile-icon-no-entry">no image</div>
 
             const clickAction = async () => {
                 const dummyModelSlotIndex = (Math.floor(Date.now() / 1000)) * 1000 + index
@@ -55,7 +63,7 @@ export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
                     <div className="model-slot-tiles-container">{modelTiles}</div>
                     <div className="model-slot-buttons">
                         <div className="model-slot-button" onClick={onModelSlotEditClicked}>
-                            edit
+                            {messageBuilderState.getMessage(__filename, "edit")}
                         </div>
                     </div>
 

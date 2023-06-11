@@ -27,7 +27,9 @@ export const useAppRoot = (): AppRootValue => {
 export const AppRootProvider = ({ children }: Props) => {
     const audioContextState = useAudioConfig()
     const appGuiSettingState = useAppGuiSetting()
+
     const [clientType, setClientType] = useState<ClientType | null>(null)
+
 
     useEffect(() => {
         if (!clientType) {

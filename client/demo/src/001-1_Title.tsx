@@ -1,5 +1,7 @@
 import React, { useMemo } from "react";
 import { isDesktopApp } from "./const";
+import { useAppRoot } from "./001_provider/001_AppRootProvider";
+import { useMessageBuilder } from "./hooks/useMessageBuilder";
 
 
 export type TitleProps = {
@@ -9,6 +11,13 @@ export type TitleProps = {
 }
 
 export const Title = (props: TitleProps) => {
+    const messageBuilderState = useMessageBuilder()
+    useMemo(() => {
+        messageBuilderState.setMessage(__filename, "github", { "ja": "github", "en": "github" })
+        messageBuilderState.setMessage(__filename, "manual", { "ja": "マニュアル", "en": "manual" })
+        messageBuilderState.setMessage(__filename, "screenCapture", { "ja": "録画ツール", "en": "Record Screen" })
+        messageBuilderState.setMessage(__filename, "support", { "ja": "支援", "en": "Donation" })
+    }, [])
 
     const githubLink = useMemo(() => {
         return isDesktopApp() ?
@@ -16,14 +25,14 @@ export const Title = (props: TitleProps) => {
                 // @ts-ignore
                 <span className="link tooltip" onClick={() => { window.electronAPI.openBrowser("https://github.com/w-okada/voice-changer") }}>
                     <img src="./assets/icons/github.svg" />
-                    <div className="tooltip-text">github</div>
+                    <div className="tooltip-text">{messageBuilderState.getMessage(__filename, "github")}</div>
                 </span>
             )
             :
             (
                 <a className="link tooltip" href="https://github.com/w-okada/voice-changer" target="_blank" rel="noopener noreferrer">
                     <img src="./assets/icons/github.svg" />
-                    <div className="tooltip-text">github</div>
+                    <div className="tooltip-text">{messageBuilderState.getMessage(__filename, "github")}</div>
                 </a>
             )
     }, [])
@@ -33,16 +42,16 @@ export const Title = (props: TitleProps) => {
         return isDesktopApp() ?
             (
                 // @ts-ignore
-                <span className="link tooltip" onClick={() => { window.electronAPI.openBrowser("https://zenn.dev/wok/books/0004_vc-client-v_1_5_1_x") }}>
+                <span className="link tooltip" onClick={() => { window.electronAPI.openBrowser("https://github.com/w-okada/voice-changer/blob/master/tutorials/tutorial_rvc_ja_latest.md") }}>
                     <img src="./assets/icons/help-circle.svg" />
-                    <div className="tooltip-text">manual</div>
+                    <div className="tooltip-text tooltip-text-100px">{messageBuilderState.getMessage(__filename, "manual")}</div>
                 </span>
             )
             :
             (
-                <a className="link tooltip" href="https://zenn.dev/wok/books/0004_vc-client-v_1_5_1_x" target="_blank" rel="noopener noreferrer">
+                <a className="link tooltip" href="https://github.com/w-okada/voice-changer/blob/master/tutorials/tutorial_rvc_ja_latest.md" target="_blank" rel="noopener noreferrer">
                     <img src="./assets/icons/help-circle.svg" />
-                    <div className="tooltip-text">manual</div>
+                    <div className="tooltip-text tooltip-text-100px">{messageBuilderState.getMessage(__filename, "manual")}</div>
                 </a>
             )
     }, [])
@@ -58,7 +67,7 @@ export const Title = (props: TitleProps) => {
                             // @ts-ignore
                             window.electronAPI.openBrowser("https://w-okada.github.io/screen-recorder-ts/")
                         }}>
-                            screen capture
+                            {messageBuilderState.getMessage(__filename, "screenCapture")}
                         </p>
                     </div>
                 </div>
@@ -71,7 +80,7 @@ export const Title = (props: TitleProps) => {
                         <p onClick={() => {
                             window.open("https://w-okada.github.io/screen-recorder-ts/", '_blank', "noreferrer")
                         }}>
-                            screen capture
+                            {messageBuilderState.getMessage(__filename, "screenCapture")}
                         </p>
                     </div>
                 </div>
@@ -85,7 +94,7 @@ export const Title = (props: TitleProps) => {
                 // @ts-ignore
                 <span className="link tooltip" onClick={() => { window.electronAPI.openBrowser("https://www.buymeacoffee.com/wokad") }}>
                     <img className="donate-img" src="./assets/buymeacoffee.png" />
-                    <div className="tooltip-text tooltip-text-100px">donate(寄付)</div>
+                    <div className="tooltip-text tooltip-text-100px">{messageBuilderState.getMessage(__filename, "support")}</div>
                 </span>
             )
             :
@@ -93,7 +102,7 @@ export const Title = (props: TitleProps) => {
                 <a className="link tooltip" href="https://www.buymeacoffee.com/wokad" target="_blank" rel="noopener noreferrer">
                     <img className="donate-img" src="./assets/buymeacoffee.png" />
                     <div className="tooltip-text tooltip-text-100px">
-                        donate(寄付)
+                        {messageBuilderState.getMessage(__filename, "support")}
                     </div>
                 </a>
             )

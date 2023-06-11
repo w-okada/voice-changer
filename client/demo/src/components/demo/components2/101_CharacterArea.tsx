@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react"
 import { useAppState } from "../../../001_provider/001_AppStateProvider"
 import { useGuiState } from "../001_GuiStateProvider"
 import { OnnxExporterInfo } from "@dannadori/voice-changer-client-js"
+import { useMessageBuilder } from "../../../hooks/useMessageBuilder"
 
 export type CharacterAreaProps = {
 }
@@ -10,6 +11,14 @@ export type CharacterAreaProps = {
 export const CharacterArea = (_props: CharacterAreaProps) => {
     const { serverSetting, clientSetting, initializedRef, volume, bufferingTime, performance } = useAppState()
     const guiState = useGuiState()
+    const messageBuilderState = useMessageBuilder()
+
+    useMemo(() => {
+        messageBuilderState.setMessage(__filename, "terms_of_use", { "ja": "利用規約", "en": "terms of use" })
+        messageBuilderState.setMessage(__filename, "export_to_onnx", { "ja": "onnx出力", "en": "export to onnx" })
+        messageBuilderState.setMessage(__filename, "save_default", { "ja": "設定保存", "en": "save setting" })
+        messageBuilderState.setMessage(__filename, "alert_onnx", { "ja": "ボイチェン中はonnx出力できません", "en": "cannot export onnx when voice conversion is enabled" })
+    }, [])
 
     const selected = useMemo(() => {
         if (serverSetting.serverSetting.modelSlotIndex == undefined) {
@@ -38,7 +47,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
         }
 
         const icon = selected.iconFile.length > 0 ? selected.iconFile : "./assets/icons/human.png"
-        const selectedTermOfUseUrlLink = selected.termsOfUseUrl ? <a href={selected.termsOfUseUrl} target="_blank" rel="noopener noreferrer" className="portrait-area-terms-of-use-link">[terms of use]</a> : <></>
+        const selectedTermOfUseUrlLink = selected.termsOfUseUrl ? <a href={selected.termsOfUseUrl} target="_blank" rel="noopener noreferrer" className="portrait-area-terms-of-use-link">[{messageBuilderState.getMessage(__filename, "terms_of_use")}]</a> : <></>
 
 
         return (
@@ -235,7 +244,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
 
         const onnxExportButtonAction = async () => {
             if (guiState.isConverting) {
-                alert("cannot export onnx when voice conversion is enabled")
+                alert(messageBuilderState.getMessage(__filename, "alert_onnx"))
                 return
             }
 
@@ -253,7 +262,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
         }
 
         const exportOnnx = selected.modelFile.endsWith("pth") ? (
-            <div className="character-area-button" onClick={onnxExportButtonAction}>export onnx</div>
+            <div className="character-area-button" onClick={onnxExportButtonAction}>{messageBuilderState.getMessage(__filename, "export_to_onnx")}</div>
         ) : <></>
         return (
             <div className="character-area-control">
@@ -262,7 +271,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
                 </div>
                 <div className="character-area-control-field">
                     <div className="character-area-buttons">
-                        <div className="character-area-button" onClick={onUpdateDefaultClicked}>save default</div>
+                        <div className="character-area-button" onClick={onUpdateDefaultClicked}>{messageBuilderState.getMessage(__filename, "save_default")}</div>
                         {exportOnnx}
                     </div>
                 </div>

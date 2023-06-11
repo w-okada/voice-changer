@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useGuiState } from "./001_GuiStateProvider";
 import { useAppState } from "../../001_provider/001_AppStateProvider";
 import { InitialFileUploadSetting, fileSelector } from "@dannadori/voice-changer-client-js";
+import { useMessageBuilder } from "../../hooks/useMessageBuilder";
 
 
 export type uploadData = {
@@ -23,8 +24,14 @@ export const ModelSlotManagerDialog = () => {
     const [mode, setMode] = useState<Mode>("localFile")
     const [fromNetTargetIndex, setFromNetTargetIndex] = useState<number>(0)
     const [lang, setLang] = useState<string>("All")
+    const messageBuilderState = useMessageBuilder()
 
-
+    useMemo(() => {
+        messageBuilderState.setMessage(__filename, "change_icon", { "ja": "アイコン変更", "en": "chage icon" })
+        messageBuilderState.setMessage(__filename, "rename", { "ja": "リネーム", "en": "rename" })
+        messageBuilderState.setMessage(__filename, "download", { "ja": "ダウンロード", "en": "download" })
+        messageBuilderState.setMessage(__filename, "terms_of_use", { "ja": "利用規約", "en": "terms of use" })
+    }, [])
     /////////////////////////////////////////
     // Slot Manager
     /////////////////////////////////////////
@@ -130,7 +137,7 @@ export const ModelSlotManagerDialog = () => {
 
             const isRegisterd = modelFileName.length > 0 ? true : false
             const name = x.name && x.name.length > 0 ? x.name : isRegisterd ? modelFileName : "blank"
-            const termOfUseUrlLink = x.termsOfUseUrl && x.termsOfUseUrl.length > 0 ? <a href={x.termsOfUseUrl} target="_blank" rel="noopener noreferrer" className="body-item-text-small">[terms of use]</a> : <></>
+            const termOfUseUrlLink = x.termsOfUseUrl && x.termsOfUseUrl.length > 0 ? <a href={x.termsOfUseUrl} target="_blank" rel="noopener noreferrer" className="body-item-text-small">[{messageBuilderState.getMessage(__filename, "terms_of_use")}]</a> : <></>
 
             const nameValueClass = isRegisterd ? "model-slot-detail-row-value-pointable" : "model-slot-detail-row-value"
             const nameValueAction = isRegisterd ? async (index: number) => {
@@ -168,21 +175,41 @@ export const ModelSlotManagerDialog = () => {
 
             return (
                 <div key={index} className="model-slot">
-                    <img src={iconUrl} className={iconClass} onClick={() => { iconAction(index) }}></img>
+                    <div className="tooltip">
+                        <img src={iconUrl} className={iconClass} onClick={() => { iconAction(index) }} />
+                        <div className="tooltip-text tooltip-text-thin tooltip-text-lower">
+                            {messageBuilderState.getMessage(__filename, "change_icon")}
+                        </div>
+                    </div>
                     <div className="model-slot-detail">
                         <div className="model-slot-detail-row">
                             <div className="model-slot-detail-row-label">[{index}]</div>
-                            <div className={nameValueClass} onClick={() => { nameValueAction(index) }}>{name}</div>
+                            <div className={nameValueClass + " tooltip"} onClick={() => { nameValueAction(index) }}>
+                                {name}
+                                <div className="tooltip-text tooltip-text-thin">
+                                    {messageBuilderState.getMessage(__filename, "rename")}
+                                </div>
+                            </div>
                             <div className="">{termOfUseUrlLink}</div>
                         </div>
                         <div className="model-slot-detail-row">
                             <div className="model-slot-detail-row-label">model:</div>
-                            <div className={fileValueClass} onClick={() => { fileValueAction(x.modelFile) }}>{modelFileName}</div>
+                            <div className={fileValueClass + " tooltip"} onClick={() => { fileValueAction(x.modelFile) }}>
+                                {modelFileName}
+                                <div className="tooltip-text tooltip-text-thin">
+                                    {messageBuilderState.getMessage(__filename, "download")}
+                                </div>
+                            </div>
                             <div className="model-slot-button  model-slot-detail-row-button" onClick={() => { onRVCModelLoadClicked(index) }}>select</div>
                         </div>
                         <div className="model-slot-detail-row">
                             <div className="model-slot-detail-row-label">index:</div>
-                            <div className={fileValueClass} onClick={() => { fileValueAction(x.indexFile) }}>{indexFileName}</div>
+                            <div className={fileValueClass + " tooltip"} onClick={() => { fileValueAction(x.indexFile) }}>
+                                {indexFileName}
+                                <div className="tooltip-text tooltip-text-thin">
+                                    {messageBuilderState.getMessage(__filename, "download")}
+                                </div>
+                            </div>
                             <div className="model-slot-button model-slot-detail-row-button" onClick={() => { onRVCIndexLoadClicked(index) }}>select</div>
                         </div>
                         <div className="model-slot-detail-row">
@@ -209,7 +236,7 @@ export const ModelSlotManagerDialog = () => {
 
 
                     </div>
-                </div>
+                </div >
             )
         })
 
@@ -267,7 +294,7 @@ export const ModelSlotManagerDialog = () => {
         }
         const options = (
             serverSetting.serverSetting.sampleModels.filter(x => { return lang == "All" ? true : x.lang == lang }).map((x, index) => {
-                const termOfUseUrlLink = x.termsOfUseUrl && x.termsOfUseUrl.length > 0 ? <a href={x.termsOfUseUrl} target="_blank" rel="noopener noreferrer" className="body-item-text-small">[terms of use]</a> : <></>
+                const termOfUseUrlLink = x.termsOfUseUrl && x.termsOfUseUrl.length > 0 ? <a href={x.termsOfUseUrl} target="_blank" rel="noopener noreferrer" className="body-item-text-small">[{messageBuilderState.getMessage(__filename, "terms_of_use")}]</a> : <></>
 
                 return (
                     <div key={index} className="model-slot">
