@@ -10,15 +10,16 @@ body:
       options:
         - Feature Request
         - Documentation Feature Request
-        - Others
         - Bug Report
+        - Question
+        - Others
     validations:
       required: true
   - type: input
     id: vc-client-version
     attributes:
       label: vc client version number
-      description: The version number of vc client used. Or download the filename
+      description: The version number of vc client used. Or filename of you download(.zip)
       placeholder: x.x.x.x
     validations:
       required: true
@@ -85,6 +86,6 @@ body:
     id: issue
     attributes:
       label: Situation
-      description: Please input your issue
+      description: Please describe the situation in as much detail as possible.
     validations:
       required: true
