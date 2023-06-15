@@ -4,16 +4,47 @@ from const import ModelType
 from voice_changer.utils.LoadModelParams import LoadModelParams
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
+from dataclasses import dataclass, asdict
+import torch
+
+
+@dataclass()
+class GPUInfo:
+    id: int
+    name: str
+    memory: int
+
+
+@dataclass()
+class VoiceChangerManagerSettings:
+    dummy: int
+
+    # intData: list[str] = field(default_factory=lambda: ["slotIndex"])
 
 
 class VoiceChangerManager(object):
     _instance = None
-    voiceChanger: VoiceChanger = None
+
+    def __init__(self, params: VoiceChangerParams):
+        self.voiceChanger: VoiceChanger = None
+        self.settings: VoiceChangerManagerSettings = VoiceChangerManagerSettings(dummy=0)
+        # スタティックな情報を収集
+        self.gpus: list[GPUInfo] = self._get_gpuInfos()
+
+    def _get_gpuInfos(self):
+        devCount = torch.cuda.device_count()
+        gpus = []
+        for id in range(devCount):
+            name = torch.cuda.get_device_name(id)
+            memory = torch.cuda.get_device_properties(id).total_memory
+            gpu = {"id": id, "name": name, "memory": memory}
+            gpus.append(gpu)
+        return gpus
 
     @classmethod
     def get_instance(cls, params: VoiceChangerParams):
         if cls._instance is None:
-            cls._instance = cls()
+            cls._instance = cls(params)
             cls._instance.voiceChanger = VoiceChanger(params)
         return cls._instance
 
@@ -26,10 +57,15 @@ class VoiceChangerManager(object):
             return info
 
     def get_info(self):
+        data = asdict(self.settings)
+        data["gpus"] = self.gpus
+
+        data["status"] = "OK"
+
         if hasattr(self, "voiceChanger"):
             info = self.voiceChanger.get_info()
-            info["status"] = "OK"
-            return info
+            data.update(info)
+            return data
         else:
             return {"status": "ERROR", "msg": "no model loaded"}
 
@@ -42,11 +78,10 @@ class VoiceChangerManager(object):
 
     def update_settings(self, key: str, val: str | int | float):
         if hasattr(self, "voiceChanger"):
-            info = self.voiceChanger.update_settings(key, val)
-            info["status"] = "OK"
-            return info
+            self.voiceChanger.update_settings(key, val)
         else:
             return {"status": "ERROR", "msg": "no model loaded"}
+        return self.get_info()
 
     def changeVoice(self, receivedData: AudioInOut):
         if hasattr(self, "voiceChanger") is True:
