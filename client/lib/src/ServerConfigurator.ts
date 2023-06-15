@@ -1,4 +1,4 @@
-import { ClientType, MergeModelRequest, OnnxExporterInfo, ServerInfo, ServerSettingKey } from "./const";
+import { ClientType, MergeModelRequest, OnnxExporterInfo, ServerInfo, ServerSettingKey, VoiceChangerType } from "./const";
 
 
 type FileChunk = {
@@ -166,16 +166,12 @@ export class ServerConfigurator {
         })
     }
 
-    loadModel = async (slot: number, isHalf: boolean, params: string = "{}") => {
-        if (isHalf == undefined || isHalf == null) {
-            console.warn("isHalf is invalid value", isHalf)
-            isHalf = false
-        }
+    loadModel = async (slot: number, voiceChangerType: VoiceChangerType, params: string = "{}") => {
         const url = this.serverUrl + "/load_model"
         const info = new Promise<ServerInfo>(async (resolve) => {
             const formData = new FormData();
             formData.append("slot", "" + slot);
-            formData.append("isHalf", "" + isHalf);
+            formData.append("voiceChangerType", voiceChangerType);
             formData.append("params", params);
 
             const request = new Request(url, {

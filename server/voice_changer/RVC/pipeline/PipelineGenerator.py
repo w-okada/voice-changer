@@ -1,8 +1,8 @@
 import os
 import traceback
 import faiss
+from voice_changer.RVC.RVCSlotInfo import RVCSlotInfo
 
-from voice_changer.RVC.ModelSlot import ModelSlot
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 from voice_changer.RVC.inferencer.InferencerManager import InferencerManager
@@ -10,15 +10,13 @@ from voice_changer.RVC.pipeline.Pipeline import Pipeline
 from voice_changer.RVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
 
 
-def createPipeline(modelSlot: ModelSlot, gpu: int, f0Detector: str):
+def createPipeline(slotInfo: RVCSlotInfo, gpu: int, f0Detector: str):
     dev = DeviceManager.get_instance().getDevice(gpu)
     half = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
 
     # Inferencer 生成
     try:
-        inferencer = InferencerManager.getInferencer(
-            modelSlot.modelType, modelSlot.modelFile, gpu
-        )
+        inferencer = InferencerManager.getInferencer(slotInfo.modelType, slotInfo.modelFile, gpu)
     except Exception as e:
         print("[Voice Changer] exception! loading inferencer", e)
         traceback.print_exc()
@@ -26,7 +24,7 @@ def createPipeline(modelSlot: ModelSlot, gpu: int, f0Detector: str):
     # Embedder 生成
     try:
         embedder = EmbedderManager.getEmbedder(
-            modelSlot.embedder,
+            slotInfo.embedder,
             # emmbedderFilename,
             half,
             dev,
@@ -39,14 +37,14 @@ def createPipeline(modelSlot: ModelSlot, gpu: int, f0Detector: str):
     pitchExtractor = PitchExtractorManager.getPitchExtractor(f0Detector)
 
     # index, feature
-    index = _loadIndex(modelSlot)
+    index = _loadIndex(slotInfo)
 
     pipeline = Pipeline(
         embedder,
         inferencer,
         pitchExtractor,
         index,
-        modelSlot.samplingRate,
+        slotInfo.samplingRate,
         dev,
         half,
     )
@@ -54,21 +52,21 @@ def createPipeline(modelSlot: ModelSlot, gpu: int, f0Detector: str):
     return pipeline
 
 
-def _loadIndex(modelSlot: ModelSlot):
+def _loadIndex(slotInfo: RVCSlotInfo):
     # Indexのロード
     print("[Voice Changer] Loading index...")
     # ファイル指定がない場合はNone
-    if modelSlot.indexFile is None:
+    if slotInfo.indexFile is None:
         print("[Voice Changer] Index is None, not used")
         return None
 
     # ファイル指定があってもファイルがない場合はNone
-    if os.path.exists(modelSlot.indexFile) is not True:
+    if os.path.exists(slotInfo.indexFile) is not True:
         return None
 
     try:
-        print("Try loading...", modelSlot.indexFile)
-        index = faiss.read_index(modelSlot.indexFile)
+        print("Try loading...", slotInfo.indexFile)
+        index = faiss.read_index(slotInfo.indexFile)
     except:
         print("[Voice Changer] load index failed. Use no index.")
         traceback.print_exc()

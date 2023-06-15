@@ -5,33 +5,21 @@ import tempfile
 from typing import Literal, TypeAlias
 
 
-ModelType: TypeAlias = Literal[
-    "MMVCv15",
+VoiceChangerType: TypeAlias = Literal[
     "MMVCv13",
-    "so-vits-svc-40v2",
+    "MMVCv15",
     "so-vits-svc-40",
-    "so-vits-svc-40_c",
     "DDSP-SVC",
     "RVC",
 ]
 
 ERROR_NO_ONNX_SESSION = "ERROR_NO_ONNX_SESSION"
 
-
 tmpdir = tempfile.TemporaryDirectory()
-# print("generate tmpdir:::",tmpdir)
 SSL_KEY_DIR = os.path.join(tmpdir.name, "keys") if hasattr(sys, "_MEIPASS") else "keys"
 MODEL_DIR = os.path.join(tmpdir.name, "logs") if hasattr(sys, "_MEIPASS") else "logs"
-UPLOAD_DIR = (
-    os.path.join(tmpdir.name, "upload_dir")
-    if hasattr(sys, "_MEIPASS")
-    else "upload_dir"
-)
-NATIVE_CLIENT_FILE_WIN = (
-    os.path.join(sys._MEIPASS, "voice-changer-native-client.exe")  # type: ignore
-    if hasattr(sys, "_MEIPASS")
-    else "voice-changer-native-client"
-)
+UPLOAD_DIR = os.path.join(tmpdir.name, "upload_dir") if hasattr(sys, "_MEIPASS") else "upload_dir"
+NATIVE_CLIENT_FILE_WIN = os.path.join(sys._MEIPASS, "voice-changer-native-client.exe") if hasattr(sys, "_MEIPASS") else "voice-changer-native-client"  # type: ignore
 NATIVE_CLIENT_FILE_MAC = (
     os.path.join(
         sys._MEIPASS,  # type: ignore
@@ -44,25 +32,12 @@ NATIVE_CLIENT_FILE_MAC = (
     else "voice-changer-native-client"
 )
 
-HUBERT_ONNX_MODEL_PATH = (
-    os.path.join(sys._MEIPASS, "model_hubert/hubert_simple.onnx")  # type: ignore
-    if hasattr(sys, "_MEIPASS")
-    else "model_hubert/hubert_simple.onnx"
-)
-
-
-TMP_DIR = (
-    os.path.join(tmpdir.name, "tmp_dir") if hasattr(sys, "_MEIPASS") else "tmp_dir"
-)
+TMP_DIR = os.path.join(tmpdir.name, "tmp_dir") if hasattr(sys, "_MEIPASS") else "tmp_dir"
 os.makedirs(TMP_DIR, exist_ok=True)
 
 
 def getFrontendPath():
-    frontend_path = (
-        os.path.join(sys._MEIPASS, "dist")
-        if hasattr(sys, "_MEIPASS")
-        else "../client/demo/dist"
-    )
+    frontend_path = os.path.join(sys._MEIPASS, "dist") if hasattr(sys, "_MEIPASS") else "../client/demo/dist"
     return frontend_path
 
 
@@ -100,84 +75,84 @@ class ServerAudioDeviceTypes(Enum):
     audiooutput = "audiooutput"
 
 
-class RVCSampleMode(Enum):
-    production = "production"
-    testOfficial = "testOfficial"
-    testDDPNTorch = "testDDPNTorch"
-    testDDPNONNX = "testDDPNONNX"
-    testONNXFull = "testONNXFull"
+RVCSampleMode: TypeAlias = Literal[
+    "production",
+    "testOfficial",
+    "testDDPNTorch",
+    "testDDPNONNX",
+    "testONNXFull",
+]
 
 
-def getRVCSampleJsonAndModelIds(mode: RVCSampleMode):
-    if mode == RVCSampleMode.production.value:
+def getSampleJsonAndModelIds(mode: RVCSampleMode):
+    if mode == "production":
         return [
             # "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0001.json",
             # "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0002.json",
-            "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0003_t.json",
-            "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0003_o.json",
+            "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0003_t2.json",
+            "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0003_o2.json",
         ], [
-            ("TokinaShigure_o", True),
-            ("KikotoMahiro_o", False),
-            ("Amitaro_o", False),
-            ("Tsukuyomi-chan_o", False),
+            ("TokinaShigure_o", {"useIndex": True}),
+            ("KikotoMahiro_o", {"useIndex": False}),
+            ("Amitaro_o", {"useIndex": False}),
+            ("Tsukuyomi-chan_o", {"useIndex": False}),
         ]
-    elif mode == RVCSampleMode.testOfficial.value:
+    elif mode == "testOfficial":
         return [
             "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_official_v1_v2.json",
             "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_ddpn_v1_v2.json",
         ], [
-            ("test-official-v1-f0-48k-l9-hubert_t", True),
-            ("test-official-v1-nof0-48k-l9-hubert_t", False),
-            ("test-official-v2-f0-40k-l12-hubert_t", False),
-            ("test-official-v2-nof0-40k-l12-hubert_t", False),
-            ("test-official-v1-f0-48k-l9-hubert_o", True),
-            ("test-official-v1-nof0-48k-l9-hubert_o", False),
-            ("test-official-v2-f0-40k-l12-hubert_o", False),
-            ("test-official-v2-nof0-40k-l12-hubert_o", False),
+            ("test-official-v1-f0-48k-l9-hubert_t", {"useIndex": True}),
+            ("test-official-v1-nof0-48k-l9-hubert_t", {"useIndex": False}),
+            ("test-official-v2-f0-40k-l12-hubert_t", {"useIndex": False}),
+            ("test-official-v2-nof0-40k-l12-hubert_t", {"useIndex": False}),
+            ("test-official-v1-f0-48k-l9-hubert_o", {"useIndex": True}),
+            ("test-official-v1-nof0-48k-l9-hubert_o", {"useIndex": False}),
+            ("test-official-v2-f0-40k-l12-hubert_o", {"useIndex": False}),
+            ("test-official-v2-nof0-40k-l12-hubert_o", {"useIndex": False}),
         ]
-    elif mode == RVCSampleMode.testDDPNTorch.value:
+    elif mode == "testDDPNTorch":
         return [
             "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_official_v1_v2.json",
             "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_ddpn_v1_v2.json",
         ], [
-            ("test-ddpn-v1-f0-48k-l9-hubert_t", False),
-            ("test-ddpn-v1-nof0-48k-l9-hubert_t", False),
-            ("test-ddpn-v2-f0-40k-l12-hubert_t", False),
-            ("test-ddpn-v2-nof0-40k-l12-hubert_t", False),
-            ("test-ddpn-v2-f0-40k-l12-hubert_jp_t", False),
-            ("test-ddpn-v2-nof0-40k-l12-hubert_jp_t", False),
+            ("test-ddpn-v1-f0-48k-l9-hubert_t", {"useIndex": False}),
+            ("test-ddpn-v1-nof0-48k-l9-hubert_t", {"useIndex": False}),
+            ("test-ddpn-v2-f0-40k-l12-hubert_t", {"useIndex": False}),
+            ("test-ddpn-v2-nof0-40k-l12-hubert_t", {"useIndex": False}),
+            ("test-ddpn-v2-f0-40k-l12-hubert_jp_t", {"useIndex": False}),
+            ("test-ddpn-v2-nof0-40k-l12-hubert_jp_t", {"useIndex": False}),
         ]
-    elif mode == RVCSampleMode.testDDPNONNX.value:
+    elif mode == "testDDPNONNX":
         return [
             "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_official_v1_v2.json",
             "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_ddpn_v1_v2.json",
         ], [
-            ("test-ddpn-v1-f0-48k-l9-hubert_o", False),
-            ("test-ddpn-v1-nof0-48k-l9-hubert_o", False),
-            ("test-ddpn-v2-f0-40k-l12-hubert_o", False),
-            ("test-ddpn-v2-nof0-40k-l12-hubert_o", False),
-            ("test-ddpn-v2-f0-40k-l12-hubert_jp_o", False),
-            ("test-ddpn-v2-nof0-40k-l12-hubert_jp_o", False),
+            ("test-ddpn-v1-f0-48k-l9-hubert_o", {"useIndex": False}),
+            ("test-ddpn-v1-nof0-48k-l9-hubert_o", {"useIndex": False}),
+            ("test-ddpn-v2-f0-40k-l12-hubert_o", {"useIndex": False}),
+            ("test-ddpn-v2-nof0-40k-l12-hubert_o", {"useIndex": False}),
+            ("test-ddpn-v2-f0-40k-l12-hubert_jp_o", {"useIndex": False}),
+            ("test-ddpn-v2-nof0-40k-l12-hubert_jp_o", {"useIndex": False}),
         ]
-    elif mode == RVCSampleMode.testONNXFull.value:
+    elif mode == "testONNXFull":
         return [
             "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_official_v1_v2.json",
             "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_ddpn_v1_v2.json",
         ], [
-            ("test-official-v1-f0-48k-l9-hubert_o_full", False),
-            ("test-official-v1-nof0-48k-l9-hubert_o_full", False),
-            ("test-official-v2-f0-40k-l12-hubert_o_full", False),
-            ("test-official-v2-nof0-40k-l12-hubert_o_full", False),
-            ("test-ddpn-v1-f0-48k-l9-hubert_o_full", False),
-            ("test-ddpn-v1-nof0-48k-l9-hubert_o_full", False),
-            ("test-ddpn-v2-f0-40k-l12-hubert_o_full", False),
-            ("test-ddpn-v2-nof0-40k-l12-hubert_o_full", False),
-            ("test-ddpn-v2-f0-40k-l12-hubert_jp_o_full", False),
-            ("test-ddpn-v2-nof0-40k-l12-hubert_jp_o_full", False),
+            ("test-official-v1-f0-48k-l9-hubert_o_full", {"useIndex": False}),
+            ("test-official-v1-nof0-48k-l9-hubert_o_full", {"useIndex": False}),
+            ("test-official-v2-f0-40k-l12-hubert_o_full", {"useIndex": False}),
+            ("test-official-v2-nof0-40k-l12-hubert_o_full", {"useIndex": False}),
+            ("test-ddpn-v1-f0-48k-l9-hubert_o_full", {"useIndex": False}),
+            ("test-ddpn-v1-nof0-48k-l9-hubert_o_full", {"useIndex": False}),
+            ("test-ddpn-v2-f0-40k-l12-hubert_o_full", {"useIndex": False}),
+            ("test-ddpn-v2-nof0-40k-l12-hubert_o_full", {"useIndex": False}),
+            ("test-ddpn-v2-f0-40k-l12-hubert_jp_o_full", {"useIndex": False}),
+            ("test-ddpn-v2-nof0-40k-l12-hubert_jp_o_full", {"useIndex": False}),
         ]
     else:
         return [], []
 
 
-RVC_MODEL_DIRNAME = "rvc"
-RVC_MAX_SLOT_NUM = 10
+MAX_SLOT_NUM = 10

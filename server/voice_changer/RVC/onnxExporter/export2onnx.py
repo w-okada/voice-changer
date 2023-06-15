@@ -4,7 +4,7 @@ import torch
 from onnxsim import simplify
 import onnx
 from const import TMP_DIR, EnumInferenceTypes
-from voice_changer.RVC.ModelSlot import ModelSlot
+from data.ModelSlot import ModelSlot
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.onnxExporter.SynthesizerTrnMs256NSFsid_ONNX import (
     SynthesizerTrnMs256NSFsid_ONNX,
@@ -30,9 +30,7 @@ def export2onnx(gpu: int, modelSlot: ModelSlot):
     modelFile = modelSlot.modelFile
 
     output_file = os.path.splitext(os.path.basename(modelFile))[0] + ".onnx"
-    output_file_simple = (
-        os.path.splitext(os.path.basename(modelFile))[0] + "_simple.onnx"
-    )
+    output_file_simple = os.path.splitext(os.path.basename(modelFile))[0] + "_simple.onnx"
     output_path = os.path.join(TMP_DIR, output_file)
     output_path_simple = os.path.join(TMP_DIR, output_file_simple)
     metadata = {
@@ -52,9 +50,7 @@ def export2onnx(gpu: int, modelSlot: ModelSlot):
     if gpuMomory > 0:
         _export2onnx(modelFile, output_path, output_path_simple, True, metadata)
     else:
-        print(
-            "[Voice Changer] Warning!!! onnx export with float32. maybe size is doubled."
-        )
+        print("[Voice Changer] Warning!!! onnx export with float32. maybe size is doubled.")
         _export2onnx(modelFile, output_path, output_path_simple, False, metadata)
     return output_file_simple
 

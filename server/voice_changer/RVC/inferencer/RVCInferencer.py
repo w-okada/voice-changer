@@ -14,7 +14,7 @@ class RVCInferencer(Inferencer):
 
         dev = DeviceManager.get_instance().getDevice(gpu)
         isHalf = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
-
+        print("LLLLLLLLLLLLLLLOOOOOOOOOOOOOOOOOOOOOOO", file)
         cpt = torch.load(file, map_location="cpu")
         model = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=isHalf)
 

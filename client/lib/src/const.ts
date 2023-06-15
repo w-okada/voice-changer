@@ -16,6 +16,16 @@ export const ClientType = {
 } as const
 export type ClientType = typeof ClientType[keyof typeof ClientType]
 
+export const VoiceChangerType = {
+    "MMVCv15": "MMVCv15",
+    "MMVCv13": "MMVCv13",
+    "so-vits-svc-40": "so-vits-svc-40",
+    "DDSP-SVC": "DDSP-SVC",
+    "RVC": "RVC"
+} as const
+export type VoiceChangerType = typeof VoiceChangerType[keyof typeof VoiceChangerType]
+
+
 ///////////////////////
 // サーバセッティング
 ///////////////////////
@@ -122,7 +132,8 @@ export const ServerSettingKey = {
     "rvcQuality": "rvcQuality",
     "modelSamplingRate": "modelSamplingRate",
     "silenceFront": "silenceFront",
-    "modelSlotIndex": "modelSlotIndex",
+    // "modelSlotIndex": "modelSlotIndex",
+    "slotIndex": "slotIndex",
 
     "useEnhancer": "useEnhancer",
     "useDiff": "useDiff",
@@ -181,7 +192,8 @@ export type VoiceChangerServerSetting = {
     rvcQuality: number // 0:low, 1:high
     silenceFront: number // 0:off, 1:on
     modelSamplingRate: ModelSamplingRate // 32000,40000,48000
-    modelSlotIndex: number,
+    // modelSlotIndex: number,
+    slotIndex: number,
 
     useEnhancer: number// DDSP-SVC
     useDiff: number// DDSP-SVC
@@ -197,7 +209,31 @@ export type VoiceChangerServerSetting = {
     enableDirectML: number
 }
 
-type ModelSlot = {
+// type ModelSlot = {
+//     modelFile: string
+//     featureFile: string,
+//     indexFile: string,
+
+//     defaultTune: number,
+//     defaultIndexRatio: number,
+//     defaultProtect: number,
+
+//     modelType: ModelType,
+//     embChannels: number,
+//     f0: boolean,
+//     samplingRate: number
+//     deprecated: boolean
+
+
+//     name: string,
+//     description: string,
+//     credit: string,
+//     termsOfUseUrl: string,
+//     iconFile: string
+// }
+
+type SlotInfo = {
+    voiceChangerType: VoiceChangerType | null
     modelFile: string
     featureFile: string,
     indexFile: string,
@@ -233,7 +269,8 @@ export type ServerInfo = VoiceChangerServerSetting & {
     pyTorchModelFile: string,
     onnxModelFile: string,
     onnxExecutionProviders: OnnxExecutionProvider[]
-    modelSlots: ModelSlot[]
+    // modelSlots: ModelSlot[]
+    slotInfos: SlotInfo[]
     serverAudioInputDevices: ServerAudioDevice[]
     serverAudioOutputDevices: ServerAudioDevice[]
     sampleModels: RVCSampleModel[]
@@ -311,7 +348,8 @@ export const DefaultServerSetting: ServerInfo = {
     rvcQuality: 0,
     modelSamplingRate: 48000,
     silenceFront: 1,
-    modelSlotIndex: 0,
+    // modelSlotIndex: 0,
+    slotIndex: 0,
     sampleModels: [],
     gpus: [],
 
@@ -331,7 +369,8 @@ export const DefaultServerSetting: ServerInfo = {
     pyTorchModelFile: "",
     onnxModelFile: "",
     onnxExecutionProviders: [],
-    modelSlots: [],
+    // modelSlots: [],
+    slotInfos: [],
     serverAudioInputDevices: [],
     serverAudioOutputDevices: []
 }

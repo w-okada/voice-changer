@@ -3,9 +3,7 @@ class NoModeLoadedException(Exception):
         self.framework = framework
 
     def __str__(self):
-        return repr(
-            f"No model for {self.framework} loaded. Please confirm the model uploaded."
-        )
+        return repr(f"No model for {self.framework} loaded. Please confirm the model uploaded.")
 
 
 class HalfPrecisionChangingException(Exception):
@@ -36,3 +34,17 @@ class DeviceCannotSupportHalfPrecisionException(Exception):
 class VoiceChangerIsNotSelectedException(Exception):
     def __str__(self):
         return repr("Voice Changer is not selected.")
+
+
+class SlotConfigNotFoundException(Exception):
+    def __init__(self, modelDir, slotIndex):
+        self.modelDir = modelDir
+        self.slotIndex = slotIndex
+
+    def __str__(self):
+        return repr(f"Config for slot {self.slotIndex} is not found. (modelDir:{self.modelDir})")
+
+
+class WeightDownladException(Exception):
+    def __str__(self):
+        return repr("Failed to download weight.")

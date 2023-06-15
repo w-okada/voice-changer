@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react"
-import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc_40v2, DefaultServerSetting_so_vits_svc_40, DefaultServerSetting_so_vits_svc_40_c, DefaultServerSetting_RVC, OnnxExporterInfo, DefaultServerSetting_DDSP_SVC, MAX_MODEL_SLOT_NUM, Framework, MergeModelRequest } from "../const"
+import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc_40v2, DefaultServerSetting_so_vits_svc_40, DefaultServerSetting_so_vits_svc_40_c, DefaultServerSetting_RVC, OnnxExporterInfo, DefaultServerSetting_DDSP_SVC, MAX_MODEL_SLOT_NUM, MergeModelRequest, VoiceChangerType } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 import { ModelLoadException } from "../exceptions"
@@ -18,12 +18,7 @@ export type ModelAssetName = typeof ModelAssetName[keyof typeof ModelAssetName]
 
 
 export type FileUploadSetting = {
-    isHalf: boolean
     uploaded: boolean
-    defaultTune: number
-    defaultIndexRatio: number
-    defaultProtect: number
-    framework: Framework
     params: string
 
     mmvcv13Config: ModelData | null
@@ -52,12 +47,7 @@ export type FileUploadSetting = {
 }
 
 export const InitialFileUploadSetting: FileUploadSetting = {
-    isHalf: true,
     uploaded: false,
-    defaultTune: 0,
-    defaultIndexRatio: 1,
-    defaultProtect: 0.5,
-    framework: Framework.PyTorch,
     params: "{}",
 
     mmvcv13Config: null,
@@ -400,43 +390,39 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             }
 
             // const configFileName = fileUploadSetting.configFile?.filename || "-"
+            const files: { kind: string, name: string }[] = []
+            if (fileUploadSetting.mmvcv13Config?.filename) files.push({ kind: "mmvcv13Config", name: fileUploadSetting.mmvcv13Config.filename })
+            if (fileUploadSetting.mmvcv13Model?.filename) files.push({ kind: "mmvcv13Model", name: fileUploadSetting.mmvcv13Model.filename })
+
+            if (fileUploadSetting.mmvcv15Config?.filename) files.push({ kind: "mmvcv15Config", name: fileUploadSetting.mmvcv15Config.filename })
+            if (fileUploadSetting.mmvcv15Model?.filename) files.push({ kind: "mmvcv15Model", name: fileUploadSetting.mmvcv15Model.filename })
+
+            if (fileUploadSetting.soVitsSvc40Config?.filename) files.push({ kind: "soVitsSvc40Config", name: fileUploadSetting.soVitsSvc40Config.filename })
+            if (fileUploadSetting.soVitsSvc40Model?.filename) files.push({ kind: "soVitsSvc40Model", name: fileUploadSetting.soVitsSvc40Model.filename })
+            if (fileUploadSetting.soVitsSvc40Cluster?.filename) files.push({ kind: "soVitsSvc40Cluster", name: fileUploadSetting.soVitsSvc40Cluster.filename })
+
+            if (fileUploadSetting.rvcModel?.filename) files.push({ kind: "rvcModel", name: fileUploadSetting.rvcModel.filename })
+            if (fileUploadSetting.rvcIndex?.filename) files.push({ kind: "rvcIndex", name: fileUploadSetting.rvcIndex.filename })
+
+            if (fileUploadSetting.ddspSvcModel?.filename) files.push({ kind: "ddspSvcModel", name: fileUploadSetting.ddspSvcModel.filename })
+            if (fileUploadSetting.ddspSvcModelConfig?.filename) files.push({ kind: "ddspSvcModelConfig", name: fileUploadSetting.ddspSvcModelConfig.filename })
+            if (fileUploadSetting.ddspSvcDiffusion?.filename) files.push({ kind: "ddspSvcDiffusion", name: fileUploadSetting.ddspSvcDiffusion.filename })
+            if (fileUploadSetting.ddspSvcDiffusionConfig?.filename) files.push({ kind: "ddspSvcDiffusionConfig", name: fileUploadSetting.ddspSvcDiffusionConfig.filename })
+
+
             const params = JSON.stringify({
-                defaultTune: fileUploadSetting.defaultTune || 0,
-                defaultIndexRatio: fileUploadSetting.defaultIndexRatio || 1,
-                defaultProtect: fileUploadSetting.defaultProtect || 0.5,
                 sampleId: fileUploadSetting.isSampleMode ? fileUploadSetting.sampleId || "" : "",
                 rvcIndexDownload: fileUploadSetting.rvcIndexDownload || false,
-                files: fileUploadSetting.isSampleMode ? {} : {
-                    mmvcv13Config: fileUploadSetting.mmvcv13Config?.filename || "",
-                    mmvcv13Model: fileUploadSetting.mmvcv13Model?.filename || "",
-                    mmvcv15Config: fileUploadSetting.mmvcv15Config?.filename || "",
-                    mmvcv15Model: fileUploadSetting.mmvcv15Model?.filename || "",
-                    soVitsSvc40Config: fileUploadSetting.soVitsSvc40Config?.filename || "",
-                    soVitsSvc40Model: fileUploadSetting.soVitsSvc40Model?.filename || "",
-                    soVitsSvc40Cluster: fileUploadSetting.soVitsSvc40Cluster?.filename || "",
-                    soVitsSvc40v2Config: fileUploadSetting.soVitsSvc40v2Config?.filename || "",
-                    soVitsSvc40v2Model: fileUploadSetting.soVitsSvc40v2Model?.filename || "",
-                    soVitsSvc40v2Cluster: fileUploadSetting.soVitsSvc40v2Cluster?.filename || "",
-                    rvcModel: fileUploadSetting.rvcModel?.filename || "",
-                    rvcIndex: fileUploadSetting.rvcIndex?.filename || "",
-                    rvcFeature: fileUploadSetting.rvcFeature?.filename || "",
-
-                    ddspSvcModel: fileUploadSetting.ddspSvcModel?.filename ? "ddsp_mod/" + fileUploadSetting.ddspSvcModel?.filename : "",
-                    ddspSvcModelConfig: fileUploadSetting.ddspSvcModelConfig?.filename ? "ddsp_mod/" + fileUploadSetting.ddspSvcModelConfig?.filename : "",
-                    ddspSvcDiffusion: fileUploadSetting.ddspSvcDiffusion?.filename ? "ddsp_diff/" + fileUploadSetting.ddspSvcDiffusion?.filename : "",
-                    ddspSvcDiffusionConfig: fileUploadSetting.ddspSvcDiffusionConfig?.filename ? "ddsp_diff/" + fileUploadSetting.ddspSvcDiffusionConfig.filename : "",
-                }
+                files: fileUploadSetting.isSampleMode ? [] : files
             })
 
-            if (fileUploadSetting.isHalf == undefined) {
-                fileUploadSetting.isHalf = false
-            }
 
             console.log("PARAMS:", params)
+            const voiceChangerType = VoiceChangerType.RVC
 
             const loadPromise = props.voiceChangerClient.loadModel(
                 slot,
-                fileUploadSetting.isHalf,
+                voiceChangerType,
                 params,
             )
 
@@ -460,12 +446,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
     const storeToCache = (slot: number, fileUploadSetting: FileUploadSetting) => {
         try {
             const saveData: FileUploadSetting = {
-                isHalf: fileUploadSetting.isHalf, // キャッシュとしては不使用。guiで上書きされる。
                 uploaded: false, // キャッシュから読み込まれるときには、まだuploadされていないから。
-                defaultTune: fileUploadSetting.defaultTune,
-                defaultIndexRatio: fileUploadSetting.defaultIndexRatio,
-                defaultProtect: fileUploadSetting.defaultProtect,
-                framework: fileUploadSetting.framework,
                 params: fileUploadSetting.params,
 
                 mmvcv13Config: fileUploadSetting.mmvcv13Config ? { data: fileUploadSetting.mmvcv13Config.data, filename: fileUploadSetting.mmvcv13Config.filename } : null,

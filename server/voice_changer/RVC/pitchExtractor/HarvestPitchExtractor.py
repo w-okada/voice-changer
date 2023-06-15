@@ -27,7 +27,7 @@ class HarvestPitchExtractor(PitchExtractor):
             audio.astype(np.double),
             fs=sr,
             f0_ceil=f0_max,
-            frame_period=10,
+            frame_period=10,  # 10ms, <= 160(window) / 16000(samplerate) * 1000(ms)
         )
         f0 = pyworld.stonemask(audio.astype(np.double), f0, t, sr)
         f0 = signal.medfilt(f0, 3)

@@ -1,8 +1,4 @@
 from dataclasses import dataclass, field
-from ModelSample import RVCModelSample
-from const import RVC_MAX_SLOT_NUM
-
-from voice_changer.RVC.ModelSlot import ModelSlot
 
 
 @dataclass
@@ -17,11 +13,6 @@ class RVCSettings:
     clusterInferRatio: float = 0.1
 
     framework: str = "PyTorch"  # PyTorch or ONNX
-    modelSlots: list[ModelSlot] = field(
-        default_factory=lambda: [ModelSlot() for _x in range(RVC_MAX_SLOT_NUM)]
-    )
-
-    sampleModels: list[RVCModelSample] = field(default_factory=lambda: [])
 
     indexRatio: float = 0
     protect: float = 0.5

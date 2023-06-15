@@ -43,12 +43,15 @@ docker/cudnn/
 server/pretrain/
 server/weights/
 server/model_dir/
+server/model_dir2/
 server/weights_/
 server/weights__/
 server/models/
 server/samples.json
 server/samples_0003_t.json
 server/samples_0003_o.json
+server/samples_0003_o2.json
+server/samples_0003_t2.json
 
 server/test_official_v1_v2.json
 server/test_ddpn_v1_v2.json

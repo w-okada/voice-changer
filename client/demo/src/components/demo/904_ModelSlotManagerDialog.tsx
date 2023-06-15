@@ -39,7 +39,7 @@ export const ModelSlotManagerDialog = () => {
         if (mode != "localFile") {
             return <></>
         }
-        if (!serverSetting.serverSetting.modelSlots) {
+        if (!serverSetting.serverSetting.slotInfos) {
             return <></>
         }
 
@@ -114,7 +114,7 @@ export const ModelSlotManagerDialog = () => {
         }
 
 
-        const slots = serverSetting.serverSetting.modelSlots.map((x, index) => {
+        const slots = serverSetting.serverSetting.slotInfos.map((x, index) => {
             let modelFileName = ""
             if (uploadData?.slot == index) {
                 modelFileName = (uploadData.model?.name || "").replace(/^.*[\\\/]/, '')
@@ -248,7 +248,7 @@ export const ModelSlotManagerDialog = () => {
 
     }, [
         mode,
-        serverSetting.serverSetting.modelSlots,
+        serverSetting.serverSetting.slotInfos,
         serverSetting.fileUploadSettings,
         serverSetting.uploadProgress,
         serverSetting.setFileUploadSetting,

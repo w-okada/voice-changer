@@ -18,14 +18,17 @@ export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
 
 
     const modelTiles = useMemo(() => {
-        if (!serverSetting.serverSetting.modelSlots) {
+        if (!serverSetting.serverSetting.slotInfos) {
             return []
         }
-        return serverSetting.serverSetting.modelSlots.map((x, index) => {
+        return serverSetting.serverSetting.slotInfos.map((x, index) => {
+            if (x.voiceChangerType == null) {
+                return null
+            }
             if (x.modelFile.length == 0) {
                 return null
             }
-            const tileContainerClass = index == serverSetting.serverSetting.modelSlotIndex ? "model-slot-tile-container-selected" : "model-slot-tile-container"
+            const tileContainerClass = index == serverSetting.serverSetting.slotIndex ? "model-slot-tile-container-selected" : "model-slot-tile-container"
             const name = x.name.length > 8 ? x.name.substring(0, 7) + "..." : x.name
             const iconElem = x.iconFile.length > 0 ?
                 <img className="model-slot-tile-icon" src={x.iconFile} alt={x.name} /> :
@@ -33,7 +36,7 @@ export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
 
             const clickAction = async () => {
                 const dummyModelSlotIndex = (Math.floor(Date.now() / 1000)) * 1000 + index
-                await serverSetting.updateServerSettings({ ...serverSetting.serverSetting, modelSlotIndex: dummyModelSlotIndex })
+                await serverSetting.updateServerSettings({ ...serverSetting.serverSetting, slotIndex: dummyModelSlotIndex })
                 setTimeout(() => { // quick hack
                     getInfo()
                 }, 1000 * 2)
@@ -50,7 +53,7 @@ export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
                 </div >
             )
         }).filter(x => x != null)
-    }, [serverSetting.serverSetting.modelSlots, serverSetting.serverSetting.modelSlotIndex])
+    }, [serverSetting.serverSetting.slotInfos, serverSetting.serverSetting.slotIndex])
 
 
     const modelSlotArea = useMemo(() => {

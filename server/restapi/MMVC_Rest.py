@@ -69,19 +69,14 @@ class MMVC_Rest:
                 StaticFiles(directory=f"{getFrontendPath()}", html=True),
                 name="static",
             )
-            app_fastapi.mount(
-                "/tmp", StaticFiles(directory=f"{TMP_DIR}"), name="static"
-            )
-            app_fastapi.mount(
-                "/upload_dir", StaticFiles(directory=f"{UPLOAD_DIR}"), name="static"
-            )
+            app_fastapi.mount("/tmp", StaticFiles(directory=f"{TMP_DIR}"), name="static")
+            app_fastapi.mount("/upload_dir", StaticFiles(directory=f"{UPLOAD_DIR}"), name="static")
 
             if sys.platform.startswith("darwin"):
                 p1 = os.path.dirname(sys._MEIPASS)
                 p2 = os.path.dirname(p1)
                 p3 = os.path.dirname(p2)
                 model_dir = os.path.join(p3, voiceChangerParams.model_dir)
-                print("mac model_dir:", model_dir)
                 app_fastapi.mount(
                     f"/{voiceChangerParams.model_dir}",
                     StaticFiles(directory=model_dir),

@@ -10,10 +10,3 @@ class FilePaths:
     clusterTorchModelFilename: str | None
     featureFilename: str | None
     indexFilename: str | None
-
-
-@dataclass
-class LoadModelParams:
-    slot: int
-    isHalf: bool
-    params: Any

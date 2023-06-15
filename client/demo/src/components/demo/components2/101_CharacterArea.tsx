@@ -21,11 +21,12 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
     }, [])
 
     const selected = useMemo(() => {
-        if (serverSetting.serverSetting.modelSlotIndex == undefined) {
+        console.log("serverSetting.serverSetting.slotInfos::", serverSetting.serverSetting.slotIndex, serverSetting.serverSetting.slotInfos)
+        if (serverSetting.serverSetting.slotIndex == undefined) {
             return
         }
-        return serverSetting.serverSetting.modelSlots[serverSetting.serverSetting.modelSlotIndex]
-    }, [serverSetting.serverSetting.modelSlotIndex, serverSetting.serverSetting.modelSlots])
+        return serverSetting.serverSetting.slotInfos[serverSetting.serverSetting.slotIndex]
+    }, [serverSetting.serverSetting.slotIndex, serverSetting.serverSetting.slotInfos])
 
 
     useEffect(() => {

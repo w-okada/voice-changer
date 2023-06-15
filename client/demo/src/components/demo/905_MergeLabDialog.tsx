@@ -13,19 +13,22 @@ export const MergeLabDialog = () => {
 
     // スロットが変更されたときの初期化処理
     const newSlotChangeKey = useMemo(() => {
-        if (!serverSetting.serverSetting.modelSlots) {
+        if (!serverSetting.serverSetting.slotInfos) {
             return ""
         }
-        return serverSetting.serverSetting.modelSlots.reduce((prev, cur) => {
+        return serverSetting.serverSetting.slotInfos.reduce((prev, cur) => {
             return prev + "_" + cur.modelFile
         }, "")
-    }, [serverSetting.serverSetting.modelSlots])
+    }, [serverSetting.serverSetting.slotInfos])
 
     const filterItems = useMemo(() => {
-        return serverSetting.serverSetting.modelSlots.reduce((prev, cur) => {
+        return serverSetting.serverSetting.slotInfos.reduce((prev, cur) => {
             const key = `${cur.modelType},${cur.samplingRate},${cur.embChannels}`
             const val = { type: cur.modelType, samplingRate: cur.samplingRate, embChannels: cur.embChannels }
             const existKeys = Object.keys(prev)
+            if (cur.voiceChangerType == null) {
+                return prev
+            }
             if (cur.modelFile.length == 0) {
                 return prev
             }
@@ -41,7 +44,7 @@ export const MergeLabDialog = () => {
     }, [newSlotChangeKey])
 
     const models = useMemo(() => {
-        return serverSetting.serverSetting.modelSlots.filter(x => {
+        return serverSetting.serverSetting.slotInfos.filter(x => {
             const filterVals = filterItems[currentFilter]
             if (!filterVals) {
                 return false

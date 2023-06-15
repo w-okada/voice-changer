@@ -28,7 +28,7 @@ class DioPitchExtractor(PitchExtractor):
             f0_floor=f0_min,
             f0_ceil=f0_max,
             channels_in_octave=2,
-            frame_period=10,
+            frame_period=10,  # 10ms, <= 160(window) / 16000(samplerate) * 1000(ms)
         )
         f0 = pyworld.stonemask(audio.astype(np.double), _f0, t, sr)
         f0 = np.pad(f0.astype("float"), (start_frame, n_frames - len(f0) - start_frame))

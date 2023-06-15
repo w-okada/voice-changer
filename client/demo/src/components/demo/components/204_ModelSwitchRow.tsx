@@ -9,11 +9,11 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
     const appState = useAppState()
 
     const modelSwitchRow = useMemo(() => {
-        const slot = appState.serverSetting.serverSetting.modelSlotIndex
+        const slot = appState.serverSetting.serverSetting.slotIndex
         const onSwitchModelClicked = async (slot: number) => {
             // Quick hack for same slot is selected. 下３桁が実際のSlotID
             const dummyModelSlotIndex = (Math.floor(Date.now() / 1000)) * 1000 + slot
-            await appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, modelSlotIndex: dummyModelSlotIndex })
+            await appState.serverSetting.updateServerSettings({ ...appState.serverSetting.serverSetting, slotIndex: dummyModelSlotIndex })
             setTimeout(() => { // quick hack
                 appState.getInfo()
             }, 1000 * 2)
@@ -24,7 +24,7 @@ export const ModelSwitchRow = (_props: ModelSwitchRowProps) => {
         }
 
 
-        const modelSlots = appState.serverSetting.serverSetting.modelSlots
+        const modelSlots = appState.serverSetting.serverSetting.slotInfos
         let options: React.JSX.Element[] = []
         if (modelSlots) {
             options = modelSlots.map((x, index) => {
