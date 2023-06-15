@@ -15,7 +15,11 @@ class ServerAudioDevice:
 
 
 def list_audio_device():
-    audioDeviceList = sd.query_devices()
+    try:
+        audioDeviceList = sd.query_devices()
+    except Exception as e:
+        print("[Voice Changer] ex: query_devices", e)
+        return [], []
 
     inputAudioDeviceList = [d for d in audioDeviceList if d["max_input_channels"] > 0]
     outputAudioDeviceList = [d for d in audioDeviceList if d["max_output_channels"] > 0]

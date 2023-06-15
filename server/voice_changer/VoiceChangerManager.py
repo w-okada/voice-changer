@@ -3,6 +3,7 @@ import threading
 from data.ModelSample import ModelSamples
 from data.ModelSlot import ModelSlots, loadSlotInfo
 from utils.downloader.SampleDownloader import downloadSample, getSampleInfos
+from voice_changer.Local.AudioDeviceList import ServerAudioDevice, list_audio_device
 from voice_changer.Local.ServerDevice import ServerDevice
 from voice_changer.RVC.ModelSlotGenerator import setSlotAsRVC
 
@@ -26,6 +27,7 @@ class GPUInfo:
 @dataclass()
 class VoiceChangerManagerSettings:
     slotIndex: int
+
     intData: list[str] = field(default_factory=lambda: ["slotIndex"])
 
 
@@ -42,6 +44,14 @@ class VoiceChangerManager(object):
         # スタティックな情報を収集
         self.sampleModels: list[ModelSamples] = getSampleInfos(self.params.sample_mode)
         self.gpus: list[GPUInfo] = self._get_gpuInfos()
+
+        audioinput, audiooutput = list_audio_device()
+        self.serverAudioInputDevices: list[ServerAudioDevice] = audioinput
+        self.serverAudioOutputDevices: list[ServerAudioDevice] = audiooutput
+
+        # ServerDevice
+        thread = threading.Thread(target=self.serverDevice.serverLocal, args=(self,))
+        thread.start()
 
     def _get_gpuInfos(self):
         devCount = torch.cuda.device_count()
@@ -63,8 +73,6 @@ class VoiceChangerManager(object):
             print(f"VoiceChanger Initialized (GPU_NUM:{gpu_num}, mps_enabled:{mps_enabled})")
 
             cls._instance.voiceChanger = VoiceChanger(params, cls._instance.settings.slotIndex)
-            thread = threading.Thread(target=cls._instance.serverDevice.serverLocal, args=(cls._instance.voiceChanger,))
-            thread.start()
             cls._instance.voiceChanger.prepareModel()
         return cls._instance
 
@@ -94,6 +102,8 @@ class VoiceChangerManager(object):
         data["slotInfos"] = slotInfos
         data["gpus"] = self.gpus
         data["sampleModels"] = self.sampleModels
+        data["serverAudioInputDevices"] = self.serverAudioInputDevices
+        data["serverAudioOutputDevices"] = self.serverAudioOutputDevices
 
         data["status"] = "OK"
         if hasattr(self, "voiceChanger"):
