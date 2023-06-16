@@ -5,7 +5,7 @@ from typing import cast
 import numpy as np
 import torch
 import torchaudio
-from ModelSample import getModelSamples
+from utils.downloader.SampleDownloader import getSampleInfos
 from voice_changer.RVC.ModelSlot import ModelSlot
 from voice_changer.RVC.SampleDownloader import downloadModelFiles
 
@@ -44,7 +44,6 @@ from Exceptions import DeviceCannotSupportHalfPrecisionException, NoModeLoadedEx
 from const import (
     RVC_MODEL_DIRNAME,
     UPLOAD_DIR,
-    getRVCSampleJsonAndModelIds,
 )
 import shutil
 import json
@@ -72,15 +71,15 @@ class RVC:
         print("[Voice Changer] RVC initialization: ", params)
 
         # サンプルカタログ作成
-        sampleJsons: list[str] = []
-        sampleJsonUrls, _sampleModels = getRVCSampleJsonAndModelIds(params.rvc_sample_mode)
-        for url in sampleJsonUrls:
-            filename = os.path.basename(url)
-            sampleJsons.append(filename)
-        sampleModels = getModelSamples(sampleJsons, "RVC")
-        if sampleModels is not None:
-            self.settings.sampleModels = sampleModels
-
+        # sampleJsons: list[str] = []
+        samples = getSampleInfos(params.sample_mode)
+        # for url in sampleJsonUrls:
+        #     filename = os.path.basename(url)
+        #     sampleJsons.append(filename)
+        # sampleModels = getModelSamples(sampleJsons, "RVC")
+        # if sampleModels is not None:
+        #     self.settings.sampleModels = sampleModels
+        self.settings.sampleModels = samples
         # 起動時にスロットにモデルがある場合はロードしておく
         if len(self.settings.modelSlots) > 0:
             for i, slot in enumerate(self.settings.modelSlots):
