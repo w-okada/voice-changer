@@ -26,7 +26,8 @@ export const MergeLabDialog = () => {
             const key = `${cur.modelType},${cur.samplingRate},${cur.embChannels}`
             const val = { type: cur.modelType, samplingRate: cur.samplingRate, embChannels: cur.embChannels }
             const existKeys = Object.keys(prev)
-            if (cur.modelFile.length == 0) {
+            console.log("modelFi;e:::::::::::::::::::", cur.modelFile)
+            if (!cur.modelFile || cur.modelFile.length == 0) {
                 return prev
             }
             if (cur.modelType == "onnxRVC" || cur.modelType == "onnxRVCNono") {

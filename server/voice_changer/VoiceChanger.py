@@ -146,10 +146,7 @@ class VoiceChanger:
     def get_info(self):
         data = asdict(self.settings)
         if self.voiceChanger is not None:
-            print("------------------ self.voiceChanger is not None")
             data.update(self.voiceChanger.get_info())
-        else:
-            print("------------------ self.voiceChanger is  None")
         return data
 
     def get_performance(self):

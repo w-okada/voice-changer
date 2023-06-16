@@ -22,7 +22,7 @@ export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
             return []
         }
         return serverSetting.serverSetting.modelSlots.map((x, index) => {
-            if (x.modelFile.length == 0) {
+            if (!x.modelFile || x.modelFile.length == 0) {
                 return null
             }
             const tileContainerClass = index == serverSetting.serverSetting.modelSlotIndex ? "model-slot-tile-container-selected" : "model-slot-tile-container"
