@@ -5,6 +5,7 @@ from typing import cast
 import numpy as np
 import torch
 import torchaudio
+from data.ModelSlot import loadAllSlotInfo
 from utils.downloader.SampleDownloader import getSampleInfos
 from voice_changer.RVC.ModelSlot import ModelSlot
 from voice_changer.RVC.SampleDownloader import downloadModelFiles
@@ -67,18 +68,12 @@ class RVC:
         self.pitchExtractor = PitchExtractorManager.getPitchExtractor(self.settings.f0Detector)
         self.params = params
         EmbedderManager.initialize(params)
-        self.loadSlots()
+        # self.loadSlots()
+        self.settings.modelSlots = loadAllSlotInfo(self.params.model_dir)
         print("[Voice Changer] RVC initialization: ", params)
 
         # サンプルカタログ作成
-        # sampleJsons: list[str] = []
         samples = getSampleInfos(params.sample_mode)
-        # for url in sampleJsonUrls:
-        #     filename = os.path.basename(url)
-        #     sampleJsons.append(filename)
-        # sampleModels = getModelSamples(sampleJsons, "RVC")
-        # if sampleModels is not None:
-        #     self.settings.sampleModels = sampleModels
         self.settings.sampleModels = samples
         # 起動時にスロットにモデルがある場合はロードしておく
         if len(self.settings.modelSlots) > 0:
@@ -160,7 +155,8 @@ class RVC:
         if slotInfo.iconFile is not None and len(slotInfo.iconFile) > 0:
             slotInfo.iconFile = self.moveToModelDir(slotInfo.iconFile, slotDir)
         json.dump(asdict(slotInfo), open(os.path.join(slotDir, "params.json"), "w"))
-        self.loadSlots()
+        # self.loadSlots()
+        self.settings.modelSlots = loadAllSlotInfo(self.params.model_dir)
 
         # 初回のみロード(起動時にスロットにモデルがあった場合はinitialLoadはFalseになっている)
         if self.initialLoad:
@@ -444,7 +440,8 @@ class RVC:
         params["defaultProtect"] = self.settings.protect
 
         json.dump(params, open(os.path.join(slotDir, "params.json"), "w"))
-        self.loadSlots()
+        # self.loadSlots()
+        self.settings.modelSlots = loadAllSlotInfo(self.params.model_dir)
 
     def update_model_info(self, newData: str):
         print("[Voice Changer] UPDATE MODEL INFO", newData)
@@ -456,7 +453,8 @@ class RVC:
         params = json.load(open(os.path.join(slotDir, "params.json"), "r", encoding="utf-8"))
         params[newDataDict["key"]] = newDataDict["val"]
         json.dump(params, open(os.path.join(slotDir, "params.json"), "w"))
-        self.loadSlots()
+        # self.loadSlots()
+        self.settings.modelSlots = loadAllSlotInfo(self.params.model_dir)
 
     def upload_model_assets(self, params: str):
         print("[Voice Changer] UPLOAD ASSETS", params)
@@ -479,4 +477,5 @@ class RVC:
         except Exception as e:
             print("Exception::::", e)
 
-        self.loadSlots()
+        # self.loadSlots()
+        self.settings.modelSlots = loadAllSlotInfo(self.params.model_dir)

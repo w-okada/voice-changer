@@ -14,7 +14,7 @@ from voice_changer.IORecorder import IORecorder
 from voice_changer.utils.LoadModelParams import LoadModelParams
 
 from voice_changer.utils.Timer import Timer
-from voice_changer.utils.VoiceChangerModel import VoiceChangerModel, AudioInOut
+from voice_changer.utils.VoiceChangerModel import AudioInOut
 from Exceptions import (
     DeviceCannotSupportHalfPrecisionException,
     DeviceChangingException,
@@ -60,8 +60,6 @@ class VoiceChangerSettings:
 
 
 class VoiceChanger:
-    settings: VoiceChangerSettings = VoiceChangerSettings()
-    voiceChanger: VoiceChangerModel | None = None
     ioRecorder: IORecorder
     sola_buffer: AudioInOut
     namespace: socketio.AsyncNamespace | None = None
@@ -148,7 +146,10 @@ class VoiceChanger:
     def get_info(self):
         data = asdict(self.settings)
         if self.voiceChanger is not None:
+            print("------------------ self.voiceChanger is not None")
             data.update(self.voiceChanger.get_info())
+        else:
+            print("------------------ self.voiceChanger is  None")
         return data
 
     def get_performance(self):

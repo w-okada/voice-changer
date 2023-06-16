@@ -1,5 +1,5 @@
 from typing import TypeAlias, Union
-from const import EnumInferenceTypes, EnumEmbedderTypes, VoiceChangerType
+from const import MAX_SLOT_NUM, EnumInferenceTypes, EnumEmbedderTypes, VoiceChangerType
 
 from dataclasses import dataclass, asdict
 
@@ -52,6 +52,14 @@ def loadSlotInfo(model_dir: str, slotIndex: int) -> ModelSlots:
         return RVCModelSlot(**jsonDict)
     else:
         return ModelSlot()
+
+
+def loadAllSlotInfo(model_dir: str):
+    slotInfos: list[ModelSlots] = []
+    for slotIndex in range(MAX_SLOT_NUM):
+        slotInfo = loadSlotInfo(model_dir, slotIndex)
+        slotInfos.append(slotInfo)
+    return slotInfos
 
 
 def saveSlotInfo(model_dir: str, slotIndex: int, slotInfo: ModelSlots):
