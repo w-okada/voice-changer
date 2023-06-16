@@ -26,8 +26,6 @@ export const useMessageBuilder = (): MessageBuilderStateAndMethod => {
         if (lang != "ja") {
             lang = "en"
         }
-
-        console.log(messagesRef.current)
         return messagesRef.current.find(x => { return x.file == file && x.id == id })?.message[lang] || "unknwon message"
     }
     return {
