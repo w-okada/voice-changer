@@ -5,10 +5,8 @@ from typing import cast
 import numpy as np
 import torch
 import torchaudio
-from data.ModelSlot import loadAllSlotInfo
+from data.ModelSlot import RVCModelSlot, loadAllSlotInfo
 from utils.downloader.SampleDownloader import getSampleInfos
-from voice_changer.RVC.ModelSlot import ModelSlot
-from voice_changer.RVC.SampleDownloader import downloadModelFiles
 
 
 # avoiding parse arg error in RVC
@@ -102,41 +100,16 @@ class RVC:
     def loadModel(self, props: LoadModelParams):
         target_slot_idx = props.slot
         params = props.params
-        slotInfo: ModelSlot = ModelSlot()
+        slotInfo: RVCModelSlot = RVCModelSlot()
 
         print("loadModel", params)
-        # サンプルが指定されたときはダウンロードしてメタデータをでっちあげる
-        if len(params["sampleId"]) > 0:
-            sampleId = params["sampleId"]
-            sampleInfo = self.getSampleInfo(sampleId)
-            useIndex = params["rvcIndexDownload"]
-
-            if sampleInfo is None:
-                print("[Voice Changer] sampleInfo is None")
-                return
-            modelPath, indexPath, iconPath = downloadModelFiles(sampleInfo, useIndex)
-            slotInfo.modelFile = modelPath
-            if indexPath is not None:
-                slotInfo.indexFile = indexPath
-            if iconPath is not None:
-                slotInfo.iconFile = iconPath
-
-            slotInfo.sampleId = sampleInfo.id
-            slotInfo.credit = sampleInfo.credit
-            slotInfo.description = sampleInfo.description
-            slotInfo.name = sampleInfo.name
-            slotInfo.termsOfUseUrl = sampleInfo.termsOfUseUrl
-
-            # slotInfo.samplingRate = sampleInfo.sampleRate
-            # slotInfo.modelType = sampleInfo.modelType
-            # slotInfo.f0 = sampleInfo.f0
-        else:
-            slotInfo.modelFile = params["files"]["rvcModel"]
-            slotInfo.indexFile = params["files"]["rvcIndex"] if "rvcIndex" in params["files"] else None
+        slotInfo.modelFile = params["files"]["rvcModel"]
+        slotInfo.indexFile = params["files"]["rvcIndex"] if "rvcIndex" in params["files"] else None
 
         slotInfo.defaultTune = params["defaultTune"]
         slotInfo.defaultIndexRatio = params["defaultIndexRatio"]
         slotInfo.defaultProtect = params["defaultProtect"]
+        slotInfo.voiceChangerType = "RVC"
         slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
 
         if slotInfo.isONNX:

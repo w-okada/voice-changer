@@ -1,8 +1,8 @@
 import os
 import traceback
 import faiss
+from data.ModelSlot import RVCModelSlot
 
-from voice_changer.RVC.ModelSlot import ModelSlot
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 from voice_changer.RVC.inferencer.InferencerManager import InferencerManager
@@ -10,15 +10,13 @@ from voice_changer.RVC.pipeline.Pipeline import Pipeline
 from voice_changer.RVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
 
 
-def createPipeline(modelSlot: ModelSlot, gpu: int, f0Detector: str):
+def createPipeline(modelSlot: RVCModelSlot, gpu: int, f0Detector: str):
     dev = DeviceManager.get_instance().getDevice(gpu)
     half = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
 
     # Inferencer 生成
     try:
-        inferencer = InferencerManager.getInferencer(
-            modelSlot.modelType, modelSlot.modelFile, gpu
-        )
+        inferencer = InferencerManager.getInferencer(modelSlot.modelType, modelSlot.modelFile, gpu)
     except Exception as e:
         print("[Voice Changer] exception! loading inferencer", e)
         traceback.print_exc()
@@ -54,7 +52,7 @@ def createPipeline(modelSlot: ModelSlot, gpu: int, f0Detector: str):
     return pipeline
 
 
-def _loadIndex(modelSlot: ModelSlot):
+def _loadIndex(modelSlot: RVCModelSlot):
     # Indexのロード
     print("[Voice Changer] Loading index...")
     # ファイル指定がない場合はNone
