@@ -90,14 +90,12 @@ class Pipeline(object):
 
         self.t_pad = round(self.sr * quality_padding_sec)  # 前後に音声を追加
         self.t_pad_tgt = round(self.targetSR * quality_padding_sec)  # 前後に音声を追加　出力時のトリミング(モデルのサンプリングで出力される)
-        print("audio shape", self.t_pad, self.t_pad_tgt, audio.shape)
         audio_pad = F.pad(audio, (self.t_pad, self.t_pad), mode="reflect").squeeze(0)
         p_len = audio_pad.shape[0] // self.window
         sid = torch.tensor(sid, device=self.device).unsqueeze(0).long()
 
         # RVC QualityがOnのときにはsilence_frontをオフに。
         silence_front = silence_front if repeat == 0 else 0
-        print("silence_front", silence_front)
 
         # ピッチ検出
         pitch, pitchf = None, None
