@@ -1,4 +1,5 @@
 import numpy as np
+from utils.downloader.SampleDownloader import downloadSample
 from voice_changer.Local.ServerDevice import ServerDevice, ServerDeviceCallbacks
 from voice_changer.VoiceChanger import VoiceChanger
 from const import ModelType
@@ -48,6 +49,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
     # VoiceChangerManager
     ############################
     def __init__(self, params: VoiceChangerParams):
+        self.params = params
         self.voiceChanger: VoiceChanger = None
         self.settings: VoiceChangerManagerSettings = VoiceChangerManagerSettings(dummy=0)
         # スタティックな情報を収集
@@ -76,12 +78,19 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         return cls._instance
 
     def loadModel(self, props: LoadModelParams):
-        info = self.voiceChanger.loadModel(props)
-        if hasattr(info, "status") and info["status"] == "NG":
+        paramDict = props.params
+        if "sampleId" in paramDict and len(paramDict["sampleId"]) > 0:
+            downloadSample(self.params.sample_mode, paramDict["sampleId"], self.params.model_dir, props.slot, {"useIndex": paramDict["rvcIndexDownload"]})
+            info = {"status": "OK"}
             return info
         else:
-            info["status"] = "OK"
-            return info
+            print("[Voice Canger]: upload models........")
+            info = self.voiceChanger.loadModel(props)
+            if hasattr(info, "status") and info["status"] == "NG":
+                return info
+            else:
+                info["status"] = "OK"
+                return info
 
     def get_info(self):
         data = asdict(self.settings)

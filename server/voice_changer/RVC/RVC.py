@@ -68,7 +68,6 @@ class RVC:
         self.pitchExtractor = PitchExtractorManager.getPitchExtractor(self.settings.f0Detector)
         self.params = params
         EmbedderManager.initialize(params)
-        # self.loadSlots()
         self.settings.modelSlots = loadAllSlotInfo(self.params.model_dir)
         print("[Voice Changer] RVC initialization: ", params)
 
@@ -147,7 +146,7 @@ class RVC:
 
         # メタデータを見て、永続化モデルフォルダに移動させる
         # その際に、メタデータのファイル格納場所も書き換える
-        slotDir = os.path.join(self.params.model_dir, RVC_MODEL_DIRNAME, str(target_slot_idx))
+        slotDir = os.path.join(self.params.model_dir, str(target_slot_idx))
         os.makedirs(slotDir, exist_ok=True)
         slotInfo.modelFile = self.moveToModelDir(slotInfo.modelFile, slotDir)
         if slotInfo.indexFile is not None and len(slotInfo.indexFile) > 0:
@@ -155,7 +154,6 @@ class RVC:
         if slotInfo.iconFile is not None and len(slotInfo.iconFile) > 0:
             slotInfo.iconFile = self.moveToModelDir(slotInfo.iconFile, slotDir)
         json.dump(asdict(slotInfo), open(os.path.join(slotDir, "params.json"), "w"))
-        # self.loadSlots()
         self.settings.modelSlots = loadAllSlotInfo(self.params.model_dir)
 
         # 初回のみロード(起動時にスロットにモデルがあった場合はinitialLoadはFalseになっている)
@@ -168,23 +166,6 @@ class RVC:
             self.prepareModel(target_slot_idx)
 
         return self.get_info()
-
-    def loadSlots(self):
-        dirname = os.path.join(self.params.model_dir, RVC_MODEL_DIRNAME)
-        if not os.path.exists(dirname):
-            return
-
-        modelSlots: list[ModelSlot] = []
-        for slot_idx in range(len(self.settings.modelSlots)):
-            slotDir = os.path.join(self.params.model_dir, RVC_MODEL_DIRNAME, str(slot_idx))
-            jsonDict = os.path.join(slotDir, "params.json")
-            if os.path.exists(jsonDict):
-                jsonDict = json.load(open(os.path.join(slotDir, "params.json")))
-                slotInfo = ModelSlot(**jsonDict)
-            else:
-                slotInfo = ModelSlot()
-            modelSlots.append(slotInfo)
-        self.settings.modelSlots = modelSlots
 
     def update_settings(self, key: str, val: int | float | str):
         if key in self.settings.intData:
@@ -255,6 +236,7 @@ class RVC:
         )
 
     def get_info(self):
+        self.settings.modelSlots = loadAllSlotInfo(self.params.model_dir)
         data = asdict(self.settings)
         if self.pipeline is not None:
             pipelineInfo = self.pipeline.getPipelineInfo()
@@ -440,7 +422,6 @@ class RVC:
         params["defaultProtect"] = self.settings.protect
 
         json.dump(params, open(os.path.join(slotDir, "params.json"), "w"))
-        # self.loadSlots()
         self.settings.modelSlots = loadAllSlotInfo(self.params.model_dir)
 
     def update_model_info(self, newData: str):
@@ -453,7 +434,6 @@ class RVC:
         params = json.load(open(os.path.join(slotDir, "params.json"), "r", encoding="utf-8"))
         params[newDataDict["key"]] = newDataDict["val"]
         json.dump(params, open(os.path.join(slotDir, "params.json"), "w"))
-        # self.loadSlots()
         self.settings.modelSlots = loadAllSlotInfo(self.params.model_dir)
 
     def upload_model_assets(self, params: str):
@@ -477,5 +457,4 @@ class RVC:
         except Exception as e:
             print("Exception::::", e)
 
-        # self.loadSlots()
         self.settings.modelSlots = loadAllSlotInfo(self.params.model_dir)
