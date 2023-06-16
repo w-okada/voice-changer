@@ -158,7 +158,7 @@ export const MergeLabDialog = () => {
                 </div>
             </div>
         );
-    }, [newSlotChangeKey, currentFilter, mergeElements]);
+    }, [newSlotChangeKey, currentFilter, mergeElements, models]);
     return dialog;
 
 };
