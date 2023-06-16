@@ -65,9 +65,7 @@ class RVC:
     needSwitch: bool = False
 
     def __init__(self, params: VoiceChangerParams):
-        self.pitchExtractor = PitchExtractorManager.getPitchExtractor(
-            self.settings.f0Detector
-        )
+        self.pitchExtractor = PitchExtractorManager.getPitchExtractor(self.settings.f0Detector)
         self.params = params
         EmbedderManager.initialize(params)
         self.loadSlots()
@@ -75,9 +73,7 @@ class RVC:
 
         # サンプルカタログ作成
         sampleJsons: list[str] = []
-        sampleJsonUrls, _sampleModels = getRVCSampleJsonAndModelIds(
-            params.rvc_sample_mode
-        )
+        sampleJsonUrls, _sampleModels = getRVCSampleJsonAndModelIds(params.rvc_sample_mode)
         for url in sampleJsonUrls:
             filename = os.path.basename(url)
             sampleJsons.append(filename)
@@ -143,9 +139,7 @@ class RVC:
             # slotInfo.f0 = sampleInfo.f0
         else:
             slotInfo.modelFile = params["files"]["rvcModel"]
-            slotInfo.indexFile = (
-                params["files"]["rvcIndex"] if "rvcIndex" in params["files"] else None
-            )
+            slotInfo.indexFile = params["files"]["rvcIndex"] if "rvcIndex" in params["files"] else None
 
         slotInfo.defaultTune = params["defaultTune"]
         slotInfo.defaultIndexRatio = params["defaultIndexRatio"]
@@ -159,9 +153,7 @@ class RVC:
 
         # メタデータを見て、永続化モデルフォルダに移動させる
         # その際に、メタデータのファイル格納場所も書き換える
-        slotDir = os.path.join(
-            self.params.model_dir, RVC_MODEL_DIRNAME, str(target_slot_idx)
-        )
+        slotDir = os.path.join(self.params.model_dir, RVC_MODEL_DIRNAME, str(target_slot_idx))
         os.makedirs(slotDir, exist_ok=True)
         slotInfo.modelFile = self.moveToModelDir(slotInfo.modelFile, slotDir)
         if slotInfo.indexFile is not None and len(slotInfo.indexFile) > 0:
@@ -189,9 +181,7 @@ class RVC:
 
         modelSlots: list[ModelSlot] = []
         for slot_idx in range(len(self.settings.modelSlots)):
-            slotDir = os.path.join(
-                self.params.model_dir, RVC_MODEL_DIRNAME, str(slot_idx)
-            )
+            slotDir = os.path.join(self.params.model_dir, RVC_MODEL_DIRNAME, str(slot_idx))
             jsonDict = os.path.join(slotDir, "params.json")
             if os.path.exists(jsonDict):
                 jsonDict = json.load(open(os.path.join(slotDir, "params.json")))
@@ -209,10 +199,7 @@ class RVC:
                 if val < 0:
                     return True
                 val = val % 1000  # Quick hack for same slot is selected
-                if (
-                    self.settings.modelSlots[val].modelFile is None
-                    or self.settings.modelSlots[val].modelFile == ""
-                ):
+                if self.settings.modelSlots[val].modelFile is None or self.settings.modelSlots[val].modelFile == "":
                     print("[Voice Changer] slot does not have model.")
                     return True
                 self.prepareModel(val)
@@ -229,9 +216,7 @@ class RVC:
         elif key in self.settings.strData:
             setattr(self.settings, key, str(val))
             if key == "f0Detector" and self.pipeline is not None:
-                pitchExtractor = PitchExtractorManager.getPitchExtractor(
-                    self.settings.f0Detector
-                )
+                pitchExtractor = PitchExtractorManager.getPitchExtractor(self.settings.f0Detector)
                 self.pipeline.setPitchExtractor(pitchExtractor)
         else:
             return False
@@ -246,9 +231,7 @@ class RVC:
         print("[Voice Changer] Prepare Model of slot:", slot)
 
         # pipelineの生成
-        self.next_pipeline = createPipeline(
-            modelSlot, self.settings.gpu, self.settings.f0Detector
-        )
+        self.next_pipeline = createPipeline(modelSlot, self.settings.gpu, self.settings.f0Detector)
 
         # その他の設定
         self.next_trans = modelSlot.defaultTune
@@ -293,9 +276,7 @@ class RVC:
         crossfadeSize: int,
         solaSearchFrame: int = 0,
     ):
-        newData = (
-            newData.astype(np.float32) / 32768.0
-        )  # RVCのモデルのサンプリングレートで入ってきている。（extraDataLength, Crossfade等も同じSRで処理）(★１)
+        newData = newData.astype(np.float32) / 32768.0  # RVCのモデルのサンプリングレートで入ってきている。（extraDataLength, Crossfade等も同じSRで処理）(★１)
 
         if self.audio_buffer is not None:
             # 過去のデータに連結
@@ -303,18 +284,14 @@ class RVC:
         else:
             self.audio_buffer = newData
 
-        convertSize = (
-            inputSize + crossfadeSize + solaSearchFrame + self.settings.extraConvertSize
-        )
+        convertSize = inputSize + crossfadeSize + solaSearchFrame + self.settings.extraConvertSize
 
         if convertSize % 128 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
             convertSize = convertSize + (128 - (convertSize % 128))
 
         # バッファがたまっていない場合はzeroで補う
         if self.audio_buffer.shape[0] < convertSize:
-            self.audio_buffer = np.concatenate(
-                [np.zeros([convertSize]), self.audio_buffer]
-            )
+            self.audio_buffer = np.concatenate([np.zeros([convertSize]), self.audio_buffer])
 
         convertOffset = -1 * convertSize
         self.audio_buffer = self.audio_buffer[convertOffset:]  # 変換対象の部分だけ抽出
@@ -324,9 +301,7 @@ class RVC:
         else:
             device = torch.device("cpu")
 
-        audio_buffer = torch.from_numpy(self.audio_buffer).to(
-            device=device, dtype=torch.float32
-        )
+        audio_buffer = torch.from_numpy(self.audio_buffer).to(device=device, dtype=torch.float32)
 
         # 出力部分だけ切り出して音量を確認。(TODO:段階的消音にする)
         cropOffset = -1 * (inputSize + crossfadeSize)
@@ -354,7 +329,7 @@ class RVC:
         #     self.needSwitch = False
 
         # half = self.deviceManager.halfPrecisionAvailable(self.settings.gpu)
-        half = self.pipeline.isHalf
+        # half = self.pipeline.isHalf
 
         audio = data[0]
         convertSize = data[1]
@@ -363,11 +338,9 @@ class RVC:
         if vol < self.settings.silentThreshold:
             return np.zeros(convertSize).astype(np.int16)
 
-        audio = torchaudio.functional.resample(
-            audio, self.settings.modelSamplingRate, 16000, rolloff=0.99
-        )
-        repeat = 3 if half else 1
-        repeat *= self.settings.rvcQuality  # 0 or 3
+        audio = torchaudio.functional.resample(audio, self.settings.modelSamplingRate, 16000, rolloff=0.99)
+        repeat = 1 if self.settings.rvcQuality else 0
+        print()
         sid = 0
         f0_up_key = self.settings.tran
         index_rate = self.settings.indexRatio
@@ -382,8 +355,7 @@ class RVC:
                 f0_up_key,
                 index_rate,
                 if_f0,
-                self.settings.extraConvertSize
-                / self.settings.modelSamplingRate,  # extaraDataSizeの秒数。RVCのモデルのサンプリングレートで処理(★１)。
+                self.settings.extraConvertSize / self.settings.modelSamplingRate,  # extaraDataSizeの秒数。RVCのモデルのサンプリングレートで処理(★１)。
                 embOutputLayer,
                 useFinalProj,
                 repeat,
@@ -393,9 +365,7 @@ class RVC:
 
             return result
         except DeviceCannotSupportHalfPrecisionException as e:
-            print(
-                "[Device Manager] Device cannot support half precision. Fallback to float...."
-            )
+            print("[Device Manager] Device cannot support half precision. Fallback to float....")
             self.deviceManager.setForceTensor(True)
             self.prepareModel(self.settings.modelSlotIndex)
             raise e
@@ -461,9 +431,7 @@ class RVC:
             "sampleId": "",
             "files": {"rvcModel": storeFile},
         }
-        props: LoadModelParams = LoadModelParams(
-            slot=targetSlot, isHalf=True, params=params
-        )
+        props: LoadModelParams = LoadModelParams(slot=targetSlot, isHalf=True, params=params)
         self.loadModel(props)
         self.prepareModel(targetSlot)
         self.settings.modelSlotIndex = targetSlot
@@ -471,12 +439,8 @@ class RVC:
 
     def update_model_default(self):
         print("[Voice Changer] UPDATE MODEL DEFAULT!!")
-        slotDir = os.path.join(
-            self.params.model_dir, RVC_MODEL_DIRNAME, str(self.currentSlot)
-        )
-        params = json.load(
-            open(os.path.join(slotDir, "params.json"), "r", encoding="utf-8")
-        )
+        slotDir = os.path.join(self.params.model_dir, RVC_MODEL_DIRNAME, str(self.currentSlot))
+        params = json.load(open(os.path.join(slotDir, "params.json"), "r", encoding="utf-8"))
         params["defaultTune"] = self.settings.tran
         params["defaultIndexRatio"] = self.settings.indexRatio
         params["defaultProtect"] = self.settings.protect
@@ -488,14 +452,10 @@ class RVC:
         print("[Voice Changer] UPDATE MODEL INFO", newData)
         newDataDict = json.loads(newData)
         try:
-            slotDir = os.path.join(
-                self.params.model_dir, RVC_MODEL_DIRNAME, str(newDataDict["slot"])
-            )
+            slotDir = os.path.join(self.params.model_dir, RVC_MODEL_DIRNAME, str(newDataDict["slot"]))
         except Exception as e:
             print("Exception::::", e)
-        params = json.load(
-            open(os.path.join(slotDir, "params.json"), "r", encoding="utf-8")
-        )
+        params = json.load(open(os.path.join(slotDir, "params.json"), "r", encoding="utf-8"))
         params[newDataDict["key"]] = newDataDict["val"]
         json.dump(params, open(os.path.join(slotDir, "params.json"), "w"))
         self.loadSlots()
@@ -504,9 +464,7 @@ class RVC:
         print("[Voice Changer] UPLOAD ASSETS", params)
         paramsDict = json.loads(params)
         uploadPath = os.path.join(UPLOAD_DIR, paramsDict["file"])
-        storeDir = os.path.join(
-            self.params.model_dir, RVC_MODEL_DIRNAME, str(paramsDict["slot"])
-        )
+        storeDir = os.path.join(self.params.model_dir, RVC_MODEL_DIRNAME, str(paramsDict["slot"]))
         storePath = os.path.join(
             storeDir,
             paramsDict["file"],

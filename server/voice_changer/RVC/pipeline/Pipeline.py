@@ -47,9 +47,7 @@ class Pipeline(object):
         print("GENERATE PITCH EXTRACTOR", self.pitchExtractor)
 
         self.index = index
-        self.big_npy = (
-            index.reconstruct_n(0, index.ntotal) if index is not None else None
-        )
+        self.big_npy = index.reconstruct_n(0, index.ntotal) if index is not None else None
         # self.feature = feature
 
         self.targetSR = targetSR
@@ -63,11 +61,7 @@ class Pipeline(object):
         inferencerInfo = self.inferencer.getInferencerInfo() if self.inferencer else {}
         embedderInfo = self.embedder.getEmbedderInfo()
         pitchExtractorInfo = self.pitchExtractor.getPitchExtractorInfo()
-        return {
-            "inferencer": inferencerInfo,
-            "embedder": embedderInfo,
-            "pitchExtractor": pitchExtractorInfo,
-        }
+        return {"inferencer": inferencerInfo, "embedder": embedderInfo, "pitchExtractor": pitchExtractorInfo, "isHalf": self.isHalf}
 
     def setPitchExtractor(self, pitchExtractor: PitchExtractor):
         self.pitchExtractor = pitchExtractor
@@ -87,16 +81,23 @@ class Pipeline(object):
     ):
         # 16000のサンプリングレートで入ってきている。以降この世界は16000で処理。
 
-        search_index = (
-            self.index is not None and self.big_npy is not None and index_rate != 0
-        )
-        self.t_pad = self.sr * repeat
-        self.t_pad_tgt = self.targetSR * repeat
-        audio_pad = F.pad(
-            audio.unsqueeze(0), (self.t_pad, self.t_pad), mode="reflect"
-        ).squeeze(0)
+        search_index = self.index is not None and self.big_npy is not None and index_rate != 0
+        # self.t_pad = self.sr * repeat  # 1秒
+        # self.t_pad_tgt = self.targetSR * repeat  # 1秒　出力時のトリミング(モデルのサンプリングで出力される)
+        audio = audio.unsqueeze(0)
+
+        quality_padding_sec = (repeat * (audio.shape[1] - 1)) / self.sr  # padding(reflect)のサイズは元のサイズより小さい必要がある。
+
+        self.t_pad = round(self.sr * quality_padding_sec)  # 前後に音声を追加
+        self.t_pad_tgt = round(self.targetSR * quality_padding_sec)  # 前後に音声を追加　出力時のトリミング(モデルのサンプリングで出力される)
+        print("audio shape", self.t_pad, self.t_pad_tgt, audio.shape)
+        audio_pad = F.pad(audio, (self.t_pad, self.t_pad), mode="reflect").squeeze(0)
         p_len = audio_pad.shape[0] // self.window
         sid = torch.tensor(sid, device=self.device).unsqueeze(0).long()
+
+        # RVC QualityがOnのときにはsilence_frontをオフに。
+        silence_front = silence_front if repeat == 0 else 0
+        print("silence_front", silence_front)
 
         # ピッチ検出
         pitch, pitchf = None, None
@@ -112,9 +113,7 @@ class Pipeline(object):
                 pitch = pitch[:p_len]
                 pitchf = pitchf[:p_len]
                 pitch = torch.tensor(pitch, device=self.device).unsqueeze(0).long()
-                pitchf = torch.tensor(
-                    pitchf, device=self.device, dtype=torch.float
-                ).unsqueeze(0)
+                pitchf = torch.tensor(pitchf, device=self.device, dtype=torch.float).unsqueeze(0)
         except IndexError:
             # print(e)
             raise NotEnoughDataExtimateF0()
@@ -169,21 +168,14 @@ class Pipeline(object):
                 npy = np.sum(self.big_npy[ix] * np.expand_dims(weight, axis=2), axis=1)
 
             # recover silient font
-            npy = np.concatenate(
-                [np.zeros([npyOffset, npy.shape[1]]).astype("float32"), npy]
-            )
+            npy = np.concatenate([np.zeros([npyOffset, npy.shape[1]]).astype("float32"), npy])
             if self.isHalf is True:
                 npy = npy.astype("float16")
 
-            feats = (
-                torch.from_numpy(npy).unsqueeze(0).to(self.device) * index_rate
-                + (1 - index_rate) * feats
-            )
+            feats = torch.from_numpy(npy).unsqueeze(0).to(self.device) * index_rate + (1 - index_rate) * feats
         feats = F.interpolate(feats.permute(0, 2, 1), scale_factor=2).permute(0, 2, 1)
         if protect < 0.5 and search_index:
-            feats0 = F.interpolate(feats0.permute(0, 2, 1), scale_factor=2).permute(
-                0, 2, 1
-            )
+            feats0 = F.interpolate(feats0.permute(0, 2, 1), scale_factor=2).permute(0, 2, 1)
 
         # ピッチサイズ調整
         p_len = audio_pad.shape[0] // self.window
@@ -219,14 +211,11 @@ class Pipeline(object):
             with torch.no_grad():
                 audio1 = (
                     torch.clip(
-                        self.inferencer.infer(feats, p_len, pitch, pitchf, sid)[0][
-                            0, 0
-                        ].to(dtype=torch.float32),
+                        self.inferencer.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0].to(dtype=torch.float32),
                         -1.0,
                         1.0,
                     )
                     * 32767.5
-                    - 0.5
                 ).data.to(dtype=torch.int16)
         except RuntimeError as e:
             if "HALF" in e.__str__().upper():
@@ -238,6 +227,8 @@ class Pipeline(object):
         del feats, p_len, padding_mask
         torch.cuda.empty_cache()
 
+        # inferで出力されるサンプリングレートはモデルのサンプリングレートになる。
+        # pipelineに（入力されるときはhubertように16k）
         if self.t_pad_tgt != 0:
             offset = self.t_pad_tgt
             end = -1 * self.t_pad_tgt

@@ -17,9 +17,7 @@ def checkRvcModelExist(model_dir: str):
     return True
 
 
-def downloadInitialSampleModels(
-    sampleJsons: list[str], sampleModelIds: list[str], model_dir: str
-):
+def downloadInitialSampleModels(sampleJsons: list[str], sampleModelIds: list[str], model_dir: str):
     sampleModels = getModelSamples(sampleJsons, "RVC")
     if sampleModels is None:
         return
@@ -58,11 +56,7 @@ def downloadInitialSampleModels(
         slotInfo.modelFile = modelFilePath
         line_num += 1
 
-        if (
-            initSampleId[1] is True
-            and hasattr(sample, "indexUrl")
-            and sample.indexUrl != ""
-        ):
+        if initSampleId[1] is True and hasattr(sample, "indexUrl") and sample.indexUrl != "":
             indexPath = os.path.join(
                 slotDir,
                 os.path.basename(sample.indexUrl),
@@ -97,7 +91,7 @@ def downloadInitialSampleModels(
         slotInfo.name = sample.name
         slotInfo.termsOfUseUrl = sample.termsOfUseUrl
         slotInfo.defaultTune = 0
-        slotInfo.defaultIndexRatio = 1
+        slotInfo.defaultIndexRatio = 0.0
         slotInfo.defaultProtect = 0.5
         slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
 
@@ -141,11 +135,7 @@ def downloadModelFiles(sampleInfo: RVCModelSample, useIndex: bool = True):
     )
 
     indexPath = None
-    if (
-        useIndex is True
-        and hasattr(sampleInfo, "indexUrl")
-        and sampleInfo.indexUrl != ""
-    ):
+    if useIndex is True and hasattr(sampleInfo, "indexUrl") and sampleInfo.indexUrl != "":
         print("[Voice Changer] Download sample with index.")
         indexPath = os.path.join(TMP_DIR, os.path.basename(sampleInfo.indexUrl))
         downloadParams.append(
