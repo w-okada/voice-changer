@@ -11,4 +11,4 @@ class VoiceChangerParams:
     hubert_base_jp: str
     hubert_soft: str
     nsf_hifigan: str
-    rvc_sample_mode: str
+    sample_mode: str
