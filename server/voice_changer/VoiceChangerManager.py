@@ -1,4 +1,5 @@
 import numpy as np
+from voice_changer.Local.ServerDevice import ServerDevice, ServerDeviceCallbacks
 from voice_changer.VoiceChanger import VoiceChanger
 from const import ModelType
 from voice_changer.utils.LoadModelParams import LoadModelParams
@@ -6,6 +7,7 @@ from voice_changer.utils.VoiceChangerModel import AudioInOut
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from dataclasses import dataclass, asdict
 import torch
+import threading
 
 
 @dataclass()
@@ -22,14 +24,37 @@ class VoiceChangerManagerSettings:
     # intData: list[str] = field(default_factory=lambda: ["slotIndex"])
 
 
-class VoiceChangerManager(object):
+class VoiceChangerManager(ServerDeviceCallbacks):
     _instance = None
 
+    ############################
+    # ServerDeviceCallbacks
+    ############################
+    def on_request(self, unpackedData: AudioInOut):
+        return self.changeVoice(unpackedData)
+
+    def emitTo(self, performance: list[float]):
+        print("emit ", performance)
+
+    def get_processing_sampling_rate(self):
+        return self.voiceChanger.get_processing_sampling_rate()
+
+    def setSamplingRate(self, sr: int):
+        self.voiceChanger.settings.inputSampleRate = sr
+
+    ############################
+    # VoiceChangerManager
+    ############################
     def __init__(self, params: VoiceChangerParams):
         self.voiceChanger: VoiceChanger = None
         self.settings: VoiceChangerManagerSettings = VoiceChangerManagerSettings(dummy=0)
         # スタティックな情報を収集
         self.gpus: list[GPUInfo] = self._get_gpuInfos()
+
+        self.serverDevice = ServerDevice(self)
+
+        thread = threading.Thread(target=self.serverDevice.start, args=())
+        thread.start()
 
     def _get_gpuInfos(self):
         devCount = torch.cuda.device_count()
@@ -62,6 +87,9 @@ class VoiceChangerManager(object):
 
         data["status"] = "OK"
 
+        info = self.serverDevice.get_info()
+        data.update(info)
+
         if hasattr(self, "voiceChanger"):
             info = self.voiceChanger.get_info()
             data.update(info)
@@ -77,6 +105,7 @@ class VoiceChangerManager(object):
             return {"status": "ERROR", "msg": "no model loaded"}
 
     def update_settings(self, key: str, val: str | int | float):
+        self.serverDevice.update_settings(key, val)
         if hasattr(self, "voiceChanger"):
             self.voiceChanger.update_settings(key, val)
         else:

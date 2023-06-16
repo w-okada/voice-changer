@@ -25,8 +25,8 @@ def list_audio_device():
     # print("output:", outputDeviceList)
     # print("hostapis", hostapis)
 
-    serverAudioInputDevices = []
-    serverAudioOutputDevices = []
+    serverAudioInputDevices: list[ServerAudioDevice] = []
+    serverAudioOutputDevices: list[ServerAudioDevice] = []
     for d in inputAudioDeviceList:
         serverInputAudioDevice: ServerAudioDevice = ServerAudioDevice(
             kind=ServerAudioDeviceTypes.audioinput,

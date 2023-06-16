@@ -11,7 +11,6 @@ import resampy
 
 
 from voice_changer.IORecorder import IORecorder
-from voice_changer.Local.AudioDeviceList import ServerAudioDevice, list_audio_device
 from voice_changer.utils.LoadModelParams import LoadModelParams
 
 from voice_changer.utils.Timer import Timer
@@ -26,10 +25,6 @@ from Exceptions import (
     VoiceChangerIsNotSelectedException,
 )
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
-import threading
-import time
-import sounddevice as sd
-import librosa
 
 STREAM_INPUT_FILE = os.path.join(TMP_DIR, "in.wav")
 STREAM_OUTPUT_FILE = os.path.join(TMP_DIR, "out.wav")
@@ -44,22 +39,7 @@ class VoiceChangerSettings:
     crossFadeOverlapSize: int = 4096
 
     recordIO: int = 0  # 0:off, 1:on
-    serverAudioInputDevices: list[ServerAudioDevice] = field(default_factory=lambda: [])
-    serverAudioOutputDevices: list[ServerAudioDevice] = field(default_factory=lambda: [])
 
-    enableServerAudio: int = 0  # 0:off, 1:on
-    serverAudioStated: int = 0  # 0:off, 1:on
-    # serverInputAudioSampleRate: int = 48000
-    # serverOutputAudioSampleRate: int = 48000
-    serverInputAudioSampleRate: int = 44100
-    serverOutputAudioSampleRate: int = 44100
-    # serverInputAudioBufferSize: int = 1024 * 24
-    # serverOutputAudioBufferSize: int = 1024 * 24
-    serverInputDeviceId: int = -1
-    serverOutputDeviceId: int = -1
-    serverReadChunkSize: int = 256
-    serverInputAudioGain: float = 1.0
-    serverOutputAudioGain: float = 1.0
     performance: list[int] = field(default_factory=lambda: [0, 0, 0, 0])
 
     # ↓mutableな物だけ列挙
@@ -68,23 +48,12 @@ class VoiceChangerSettings:
             "inputSampleRate",
             "crossFadeOverlapSize",
             "recordIO",
-            "enableServerAudio",
-            "serverAudioStated",
-            "serverInputAudioSampleRate",
-            "serverOutputAudioSampleRate",
-            # "serverInputAudioBufferSize",
-            # "serverOutputAudioBufferSize",
-            "serverInputDeviceId",
-            "serverOutputDeviceId",
-            "serverReadChunkSize",
         ]
     )
     floatData: list[str] = field(
         default_factory=lambda: [
             "crossFadeOffsetRate",
             "crossFadeEndRate",
-            "serverInputAudioGain",
-            "serverOutputAudioGain",
         ]
     )
     strData: list[str] = field(default_factory=lambda: [])
@@ -100,120 +69,6 @@ class VoiceChanger:
     localPerformanceShowTime = 0.0
 
     emitTo = None
-
-    def audio_callback(self, indata: np.ndarray, outdata: np.ndarray, frames, times, status):
-        try:
-            indata = indata * self.settings.serverInputAudioGain
-            with Timer("all_inference_time") as t:
-                unpackedData = librosa.to_mono(indata.T) * 32768.0
-                out_wav, times = self.on_request(unpackedData)
-                outputChunnels = outdata.shape[1]
-                outdata[:] = np.repeat(out_wav, outputChunnels).reshape(-1, outputChunnels) / 32768.0
-                outdata[:] = outdata * self.settings.serverOutputAudioGain
-            all_inference_time = t.secs
-            performance = [all_inference_time] + times
-            if self.emitTo is not None:
-                self.emitTo(performance)
-            self.settings.performance = [round(x * 1000) for x in performance]
-        except Exception as e:
-            print("[Voice Changer] ex:", e)
-
-    def getServerAudioDevice(self, audioDeviceList: list[ServerAudioDevice], index: int):
-        serverAudioDevice = [x for x in audioDeviceList if x.index == index]
-        if len(serverAudioDevice) > 0:
-            return serverAudioDevice[0]
-        else:
-            return None
-
-    def serverLocal(self, _vc):
-        vc: VoiceChanger = _vc
-
-        currentInputDeviceId = -1
-        currentModelSamplingRate = -1
-        currentOutputDeviceId = -1
-        currentInputChunkNum = -1
-        while True:
-            if vc.settings.serverAudioStated == 0 or vc.settings.serverInputDeviceId == -1 or vc.voiceChanger is None:
-                vc.settings.inputSampleRate = 48000
-                time.sleep(2)
-            else:
-                sd._terminate()
-                sd._initialize()
-
-                sd.default.device[0] = vc.settings.serverInputDeviceId
-                currentInputDeviceId = vc.settings.serverInputDeviceId
-                sd.default.device[1] = vc.settings.serverOutputDeviceId
-                currentOutputDeviceId = vc.settings.serverOutputDeviceId
-
-                currentInputChannelNum = vc.settings.serverAudioInputDevices
-
-                serverInputAudioDevice = self.getServerAudioDevice(vc.settings.serverAudioInputDevices, currentInputDeviceId)
-                serverOutputAudioDevice = self.getServerAudioDevice(vc.settings.serverAudioOutputDevices, currentOutputDeviceId)
-                print(serverInputAudioDevice, serverOutputAudioDevice)
-                if serverInputAudioDevice is None or serverOutputAudioDevice is None:
-                    time.sleep(2)
-                    print("serverInputAudioDevice or serverOutputAudioDevice is None")
-                    continue
-
-                currentInputChannelNum = serverInputAudioDevice.maxInputChannels
-                currentOutputChannelNum = serverOutputAudioDevice.maxOutputChannels
-
-                currentInputChunkNum = vc.settings.serverReadChunkSize
-                block_frame = currentInputChunkNum * 128
-
-                # sample rate precheck(alsa cannot use 40000?)
-                try:
-                    currentModelSamplingRate = self.voiceChanger.get_processing_sampling_rate()
-                except Exception as e:
-                    print("[Voice Changer] ex: get_processing_sampling_rate", e)
-                    continue
-                try:
-                    with sd.Stream(
-                        callback=self.audio_callback,
-                        blocksize=block_frame,
-                        samplerate=currentModelSamplingRate,
-                        dtype="float32",
-                        channels=[currentInputChannelNum, currentOutputChannelNum],
-                    ):
-                        pass
-                    vc.settings.serverInputAudioSampleRate = currentModelSamplingRate
-                    vc.settings.inputSampleRate = currentModelSamplingRate
-                    print(f"[Voice Changer] sample rate {vc.settings.serverInputAudioSampleRate}")
-                except Exception as e:
-                    print(
-                        "[Voice Changer] ex: fallback to device default samplerate",
-                        e,
-                    )
-                    vc.settings.serverInputAudioSampleRate = serverInputAudioDevice.default_samplerate
-                    vc.settings.inputSampleRate = vc.settings.serverInputAudioSampleRate
-
-                # main loop
-                try:
-                    with sd.Stream(
-                        callback=self.audio_callback,
-                        blocksize=block_frame,
-                        samplerate=vc.settings.serverInputAudioSampleRate,
-                        dtype="float32",
-                        channels=[currentInputChannelNum, currentOutputChannelNum],
-                    ):
-                        while vc.settings.serverAudioStated == 1 and currentInputDeviceId == vc.settings.serverInputDeviceId and currentOutputDeviceId == vc.settings.serverOutputDeviceId and currentModelSamplingRate == self.voiceChanger.get_processing_sampling_rate() and currentInputChunkNum == vc.settings.serverReadChunkSize:
-                            time.sleep(2)
-                            print(
-                                "[Voice Changer] server audio",
-                                self.settings.performance,
-                            )
-                            print(
-                                "[Voice Changer] info:",
-                                vc.settings.serverAudioStated,
-                                currentInputDeviceId,
-                                currentOutputDeviceId,
-                                vc.settings.serverInputAudioSampleRate,
-                                currentInputChunkNum,
-                            )
-
-                except Exception as e:
-                    print("[Voice Changer] ex:", e)
-                    time.sleep(2)
 
     def __init__(self, params: VoiceChangerParams):
         # 初期化
@@ -231,12 +86,6 @@ class VoiceChanger:
         self.prev_audio = np.zeros(4096)
         self.mps_enabled: bool = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
 
-        audioinput, audiooutput = list_audio_device()
-        self.settings.serverAudioInputDevices = audioinput
-        self.settings.serverAudioOutputDevices = audiooutput
-
-        thread = threading.Thread(target=self.serverLocal, args=(self,))
-        thread.start()
         print(f"VoiceChanger Initialized (GPU_NUM:{self.gpu_num}, mps_enabled:{self.mps_enabled})")
 
     def switchModelType(self, modelType: ModelType):
@@ -374,6 +223,12 @@ class VoiceChanger:
                 delattr(self, "np_prev_audio1")
             if hasattr(self, "sola_buffer") is True:
                 del self.sola_buffer
+
+    def get_processing_sampling_rate(self):
+        if self.voiceChanger is None:
+            return 0
+        else:
+            return self.voiceChanger.get_processing_sampling_rate()
 
     #  receivedData: tuple of short
     def on_request(self, receivedData: AudioInOut) -> tuple[AudioInOut, list[Union[int, float]]]:
