@@ -8,6 +8,8 @@ from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from dataclasses import dataclass, asdict
 import torch
 import threading
+from typing import Callable
+from typing import Any
 
 
 @dataclass()
@@ -34,7 +36,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         return self.changeVoice(unpackedData)
 
     def emitTo(self, performance: list[float]):
-        print("emit ", performance)
+        self.emitToFunc(performance)
 
     def get_processing_sampling_rate(self):
         return self.voiceChanger.get_processing_sampling_rate()
@@ -139,3 +141,6 @@ class VoiceChangerManager(ServerDeviceCallbacks):
 
     def upload_model_assets(self, params: str):
         return self.voiceChanger.upload_model_assets(params)
+
+    def setEmitTo(self, emitTo: Callable[[Any], None]):
+        self.emitToFunc = emitTo

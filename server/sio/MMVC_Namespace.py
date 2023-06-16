@@ -24,7 +24,8 @@ class MMVC_Namespace(socketio.AsyncNamespace):
     def __init__(self, namespace: str, voiceChangerManager: VoiceChangerManager):
         super().__init__(namespace)
         self.voiceChangerManager = voiceChangerManager
-        self.voiceChangerManager.voiceChanger.emitTo = self.emit_coroutine
+        # self.voiceChangerManager.voiceChanger.emitTo = self.emit_coroutine
+        self.voiceChangerManager.setEmitTo(self.emit_coroutine)
 
     @classmethod
     def get_instance(cls, voiceChangerManager: VoiceChangerManager):
@@ -34,11 +35,7 @@ class MMVC_Namespace(socketio.AsyncNamespace):
 
     def on_connect(self, sid, environ):
         self.sid = sid
-        print(
-            "[{}] connet sid : {}".format(
-                datetime.now().strftime("%Y-%m-%d %H:%M:%S"), sid
-            )
-        )
+        print("[{}] connet sid : {}".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), sid))
         pass
 
     async def on_request_message(self, sid, msg):
@@ -50,9 +47,7 @@ class MMVC_Namespace(socketio.AsyncNamespace):
             print(data)
             await self.emit("response", [timestamp, 0], to=sid)
         else:
-            unpackedData = np.array(
-                struct.unpack("<%sh" % (len(data) // struct.calcsize("<h")), data)
-            ).astype(np.int16)
+            unpackedData = np.array(struct.unpack("<%sh" % (len(data) // struct.calcsize("<h")), data)).astype(np.int16)
 
             res = self.voiceChangerManager.changeVoice(unpackedData)
             audio1 = res[0]

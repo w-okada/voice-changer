@@ -107,20 +107,16 @@ class ServerDevice:
                 sd._initialize()
 
                 sd.default.device[0] = self.settings.serverInputDeviceId
-                # currentInputDeviceId = self.settings.serverInputDeviceId
                 sd.default.device[1] = self.settings.serverOutputDeviceId
-                # currentOutputDeviceId = self.settings.serverOutputDeviceId
 
                 serverInputAudioDevice = self.getServerInputAudioDevice(sd.default.device[0])
                 serverOutputAudioDevice = self.getServerOutputAudioDevice(sd.default.device[1])
-                print(serverInputAudioDevice, serverOutputAudioDevice)
+                print("Devices:", serverInputAudioDevice, serverOutputAudioDevice)
                 if serverInputAudioDevice is None or serverOutputAudioDevice is None:
                     time.sleep(2)
                     print("serverInputAudioDevice or serverOutputAudioDevice is None")
                     continue
 
-                # currentInputChannelNum = serverInputAudioDevice.maxInputChannels
-                # currentOutputChannelNum = serverOutputAudioDevice.maxOutputChannels
                 sd.default.channels[0] = serverInputAudioDevice.maxInputChannels
                 sd.default.channels[1] = serverOutputAudioDevice.maxOutputChannels
 
@@ -164,10 +160,7 @@ class ServerDevice:
                     ):
                         while self.settings.serverAudioStated == 1 and sd.default.device[0] == self.settings.serverInputDeviceId and sd.default.device[1] == self.settings.serverOutputDeviceId and currentModelSamplingRate == self.serverDeviceCallbacks.get_processing_sampling_rate() and currentInputChunkNum == self.settings.serverReadChunkSize:
                             time.sleep(2)
-                            print(
-                                "[Voice Changer] server audio",
-                                self.performance,
-                            )
+                            print("[Voice Changer] server audio", self.performance)
                             print(f"[Voice Changer] started:{self.settings.serverAudioStated}, input:{sd.default.device[0]}, output:{sd.default.device[1]}, mic_sr:{self.settings.serverInputAudioSampleRate}, model_sr:{currentModelSamplingRate}, chunk:{currentInputChunkNum}, ch:[{sd.default.channels}]")
 
                 except Exception as e:

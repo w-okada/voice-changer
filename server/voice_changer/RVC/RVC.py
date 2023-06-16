@@ -340,7 +340,6 @@ class RVC:
 
         audio = torchaudio.functional.resample(audio, self.settings.modelSamplingRate, 16000, rolloff=0.99)
         repeat = 1 if self.settings.rvcQuality else 0
-        print()
         sid = 0
         f0_up_key = self.settings.tran
         index_rate = self.settings.indexRatio
