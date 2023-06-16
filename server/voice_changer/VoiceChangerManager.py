@@ -140,16 +140,20 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         return self.voiceChanger.export2onnx()
 
     def merge_models(self, request: str):
-        return self.voiceChanger.merge_models(request)
+        self.voiceChanger.merge_models(request)
+        return self.get_info()
 
     def update_model_default(self):
-        return self.voiceChanger.update_model_default()
+        self.voiceChanger.update_model_default()
+        return self.get_info()
 
     def update_model_info(self, newData: str):
-        return self.voiceChanger.update_model_info(newData)
+        self.voiceChanger.update_model_info(newData)
+        return self.get_info()
 
     def upload_model_assets(self, params: str):
-        return self.voiceChanger.upload_model_assets(params)
+        self.voiceChanger.upload_model_assets(params)
+        return self.get_info()
 
     def setEmitTo(self, emitTo: Callable[[Any], None]):
         self.emitToFunc = emitTo

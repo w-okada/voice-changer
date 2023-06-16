@@ -41,7 +41,6 @@ from voice_changer.RVC.pipeline.Pipeline import Pipeline
 
 from Exceptions import DeviceCannotSupportHalfPrecisionException, NoModeLoadedException
 from const import (
-    RVC_MODEL_DIRNAME,
     UPLOAD_DIR,
 )
 import shutil
@@ -388,7 +387,7 @@ class RVC:
 
     def update_model_default(self):
         print("[Voice Changer] UPDATE MODEL DEFAULT!!")
-        slotDir = os.path.join(self.params.model_dir, RVC_MODEL_DIRNAME, str(self.currentSlot))
+        slotDir = os.path.join(self.params.model_dir, str(self.currentSlot))
         params = json.load(open(os.path.join(slotDir, "params.json"), "r", encoding="utf-8"))
         params["defaultTune"] = self.settings.tran
         params["defaultIndexRatio"] = self.settings.indexRatio
@@ -401,7 +400,7 @@ class RVC:
         print("[Voice Changer] UPDATE MODEL INFO", newData)
         newDataDict = json.loads(newData)
         try:
-            slotDir = os.path.join(self.params.model_dir, RVC_MODEL_DIRNAME, str(newDataDict["slot"]))
+            slotDir = os.path.join(self.params.model_dir, str(newDataDict["slot"]))
         except Exception as e:
             print("Exception::::", e)
         params = json.load(open(os.path.join(slotDir, "params.json"), "r", encoding="utf-8"))
@@ -413,7 +412,7 @@ class RVC:
         print("[Voice Changer] UPLOAD ASSETS", params)
         paramsDict = json.loads(params)
         uploadPath = os.path.join(UPLOAD_DIR, paramsDict["file"])
-        storeDir = os.path.join(self.params.model_dir, RVC_MODEL_DIRNAME, str(paramsDict["slot"]))
+        storeDir = os.path.join(self.params.model_dir, str(paramsDict["slot"]))
         storePath = os.path.join(
             storeDir,
             paramsDict["file"],

@@ -165,8 +165,9 @@ export const ModelSlotManagerDialog = () => {
             const fileValueClass = (uploadData?.slot == index) ? "model-slot-detail-row-value-edit" : isRegisterd ? "model-slot-detail-row-value-download" : "model-slot-detail-row-value"
             const fileValueAction = (uploadData?.slot == index) ? (_url: string) => {
             } : isRegisterd ? (url: string) => {
+                console.log("Download url:::", url)
                 const link = document.createElement("a")
-                link.href = url
+                link.href = "/" + url
                 link.download = url.replace(/^.*[\\\/]/, '')
                 link.click()
             } : (_url: string) => { }
