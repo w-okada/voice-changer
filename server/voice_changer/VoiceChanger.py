@@ -1,6 +1,5 @@
 from typing import Any, Union, cast
 
-import socketio
 from const import TMP_DIR, ModelType
 import torch
 import os
@@ -61,12 +60,7 @@ class VoiceChangerSettings:
 
 class VoiceChanger:
     ioRecorder: IORecorder
-    sola_buffer: AudioInOut
-    namespace: socketio.AsyncNamespace | None = None
-
-    localPerformanceShowTime = 0.0
-
-    emitTo = None
+    #    sola_buffer: AudioInOut
 
     def __init__(self, params: VoiceChangerParams):
         # 初期化

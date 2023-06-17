@@ -1,5 +1,5 @@
 from const import UPLOAD_DIR
-from data.ModelSlot import ModelSlots, loadAllSlotInfo, loadSlotInfo, saveSlotInfo
+from data.ModelSlot import ModelSlots, loadAllSlotInfo, saveSlotInfo
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 import json
 import os
