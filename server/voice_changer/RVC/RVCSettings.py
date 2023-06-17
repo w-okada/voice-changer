@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
 from ModelSample import RVCModelSample
-from const import MAX_SLOT_NUM
-from data.ModelSlot import ModelSlot, ModelSlots
+
+# from const import MAX_SLOT_NUM
+# from data.ModelSlot import ModelSlot, ModelSlots
 
 
 @dataclass
@@ -16,7 +17,7 @@ class RVCSettings:
     clusterInferRatio: float = 0.1
 
     framework: str = "PyTorch"  # PyTorch or ONNX
-    modelSlots: list[ModelSlots] = field(default_factory=lambda: [ModelSlot() for _x in range(MAX_SLOT_NUM)])
+    # modelSlots: list[ModelSlots] = field(default_factory=lambda: [ModelSlot() for _x in range(MAX_SLOT_NUM)])
 
     sampleModels: list[RVCModelSample] = field(default_factory=lambda: [])
 

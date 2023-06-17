@@ -5,8 +5,9 @@ from typing import cast
 import numpy as np
 import torch
 import torchaudio
-from data.ModelSlot import RVCModelSlot, loadAllSlotInfo
+from data.ModelSlot import RVCModelSlot
 from utils.downloader.SampleDownloader import getSampleInfos
+from voice_changer.ModelSlotManager import ModelSlotManager
 
 
 # avoiding parse arg error in RVC
@@ -65,21 +66,26 @@ class RVC:
         self.pitchExtractor = PitchExtractorManager.getPitchExtractor(self.settings.f0Detector)
         self.params = params
         EmbedderManager.initialize(params)
-        self.settings.modelSlots = loadAllSlotInfo(self.params.model_dir)
         print("[Voice Changer] RVC initialization: ", params)
+        self.modelSlotManager = ModelSlotManager.get_instance(self.params)
 
         # サンプルカタログ作成
         samples = getSampleInfos(params.sample_mode)
         self.settings.sampleModels = samples
         # 起動時にスロットにモデルがある場合はロードしておく
-        if len(self.settings.modelSlots) > 0:
-            for i, slot in enumerate(self.settings.modelSlots):
-                if len(slot.modelFile) > 0:
-                    self.prepareModel(i)
-                    self.settings.modelSlotIndex = i
-                    self.switchModel(self.settings.modelSlotIndex)
-                    self.initialLoad = False
-                    break
+
+        allSlots = self.modelSlotManager.getAllSlotInfo()
+        availableIndex = -1
+        for i, slot in enumerate(allSlots):
+            if slot.modelFile is not None and slot.modelFile != "":
+                availableIndex = i
+                break
+        if availableIndex >= 0:
+            self.prepareModel(availableIndex)
+            self.settings.modelSlotIndex = availableIndex
+            self.switchModel(self.settings.modelSlotIndex)
+            self.initialLoad = False
+
         self.prevVol = 0.0
 
     def getSampleInfo(self, id: str):
@@ -125,8 +131,8 @@ class RVC:
             slotInfo.indexFile = self.moveToModelDir(slotInfo.indexFile, slotDir)
         if slotInfo.iconFile is not None and len(slotInfo.iconFile) > 0:
             slotInfo.iconFile = self.moveToModelDir(slotInfo.iconFile, slotDir)
-        json.dump(asdict(slotInfo), open(os.path.join(slotDir, "params.json"), "w"))
-        self.settings.modelSlots = loadAllSlotInfo(self.params.model_dir)
+        # json.dump(asdict(slotInfo), open(os.path.join(slotDir, "params.json"), "w"))
+        self.modelSlotManager.save_model_slot(target_slot_idx, slotInfo)
 
         # 初回のみロード(起動時にスロットにモデルがあった場合はinitialLoadはFalseになっている)
         if self.initialLoad:
@@ -147,7 +153,8 @@ class RVC:
                 if val < 0:
                     return True
                 val = val % 1000  # Quick hack for same slot is selected
-                if self.settings.modelSlots[val].modelFile is None or self.settings.modelSlots[val].modelFile == "":
+                allModelSlots = self.modelSlotManager.getAllSlotInfo()
+                if allModelSlots[val].modelFile is None or allModelSlots[val].modelFile == "":
                     print("[Voice Changer] slot does not have model.")
                     return True
                 self.prepareModel(val)
@@ -174,7 +181,8 @@ class RVC:
         if slot < 0:
             print("[Voice Changer] Prepare Model of slot skip:", slot)
             return self.get_info()
-        modelSlot = self.settings.modelSlots[slot]
+        allModelSlots = self.modelSlotManager.getAllSlotInfo()
+        modelSlot = allModelSlots[slot]
 
         print("[Voice Changer] Prepare Model of slot:", slot)
 
@@ -208,7 +216,6 @@ class RVC:
         )
 
     def get_info(self):
-        self.settings.modelSlots = loadAllSlotInfo(self.params.model_dir)
         data = asdict(self.settings)
         if self.pipeline is not None:
             pipelineInfo = self.pipeline.getPipelineInfo()
@@ -293,9 +300,15 @@ class RVC:
         f0_up_key = self.settings.tran
         index_rate = self.settings.indexRatio
         protect = self.settings.protect
-        if_f0 = 1 if self.settings.modelSlots[self.currentSlot].f0 else 0
-        embOutputLayer = self.settings.modelSlots[self.currentSlot].embOutputLayer
-        useFinalProj = self.settings.modelSlots[self.currentSlot].useFinalProj
+
+        # if_f0 = 1 if self.settings.modelSlots[self.currentSlot].f0 else 0
+        # embOutputLayer = self.settings.modelSlots[self.currentSlot].embOutputLayer
+        # useFinalProj = self.settings.modelSlots[self.currentSlot].useFinalProj
+
+        if_f0 = 1 if self.modelSlotManager.get_slot_info(self.currentSlot).f0 else 0
+        embOutputLayer = self.modelSlotManager.get_slot_info(self.currentSlot).embOutputLayer
+        useFinalProj = self.modelSlotManager.get_slot_info(self.currentSlot).useFinalProj
+
         try:
             audio_out = self.pipeline.exec(
                 sid,
@@ -340,7 +353,8 @@ class RVC:
                 pass
 
     def export2onnx(self):
-        modelSlot = self.settings.modelSlots[self.settings.modelSlotIndex]
+        allModelSlots = self.modelSlotManager.getAllSlotInfo()
+        modelSlot = allModelSlots[self.settings.modelSlotIndex]
 
         if modelSlot.isONNX:
             print("[Voice Changer] export2onnx, No pyTorch filepath.")
@@ -359,7 +373,9 @@ class RVC:
         merged = merge_model(req)
         targetSlot = 0
         if req.slot < 0:
-            targetSlot = len(self.settings.modelSlots) - 1
+            # 最後尾のスロット番号を格納先とする。
+            allModelSlots = self.modelSlotManager.getAllSlotInfo()
+            targetSlot = len(allModelSlots) - 1
         else:
             targetSlot = req.slot
 
@@ -386,47 +402,37 @@ class RVC:
         self.currentSlot = self.settings.modelSlotIndex
 
     def update_model_default(self):
-        print("[Voice Changer] UPDATE MODEL DEFAULT!!")
-        slotDir = os.path.join(self.params.model_dir, str(self.currentSlot))
-        params = json.load(open(os.path.join(slotDir, "params.json"), "r", encoding="utf-8"))
-        params["defaultTune"] = self.settings.tran
-        params["defaultIndexRatio"] = self.settings.indexRatio
-        params["defaultProtect"] = self.settings.protect
-
-        json.dump(params, open(os.path.join(slotDir, "params.json"), "w"))
-        self.settings.modelSlots = loadAllSlotInfo(self.params.model_dir)
+        # {"slot":9,"key":"name","val":"dogsdododg"}
+        self.modelSlotManager.update_model_info(
+            json.dumps(
+                {
+                    "slot": self.currentSlot,
+                    "key": "defaultTune",
+                    "val": self.settings.tran,
+                }
+            )
+        )
+        self.modelSlotManager.update_model_info(
+            json.dumps(
+                {
+                    "slot": self.currentSlot,
+                    "key": "defaultIndexRatio",
+                    "val": self.settings.indexRatio,
+                }
+            )
+        )
+        self.modelSlotManager.update_model_info(
+            json.dumps(
+                {
+                    "slot": self.currentSlot,
+                    "key": "defaultProtect",
+                    "val": self.settings.protect,
+                }
+            )
+        )
 
     def update_model_info(self, newData: str):
-        print("[Voice Changer] UPDATE MODEL INFO", newData)
-        newDataDict = json.loads(newData)
-        try:
-            slotDir = os.path.join(self.params.model_dir, str(newDataDict["slot"]))
-        except Exception as e:
-            print("Exception::::", e)
-        params = json.load(open(os.path.join(slotDir, "params.json"), "r", encoding="utf-8"))
-        params[newDataDict["key"]] = newDataDict["val"]
-        json.dump(params, open(os.path.join(slotDir, "params.json"), "w"))
-        self.settings.modelSlots = loadAllSlotInfo(self.params.model_dir)
+        self.modelSlotManager.update_model_info(newData)
 
     def upload_model_assets(self, params: str):
-        print("[Voice Changer] UPLOAD ASSETS", params)
-        paramsDict = json.loads(params)
-        uploadPath = os.path.join(UPLOAD_DIR, paramsDict["file"])
-        storeDir = os.path.join(self.params.model_dir, str(paramsDict["slot"]))
-        storePath = os.path.join(
-            storeDir,
-            paramsDict["file"],
-        )
-        storeJson = os.path.join(
-            storeDir,
-            "params.json",
-        )
-        try:
-            shutil.move(uploadPath, storePath)
-            params = json.load(open(storeJson, "r", encoding="utf-8"))
-            params[paramsDict["name"]] = storePath  # type:ignore
-            json.dump(params, open(storeJson, "w"))
-        except Exception as e:
-            print("Exception::::", e)
-
-        self.settings.modelSlots = loadAllSlotInfo(self.params.model_dir)
+        self.modelSlotManager.store_model_assets(params)

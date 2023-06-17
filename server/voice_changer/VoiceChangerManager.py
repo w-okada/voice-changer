@@ -1,4 +1,5 @@
 import numpy as np
+from data.ModelSlot import loadAllSlotInfo
 from utils.downloader.SampleDownloader import downloadSample
 from voice_changer.Local.ServerDevice import ServerDevice, ServerDeviceCallbacks
 from voice_changer.VoiceChanger import VoiceChanger
@@ -95,6 +96,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
     def get_info(self):
         data = asdict(self.settings)
         data["gpus"] = self.gpus
+        data["modelSlots"] = loadAllSlotInfo(self.params.model_dir)
 
         data["status"] = "OK"
 
@@ -143,6 +145,9 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         self.voiceChanger.merge_models(request)
         return self.get_info()
 
+    def setEmitTo(self, emitTo: Callable[[Any], None]):
+        self.emitToFunc = emitTo
+
     def update_model_default(self):
         self.voiceChanger.update_model_default()
         return self.get_info()
@@ -154,6 +159,3 @@ class VoiceChangerManager(ServerDeviceCallbacks):
     def upload_model_assets(self, params: str):
         self.voiceChanger.upload_model_assets(params)
         return self.get_info()
-
-    def setEmitTo(self, emitTo: Callable[[Any], None]):
-        self.emitToFunc = emitTo
