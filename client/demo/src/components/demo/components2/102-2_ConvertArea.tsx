@@ -1,5 +1,6 @@
 import React, { useMemo } from "react"
 import { useAppState } from "../../../001_provider/001_AppStateProvider"
+import { useAppRoot } from "../../../001_provider/001_AppRootProvider"
 
 export type ConvertProps = {
     inputChunkNums: number[]
@@ -8,7 +9,8 @@ export type ConvertProps = {
 
 export const ConvertArea = (props: ConvertProps) => {
     const { clientSetting, serverSetting, workletNodeSetting } = useAppState()
-
+    const { appGuiSettingState } = useAppRoot()
+    const edition = appGuiSettingState.edition
     const convertArea = useMemo(() => {
         let nums: number[]
         if (!props.inputChunkNums) {
@@ -23,6 +25,38 @@ export const ConvertArea = (props: ConvertProps) => {
             name: "cpu",
             memory: 0
         })
+        const gpuSelect = edition == "onnxdirectML-cuda" || true ? (
+            <div className="config-sub-area-control">
+                <div className="config-sub-area-control-title">GPU(dml):</div>
+                <div className="config-sub-area-control-field">
+                    <div className="config-sub-area-buttons left-padding-1">
+                        <div onClick={
+                            async () => {
+                                await serverSetting.updateServerSettings({
+                                    ...serverSetting.serverSetting, gpu: serverSetting.serverSetting.gpu == 0 ? -1 : 0
+                                })
+                            }} className="config-sub-area-button ">{serverSetting.serverSetting.gpu == 0 ? "on" : "off"}</div>
+                    </div>
+                </div>
+            </div >
+
+        ) : (
+            <div className="config-sub-area-control">
+                <div className="config-sub-area-control-title">GPU:</div>
+                <div className="config-sub-area-control-field">
+                    <select className="body-select" value={serverSetting.serverSetting.gpu} onChange={(e) => {
+                        serverSetting.updateServerSettings({ ...serverSetting.serverSetting, gpu: Number(e.target.value) })
+                    }}>
+                        {
+                            gpusEntry.map(x => {
+                                return <option key={x.id} value={x.id}>{x.name}{x.name == "cpu" ? "" : `(${(x.memory / 1024 / 1024 / 1024).toFixed(0)}GB)`} </option>
+                            })
+                        }
+                    </select>
+                </div>
+            </div>
+
+        )
         return (
             <div className="config-sub-area">
                 <div className="config-sub-area-control">
@@ -57,24 +91,10 @@ export const ConvertArea = (props: ConvertProps) => {
                         </select>
                     </div>
                 </div>
-                <div className="config-sub-area-control">
-                    <div className="config-sub-area-control-title">GPU:</div>
-                    <div className="config-sub-area-control-field">
-                        <select className="body-select" value={serverSetting.serverSetting.gpu} onChange={(e) => {
-                            serverSetting.updateServerSettings({ ...serverSetting.serverSetting, gpu: Number(e.target.value) })
-                        }}>
-                            {
-                                gpusEntry.map(x => {
-                                    return <option key={x.id} value={x.id}>{x.name}{x.name == "cpu" ? "" : `(${(x.memory / 1024 / 1024 / 1024).toFixed(0)}GB)`} </option>
-                                })
-                            }
-                        </select>
-                    </div>
-                </div>
-
+                {gpuSelect}
             </div>
         )
-    }, [serverSetting.serverSetting, clientSetting.clientSetting, workletNodeSetting.workletNodeSetting, serverSetting.updateServerSettings, clientSetting.updateClientSetting, workletNodeSetting.updateWorkletNodeSetting])
+    }, [serverSetting.serverSetting, clientSetting.clientSetting, workletNodeSetting.workletNodeSetting, serverSetting.updateServerSettings, clientSetting.updateClientSetting, workletNodeSetting.updateWorkletNodeSetting, edition])
 
 
     return convertArea

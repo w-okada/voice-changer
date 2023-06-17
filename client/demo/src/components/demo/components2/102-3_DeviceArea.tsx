@@ -16,6 +16,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
     const audioSrcNode = useRef<MediaElementAudioSourceNode>()
     const { appGuiSettingState } = useAppRoot()
     const clientType = appGuiSettingState.appGuiSetting.id
+
     const { getItem, setItem } = useIndexedDB({ clientType: clientType })
     const [outputRecordingStarted, setOutputRecordingStarted] = useState<boolean>(false)
 
