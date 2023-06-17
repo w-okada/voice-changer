@@ -104,10 +104,10 @@ def getSampleJsonAndModelIds(mode: RVCSampleMode):
             "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0003_t2.json",
             "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0003_o2.json",
         ], [
-            # ("TokinaShigure_o", {"useIndex": True}),
-            # ("KikotoMahiro_o", {"useIndex": False}),
-            # ("Amitaro_o", {"useIndex": False}),
             ("Tsukuyomi-chan_o", {"useIndex": False}),
+            ("Amitaro_o", {"useIndex": False}),
+            ("KikotoMahiro_o", {"useIndex": False}),
+            ("TokinaShigure_o", {"useIndex": True}),
         ]
     elif mode == "testOfficial":
         return [
