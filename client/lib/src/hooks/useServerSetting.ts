@@ -251,7 +251,8 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
     const _uploadFile2 = useMemo(() => {
         return async (file: File, onprogress: (progress: number, end: boolean) => void, dir: string = "") => {
             if (!props.voiceChangerClient) return
-            console.log("uploading...", file.name)
+            console.log("uploading..1.", file)
+            console.log("uploading..2.", file.name)
             const num = await props.voiceChangerClient.uploadFile2(file, onprogress)
             const res = await props.voiceChangerClient.concatUploadedFile(dir + file.name, num)
             console.log("uploaded", num, res)
@@ -262,6 +263,8 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
     const loadModel = useMemo(() => {
         return async (slot: number) => {
             const fileUploadSetting = fileUploadSettings[slot]
+            console.log("[loadModel]", fileUploadSetting)
+            console.log("[loadModel] model:", props.clientType)
 
             if (fileUploadSetting.isSampleMode == false) {
                 if (props.clientType == "MMVCv13") {
@@ -337,6 +340,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 fileUploadSetting.soVitsSvc40v2Cluster,
 
             ].filter(x => { return x != null }) as ModelData[]
+            console.log("[SENDING FILE]", normalModels)
             for (let i = 0; i < normalModels.length; i++) {
                 if (!normalModels[i].data) {
                     // const fileSize = normalModels[i].file!.size / 1024 / 1024
@@ -348,12 +352,12 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 for (let i = 0; i < normalModels.length; i++) {
                     const progRate = 1 / normalModels.length
                     const progOffset = 100 * i * progRate
-                    // await _uploadFile(normalModels[i], (progress: number, _end: boolean) => {
-                    //     setUploadProgress(progress * progRate + progOffset)
-                    // })
-                    await _uploadFile2(normalModels[i].file!, (progress: number, _end: boolean) => {
+                    await _uploadFile(normalModels[i], (progress: number, _end: boolean) => {
                         setUploadProgress(progress * progRate + progOffset)
                     })
+                    // await _uploadFile2(normalModels[i].file!, (progress: number, _end: boolean) => {
+                    //     setUploadProgress(progress * progRate + progOffset)
+                    // })
                 }
             }
 
@@ -407,24 +411,21 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 sampleId: fileUploadSetting.isSampleMode ? fileUploadSetting.sampleId || "" : "",
                 rvcIndexDownload: fileUploadSetting.rvcIndexDownload || false,
                 files: fileUploadSetting.isSampleMode ? {} : {
-                    mmvcv13Config: fileUploadSetting.mmvcv13Config?.filename || "",
-                    mmvcv13Model: fileUploadSetting.mmvcv13Model?.filename || "",
-                    mmvcv15Config: fileUploadSetting.mmvcv15Config?.filename || "",
-                    mmvcv15Model: fileUploadSetting.mmvcv15Model?.filename || "",
-                    soVitsSvc40Config: fileUploadSetting.soVitsSvc40Config?.filename || "",
-                    soVitsSvc40Model: fileUploadSetting.soVitsSvc40Model?.filename || "",
-                    soVitsSvc40Cluster: fileUploadSetting.soVitsSvc40Cluster?.filename || "",
-                    soVitsSvc40v2Config: fileUploadSetting.soVitsSvc40v2Config?.filename || "",
-                    soVitsSvc40v2Model: fileUploadSetting.soVitsSvc40v2Model?.filename || "",
-                    soVitsSvc40v2Cluster: fileUploadSetting.soVitsSvc40v2Cluster?.filename || "",
-                    rvcModel: fileUploadSetting.rvcModel?.filename || "",
-                    rvcIndex: fileUploadSetting.rvcIndex?.filename || "",
-                    rvcFeature: fileUploadSetting.rvcFeature?.filename || "",
+                    mmvcv13Config: props.clientType == "MMVCv13" ? fileUploadSetting.mmvcv13Config?.filename || "" : "",
+                    mmvcv13Model: props.clientType == "MMVCv13" ? fileUploadSetting.mmvcv13Model?.filename || "" : "",
+                    mmvcv15Config: props.clientType == "MMVCv15" ? fileUploadSetting.mmvcv15Config?.filename || "" : "",
+                    mmvcv15Model: props.clientType == "MMVCv15" ? fileUploadSetting.mmvcv15Model?.filename || "" : "",
+                    soVitsSvc40Config: props.clientType == "so-vits-svc-40" ? fileUploadSetting.soVitsSvc40Config?.filename || "" : "",
+                    soVitsSvc40Model: props.clientType == "so-vits-svc-40" ? fileUploadSetting.soVitsSvc40Model?.filename || "" : "",
+                    soVitsSvc40Cluster: props.clientType == "so-vits-svc-40" ? fileUploadSetting.soVitsSvc40Cluster?.filename || "" : "",
+                    rvcModel: props.clientType == "RVC" ? fileUploadSetting.rvcModel?.filename || "" : "",
+                    rvcIndex: props.clientType == "RVC" ? fileUploadSetting.rvcIndex?.filename || "" : "",
+                    rvcFeature: props.clientType == "RVC" ? fileUploadSetting.rvcFeature?.filename || "" : "",
 
-                    ddspSvcModel: fileUploadSetting.ddspSvcModel?.filename ? "ddsp_mod/" + fileUploadSetting.ddspSvcModel?.filename : "",
-                    ddspSvcModelConfig: fileUploadSetting.ddspSvcModelConfig?.filename ? "ddsp_mod/" + fileUploadSetting.ddspSvcModelConfig?.filename : "",
-                    ddspSvcDiffusion: fileUploadSetting.ddspSvcDiffusion?.filename ? "ddsp_diff/" + fileUploadSetting.ddspSvcDiffusion?.filename : "",
-                    ddspSvcDiffusionConfig: fileUploadSetting.ddspSvcDiffusionConfig?.filename ? "ddsp_diff/" + fileUploadSetting.ddspSvcDiffusionConfig.filename : "",
+                    ddspSvcModel: props.clientType == "DDSP-SVC" ? fileUploadSetting.ddspSvcModel?.filename ? "ddsp_mod/" + fileUploadSetting.ddspSvcModel?.filename : "" : "",
+                    ddspSvcModelConfig: props.clientType == "DDSP-SVC" ? fileUploadSetting.ddspSvcModelConfig?.filename ? "ddsp_mod/" + fileUploadSetting.ddspSvcModelConfig?.filename : "" : "",
+                    ddspSvcDiffusion: props.clientType == "DDSP-SVC" ? fileUploadSetting.ddspSvcDiffusion?.filename ? "ddsp_diff/" + fileUploadSetting.ddspSvcDiffusion?.filename : "" : "",
+                    ddspSvcDiffusionConfig: props.clientType == "DDSP-SVC" ? fileUploadSetting.ddspSvcDiffusionConfig?.filename ? "ddsp_diff/" + fileUploadSetting.ddspSvcDiffusionConfig.filename : "" : "",
                 }
             })
 

@@ -8,7 +8,7 @@ from data.ModelSample import ModelSamples, generateModelSample
 from data.ModelSlot import RVCModelSlot
 from voice_changer.ModelSlotManager import ModelSlotManager
 from voice_changer.RVC.ModelSlotGenerator import _setInfoByONNX, _setInfoByPytorch
-from utils.downloader.Downloader import download, download_no_tqdm
+from downloader.Downloader import download, download_no_tqdm
 
 
 def downloadInitialSamples(mode: RVCSampleMode, model_dir: str):

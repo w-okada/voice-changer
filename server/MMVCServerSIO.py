@@ -7,8 +7,8 @@ import platform
 import os
 import argparse
 from Exceptions import WeightDownladException
-from utils.downloader.SampleDownloader import downloadInitialSamples
-from utils.downloader.WeightDownloader import downloadWeight
+from downloader.SampleDownloader import downloadInitialSamples
+from downloader.WeightDownloader import downloadWeight
 
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 

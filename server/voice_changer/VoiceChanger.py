@@ -81,6 +81,7 @@ class VoiceChanger:
         print(f"VoiceChanger Initialized (GPU_NUM:{self.gpu_num}, mps_enabled:{self.mps_enabled})")
 
     def switchModelType(self, modelType: ModelType):
+        print("Switch Model Type:", modelType)
         try:
             if self.voiceChanger is not None:
                 # return {"status": "ERROR", "msg": "vc is already selected. currently re-select is not implemented"}
@@ -119,6 +120,7 @@ class VoiceChanger:
         except Exception as e:
             print(e)
             print(traceback.format_exc())
+        print("Switch Model Type:", self.voiceChanger)
         return {"status": "OK", "msg": "vc is switched."}
 
     def getModelType(self):

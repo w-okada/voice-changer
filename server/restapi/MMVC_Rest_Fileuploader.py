@@ -87,7 +87,7 @@ class MMVC_Rest_Fileuploader:
     ):
         try:
             paramDict = json.loads(params)
-            # print("paramDict", paramDict)
+            print("paramDict", paramDict)
 
             # Change Filepath
             newFilesDict = {}

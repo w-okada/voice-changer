@@ -1,5 +1,5 @@
 import numpy as np
-from utils.downloader.SampleDownloader import downloadSample, getSampleInfos
+from downloader.SampleDownloader import downloadSample, getSampleInfos
 from voice_changer.Local.ServerDevice import ServerDevice, ServerDeviceCallbacks
 from voice_changer.ModelSlotManager import ModelSlotManager
 from voice_changer.VoiceChanger import VoiceChanger

@@ -1,7 +1,7 @@
 import os
 from concurrent.futures import ThreadPoolExecutor
 
-from utils.downloader.Downloader import download
+from downloader.Downloader import download
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from Exceptions import WeightDownladException
 
