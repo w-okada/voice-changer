@@ -77,7 +77,7 @@ class MMVC_Rest_Fileuploader:
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:
             print("[Voice Changer] ex:", e)
-            print(sys.exc_info()[2].tb_lineno)
+            print(sys.exc_info())
 
     def post_load_model(
         self,

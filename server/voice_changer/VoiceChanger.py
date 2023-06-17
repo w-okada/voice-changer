@@ -60,7 +60,7 @@ class VoiceChangerSettings:
 
 class VoiceChanger:
     ioRecorder: IORecorder
-    #    sola_buffer: AudioInOut
+    sola_buffer: AudioInOut
 
     def __init__(self, params: VoiceChangerParams):
         # 初期化

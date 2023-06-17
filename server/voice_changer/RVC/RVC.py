@@ -6,7 +6,6 @@ import numpy as np
 import torch
 import torchaudio
 from data.ModelSlot import RVCModelSlot
-from utils.downloader.SampleDownloader import getSampleInfos
 from voice_changer.ModelSlotManager import ModelSlotManager
 
 
@@ -67,13 +66,9 @@ class RVC:
         self.params = params
         EmbedderManager.initialize(params)
         print("[Voice Changer] RVC initialization: ", params)
-        self.modelSlotManager = ModelSlotManager.get_instance(self.params)
+        self.modelSlotManager = ModelSlotManager.get_instance(self.params.model_dir)
 
-        # サンプルカタログ作成
-        samples = getSampleInfos(params.sample_mode)
-        self.settings.sampleModels = samples
         # 起動時にスロットにモデルがある場合はロードしておく
-
         allSlots = self.modelSlotManager.getAllSlotInfo()
         availableIndex = -1
         for i, slot in enumerate(allSlots):
@@ -87,13 +82,6 @@ class RVC:
             self.initialLoad = False
 
         self.prevVol = 0.0
-
-    def getSampleInfo(self, id: str):
-        sampleInfos = list(filter(lambda x: x.id == id, self.settings.sampleModels))
-        if len(sampleInfos) > 0:
-            return sampleInfos[0]
-        else:
-            None
 
     def moveToModelDir(self, file: str, dstDir: str):
         dst = os.path.join(dstDir, os.path.basename(file))

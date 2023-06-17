@@ -5,7 +5,8 @@ from typing import Any, Tuple
 
 from const import RVCSampleMode, getSampleJsonAndModelIds
 from data.ModelSample import ModelSamples, generateModelSample
-from data.ModelSlot import RVCModelSlot, loadSlotInfo, saveSlotInfo
+from data.ModelSlot import RVCModelSlot
+from voice_changer.ModelSlotManager import ModelSlotManager
 from voice_changer.RVC.ModelSlotGenerator import _setInfoByONNX, _setInfoByPytorch
 from utils.downloader.Downloader import download, download_no_tqdm
 
@@ -27,7 +28,7 @@ def downloadSample(mode: RVCSampleMode, modelId: str, model_dir: str, slotIndex:
     sampleJsonUrls, _sampleModels = getSampleJsonAndModelIds(mode)
     sampleJsons = _generateSampleJsons(sampleJsonUrls)
     samples = _generateSampleList(sampleJsons)
-    _downloadSamples(samples, [(modelId, params)], model_dir, [slotIndex])
+    _downloadSamples(samples, [(modelId, params)], model_dir, [slotIndex], withoutTqdm=True)
     pass
 
 
@@ -67,9 +68,10 @@ def _generateSampleList(sampleJsons: list[str]):
     return samples
 
 
-def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str, Any]], model_dir: str, slotIndex: list[int]):
+def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str, Any]], model_dir: str, slotIndex: list[int], withoutTqdm=False):
     downloadParams = []
     line_num = 0
+    modelSlotManager = ModelSlotManager.get_instance(model_dir)
 
     for i, initSampleId in enumerate(sampleModelIds):
         targetSampleId = initSampleId[0]
@@ -145,22 +147,26 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
             slotInfo.defaultIndexRatio = 1
             slotInfo.defaultProtect = 0.5
             slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
-            saveSlotInfo(model_dir, tagetSlotIndex, slotInfo)
+            modelSlotManager.save_model_slot(tagetSlotIndex, slotInfo)
         else:
             print(f"[Voice Changer] {sample.voiceChangerType} is not supported.")
 
     # ダウンロード
     print("[Voice Changer] Downloading model files...")
-    with ThreadPoolExecutor() as pool:
-        pool.map(download, downloadParams)
+    if withoutTqdm:
+        with ThreadPoolExecutor() as pool:
+            pool.map(download_no_tqdm, downloadParams)
+    else:
+        with ThreadPoolExecutor() as pool:
+            pool.map(download, downloadParams)
 
     # メタデータ作成
     print("[Voice Changer] Generating metadata...")
     for targetSlotIndex in slotIndex:
-        slotInfo = loadSlotInfo(model_dir, targetSlotIndex)
+        slotInfo = modelSlotManager.get_slot_info(targetSlotIndex)
         if slotInfo.voiceChangerType == "RVC":
             if slotInfo.isONNX:
                 _setInfoByONNX(slotInfo)
             else:
                 _setInfoByPytorch(slotInfo)
-        saveSlotInfo(model_dir, targetSlotIndex, slotInfo)
+        modelSlotManager.save_model_slot(tagetSlotIndex, slotInfo)

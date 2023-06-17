@@ -1,7 +1,7 @@
 import numpy as np
-from data.ModelSlot import loadAllSlotInfo
-from utils.downloader.SampleDownloader import downloadSample
+from utils.downloader.SampleDownloader import downloadSample, getSampleInfos
 from voice_changer.Local.ServerDevice import ServerDevice, ServerDeviceCallbacks
+from voice_changer.ModelSlotManager import ModelSlotManager
 from voice_changer.VoiceChanger import VoiceChanger
 from const import ModelType
 from voice_changer.utils.LoadModelParams import LoadModelParams
@@ -53,6 +53,8 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         self.params = params
         self.voiceChanger: VoiceChanger = None
         self.settings: VoiceChangerManagerSettings = VoiceChangerManagerSettings(dummy=0)
+
+        self.modelSlotManager = ModelSlotManager.get_instance(self.params.model_dir)
         # スタティックな情報を収集
         self.gpus: list[GPUInfo] = self._get_gpuInfos()
 
@@ -82,6 +84,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         paramDict = props.params
         if "sampleId" in paramDict and len(paramDict["sampleId"]) > 0:
             downloadSample(self.params.sample_mode, paramDict["sampleId"], self.params.model_dir, props.slot, {"useIndex": paramDict["rvcIndexDownload"]})
+            self.modelSlotManager.getAllSlotInfo(reload=True)
             info = {"status": "OK"}
             return info
         else:
@@ -96,7 +99,8 @@ class VoiceChangerManager(ServerDeviceCallbacks):
     def get_info(self):
         data = asdict(self.settings)
         data["gpus"] = self.gpus
-        data["modelSlots"] = loadAllSlotInfo(self.params.model_dir)
+        data["modelSlots"] = self.modelSlotManager.getAllSlotInfo(reload=True)
+        data["sampleModels"] = getSampleInfos(self.params.sample_mode)
 
         data["status"] = "OK"
 

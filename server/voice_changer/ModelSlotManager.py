@@ -1,6 +1,5 @@
 from const import UPLOAD_DIR
 from data.ModelSlot import ModelSlots, loadAllSlotInfo, saveSlotInfo
-from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 import json
 import os
 import shutil
@@ -9,24 +8,26 @@ import shutil
 class ModelSlotManager:
     _instance = None
 
-    def __init__(self, params: VoiceChangerParams):
-        self.params = params
-        self.modelSlots = loadAllSlotInfo(self.params.model_dir)
+    def __init__(self, model_dir: str):
+        self.model_dir = model_dir
+        self.modelSlots = loadAllSlotInfo(self.model_dir)
 
     @classmethod
-    def get_instance(cls, params: VoiceChangerParams):
+    def get_instance(cls, model_dir: str):
         if cls._instance is None:
-            cls._instance = cls(params)
+            cls._instance = cls(model_dir)
         return cls._instance
 
     def _save_model_slot(self, slotIndex: int, slotInfo: ModelSlots):
-        saveSlotInfo(self.params.model_dir, slotIndex, slotInfo)
-        self.modelSlots = loadAllSlotInfo(self.params.model_dir)
+        saveSlotInfo(self.model_dir, slotIndex, slotInfo)
+        self.modelSlots = loadAllSlotInfo(self.model_dir)
 
     def _load_model_slot(self, slotIndex: int):
         return self.modelSlots[slotIndex]
 
-    def getAllSlotInfo(self):
+    def getAllSlotInfo(self, reload: bool = False):
+        if reload:
+            self.modelSlots = loadAllSlotInfo(self.model_dir)
         return self.modelSlots
 
     def get_slot_info(self, slotIndex: int):
@@ -46,7 +47,7 @@ class ModelSlotManager:
         print("[Voice Changer] UPLOAD ASSETS", params)
         paramsDict = json.loads(params)
         uploadPath = os.path.join(UPLOAD_DIR, paramsDict["file"])
-        storeDir = os.path.join(self.params.model_dir, str(paramsDict["slot"]))
+        storeDir = os.path.join(self.model_dir, str(paramsDict["slot"]))
         storePath = os.path.join(
             storeDir,
             paramsDict["file"],
