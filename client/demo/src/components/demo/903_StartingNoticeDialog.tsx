@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
 import { useGuiState } from "./001_GuiStateProvider";
-// import { getMessage } from "./messages/MessageBuilder";
 import { isDesktopApp } from "../../const";
 import { useAppRoot } from "../../001_provider/001_AppRootProvider";
 import { useMessageBuilder } from "../../hooks/useMessageBuilder";

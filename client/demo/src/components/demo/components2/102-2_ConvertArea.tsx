@@ -25,7 +25,7 @@ export const ConvertArea = (props: ConvertProps) => {
             name: "cpu",
             memory: 0
         })
-        const gpuSelect = edition == "onnxdirectML-cuda" ? (
+        const gpuSelect = edition.indexOf("onnxdirectML-cuda") >= 0 ? (
             <div className="config-sub-area-control">
                 <div className="config-sub-area-control-title">GPU(dml):</div>
                 <div className="config-sub-area-control-field">
