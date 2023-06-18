@@ -4,6 +4,14 @@
 
 ## What's New!
 
+- v.1.5.3.5a
+
+  - some bugfix
+    - onnxcuda: onnx framework version changed. 1.15.1 -> 1.13.1
+    - rvc quality processing failed.
+    - model upload issue.
+    - and others.
+
 - v.1.5.3.5
 
   - RVC: new GUI released. Other VCs will be migrated to the new GUI in stages.
@@ -75,16 +83,19 @@ We offer Windows and Mac versions.
 
 - Download (When you cannot download from google drive, try [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main))
 
-| Version    | OS  | Framework                                 | link                                                                                           | support VC                                                                    | size   |
-| ---------- | --- | ----------------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------ |
-| v.1.5.3.5  | mac | ONNX(cpu), PyTorch(cpu,mps)               | [normal](https://drive.google.com/uc?id=1X4_zYe72yo3RnVHC1G5SZs8CRzlBiMPf&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 785MB  |
-|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)         | [normal](https://drive.google.com/uc?id=1SeMiX3ZSyewsLKDptpRDlVD6j0htpKaJ&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC                    | 3243MB |
-|            | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) \*2 | [normal](https://drive.google.com/uc?id=1FTWrKybOnOKp3yA8PGfQNV-OdyEAqpvx&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC                    | 3121MB |
-| v.1.5.3.4d | mac | ONNX(cpu), PyTorch(cpu,mps)               | [normal](https://drive.google.com/uc?id=1xZPn9UiqBgPHANQAzFF5O2sqahqFOuoB&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 785MB  |
-|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)         | [normal](https://drive.google.com/uc?id=1oks9Aq_cFKNk95VOvXwhEKE8GHX0RUW9&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC                    | 3243MB |
-|            | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) \*2 | [normal](https://drive.google.com/uc?id=1jJ6P9rBuSj5u_SSWAbwGAaT31cM4rRcf&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC                    | 3121MB |
-| v.1.5.3.3b | mac | ONNX(cpu), PyTorch(cpu,mps)               | [normal](https://drive.google.com/uc?id=14_STxl6lYwhTahcgMGfsjnwpoHmN0svf&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 797MB  |
-|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)         | [normal](https://drive.google.com/uc?id=1VpMSF5lE3VrUeb_TusWQi22_Hx8JoPhC&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2872MB |
+| Version    | OS  | Framework                                 | link                                                                                                                                                             | support VC                                                                    | size   |
+| ---------- | --- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------ |
+| v.1.5.3.5a | mac | ONNX(cpu), PyTorch(cpu,mps)               | [normal](https://drive.google.com/uc?id=1CDngewM_1xo8HgJ5oT6qqhhmgUUhiSdz&export=download), [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)  | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 785MB  |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)         | [normal](https://drive.google.com/uc?id=1Tc1qvJIGF79cXCKDnZP4bGYXVg7OgJHp&export=download), [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)  | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC                    | 3236MB |
+|            | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda)\*2  | [normal](https://drive.google.com/uc?id=1dibo9F09V1n6DyBBw0qmBm5hCRoXoo12&export=download), [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)  | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC                    | 3121MB |
+| v.1.5.3.5  | mac | ONNX(cpu), PyTorch(cpu,mps)               | [normal](https://drive.google.com/uc?id=1X4_zYe72yo3RnVHC1G5SZs8CRzlBiMPf&export=download), [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)  | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 785MB  |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)         | [normal](https://drive.google.com/uc?id=1SeMiX3ZSyewsLKDptpRDlVD6j0htpKaJ&export=download), [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)  | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC                    | 3243MB |
+|            | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) \*2 | [normal](https://drive.google.com/uc?id=1FTWrKybOnOKp3yA8PGfQNV-OdyEAqpvx&export=download), [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)  | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC                    | 3121MB |
+| v.1.5.3.4d | mac | ONNX(cpu), PyTorch(cpu,mps)               | [normal](https://drive.google.com/uc?id=1xZPn9UiqBgPHANQAzFF5O2sqahqFOuoB&export=download), [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)  | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 785MB  |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)         | [normal](https://drive.google.com/uc?id=1oks9Aq_cFKNk95VOvXwhEKE8GHX0RUW9&export=download), [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)  | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC                    | 3243MB |
+|            | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) \*2 | [normal](https://drive.google.com/uc?id=1jJ6P9rBuSj5u_SSWAbwGAaT31cM4rRcf&export=download), [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)  | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC                    | 3121MB |
+| v.1.5.3.3b | mac | ONNX(cpu), PyTorch(cpu,mps)               | [normal](https://drive.google.com/uc?id=14_STxl6lYwhTahcgMGfsjnwpoHmN0svf&export=download), [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)  | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 797MB  |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)         | [normal](https://drive.google.com/uc?id=1VpMSF5lE3VrUeb_TusWQi22_Hx8JoPhC&export=download) , [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2872MB |
 
 (\*1) You can alson download from [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)
 (\*2) The developer does not have an AMD graphics card, so it has not been tested. This package only includes onnxruntime-directml.
