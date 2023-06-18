@@ -1,3 +1,5 @@
+これはVCClientでv3モデルを試すためのフォーク版です。それ以外の用途ではフォーク元を利用してください
+
 ## VC Client
 
 [English](/README_en.md)
