@@ -11,7 +11,33 @@ def _setInfoByPytorch(slot: ModelSlot):
     cpt = torch.load(slot.modelFile, map_location="cpu")
     config_len = len(cpt["config"])
 
-    if config_len == 18:
+    if cpt["version"] == "v3":
+        slot.f0 = True if cpt["f0"] == 1 else False
+        slot.modelType = EnumInferenceTypes.pyTorchRVCv3.value
+        slot.embChannels = cpt["config"][17]
+        slot.embOutputLayer = (
+            cpt["embedder_output_layer"] if "embedder_output_layer" in cpt else 9
+        )
+        if slot.embChannels == 256:
+            slot.useFinalProj = True
+        else:
+            slot.useFinalProj = False
+
+        slot.embedder = cpt["embedder_name"]
+        if slot.embedder.endswith("768"):
+            slot.embedder = slot.embedder[:-3]
+
+        if slot.embedder == EnumEmbedderTypes.hubert.value:
+            slot.embedder = EnumEmbedderTypes.hubert.value
+        elif slot.embedder == EnumEmbedderTypes.contentvec.value:
+            slot.embedder = EnumEmbedderTypes.contentvec.value
+        elif slot.embedder == EnumEmbedderTypes.hubert_jp.value:
+            slot.embedder = EnumEmbedderTypes.hubert_jp.value
+            print("nadare v3 loaded")
+        else:
+            raise RuntimeError("[Voice Changer][setInfoByONNX] unknown embedder")
+
+    elif config_len == 18:
         # Original RVC
         slot.f0 = True if cpt["f0"] == 1 else False
         version = cpt.get("version", "v1")
