@@ -30,45 +30,22 @@ class InferencerManager:
         file: str,
         gpu: int,
     ) -> Inferencer:
-        if (
-            inferencerType == EnumInferenceTypes.pyTorchRVC
-            or inferencerType == EnumInferenceTypes.pyTorchRVC.value
-        ):
+        print("inferencerTypeinferencerTypeinferencerTypeinferencerType", inferencerType)
+        if inferencerType == EnumInferenceTypes.pyTorchRVC or inferencerType == EnumInferenceTypes.pyTorchRVC.value:
             return RVCInferencer().loadModel(file, gpu)
-        elif (
-            inferencerType == EnumInferenceTypes.pyTorchRVCNono
-            or inferencerType == EnumInferenceTypes.pyTorchRVCNono.value
-        ):
+        elif inferencerType == EnumInferenceTypes.pyTorchRVCNono or inferencerType == EnumInferenceTypes.pyTorchRVCNono.value:
             return RVCInferencerNono().loadModel(file, gpu)
-        elif (
-            inferencerType == EnumInferenceTypes.pyTorchRVCv2
-            or inferencerType == EnumInferenceTypes.pyTorchRVCv2.value
-        ):
+        elif inferencerType == EnumInferenceTypes.pyTorchRVCv2 or inferencerType == EnumInferenceTypes.pyTorchRVCv2.value:
             return RVCInferencerv2().loadModel(file, gpu)
-        elif (
-            inferencerType == EnumInferenceTypes.pyTorchRVCv2Nono
-            or inferencerType == EnumInferenceTypes.pyTorchRVCv2Nono.value
-        ):
+        elif inferencerType == EnumInferenceTypes.pyTorchRVCv2Nono or inferencerType == EnumInferenceTypes.pyTorchRVCv2Nono.value:
             return RVCInferencerv2Nono().loadModel(file, gpu)
-        elif (
-            inferencerType == EnumInferenceTypes.pyTorchWebUI
-            or inferencerType == EnumInferenceTypes.pyTorchWebUI.value
-        ):
+        elif inferencerType == EnumInferenceTypes.pyTorchWebUI or inferencerType == EnumInferenceTypes.pyTorchWebUI.value:
             return WebUIInferencer().loadModel(file, gpu)
-        elif (
-            inferencerType == EnumInferenceTypes.pyTorchWebUINono
-            or inferencerType == EnumInferenceTypes.pyTorchWebUINono.value
-        ):
+        elif inferencerType == EnumInferenceTypes.pyTorchWebUINono or inferencerType == EnumInferenceTypes.pyTorchWebUINono.value:
             return WebUIInferencerNono().loadModel(file, gpu)
-        elif (
-            inferencerType == EnumInferenceTypes.onnxRVC
-            or inferencerType == EnumInferenceTypes.onnxRVC.value
-        ):
+        elif inferencerType == EnumInferenceTypes.onnxRVC or inferencerType == EnumInferenceTypes.onnxRVC.value:
             return OnnxRVCInferencer().loadModel(file, gpu)
-        elif (
-            inferencerType == EnumInferenceTypes.onnxRVCNono
-            or inferencerType == EnumInferenceTypes.onnxRVCNono.value
-        ):
+        elif inferencerType == EnumInferenceTypes.onnxRVCNono or inferencerType == EnumInferenceTypes.onnxRVCNono.value:
             return OnnxRVCInferencerNono().loadModel(file, gpu)
         else:
             raise RuntimeError("[Voice Changer] Inferencer not found", inferencerType)

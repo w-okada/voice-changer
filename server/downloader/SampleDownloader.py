@@ -76,7 +76,7 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
     for i, initSampleId in enumerate(sampleModelIds):
         targetSampleId = initSampleId[0]
         targetSampleParams = initSampleId[1]
-        tagetSlotIndex = slotIndex[i]
+        targetSlotIndex = slotIndex[i]
 
         # 初期サンプルをサーチ
         match = False
@@ -89,7 +89,7 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
             continue
 
         # 検出されたら、、、
-        slotDir = os.path.join(model_dir, str(tagetSlotIndex))
+        slotDir = os.path.join(model_dir, str(targetSlotIndex))
         if sample.voiceChangerType == "RVC":
             slotInfo: RVCModelSlot = RVCModelSlot()
 
@@ -147,7 +147,7 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
             slotInfo.defaultIndexRatio = 1
             slotInfo.defaultProtect = 0.5
             slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
-            modelSlotManager.save_model_slot(tagetSlotIndex, slotInfo)
+            modelSlotManager.save_model_slot(targetSlotIndex, slotInfo)
         else:
             print(f"[Voice Changer] {sample.voiceChangerType} is not supported.")
 
@@ -169,4 +169,4 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
                 _setInfoByONNX(slotInfo)
             else:
                 _setInfoByPytorch(slotInfo)
-        modelSlotManager.save_model_slot(tagetSlotIndex, slotInfo)
+            modelSlotManager.save_model_slot(targetSlotIndex, slotInfo)
