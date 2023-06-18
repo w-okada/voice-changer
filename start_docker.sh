@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-DOCKER_IMAGE=dannadori/vcclient:20230602_014557
+DOCKER_IMAGE=dannadori/vcclient:20230618_173205
 #DOCKER_IMAGE=vcclient
 
 ### DEFAULT VAR ###
@@ -19,7 +19,6 @@ fi
 
 if [ "${USE_GPU}" = "on" ]; then
     echo "VC Client start...(with gpu)"
-
     docker run -it --rm --gpus all --shm-size=1024M \
     -e EX_IP="`hostname -I`" \
     -e EX_PORT=${EX_PORT} \

@@ -1,5 +1,7 @@
 # Realtime Voice Changer Client for RVC チュートリアル(v.1.5.3.3)
 
+[English](/tutorials/tutorial_rvc_en_latest.md)
+
 # はじめに
 
 本アプリケーションは、各種音声変換 AI(VC, Voice Conversion)を用いてリアルタイム音声変換を行うためのクライアントソフトウェアです。本ドキュメントでは[RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI)に限定した音声変換のためのチュートリアルを行います。

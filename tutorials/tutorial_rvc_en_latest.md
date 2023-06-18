@@ -1,5 +1,7 @@
 # Realtime Voice Changer Client for RVC Tutorial (v.1.5.3.3)
 
+[Japanese/日本語](/tutorials/tutorial_rvc_en_latest.md)
+
 # Introduction
 
 This application is client software for real-time voice conversion that supports various voice conversion models. This document provides a description for voice conversion limited to [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI).
