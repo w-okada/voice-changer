@@ -40,7 +40,7 @@ RUN apt-get update \
 WORKDIR /
 ADD dummy /
 
-RUN git clone https://github.com/w-okada/voice-changer.git -b v.1.5.3.4
+RUN git clone https://github.com/w-okada/voice-changer.git -b v.1.5.3.5a
 
 
 ADD /setup.sh  /voice-changer/server

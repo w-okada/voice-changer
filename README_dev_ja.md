@@ -32,6 +32,7 @@ cd server
 git clone https://github.com/isletennos/MMVC_Client.git MMVC_Client_v13
 git clone https://github.com/isletennos/MMVC_Client.git MMVC_Client_v15
 git clone https://github.com/StarStringStudio/so-vits-svc.git so-vits-svc-40
+cd so-vits-svc-40 && git checkout 293fe0bc03a583df17846c715c179152745c1b8d && cd -
 git clone https://github.com/StarStringStudio/so-vits-svc.git so-vits-svc-40v2
 cd so-vits-svc-40v2 && git checkout 08c70ff3d2f7958820b715db2a2180f4b7f92f8d && cd -
 git clone https://github.com/yxlllc/DDSP-SVC.git DDSP-SVC
