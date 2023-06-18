@@ -43,8 +43,6 @@ ADD dummy /
 RUN git clone https://github.com/w-okada/voice-changer.git -b v.1.5.3.5a
 
 
-ADD /setup.sh  /voice-changer/server
-ADD /exec.sh  /voice-changer/server
 
 RUN chmod 0777 /voice-changer/server
 WORKDIR /voice-changer/server
@@ -64,4 +62,9 @@ RUN git clone https://github.com/yxlllc/DDSP-SVC.git DDSP-SVC
 RUN cd DDSP-SVC && git checkout e716efb14aee747492bc6ac1deb07506c26ed550 && cd -
 RUN git clone https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI.git RVC
 RUN cd RVC && git checkout 563c64ded9925085f547b13ecafb8eb9c182952b && cd -
+
+ADD /setup.sh  /voice-changer/server
+ADD /exec.sh  /voice-changer/server
+
+
 ENTRYPOINT ["/bin/bash", "setup.sh"]
