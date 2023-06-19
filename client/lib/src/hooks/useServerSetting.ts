@@ -41,6 +41,7 @@ export type ModelFileKind = typeof ModelFileKind[keyof typeof ModelFileKind]
 export type ModelFile = {
     file: File,
     kind: ModelFileKind
+    dir: string
 }
 
 export type ModelUploadSetting = {
@@ -296,7 +297,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             if (!props.voiceChangerClient) return
             console.log("uploading..1.", file)
             console.log("uploading..2.", file.name)
-            const num = await props.voiceChangerClient.uploadFile2(file, onprogress)
+            const num = await props.voiceChangerClient.uploadFile2(dir, file, onprogress)
             const res = await props.voiceChangerClient.concatUploadedFile(dir + file.name, num)
             console.log("uploaded", num, res)
         }
@@ -319,11 +320,11 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                     const progOffset = 100 * i * progRate
                     await _uploadFile2(setting.files[i].file, (progress: number, _end: boolean) => {
                         setUploadProgress(progress * progRate + progOffset)
-                    })
+                    }, setting.files[i].dir)
                 }
             }
             const params: ModelUploadSettingForServer = {
-                ...setting, files: setting.files.map((f) => { return { name: f.file.name, kind: f.kind } })
+                ...setting, files: setting.files.map((f) => { return { name: f.file.name, kind: f.kind, dir: f.dir } })
             }
 
             const loadPromise = props.voiceChangerClient.loadModel(

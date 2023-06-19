@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useAppState } from "../../001_provider/001_AppStateProvider";
-import { FileUploadSetting, InitialFileUploadSetting, ModelFileKind, ModelUploadSetting, VoiceChangerType, fileSelector } from "@dannadori/voice-changer-client-js";
+import { ModelFileKind, ModelUploadSetting, VoiceChangerType, fileSelector } from "@dannadori/voice-changer-client-js";
 import { useMessageBuilder } from "../../hooks/useMessageBuilder";
 import { ModelSlotManagerDialogScreen } from "./904_ModelSlotManagerDialog";
 import { checkExtention, trimfileName } from "../../utils/utils";
@@ -54,15 +54,31 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
 
         const checkModelSetting = (setting: ModelUploadSetting) => {
             if (setting.voiceChangerType == "RVC") {
-                // const enough = !!setting.files.find(x => { return x.kind == "rvcModel" }) &&
-                //     !!setting.files.find(x => { return x.kind == "rvcIndex" })
-                // return enough
                 const enough = !!setting.files.find(x => { return x.kind == "rvcModel" })
                 return enough
+            } else if (setting.voiceChangerType == "MMVCv13") {
+                const enough = !!setting.files.find(x => { return x.kind == "mmvcv13Model" }) &&
+                    !!setting.files.find(x => { return x.kind == "mmvcv13Config" })
+                return enough
+            } else if (setting.voiceChangerType == "MMVCv15") {
+                const enough = !!setting.files.find(x => { return x.kind == "mmvcv15Model" }) &&
+                    !!setting.files.find(x => { return x.kind == "mmvcv15Config" })
+                return enough
+            } else if (setting.voiceChangerType == "so-vits-svc-40") {
+                const enough = !!setting.files.find(x => { return x.kind == "soVitsSvc40Config" }) &&
+                    !!setting.files.find(x => { return x.kind == "soVitsSvc40Model" })
+                return enough
+            } else if (setting.voiceChangerType == "DDSP-SVC") {
+                const enough = !!setting.files.find(x => { return x.kind == "ddspSvcModel" }) &&
+                    !!setting.files.find(x => { return x.kind == "ddspSvcModelConfig" }) &&
+                    !!setting.files.find(x => { return x.kind == "ddspSvcDiffusion" }) &&
+                    !!setting.files.find(x => { return x.kind == "ddspSvcDiffusionConfig" })
+                return enough
             }
+            return false
         }
 
-        const generateFileRow = (setting: ModelUploadSetting, title: string, kind: ModelFileKind, ext: string[]) => {
+        const generateFileRow = (setting: ModelUploadSetting, title: string, kind: ModelFileKind, ext: string[], dir: string = "") => {
             const selectedFile = setting.files.find(x => { return x.kind == kind })
             const selectedFilename = selectedFile?.file.name || ""
             return (
@@ -81,7 +97,7 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
                         if (selectedFile) {
                             selectedFile.file = file
                         } else {
-                            setting.files.push({ kind: kind, file: file })
+                            setting.files.push({ kind: kind, file: file, dir: dir })
                         }
                         setUploadSetting({ ...setting })
                     }}>
@@ -96,6 +112,21 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
             if (vcType == "RVC") {
                 rows.push(generateFileRow(uploadSetting!, "Model", "rvcModel", ["pth", "onnx"]))
                 rows.push(generateFileRow(uploadSetting!, "Index", "rvcIndex", ["index", "bin"]))
+            } else if (vcType == "MMVCv13") {
+                rows.push(generateFileRow(uploadSetting!, "Config", "mmvcv13Config", ["json"]))
+                rows.push(generateFileRow(uploadSetting!, "Model", "mmvcv13Model", ["pth", "onnx"]))
+            } else if (vcType == "MMVCv15") {
+                rows.push(generateFileRow(uploadSetting!, "Config", "mmvcv15Config", ["json"]))
+                rows.push(generateFileRow(uploadSetting!, "Model", "mmvcv15Model", ["pth", "onnx"]))
+            } else if (vcType == "so-vits-svc-40") {
+                rows.push(generateFileRow(uploadSetting!, "Config", "soVitsSvc40Config", ["json"]))
+                rows.push(generateFileRow(uploadSetting!, "Model", "soVitsSvc40Model", ["pth"]))
+                rows.push(generateFileRow(uploadSetting!, "Cluster", "soVitsSvc40Cluster", ["pth", "pt"]))
+            } else if (vcType == "DDSP-SVC") {
+                rows.push(generateFileRow(uploadSetting!, "Config", "ddspSvcModelConfig", ["yaml"], "model/"))
+                rows.push(generateFileRow(uploadSetting!, "Model", "ddspSvcModel", ["pth", "pt"], "model/"))
+                rows.push(generateFileRow(uploadSetting!, "Config(diff)", "ddspSvcDiffusionConfig", ["yaml"], "diff/"))
+                rows.push(generateFileRow(uploadSetting!, "Model(diff)", "ddspSvcDiffusion", ["pth", "pt"], "diff/"))
             }
             return rows
         }

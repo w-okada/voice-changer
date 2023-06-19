@@ -95,21 +95,47 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             # Dataを展開
             params = LoadModelParams2(**paramDict)
             params.files = [LoadModelParamFile(**x) for x in paramDict["files"]]
+
             # ファイルをslotにコピー
             for file in params.files:
                 print("FILE", file)
-                srcPath = os.path.join(UPLOAD_DIR, file.name)
-                dstDir = os.path.join(self.params.model_dir, str(params.slot))
+                srcPath = os.path.join(UPLOAD_DIR, file.dir, file.name)
+                dstDir = os.path.join(
+                    self.params.model_dir,
+                    str(params.slot),
+                    file.dir,
+                )
                 dstPath = os.path.join(dstDir, file.name)
                 os.makedirs(dstDir, exist_ok=True)
                 print(f"move to {srcPath} -> {dstPath}")
                 shutil.move(srcPath, dstPath)
                 file.name = dstPath
+
             # メタデータ作成(各VCで定義)
             if params.voiceChangerType == "RVC":
                 from voice_changer.RVC.RVC import RVC  # 起動時にインポートするとパラメータが取れない。
 
                 slotInfo = RVC.loadModel2(params)
+                self.modelSlotManager.save_model_slot(params.slot, slotInfo)
+            elif params.voiceChangerType == "MMVCv13":
+                from voice_changer.MMVCv13.MMVCv13 import MMVCv13
+
+                slotInfo = MMVCv13.loadModel2(params)
+                self.modelSlotManager.save_model_slot(params.slot, slotInfo)
+            elif params.voiceChangerType == "MMVCv15":
+                from voice_changer.MMVCv15.MMVCv15 import MMVCv15
+
+                slotInfo = MMVCv15.loadModel2(params)
+                self.modelSlotManager.save_model_slot(params.slot, slotInfo)
+            elif params.voiceChangerType == "so-vits-svc-40":
+                from voice_changer.SoVitsSvc40.SoVitsSvc40 import SoVitsSvc40
+
+                slotInfo = SoVitsSvc40.loadModel2(params)
+                self.modelSlotManager.save_model_slot(params.slot, slotInfo)
+            elif params.voiceChangerType == "DDSP-SVC":
+                from voice_changer.DDSP_SVC.DDSP_SVC import DDSP_SVC
+
+                slotInfo = DDSP_SVC.loadModel2(params)
                 self.modelSlotManager.save_model_slot(params.slot, slotInfo)
             print("params", params)
 

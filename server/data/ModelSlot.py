@@ -38,7 +38,72 @@ class RVCModelSlot(ModelSlot):
     iconFile: str = ""
 
 
-ModelSlots: TypeAlias = Union[ModelSlot, RVCModelSlot]
+@dataclass
+class MMVCv13ModelSlot(ModelSlot):
+    voiceChangerType: VoiceChangerType = "MMVCv13"
+    modelFile: str = ""
+    configFile: str = ""
+    srcId: int = 107
+    dstId: int = 100
+    isONNX: bool = False
+    samplingRate: int = 24000
+
+    name: str = ""
+    description: str = ""
+    iconFile: str = ""
+
+
+@dataclass
+class MMVCv15ModelSlot(ModelSlot):
+    voiceChangerType: VoiceChangerType = "MMVCv15"
+    modelFile: str = ""
+    configFile: str = ""
+    srcId: int = 0
+    dstId: int = 101
+    isONNX: bool = False
+    samplingRate: int = 24000
+
+    name: str = ""
+    description: str = ""
+    iconFile: str = ""
+
+
+@dataclass
+class SoVitsSvc40ModelSlot(ModelSlot):
+    voiceChangerType: VoiceChangerType = "so-vits-svc-40"
+    modelFile: str = ""
+    configFile: str = ""
+    clusterFile: str = ""
+    dstId: int = 0
+    isONNX: bool = False
+
+    name: str = ""
+    description: str = ""
+    credit: str = ""
+    termsOfUseUrl: str = ""
+    sampleId: str = ""
+    iconFile: str = ""
+
+
+@dataclass
+class DDSPSVCModelSlot(ModelSlot):
+    voiceChangerType: VoiceChangerType = "DDSP-SVC"
+    modelFile: str = ""
+    configFile: str = ""
+    diffModelFile: str = ""
+    diffConfigFile: str = ""
+    dstId: int = 0
+    isONNX: bool = False
+
+    name: str = ""
+    description: str = ""
+    credit: str = ""
+    termsOfUseUrl: str = ""
+    sampleId: str = ""
+    iconFile: str = ""
+
+
+ModelSlots: TypeAlias = Union[ModelSlot, RVCModelSlot, MMVCv13ModelSlot, MMVCv15ModelSlot, SoVitsSvc40ModelSlot, DDSPSVCModelSlot]
 
 
 def loadSlotInfo(model_dir: str, slotIndex: int) -> ModelSlots:
@@ -50,6 +115,14 @@ def loadSlotInfo(model_dir: str, slotIndex: int) -> ModelSlots:
     slotInfo = ModelSlot(**{k: v for k, v in jsonDict.items() if k in ModelSlot.__annotations__})
     if slotInfo.voiceChangerType == "RVC":
         return RVCModelSlot(**jsonDict)
+    elif slotInfo.voiceChangerType == "MMVCv13":
+        return MMVCv13ModelSlot(**jsonDict)
+    elif slotInfo.voiceChangerType == "MMVCv15":
+        return MMVCv15ModelSlot(**jsonDict)
+    elif slotInfo.voiceChangerType == "so-vits-svc-40":
+        return SoVitsSvc40ModelSlot(**jsonDict)
+    elif slotInfo.voiceChangerType == "DDSP-SVC":
+        return DDSPSVCModelSlot(**jsonDict)
     else:
         return ModelSlot()
 

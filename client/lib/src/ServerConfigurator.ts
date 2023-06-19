@@ -57,13 +57,13 @@ export class ServerConfigurator {
         return info
     }
 
-    uploadFile2 = async (file: File, onprogress: (progress: number, end: boolean) => void) => {
+    uploadFile2 = async (dir: string, file: File, onprogress: (progress: number, end: boolean) => void) => {
         const url = this.serverUrl + "/upload_file"
         onprogress(0, false)
         const size = 1024 * 1024;
         let index = 0; // index値
         const fileLength = file.size
-        const filename = file.name
+        const filename = dir + file.name
         const fileChunkNum = Math.ceil(fileLength / size)
 
         while (true) {

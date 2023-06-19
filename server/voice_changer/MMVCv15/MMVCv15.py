@@ -1,7 +1,8 @@
 import sys
 import os
+from data.ModelSlot import MMVCv15ModelSlot
 
-from voice_changer.utils.LoadModelParams import LoadModelParams
+from voice_changer.utils.LoadModelParams import LoadModelParams, LoadModelParams2
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 
 if sys.platform.startswith("darwin"):
@@ -172,12 +173,7 @@ class MMVCv15:
     def get_info(self):
         data = asdict(self.settings)
 
-        data["onnxExecutionProviders"] = (
-            self.onnx_session.get_providers()
-            if self.settings.onnxModelFile != ""
-            and self.settings.onnxModelFile is not None
-            else []
-        )
+        data["onnxExecutionProviders"] = self.onnx_session.get_providers() if self.settings.onnxModelFile != "" and self.settings.onnxModelFile is not None else []
         files = ["configFile", "pyTorchModelFile", "onnxModelFile"]
         for f in files:
             if data[f] is not None and os.path.exists(data[f]):
@@ -195,9 +191,7 @@ class MMVCv15:
     def _get_f0(self, detector: str, newData: AudioInOut):
         audio_norm_np = newData.astype(np.float64)
         if detector == "dio":
-            _f0, _time = pw.dio(
-                audio_norm_np, self.hps.data.sampling_rate, frame_period=5.5
-            )
+            _f0, _time = pw.dio(audio_norm_np, self.hps.data.sampling_rate, frame_period=5.5)
             f0 = pw.stonemask(audio_norm_np, _f0, _time, self.hps.data.sampling_rate)
         else:
             f0, t = pw.harvest(
@@ -207,9 +201,7 @@ class MMVCv15:
                 f0_floor=71.0,
                 f0_ceil=1000.0,
             )
-        f0 = convert_continuos_f0(
-            f0, int(audio_norm_np.shape[0] / self.hps.data.hop_length)
-        )
+        f0 = convert_continuos_f0(f0, int(audio_norm_np.shape[0] / self.hps.data.hop_length))
         f0 = torch.from_numpy(f0.astype(np.float32))
         return f0
 
@@ -237,9 +229,7 @@ class MMVCv15:
         newData = newData.astype(np.float32) / self.hps.data.max_wav_value
 
         if self.audio_buffer is not None:
-            self.audio_buffer = np.concatenate(
-                [self.audio_buffer, newData], 0
-            )  # 過去のデータに連結
+            self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)  # 過去のデータに連結
         else:
             self.audio_buffer = newData
 
@@ -248,9 +238,7 @@ class MMVCv15:
         # if convertSize < 8192:
         #     convertSize = 8192
         if convertSize % self.hps.data.hop_length != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
-            convertSize = convertSize + (
-                self.hps.data.hop_length - (convertSize % self.hps.data.hop_length)
-            )
+            convertSize = convertSize + (self.hps.data.hop_length - (convertSize % self.hps.data.hop_length))
 
         # ONNX は固定長
         if self.settings.framework == "ONNX":
@@ -290,16 +278,15 @@ class MMVCv15:
                     "sid_src": sid_src.numpy(),
                     "sid_tgt": sid_tgt1.numpy(),
                 },
-            )[0][0, 0]
+            )[
+                0
+            ][0, 0]
             * self.hps.data.max_wav_value
         )
         return audio1
 
     def _pyTorch_inference(self, data):
-        if (
-            self.settings.pyTorchModelFile == ""
-            or self.settings.pyTorchModelFile is None
-        ):
+        if self.settings.pyTorchModelFile == "" or self.settings.pyTorchModelFile is None:
             print("[Voice Changer] No pyTorch session.")
             raise NoModeLoadedException("pytorch")
 
@@ -316,12 +303,7 @@ class MMVCv15:
             sid_src = sid_src.to(dev)
             sid_target = torch.LongTensor([self.settings.dstId]).to(dev)
 
-            audio1 = (
-                self.net_g.to(dev)
-                .voice_conversion(spec, spec_lengths, f0, sid_src, sid_target)[0, 0]
-                .data
-                * self.hps.data.max_wav_value
-            )
+            audio1 = self.net_g.to(dev).voice_conversion(spec, spec_lengths, f0, sid_src, sid_target)[0, 0].data * self.hps.data.max_wav_value
             result = audio1.float().cpu().numpy()
         return result
 
@@ -335,6 +317,18 @@ class MMVCv15:
         except onnxruntime.capi.onnxruntime_pybind11_state.InvalidArgument as _e:
             print(_e)
             raise ONNXInputArgumentException()
+
+    @classmethod
+    def loadModel2(cls, props: LoadModelParams2):
+        slotInfo: MMVCv15ModelSlot = MMVCv15ModelSlot()
+        for file in props.files:
+            if file.kind == "mmvcv15Model":
+                slotInfo.modelFile = file.name
+            elif file.kind == "mmvcv15Config":
+                slotInfo.configFile = file.name
+        slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
+        slotInfo.name = os.path.splitext(os.path.basename(slotInfo.modelFile))[0]
+        return slotInfo
 
     def __del__(self):
         del self.net_g

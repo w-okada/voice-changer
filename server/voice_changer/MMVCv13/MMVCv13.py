@@ -1,7 +1,8 @@
 import sys
 import os
+from data.ModelSlot import MMVCv13ModelSlot
 
-from voice_changer.utils.LoadModelParams import LoadModelParams
+from voice_changer.utils.LoadModelParams import LoadModelParams, LoadModelParams2
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 
 if sys.platform.startswith("darwin"):
@@ -77,13 +78,7 @@ class MMVCv13:
 
         # PyTorchモデル生成
         if self.settings.pyTorchModelFile is not None:
-            self.net_g = SynthesizerTrn(
-                len(symbols),
-                self.hps.data.filter_length // 2 + 1,
-                self.hps.train.segment_size // self.hps.data.hop_length,
-                n_speakers=self.hps.data.n_speakers,
-                **self.hps.model
-            )
+            self.net_g = SynthesizerTrn(len(symbols), self.hps.data.filter_length // 2 + 1, self.hps.train.segment_size // self.hps.data.hop_length, n_speakers=self.hps.data.n_speakers, **self.hps.model)
             self.net_g.eval()
             load_checkpoint(self.settings.pyTorchModelFile, self.net_g, None)
 
@@ -154,9 +149,7 @@ class MMVCv13:
     def get_info(self):
         data = asdict(self.settings)
 
-        data["onnxExecutionProviders"] = (
-            self.onnx_session.get_providers() if self.onnx_session is not None else []
-        )
+        data["onnxExecutionProviders"] = self.onnx_session.get_providers() if self.onnx_session is not None else []
         files = ["configFile", "pyTorchModelFile", "onnxModelFile"]
         for f in files:
             if data[f] is not None and os.path.exists(data[f]):
@@ -193,9 +186,7 @@ class MMVCv13:
         newData = newData.astype(np.float32) / self.hps.data.max_wav_value
 
         if self.audio_buffer is not None:
-            self.audio_buffer = np.concatenate(
-                [self.audio_buffer, newData], 0
-            )  # 過去のデータに連結
+            self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)  # 過去のデータに連結
         else:
             self.audio_buffer = newData
 
@@ -204,9 +195,7 @@ class MMVCv13:
         # if convertSize < 8192:
         #     convertSize = 8192
         if convertSize % self.hps.data.hop_length != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
-            convertSize = convertSize + (
-                self.hps.data.hop_length - (convertSize % self.hps.data.hop_length)
-            )
+            convertSize = convertSize + (self.hps.data.hop_length - (convertSize % self.hps.data.hop_length))
 
         convertOffset = -1 * convertSize
         self.audio_buffer = self.audio_buffer[convertOffset:]  # 変換対象の部分だけ抽出
@@ -238,7 +227,9 @@ class MMVCv13:
                     "sid_src": sid_src.numpy(),
                     "sid_tgt": sid_tgt1.numpy(),
                 },
-            )[0][0, 0]
+            )[
+                0
+            ][0, 0]
             * self.hps.data.max_wav_value
         )
         return audio1
@@ -254,19 +245,10 @@ class MMVCv13:
             dev = torch.device("cuda", index=self.settings.gpu)
 
         with torch.no_grad():
-            x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [
-                x.to(dev) for x in data
-            ]
+            x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [x.to(dev) for x in data]
             sid_target = torch.LongTensor([self.settings.dstId]).to(dev)
 
-            audio1 = (
-                self.net_g.to(dev)
-                .voice_conversion(
-                    spec, spec_lengths, sid_src=sid_src, sid_tgt=sid_target
-                )[0, 0]
-                .data
-                * self.hps.data.max_wav_value
-            )
+            audio1 = self.net_g.to(dev).voice_conversion(spec, spec_lengths, sid_src=sid_src, sid_tgt=sid_target)[0, 0].data * self.hps.data.max_wav_value
             result = audio1.float().cpu().numpy()
 
         return result
@@ -277,6 +259,18 @@ class MMVCv13:
         else:
             audio = self._pyTorch_inference(data)
         return audio
+
+    @classmethod
+    def loadModel2(cls, props: LoadModelParams2):
+        slotInfo: MMVCv13ModelSlot = MMVCv13ModelSlot()
+        for file in props.files:
+            if file.kind == "mmvcv13Model":
+                slotInfo.modelFile = file.name
+            elif file.kind == "mmvcv13Config":
+                slotInfo.configFile = file.name
+        slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
+        slotInfo.name = os.path.splitext(os.path.basename(slotInfo.modelFile))[0]
+        return slotInfo
 
     def __del__(self):
         del self.net_g

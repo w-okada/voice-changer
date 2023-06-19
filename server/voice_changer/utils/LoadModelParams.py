@@ -43,6 +43,7 @@ LoadModelParamFileKind: TypeAlias = Literal[
 class LoadModelParamFile:
     name: str
     kind: LoadModelParamFileKind
+    dir: str
 
 
 @dataclass

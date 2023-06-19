@@ -3,6 +3,7 @@ import os
 from dataclasses import asdict
 import numpy as np
 import torch
+from data.ModelSlot import DDSPSVCModelSlot
 from voice_changer.DDSP_SVC.ModelSlot import ModelSlot
 
 from voice_changer.DDSP_SVC.deviceManager.DeviceManager import DeviceManager
@@ -21,7 +22,7 @@ from diffusion.infer_gt_mel import DiffGtMel  # type: ignore
 
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
-from voice_changer.utils.LoadModelParams import LoadModelParams
+from voice_changer.utils.LoadModelParams import LoadModelParams, LoadModelParams2
 from voice_changer.DDSP_SVC.DDSP_SVCSetting import DDSP_SVCSettings
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 
@@ -44,11 +45,7 @@ def phase_vocoder(a, b, fade_out, fade_in):
     deltaphase = deltaphase - 2 * np.pi * torch.floor(deltaphase / 2 / np.pi + 0.5)
     w = 2 * np.pi * torch.arange(n // 2 + 1).to(a) + deltaphase
     t = torch.arange(n).unsqueeze(-1).to(a) / n
-    result = (
-        a * (fade_out**2)
-        + b * (fade_in**2)
-        + torch.sum(absab * torch.cos(w * t + phia), -1) * fade_out * fade_in / n
-    )
+    result = a * (fade_out**2) + b * (fade_in**2) + torch.sum(absab * torch.cos(w * t + phia), -1) * fade_out * fade_in / n
     return result
 
 
@@ -102,9 +99,7 @@ class DDSP_SVC:
     def reloadModel(self):
         self.device = self.deviceManager.getDevice(self.settings.gpu)
         modelFile = self.settings.modelSlots[self.settings.modelSlotIndex].modelFile
-        diffusionFile = self.settings.modelSlots[
-            self.settings.modelSlotIndex
-        ].diffusionFile
+        diffusionFile = self.settings.modelSlots[self.settings.modelSlotIndex].diffusionFile
 
         self.svc_model = SvcDDSP()
         self.svc_model.setVCParams(self.params)
@@ -144,15 +139,11 @@ class DDSP_SVC:
         # newData = newData.astype(np.float32)
 
         if self.audio_buffer is not None:
-            self.audio_buffer = np.concatenate(
-                [self.audio_buffer, newData], 0
-            )  # 過去のデータに連結
+            self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)  # 過去のデータに連結
         else:
             self.audio_buffer = newData
 
-        convertSize = (
-            inputSize + crossfadeSize + solaSearchFrame + self.settings.extraConvertSize
-        )
+        convertSize = inputSize + crossfadeSize + solaSearchFrame + self.settings.extraConvertSize
 
         # if convertSize % self.hop_size != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
         #     convertSize = convertSize + (self.hop_size - (convertSize % self.hop_size))
@@ -187,8 +178,7 @@ class DDSP_SVC:
             f0_min=50,
             f0_max=1100,
             # safe_prefix_pad_length=0,  # TBD なにこれ？
-            safe_prefix_pad_length=self.settings.extraConvertSize
-            / self.svc_model.args.data.sampling_rate,
+            safe_prefix_pad_length=self.settings.extraConvertSize / self.svc_model.args.data.sampling_rate,
             diff_model=self.diff_model,
             diff_acc=self.settings.diffAcc,  # TBD なにこれ？
             diff_spk_id=self.settings.diffSpkId,
@@ -196,9 +186,7 @@ class DDSP_SVC:
             # diff_use_dpm=True if self.settings.useDiffDpm == 1 else False,  # TBD なにこれ？
             method=self.settings.diffMethod,
             k_step=self.settings.kStep,  # TBD なにこれ？
-            diff_silence=True
-            if self.settings.useDiffSilence == 1
-            else False,  # TBD なにこれ？
+            diff_silence=True if self.settings.useDiffSilence == 1 else False,  # TBD なにこれ？
         )
 
         return _audio.cpu().numpy() * 32768.0
@@ -210,9 +198,21 @@ class DDSP_SVC:
             audio = self._pyTorch_inference(data)
         return audio
 
-    # def destroy(self):
-    #     del self.net_g
-    #     del self.onnx_session
+    @classmethod
+    def loadModel2(cls, props: LoadModelParams2):
+        slotInfo: DDSPSVCModelSlot = DDSPSVCModelSlot()
+        for file in props.files:
+            if file.kind == "ddspSvcModelConfig":
+                slotInfo.configFile = file.name
+            elif file.kind == "ddspSvcModel":
+                slotInfo.modelFile = file.name
+            elif file.kind == "ddspSvcDiffusionConfig":
+                slotInfo.diffConfigFile = file.name
+            elif file.kind == "ddspSvcDiffusion":
+                slotInfo.diffModelFile = file.name
+        slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
+        slotInfo.name = os.path.splitext(os.path.basename(slotInfo.modelFile))[0]
+        return slotInfo
 
     def __del__(self):
         del self.net_g
