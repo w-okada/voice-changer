@@ -30,7 +30,7 @@ from voice_changer.RVC.ModelSlotGenerator import (
 )
 from voice_changer.RVC.RVCSettings import RVCSettings
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
-from voice_changer.utils.LoadModelParams import LoadModelParams
+from voice_changer.utils.LoadModelParams import LoadModelParams, LoadModelParams2
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from voice_changer.RVC.onnxExporter.export2onnx import export2onnx
@@ -89,6 +89,27 @@ class RVC:
             os.remove(dst)
         shutil.move(file, dst)
         return dst
+
+    @classmethod
+    def loadModel2(cls, props: LoadModelParams2):
+        slotInfo: RVCModelSlot = RVCModelSlot()
+        for file in props.files:
+            if file.kind == "rvcModel":
+                slotInfo.modelFile = file.name
+            elif file.kind == "rvcIndex":
+                slotInfo.indexFile = file.name
+        slotInfo.defaultTune = 0
+        slotInfo.defaultIndexRatio = 0
+        slotInfo.defaultProtect = 0.5
+        slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
+        slotInfo.name = os.path.splitext(os.path.basename(slotInfo.modelFile))[0]
+        # slotInfo.iconFile = "/assets/icons/noimage.png"
+
+        if slotInfo.isONNX:
+            _setInfoByONNX(slotInfo)
+        else:
+            _setInfoByPytorch(slotInfo)
+        return slotInfo
 
     def loadModel(self, props: LoadModelParams):
         target_slot_idx = props.slot

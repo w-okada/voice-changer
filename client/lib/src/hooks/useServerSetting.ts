@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react"
-import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc_40v2, DefaultServerSetting_so_vits_svc_40, DefaultServerSetting_so_vits_svc_40_c, DefaultServerSetting_RVC, OnnxExporterInfo, DefaultServerSetting_DDSP_SVC, MAX_MODEL_SLOT_NUM, Framework, MergeModelRequest } from "../const"
+import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc_40v2, DefaultServerSetting_so_vits_svc_40, DefaultServerSetting_so_vits_svc_40_c, DefaultServerSetting_RVC, OnnxExporterInfo, DefaultServerSetting_DDSP_SVC, MAX_MODEL_SLOT_NUM, Framework, MergeModelRequest, VoiceChangerType } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { useIndexedDB } from "./useIndexedDB"
 import { ModelLoadException } from "../exceptions"
@@ -16,6 +16,48 @@ export const ModelAssetName = {
 } as const
 export type ModelAssetName = typeof ModelAssetName[keyof typeof ModelAssetName]
 
+
+export const ModelFileKind = {
+    "mmvcv13Config": "mmvcv13Config",
+    "mmvcv13Model": "mmvcv13Model",
+    "mmvcv15Config": "mmvcv15Config",
+    "mmvcv15Model": "mmvcv15Model",
+
+    "soVitsSvc40Config": "soVitsSvc40Config",
+    "soVitsSvc40Model": "soVitsSvc40Model",
+    "soVitsSvc40Cluster": "soVitsSvc40Cluster",
+
+    "rvcModel": "rvcModel",
+    "rvcIndex": "rvcIndex",
+
+    "ddspSvcModel": "ddspSvcModel",
+    "ddspSvcModelConfig": "ddspSvcModelConfig",
+    "ddspSvcDiffusion": "ddspSvcDiffusion",
+    "ddspSvcDiffusionConfig": "ddspSvcDiffusionConfig",
+
+} as const
+export type ModelFileKind = typeof ModelFileKind[keyof typeof ModelFileKind]
+
+export type ModelFile = {
+    file: File,
+    kind: ModelFileKind
+}
+
+export type ModelUploadSetting = {
+    voiceChangerType: VoiceChangerType,
+    slot: number
+    isSampleMode: boolean
+    sampleId: string | null
+
+    files: ModelFile[]
+}
+export type ModelFileForServer = Omit<ModelFile, "file"> & {
+    name: string,
+    kind: ModelFileKind
+}
+export type ModelUploadSettingForServer = Omit<ModelUploadSetting, "files"> & {
+    files: ModelFileForServer[]
+}
 
 export type FileUploadSetting = {
     isHalf: boolean
@@ -105,6 +147,7 @@ export type ServerSettingState = {
     fileUploadSettings: FileUploadSetting[]
     setFileUploadSetting: (slot: number, val: FileUploadSetting) => void
     loadModel: (slot: number) => Promise<void>
+    uploadModel: (setting: ModelUploadSetting) => Promise<void>
     uploadProgress: number
     isUploading: boolean
 
@@ -259,7 +302,46 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         }
     }, [props.voiceChangerClient])
 
+    // 新しいアップローダ
+    const uploadModel = useMemo(() => {
+        return async (setting: ModelUploadSetting) => {
+            if (!props.voiceChangerClient) {
+                return
+            }
 
+            setUploadProgress(0)
+            setIsUploading(true)
+
+
+            if (setting.isSampleMode == false) {
+                const progRate = 1 / setting.files.length
+                for (let i = 0; i < setting.files.length; i++) {
+                    const progOffset = 100 * i * progRate
+                    await _uploadFile2(setting.files[i].file, (progress: number, _end: boolean) => {
+                        setUploadProgress(progress * progRate + progOffset)
+                    })
+                }
+            }
+            const params: ModelUploadSettingForServer = {
+                ...setting, files: setting.files.map((f) => { return { name: f.file.name, kind: f.kind } })
+            }
+
+            const loadPromise = props.voiceChangerClient.loadModel(
+                0,
+                false,
+                JSON.stringify(params),
+            )
+            await loadPromise
+
+            setUploadProgress(0)
+            setIsUploading(false)
+            reloadServerInfo()
+
+        }
+    }, [props.voiceChangerClient])
+
+
+    // 古いアップローダ（新GUIへ以降まで、当分残しておく。）
     const loadModel = useMemo(() => {
         return async (slot: number) => {
             const fileUploadSetting = fileUploadSettings[slot]
@@ -571,6 +653,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
         fileUploadSettings,
         setFileUploadSetting,
         loadModel,
+        uploadModel,
         uploadProgress,
         isUploading,
         getOnnx,

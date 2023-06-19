@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useGuiState } from "./001_GuiStateProvider";
 import { useAppState } from "../../001_provider/001_AppStateProvider";
-import { MergeElement, ModelType } from "@dannadori/voice-changer-client-js";
+import { MergeElement, RVCModelType } from "@dannadori/voice-changer-client-js";
 
 
 export const MergeLabDialog = () => {
@@ -36,7 +36,7 @@ export const MergeLabDialog = () => {
                 prev[key] = val
             }
             return prev
-        }, {} as { [key: string]: { type: ModelType, samplingRate: number, embChannels: number } })
+        }, {} as { [key: string]: { type: RVCModelType, samplingRate: number, embChannels: number } })
 
     }, [newSlotChangeKey])
 

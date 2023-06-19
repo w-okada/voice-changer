@@ -732,9 +732,11 @@ body {
         .dialog-fixed-size-content {
             width: 90%;
             max-height: 70vh;
-            .model-slot-header {
+            .model-slot-header,
+            .file-uploader-header {
                 font-weight: 700;
-                .model-slot-header-button {
+                .model-slot-header-button,
+                .file-uploader-header-button {
                     font-weight: 400;
                     font-size: 0.8rem;
                     user-select: none;
@@ -846,6 +848,59 @@ body {
                         &:hover {
                             border: solid 1px #000;
                         }
+                    }
+                }
+            }
+
+            .file-uploader-voice-changer-select {
+                font-size: 1rem;
+                padding-left: 0.5rem;
+            }
+            .file-uploader-file-select-container {
+                font-size: 0.9rem;
+                padding-left: 1rem;
+                .file-uploader-file-select-row {
+                    display: flex;
+                    flex-direction: row;
+                    margin: 0.2rem;
+                    .file-uploader-file-select-row-label {
+                        width: 5rem;
+                    }
+                    .file-uploader-file-select-row-value {
+                        width: 20rem;
+                        color: #f00;
+                        white-space: nowrap;
+                    }
+                    .file-uploader-file-select-row-button {
+                        user-select: none;
+                        border: solid 1px #999;
+                        border-radius: 2px;
+                        cursor: pointer;
+                        vertical-align: middle;
+                        text-align: center;
+                        padding: 1px;
+                        &:hover {
+                            border: solid 1px #000;
+                        }
+                    }
+                }
+            }
+            .file-uploader-file-select-upload-button-container {
+                display: flex;
+                flex-direction: row;
+                margin-top: 1rem;
+                justify-content: center;
+                .file-uploader-file-select-upload-button {
+                    width: 8rem;
+                    user-select: none;
+                    border: solid 1px #999;
+                    border-radius: 2px;
+                    cursor: pointer;
+                    vertical-align: middle;
+                    text-align: center;
+                    padding: 1px;
+                    &:hover {
+                        border: solid 1px #000;
                     }
                 }
             }

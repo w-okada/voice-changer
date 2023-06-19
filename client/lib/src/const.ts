@@ -16,6 +16,19 @@ export const ClientType = {
 } as const
 export type ClientType = typeof ClientType[keyof typeof ClientType]
 
+
+export const VoiceChangerType = {
+    "MMVCv15": "MMVCv15",
+    "MMVCv13": "MMVCv13",
+    "so-vits-svc-40": "so-vits-svc-40",
+    "so-vits-svc-40_c": "so-vits-svc-40_c",
+    "so-vits-svc-40v2": "so-vits-svc-40v2",
+    "DDSP-SVC": "DDSP-SVC",
+    "RVC": "RVC"
+
+} as const
+export type VoiceChangerType = typeof VoiceChangerType[keyof typeof VoiceChangerType]
+
 ///////////////////////
 // サーバセッティング
 ///////////////////////
@@ -70,7 +83,7 @@ export const DiffMethod = {
 } as const
 export type DiffMethod = typeof DiffMethod[keyof typeof DiffMethod]
 
-export const ModelType = {
+export const RVCModelType = {
     "pyTorchRVC": "pyTorchRVC",
     "pyTorchRVCNono": "pyTorchRVCNono",
     "pyTorchRVCv2": "pyTorchRVCv2",
@@ -80,7 +93,7 @@ export const ModelType = {
     "onnxRVC": "onnxRVC",
     "onnxRVCNono": "onnxRVCNono",
 } as const
-export type ModelType = typeof ModelType[keyof typeof ModelType]
+export type RVCModelType = typeof RVCModelType[keyof typeof RVCModelType]
 
 export const ServerSettingKey = {
     "srcId": "srcId",
@@ -198,27 +211,29 @@ export type VoiceChangerServerSetting = {
 }
 
 type ModelSlot = {
-    modelFile: string
-    featureFile: string,
-    indexFile: string,
-
-    defaultTune: number,
-    defaultIndexRatio: number,
-    defaultProtect: number,
-
-    modelType: ModelType,
-    embChannels: number,
-    f0: boolean,
-    samplingRate: number
-    deprecated: boolean
-
-
+    voiceChangerType: VoiceChangerType
     name: string,
     description: string,
     credit: string,
     termsOfUseUrl: string,
     iconFile: string
 }
+
+export type RVCModelSlot = ModelSlot & {
+    modelFile: string
+    indexFile: string,
+    defaultIndexRatio: number,
+    defaultProtect: number,
+    defaultTune: number,
+    modelType: RVCModelType,
+
+    embChannels: number,
+    f0: boolean,
+    samplingRate: number
+    deprecated: boolean
+}
+
+export type ModelSlotUnion = RVCModelSlot
 
 type ServerAudioDevice = {
     kind: "audioinput" | "audiooutput",
@@ -233,7 +248,7 @@ export type ServerInfo = VoiceChangerServerSetting & {
     pyTorchModelFile: string,
     onnxModelFile: string,
     onnxExecutionProviders: OnnxExecutionProvider[]
-    modelSlots: ModelSlot[]
+    modelSlots: ModelSlotUnion[]
     serverAudioInputDevices: ServerAudioDevice[]
     serverAudioOutputDevices: ServerAudioDevice[]
     sampleModels: RVCSampleModel[]

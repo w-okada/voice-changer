@@ -88,20 +88,24 @@ class MMVC_Rest_Fileuploader:
         try:
             paramDict = json.loads(params)
             print("paramDict", paramDict)
-
-            # Change Filepath
-            newFilesDict = {}
-            for key, val in paramDict["files"].items():
-                if val != "-" and val != "":
-                    uploadPath = os.path.join(UPLOAD_DIR, val)
-                    storePath = os.path.join(UPLOAD_DIR, f"{slot}", val)
-                    storeDir = os.path.dirname(storePath)
-                    os.makedirs(storeDir, exist_ok=True)
-                    shutil.move(uploadPath, storePath)
-                    newFilesDict[key] = storePath
-            paramDict["files"] = newFilesDict
-
-            props: LoadModelParams = LoadModelParams(slot=slot, isHalf=isHalf, params=paramDict)
+            if paramDict["voiceChangerType"]:
+                # 新しいアップローダ用
+                print("NEW UPLOADER")
+                props: LoadModelParams = LoadModelParams(slot=slot, isHalf=isHalf, params=paramDict)
+            else:
+                # 古いアップローダ用
+                # Change Filepath
+                newFilesDict = {}
+                for key, val in paramDict["files"].items():
+                    if val != "-" and val != "":
+                        uploadPath = os.path.join(UPLOAD_DIR, val)
+                        storePath = os.path.join(UPLOAD_DIR, f"{slot}", val)
+                        storeDir = os.path.dirname(storePath)
+                        os.makedirs(storeDir, exist_ok=True)
+                        shutil.move(uploadPath, storePath)
+                        newFilesDict[key] = storePath
+                paramDict["files"] = newFilesDict
+                props = LoadModelParams(slot=slot, isHalf=isHalf, params=paramDict)
 
             info = self.voiceChangerManager.loadModel(props)
             json_compatible_item_data = jsonable_encoder(info)
