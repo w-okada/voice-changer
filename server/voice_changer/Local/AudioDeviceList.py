@@ -20,6 +20,7 @@ def list_audio_device():
     except Exception as e:
         print("[Voice Changer] ex:query_devices")
         print(e)
+        return [], []
 
     inputAudioDeviceList = [d for d in audioDeviceList if d["max_input_channels"] > 0]
     outputAudioDeviceList = [d for d in audioDeviceList if d["max_output_channels"] > 0]
