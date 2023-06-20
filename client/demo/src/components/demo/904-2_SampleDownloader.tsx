@@ -17,7 +17,11 @@ export const SampleDownloaderScreen = (props: SampleDownloaderScreenProps) => {
     const [lang, setLang] = useState<string>("All")
     const messageBuilderState = useMessageBuilder()
     useMemo(() => {
+        messageBuilderState.setMessage(__filename, "header_message", { "ja": "サンプルをダウンロードしてください. 対象：", "en": "Download Sample for" })
+        messageBuilderState.setMessage(__filename, "lang", { "ja": "言語", "en": "Lang" })
+        messageBuilderState.setMessage(__filename, "back", { "ja": "戻る", "en": "back" })
         messageBuilderState.setMessage(__filename, "terms_of_use", { "ja": "利用規約", "en": "terms of use" })
+        messageBuilderState.setMessage(__filename, "download", { "ja": "ダウンロード", "en": "download" })
     }, [])
 
 
@@ -82,7 +86,9 @@ export const SampleDownloaderScreen = (props: SampleDownloaderScreenProps) => {
                             </div>
                         </div>
                         <div className="model-slot-buttons">
-                            <div className="model-slot-button" onClick={() => { onDownloadSampleClicked(x.id) }}>download</div>
+                            <div className="model-slot-button" onClick={() => { onDownloadSampleClicked(x.id) }}>
+                                {messageBuilderState.getMessage(__filename, "download")}
+                            </div>
                         </div>
                     </div>
                 )
@@ -93,10 +99,13 @@ export const SampleDownloaderScreen = (props: SampleDownloaderScreenProps) => {
             <div className="dialog-frame">
                 <div className="dialog-title">Sample Downloader</div>
                 <div className="dialog-fixed-size-content">
-                    <div className="model-slot-header">Select Sample for Slot[{props.targetIndex}]  <span onClick={() => {
-                        props.backToSlotManager()
-                    }} className="model-slot-header-button">&lt;&lt;back</span></div>
-                    <div>Lang:
+                    <div className="model-slot-header">
+                        {messageBuilderState.getMessage(__filename, "header_message")} Slot[{props.targetIndex}]
+                        <span onClick={() => { props.backToSlotManager() }} className="model-slot-header-button">
+                            &lt;&lt;{messageBuilderState.getMessage(__filename, "back")}
+                        </span>
+                    </div>
+                    <div>{messageBuilderState.getMessage(__filename, "lang")}:
                         <select value={lang} onChange={(e) => { setLang(e.target.value) }}>
                             {langOptions}
                         </select>

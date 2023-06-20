@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useGuiState } from "./001_GuiStateProvider";
 import { useAppState } from "../../001_provider/001_AppStateProvider";
-import { MergeElement, RVCModelType } from "@dannadori/voice-changer-client-js";
+import { MergeElement, RVCModelSlot, RVCModelType } from "@dannadori/voice-changer-client-js";
 
 
 export const MergeLabDialog = () => {
@@ -23,13 +23,17 @@ export const MergeLabDialog = () => {
 
     const filterItems = useMemo(() => {
         return serverSetting.serverSetting.modelSlots.reduce((prev, cur) => {
-            const key = `${cur.modelType},${cur.samplingRate},${cur.embChannels}`
-            const val = { type: cur.modelType, samplingRate: cur.samplingRate, embChannels: cur.embChannels }
+            if (cur.voiceChangerType != "RVC") {
+                return prev
+            }
+            const curRVC = cur as RVCModelSlot
+            const key = `${curRVC.modelType},${cur.samplingRate},${curRVC.embChannels}`
+            const val = { type: curRVC.modelType, samplingRate: cur.samplingRate, embChannels: curRVC.embChannels }
             const existKeys = Object.keys(prev)
             if (!cur.modelFile || cur.modelFile.length == 0) {
                 return prev
             }
-            if (cur.modelType == "onnxRVC" || cur.modelType == "onnxRVCNono") {
+            if (curRVC.modelType == "onnxRVC" || curRVC.modelType == "onnxRVCNono") {
                 return prev
             }
             if (!existKeys.includes(key)) {
@@ -42,11 +46,15 @@ export const MergeLabDialog = () => {
 
     const models = useMemo(() => {
         return serverSetting.serverSetting.modelSlots.filter(x => {
+            if (x.voiceChangerType != "RVC") {
+                return
+            }
+            const xRVC = x as RVCModelSlot
             const filterVals = filterItems[currentFilter]
             if (!filterVals) {
                 return false
             }
-            if (x.modelType == filterVals.type && x.samplingRate == filterVals.samplingRate && x.embChannels == filterVals.embChannels) {
+            if (xRVC.modelType == filterVals.type && xRVC.samplingRate == filterVals.samplingRate && xRVC.embChannels == filterVals.embChannels) {
                 return true
             } else {
                 return false

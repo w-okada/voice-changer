@@ -19,8 +19,11 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
     const messageBuilderState = useMessageBuilder()
 
     useMemo(() => {
+        messageBuilderState.setMessage(__filename, "header_message", { "ja": "ファイルをアップロードしてください. 対象：", "en": "Upload Files for " })
+        messageBuilderState.setMessage(__filename, "back", { "ja": "戻る", "en": "back" })
         messageBuilderState.setMessage(__filename, "select", { "ja": "ファイル選択", "en": "select file" })
         messageBuilderState.setMessage(__filename, "upload", { "ja": "アップロード", "en": "upload" })
+        messageBuilderState.setMessage(__filename, "uploading", { "ja": "アップロード中", "en": "uploading" })
         messageBuilderState.setMessage(__filename, "alert-model-ext", {
             "ja": "ファイルの拡張子は次のモノである必要があります。",
             "en": "extension of file should be the following."
@@ -132,13 +135,20 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
         }
         const fileRows = generateFileRowsByVCType(voiceChangerType)
 
+        // appState.serverSetting.uploadProgress == 0 ? `loading model...(wait about 20sec)` : `processing.... ${appState.serverSetting.uploadProgress.toFixed(1)}%` : ""
+
+        const buttonLabel = serverSetting.uploadProgress == 0 ?
+            messageBuilderState.getMessage(__filename, "upload") :
+            messageBuilderState.getMessage(__filename, "uploading") + `(${serverSetting.uploadProgress.toFixed(1)}%)`
         return (
             <div className="dialog-frame">
                 <div className="dialog-title">File Uploader</div>
                 <div className="dialog-fixed-size-content">
-                    <div className="file-uploader-header">Upload Files for Slot[{props.targetIndex}]  <span onClick={() => {
-                        props.backToSlotManager()
-                    }} className="file-uploader-header-button">&lt;&lt;back</span></div>
+                    <div className="file-uploader-header">
+                        {messageBuilderState.getMessage(__filename, "header_message")} Slot[{props.targetIndex}]
+                        <span onClick={() => {
+                            props.backToSlotManager()
+                        }} className="file-uploader-header-button">&lt;&lt;{messageBuilderState.getMessage(__filename, "back")}</span></div>
                     <div className="file-uploader-voice-changer-select" >VoiceChangerType:
                         <select value={voiceChangerType} onChange={(e) => {
                             setVoiceChangerType(e.target.value as VoiceChangerType)
@@ -155,6 +165,9 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
                             if (!uploadSetting) {
                                 return
                             }
+                            if (serverSetting.uploadProgress != 0) {
+                                return
+                            }
                             if (checkModelSetting(uploadSetting)) {
                                 serverSetting.uploadModel(uploadSetting)
                             } else {
@@ -162,7 +175,7 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
                                 alert(errorMessage)
                             }
                         }}>
-                            {messageBuilderState.getMessage(__filename, "upload")}
+                            {buttonLabel}
                         </div>
                     </div>
                 </div>
@@ -174,7 +187,8 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
         props.targetIndex,
         voiceChangerType,
         uploadSetting,
-        serverSetting.uploadModel
+        serverSetting.uploadModel,
+        serverSetting.uploadProgress
     ])
 
 

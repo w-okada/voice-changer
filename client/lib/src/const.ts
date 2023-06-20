@@ -233,7 +233,54 @@ export type RVCModelSlot = ModelSlot & {
     deprecated: boolean
 }
 
-export type ModelSlotUnion = RVCModelSlot
+export type MMVCv13ModelSlot = ModelSlot & {
+    modelFile: string
+    configFile: string,
+    srcId: number
+    dstId: number
+
+    samplingRate: number
+}
+
+export type MMVCv15ModelSlot = ModelSlot & {
+    modelFile: string
+    configFile: string,
+    srcId: number
+    dstId: number
+    f0Factor: number
+    samplingRate: number
+}
+
+export type SoVitsSvc40ModelSlot = ModelSlot & {
+    modelFile: string
+    configFile: string,
+    clusterFile: string,
+    dstId: number
+
+    samplingRate: number
+
+    defaultTune: number
+    defaultClusterInferRatio: number
+    noiseScale: number
+}
+
+export type DDSPSVCModelSlot = ModelSlot & {
+    modelFile: string
+    configFile: string,
+    diffModelFile: string
+    diffConfigFile: string
+    dstId: number
+
+    samplingRate: number
+
+    defaultTune: number
+    enhancer: boolean
+    diffusion: boolean
+    acc: number
+    kstep: number
+}
+
+export type ModelSlotUnion = RVCModelSlot | MMVCv13ModelSlot | MMVCv15ModelSlot | SoVitsSvc40ModelSlot | DDSPSVCModelSlot
 
 type ServerAudioDevice = {
     kind: "audioinput" | "audiooutput",

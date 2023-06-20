@@ -735,6 +735,7 @@ body {
             .model-slot-header,
             .file-uploader-header {
                 font-weight: 700;
+                margin: 5px 5px 5px 5px;
                 .model-slot-header-button,
                 .file-uploader-header-button {
                     font-weight: 400;
@@ -745,7 +746,8 @@ body {
                     cursor: pointer;
                     vertical-align: middle;
                     text-align: center;
-                    padding: 1px;
+                    padding: 1px 5px 1px 5px;
+                    margin-left: 1rem;
                     &:hover {
                         border: solid 1px #000;
                     }
@@ -755,6 +757,7 @@ body {
                 max-height: 60vh;
                 width: 100%;
                 overflow-y: scroll;
+
                 .model-slot {
                     height: 5rem;
                     display: flex;
@@ -774,28 +777,43 @@ body {
                         font-size: 0.8rem;
                         border-bottom: solid 1px #aaa;
                         width: 80%;
+                        overflow-y: scroll;
+                        &::-webkit-scrollbar {
+                            width: 10px;
+                            height: 10px;
+                        }
+                        &::-webkit-scrollbar-track {
+                            background-color: #eee;
+                            border-radius: 3px;
+                        }
+                        &::-webkit-scrollbar-thumb {
+                            background: #f7cfec80;
+                            border-radius: 3px;
+                        }
+
                         .model-slot-detail-row {
                             display: flex;
                             flex-direction: row;
                             .model-slot-detail-row-label {
-                                width: 15%;
+                                width: 20%;
+                                white-space: nowrap;
                             }
                             .model-slot-detail-row-value {
-                                width: 60%;
+                                width: 55%;
                                 white-space: nowrap;
                             }
                             .model-slot-detail-row-value-download {
-                                width: 60%;
+                                width: 55%;
                                 white-space: nowrap;
                                 cursor: pointer;
                             }
                             .model-slot-detail-row-value-pointable {
-                                width: 60%;
+                                width: 55%;
                                 white-space: nowrap;
                                 cursor: pointer;
                             }
                             .model-slot-detail-row-value-edit {
-                                width: 60%;
+                                width: 55%;
                                 font-weight: 700;
                                 color: #f00;
                                 white-space: nowrap;
@@ -889,16 +907,17 @@ body {
                 display: flex;
                 flex-direction: row;
                 margin-top: 1rem;
+                margin-bottom: 0.5rem;
                 justify-content: center;
                 .file-uploader-file-select-upload-button {
-                    width: 8rem;
+                    /* width: 12rem; */
                     user-select: none;
                     border: solid 1px #999;
                     border-radius: 2px;
                     cursor: pointer;
                     vertical-align: middle;
                     text-align: center;
-                    padding: 1px;
+                    padding: 1px 10px 1px 10px;
                     &:hover {
                         border: solid 1px #000;
                     }

@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useGuiState } from "./001_GuiStateProvider";
 import { useAppState } from "../../001_provider/001_AppStateProvider";
-import { RVCModelSlot, fileSelector } from "@dannadori/voice-changer-client-js";
+import { DDSPSVCModelSlot, MMVCv13ModelSlot, MMVCv15ModelSlot, RVCModelSlot, SoVitsSvc40ModelSlot, fileSelector } from "@dannadori/voice-changer-client-js";
 import { useMessageBuilder } from "../../hooks/useMessageBuilder";
 import { ModelSlotManagerDialogScreen } from "./904_ModelSlotManagerDialog";
 import { checkExtention, trimfileName } from "../../utils/utils";
@@ -23,6 +23,9 @@ export const MainScreen = (props: MainScreenProps) => {
         messageBuilderState.setMessage(__filename, "rename", { "ja": "リネーム", "en": "rename" })
         messageBuilderState.setMessage(__filename, "download", { "ja": "ダウンロード", "en": "download" })
         messageBuilderState.setMessage(__filename, "terms_of_use", { "ja": "利用規約", "en": "terms of use" })
+        messageBuilderState.setMessage(__filename, "sample", { "ja": "サンプル", "en": "DL sample" })
+        messageBuilderState.setMessage(__filename, "upload", { "ja": "アップロード", "en": "upload" })
+        messageBuilderState.setMessage(__filename, "close", { "ja": "閉じる", "en": "close" })
     }, [])
 
 
@@ -85,7 +88,9 @@ export const MainScreen = (props: MainScreenProps) => {
                 <div className="body-item-text">
                 </div>
                 <div className="body-button-container body-button-container-space-around">
-                    <div className="body-button" onClick={() => { props.close() }} >close</div>
+                    <div className="body-button" onClick={() => { props.close() }} >
+                        {messageBuilderState.getMessage(__filename, "close")}
+                    </div>
                 </div>
                 <div className="body-item-text"></div>
             </div>
@@ -167,6 +172,37 @@ export const MainScreen = (props: MainScreenProps) => {
                 fileRows.push(generateFileRow("model", slotInfo.modelFile))
                 fileRows.push(generateFileRow("index", slotInfo.indexFile))
                 infoRow = generateInfoRow(`${slotInfo.f0 ? "f0" : "nof0"}, ${slotInfo.samplingRate}, ${slotInfo.embChannels}, ${slotInfo.modelType}, ${slotInfo.defaultTune}, ${slotInfo.defaultIndexRatio}, ${slotInfo.defaultProtect}`)
+            } else if (x.voiceChangerType == "MMVCv13") {
+                const slotInfo = x as MMVCv13ModelSlot
+                iconArea = generateIconArea(index, slotInfo.iconFile, true)
+                nameRow = generateNameRow(index, slotInfo.name, slotInfo.termsOfUseUrl)
+                fileRows.push(generateFileRow("config", slotInfo.configFile))
+                fileRows.push(generateFileRow("model", slotInfo.modelFile))
+                infoRow = generateInfoRow(``)
+            } else if (x.voiceChangerType == "MMVCv15") {
+                const slotInfo = x as MMVCv15ModelSlot
+                iconArea = generateIconArea(index, slotInfo.iconFile, true)
+                nameRow = generateNameRow(index, slotInfo.name, slotInfo.termsOfUseUrl)
+                fileRows.push(generateFileRow("config", slotInfo.configFile))
+                fileRows.push(generateFileRow("model", slotInfo.modelFile))
+                infoRow = generateInfoRow((`f0factor:${slotInfo.f0Factor}`))
+            } else if (x.voiceChangerType == "so-vits-svc-40") {
+                const slotInfo = x as SoVitsSvc40ModelSlot
+                iconArea = generateIconArea(index, slotInfo.iconFile, true)
+                nameRow = generateNameRow(index, slotInfo.name, slotInfo.termsOfUseUrl)
+                fileRows.push(generateFileRow("config", slotInfo.configFile))
+                fileRows.push(generateFileRow("model", slotInfo.modelFile))
+                fileRows.push(generateFileRow("cluster", slotInfo.clusterFile))
+                infoRow = generateInfoRow((`tune:${slotInfo.defaultTune},cluster:${slotInfo.defaultClusterInferRatio},noise:${slotInfo.noiseScale}`))
+            } else if (x.voiceChangerType == "DDSP-SVC") {
+                const slotInfo = x as DDSPSVCModelSlot
+                iconArea = generateIconArea(index, slotInfo.iconFile, true)
+                nameRow = generateNameRow(index, slotInfo.name, slotInfo.termsOfUseUrl)
+                fileRows.push(generateFileRow("config", slotInfo.configFile))
+                fileRows.push(generateFileRow("model", slotInfo.modelFile))
+                fileRows.push(generateFileRow("diff conf", slotInfo.diffConfigFile))
+                fileRows.push(generateFileRow("diff model", slotInfo.diffModelFile))
+                infoRow = generateInfoRow((`tune:${slotInfo.defaultTune},acc:${slotInfo.acc},ks:${slotInfo.kstep}, diff:${slotInfo.diffusion},enh:${slotInfo.enhancer}`))
             } else {
                 iconArea = generateIconArea(index, "/assets/icons/blank.png", false)
                 nameRow = generateNameRow(index, "", "")
@@ -181,8 +217,8 @@ export const MainScreen = (props: MainScreenProps) => {
                         {infoRow}
                     </div>
                     <div className="model-slot-buttons">
-                        <div className="model-slot-button" onClick={() => { props.openFileUploader(index) }} >upload</div>
-                        <div className="model-slot-button" onClick={() => { props.openSampleDownloader(index) }} >DL sample</div>
+                        <div className="model-slot-button" onClick={() => { props.openFileUploader(index) }} >{messageBuilderState.getMessage(__filename, "upload")}</div>
+                        <div className="model-slot-button" onClick={() => { props.openSampleDownloader(index) }} >{messageBuilderState.getMessage(__filename, "sample")}</div>
                     </div>
                 </div >
             )
