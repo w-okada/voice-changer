@@ -19,7 +19,6 @@ class RVCSettings:
     rvcQuality: int = 0
     silenceFront: int = 1  # 0:off, 1:on
     modelSamplingRate: int = 48000
-    modelSlotIndex: int = -1
 
     speakers: dict[str, int] = field(default_factory=lambda: {})
     isHalf: int = 1  # 0:off, 1:on

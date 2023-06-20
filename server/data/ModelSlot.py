@@ -10,6 +10,11 @@ import json
 @dataclass
 class ModelSlot:
     voiceChangerType: VoiceChangerType | None = None
+    name: str = ""
+    description: str = ""
+    credit: str = ""
+    termsOfUseUrl: str = ""
+    iconFile: str = ""
 
 
 @dataclass
@@ -30,12 +35,7 @@ class RVCModelSlot(ModelSlot):
     deprecated: bool = False
     embedder: str = EnumEmbedderTypes.hubert.value
 
-    name: str = ""
-    description: str = ""
-    credit: str = ""
-    termsOfUseUrl: str = ""
     sampleId: str = ""
-    iconFile: str = ""
 
 
 @dataclass
@@ -48,10 +48,6 @@ class MMVCv13ModelSlot(ModelSlot):
     isONNX: bool = False
     samplingRate: int = 24000
 
-    name: str = ""
-    description: str = ""
-    iconFile: str = ""
-
 
 @dataclass
 class MMVCv15ModelSlot(ModelSlot):
@@ -60,12 +56,9 @@ class MMVCv15ModelSlot(ModelSlot):
     configFile: str = ""
     srcId: int = 0
     dstId: int = 101
+    f0Factor: float = 1.0
     isONNX: bool = False
     samplingRate: int = 24000
-
-    name: str = ""
-    description: str = ""
-    iconFile: str = ""
 
 
 @dataclass
@@ -77,12 +70,11 @@ class SoVitsSvc40ModelSlot(ModelSlot):
     dstId: int = 0
     isONNX: bool = False
 
-    name: str = ""
-    description: str = ""
-    credit: str = ""
-    termsOfUseUrl: str = ""
     sampleId: str = ""
-    iconFile: str = ""
+
+    defaultTune: int = 0
+    defaultClusterInferRatio: float = 0.0
+    noiseScale: float = 0.0
 
 
 @dataclass
@@ -95,12 +87,12 @@ class DDSPSVCModelSlot(ModelSlot):
     dstId: int = 0
     isONNX: bool = False
 
-    name: str = ""
-    description: str = ""
-    credit: str = ""
-    termsOfUseUrl: str = ""
     sampleId: str = ""
-    iconFile: str = ""
+    defaultTune: int = 0
+    enhancer: bool = False
+    diffusion: bool = True
+    acc: int = 20
+    kstep: int = 100
 
 
 ModelSlots: TypeAlias = Union[ModelSlot, RVCModelSlot, MMVCv13ModelSlot, MMVCv15ModelSlot, SoVitsSvc40ModelSlot, DDSPSVCModelSlot]

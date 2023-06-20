@@ -15,7 +15,7 @@ def downloadInitialSamples(mode: RVCSampleMode, model_dir: str):
     sampleJsonUrls, sampleModels = getSampleJsonAndModelIds(mode)
     sampleJsons = _downloadSampleJsons(sampleJsonUrls)
     if os.path.exists(model_dir):
-        print("[Voice Changer] model_dir is already exists. skil download samples.")
+        print("[Voice Changer] model_dir is already exists. skip download samples.")
         return
     samples = _generateSampleList(sampleJsons)
     slotIndex = list(range(len(sampleModels)))

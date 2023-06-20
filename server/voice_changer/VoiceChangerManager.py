@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import numpy as np
@@ -9,9 +10,10 @@ from const import UPLOAD_DIR, ModelType
 from voice_changer.utils.LoadModelParams import LoadModelParamFile, LoadModelParams, LoadModelParams2
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 import torch
-import threading
+
+# import threading
 from typing import Callable
 from typing import Any
 
@@ -26,8 +28,9 @@ class GPUInfo:
 @dataclass()
 class VoiceChangerManagerSettings:
     dummy: int
-
-    # intData: list[str] = field(default_factory=lambda: ["slotIndex"])
+    modelSlotIndex: int = -1
+    # ↓mutableな物だけ列挙
+    intData: list[str] = field(default_factory=lambda: ["modelSlotIndex"])
 
 
 class VoiceChangerManager(ServerDeviceCallbacks):
@@ -62,8 +65,8 @@ class VoiceChangerManager(ServerDeviceCallbacks):
 
         self.serverDevice = ServerDevice(self)
 
-        thread = threading.Thread(target=self.serverDevice.start, args=())
-        thread.start()
+        # thread = threading.Thread(target=self.serverDevice.start, args=())
+        # thread.start()
 
     def _get_gpuInfos(self):
         devCount = torch.cuda.device_count()
@@ -174,12 +177,38 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         else:
             return {"status": "ERROR", "msg": "no model loaded"}
 
-    def update_settings(self, key: str, val: str | int | float):
-        self.serverDevice.update_settings(key, val)
-        if hasattr(self, "voiceChanger"):
-            self.voiceChanger.update_settings(key, val)
+    def generateVoiceChanger(self, val: int):
+        slotInfo = self.modelSlotManager.get_slot_info(val)
+        if slotInfo is None:
+            print(f"[Voice Changer] model slot is not found {val}")
+            return
+        elif slotInfo.voiceChangerType == "RVC":
+            print("................RVC")
+            from voice_changer.RVC.RVC import RVC
+
+            self.voiceChangerModel = RVC(self.params, slotInfo)
+            self.voiceChanger = VoiceChanger(self.params)
+            self.voiceChanger.setModel(self.voiceChangerModel)
+
         else:
-            return {"status": "ERROR", "msg": "no model loaded"}
+            print(f"[Voice Changer] unknown voice changer model: {slotInfo.voiceChangerType}")
+            del self.voiceChangerModel
+            return
+
+    def update_settings(self, key: str, val: str | int | float):
+        if key in self.settings.intData:
+            newVal = int(val)
+            if key == "modelSlotIndex":
+                newVal = newVal % 1000
+                print(f"[Voice Changer] model slot is changed {self.settings.modelSlotIndex} -> {newVal}")
+                self.generateVoiceChanger(newVal)
+            setattr(self.settings, key, newVal)
+
+        else:
+            self.serverDevice.update_settings(key, val)
+            if hasattr(self, "voiceChanger"):
+                self.voiceChanger.update_settings(key, val)
+
         return self.get_info()
 
     def changeVoice(self, receivedData: AudioInOut):
@@ -206,13 +235,19 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         self.emitToFunc = emitTo
 
     def update_model_default(self):
-        self.voiceChanger.update_model_default()
+        # self.voiceChanger.update_model_default()
+        current_settings = self.voiceChangerModel.get_model_current()
+        for current_setting in current_settings:
+            current_setting["slot"] = self.settings.modelSlotIndex
+            self.modelSlotManager.update_model_info(json.dumps(current_setting))
         return self.get_info()
 
     def update_model_info(self, newData: str):
-        self.voiceChanger.update_model_info(newData)
+        # self.voiceChanger.update_model_info(newData)
+        self.modelSlotManager.update_model_info(newData)
         return self.get_info()
 
     def upload_model_assets(self, params: str):
-        self.voiceChanger.upload_model_assets(params)
+        # self.voiceChanger.upload_model_assets(params)
+        self.modelSlotManager.store_model_assets(params)
         return self.get_info()
