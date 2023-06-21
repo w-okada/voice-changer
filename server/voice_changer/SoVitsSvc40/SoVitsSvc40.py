@@ -2,7 +2,6 @@ import sys
 import os
 from data.ModelSlot import SoVitsSvc40ModelSlot
 
-from voice_changer.utils.LoadModelParams import LoadModelParams, LoadModelParams2
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 
@@ -16,7 +15,6 @@ if sys.platform.startswith("darwin"):
 else:
     sys.path.append("so-vits-svc-40")
 
-import io
 from dataclasses import dataclass, asdict, field
 import numpy as np
 import torch
@@ -56,89 +54,66 @@ class SoVitsSvc40Settings:
     extraConvertSize: int = 1024 * 32
     clusterInferRatio: float = 0.1
 
-    framework: str = "PyTorch"  # PyTorch or ONNX
-    pyTorchModelFile: str | None = ""
-    onnxModelFile: str | None = ""
-    configFile: str = ""
-
     speakers: dict[str, int] = field(default_factory=lambda: {})
 
     # ↓mutableな物だけ列挙
-    intData = ["gpu", "dstId", "tran", "predictF0", "extraConvertSize"]
+    intData = ["gpu", "dstId", "tran", "predictF0"]
     floatData = ["noiseScale", "silentThreshold", "clusterInferRatio"]
-    strData = ["framework", "f0Detector"]
+    strData = ["f0Detector"]
 
 
 class SoVitsSvc40:
-    audio_buffer: AudioInOut | None = None
-
-    def __init__(self, params: VoiceChangerParams):
+    def __init__(self, params: VoiceChangerParams, slotInfo: SoVitsSvc40ModelSlot):
+        print("[Voice Changer] [so-vits-svc40] Creating instance ")
         self.settings = SoVitsSvc40Settings()
         self.net_g = None
         self.onnx_session = None
 
-        self.raw_path = io.BytesIO()
-        self.gpu_num = torch.cuda.device_count()
-        self.prevVol = 0
         self.params = params
-        print("[Voice Changer] so-vits-svc40 initialization:", params)
-
-    # def loadModel(self, config: str, pyTorch_model_file: str = None, onnx_model_file: str = None, clusterTorchModel: str = None):
-    def loadModel(self, props: LoadModelParams):
-        params = props.params
-        self.settings.configFile = params["files"]["soVitsSvc40Config"]
-        self.hps = utils.get_hparams_from_file(self.settings.configFile)
-        self.settings.speakers = self.hps.spk
-
-        modelFile = params["files"]["soVitsSvc40Model"]
-        if modelFile.endswith(".onnx"):
-            self.settings.pyTorchModelFile = None
-            self.settings.onnxModelFile = modelFile
-        else:
-            self.settings.pyTorchModelFile = modelFile
-            self.settings.onnxModelFile = None
-
-        clusterTorchModel = params["files"]["soVitsSvc40Cluster"] if "soVitsSvc40Cluster" in params["files"] else None
-
-        content_vec_path = self.params.content_vec_500
-        content_vec_onnx_path = self.params.content_vec_500_onnx
-        content_vec_onnx_on = self.params.content_vec_500_onnx_on
-        hubert_base_path = self.params.hubert_base
 
         # hubert model
         try:
-            if os.path.exists(content_vec_path) is False:
-                content_vec_path = hubert_base_path
-
-            if content_vec_onnx_on is True:
-                providers, options = self.getOnnxExecutionProvider()
-                self.content_vec_onnx = onnxruntime.InferenceSession(
-                    content_vec_onnx_path,
-                    providers=providers,
-                    provider_options=options,
-                )
-            else:
-                models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(
-                    [content_vec_path],
-                    suffix="",
-                )
-                model = models[0]
-                model.eval()
-                self.hubert_model = model.cpu()
+            models, saved_cfg, task = checkpoint_utils.load_model_ensemble_and_task(
+                [self.params.hubert_base],
+                suffix="",
+            )
+            model = models[0]
+            model.eval()
+            self.hubert_model = model.cpu()
         except Exception as e:
             print("EXCEPTION during loading hubert/contentvec model", e)
 
+        self.gpu_num = torch.cuda.device_count()
+        self.audio_buffer: AudioInOut | None = None
+        self.prevVol = 0
+        self.slotInfo = slotInfo
+        self.initialize()
+
+    def initialize(self):
+        print("[Voice Changer] [so-vits-svc40] Initializing... ")
+        self.hps = utils.get_hparams_from_file(self.slotInfo.configFile)
+        self.settings.speakers = self.hps.spk
+
         # cluster
         try:
-            if clusterTorchModel is not None and os.path.exists(clusterTorchModel):
-                self.cluster_model = cluster.get_cluster_model(clusterTorchModel)
+            if self.slotInfo.clusterFile is not None:
+                self.cluster_model = cluster.get_cluster_model(self.slotInfo.clusterFile)
             else:
                 self.cluster_model = None
         except Exception as e:
-            print("EXCEPTION during loading cluster model ", e)
+            print("[Voice Changer] [so-vits-svc40] EXCEPTION during loading cluster model ", e)
+            print("[Voice Changer] [so-vits-svc40] fallback to without cluster")
+            self.cluster_model = None
 
-        # PyTorchモデル生成
-        if self.settings.pyTorchModelFile is not None:
+        # model
+        if self.slotInfo.isONNX:
+            providers, options = self.getOnnxExecutionProvider()
+            self.onnx_session = onnxruntime.InferenceSession(
+                self.slotInfo.modelFile,
+                providers=providers,
+                provider_options=options,
+            )
+        else:
             net_g = SynthesizerTrn(
                 self.hps.data.filter_length // 2 + 1,
                 self.hps.train.segment_size // self.hps.data.hop_length,
@@ -146,21 +121,12 @@ class SoVitsSvc40:
             )
             net_g.eval()
             self.net_g = net_g
-            utils.load_checkpoint(self.settings.pyTorchModelFile, self.net_g, None)
-
-        # ONNXモデル生成
-        if self.settings.onnxModelFile is not None:
-            providers, options = self.getOnnxExecutionProvider()
-            self.onnx_session = onnxruntime.InferenceSession(
-                self.settings.onnxModelFile,
-                providers=providers,
-                provider_options=options,
-            )
-        return self.get_info()
+            utils.load_checkpoint(self.slotInfo.modelFile, self.net_g, None)
 
     def getOnnxExecutionProvider(self):
         availableProviders = onnxruntime.get_available_providers()
-        if self.settings.gpu >= 0 and "CUDAExecutionProvider" in availableProviders:
+        devNum = torch.cuda.device_count()
+        if self.settings.gpu >= 0 and "CUDAExecutionProvider" in availableProviders and devNum > 0:
             return ["CUDAExecutionProvider"], [{"device_id": self.settings.gpu}]
         elif self.settings.gpu >= 0 and "DmlExecutionProvider" in availableProviders:
             return ["DmlExecutionProvider"], [{}]
@@ -173,26 +139,15 @@ class SoVitsSvc40:
                 }
             ]
 
-    def isOnnx(self):
-        if self.settings.onnxModelFile is not None:
-            return True
-        else:
-            return False
-
     def update_settings(self, key: str, val: int | float | str):
         if key in self.settings.intData:
             val = int(val)
             setattr(self.settings, key, val)
 
-            if key == "gpu" and self.isOnnx():
+            if key == "gpu" and self.slotInfo.isONNX:
                 providers, options = self.getOnnxExecutionProvider()
                 if self.onnx_session is not None:
                     self.onnx_session.set_providers(
-                        providers=providers,
-                        provider_options=options,
-                    )
-                if self.content_vec_onnx is not None:
-                    self.content_vec_onnx.set_providers(
                         providers=providers,
                         provider_options=options,
                     )
@@ -210,12 +165,6 @@ class SoVitsSvc40:
         data = asdict(self.settings)
 
         data["onnxExecutionProviders"] = self.onnx_session.get_providers() if self.onnx_session is not None else []
-        files = ["configFile", "pyTorchModelFile", "onnxModelFile"]
-        for f in files:
-            if data[f] is not None and os.path.exists(data[f]):
-                data[f] = os.path.basename(data[f])
-            else:
-                data[f] = ""
 
         return data
 
@@ -253,7 +202,7 @@ class SoVitsSvc40:
         wav16k_numpy = librosa.resample(audio_buffer, orig_sr=self.hps.data.sampling_rate, target_sr=16000)
         wav16k_tensor = torch.from_numpy(wav16k_numpy)
 
-        if (self.settings.gpu < 0 or self.gpu_num == 0) or self.settings.framework == "ONNX":
+        if (self.settings.gpu < 0 or self.gpu_num == 0) or self.slotInfo.isONNX:
             dev = torch.device("cpu")
         else:
             dev = torch.device("cuda", index=self.settings.gpu)
@@ -330,10 +279,6 @@ class SoVitsSvc40:
         return (c, f0, uv, convertSize, vol)
 
     def _onnx_inference(self, data):
-        if hasattr(self, "onnx_session") is False or self.onnx_session is None:
-            print("[Voice Changer] No onnx session.")
-            raise NoModeLoadedException("ONNX")
-
         convertSize = data[3]
         vol = data[4]
         data = (
@@ -367,10 +312,6 @@ class SoVitsSvc40:
         return result
 
     def _pyTorch_inference(self, data):
-        if hasattr(self, "net_g") is False or self.net_g is None:
-            print("[Voice Changer] No pyTorch session.")
-            raise NoModeLoadedException("pytorch")
-
         if self.settings.gpu < 0 or self.gpu_num == 0:
             dev = torch.device("cpu")
         else:
@@ -414,26 +355,12 @@ class SoVitsSvc40:
         return result
 
     def inference(self, data):
-        if self.isOnnx():
+        if self.slotInfo.isONNX:
             audio = self._onnx_inference(data)
         else:
             audio = self._pyTorch_inference(data)
 
         return audio
-
-    @classmethod
-    def loadModel2(cls, props: LoadModelParams2):
-        slotInfo: SoVitsSvc40ModelSlot = SoVitsSvc40ModelSlot()
-        for file in props.files:
-            if file.kind == "soVitsSvc40Config":
-                slotInfo.configFile = file.name
-            elif file.kind == "soVitsSvc40Model":
-                slotInfo.modelFile = file.name
-            elif file.kind == "soVitsSvc40Cluster":
-                slotInfo.clusterFile = file.name
-        slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
-        slotInfo.name = os.path.splitext(os.path.basename(slotInfo.modelFile))[0]
-        return slotInfo
 
     def __del__(self):
         del self.net_g
