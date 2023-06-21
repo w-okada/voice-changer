@@ -1,8 +1,6 @@
 import sys
 import os
 from data.ModelSlot import MMVCv15ModelSlot
-
-from voice_changer.utils.LoadModelParams import LoadModelParams, LoadModelParams2
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 
 if sys.platform.startswith("darwin"):
@@ -49,42 +47,29 @@ class MMVCv15Settings:
     f0Factor: float = 1.0
     f0Detector: str = "dio"  # dio or harvest
 
-    framework: str = "PyTorch"  # PyTorch or ONNX
-    pyTorchModelFile: str = ""
-    onnxModelFile: str = ""
-    configFile: str = ""
-
     # ↓mutableな物だけ列挙
     intData = ["gpu", "srcId", "dstId"]
     floatData = ["f0Factor"]
-    strData = ["framework", "f0Detector"]
+    strData = ["f0Detector"]
 
 
 class MMVCv15:
-    audio_buffer: AudioInOut | None = None
-
-    def __init__(self):
+    def __init__(self, slotInfo: MMVCv15ModelSlot):
+        print("[Voice Changer] [MMVCv15] Creating instance ")
         self.settings = MMVCv15Settings()
         self.net_g = None
-        self.onnx_session = None
+        self.onnx_session: onnxruntime.InferenceSession | None = None
 
         self.gpu_num = torch.cuda.device_count()
 
-    def loadModel(self, props: LoadModelParams):
-        params = props.params
+        self.slotInfo = slotInfo
+        self.audio_buffer: AudioInOut | None = None
+        self.initialize()
 
-        self.settings.configFile = params["files"]["mmvcv15Config"]
-        self.hps = get_hparams_from_file(self.settings.configFile)
+    def initialize(self):
+        print("[Voice Changer] [MMVCv15] Initializing... ")
+        self.hps = get_hparams_from_file(self.slotInfo.configFile)
 
-        modelFile = params["files"]["mmvcv15Model"]
-        if modelFile.endswith(".onnx"):
-            self.settings.pyTorchModelFile = None
-            self.settings.onnxModelFile = modelFile
-        else:
-            self.settings.pyTorchModelFile = modelFile
-            self.settings.onnxModelFile = None
-
-        # PyTorchモデル生成
         self.net_g = SynthesizerTrn(
             spec_channels=self.hps.data.filter_length // 2 + 1,
             segment_size=self.hps.train.segment_size // self.hps.data.hop_length,
@@ -103,18 +88,12 @@ class MMVCv15:
             requires_grad_text_enc=self.hps.requires_grad.text_enc,
             requires_grad_dec=self.hps.requires_grad.dec,
         )
-        if self.settings.pyTorchModelFile is not None:
-            self.settings.framework = "PyTorch"
-            self.net_g.eval()
-            load_checkpoint(self.settings.pyTorchModelFile, self.net_g, None)
 
-        # ONNXモデル生成
-        self.onxx_input_length = 8192
-        if self.settings.onnxModelFile is not None:
-            self.settings.framework = "ONNX"
+        if self.slotInfo.isONNX:
+            self.onxx_input_length = 8192
             providers, options = self.getOnnxExecutionProvider()
             self.onnx_session = onnxruntime.InferenceSession(
-                self.settings.onnxModelFile,
+                self.slotInfo.modelFile,
                 providers=providers,
                 provider_options=options,
             )
@@ -123,11 +102,21 @@ class MMVCv15:
                 # print("ONNX INPUT SHAPE", i.name, i.shape)
                 if i.name == "sin":
                     self.onxx_input_length = i.shape[2]
-        return self.get_info()
+        else:
+            self.net_g.eval()
+            load_checkpoint(self.slotInfo.modelFile, self.net_g, None)
+
+        # その他の設定
+        self.settings.srcId = self.slotInfo.srcId
+        self.settings.dstId = self.slotInfo.dstId
+        self.settings.f0Factor = self.slotInfo.f0Factor
+
+        print("[Voice Changer] [MMVCv15] Initializing... done")
 
     def getOnnxExecutionProvider(self):
         availableProviders = onnxruntime.get_available_providers()
-        if self.settings.gpu >= 0 and "CUDAExecutionProvider" in availableProviders:
+        devNum = torch.cuda.device_count()
+        if self.settings.gpu >= 0 and "CUDAExecutionProvider" in availableProviders and devNum > 0:
             return ["CUDAExecutionProvider"], [{"device_id": self.settings.gpu}]
         elif self.settings.gpu >= 0 and "DmlExecutionProvider" in availableProviders:
             return ["DmlExecutionProvider"], [{}]
@@ -140,20 +129,14 @@ class MMVCv15:
                 }
             ]
 
-    def isOnnx(self):
-        if self.settings.onnxModelFile is not None:
-            return True
-        else:
-            return False
-
     def update_settings(self, key: str, val: int | float | str):
         if key in self.settings.intData:
             val = int(val)
             setattr(self.settings, key, val)
-            if key == "gpu" and self.isOnnx():
+            if key == "gpu" and self.slotInfo.isONNX:
                 providers, options = self.getOnnxExecutionProvider()
                 self.onnx_session = onnxruntime.InferenceSession(
-                    self.settings.onnxModelFile,
+                    self.slotInfo.modelFile,
                     providers=providers,
                     provider_options=options,
                 )
@@ -174,12 +157,6 @@ class MMVCv15:
         data = asdict(self.settings)
 
         data["onnxExecutionProviders"] = self.onnx_session.get_providers() if self.settings.onnxModelFile != "" and self.settings.onnxModelFile is not None else []
-        files = ["configFile", "pyTorchModelFile", "onnxModelFile"]
-        for f in files:
-            if data[f] is not None and os.path.exists(data[f]):
-                data[f] = os.path.basename(data[f])
-            else:
-                data[f] = ""
 
         return data
 
@@ -241,7 +218,7 @@ class MMVCv15:
             convertSize = convertSize + (self.hps.data.hop_length - (convertSize % self.hps.data.hop_length))
 
         # ONNX は固定長
-        if self.settings.framework == "ONNX":
+        if self.slotInfo.isONNX:
             convertSize = self.onxx_input_length
 
         convertOffset = -1 * convertSize
@@ -286,10 +263,6 @@ class MMVCv15:
         return audio1
 
     def _pyTorch_inference(self, data):
-        if self.settings.pyTorchModelFile == "" or self.settings.pyTorchModelFile is None:
-            print("[Voice Changer] No pyTorch session.")
-            raise NoModeLoadedException("pytorch")
-
         if self.settings.gpu < 0 or self.gpu_num == 0:
             dev = torch.device("cpu")
         else:
@@ -309,7 +282,7 @@ class MMVCv15:
 
     def inference(self, data):
         try:
-            if self.isOnnx():
+            if self.slotInfo.isONNX:
                 audio = self._onnx_inference(data)
             else:
                 audio = self._pyTorch_inference(data)
@@ -317,18 +290,6 @@ class MMVCv15:
         except onnxruntime.capi.onnxruntime_pybind11_state.InvalidArgument as _e:
             print(_e)
             raise ONNXInputArgumentException()
-
-    @classmethod
-    def loadModel2(cls, props: LoadModelParams2):
-        slotInfo: MMVCv15ModelSlot = MMVCv15ModelSlot()
-        for file in props.files:
-            if file.kind == "mmvcv15Model":
-                slotInfo.modelFile = file.name
-            elif file.kind == "mmvcv15Config":
-                slotInfo.configFile = file.name
-        slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
-        slotInfo.name = os.path.splitext(os.path.basename(slotInfo.modelFile))[0]
-        return slotInfo
 
     def __del__(self):
         del self.net_g

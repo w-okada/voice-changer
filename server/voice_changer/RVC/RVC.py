@@ -35,26 +35,17 @@ from Exceptions import DeviceCannotSupportHalfPrecisionException
 
 
 class RVC(VoiceChangerModel):
-    initialLoad: bool = True
-    settings: RVCSettings = RVCSettings()
-
-    pipeline: Pipeline | None = None
-
-    deviceManager = DeviceManager.get_instance()
-
-    audio_buffer: AudioInOut | None = None
-    prevVol: float = 0
-    params: VoiceChangerParams
-    currentSlot: int = 0
-    needSwitch: bool = False
-
     def __init__(self, params: VoiceChangerParams, slotInfo: RVCModelSlot):
         print("[Voice Changer] [RVC] Creating instance ")
+        self.deviceManager = DeviceManager.get_instance()
         EmbedderManager.initialize(params)
-
+        self.settings = RVCSettings()
         self.params = params
         self.pitchExtractor = PitchExtractorManager.getPitchExtractor(self.settings.f0Detector)
 
+        self.pipeline: Pipeline | None = None
+
+        self.audio_buffer: AudioInOut | None = None
         self.prevVol = 0.0
         self.slotInfo = slotInfo
         self.initialize()

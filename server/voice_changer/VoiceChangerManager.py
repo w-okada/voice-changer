@@ -116,14 +116,14 @@ class VoiceChangerManager(ServerDeviceCallbacks):
                 slotInfo = RVCModelSlotGenerator.loadModel(params)
                 self.modelSlotManager.save_model_slot(params.slot, slotInfo)
             elif params.voiceChangerType == "MMVCv13":
-                from voice_changer.MMVCv13.MMVCv13 import MMVCv13
+                from voice_changer.MMVCv13.MMVCv13ModelSlotGenerator import MMVCv13ModelSlotGenerator
 
-                slotInfo = MMVCv13.loadModel(params)
+                slotInfo = MMVCv13ModelSlotGenerator.loadModel(params)
                 self.modelSlotManager.save_model_slot(params.slot, slotInfo)
             elif params.voiceChangerType == "MMVCv15":
-                from voice_changer.MMVCv15.MMVCv15 import MMVCv15
+                from voice_changer.MMVCv15.MMVCv15ModelSlotGenerator import MMVCv15ModelSlotGenerator
 
-                slotInfo = MMVCv15.loadModel(params)
+                slotInfo = MMVCv15ModelSlotGenerator.loadModel(params)
                 self.modelSlotManager.save_model_slot(params.slot, slotInfo)
             elif params.voiceChangerType == "so-vits-svc-40":
                 from voice_changer.SoVitsSvc40.SoVitsSvc40 import SoVitsSvc40
@@ -174,7 +174,20 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             self.voiceChangerModel = RVC(self.params, slotInfo)
             self.voiceChanger = VoiceChanger(self.params)
             self.voiceChanger.setModel(self.voiceChangerModel)
+        elif slotInfo.voiceChangerType == "MMVCv13":
+            print("................MMVCv13")
+            from voice_changer.MMVCv13.MMVCv13 import MMVCv13
 
+            self.voiceChangerModel = MMVCv13(slotInfo)
+            self.voiceChanger = VoiceChanger(self.params)
+            self.voiceChanger.setModel(self.voiceChangerModel)
+        elif slotInfo.voiceChangerType == "MMVCv15":
+            print("................MMVCv15")
+            from voice_changer.MMVCv15.MMVCv15 import MMVCv15
+
+            self.voiceChangerModel = MMVCv15(slotInfo)
+            self.voiceChanger = VoiceChanger(self.params)
+            self.voiceChanger.setModel(self.voiceChangerModel)
         else:
             print(f"[Voice Changer] unknown voice changer model: {slotInfo.voiceChangerType}")
             del self.voiceChangerModel

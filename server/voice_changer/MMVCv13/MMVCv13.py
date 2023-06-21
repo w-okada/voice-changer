@@ -2,7 +2,6 @@ import sys
 import os
 from data.ModelSlot import MMVCv13ModelSlot
 
-from voice_changer.utils.LoadModelParams import LoadModelParams, LoadModelParams2
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 
 if sys.platform.startswith("darwin"):
@@ -22,8 +21,10 @@ import numpy as np
 import torch
 import onnxruntime
 
-from symbols import symbols  # type:ignore
-from models import SynthesizerTrn  # type:ignore
+# from symbols import symbols  # type:ignore
+# from models import SynthesizerTrn  # type:ignore
+from voice_changer.MMVCv13.models.models import SynthesizerTrn
+from voice_changer.MMVCv13.models.symbols import symbols
 from voice_changer.MMVCv13.TrainerFunctions import (
     TextAudioSpeakerCollate,
     spectrogram_torch,
@@ -40,21 +41,15 @@ class MMVCv13Settings:
     srcId: int = 0
     dstId: int = 101
 
-    framework: str = "PyTorch"  # PyTorch or ONNX
-    pyTorchModelFile: str = ""
-    onnxModelFile: str = ""
-    configFile: str = ""
-
     # ↓mutableな物だけ列挙
     intData = ["gpu", "srcId", "dstId"]
     floatData: list[str] = field(default_factory=lambda: [])
-    strData = ["framework"]
+    strData: list[str] = field(default_factory=lambda: [])
 
 
 class MMVCv13:
-    audio_buffer: AudioInOut | None = None
-
-    def __init__(self):
+    def __init__(self, slotInfo: MMVCv13ModelSlot):
+        print("[Voice Changer] [MMVCv13] Creating instance ")
         self.settings = MMVCv13Settings()
         self.net_g = None
         self.onnx_session = None
@@ -62,43 +57,35 @@ class MMVCv13:
         self.gpu_num = torch.cuda.device_count()
         self.text_norm = torch.LongTensor([0, 6, 0])
 
-    def loadModel(self, props: LoadModelParams):
-        params = props.params
+        self.audio_buffer: AudioInOut | None = None
+        self.slotInfo = slotInfo
+        self.initialize()
 
-        self.settings.configFile = params["files"]["mmvcv13Config"]
-        self.hps = get_hparams_from_file(self.settings.configFile)
+    def initialize(self):
+        print("[Voice Changer] [MMVCv13] Initializing... ")
 
-        modelFile = params["files"]["mmvcv13Model"]
-        if modelFile.endswith(".onnx"):
-            self.settings.pyTorchModelFile = None
-            self.settings.onnxModelFile = modelFile
-        else:
-            self.settings.pyTorchModelFile = modelFile
-            self.settings.onnxModelFile = None
-
-        # PyTorchモデル生成
-        if self.settings.pyTorchModelFile is not None:
-            self.net_g = SynthesizerTrn(len(symbols), self.hps.data.filter_length // 2 + 1, self.hps.train.segment_size // self.hps.data.hop_length, n_speakers=self.hps.data.n_speakers, **self.hps.model)
-            self.net_g.eval()
-            load_checkpoint(self.settings.pyTorchModelFile, self.net_g, None)
-
-        # ONNXモデル生成
-        if self.settings.onnxModelFile is not None:
-            # ort_options = onnxruntime.SessionOptions()
-            # ort_options.intra_op_num_threads = 8
-            # ort_options.execution_mode = ort_options.ExecutionMode.ORT_PARALLEL
-            # ort_options.inter_op_num_threads = 8
+        self.hps = get_hparams_from_file(self.slotInfo.configFile)
+        if self.slotInfo.isONNX:
             providers, options = self.getOnnxExecutionProvider()
             self.onnx_session = onnxruntime.InferenceSession(
-                self.settings.onnxModelFile,
+                self.slotInfo.modelFile,
                 providers=providers,
                 provider_options=options,
             )
-        return self.get_info()
+        else:
+            self.net_g = SynthesizerTrn(len(symbols), self.hps.data.filter_length // 2 + 1, self.hps.train.segment_size // self.hps.data.hop_length, n_speakers=self.hps.data.n_speakers, **self.hps.model)
+            self.net_g.eval()
+            load_checkpoint(self.slotInfo.modelFile, self.net_g, None)
+
+        # その他の設定
+        self.settings.srcId = self.slotInfo.srcId
+        self.settings.dstId = self.slotInfo.dstId
+        print("[Voice Changer] [MMVCv13] Initializing... done")
 
     def getOnnxExecutionProvider(self):
         availableProviders = onnxruntime.get_available_providers()
-        if self.settings.gpu >= 0 and "CUDAExecutionProvider" in availableProviders:
+        devNum = torch.cuda.device_count()
+        if self.settings.gpu >= 0 and "CUDAExecutionProvider" in availableProviders and devNum > 0:
             return ["CUDAExecutionProvider"], [{"device_id": self.settings.gpu}]
         elif self.settings.gpu >= 0 and "DmlExecutionProvider" in availableProviders:
             return ["DmlExecutionProvider"], [{}]
@@ -111,21 +98,15 @@ class MMVCv13:
                 }
             ]
 
-    def isOnnx(self):
-        if self.settings.onnxModelFile is not None:
-            return True
-        else:
-            return False
-
     def update_settings(self, key: str, val: int | float | str):
         if key in self.settings.intData:
             val = int(val)
             setattr(self.settings, key, val)
 
-            if key == "gpu" and self.isOnnx():
+            if key == "gpu" and self.slotInfo.isONNX:
                 providers, options = self.getOnnxExecutionProvider()
                 self.onnx_session = onnxruntime.InferenceSession(
-                    self.settings.onnxModelFile,
+                    self.slotInfo.modelFile,
                     providers=providers,
                     provider_options=options,
                 )
@@ -150,13 +131,6 @@ class MMVCv13:
         data = asdict(self.settings)
 
         data["onnxExecutionProviders"] = self.onnx_session.get_providers() if self.onnx_session is not None else []
-        files = ["configFile", "pyTorchModelFile", "onnxModelFile"]
-        for f in files:
-            if data[f] is not None and os.path.exists(data[f]):
-                data[f] = os.path.basename(data[f])
-            else:
-                data[f] = ""
-
         return data
 
     def get_processing_sampling_rate(self):
@@ -211,7 +185,7 @@ class MMVCv13:
         return data
 
     def _onnx_inference(self, data):
-        if hasattr(self, "onnx_session") is False or self.onnx_session is None:
+        if self.onnx_session is None:
             print("[Voice Changer] No ONNX session.")
             raise NoModeLoadedException("ONNX")
 
@@ -254,23 +228,11 @@ class MMVCv13:
         return result
 
     def inference(self, data):
-        if self.isOnnx():
+        if self.slotInfo.isONNX:
             audio = self._onnx_inference(data)
         else:
             audio = self._pyTorch_inference(data)
         return audio
-
-    @classmethod
-    def loadModel2(cls, props: LoadModelParams2):
-        slotInfo: MMVCv13ModelSlot = MMVCv13ModelSlot()
-        for file in props.files:
-            if file.kind == "mmvcv13Model":
-                slotInfo.modelFile = file.name
-            elif file.kind == "mmvcv13Config":
-                slotInfo.configFile = file.name
-        slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
-        slotInfo.name = os.path.splitext(os.path.basename(slotInfo.modelFile))[0]
-        return slotInfo
 
     def __del__(self):
         del self.net_g
