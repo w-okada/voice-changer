@@ -20,7 +20,7 @@ import torch
 import onnxruntime
 import pyworld as pw
 
-from models import SynthesizerTrn  # type:ignore
+from voice_changer.MMVCv15.models.models import SynthesizerTrn  # type:ignore
 from voice_changer.MMVCv15.client_modules import (
     convert_continuos_f0,
     spectrogram_torch,
@@ -156,8 +156,7 @@ class MMVCv15:
     def get_info(self):
         data = asdict(self.settings)
 
-        data["onnxExecutionProviders"] = self.onnx_session.get_providers() if self.settings.onnxModelFile != "" and self.settings.onnxModelFile is not None else []
-
+        data["onnxExecutionProviders"] = self.onnx_session.get_providers() if self.onnx_session is not None else []
         return data
 
     def get_processing_sampling_rate(self):
@@ -231,10 +230,6 @@ class MMVCv15:
         return [spec, f0, sid]
 
     def _onnx_inference(self, data):
-        if self.settings.onnxModelFile == "" and self.settings.onnxModelFile is None:
-            print("[Voice Changer] No ONNX session.")
-            raise NoModeLoadedException("ONNX")
-
         spec, f0, sid_src = data
         spec = spec.unsqueeze(0)
         spec_lengths = torch.tensor([spec.size(2)])
