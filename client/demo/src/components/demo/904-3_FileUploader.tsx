@@ -41,6 +41,7 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
             isSampleMode: false,
             sampleId: null,
             files: [],
+            params: {}
         })
     }, [props.targetIndex, voiceChangerType])
 

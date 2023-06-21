@@ -51,6 +51,7 @@ export type ModelUploadSetting = {
     sampleId: string | null
 
     files: ModelFile[]
+    params: any
 }
 export type ModelFileForServer = Omit<ModelFile, "file"> & {
     name: string,
@@ -340,7 +341,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
 
         }
     }, [props.voiceChangerClient])
-
 
     // 古いアップローダ（新GUIへ以降まで、当分残しておく。）
     const loadModel = useMemo(() => {

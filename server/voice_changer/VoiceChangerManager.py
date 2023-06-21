@@ -7,7 +7,7 @@ from voice_changer.Local.ServerDevice import ServerDevice, ServerDeviceCallbacks
 from voice_changer.ModelSlotManager import ModelSlotManager
 from voice_changer.VoiceChanger import VoiceChanger
 from const import UPLOAD_DIR, ModelType
-from voice_changer.utils.LoadModelParams import LoadModelParamFile, LoadModelParams, LoadModelParams2
+from voice_changer.utils.LoadModelParams import LoadModelParams
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from dataclasses import dataclass, asdict, field
@@ -85,20 +85,15 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             cls._instance.voiceChanger = VoiceChanger(params)
         return cls._instance
 
-    def loadModel(self, props: LoadModelParams):
-        paramDict = props.params
-        if paramDict["sampleId"] is not None:
+    def loadModel(self, params: LoadModelParams):
+        if params.isSampleMode:
             # サンプルダウンロード
-            downloadSample(self.params.sample_mode, paramDict["sampleId"], self.params.model_dir, props.slot, {"useIndex": paramDict["rvcIndexDownload"]})
+            downloadSample(self.params.sample_mode, params.sampleId, self.params.model_dir, params.slot, {"useIndex": params.params["rvcIndexDownload"]})
             self.modelSlotManager.getAllSlotInfo(reload=True)
             info = {"status": "OK"}
             return info
-        elif paramDict["voiceChangerType"]:
-            # 新しいアップローダ
-            # Dataを展開
-            params = LoadModelParams2(**paramDict)
-            params.files = [LoadModelParamFile(**x) for x in paramDict["files"]]
-
+        else:
+            # アップローダ
             # ファイルをslotにコピー
             for file in params.files:
                 print("FILE", file)
@@ -116,41 +111,31 @@ class VoiceChangerManager(ServerDeviceCallbacks):
 
             # メタデータ作成(各VCで定義)
             if params.voiceChangerType == "RVC":
-                from voice_changer.RVC.RVC import RVC  # 起動時にインポートするとパラメータが取れない。
+                from voice_changer.RVC.RVCModelSlotGenerator import RVCModelSlotGenerator  # 起動時にインポートするとパラメータが取れない。
 
-                slotInfo = RVC.loadModel2(params)
+                slotInfo = RVCModelSlotGenerator.loadModel(params)
                 self.modelSlotManager.save_model_slot(params.slot, slotInfo)
             elif params.voiceChangerType == "MMVCv13":
                 from voice_changer.MMVCv13.MMVCv13 import MMVCv13
 
-                slotInfo = MMVCv13.loadModel2(params)
+                slotInfo = MMVCv13.loadModel(params)
                 self.modelSlotManager.save_model_slot(params.slot, slotInfo)
             elif params.voiceChangerType == "MMVCv15":
                 from voice_changer.MMVCv15.MMVCv15 import MMVCv15
 
-                slotInfo = MMVCv15.loadModel2(params)
+                slotInfo = MMVCv15.loadModel(params)
                 self.modelSlotManager.save_model_slot(params.slot, slotInfo)
             elif params.voiceChangerType == "so-vits-svc-40":
                 from voice_changer.SoVitsSvc40.SoVitsSvc40 import SoVitsSvc40
 
-                slotInfo = SoVitsSvc40.loadModel2(params)
+                slotInfo = SoVitsSvc40.loadModel(params)
                 self.modelSlotManager.save_model_slot(params.slot, slotInfo)
             elif params.voiceChangerType == "DDSP-SVC":
                 from voice_changer.DDSP_SVC.DDSP_SVC import DDSP_SVC
 
-                slotInfo = DDSP_SVC.loadModel2(params)
+                slotInfo = DDSP_SVC.loadModel(params)
                 self.modelSlotManager.save_model_slot(params.slot, slotInfo)
             print("params", params)
-
-        else:
-            # 古いアップローダ
-            print("[Voice Canger]: upload models........")
-            info = self.voiceChanger.loadModel(props)
-            if hasattr(info, "status") and info["status"] == "NG":
-                return info
-            else:
-                info["status"] = "OK"
-                return info
 
     def get_info(self):
         data = asdict(self.settings)

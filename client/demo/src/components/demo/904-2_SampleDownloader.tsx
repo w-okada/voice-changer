@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useAppState } from "../../001_provider/001_AppStateProvider";
-import { InitialFileUploadSetting } from "@dannadori/voice-changer-client-js";
+import { ModelUploadSetting } from "@dannadori/voice-changer-client-js";
 import { useMessageBuilder } from "../../hooks/useMessageBuilder";
 import { ModelSlotManagerDialogScreen } from "./904_ModelSlotManagerDialog";
 
@@ -51,15 +51,18 @@ export const SampleDownloaderScreen = (props: SampleDownloaderScreenProps) => {
         )
 
         const onDownloadSampleClicked = async (id: string) => {
-            serverSetting.fileUploadSettings[props.targetIndex] = {
-                ...InitialFileUploadSetting,
-                rvcModel: null,
-                rvcIndex: null,
+            const uploadParams: ModelUploadSetting = {
+                voiceChangerType: "RVC",
+                slot: props.targetIndex,
+                isSampleMode: true,
                 sampleId: id,
-                isSampleMode: true
+                files: [],
+                params: {
+                    rvcIndexDownload: true
+                }
             }
             try {
-                await serverSetting.loadModel(props.targetIndex)
+                await serverSetting.uploadModel(uploadParams)
             } catch (e) {
                 alert(e)
             }

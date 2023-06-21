@@ -21,10 +21,8 @@ class VoiceChangerModel(Protocol):
     def inference(self, data: tuple[Any, ...]) -> Any:
         ...
 
-    def generate_input(
-        self, newData: AudioInOut, inputSize: int, crossfadeSize: int
-    ) -> tuple[Any, ...]:
+    def generate_input(self, newData: AudioInOut, inputSize: int, crossfadeSize: int, solaSearchFrame: int) -> tuple[Any, ...]:
         ...
 
-    def update_settings(self, key: str, val: Any) -> bool:
+    def update_settings(self, key: str, val: int | float | str) -> bool:
         ...

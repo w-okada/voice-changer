@@ -1,7 +1,6 @@
 import sys
 import json
 import os
-import shutil
 from typing import Union
 from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
@@ -12,7 +11,7 @@ from restapi.mods.FileUploader import upload_file, concat_file_chunks
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 
 from const import MODEL_DIR, UPLOAD_DIR, ModelType
-from voice_changer.utils.LoadModelParams import LoadModelParams
+from voice_changer.utils.LoadModelParams import LoadModelParamFile, LoadModelParams
 
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -88,26 +87,11 @@ class MMVC_Rest_Fileuploader:
         try:
             paramDict = json.loads(params)
             print("paramDict", paramDict)
-            if paramDict["voiceChangerType"]:
-                # 新しいアップローダ用
-                print("NEW UPLOADER")
-                props: LoadModelParams = LoadModelParams(slot=slot, isHalf=isHalf, params=paramDict)
-            else:
-                # 古いアップローダ用
-                # Change Filepath
-                newFilesDict = {}
-                for key, val in paramDict["files"].items():
-                    if val != "-" and val != "":
-                        uploadPath = os.path.join(UPLOAD_DIR, val)
-                        storePath = os.path.join(UPLOAD_DIR, f"{slot}", val)
-                        storeDir = os.path.dirname(storePath)
-                        os.makedirs(storeDir, exist_ok=True)
-                        shutil.move(uploadPath, storePath)
-                        newFilesDict[key] = storePath
-                paramDict["files"] = newFilesDict
-                props = LoadModelParams(slot=slot, isHalf=isHalf, params=paramDict)
+            loadModelparams = LoadModelParams(**paramDict)
+            loadModelparams.files = [LoadModelParamFile(**x) for x in paramDict["files"]]
+            # print("paramDict", loadModelparams)
 
-            info = self.voiceChangerManager.loadModel(props)
+            info = self.voiceChangerManager.loadModel(loadModelparams)
             json_compatible_item_data = jsonable_encoder(info)
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:

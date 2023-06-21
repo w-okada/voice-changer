@@ -20,14 +20,10 @@ if sys.platform.startswith("darwin"):
 else:
     sys.path.append("RVC")
 
-from voice_changer.RVC.ModelSlotGenerator import (
-    _setInfoByONNX,
-    _setInfoByPytorch,
-)
+
 from voice_changer.RVC.RVCSettings import RVCSettings
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
-from voice_changer.utils.LoadModelParams import LoadModelParams2
-from voice_changer.utils.VoiceChangerModel import AudioInOut
+from voice_changer.utils.VoiceChangerModel import AudioInOut, VoiceChangerModel
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from voice_changer.RVC.onnxExporter.export2onnx import export2onnx
 from voice_changer.RVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
@@ -35,10 +31,10 @@ from voice_changer.RVC.pipeline.PipelineGenerator import createPipeline
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.pipeline.Pipeline import Pipeline
 
-from Exceptions import DeviceCannotSupportHalfPrecisionException, NoModeLoadedException
+from Exceptions import DeviceCannotSupportHalfPrecisionException
 
 
-class RVC:
+class RVC(VoiceChangerModel):
     initialLoad: bool = True
     settings: RVCSettings = RVCSettings()
 
@@ -53,7 +49,7 @@ class RVC:
     needSwitch: bool = False
 
     def __init__(self, params: VoiceChangerParams, slotInfo: RVCModelSlot):
-        print("[Voice Changer][RVC] Creating instance ")
+        print("[Voice Changer] [RVC] Creating instance ")
         EmbedderManager.initialize(params)
 
         self.params = params
@@ -64,38 +60,16 @@ class RVC:
         self.initialize()
 
     def initialize(self):
-        print("[Voice Changer][RVC] Initializing... ")
+        print("[Voice Changer] [RVC] Initializing... ")
 
         # pipelineの生成
         self.pipeline = createPipeline(self.slotInfo, self.settings.gpu, self.settings.f0Detector)
 
         # その他の設定
-        self.trans = self.slotInfo.defaultTune
-        self.index_ratio = self.slotInfo.defaultIndexRatio
-        self.protect = self.slotInfo.defaultProtect
-        self.samplingRate = self.slotInfo.samplingRate
-        print("[Voice Changer][RVC] Initializing... done")
-
-    @classmethod
-    def loadModel2(cls, props: LoadModelParams2):
-        slotInfo: RVCModelSlot = RVCModelSlot()
-        for file in props.files:
-            if file.kind == "rvcModel":
-                slotInfo.modelFile = file.name
-            elif file.kind == "rvcIndex":
-                slotInfo.indexFile = file.name
-        slotInfo.defaultTune = 0
-        slotInfo.defaultIndexRatio = 0
-        slotInfo.defaultProtect = 0.5
-        slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
-        slotInfo.name = os.path.splitext(os.path.basename(slotInfo.modelFile))[0]
-        # slotInfo.iconFile = "/assets/icons/noimage.png"
-
-        if slotInfo.isONNX:
-            _setInfoByONNX(slotInfo)
-        else:
-            _setInfoByPytorch(slotInfo)
-        return slotInfo
+        self.settings.tran = self.slotInfo.defaultTune
+        self.settings.indexRatio = self.slotInfo.defaultIndexRatio
+        self.settings.protect = self.slotInfo.defaultProtect
+        print("[Voice Changer] [RVC] Initializing... done")
 
     def update_settings(self, key: str, val: int | float | str):
         print("[Voice Changer][RVC]: update_settings", key, val)
@@ -123,7 +97,7 @@ class RVC:
         return data
 
     def get_processing_sampling_rate(self):
-        return self.settings.modelSamplingRate
+        return self.slotInfo.samplingRate
 
     def generate_input(
         self,
@@ -170,14 +144,6 @@ class RVC:
         return (audio_buffer, convertSize, vol)
 
     def inference(self, data):
-        # if self.settings.modelSlotIndex < 0:
-        #     print(
-        #         "[Voice Changer] wait for loading model...",
-        #         self.settings.modelSlotIndex,
-        #         self.currentSlot,
-        #     )
-        #     raise NoModeLoadedException("model_common")
-
         audio = data[0]
         convertSize = data[1]
         vol = data[2]
@@ -185,16 +151,12 @@ class RVC:
         if vol < self.settings.silentThreshold:
             return np.zeros(convertSize).astype(np.int16)
 
-        audio = torchaudio.functional.resample(audio, self.settings.modelSamplingRate, 16000, rolloff=0.99)
+        audio = torchaudio.functional.resample(audio, self.slotInfo.samplingRate, 16000, rolloff=0.99)
         repeat = 1 if self.settings.rvcQuality else 0
         sid = 0
         f0_up_key = self.settings.tran
         index_rate = self.settings.indexRatio
         protect = self.settings.protect
-
-        # if_f0 = 1 if self.settings.modelSlots[self.currentSlot].f0 else 0
-        # embOutputLayer = self.settings.modelSlots[self.currentSlot].embOutputLayer
-        # useFinalProj = self.settings.modelSlots[self.currentSlot].useFinalProj
 
         if_f0 = 1 if self.slotInfo.f0 else 0
         embOutputLayer = self.slotInfo.embOutputLayer
@@ -207,7 +169,7 @@ class RVC:
                 f0_up_key,
                 index_rate,
                 if_f0,
-                self.settings.extraConvertSize / self.settings.modelSamplingRate,  # extaraDataSizeの秒数。RVCのモデルのサンプリングレートで処理(★１)。
+                self.settings.extraConvertSize / self.slotInfo.samplingRate,  # extaraDataSizeの秒数。RVCのモデルのサンプリングレートで処理(★１)。
                 embOutputLayer,
                 useFinalProj,
                 repeat,
@@ -292,36 +254,6 @@ class RVC:
         # self.settings.modelSlotIndex = targetSlot
         # self.currentSlot = self.settings.modelSlotIndex
 
-    # def update_model_default(self):
-    #     # {"slot":9,"key":"name","val":"dogsdododg"}
-    #     self.modelSlotManager.update_model_info(
-    #         json.dumps(
-    #             {
-    #                 "slot": self.currentSlot,
-    #                 "key": "defaultTune",
-    #                 "val": self.settings.tran,
-    #             }
-    #         )
-    #     )
-    #     self.modelSlotManager.update_model_info(
-    #         json.dumps(
-    #             {
-    #                 "slot": self.currentSlot,
-    #                 "key": "defaultIndexRatio",
-    #                 "val": self.settings.indexRatio,
-    #             }
-    #         )
-    #     )
-    #     self.modelSlotManager.update_model_info(
-    #         json.dumps(
-    #             {
-    #                 "slot": self.currentSlot,
-    #                 "key": "defaultProtect",
-    #                 "val": self.settings.protect,
-    #             }
-    #         )
-    #     )
-
     def get_model_current(self):
         return [
             {
@@ -337,9 +269,3 @@ class RVC:
                 "val": self.settings.protect,
             },
         ]
-
-    # def update_model_info(self, newData: str):
-    #     self.modelSlotManager.update_model_info(newData)
-
-    # def upload_model_assets(self, params: str):
-    #     self.modelSlotManager.store_model_assets(params)
