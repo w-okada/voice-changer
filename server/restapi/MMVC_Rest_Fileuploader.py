@@ -1,4 +1,3 @@
-import sys
 import json
 import os
 from typing import Union
@@ -42,7 +41,7 @@ class MMVC_Rest_Fileuploader:
             json_compatible_item_data = jsonable_encoder(res)
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:
-            print("[Voice Changer] ex:", e)
+            print("[Voice Changer] post_upload_file ex:", e)
 
     def post_concat_uploaded_file(self, filename: str = Form(...), filenameChunkNum: int = Form(...)):
         try:
@@ -50,7 +49,7 @@ class MMVC_Rest_Fileuploader:
             json_compatible_item_data = jsonable_encoder(res)
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:
-            print("[Voice Changer] ex:", e)
+            print("[Voice Changer] post_concat_uploaded_file ex:", e)
 
     def get_info(self):
         try:
@@ -58,7 +57,7 @@ class MMVC_Rest_Fileuploader:
             json_compatible_item_data = jsonable_encoder(info)
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:
-            print("[Voice Changer] ex:", e)
+            print("[Voice Changer] get_info ex:", e)
 
     def get_performance(self):
         try:
@@ -66,7 +65,7 @@ class MMVC_Rest_Fileuploader:
             json_compatible_item_data = jsonable_encoder(info)
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:
-            print("[Voice Changer] ex:", e)
+            print("[Voice Changer] get_performance ex:", e)
 
     def post_update_settings(self, key: str = Form(...), val: Union[int, str, float] = Form(...)):
         try:
@@ -75,8 +74,10 @@ class MMVC_Rest_Fileuploader:
             json_compatible_item_data = jsonable_encoder(info)
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:
-            print("[Voice Changer] ex:", e)
-            print(sys.exc_info())
+            print("[Voice Changer] post_update_settings ex:", e)
+            import traceback
+
+            traceback.print_exc()
 
     def post_load_model(
         self,
@@ -95,7 +96,7 @@ class MMVC_Rest_Fileuploader:
             json_compatible_item_data = jsonable_encoder(info)
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:
-            print("[Voice Changer] ex:", e)
+            print("[Voice Changer] post_load_model ex:", e)
 
     def post_model_type(self, modelType: ModelType = Form(...)):
         try:
@@ -103,7 +104,7 @@ class MMVC_Rest_Fileuploader:
             json_compatible_item_data = jsonable_encoder(info)
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:
-            print("[Voice Changer] ex:", e)
+            print("[Voice Changer] post_model_type ex:", e)
 
     def get_model_type(self):
         try:
@@ -111,7 +112,7 @@ class MMVC_Rest_Fileuploader:
             json_compatible_item_data = jsonable_encoder(info)
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:
-            print("[Voice Changer] ex:", e)
+            print("[Voice Changer] get_model_type ex:", e)
 
     def get_onnx(self):
         try:
@@ -119,7 +120,7 @@ class MMVC_Rest_Fileuploader:
             json_compatible_item_data = jsonable_encoder(info)
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:
-            print("[Voice Changer] ex:", e)
+            print("[Voice Changer] get_onnx ex:", e)
 
     def post_merge_models(self, request: str = Form(...)):
         try:
@@ -128,7 +129,7 @@ class MMVC_Rest_Fileuploader:
             json_compatible_item_data = jsonable_encoder(info)
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:
-            print("[Voice Changer] ex:", e)
+            print("[Voice Changer] post_merge_models ex:", e)
 
     def post_update_model_default(self):
         try:
@@ -136,7 +137,7 @@ class MMVC_Rest_Fileuploader:
             json_compatible_item_data = jsonable_encoder(info)
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:
-            print("[Voice Changer] ex:", e)
+            print("[Voice Changer] post_update_model_default ex:", e)
 
     def post_update_model_info(self, newData: str = Form(...)):
         try:
@@ -144,7 +145,7 @@ class MMVC_Rest_Fileuploader:
             json_compatible_item_data = jsonable_encoder(info)
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:
-            print("[Voice Changer] ex:", e)
+            print("[Voice Changer] post_update_model_info ex:", e)
 
     def post_upload_model_assets(self, params: str = Form(...)):
         try:
@@ -152,4 +153,4 @@ class MMVC_Rest_Fileuploader:
             json_compatible_item_data = jsonable_encoder(info)
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:
-            print("[Voice Changer] ex:", e)
+            print("[Voice Changer] post_update_model_info ex:", e)

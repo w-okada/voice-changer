@@ -24,9 +24,10 @@ import onnxruntime
 
 import pyworld as pw
 
-from models import SynthesizerTrn  # type:ignore
-import cluster  # type:ignore
-import utils
+# from models import SynthesizerTrn  # type:ignore
+from .models.models import SynthesizerTrn
+from .models.utils import interpolate_f0, get_hparams_from_file, load_checkpoint, repeat_expand_2d, get_hubert_content
+from .models.cluster import get_cluster_model, get_cluster_center_result
 from fairseq import checkpoint_utils
 import librosa
 
@@ -91,13 +92,13 @@ class SoVitsSvc40:
 
     def initialize(self):
         print("[Voice Changer] [so-vits-svc40] Initializing... ")
-        self.hps = utils.get_hparams_from_file(self.slotInfo.configFile)
+        self.hps = get_hparams_from_file(self.slotInfo.configFile)
         self.settings.speakers = self.hps.spk
 
         # cluster
         try:
             if self.slotInfo.clusterFile is not None:
-                self.cluster_model = cluster.get_cluster_model(self.slotInfo.clusterFile)
+                self.cluster_model = get_cluster_model(self.slotInfo.clusterFile)
             else:
                 self.cluster_model = None
         except Exception as e:
@@ -121,7 +122,7 @@ class SoVitsSvc40:
             )
             net_g.eval()
             self.net_g = net_g
-            utils.load_checkpoint(self.slotInfo.modelFile, self.net_g, None)
+            load_checkpoint(self.slotInfo.modelFile, self.net_g, None)
 
     def getOnnxExecutionProvider(self):
         availableProviders = onnxruntime.get_available_providers()
@@ -192,7 +193,7 @@ class SoVitsSvc40:
         if wav_44k.shape[0] % self.hps.data.hop_length != 0:
             print(f" !!! !!! !!! wav size not multiple of hopsize: {wav_44k.shape[0] / self.hps.data.hop_length}")
 
-        f0, uv = utils.interpolate_f0(f0)
+        f0, uv = interpolate_f0(f0)
         f0 = torch.FloatTensor(f0)
         uv = torch.FloatTensor(uv)
         f0 = f0 * 2 ** (tran / 12)
@@ -224,12 +225,12 @@ class SoVitsSvc40:
             else:
                 self.hubert_model = self.hubert_model.to(dev)
                 wav16k_tensor = wav16k_tensor.to(dev)
-                c = utils.get_hubert_content(self.hubert_model, wav_16k_tensor=wav16k_tensor)
+                c = get_hubert_content(self.hubert_model, wav_16k_tensor=wav16k_tensor)
 
         uv = uv.to(dev)
         f0 = f0.to(dev)
 
-        c = utils.repeat_expand_2d(c.squeeze(0), f0.shape[1])
+        c = repeat_expand_2d(c.squeeze(0), f0.shape[1])
 
         if self.settings.clusterInferRatio != 0 and hasattr(self, "cluster_model") and self.cluster_model is not None:
             speaker = [key for key, value in self.settings.speakers.items() if value == self.settings.dstId]
@@ -237,7 +238,7 @@ class SoVitsSvc40:
                 pass
                 # print("not only one speaker found.", speaker)
             else:
-                cluster_c = cluster.get_cluster_center_result(self.cluster_model, c.cpu().numpy().T, speaker[0]).T
+                cluster_c = get_cluster_center_result(self.cluster_model, c.cpu().numpy().T, speaker[0]).T
                 cluster_c = torch.FloatTensor(cluster_c).to(dev)
                 c = c.to(dev)
                 c = self.settings.clusterInferRatio * cluster_c + (1 - self.settings.clusterInferRatio) * c
