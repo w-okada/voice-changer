@@ -1,7 +1,5 @@
 from dataclasses import dataclass, field
 
-from voice_changer.DDSP_SVC.ModelSlot import ModelSlot
-
 
 @dataclass
 class DDSP_SVCSettings:
@@ -23,14 +21,7 @@ class DDSP_SVCSettings:
     kStep: int = 120
     threshold: int = -45
 
-    framework: str = "PyTorch"  # PyTorch or ONNX
-    pyTorchModelFile: str = ""
-    onnxModelFile: str = ""
-    configFile: str = ""
-
     speakers: dict[str, int] = field(default_factory=lambda: {})
-    modelSlotIndex: int = -1
-    modelSlots: list[ModelSlot] = field(default_factory=lambda: [ModelSlot()])
     # ↓mutableな物だけ列挙
     intData = [
         "gpu",
@@ -46,4 +37,4 @@ class DDSP_SVCSettings:
         "kStep",
     ]
     floatData = ["silentThreshold"]
-    strData = ["framework", "f0Detector", "diffMethod"]
+    strData = ["f0Detector", "diffMethod"]

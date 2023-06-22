@@ -3,13 +3,13 @@
 import torch
 
 try:
-    from ddsp.vocoder import load_model, F0_Extractor, Volume_Extractor, Units_Encoder  # type: ignore
+    from .models.ddsp.vocoder import load_model, F0_Extractor, Volume_Extractor, Units_Encoder
 except Exception as e:
     print(e)
-    from ddsp.vocoder import load_model, F0_Extractor, Volume_Extractor, Units_Encoder  # type: ignore
+    from .models.ddsp.vocoder import load_model, F0_Extractor, Volume_Extractor, Units_Encoder
 
-from ddsp.core import upsample  # type: ignore
-from enhancer import Enhancer  # type: ignore
+from .models.ddsp.core import upsample
+from .models.enhancer import Enhancer
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 import numpy as np
 
@@ -38,11 +38,7 @@ class SvcDDSP:
             print("ARGS:", self.args)
 
             # load units encoder
-            if (
-                self.units_encoder is None
-                or self.args.data.encoder != self.encoder_type
-                or self.args.data.encoder_ckpt != self.encoder_ckpt
-            ):
+            if self.units_encoder is None or self.args.data.encoder != self.encoder_type or self.args.data.encoder_ckpt != self.encoder_ckpt:
                 if self.args.data.encoder == "cnhubertsoftfish":
                     cnhubertsoft_gate = self.args.data.cnhubertsoft_gate
                 else:
@@ -77,15 +73,9 @@ class SvcDDSP:
                 self.encoder_ckpt = encoderPath
 
         # load enhancer
-        if (
-            self.enhancer is None
-            or self.args.enhancer.type != self.enhancer_type
-            or self.args.enhancer.ckpt != self.enhancer_ckpt
-        ):
+        if self.enhancer is None or self.args.enhancer.type != self.enhancer_type or self.args.enhancer.ckpt != self.enhancer_ckpt:
             enhancerPath = self.params.nsf_hifigan
-            self.enhancer = Enhancer(
-                self.args.enhancer.type, enhancerPath, device=self.device
-            )
+            self.enhancer = Enhancer(self.args.enhancer.type, enhancerPath, device=self.device)
             self.enhancer_type = self.args.enhancer.type
             self.enhancer_ckpt = enhancerPath
 
@@ -118,9 +108,7 @@ class SvcDDSP:
         # print("audio", audio)
         # load input
         # audio, sample_rate = librosa.load(input_wav, sr=None, mono=True)
-        hop_size = (
-            self.args.data.block_size * sample_rate / self.args.data.sampling_rate
-        )
+        hop_size = self.args.data.block_size * sample_rate / self.args.data.sampling_rate
         if audio_alignment:
             audio_length = len(audio)
         # safe front silence
@@ -131,12 +119,9 @@ class SvcDDSP:
         audio_t = torch.from_numpy(audio).float().unsqueeze(0).to(self.device)
 
         # extract f0
-        pitch_extractor = F0_Extractor(
-            pitch_extractor_type, sample_rate, hop_size, float(f0_min), float(f0_max)
-        )
-        f0 = pitch_extractor.extract(
-            audio, uv_interp=True, device=self.device, silence_front=silence_front
-        )
+        print("pitch_extractor_type", pitch_extractor_type)
+        pitch_extractor = F0_Extractor(pitch_extractor_type, sample_rate, hop_size, float(f0_min), float(f0_max))
+        f0 = pitch_extractor.extract(audio, uv_interp=True, device=self.device, silence_front=silence_front)
         f0 = torch.from_numpy(f0).float().to(self.device).unsqueeze(-1).unsqueeze(0)
         f0 = f0 * 2 ** (float(pitch_adjust) / 12)
 
@@ -148,9 +133,7 @@ class SvcDDSP:
         mask = np.array([np.max(mask[n : n + 9]) for n in range(len(mask) - 8)])  # type: ignore
         mask = torch.from_numpy(mask).float().to(self.device).unsqueeze(-1).unsqueeze(0)
         mask = upsample(mask, self.args.data.block_size).squeeze(-1)
-        volume = (
-            torch.from_numpy(volume).float().to(self.device).unsqueeze(-1).unsqueeze(0)
-        )
+        volume = torch.from_numpy(volume).float().to(self.device).unsqueeze(-1).unsqueeze(0)
 
         # extract units
         units = self.units_encoder.encode(audio_t, sample_rate, hop_size)
@@ -165,9 +148,7 @@ class SvcDDSP:
 
             # forward and return the output
         with torch.no_grad():
-            output, _, (s_h, s_n) = self.model(
-                units, f0, volume, spk_id=spk_id, spk_mix_dict=dictionary
-            )
+            output, _, (s_h, s_n) = self.model(units, f0, volume, spk_id=spk_id, spk_mix_dict=dictionary)
 
             if diff_use and diff_model is not None:
                 output = diff_model.infer(

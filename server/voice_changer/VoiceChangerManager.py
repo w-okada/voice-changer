@@ -131,9 +131,9 @@ class VoiceChangerManager(ServerDeviceCallbacks):
                 slotInfo = SoVitsSvc40ModelSlotGenerator.loadModel(params)
                 self.modelSlotManager.save_model_slot(params.slot, slotInfo)
             elif params.voiceChangerType == "DDSP-SVC":
-                from voice_changer.DDSP_SVC.DDSP_SVC import DDSP_SVC
+                from voice_changer.DDSP_SVC.DDSP_SVCModelSlotGenerator import DDSP_SVCModelSlotGenerator
 
-                slotInfo = DDSP_SVC.loadModel(params)
+                slotInfo = DDSP_SVCModelSlotGenerator.loadModel(params)
                 self.modelSlotManager.save_model_slot(params.slot, slotInfo)
             print("params", params)
 
@@ -193,6 +193,13 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             from voice_changer.SoVitsSvc40.SoVitsSvc40 import SoVitsSvc40
 
             self.voiceChangerModel = SoVitsSvc40(self.params, slotInfo)
+            self.voiceChanger = VoiceChanger(self.params)
+            self.voiceChanger.setModel(self.voiceChangerModel)
+        elif slotInfo.voiceChangerType == "DDSP-SVC":
+            print("................DDSP-SVC")
+            from voice_changer.DDSP_SVC.DDSP_SVC import DDSP_SVC
+
+            self.voiceChangerModel = DDSP_SVC(self.params, slotInfo)
             self.voiceChanger = VoiceChanger(self.params)
             self.voiceChanger.setModel(self.voiceChangerModel)
         else:

@@ -4,7 +4,6 @@ from dataclasses import asdict
 import numpy as np
 import torch
 from data.ModelSlot import DDSPSVCModelSlot
-from voice_changer.DDSP_SVC.ModelSlot import ModelSlot
 
 from voice_changer.DDSP_SVC.deviceManager.DeviceManager import DeviceManager
 
@@ -18,11 +17,10 @@ if sys.platform.startswith("darwin"):
 else:
     sys.path.append("DDSP-SVC")
 
-from diffusion.infer_gt_mel import DiffGtMel  # type: ignore
+from .models.diffusion.infer_gt_mel import DiffGtMel
 
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
-from voice_changer.utils.LoadModelParams import LoadModelParams, LoadModelParams2
 from voice_changer.DDSP_SVC.DDSP_SVCSetting import DDSP_SVCSettings
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 
@@ -51,68 +49,39 @@ def phase_vocoder(a, b, fade_out, fade_in):
 
 class DDSP_SVC:
     initialLoad: bool = True
-    settings: DDSP_SVCSettings = DDSP_SVCSettings()
-    diff_model: DiffGtMel = DiffGtMel()
-    svc_model: SvcDDSP = SvcDDSP()
 
-    deviceManager = DeviceManager.get_instance()
-    # diff_model: DiffGtMel = DiffGtMel()
-
-    audio_buffer: AudioInOut | None = None
-    prevVol: float = 0
-    # resample_kernel = {}
-
-    def __init__(self, params: VoiceChangerParams):
+    def __init__(self, params: VoiceChangerParams, slotInfo: DDSPSVCModelSlot):
+        print("[Voice Changer] [DDSP-SVC] Creating instance ")
+        self.deviceManager = DeviceManager.get_instance()
         self.gpu_num = torch.cuda.device_count()
         self.params = params
+        self.settings = DDSP_SVCSettings()
+        self.svc_model: SvcDDSP = SvcDDSP()
+        self.diff_model: DiffGtMel = DiffGtMel()
+
         self.svc_model.setVCParams(params)
         EmbedderManager.initialize(params)
-        print("[Voice Changer] DDSP-SVC initialization:", params)
 
-    def loadModel(self, props: LoadModelParams):
-        target_slot_idx = props.slot
-        params = props.params
+        self.audio_buffer: AudioInOut | None = None
+        self.prevVol = 0.0
+        self.slotInfo = slotInfo
+        self.initialize()
 
-        modelFile = params["files"]["ddspSvcModel"]
-        diffusionFile = params["files"]["ddspSvcDiffusion"]
-        modelSlot = ModelSlot(
-            modelFile=modelFile,
-            diffusionFile=diffusionFile,
-            defaultTrans=params["trans"] if "trans" in params else 0,
-        )
-        self.settings.modelSlots[target_slot_idx] = modelSlot
-
-        # 初回のみロード
-        # if self.initialLoad:
-        #     self.prepareModel(target_slot_idx)
-        #     self.settings.modelSlotIndex = target_slot_idx
-        #     self.switchModel()
-        #     self.initialLoad = False
-        # elif target_slot_idx == self.currentSlot:
-        #     self.prepareModel(target_slot_idx)
-        self.settings.modelSlotIndex = target_slot_idx
-        self.reloadModel()
-
-        print("params:", params)
-        return self.get_info()
-
-    def reloadModel(self):
+    def initialize(self):
         self.device = self.deviceManager.getDevice(self.settings.gpu)
-        modelFile = self.settings.modelSlots[self.settings.modelSlotIndex].modelFile
-        diffusionFile = self.settings.modelSlots[self.settings.modelSlotIndex].diffusionFile
 
         self.svc_model = SvcDDSP()
         self.svc_model.setVCParams(self.params)
-        self.svc_model.update_model(modelFile, self.device)
+        self.svc_model.update_model(self.slotInfo.modelFile, self.device)
         self.diff_model = DiffGtMel(device=self.device)
-        self.diff_model.flush_model(diffusionFile, ddsp_config=self.svc_model.args)
+        self.diff_model.flush_model(self.slotInfo.diffModelFile, ddsp_config=self.svc_model.args)
 
     def update_settings(self, key: str, val: int | float | str):
         if key in self.settings.intData:
             val = int(val)
             setattr(self.settings, key, val)
             if key == "gpu":
-                self.reloadModel()
+                self.initialize()
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
@@ -160,10 +129,6 @@ class DDSP_SVC:
     #     raise NoModeLoadedException("ONNX")
 
     def _pyTorch_inference(self, data):
-        # if hasattr(self, "model") is False or self.model is None:
-        #     print("[Voice Changer] No pyTorch session.")
-        #     raise NoModeLoadedException("pytorch")
-
         input_wav = data[0]
         _audio, _model_sr = self.svc_model.infer(
             input_wav,
@@ -192,32 +157,13 @@ class DDSP_SVC:
         return _audio.cpu().numpy() * 32768.0
 
     def inference(self, data):
-        if self.settings.framework == "ONNX":
+        if self.slotInfo.isONNX:
             audio = self._onnx_inference(data)
         else:
             audio = self._pyTorch_inference(data)
         return audio
 
-    @classmethod
-    def loadModel2(cls, props: LoadModelParams2):
-        slotInfo: DDSPSVCModelSlot = DDSPSVCModelSlot()
-        for file in props.files:
-            if file.kind == "ddspSvcModelConfig":
-                slotInfo.configFile = file.name
-            elif file.kind == "ddspSvcModel":
-                slotInfo.modelFile = file.name
-            elif file.kind == "ddspSvcDiffusionConfig":
-                slotInfo.diffConfigFile = file.name
-            elif file.kind == "ddspSvcDiffusion":
-                slotInfo.diffModelFile = file.name
-        slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
-        slotInfo.name = os.path.splitext(os.path.basename(slotInfo.modelFile))[0]
-        return slotInfo
-
     def __del__(self):
-        del self.net_g
-        del self.onnx_session
-
         remove_path = os.path.join("DDSP-SVC")
         sys.path = [x for x in sys.path if x.endswith(remove_path) is False]
 
