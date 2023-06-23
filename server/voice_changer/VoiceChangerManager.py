@@ -5,9 +5,11 @@ import numpy as np
 from downloader.SampleDownloader import downloadSample, getSampleInfos
 from voice_changer.Local.ServerDevice import ServerDevice, ServerDeviceCallbacks
 from voice_changer.ModelSlotManager import ModelSlotManager
+from voice_changer.RVC.RVCModelMerger import RVCModelMerger
 from voice_changer.VoiceChanger import VoiceChanger
 from const import UPLOAD_DIR, ModelType
-from voice_changer.utils.LoadModelParams import LoadModelParams
+from voice_changer.utils.LoadModelParams import LoadModelParamFile, LoadModelParams
+from voice_changer.utils.ModelMerger import MergeElement, ModelMergerRequest
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from dataclasses import dataclass, asdict, field
@@ -240,7 +242,15 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         return self.voiceChanger.export2onnx()
 
     def merge_models(self, request: str):
-        self.voiceChanger.merge_models(request)
+        # self.voiceChanger.merge_models(request)
+        req = json.loads(request)
+        req = ModelMergerRequest(**req)
+        req.files = [MergeElement(**f) for f in req.files]
+        slot = len(self.modelSlotManager.getAllSlotInfo()) - 1
+        if req.voiceChangerType == "RVC":
+            merged = RVCModelMerger.merge_models(req, slot)
+            loadParam = LoadModelParams(voiceChangerType="RVC", slot=slot, isSampleMode=False, sampleId="", files=[LoadModelParamFile(name=os.path.basename(merged), kind="rvcModel", dir=f"{slot}")], params={})
+            self.loadModel(loadParam)
         return self.get_info()
 
     def setEmitTo(self, emitTo: Callable[[Any], None]):

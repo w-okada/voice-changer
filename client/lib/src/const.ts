@@ -602,9 +602,7 @@ export type MergeElement = {
     strength: number
 }
 export type MergeModelRequest = {
+    voiceChangerType: VoiceChangerType
     command: "mix",
-    defaultTune: number,
-    defaultIndexRatio: number,
-    defaultProtect: number,
     files: MergeElement[]
 }

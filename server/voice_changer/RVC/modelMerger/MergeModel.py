@@ -1,10 +1,12 @@
 from typing import Dict, Any
-from voice_changer.RVC.modelMerger.MergeModelRequest import MergeModelRequest
+
 from collections import OrderedDict
 import torch
 
+from voice_changer.utils.ModelMerger import ModelMergerRequest
 
-def merge_model(request: MergeModelRequest):
+
+def merge_model(request: ModelMergerRequest):
     def extract(ckpt: Dict[str, Any]):
         a = ckpt["model"]
         opt: Dict[str, Any] = OrderedDict()
@@ -61,13 +63,7 @@ def merge_model(request: MergeModelRequest):
     merged["sr"] = state_dict["sr"]
     merged["f0"] = state_dict["f0"]
     merged["info"] = state_dict["info"]
-    merged["embedder_name"] = (
-        state_dict["embedder_name"] if "embedder_name" in state_dict else None
-    )
-    merged["embedder_output_layer"] = (
-        state_dict["embedder_output_layer"]
-        if "embedder_output_layer" in state_dict
-        else None
-    )
+    merged["embedder_name"] = state_dict["embedder_name"] if "embedder_name" in state_dict else None
+    merged["embedder_output_layer"] = state_dict["embedder_output_layer"] if "embedder_output_layer" in state_dict else None
     print("write metadata done.")
     return merged

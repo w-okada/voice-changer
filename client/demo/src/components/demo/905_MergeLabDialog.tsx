@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useGuiState } from "./001_GuiStateProvider";
 import { useAppState } from "../../001_provider/001_AppStateProvider";
-import { MergeElement, RVCModelSlot, RVCModelType } from "@dannadori/voice-changer-client-js";
+import { MergeElement, RVCModelSlot, RVCModelType, VoiceChangerType } from "@dannadori/voice-changer-client-js";
 
 
 export const MergeLabDialog = () => {
@@ -104,10 +104,8 @@ export const MergeLabDialog = () => {
 
         const onMergeClicked = () => {
             serverSetting.mergeModel({
+                voiceChangerType: VoiceChangerType.RVC,
                 command: "mix",
-                defaultTune: 0,
-                defaultIndexRatio: 1,
-                defaultProtect: 0.5,
                 files: mergeElements
             })
         }

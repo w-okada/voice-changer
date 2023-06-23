@@ -83,49 +83,6 @@ class VoiceChanger:
     def setModel(self, model: Any):
         self.voiceChanger = model
 
-    # def switchModelType(self, modelType: ModelType):
-    #     print("Switch Model Type:", modelType)
-    #     try:
-    #         if self.voiceChanger is not None:
-    #             # return {"status": "ERROR", "msg": "vc is already selected. currently re-select is not implemented"}
-    #             del self.voiceChanger
-    #             self.voiceChanger = None
-
-    #         self.modelType = modelType
-    #         if self.modelType == "MMVCv15":
-    #             from voice_changer.MMVCv15.MMVCv15 import MMVCv15
-
-    #             self.voiceChanger = MMVCv15()  # type: ignore
-    #         elif self.modelType == "MMVCv13":
-    #             from voice_changer.MMVCv13.MMVCv13 import MMVCv13
-
-    #             self.voiceChanger = MMVCv13()
-    #         elif self.modelType == "so-vits-svc-40v2":
-    #             from voice_changer.SoVitsSvc40v2.SoVitsSvc40v2 import SoVitsSvc40v2
-
-    #             self.voiceChanger = SoVitsSvc40v2(self.params)
-    #         elif self.modelType == "so-vits-svc-40" or self.modelType == "so-vits-svc-40_c":
-    #             from voice_changer.SoVitsSvc40.SoVitsSvc40 import SoVitsSvc40
-
-    #             self.voiceChanger = SoVitsSvc40(self.params)
-    #         elif self.modelType == "DDSP-SVC":
-    #             from voice_changer.DDSP_SVC.DDSP_SVC import DDSP_SVC
-
-    #             self.voiceChanger = DDSP_SVC(self.params)
-    #         elif self.modelType == "RVC":
-    #             from voice_changer.RVC.RVC import RVC
-
-    #             self.voiceChanger = RVC(self.params)
-    #         else:
-    #             from voice_changer.MMVCv13.MMVCv13 import MMVCv13
-
-    #             self.voiceChanger = MMVCv13()
-    #     except Exception as e:
-    #         print(e)
-    #         print(traceback.format_exc())
-    #     print("Switch Model Type:", self.voiceChanger)
-    #     return {"status": "OK", "msg": "vc is switched."}
-
     def getModelType(self):
         if self.modelType is not None:
             return {"status": "OK", "vc": self.modelType}
@@ -382,27 +339,6 @@ class VoiceChanger:
             print("[Voice Changer] Voice Changer is not selected.")
             return
         self.voiceChanger.merge_models(request)
-        return self.get_info()
-
-    def update_model_default(self):
-        if self.voiceChanger is None:
-            print("[Voice Changer] Voice Changer is not selected.")
-            return
-        self.voiceChanger.update_model_default()
-        return self.get_info()
-
-    def update_model_info(self, newData: str):
-        if self.voiceChanger is None:
-            print("[Voice Changer] Voice Changer is not selected.")
-            return
-        self.voiceChanger.update_model_info(newData)
-        return self.get_info()
-
-    def upload_model_assets(self, params: str):
-        if self.voiceChanger is None:
-            print("[Voice Changer] Voice Changer is not selected.")
-            return
-        self.voiceChanger.upload_model_assets(params)
         return self.get_info()
 
 

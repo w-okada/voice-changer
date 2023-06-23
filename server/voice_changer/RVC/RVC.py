@@ -197,8 +197,7 @@ class RVC(VoiceChangerModel):
                 pass
 
     def export2onnx(self):
-        allModelSlots = self.modelSlotManager.getAllSlotInfo()
-        modelSlot = allModelSlots[self.settings.modelSlotIndex]
+        modelSlot = self.slotInfo
 
         if modelSlot.isONNX:
             print("[Voice Changer] export2onnx, No pyTorch filepath.")

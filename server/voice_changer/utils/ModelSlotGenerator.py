@@ -5,5 +5,5 @@ from voice_changer.utils.LoadModelParams import LoadModelParams
 
 class ModelSlotGenerator(Protocol):
     @classmethod
-    def loadModel(self, params: LoadModelParams):
+    def loadModel(cls, params: LoadModelParams):
         ...

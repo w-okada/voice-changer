@@ -153,23 +153,7 @@ class AudioDataset(Dataset):
         start_frame = int(idx_from / frame_resolution)
         units_frame_len = int(waveform_sec / frame_resolution)
         aug_flag = random.choice([True, False]) and self.use_aug
-        """
-        audio = data_buffer.get('audio')
-        if audio is None:
-            path_audio = os.path.join(self.path_root, 'audio', name) + '.wav'
-            audio, sr = librosa.load(
-                    path_audio, 
-                    sr = self.sample_rate, 
-                    offset = start_frame * frame_resolution,
-                    duration = waveform_sec)
-            if len(audio.shape) > 1:
-                audio = librosa.to_mono(audio)
-            # clip audio into N seconds
-            audio = audio[ : audio.shape[-1] // self.hop_size * self.hop_size]       
-            audio = torch.from_numpy(audio).float()
-        else:
-            audio = audio[start_frame * self.hop_size : (start_frame + units_frame_len) * self.hop_size]
-        """
+
         # load mel
         mel_key = "aug_mel" if aug_flag else "mel"
         mel = data_buffer.get(mel_key)
