@@ -3,9 +3,7 @@ from const import EnumInferenceTypes
 
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
-from infer_pack.models import (  # type:ignore
-    SynthesizerTrnMs768NSFsid_nono,
-)
+from .rvc_models.infer_pack.models import SynthesizerTrnMs768NSFsid_nono
 
 
 class RVCInferencerv2Nono(Inferencer):

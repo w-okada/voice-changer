@@ -1,36 +1,10 @@
 from torch import nn
-from infer_pack.models import (  # type:ignore
-    TextEncoder768,
-    GeneratorNSF,
-    PosteriorEncoder,
-    ResidualCouplingBlock,
-)
+from ..inferencer.rvc_models.infer_pack.models import TextEncoder768, PosteriorEncoder, ResidualCouplingBlock, GeneratorNSF  # type: ignore
 import torch
 
 
 class SynthesizerTrnMs768NSFsid_ONNX(nn.Module):
-    def __init__(
-        self,
-        spec_channels,
-        segment_size,
-        inter_channels,
-        hidden_channels,
-        filter_channels,
-        n_heads,
-        n_layers,
-        kernel_size,
-        p_dropout,
-        resblock,
-        resblock_kernel_sizes,
-        resblock_dilation_sizes,
-        upsample_rates,
-        upsample_initial_channel,
-        upsample_kernel_sizes,
-        spk_embed_dim,
-        gin_channels,
-        sr,
-        **kwargs
-    ):
+    def __init__(self, spec_channels, segment_size, inter_channels, hidden_channels, filter_channels, n_heads, n_layers, kernel_size, p_dropout, resblock, resblock_kernel_sizes, resblock_dilation_sizes, upsample_rates, upsample_initial_channel, upsample_kernel_sizes, spk_embed_dim, gin_channels, sr, **kwargs):
         super().__init__()
         self.spec_channels = spec_channels
         self.inter_channels = inter_channels
@@ -80,9 +54,7 @@ class SynthesizerTrnMs768NSFsid_ONNX(nn.Module):
             16,
             gin_channels=gin_channels,
         )
-        self.flow = ResidualCouplingBlock(
-            inter_channels, hidden_channels, 5, 1, 3, gin_channels=gin_channels
-        )
+        self.flow = ResidualCouplingBlock(inter_channels, hidden_channels, 5, 1, 3, gin_channels=gin_channels)
         self.emb_g = nn.Embedding(self.spk_embed_dim, gin_channels)
 
         print("gin_channels:", gin_channels, "self.spk_embed_dim:", self.spk_embed_dim)

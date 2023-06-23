@@ -2,9 +2,7 @@ import torch
 from const import EnumInferenceTypes
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
-from infer_pack.models import (  # type:ignore
-    SynthesizerTrnMs768NSFsid,
-)
+from .rvc_models.infer_pack.models import SynthesizerTrnMs768NSFsid
 
 
 class RVCInferencerv2(Inferencer):

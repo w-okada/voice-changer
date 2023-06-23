@@ -1,10 +1,5 @@
 from torch import nn
-from infer_pack.models import (  # type:ignore
-    TextEncoder768,
-    PosteriorEncoder,
-    ResidualCouplingBlock,
-    Generator,
-)
+from ..inferencer.rvc_models.infer_pack.models import TextEncoder768, PosteriorEncoder, ResidualCouplingBlock, Generator  # type: ignore
 import torch
 
 

@@ -210,40 +210,6 @@ class RVC(VoiceChangerModel):
             "filename": output_file_simple,
         }
 
-    def merge_models(self, request: str):
-        print("[Voice Changer] MergeRequest:", request)
-        # req: MergeModelRequest = MergeModelRequest.from_json(request)
-        # merged = merge_model(req)
-        # targetSlot = 0
-        # if req.slot < 0:
-        #     # 最後尾のスロット番号を格納先とする。
-        #     allModelSlots = self.modelSlotManager.getAllSlotInfo()
-        #     targetSlot = len(allModelSlots) - 1
-        # else:
-        #     targetSlot = req.slot
-
-        # # いったんは、アップロードフォルダに格納する。（歴史的経緯）
-        # # 後続のloadmodelを呼び出すことで永続化モデルフォルダに移動させられる。
-        # storeDir = os.path.join(UPLOAD_DIR, f"{targetSlot}")
-        # print("[Voice Changer] store merged model to:", storeDir)
-        # os.makedirs(storeDir, exist_ok=True)
-        # storeFile = os.path.join(storeDir, "merged.pth")
-        # torch.save(merged, storeFile)
-
-        # # loadmodelを呼び出して永続化モデルフォルダに移動させる。
-        # params = {
-        #     "defaultTune": req.defaultTune,
-        #     "defaultIndexRatio": req.defaultIndexRatio,
-        #     "defaultProtect": req.defaultProtect,
-        #     "sampleId": "",
-        #     "files": {"rvcModel": storeFile},
-        # }
-        # props: LoadModelParams = LoadModelParams(slot=targetSlot, isHalf=True, params=params)
-        # self.loadModel(props)
-        # self.prepareModel(targetSlot)
-        # self.settings.modelSlotIndex = targetSlot
-        # self.currentSlot = self.settings.modelSlotIndex
-
     def get_model_current(self):
         return [
             {

@@ -144,7 +144,7 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
             slotInfo.name = sample.name
             slotInfo.termsOfUseUrl = sample.termsOfUseUrl
             slotInfo.defaultTune = 0
-            slotInfo.defaultIndexRatio = 1
+            slotInfo.defaultIndexRatio = 0
             slotInfo.defaultProtect = 0.5
             slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
             modelSlotManager.save_model_slot(targetSlotIndex, slotInfo)

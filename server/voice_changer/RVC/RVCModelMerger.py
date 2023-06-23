@@ -20,17 +20,3 @@ class RVCModelMerger(ModelMerger):
         storeFile = os.path.join(storeDir, "merged.pth")
         torch.save(merged, storeFile)
         return storeFile
-
-        # # loadmodelを呼び出して永続化モデルフォルダに移動させる。
-        # params = {
-        #     "defaultTune": req.defaultTune,
-        #     "defaultIndexRatio": req.defaultIndexRatio,
-        #     "defaultProtect": req.defaultProtect,
-        #     "sampleId": "",
-        #     "files": {"rvcModel": storeFile},
-        # }
-        # props: LoadModelParams = LoadModelParams(slot=targetSlot, isHalf=True, params=params)
-        # self.loadModel(props)
-        # self.prepareModel(targetSlot)
-        # self.settings.modelSlotIndex = targetSlot
-        # self.currentSlot = self.settings.modelSlotIndex
