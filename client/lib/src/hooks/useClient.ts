@@ -72,7 +72,7 @@ export const useClient = (props: UseClientProps): ClientState => {
     const clientSetting = useClientSetting({ clientType: props.clientType, voiceChangerClient, audioContext: props.audioContext })
     const workletNodeSetting = useWorkletNodeSetting({ clientType: props.clientType, voiceChangerClient })
     const workletSetting = useWorkletSetting({ clientType: props.clientType, voiceChangerClient })
-    const serverSetting = useServerSetting({ clientType: props.clientType, voiceChangerClient })
+    const serverSetting = useServerSetting({ voiceChangerClient })
     const indexedDBState = useIndexedDB({ clientType: props.clientType })
 
 
@@ -184,7 +184,6 @@ export const useClient = (props: UseClientProps): ClientState => {
         await clientSetting.clearSetting()
         await workletNodeSetting.clearSetting()
         await workletSetting.clearSetting()
-        await serverSetting.clearSetting()
     }
 
     return {

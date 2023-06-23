@@ -1,14 +1,6 @@
-import { useState, useMemo, useEffect } from "react"
-import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, INDEXEDDB_KEY_SERVER, INDEXEDDB_KEY_MODEL_DATA, ClientType, DefaultServerSetting_MMVCv13, DefaultServerSetting_MMVCv15, DefaultServerSetting_so_vits_svc_40, DefaultServerSetting_RVC, OnnxExporterInfo, DefaultServerSetting_DDSP_SVC, MAX_MODEL_SLOT_NUM, Framework, MergeModelRequest, VoiceChangerType } from "../const"
+import { useState, useMemo } from "react"
+import { VoiceChangerServerSetting, ServerInfo, ServerSettingKey, OnnxExporterInfo, MergeModelRequest, VoiceChangerType, DefaultServerSetting } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
-import { useIndexedDB } from "./useIndexedDB"
-
-
-type ModelData = {
-    file?: File
-    data?: ArrayBuffer
-    filename?: string
-}
 
 export const ModelAssetName = {
     iconFile: "iconFile"
@@ -60,68 +52,6 @@ export type ModelUploadSettingForServer = Omit<ModelUploadSetting, "files"> & {
     files: ModelFileForServer[]
 }
 
-export type FileUploadSetting = {
-    isHalf: boolean
-    uploaded: boolean
-    defaultTune: number
-    defaultIndexRatio: number
-    defaultProtect: number
-    framework: Framework
-    params: string
-
-    mmvcv13Config: ModelData | null
-    mmvcv13Model: ModelData | null
-    mmvcv15Config: ModelData | null
-    mmvcv15Model: ModelData | null
-    soVitsSvc40Config: ModelData | null
-    soVitsSvc40Model: ModelData | null
-    soVitsSvc40Cluster: ModelData | null
-    rvcModel: ModelData | null
-    rvcFeature: ModelData | null
-    rvcIndex: ModelData | null
-
-    isSampleMode: boolean
-    sampleId: string | null
-    rvcIndexDownload: boolean
-
-    ddspSvcModel: ModelData | null
-    ddspSvcModelConfig: ModelData | null
-    ddspSvcDiffusion: ModelData | null
-    ddspSvcDiffusionConfig: ModelData | null
-
-}
-
-export const InitialFileUploadSetting: FileUploadSetting = {
-    isHalf: true,
-    uploaded: false,
-    defaultTune: 0,
-    defaultIndexRatio: 1,
-    defaultProtect: 0.5,
-    framework: Framework.PyTorch,
-    params: "{}",
-
-    mmvcv13Config: null,
-    mmvcv13Model: null,
-    mmvcv15Config: null,
-    mmvcv15Model: null,
-    soVitsSvc40Config: null,
-    soVitsSvc40Model: null,
-    soVitsSvc40Cluster: null,
-    rvcModel: null,
-    rvcFeature: null,
-    rvcIndex: null,
-
-    isSampleMode: false,
-    sampleId: null,
-    rvcIndexDownload: true,
-
-
-    ddspSvcModel: null,
-    ddspSvcModelConfig: null,
-    ddspSvcDiffusion: null,
-    ddspSvcDiffusionConfig: null,
-}
-
 type AssetUploadSetting = {
     slot: number
     name: ModelAssetName
@@ -129,18 +59,14 @@ type AssetUploadSetting = {
 }
 
 export type UseServerSettingProps = {
-    clientType: ClientType | null
     voiceChangerClient: VoiceChangerClient | null
 }
 
 export type ServerSettingState = {
     serverSetting: ServerInfo
     updateServerSettings: (setting: ServerInfo) => Promise<void>
-    clearSetting: () => Promise<void>
     reloadServerInfo: () => Promise<void>;
 
-    fileUploadSettings: FileUploadSetting[]
-    setFileUploadSetting: (slot: number, val: FileUploadSetting) => void
     uploadModel: (setting: ModelUploadSetting) => Promise<void>
     uploadProgress: number
     isUploading: boolean
@@ -153,80 +79,7 @@ export type ServerSettingState = {
 }
 
 export const useServerSetting = (props: UseServerSettingProps): ServerSettingState => {
-    // const settingRef = useRef<VoiceChangerServerSetting>(DefaultVoiceChangerServerSetting)
-    const getDefaultServerSetting = () => {
-        if (props.clientType == "MMVCv13") {
-            return DefaultServerSetting_MMVCv13
-        } else if (props.clientType == "MMVCv15") {
-            return DefaultServerSetting_MMVCv15
-        } else if (props.clientType == "so-vits-svc-40") {
-            return DefaultServerSetting_so_vits_svc_40
-        } else if (props.clientType == "DDSP-SVC") {
-            return DefaultServerSetting_DDSP_SVC
-        } else if (props.clientType == "RVC") {
-            return DefaultServerSetting_RVC
-        } else {
-            return DefaultServerSetting_MMVCv15
-        }
-    }
-
-    const [serverSetting, setServerSetting] = useState<ServerInfo>(getDefaultServerSetting())
-    const [fileUploadSettings, setFileUploadSettings] = useState<FileUploadSetting[]>([])
-    const { setItem, getItem, removeItem } = useIndexedDB({ clientType: props.clientType })
-
-
-    // clientTypeが新しく設定されたときに、serverのmodelType動作を変更＋設定反映
-    useEffect(() => {
-        if (!props.voiceChangerClient) return
-        if (!props.clientType) return
-        const setInitialSetting = async () => {
-            // Set Model Type
-            await props.voiceChangerClient!.switchModelType(props.clientType!)
-
-            // Load Default (and Cache) and set
-            const defaultServerSetting = getDefaultServerSetting()
-            const cachedServerSetting = await getItem(INDEXEDDB_KEY_SERVER)
-            let initialSetting: ServerInfo
-            if (cachedServerSetting) {
-                initialSetting = {
-                    ...defaultServerSetting, ...cachedServerSetting as ServerInfo,
-                    serverAudioStated: 0,
-                    inputSampleRate: 48000
-                }// sample rateは時限措置
-            } else {
-                initialSetting = { ...defaultServerSetting }
-            }
-            setServerSetting(initialSetting)
-
-            // upload setting
-            for (let i = 0; i < Object.values(ServerSettingKey).length; i++) {
-                const k = Object.values(ServerSettingKey)[i] as keyof VoiceChangerServerSetting
-                const v = initialSetting[k]
-                if (v) {
-                    props.voiceChangerClient!.updateServerSettings(k, "" + v)
-                }
-            }
-
-            // Load file upload cache
-            const loadedFileUploadSettings: FileUploadSetting[] = []
-            for (let i = 0; i < MAX_MODEL_SLOT_NUM; i++) {
-                const modleKey = `${INDEXEDDB_KEY_MODEL_DATA}_${i}`
-                const fileuploadSetting = await getItem(modleKey)
-                if (!fileuploadSetting) {
-                    loadedFileUploadSettings.push(InitialFileUploadSetting)
-                } else {
-                    loadedFileUploadSettings.push(fileuploadSetting as FileUploadSetting)
-                }
-            }
-            setFileUploadSettings(loadedFileUploadSettings)
-
-
-            reloadServerInfo()
-        }
-
-        setInitialSetting()
-
-    }, [props.voiceChangerClient, props.clientType])
+    const [serverSetting, setServerSetting] = useState<ServerInfo>(DefaultServerSetting)
 
     //////////////
     // 設定
@@ -249,19 +102,11 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                     setServerSetting(res)
                     const storeData = { ...res }
                     storeData.recordIO = 0
-                    setItem(INDEXEDDB_KEY_SERVER, storeData)
                 }
             }
         }
     }, [props.voiceChangerClient, serverSetting])
 
-    const setFileUploadSetting = useMemo(() => {
-        return async (slot: number, fileUploadSetting: FileUploadSetting) => {
-            fileUploadSetting.uploaded = false
-            fileUploadSettings[slot] = fileUploadSetting
-            setFileUploadSettings([...fileUploadSettings])
-        }
-    }, [fileUploadSettings])
 
 
     //////////////
@@ -335,7 +180,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             await props.voiceChangerClient.uploadAssets(JSON.stringify(assetUploadSetting))
             reloadServerInfo()
         }
-    }, [fileUploadSettings, props.voiceChangerClient, props.clientType])
+    }, [props.voiceChangerClient])
 
 
 
@@ -347,18 +192,8 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             setServerSetting(res)
             const storeData = { ...res }
             storeData.recordIO = 0
-            setItem(INDEXEDDB_KEY_SERVER, storeData)
         }
     }, [props.voiceChangerClient])
-
-    const clearSetting = async () => {
-        await removeItem(INDEXEDDB_KEY_SERVER)
-        await removeItem(INDEXEDDB_KEY_MODEL_DATA)
-        for (let i = 0; i < MAX_MODEL_SLOT_NUM; i++) {
-            const modleKey = `${INDEXEDDB_KEY_MODEL_DATA}_${i}`
-            await removeItem(modleKey)
-        }
-    }
 
 
     const getOnnx = async () => {
@@ -385,11 +220,8 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
     return {
         serverSetting,
         updateServerSettings,
-        clearSetting,
         reloadServerInfo,
 
-        fileUploadSettings,
-        setFileUploadSetting,
         uploadModel,
         uploadProgress,
         isUploading,

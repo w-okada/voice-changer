@@ -1,19 +1,17 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import "./css/App.css"
-import { ErrorInfo, useEffect, useMemo, useState, } from "react";
-import { AppStateProvider } from "./001_provider/001_AppStateProvider";
-
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { far } from "@fortawesome/free-regular-svg-icons";
 import { fab } from "@fortawesome/free-brands-svg-icons";
-import { AppRootProvider, useAppRoot } from "./001_provider/001_AppRootProvider";
+import { ErrorInfo, useEffect, useMemo, useState, } from "react";
+
+import "./css/App.css"
 import ErrorBoundary from "./001_provider/900_ErrorBoundary";
-import { ClientType, useIndexedDB } from "@dannadori/voice-changer-client-js";
-import { INDEXEDDB_KEY_DEFAULT_MODEL_TYPE } from "./const";
+import { AppStateProvider } from "./001_provider/001_AppStateProvider";
+import { AppRootProvider, useAppRoot } from "./001_provider/001_AppRootProvider";
+import { useIndexedDB } from "@dannadori/voice-changer-client-js";
 import { Demo } from "./components/demo/010_Demo";
-import { ClientSelector } from "./001_ClientSelector";
 import { useMessageBuilder } from "./hooks/useMessageBuilder";
 
 library.add(fas, far, fab);
@@ -40,7 +38,7 @@ const App = () => {
 }
 
 const AppStateWrapper = () => {
-    const { appGuiSettingState, clientType, setClientType } = useAppRoot()
+    const { appGuiSettingState, setClientType } = useAppRoot()
     const messageBuilderState = useMessageBuilder()
     // エラーメッセージ登録
     useMemo(() => {
@@ -53,7 +51,7 @@ const AppStateWrapper = () => {
 
     // エラーバウンダリー設定
     const [error, setError] = useState<{ error: Error, errorInfo: ErrorInfo }>()
-    const { getItem, removeDB } = useIndexedDB({ clientType: null })
+    const { removeDB } = useIndexedDB({ clientType: null })
 
 
     const errorComponent = useMemo(() => {
@@ -105,19 +103,15 @@ const AppStateWrapper = () => {
 
     useEffect(() => {
         const loadDefaultModelType = async () => {
-            const defaultModelType = await getItem(INDEXEDDB_KEY_DEFAULT_MODEL_TYPE)
-            if (defaultModelType && defaultModelType != "null") {
-                setClientType(defaultModelType as ClientType)
-            }
+            setClientType("RVC")
         }
         loadDefaultModelType()
     }, [])
 
-    if (!clientType) {
-        return <ClientSelector></ClientSelector>
 
-    } else if (!appGuiSettingState.guiSettingLoaded) {
-        return <></>
+
+    if (!appGuiSettingState.guiSettingLoaded) {
+        return <>a</>
     } else {
         return (
             <ErrorBoundary fallback={errorComponent} onError={updateError}>

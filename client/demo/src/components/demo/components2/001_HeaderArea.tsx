@@ -13,14 +13,12 @@ export type HeaderAreaProps = {
 }
 
 export const HeaderArea = (props: HeaderAreaProps) => {
-    const { appGuiSettingState, setClientType } = useAppRoot()
+    const { appGuiSettingState } = useAppRoot()
     const messageBuilderState = useMessageBuilder()
-    const { clientSetting, clearSetting } = useAppState()
-    const { setIsConverting, isConverting } = useGuiState()
+    const { clearSetting } = useAppState()
 
     const clientType = appGuiSettingState.appGuiSetting.id
     const { removeItem } = useIndexedDB({ clientType: clientType })
-    const { setItem } = useIndexedDB({ clientType: null })
 
     useMemo(() => {
         messageBuilderState.setMessage(__filename, "github", { "ja": "github", "en": "github" })
@@ -125,20 +123,6 @@ export const HeaderArea = (props: HeaderAreaProps) => {
             await removeItem(INDEXEDDB_KEY_AUDIO_OUTPUT)
             location.reload()
         }
-        const onReloadClicked = async () => {
-            location.reload()
-        }
-        const onReselectVCClicked = async () => {
-            setIsConverting(false)
-            if (isConverting) {
-                await clientSetting.stop()
-                setIsConverting(false)
-            }
-            setItem(INDEXEDDB_KEY_DEFAULT_MODEL_TYPE, "null")
-            setClientType(null)
-            appGuiSettingState.clearAppGuiSetting()
-
-        }
 
         return (
             <div className="headerArea">
@@ -158,8 +142,8 @@ export const HeaderArea = (props: HeaderAreaProps) => {
                     </span>
                     <span className="belongings">
                         <div className="belongings-button" onClick={onClearSettingClicked}>clear setting</div>
-                        <div className="belongings-button" onClick={onReloadClicked}>reload</div>
-                        <div className="belongings-button" onClick={onReselectVCClicked}>select vc</div>
+                        {/* <div className="belongings-button" onClick={onReloadClicked}>reload</div>
+                        <div className="belongings-button" onClick={onReselectVCClicked}>select vc</div> */}
                     </span>
                 </div>
 
