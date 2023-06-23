@@ -24,7 +24,7 @@ from const import (
 )
 import subprocess
 import multiprocessing as mp
-from misc.log_control import setup_loggers
+from mods.log_control import setup_loggers
 
 setup_loggers()
 
