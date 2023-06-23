@@ -16,9 +16,7 @@ VoiceChangerType: TypeAlias = Literal[
 ModelType: TypeAlias = Literal[
     "MMVCv15",
     "MMVCv13",
-    "so-vits-svc-40v2",
     "so-vits-svc-40",
-    "so-vits-svc-40_c",
     "DDSP-SVC",
     "RVC",
 ]

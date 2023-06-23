@@ -8,8 +8,6 @@ export const ClientType = {
     "MMVCv15": "MMVCv15",
     "MMVCv13": "MMVCv13",
     "so-vits-svc-40": "so-vits-svc-40",
-    "so-vits-svc-40_c": "so-vits-svc-40_c",
-    "so-vits-svc-40v2": "so-vits-svc-40v2",
     "DDSP-SVC": "DDSP-SVC",
     "RVC": "RVC"
 
@@ -21,8 +19,6 @@ export const VoiceChangerType = {
     "MMVCv15": "MMVCv15",
     "MMVCv13": "MMVCv13",
     "so-vits-svc-40": "so-vits-svc-40",
-    "so-vits-svc-40_c": "so-vits-svc-40_c",
-    "so-vits-svc-40v2": "so-vits-svc-40v2",
     "DDSP-SVC": "DDSP-SVC",
     "RVC": "RVC"
 
@@ -413,13 +409,6 @@ export const DefaultServerSetting_so_vits_svc_40: ServerInfo = {
     ...DefaultServerSetting, tran: 10, noiseScale: 0.3, extraConvertSize: 1024 * 8, clusterInferRatio: 0.1,
 }
 
-export const DefaultServerSetting_so_vits_svc_40_c: ServerInfo = {
-    ...DefaultServerSetting, tran: 10, noiseScale: 0.3, extraConvertSize: 1024 * 8, clusterInferRatio: 0.1,
-}
-export const DefaultServerSetting_so_vits_svc_40v2: ServerInfo = {
-    ...DefaultServerSetting, tran: 10, noiseScale: 0.3, extraConvertSize: 1024 * 8, clusterInferRatio: 0.1,
-}
-
 export const DefaultServerSetting_DDSP_SVC: ServerInfo = {
     ...DefaultServerSetting, dstId: 1, tran: 10, extraConvertSize: 1024 * 8
 }
@@ -482,10 +471,6 @@ export const DefaultWorkletNodeSetting: WorkletNodeSetting = {
 }
 
 export const DefaultWorkletNodeSetting_so_vits_svc_40: WorkletNodeSetting = {
-    ...DefaultWorkletNodeSetting, inputChunkNum: 128,
-}
-
-export const DefaultWorkletNodeSetting_so_vits_svc_40v2: WorkletNodeSetting = {
     ...DefaultWorkletNodeSetting, inputChunkNum: 128,
 }
 

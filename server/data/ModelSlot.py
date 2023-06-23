@@ -24,7 +24,7 @@ class RVCModelSlot(ModelSlot):
     modelFile: str = ""
     indexFile: str = ""
     defaultTune: int = 0
-    defaultIndexRatio: int = 1
+    defaultIndexRatio: int = 0
     defaultProtect: float = 0.5
     isONNX: bool = False
     modelType: str = EnumInferenceTypes.pyTorchRVC.value
