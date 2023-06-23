@@ -217,6 +217,7 @@ type ModelSlot = {
     credit: string,
     termsOfUseUrl: string,
     iconFile: string
+    speakers: { [key: number]: string }
 }
 
 export type RVCModelSlot = ModelSlot & {
@@ -240,6 +241,7 @@ export type MMVCv13ModelSlot = ModelSlot & {
     dstId: number
 
     samplingRate: number
+    speakers: { [key: number]: string }
 }
 
 export type MMVCv15ModelSlot = ModelSlot & {
@@ -249,6 +251,7 @@ export type MMVCv15ModelSlot = ModelSlot & {
     dstId: number
     f0Factor: number
     samplingRate: number
+
 }
 
 export type SoVitsSvc40ModelSlot = ModelSlot & {
@@ -262,6 +265,7 @@ export type SoVitsSvc40ModelSlot = ModelSlot & {
     defaultTune: number
     defaultClusterInferRatio: number
     noiseScale: number
+    speakers: { [key: number]: string }
 }
 
 export type DDSPSVCModelSlot = ModelSlot & {
@@ -278,6 +282,7 @@ export type DDSPSVCModelSlot = ModelSlot & {
     diffusion: boolean
     acc: number
     kstep: number
+    speakers: { [key: number]: string }
 }
 
 export type ModelSlotUnion = RVCModelSlot | MMVCv13ModelSlot | MMVCv15ModelSlot | SoVitsSvc40ModelSlot | DDSPSVCModelSlot

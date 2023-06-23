@@ -3,6 +3,7 @@ import { useGuiState } from "./001_GuiStateProvider";
 import { MainScreen } from "./904-1_MainScreen";
 import { SampleDownloaderScreen } from "./904-2_SampleDownloader";
 import { FileUploaderScreen } from "./904-3_FileUploader";
+import { EditorScreen } from "./904-4_Editor";
 
 export type uploadData = {
     slot: number
@@ -19,7 +20,8 @@ export type ModelSlotSettingMode = typeof ModelSlotSettingMode[keyof typeof Mode
 export const ModelSlotManagerDialogScreen = {
     "Main": "Main",
     "SampleDownloader": "SampleDownloader",
-    "FileUploader": "FileUploader"
+    "FileUploader": "FileUploader",
+    "Editor": "Editor"
 } as const
 export type ModelSlotManagerDialogScreen = typeof ModelSlotManagerDialogScreen[keyof typeof ModelSlotManagerDialogScreen]
 
@@ -33,13 +35,17 @@ export const ModelSlotManagerDialog = () => {
         const close = () => { guiState.stateControls.showModelSlotManagerCheckbox.updateState(false) }
         const openSampleDownloader = (index: number) => { setTargetIndex(index); setScreen("SampleDownloader") }
         const openFileUploader = (index: number) => { setTargetIndex(index); setScreen("FileUploader") }
+        const openEditor = (index: number) => { setTargetIndex(index); setScreen("Editor") }
+
         const backToSlotManager = () => { setScreen("Main") }
         const mainScreen = (
             <MainScreen
                 screen={screen}
                 close={close}
                 openSampleDownloader={openSampleDownloader}
-                openFileUploader={openFileUploader} />
+                openFileUploader={openFileUploader}
+                openEditor={openEditor}
+            />
         )
         const sampleDownloaderScreen = (
             <SampleDownloaderScreen
@@ -55,11 +61,19 @@ export const ModelSlotManagerDialog = () => {
                 close={close}
                 backToSlotManager={backToSlotManager} />
         )
+        const editorScreen = (
+            <EditorScreen
+                screen={screen}
+                targetIndex={targetIndex}
+                close={close}
+                backToSlotManager={backToSlotManager} />
+        )
         return (
             <div className="dialog-frame">
                 {mainScreen}
                 {sampleDownloaderScreen}
                 {fileUploaderScreen}
+                {editorScreen}
             </div>
         )
     }, [screen, targetIndex])

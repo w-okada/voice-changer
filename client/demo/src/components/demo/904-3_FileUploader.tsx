@@ -170,7 +170,9 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
                                 return
                             }
                             if (checkModelSetting(uploadSetting)) {
-                                serverSetting.uploadModel(uploadSetting)
+                                serverSetting.uploadModel(uploadSetting).then(() => {
+                                    props.backToSlotManager()
+                                })
                             } else {
                                 const errorMessage = messageBuilderState.getMessage(__filename, "alert-model-file")
                                 alert(errorMessage)

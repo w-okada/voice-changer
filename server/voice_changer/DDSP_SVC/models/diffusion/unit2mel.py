@@ -1,5 +1,5 @@
 import os
-import yaml
+import yaml  # type: ignore
 import torch
 import torch.nn as nn
 import numpy as np
@@ -9,12 +9,12 @@ from .vocoder import Vocoder
 
 
 class DotDict(dict):
-    def __getattr__(*args):
+    def __getattr__(*args):  # type: ignore
         val = dict.get(*args)
         return DotDict(val) if type(val) is dict else val
 
-    __setattr__ = dict.__setitem__
-    __delattr__ = dict.__delitem__
+    __setattr__ = dict.__setitem__  # type: ignore
+    __delattr__ = dict.__delitem__  # type: ignore
 
 
 def load_model_vocoder(model_path, device="cpu"):

@@ -40,11 +40,13 @@ class ModelSlotManager:
         print("[Voice Changer] UPDATE MODEL INFO", newData)
         newDataDict = json.loads(newData)
         slotInfo = self._load_model_slot(newDataDict["slot"])
-        setattr(slotInfo, newDataDict["key"], newDataDict["val"])
+        if newDataDict["key"] == "speakers":
+            setattr(slotInfo, newDataDict["key"], json.loads(newDataDict["val"]))
+        else:
+            setattr(slotInfo, newDataDict["key"], newDataDict["val"])
         self._save_model_slot(newDataDict["slot"], slotInfo)
 
     def store_model_assets(self, params: str):
-        print("[Voice Changer] UPLOAD ASSETS", params)
         paramsDict = json.loads(params)
         uploadPath = os.path.join(UPLOAD_DIR, paramsDict["file"])
         storeDir = os.path.join(self.model_dir, str(paramsDict["slot"]))

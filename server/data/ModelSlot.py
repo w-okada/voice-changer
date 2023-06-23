@@ -1,7 +1,7 @@
 from typing import TypeAlias, Union
 from const import MAX_SLOT_NUM, EnumInferenceTypes, EnumEmbedderTypes, VoiceChangerType
 
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 
 import os
 import json
@@ -15,6 +15,7 @@ class ModelSlot:
     credit: str = ""
     termsOfUseUrl: str = ""
     iconFile: str = ""
+    speakers: dict = field(default_factory=lambda: {})
 
 
 @dataclass
@@ -36,6 +37,7 @@ class RVCModelSlot(ModelSlot):
     embedder: str = EnumEmbedderTypes.hubert.value
 
     sampleId: str = ""
+    speakers: dict = field(default_factory=lambda: {0: "target"})
 
 
 @dataclass
@@ -47,6 +49,7 @@ class MMVCv13ModelSlot(ModelSlot):
     dstId: int = 100
     isONNX: bool = False
     samplingRate: int = 24000
+    speakers: dict = field(default_factory=lambda: {107: "user", 100: "zundamon", 101: "sora", 102: "methane", 103: "tsumugi"})
 
 
 @dataclass
@@ -59,6 +62,7 @@ class MMVCv15ModelSlot(ModelSlot):
     f0Factor: float = 1.0
     isONNX: bool = False
     samplingRate: int = 24000
+    speakers: dict = field(default_factory=lambda: {0: "user", 101: "zundamon", 102: "sora", 103: "methane", 104: "tsumugi"})
 
 
 @dataclass
@@ -75,6 +79,7 @@ class SoVitsSvc40ModelSlot(ModelSlot):
     defaultTune: int = 0
     defaultClusterInferRatio: float = 0.0
     noiseScale: float = 0.0
+    speakers: dict = field(default_factory=lambda: {1: "user"})
 
 
 @dataclass
@@ -93,6 +98,7 @@ class DDSPSVCModelSlot(ModelSlot):
     diffusion: bool = True
     acc: int = 20
     kstep: int = 100
+    speakers: dict = field(default_factory=lambda: {1: "user"})
 
 
 ModelSlots: TypeAlias = Union[ModelSlot, RVCModelSlot, MMVCv13ModelSlot, MMVCv15ModelSlot, SoVitsSvc40ModelSlot, DDSPSVCModelSlot]

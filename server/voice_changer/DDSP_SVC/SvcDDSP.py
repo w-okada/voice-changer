@@ -119,7 +119,6 @@ class SvcDDSP:
         audio_t = torch.from_numpy(audio).float().unsqueeze(0).to(self.device)
 
         # extract f0
-        print("pitch_extractor_type", pitch_extractor_type)
         pitch_extractor = F0_Extractor(pitch_extractor_type, sample_rate, hop_size, float(f0_min), float(f0_max))
         f0 = pitch_extractor.extract(audio, uv_interp=True, device=self.device, silence_front=silence_front)
         f0 = torch.from_numpy(f0).float().to(self.device).unsqueeze(-1).unsqueeze(0)

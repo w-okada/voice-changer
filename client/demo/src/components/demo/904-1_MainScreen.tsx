@@ -11,6 +11,7 @@ export type MainScreenProps = {
     close: () => void
     openSampleDownloader: (slotIndex: number) => void
     openFileUploader: (slotIndex: number) => void
+    openEditor: (slotIndex: number) => void
 }
 
 
@@ -25,6 +26,7 @@ export const MainScreen = (props: MainScreenProps) => {
         messageBuilderState.setMessage(__filename, "terms_of_use", { "ja": "利用規約", "en": "terms of use" })
         messageBuilderState.setMessage(__filename, "sample", { "ja": "サンプル", "en": "DL sample" })
         messageBuilderState.setMessage(__filename, "upload", { "ja": "アップロード", "en": "upload" })
+        messageBuilderState.setMessage(__filename, "edit", { "ja": "編集", "en": "edit" })
         messageBuilderState.setMessage(__filename, "close", { "ja": "閉じる", "en": "close" })
     }, [])
 
@@ -219,6 +221,7 @@ export const MainScreen = (props: MainScreenProps) => {
                     <div className="model-slot-buttons">
                         <div className="model-slot-button" onClick={() => { props.openFileUploader(index) }} >{messageBuilderState.getMessage(__filename, "upload")}</div>
                         <div className="model-slot-button" onClick={() => { props.openSampleDownloader(index) }} >{messageBuilderState.getMessage(__filename, "sample")}</div>
+                        <div className="model-slot-button" onClick={() => { props.openEditor(index) }} >{messageBuilderState.getMessage(__filename, "edit")}</div>
                     </div>
                 </div >
             )

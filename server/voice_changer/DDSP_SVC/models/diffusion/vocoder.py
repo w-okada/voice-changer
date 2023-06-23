@@ -1,7 +1,7 @@
 import torch
 from torchaudio.transforms import Resample
-from ..nsf_hifigan.nvSTFT import STFT
-from ..nsf_hifigan.models import load_model, load_config
+from ..nsf_hifigan.nvSTFT import STFT  # type: ignore
+from ..nsf_hifigan.models import load_model, load_config  # type: ignore
 
 
 class Vocoder:

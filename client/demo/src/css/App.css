@@ -870,7 +870,8 @@ body {
                 }
             }
 
-            .file-uploader-voice-changer-select {
+            .file-uploader-voice-changer-select,
+            .edit-model-slot-title {
                 font-size: 1rem;
                 padding-left: 0.5rem;
             }
@@ -920,6 +921,39 @@ body {
                     padding: 1px 10px 1px 10px;
                     &:hover {
                         border: solid 1px #000;
+                    }
+                }
+            }
+            .edit-model-slot-row {
+                display: flex;
+                flex-direction: row;
+                .edit-model-slot-title {
+                }
+                .edit-model-slot-speakers {
+                    display: flex;
+                    flex-direction: row;
+                    margin: 0px 0px 0px 1rem;
+                    .edit-model-slot-speakers-id-label,
+                    .edit-model-slot-speakers-name-label {
+                        margin: 0px 0px 0px 0.5rem;
+                    }
+                    .edit-model-slot-speakers-buttons {
+                        margin: 0px 0px 0px 0.5rem;
+                        display: flex;
+                        flex-direction: row;
+                        .edit-model-slot-speakers-button {
+                            margin: 0px 0.5rem 0px 0.5rem;
+                            user-select: none;
+                            border: solid 1px #999;
+                            border-radius: 2px;
+                            cursor: pointer;
+                            vertical-align: middle;
+                            text-align: center;
+                            padding: 0px 10px 0px 10px;
+                            &:hover {
+                                border: solid 1px #000;
+                            }
+                        }
                     }
                 }
             }
@@ -1250,8 +1284,9 @@ body {
                     }
                 }
             }
+
             .character-area-control-title {
-                width: 3rem;
+                width: 4rem;
                 font-weight: 700;
             }
             .character-area-control-field {

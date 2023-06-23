@@ -3,6 +3,12 @@ import { useAppState } from "../../../001_provider/001_AppStateProvider"
 import { useGuiState } from "../001_GuiStateProvider"
 import { OnnxExporterInfo } from "@dannadori/voice-changer-client-js"
 import { useMessageBuilder } from "../../../hooks/useMessageBuilder"
+import { TuningArea } from "./101-1_TuningArea"
+import { IndexArea } from "./101-2_IndexArea"
+import { SpeakerArea } from "./101-3_SpeakerArea"
+import { F0FactorArea } from "./101-4_F0FactorArea"
+import { SoVitsSVC40SettingArea } from "./101-5_so-vits-svc40SettingArea"
+import { DDSPSVC30SettingArea } from "./101-6_ddsp-svc30SettingArea"
 
 export type CharacterAreaProps = {
 }
@@ -178,60 +184,6 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
         )
     }, [serverSetting.serverSetting, clientSetting.clientSetting, clientSetting.updateClientSetting, serverSetting.updateServerSettings])
 
-    const tuningCotrol = useMemo(() => {
-        const currentTuning = serverSetting.serverSetting.tran
-        const tranValueUpdatedAction = async (val: number) => {
-            await serverSetting.updateServerSettings({ ...serverSetting.serverSetting, tran: val })
-        }
-
-        return (
-            <div className="character-area-control">
-                <div className="character-area-control-title">
-                    TUNE:
-                </div>
-                <div className="character-area-control-field">
-                    <div className="character-area-slider-control">
-                        <span className="character-area-slider-control-kind"></span>
-                        <span className="character-area-slider-control-slider">
-                            <input type="range" min="-50" max="50" step="1" value={currentTuning} onChange={(e) => {
-                                tranValueUpdatedAction(Number(e.target.value))
-                            }}></input>
-                        </span>
-                        <span className="character-area-slider-control-val">{currentTuning}</span>
-                    </div>
-
-                </div>
-            </div>
-        )
-    }, [serverSetting.serverSetting, clientSetting.updateClientSetting])
-
-
-    const indexCotrol = useMemo(() => {
-        const currentIndexRatio = serverSetting.serverSetting.indexRatio
-        const indexRatioValueUpdatedAction = async (val: number) => {
-            await serverSetting.updateServerSettings({ ...serverSetting.serverSetting, indexRatio: val })
-        }
-
-        return (
-            <div className="character-area-control">
-                <div className="character-area-control-title">
-                    INDEX:
-                </div>
-                <div className="character-area-control-field">
-                    <div className="character-area-slider-control">
-                        <span className="character-area-slider-control-kind"></span>
-                        <span className="character-area-slider-control-slider">
-                            <input type="range" min="0" max="1" step="0.1" value={currentIndexRatio} onChange={(e) => {
-                                indexRatioValueUpdatedAction(Number(e.target.value))
-                            }}></input>
-                        </span>
-                        <span className="character-area-slider-control-val">{currentIndexRatio}</span>
-                    </div>
-
-                </div>
-            </div>
-        )
-    }, [serverSetting.serverSetting, clientSetting.updateClientSetting])
 
 
     const modelSlotControl = useMemo(() => {
@@ -261,7 +213,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
 
         }
 
-        const exportOnnx = selected.modelFile.endsWith("pth") ? (
+        const exportOnnx = selected.voiceChangerType == "RVC" && selected.modelFile.endsWith("pth") ? (
             <div className="character-area-button" onClick={onnxExportButtonAction}>{messageBuilderState.getMessage(__filename, "export_to_onnx")}</div>
         ) : <></>
         return (
@@ -286,13 +238,17 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
                 <div className="character-area-control-area">
                     {startControl}
                     {gainControl}
-                    {tuningCotrol}
-                    {indexCotrol}
+                    <TuningArea />
+                    <IndexArea />
+                    <SpeakerArea />
+                    <F0FactorArea />
+                    <SoVitsSVC40SettingArea />
+                    <DDSPSVC30SettingArea />
                     {modelSlotControl}
                 </div>
             </div>
         )
-    }, [portrait, startControl, gainControl, tuningCotrol, modelSlotControl])
+    }, [portrait, startControl, gainControl, modelSlotControl])
 
     return characterArea
 }

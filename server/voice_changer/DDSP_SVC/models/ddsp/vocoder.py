@@ -1,6 +1,6 @@
 import os
 import numpy as np
-import yaml
+import yaml  # type: ignore
 import torch
 import torch.nn.functional as F
 import pyworld as pw
@@ -72,7 +72,7 @@ class F0_Extractor:
             f0 = np.pad(f0, (start_frame, 0))
 
         else:
-            raise ValueError(f" [x] Unknown f0 extractor: {f0_extractor}")
+            raise ValueError(f" [x] Unknown f0 extractor: {f0_extractor}")  # NOQA # type: ignore
 
         # interpolate the unvoiced f0
         if uv_interp:
@@ -410,12 +410,12 @@ class Audio2HubertLarge1024L24:
 
 
 class DotDict(dict):
-    def __getattr__(*args):
+    def __getattr__(*args):  # type: ignore
         val = dict.get(*args)
         return DotDict(val) if type(val) is dict else val
 
-    __setattr__ = dict.__setitem__
-    __delattr__ = dict.__delitem__
+    __setattr__ = dict.__setitem__  # type: ignore
+    __delattr__ = dict.__delitem__  # type: ignore
 
 
 def load_model(model_path, device="cpu"):
