@@ -4,26 +4,25 @@ from torch import device
 from const import EnumInferenceTypes
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
-from .model_v3.models import SynthesizerTrnMs256NSFSid
+from .voras_beta.models import Synthesizer
 
 
-class RVCInferencerv3(Inferencer):
+class VoRASInferencer(Inferencer):
     def loadModel(self, file: str, gpu: device):
-        print("nadare v3 load start")
-        super().setProps(EnumInferenceTypes.pyTorchRVCv3, file, True, gpu)
+        super().setProps(EnumInferenceTypes.pyTorchVoRASbeta, file, False, gpu)
 
         dev = DeviceManager.get_instance().getDevice(gpu)
-        isHalf = False # DeviceManager.get_instance().halfPrecisionAvailable(gpu)
+        self.isHalf = False # DeviceManager.get_instance().halfPrecisionAvailable(gpu)
 
         cpt = torch.load(file, map_location="cpu")
-        model = SynthesizerTrnMs256NSFSid(**cpt["params"])
+        model = Synthesizer(**cpt["params"])
 
         model.eval()
         model.load_state_dict(cpt["weight"], strict=False)
+        model.remove_weight_norm()
+        model.change_speaker(0)
 
         model = model.to(dev)
-        if isHalf:
-            model = model.half()
 
         self.model = model
         print("load model comprete")

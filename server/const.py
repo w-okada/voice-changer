@@ -65,9 +65,9 @@ class EnumInferenceTypes(Enum):
     pyTorchRVCNono = "pyTorchRVCNono"
     pyTorchRVCv2 = "pyTorchRVCv2"
     pyTorchRVCv2Nono = "pyTorchRVCv2Nono"
-    pyTorchRVCv3 = "pyTorchRVCv3"
     pyTorchWebUI = "pyTorchWebUI"
     pyTorchWebUINono = "pyTorchWebUINono"
+    pyTorchVoRASbeta = "pyTorchVoRASbeta"
     onnxRVC = "onnxRVC"
     onnxRVCNono = "onnxRVCNono"
 

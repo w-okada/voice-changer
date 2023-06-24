@@ -8,7 +8,7 @@ from const import EnumInferenceTypes
 class Inferencer(Protocol):
     inferencerType: EnumInferenceTypes = EnumInferenceTypes.pyTorchRVC
     file: str
-    isHalf: bool = True
+    isHalf: bool = False
     gpu: int = 0
 
     model: onnxruntime.InferenceSession | Any | None = None
