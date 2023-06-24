@@ -5,6 +5,7 @@ import { IndexedDBStateAndMethod, useIndexedDB } from "./useIndexedDB"
 import { ServerSettingState, useServerSetting } from "./useServerSetting"
 import { useWorkletNodeSetting, WorkletNodeSettingState } from "./useWorkletNodeSetting"
 import { useWorkletSetting, WorkletSettingState } from "./useWorkletSetting"
+import { DefaultVoiceChangerClientSetting, DefaultWorkletNodeSetting, DefaultWorkletSetting } from "../const"
 
 export type UseClientProps = {
     audioContext: AudioContext | null
@@ -67,9 +68,9 @@ export const useClient = (props: UseClientProps): ClientState => {
 
 
     // (1-2) 各種設定I/F
-    const clientSetting = useClientSetting({ voiceChangerClient, audioContext: props.audioContext })
-    const workletNodeSetting = useWorkletNodeSetting({ voiceChangerClient: voiceChangerClient })
-    const workletSetting = useWorkletSetting({ voiceChangerClient })
+    const clientSetting = useClientSetting({ voiceChangerClient, audioContext: props.audioContext, defaultVoiceChangerClientSetting: DefaultVoiceChangerClientSetting })
+    const workletNodeSetting = useWorkletNodeSetting({ voiceChangerClient: voiceChangerClient, defaultWorkletNodeSetting: DefaultWorkletNodeSetting })
+    const workletSetting = useWorkletSetting({ voiceChangerClient, defaultWorkletSetting: DefaultWorkletSetting })
     const serverSetting = useServerSetting({ voiceChangerClient })
     const indexedDBState = useIndexedDB({ clientType: null })
 
@@ -179,9 +180,7 @@ export const useClient = (props: UseClientProps): ClientState => {
 
 
     const clearSetting = async () => {
-        await clientSetting.clearSetting()
-        await workletNodeSetting.clearSetting()
-        await workletSetting.clearSetting()
+        // TBD
     }
 
     return {
@@ -198,8 +197,6 @@ export const useClient = (props: UseClientProps): ClientState => {
         volume,
         performance,
         updatePerformance,
-
-        // setClientType,
 
         // 情報取得
         getInfo,

@@ -74,7 +74,7 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
             this.numTrancateTreshold = request.numTrancateTreshold
             // this.volTrancateLength = request.volTrancateLength
             // this.volTrancateThreshold = request.volTrancateThreshold
-            console.log("[worklet] worklet configured", request)
+            // console.log("[worklet] worklet configured", request)
             return
         } else if (request.requestType === "start") {
             if (this.isRecording) {

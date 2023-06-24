@@ -459,17 +459,6 @@ export const DefaultWorkletNodeSetting: WorkletNodeSetting = {
     downSamplingMode: "average"
 }
 
-export const DefaultWorkletNodeSetting_so_vits_svc_40: WorkletNodeSetting = {
-    ...DefaultWorkletNodeSetting, inputChunkNum: 128,
-}
-
-export const DefaultWorkletNodeSetting_DDSP_SVC: WorkletNodeSetting = {
-    ...DefaultWorkletNodeSetting, inputChunkNum: 256,
-}
-
-export const DefaultWorkletNodeSetting_RVC: WorkletNodeSetting = {
-    ...DefaultWorkletNodeSetting, inputChunkNum: 256,
-}
 
 ///////////////////////
 // クライアントセッティング
@@ -479,15 +468,6 @@ export const SampleRate = {
 } as const
 export type SampleRate = typeof SampleRate[keyof typeof SampleRate]
 
-export type Speaker = {
-    "id": number,
-    "name": string,
-}
-export type Correspondence = {
-    "sid": number,
-    "correspondence": number,
-    "dirname": string
-}
 export type VoiceChangerClientSetting = {
     audioInput: string | MediaStream | null,
     sampleRate: SampleRate, // 48000Hz
@@ -495,8 +475,6 @@ export type VoiceChangerClientSetting = {
     noiseSuppression: boolean,
     noiseSuppression2: boolean
 
-    speakers: Speaker[],
-    correspondences: Correspondence[],
     inputGain: number
     outputGain: number
 }
@@ -504,29 +482,6 @@ export type VoiceChangerClientSetting = {
 export const DefaultVoiceChangerClientSetting: VoiceChangerClientSetting = {
     audioInput: null,
     sampleRate: 48000,
-    speakers: [
-        {
-            "id": 0,
-            "name": "user"
-        },
-        {
-            "id": 101,
-            "name": "ずんだもん"
-        },
-        {
-            "id": 102,
-            "name": "そら"
-        },
-        {
-            "id": 103,
-            "name": "めたん"
-        },
-        {
-            "id": 104,
-            "name": "つむぎ"
-        }
-    ],
-    correspondences: [],
     echoCancel: false,
     noiseSuppression: false,
     noiseSuppression2: false,
@@ -555,9 +510,7 @@ export const INDEXEDDB_DB_APP_NAME = "INDEXEDDB_KEY_VOICE_CHANGER"
 export const INDEXEDDB_DB_NAME = "INDEXEDDB_KEY_VOICE_CHANGER_DB"
 export const INDEXEDDB_KEY_CLIENT = "INDEXEDDB_KEY_VOICE_CHANGER_LIB_CLIENT"
 export const INDEXEDDB_KEY_SERVER = "INDEXEDDB_KEY_VOICE_CHANGER_LIB_SERVER"
-export const INDEXEDDB_KEY_WORKLETNODE = "INDEXEDDB_KEY_VOICE_CHANGER_LIB_WORKLETNODE"
 export const INDEXEDDB_KEY_MODEL_DATA = "INDEXEDDB_KEY_VOICE_CHANGER_LIB_MODEL_DATA"
-export const INDEXEDDB_KEY_WORKLET = "INDEXEDDB_KEY_VOICE_CHANGER_LIB_WORKLET"
 
 
 // ONNX
@@ -566,9 +519,6 @@ export type OnnxExporterInfo = {
     "path": string
     "filename": string
 }
-
-
-export const MAX_MODEL_SLOT_NUM = 4
 
 // Merge
 export type MergeElement = {

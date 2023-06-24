@@ -1,17 +1,16 @@
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo } from "react"
 
-import { VoiceChangerClientSetting, DefaultVoiceChangerClientSetting, INDEXEDDB_KEY_CLIENT } from "../const"
+import { VoiceChangerClientSetting } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
-import { useIndexedDB } from "./useIndexedDB"
 
 export type UseClientSettingProps = {
     voiceChangerClient: VoiceChangerClient | null
     audioContext: AudioContext | null
+    defaultVoiceChangerClientSetting: VoiceChangerClientSetting
 }
 
 export type ClientSettingState = {
     clientSetting: VoiceChangerClientSetting;
-    clearSetting: () => Promise<void>
     setServerUrl: (url: string) => void;
     updateClientSetting: (clientSetting: VoiceChangerClientSetting) => void
 
@@ -21,53 +20,7 @@ export type ClientSettingState = {
 }
 
 export const useClientSetting = (props: UseClientSettingProps): ClientSettingState => {
-    const [clientSetting, setClientSetting] = useState<VoiceChangerClientSetting>(DefaultVoiceChangerClientSetting)
-    const { setItem, getItem, removeItem } = useIndexedDB({ clientType: null })
-
-    // 初期化 その１ DBから取得
-    useEffect(() => {
-        const loadCache = async () => {
-            const setting = await getItem(INDEXEDDB_KEY_CLIENT) as VoiceChangerClientSetting
-            if (!setting) {
-                return
-            }
-
-            console.log("[ClientSetting] Load Setting from db", setting)
-            if (setting.audioInput == "null") {
-                setting.audioInput = null
-            }
-            if (setting) {
-                setClientSetting({ ...setting })
-            }
-        }
-        loadCache()
-    }, [])
-    // 初期化 その２ クライアントに設定
-    useEffect(() => {
-        const initialSetup = async () => {
-            if (!props.voiceChangerClient) return
-            try {
-                await props.voiceChangerClient.updateClientSetting(clientSetting)
-            } catch (e) {
-                console.error(e)
-            }
-        }
-        initialSetup()
-    }, [props.voiceChangerClient])
-
-
-    const storeSetting = async (setting: VoiceChangerClientSetting) => {
-        const storeData = { ...setting }
-        if (typeof storeData.audioInput != "string") {
-            storeData.audioInput = null
-        }
-        setItem(INDEXEDDB_KEY_CLIENT, storeData)
-        setClientSetting(setting)
-    }
-
-    const clearSetting = async () => {
-        await removeItem(INDEXEDDB_KEY_CLIENT)
-    }
+    const [clientSetting, setClientSetting] = useState<VoiceChangerClientSetting>(props.defaultVoiceChangerClientSetting)
 
     //////////////
     // 設定
@@ -79,7 +32,7 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
                 const cur_v = clientSetting[k as keyof VoiceChangerClientSetting]
                 const new_v = _clientSetting[k as keyof VoiceChangerClientSetting]
                 if (cur_v != new_v) {
-                    storeSetting(_clientSetting)
+                    setClientSetting(_clientSetting)
                     await props.voiceChangerClient.updateClientSetting(_clientSetting)
                     break
                 }
@@ -122,7 +75,6 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
 
     return {
         clientSetting,
-        clearSetting,
         setServerUrl,
         updateClientSetting,
 

@@ -1,16 +1,16 @@
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo } from "react"
 
-import { DefaultWorkletNodeSetting, INDEXEDDB_KEY_WORKLETNODE, WorkletNodeSetting } from "../const"
+import { WorkletNodeSetting } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
-import { useIndexedDB } from "./useIndexedDB"
+
 
 export type UseWorkletNodeSettingProps = {
     voiceChangerClient: VoiceChangerClient | null
+    defaultWorkletNodeSetting: WorkletNodeSetting
 }
 
 export type WorkletNodeSettingState = {
     workletNodeSetting: WorkletNodeSetting;
-    clearSetting: () => Promise<void>
     updateWorkletNodeSetting: (setting: WorkletNodeSetting) => void
     startOutputRecording: () => void
     stopOutputRecording: () => Promise<Float32Array>
@@ -18,36 +18,8 @@ export type WorkletNodeSettingState = {
 }
 
 export const useWorkletNodeSetting = (props: UseWorkletNodeSettingProps): WorkletNodeSettingState => {
-    const defaultWorkletNodeSetting = useMemo(() => {
-        return DefaultWorkletNodeSetting
-    }, [])
 
-    const [workletNodeSetting, _setWorkletNodeSetting] = useState<WorkletNodeSetting>(defaultWorkletNodeSetting)
-    const { setItem, getItem, removeItem } = useIndexedDB({ clientType: null })
-
-    // 初期化 その１ DBから取得
-    useEffect(() => {
-        const loadCache = async () => {
-            const setting = await getItem(INDEXEDDB_KEY_WORKLETNODE) as WorkletNodeSetting
-            if (setting) {
-                _setWorkletNodeSetting({ ...setting, sendingSampleRate: 48000 }) // sample rateは時限措置
-            }
-        }
-        loadCache()
-    }, [])
-
-    // 初期化 その２ クライアントに設定
-    useEffect(() => {
-        if (!props.voiceChangerClient) return
-        props.voiceChangerClient.setServerUrl(workletNodeSetting.serverUrl)
-        props.voiceChangerClient.updateWorkletNodeSetting(workletNodeSetting)
-    }, [props.voiceChangerClient])
-
-
-
-    const clearSetting = async () => {
-        await removeItem(INDEXEDDB_KEY_WORKLETNODE)
-    }
+    const [workletNodeSetting, _setWorkletNodeSetting] = useState<WorkletNodeSetting>(props.defaultWorkletNodeSetting)
 
     //////////////
     // 設定
@@ -61,7 +33,6 @@ export const useWorkletNodeSetting = (props: UseWorkletNodeSettingProps): Workle
                 const new_v = _workletNodeSetting[k as keyof WorkletNodeSetting]
                 if (cur_v != new_v) {
                     _setWorkletNodeSetting(_workletNodeSetting)
-                    setItem(INDEXEDDB_KEY_WORKLETNODE, _workletNodeSetting)
                     props.voiceChangerClient.updateWorkletNodeSetting(_workletNodeSetting)
                     break
                 }
@@ -92,7 +63,6 @@ export const useWorkletNodeSetting = (props: UseWorkletNodeSettingProps): Workle
 
     return {
         workletNodeSetting,
-        clearSetting,
         updateWorkletNodeSetting,
         startOutputRecording,
         stopOutputRecording,
