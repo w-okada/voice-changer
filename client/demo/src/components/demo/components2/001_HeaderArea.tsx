@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
-import { INDEXEDDB_KEY_AUDIO_OUTPUT, INDEXEDDB_KEY_DEFAULT_MODEL_TYPE, isDesktopApp } from "../../../const";
-import { useGuiState } from "../001_GuiStateProvider";
+import { INDEXEDDB_KEY_AUDIO_OUTPUT, isDesktopApp } from "../../../const";
 import { useAppRoot } from "../../../001_provider/001_AppRootProvider";
 import { useAppState } from "../../../001_provider/001_AppStateProvider";
 import { useIndexedDB } from "@dannadori/voice-changer-client-js";

@@ -34,7 +34,6 @@ export type StateControls = {
     openAdvancedSettingCheckbox: StateControlCheckbox
     openLabCheckbox: StateControlCheckbox
 
-    showLicenseCheckbox: StateControlCheckbox
     showWaitingCheckbox: StateControlCheckbox
     showStartingNoticeCheckbox: StateControlCheckbox
     showModelSlotManagerCheckbox: StateControlCheckbox
@@ -165,7 +164,6 @@ export const GuiStateProvider = ({ children }: Props) => {
     const openAdvancedSettingCheckbox = useStateControlCheckbox(OpenAdvancedSettingCheckbox);
     const openLabCheckbox = useStateControlCheckbox(OpenLabCheckbox);
 
-    const showLicenseCheckbox = useStateControlCheckbox(OpenLicenseDialogCheckbox);
     const showWaitingCheckbox = useStateControlCheckbox(OpenWaitingDialogCheckbox);
     const showStartingNoticeCheckbox = useStateControlCheckbox(OpenStartingNoticeDialogCheckbox);
     const showModelSlotManagerCheckbox = useStateControlCheckbox(OpenModelSlotManagerDialogCheckbox);
@@ -187,7 +185,6 @@ export const GuiStateProvider = ({ children }: Props) => {
         openAdvancedSettingCheckbox.updateState(false)
 
 
-        showLicenseCheckbox.updateState(false)
         showWaitingCheckbox.updateState(false)
 
 
@@ -233,7 +230,6 @@ export const GuiStateProvider = ({ children }: Props) => {
             openAdvancedSettingCheckbox,
             openLabCheckbox,
 
-            showLicenseCheckbox,
             showWaitingCheckbox,
             showStartingNoticeCheckbox,
             showModelSlotManagerCheckbox,

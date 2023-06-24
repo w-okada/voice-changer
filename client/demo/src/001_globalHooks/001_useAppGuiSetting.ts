@@ -7,36 +7,9 @@ export type AppGuiDemoSetting = {
     type: "demo",
     id: ClientType,
     front: {
-        "title": GuiComponentSetting[],
-        "serverControl": GuiComponentSetting[],
-        "modelSetting": GuiComponentSetting[],
-        "deviceSetting": GuiComponentSetting[],
-        "qualityControl": GuiComponentSetting[],
-        "speakerSetting": GuiComponentSetting[],
-        "converterSetting": GuiComponentSetting[],
-        "advancedSetting": GuiComponentSetting[],
-        "lab": GuiComponentSetting[],
         "modelSlotControl": GuiComponentSetting[],
-    },
-    dialogs: {
-        "license": { title: string, auther: string, contact: string, url: string, license: string }[]
     }
 }
-
-// export type AppGuiDemoSetting2 = {
-//     type: "demo",
-//     id: ClientType,
-//     front: GuiSectionSetting[],
-//     dialogs: {
-//         "license": { title: string, auther: string, contact: string, url: string, license: string }[]
-//     }
-// }
-
-
-// export type GuiSectionSetting = {
-//     "title": string,
-//     "components": GuiComponentSetting[]
-// }
 
 export type GuiComponentSetting = {
     "name": string,
@@ -47,20 +20,7 @@ const InitialAppGuiDemoSetting: AppGuiDemoSetting = {
     type: "demo",
     id: ClientType.MMVCv13,
     front: {
-        "title": [],
-        "serverControl": [],
-        "modelSetting": [],
-        "deviceSetting": [],
-        "qualityControl": [],
-        "speakerSetting": [],
-        "converterSetting": [],
-        "advancedSetting": [],
-        "lab": [],
         "modelSlotControl": []
-    },
-    dialogs: {
-        "license": [{ title: "", auther: "", contact: "", url: "", license: "MIT" }]
-
     }
 }
 

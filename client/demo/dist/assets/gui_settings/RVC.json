@@ -2,16 +2,6 @@
     "type": "demo",
     "id": "RVC",
     "front": {
-        "title": [],
-        "serverControl": [],
-        "modelSetting": [],
-        "lab": [],
-
-        "deviceSetting": [],
-        "qualityControl": [],
-        "speakerSetting": [],
-        "converterSetting": [],
-        "advancedSetting": [],
         "modelSlotControl": [
             {
                 "name": "headerArea",
@@ -34,18 +24,6 @@
                     "detectors": ["dio", "harvest", "crepe"],
                     "inputChunkNums": [8, 16, 24, 32, 40, 48, 64, 80, 96, 112, 128, 192, 256, 320, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960, 1024, 2048]
                 }
-            }
-        ]
-    },
-
-    "dialogs": {
-        "license": [
-            {
-                "title": "Retrieval-based-Voice-Conversion-WebUI",
-                "auther": "liujing04",
-                "contact": "",
-                "url": "https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI",
-                "license": "MIT"
             }
         ]
     }
