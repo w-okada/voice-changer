@@ -38,7 +38,7 @@ const App = () => {
 }
 
 const AppStateWrapper = () => {
-    const { appGuiSettingState, setClientType } = useAppRoot()
+    const { appGuiSettingState, getGUISetting } = useAppRoot()
     const messageBuilderState = useMessageBuilder()
     // エラーメッセージ登録
     useMemo(() => {
@@ -103,7 +103,7 @@ const AppStateWrapper = () => {
 
     useEffect(() => {
         const loadDefaultModelType = async () => {
-            setClientType("RVC")
+            getGUISetting()
         }
         loadDefaultModelType()
     }, [])
@@ -111,7 +111,7 @@ const AppStateWrapper = () => {
 
 
     if (!appGuiSettingState.guiSettingLoaded) {
-        return <>a</>
+        return <>loading...</>
     } else {
         return (
             <ErrorBoundary fallback={errorComponent} onError={updateError}>

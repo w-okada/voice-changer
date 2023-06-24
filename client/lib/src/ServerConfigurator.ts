@@ -1,4 +1,4 @@
-import { ClientType, MergeModelRequest, OnnxExporterInfo, ServerInfo, ServerSettingKey } from "./const";
+import { MergeModelRequest, OnnxExporterInfo, ServerInfo, ServerSettingKey } from "./const";
 
 
 type FileChunk = {
@@ -193,22 +193,6 @@ export class ServerConfigurator {
         const info = new Promise<ServerInfo>(async (resolve) => {
             const formData = new FormData();
             formData.append("params", params);
-
-            const request = new Request(url, {
-                method: 'POST',
-                body: formData,
-            });
-            const res = await (await fetch(request)).json() as ServerInfo
-            resolve(res)
-        })
-        return await info
-    }
-
-    switchModelType = async (clinetType: ClientType) => {
-        const url = this.serverUrl + "/model_type"
-        const info = new Promise<ServerInfo>(async (resolve) => {
-            const formData = new FormData();
-            formData.append("modelType", clinetType);
 
             const request = new Request(url, {
                 method: 'POST',

@@ -25,7 +25,7 @@ export const useAppState = (): AppStateValue => {
 
 export const AppStateProvider = ({ children }: Props) => {
     const appRoot = useAppRoot()
-    const clientState = useVCClient({ audioContext: appRoot.audioContextState.audioContext, clientType: appRoot.clientType })
+    const clientState = useVCClient({ audioContext: appRoot.audioContextState.audioContext })
     const messageBuilderState = useMessageBuilder()
 
     useEffect(() => {

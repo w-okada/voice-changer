@@ -16,8 +16,7 @@ export const HeaderArea = (props: HeaderAreaProps) => {
     const messageBuilderState = useMessageBuilder()
     const { clearSetting } = useAppState()
 
-    const clientType = appGuiSettingState.appGuiSetting.id
-    const { removeItem } = useIndexedDB({ clientType: clientType })
+    const { removeItem } = useIndexedDB({ clientType: null })
 
     useMemo(() => {
         messageBuilderState.setMessage(__filename, "github", { "ja": "github", "en": "github" })

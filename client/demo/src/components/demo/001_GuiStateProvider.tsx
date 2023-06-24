@@ -87,7 +87,7 @@ type TextInputResolveType = {
 }
 
 export const GuiStateProvider = ({ children }: Props) => {
-    const { clientType, appGuiSettingState } = useAppRoot()
+    const { appGuiSettingState } = useAppRoot()
     const [isConverting, setIsConverting] = useState<boolean>(false)
     const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false)
     const [modelSlotNum, setModelSlotNum] = useState<number>(0)
@@ -213,10 +213,6 @@ export const GuiStateProvider = ({ children }: Props) => {
         setTimeout(show)
     }, [appGuiSettingState.edition])
 
-
-    useEffect(() => {
-        setModelSlotNum(0)
-    }, [clientType])
 
 
     const providerValue = {

@@ -1,8 +1,7 @@
-import { ClientState, useClient, ClientType } from "@dannadori/voice-changer-client-js"
+import { ClientState, useClient } from "@dannadori/voice-changer-client-js"
 
 export type UseVCClientProps = {
     audioContext: AudioContext | null
-    clientType: ClientType | null
 }
 
 export type VCClientState = {
@@ -11,16 +10,8 @@ export type VCClientState = {
 
 export const useVCClient = (props: UseVCClientProps): VCClientState => {
     const clientState = useClient({
-        audioContext: props.audioContext,
-        clientType: props.clientType,
-
+        audioContext: props.audioContext
     })
-
-
-    // const setClientType = (clientType: ClientType) => {
-    //     console.log("SET CLIENT TYPE", clientType)
-    //     clientState.setClientType(clientType)
-    // }
 
     const ret: VCClientState = {
         clientState

@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react"
-import { ClientType } from "@dannadori/voice-changer-client-js"
 
-export type AppGuiSetting = AppGuiDemoSetting
-
-export type AppGuiDemoSetting = {
+export type AppGuiSetting = {
     type: "demo",
-    id: ClientType,
     front: {
         "modelSlotControl": GuiComponentSetting[],
     }
@@ -16,9 +12,8 @@ export type GuiComponentSetting = {
     "options": any
 }
 
-const InitialAppGuiDemoSetting: AppGuiDemoSetting = {
+const InitialAppGuiDemoSetting: AppGuiSetting = {
     type: "demo",
-    id: ClientType.MMVCv13,
     front: {
         "modelSlotControl": []
     }

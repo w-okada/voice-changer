@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react"
-import { ClientType } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
 import { ClientSettingState, useClientSetting } from "./useClientSetting"
 import { IndexedDBStateAndMethod, useIndexedDB } from "./useIndexedDB"
@@ -9,7 +8,6 @@ import { useWorkletSetting, WorkletSettingState } from "./useWorkletSetting"
 
 export type UseClientProps = {
     audioContext: AudioContext | null
-    clientType: ClientType | null
 }
 
 export type ClientState = {
@@ -69,11 +67,11 @@ export const useClient = (props: UseClientProps): ClientState => {
 
 
     // (1-2) 各種設定I/F
-    const clientSetting = useClientSetting({ clientType: props.clientType, voiceChangerClient, audioContext: props.audioContext })
-    const workletNodeSetting = useWorkletNodeSetting({ clientType: props.clientType, voiceChangerClient })
-    const workletSetting = useWorkletSetting({ clientType: props.clientType, voiceChangerClient })
+    const clientSetting = useClientSetting({ voiceChangerClient, audioContext: props.audioContext })
+    const workletNodeSetting = useWorkletNodeSetting({ voiceChangerClient: voiceChangerClient })
+    const workletSetting = useWorkletSetting({ voiceChangerClient })
     const serverSetting = useServerSetting({ voiceChangerClient })
-    const indexedDBState = useIndexedDB({ clientType: props.clientType })
+    const indexedDBState = useIndexedDB({ clientType: null })
 
 
     // (1-3) モニタリングデータ

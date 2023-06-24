@@ -1,9 +1,9 @@
 import localForage from "localforage";
 import { useMemo } from "react";
-import { ClientType, INDEXEDDB_DB_APP_NAME, INDEXEDDB_DB_NAME } from "../const";
+import { INDEXEDDB_DB_APP_NAME, INDEXEDDB_DB_NAME } from "../const";
 
 export type UseIndexedDBProps = {
-    clientType: ClientType | null
+    clientType: null
 }
 export type IndexedDBState = {
     dummy: string
