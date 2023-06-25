@@ -10,6 +10,7 @@ from voice_changer.RVC.inferencer.WebUIInferencer import WebUIInferencer
 from voice_changer.RVC.inferencer.WebUIInferencerNono import WebUIInferencerNono
 from voice_changer.RVC.inferencer.VorasInferencebeta import VoRASInferencer
 
+
 class InferencerManager:
     currentInferencer: Inferencer | None = None
 

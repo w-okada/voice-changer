@@ -23,9 +23,7 @@ def convert_pad_shape(pad_shape):
 def kl_divergence(m_p, logs_p, m_q, logs_q):
     """KL(P||Q)"""
     kl = (logs_q - logs_p) - 0.5
-    kl += (
-        0.5 * (torch.exp(2.0 * logs_p) + ((m_p - m_q) ** 2)) * torch.exp(-2.0 * logs_q)
-    )
+    kl += 0.5 * (torch.exp(2.0 * logs_p) + ((m_p - m_q) ** 2)) * torch.exp(-2.0 * logs_q)
     return kl
 
 
@@ -46,7 +44,7 @@ def slice_segments(x, ids_str, segment_size=4):
         idx_str = ids_str[i]
         idx_end = idx_str + segment_size
         r = x[i, :, idx_str:idx_end]
-        ret[i, :, :r.size(1)] = r
+        ret[i, :, : r.size(1)] = r
     return ret
 
 
@@ -56,7 +54,7 @@ def slice_segments2(x, ids_str, segment_size=4):
         idx_str = ids_str[i]
         idx_end = idx_str + segment_size
         r = x[i, idx_str:idx_end]
-        ret[i, :r.size(0)] = r
+        ret[i, : r.size(0)] = r
     return ret
 
 
@@ -64,7 +62,7 @@ def rand_slice_segments(x, x_lengths, segment_size=4, ids_str=None):
     b, d, t = x.size()
     if ids_str is None:
         ids_str = torch.zeros([b]).to(device=x.device, dtype=x_lengths.dtype)
-    ids_str_max = torch.maximum(torch.zeros_like(x_lengths).to(device=x_lengths.device ,dtype=x_lengths.dtype), x_lengths - segment_size + 1 - ids_str)
+    ids_str_max = torch.maximum(torch.zeros_like(x_lengths).to(device=x_lengths.device, dtype=x_lengths.dtype), x_lengths - segment_size + 1 - ids_str)
     ids_str += (torch.rand([b]).to(device=x.device) * ids_str_max).to(dtype=torch.long)
     ret = slice_segments(x, ids_str, segment_size)
     return ret, ids_str
@@ -73,12 +71,8 @@ def rand_slice_segments(x, x_lengths, segment_size=4, ids_str=None):
 def get_timing_signal_1d(length, channels, min_timescale=1.0, max_timescale=1.0e4):
     position = torch.arange(length, dtype=torch.float)
     num_timescales = channels // 2
-    log_timescale_increment = math.log(float(max_timescale) / float(min_timescale)) / (
-        num_timescales - 1
-    )
-    inv_timescales = min_timescale * torch.exp(
-        torch.arange(num_timescales, dtype=torch.float) * -log_timescale_increment
-    )
+    log_timescale_increment = math.log(float(max_timescale) / float(min_timescale)) / (num_timescales - 1)
+    inv_timescales = min_timescale * torch.exp(torch.arange(num_timescales, dtype=torch.float) * -log_timescale_increment)
     scaled_time = position.unsqueeze(0) * inv_timescales.unsqueeze(1)
     signal = torch.cat([torch.sin(scaled_time), torch.cos(scaled_time)], 0)
     signal = F.pad(signal, [0, 0, 0, channels % 2])
@@ -103,7 +97,8 @@ def subsequent_mask(length):
     return mask
 
 
-@torch.jit.script
+# @torch.jit.script
+@torch.jit._script_if_tracing
 def fused_add_tanh_sigmoid_multiply(input_a, input_b, n_channels):
     n_channels_int = n_channels[0]
     in_act = input_a + input_b
