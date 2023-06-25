@@ -10,8 +10,30 @@ from data.ModelSlot import ModelSlot
 def _setInfoByPytorch(slot: ModelSlot):
     cpt = torch.load(slot.modelFile, map_location="cpu")
     config_len = len(cpt["config"])
+    print(cpt["version"])
+    if cpt["version"] == "voras_beta":
+        slot.f0 = True if cpt["f0"] == 1 else False
+        slot.modelType = EnumInferenceTypes.pyTorchVoRASbeta.value
+        slot.embChannels = 768
+        slot.embOutputLayer = (
+            cpt["embedder_output_layer"] if "embedder_output_layer" in cpt else 9
+        )
+        slot.useFinalProj = False
 
-    if config_len == 18:
+        slot.embedder = cpt["embedder_name"]
+        if slot.embedder.endswith("768"):
+            slot.embedder = slot.embedder[:-3]
+
+        if slot.embedder == EnumEmbedderTypes.hubert.value:
+            slot.embedder = EnumEmbedderTypes.hubert.value
+        elif slot.embedder == EnumEmbedderTypes.contentvec.value:
+            slot.embedder = EnumEmbedderTypes.contentvec.value
+        elif slot.embedder == EnumEmbedderTypes.hubert_jp.value:
+            slot.embedder = EnumEmbedderTypes.hubert_jp.value
+        else:
+            raise RuntimeError("[Voice Changer][setInfoByONNX] unknown embedder")
+
+    elif config_len == 18:
         # Original RVC
         slot.f0 = True if cpt["f0"] == 1 else False
         version = cpt.get("version", "v1")
