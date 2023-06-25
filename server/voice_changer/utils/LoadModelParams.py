@@ -8,6 +8,7 @@ LoadModelParamFileKind: TypeAlias = Literal[
     "mmvcv13Model",
     "mmvcv15Config",
     "mmvcv15Model",
+    "mmvcv15Correspondence",
     "soVitsSvc40Config",
     "soVitsSvc40Model",
     "soVitsSvc40Cluster",

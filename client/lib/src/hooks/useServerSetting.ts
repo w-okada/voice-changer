@@ -13,6 +13,7 @@ export const ModelFileKind = {
     "mmvcv13Model": "mmvcv13Model",
     "mmvcv15Config": "mmvcv15Config",
     "mmvcv15Model": "mmvcv15Model",
+    "mmvcv15Correspondence": "mmvcv15Correspondence",
 
     "soVitsSvc40Config": "soVitsSvc40Config",
     "soVitsSvc40Model": "soVitsSvc40Model",

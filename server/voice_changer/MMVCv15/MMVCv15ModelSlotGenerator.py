@@ -14,6 +14,22 @@ class MMVCv15ModelSlotGenerator(ModelSlotGenerator):
                 slotInfo.modelFile = file.name
             elif file.kind == "mmvcv15Config":
                 slotInfo.configFile = file.name
+            elif file.kind == "mmvcv15Correspondence":
+                with open(file.name, "r") as f:
+                    slotInfo.speakers = {}
+                    while True:
+                        line = f.readline()
+                        if not line:
+                            break
+                        vals = line.strip().split("|")
+                        if len(vals) != 3:
+                            break
+                        id = vals[0]
+                        f0 = vals[1]
+                        name = vals[2]
+                        slotInfo.speakers[id] = name
+                        slotInfo.f0[id] = f0
+
         slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
         slotInfo.name = os.path.splitext(os.path.basename(slotInfo.modelFile))[0]
         return slotInfo

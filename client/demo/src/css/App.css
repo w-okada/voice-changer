@@ -1324,6 +1324,9 @@ body {
                     .character-area-slider-control-val {
                         width: 3rem;
                     }
+                    .character-area-slider-control-text {
+                        padding: 0px 1px 0px 1px;
+                    }
                 }
                 .character-area-buttons {
                     display: flex;

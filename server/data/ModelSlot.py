@@ -62,7 +62,8 @@ class MMVCv15ModelSlot(ModelSlot):
     f0Factor: float = 1.0
     isONNX: bool = False
     samplingRate: int = 24000
-    speakers: dict = field(default_factory=lambda: {0: "user", 101: "zundamon", 102: "sora", 103: "methane", 104: "tsumugi"})
+    speakers: dict = field(default_factory=lambda: {})
+    f0: dict = field(default_factory=lambda: {})
 
 
 @dataclass

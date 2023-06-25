@@ -121,6 +121,7 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
                 rows.push(generateFileRow(uploadSetting!, "Model", "mmvcv13Model", ["pth", "onnx"]))
             } else if (vcType == "MMVCv15") {
                 rows.push(generateFileRow(uploadSetting!, "Config", "mmvcv15Config", ["json"]))
+                rows.push(generateFileRow(uploadSetting!, "Corres", "mmvcv15Correspondence", ["txt"]))
                 rows.push(generateFileRow(uploadSetting!, "Model", "mmvcv15Model", ["pth", "onnx"]))
             } else if (vcType == "so-vits-svc-40") {
                 rows.push(generateFileRow(uploadSetting!, "Config", "soVitsSvc40Config", ["json"]))

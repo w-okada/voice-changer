@@ -218,7 +218,7 @@ export type MMVCv15ModelSlot = ModelSlot & {
     dstId: number
     f0Factor: number
     samplingRate: number
-
+    f0: { [key: number]: number }
 }
 
 export type SoVitsSvc40ModelSlot = ModelSlot & {
