@@ -7,7 +7,7 @@ from voice_changer.Local.ServerDevice import ServerDevice, ServerDeviceCallbacks
 from voice_changer.ModelSlotManager import ModelSlotManager
 from voice_changer.RVC.RVCModelMerger import RVCModelMerger
 from voice_changer.VoiceChanger import VoiceChanger
-from const import UPLOAD_DIR, ModelType
+from const import STORED_SETTING_FILE, UPLOAD_DIR, ModelType
 from voice_changer.utils.LoadModelParams import LoadModelParamFile, LoadModelParams
 from voice_changer.utils.ModelMerger import MergeElement, ModelMergerRequest
 from voice_changer.utils.VoiceChangerModel import AudioInOut
@@ -69,6 +69,28 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         # thread = threading.Thread(target=self.serverDevice.start, args=())
         # thread.start()
 
+        # 設定保存用情報
+        self.stored_setting: dict[str, str | int | float] = {}
+        if os.path.exists(STORED_SETTING_FILE):
+            self.stored_setting = json.load(open(STORED_SETTING_FILE, "r", encoding="utf-8"))
+        for key, val in self.stored_setting.items():
+            self.update_settings(key, val)
+
+    def store_setting(self, key: str, val: str | int | float):
+        saveItemForServerDevice = ["enableServerAudio", "serverInputDeviceId", "serverOutputDeviceId", "serverReadChunkSize", "serverInputAudioGain", "serverOutputAudioGain"]
+        saveItemForVoiceChanger = ["crossFadeOffsetRate", "crossFadeEndRate", "crossFadeOverlapSize"]
+        saveItemForVoiceChangerManager = ["modelSlotIndex"]
+        saveItemForRVC = ["extraConvertSize", "gpu", "silentThreshold"]
+
+        saveItem = []
+        saveItem.extend(saveItemForServerDevice)
+        saveItem.extend(saveItemForVoiceChanger)
+        saveItem.extend(saveItemForVoiceChangerManager)
+        saveItem.extend(saveItemForRVC)
+        if key in saveItem:
+            self.stored_setting[key] = val
+            json.dump(self.stored_setting, open(STORED_SETTING_FILE, "w"))
+
     def _get_gpuInfos(self):
         devCount = torch.cuda.device_count()
         gpus = []
@@ -83,7 +105,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
     def get_instance(cls, params: VoiceChangerParams):
         if cls._instance is None:
             cls._instance = cls(params)
-            cls._instance.voiceChanger = VoiceChanger(params)
+            # cls._instance.voiceChanger = VoiceChanger(params)
         return cls._instance
 
     def loadModel(self, params: LoadModelParams):
@@ -149,12 +171,11 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         info = self.serverDevice.get_info()
         data.update(info)
 
-        if hasattr(self, "voiceChanger"):
+        if self.voiceChanger is not None:
             info = self.voiceChanger.get_info()
             data.update(info)
-            return data
-        else:
-            return {"status": "ERROR", "msg": "no model loaded"}
+
+        return data
 
     def get_performance(self):
         if hasattr(self, "voiceChanger"):
@@ -209,12 +230,19 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             return
 
     def update_settings(self, key: str, val: str | int | float):
+        self.store_setting(key, val)
+
         if key in self.settings.intData:
             newVal = int(val)
             if key == "modelSlotIndex":
                 newVal = newVal % 1000
                 print(f"[Voice Changer] model slot is changed {self.settings.modelSlotIndex} -> {newVal}")
                 self.generateVoiceChanger(newVal)
+                # キャッシュ設定の反映
+                for k, v in self.stored_setting.items():
+                    if k != "modelSlotIndex":
+                        self.update_settings(k, v)
+
             setattr(self.settings, key, newVal)
 
         else:

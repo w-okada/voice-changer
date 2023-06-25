@@ -16,7 +16,7 @@ server/in.wav
 server/out.wav
 server/G_*.pth
 server/train_config.json
-
+server/stored_setting.json
 # v.1.3.xテスト用モデルフォルダ
 server/v13
 

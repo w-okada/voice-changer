@@ -21,6 +21,7 @@ ModelType: TypeAlias = Literal[
     "RVC",
 ]
 
+STORED_SETTING_FILE = "stored_setting.json"
 
 tmpdir = tempfile.TemporaryDirectory()
 SSL_KEY_DIR = os.path.join(tmpdir.name, "keys") if hasattr(sys, "_MEIPASS") else "keys"
