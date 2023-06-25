@@ -36,15 +36,13 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
     def _setInfoByPytorch(cls, slot: ModelSlot):
         cpt = torch.load(slot.modelFile, map_location="cpu")
         config_len = len(cpt["config"])
-        
+
         print(cpt["version"])
         if cpt["version"] == "voras_beta":
             slot.f0 = True if cpt["f0"] == 1 else False
             slot.modelType = EnumInferenceTypes.pyTorchVoRASbeta.value
             slot.embChannels = 768
-            slot.embOutputLayer = (
-                cpt["embedder_output_layer"] if "embedder_output_layer" in cpt else 9
-            )
+            slot.embOutputLayer = cpt["embedder_output_layer"] if "embedder_output_layer" in cpt else 9
             slot.useFinalProj = False
 
             slot.embedder = cpt["embedder_name"]
