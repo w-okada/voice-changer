@@ -245,10 +245,9 @@ class VoiceChangerManager(ServerDeviceCallbacks):
 
             setattr(self.settings, key, newVal)
 
-        else:
-            self.serverDevice.update_settings(key, val)
-            if hasattr(self, "voiceChanger"):
-                self.voiceChanger.update_settings(key, val)
+        self.serverDevice.update_settings(key, val)
+        if self.voiceChanger is not None:
+            self.voiceChanger.update_settings(key, val)
 
         return self.get_info()
 
