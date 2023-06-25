@@ -36,9 +36,9 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
     def _setInfoByPytorch(cls, slot: ModelSlot):
         cpt = torch.load(slot.modelFile, map_location="cpu")
         config_len = len(cpt["config"])
+        version = cpt.get("version", "v1")
 
-        print(cpt["version"])
-        if cpt["version"] == "voras_beta":
+        if version == "voras_beta":
             slot.f0 = True if cpt["f0"] == 1 else False
             slot.modelType = EnumInferenceTypes.pyTorchVoRASbeta.value
             slot.embChannels = 768
