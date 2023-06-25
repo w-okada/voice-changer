@@ -7,9 +7,9 @@ export type QualityAreaProps = {
 }
 
 export const QualityArea = (props: QualityAreaProps) => {
-    const { clientSetting, serverSetting } = useAppState()
+    const { setVoiceChangerClientSetting, serverSetting, setting } = useAppState()
     const qualityArea = useMemo(() => {
-        if (!serverSetting.updateServerSettings || !clientSetting.updateClientSetting || !serverSetting.serverSetting || !clientSetting.clientSetting) {
+        if (!serverSetting.updateServerSettings || !setVoiceChangerClientSetting || !serverSetting.serverSetting || !setting) {
             return <></>
         }
         return (
@@ -19,9 +19,9 @@ export const QualityArea = (props: QualityAreaProps) => {
                     <div className="config-sub-area-control-field">
                         <div className="config-sub-area-noise-container">
                             <div className="config-sub-area-noise-checkbox-container">
-                                <input type="checkbox" disabled={serverSetting.serverSetting.enableServerAudio != 0} checked={clientSetting.clientSetting.echoCancel} onChange={(e) => {
+                                <input type="checkbox" disabled={serverSetting.serverSetting.enableServerAudio != 0} checked={setting.voiceChangerClientSetting.echoCancel} onChange={(e) => {
                                     try {
-                                        clientSetting.updateClientSetting({ ...clientSetting.clientSetting, echoCancel: e.target.checked })
+                                        setVoiceChangerClientSetting({ ...setting.voiceChangerClientSetting, echoCancel: e.target.checked })
                                     } catch (e) {
                                         console.error(e)
                                     }
@@ -29,9 +29,9 @@ export const QualityArea = (props: QualityAreaProps) => {
 
                             </div>
                             <div className="config-sub-area-noise-checkbox-container">
-                                <input type="checkbox" disabled={serverSetting.serverSetting.enableServerAudio != 0} checked={clientSetting.clientSetting.noiseSuppression} onChange={(e) => {
+                                <input type="checkbox" disabled={serverSetting.serverSetting.enableServerAudio != 0} checked={setting.voiceChangerClientSetting.noiseSuppression} onChange={(e) => {
                                     try {
-                                        clientSetting.updateClientSetting({ ...clientSetting.clientSetting, noiseSuppression: e.target.checked })
+                                        setVoiceChangerClientSetting({ ...setting.voiceChangerClientSetting, noiseSuppression: e.target.checked })
                                     } catch (e) {
                                         console.error(e)
                                     }
@@ -39,9 +39,9 @@ export const QualityArea = (props: QualityAreaProps) => {
 
                             </div>
                             <div className="config-sub-area-noise-checkbox-container">
-                                <input type="checkbox" disabled={serverSetting.serverSetting.enableServerAudio != 0} checked={clientSetting.clientSetting.noiseSuppression2} onChange={(e) => {
+                                <input type="checkbox" disabled={serverSetting.serverSetting.enableServerAudio != 0} checked={setting.voiceChangerClientSetting.noiseSuppression2} onChange={(e) => {
                                     try {
-                                        clientSetting.updateClientSetting({ ...clientSetting.clientSetting, noiseSuppression2: e.target.checked })
+                                        setVoiceChangerClientSetting({ ...setting.voiceChangerClientSetting, noiseSuppression2: e.target.checked })
                                     } catch (e) {
                                         console.error(e)
                                     }
@@ -82,7 +82,7 @@ export const QualityArea = (props: QualityAreaProps) => {
 
             </div>
         )
-    }, [serverSetting.serverSetting, clientSetting.clientSetting, serverSetting.updateServerSettings, clientSetting.updateClientSetting])
+    }, [serverSetting.serverSetting, setting.voiceChangerClientSetting, serverSetting.updateServerSettings, setVoiceChangerClientSetting])
 
 
     return qualityArea

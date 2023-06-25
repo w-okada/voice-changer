@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 
 import { VoiceChangerClientSetting } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
@@ -10,35 +10,33 @@ export type UseClientSettingProps = {
 }
 
 export type ClientSettingState = {
-    clientSetting: VoiceChangerClientSetting;
-    setServerUrl: (url: string) => void;
-    updateClientSetting: (clientSetting: VoiceChangerClientSetting) => void
 
+    setServerUrl: (url: string) => void;
     start: () => Promise<void>
     stop: () => Promise<void>
     reloadClientSetting: () => Promise<void>
 }
 
 export const useClientSetting = (props: UseClientSettingProps): ClientSettingState => {
-    const [clientSetting, setClientSetting] = useState<VoiceChangerClientSetting>(props.defaultVoiceChangerClientSetting)
+    // 更新比較用
+    const [voiceChangerClientSetting, setVoiceChangerClientSetting] = useState<VoiceChangerClientSetting>(props.defaultVoiceChangerClientSetting)
 
-    //////////////
-    // 設定
-    /////////////
-    const updateClientSetting = useMemo(() => {
-        return async (_clientSetting: VoiceChangerClientSetting) => {
+    useEffect(() => {
+        const update = async () => {
             if (!props.voiceChangerClient) return
-            for (let k in _clientSetting) {
-                const cur_v = clientSetting[k as keyof VoiceChangerClientSetting]
-                const new_v = _clientSetting[k as keyof VoiceChangerClientSetting]
+            for (let k in props.defaultVoiceChangerClientSetting) {
+                const cur_v = voiceChangerClientSetting[k as keyof VoiceChangerClientSetting]
+                const new_v = props.defaultVoiceChangerClientSetting[k as keyof VoiceChangerClientSetting]
                 if (cur_v != new_v) {
-                    setClientSetting(_clientSetting)
-                    await props.voiceChangerClient.updateClientSetting(_clientSetting)
+                    setVoiceChangerClientSetting(props.defaultVoiceChangerClientSetting)
+                    await props.voiceChangerClient.updateClientSetting(props.defaultVoiceChangerClientSetting)
                     break
                 }
             }
         }
-    }, [props.voiceChangerClient, clientSetting])
+        update()
+    }, [props.voiceChangerClient, props.defaultVoiceChangerClientSetting])
+
 
     const setServerUrl = useMemo(() => {
         return (url: string) => {
@@ -55,7 +53,6 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
     const start = useMemo(() => {
         return async () => {
             if (!props.voiceChangerClient) return
-            // props.voiceChangerClient.setServerUrl(setting.mmvcServerUrl, true)
             await props.voiceChangerClient.start()
         }
     }, [props.voiceChangerClient])
@@ -74,9 +71,7 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
     }, [props.voiceChangerClient])
 
     return {
-        clientSetting,
         setServerUrl,
-        updateClientSetting,
 
         start,
         stop,

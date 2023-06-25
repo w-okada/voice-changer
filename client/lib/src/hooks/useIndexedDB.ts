@@ -12,7 +12,6 @@ export type IndexedDBStateAndMethod = IndexedDBState & {
     setItem: (key: string, value: unknown) => Promise<void>,
     getItem: (key: string) => Promise<unknown>
     removeItem: (key: string) => Promise<void>
-    // clearAll: () => Promise<void>
     removeDB: () => Promise<void>
 }
 

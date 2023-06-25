@@ -3,21 +3,18 @@ import { useAppState } from "../../../001_provider/001_AppStateProvider"
 import { fileSelectorAsDataURL, useIndexedDB, } from "@dannadori/voice-changer-client-js"
 import { useGuiState } from "../001_GuiStateProvider"
 import { AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_CONVERTED, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, INDEXEDDB_KEY_AUDIO_OUTPUT } from "../../../const"
-import { useAppRoot } from "../../../001_provider/001_AppRootProvider"
 
 export type DeviceAreaProps = {
 }
 
 export const DeviceArea = (_props: DeviceAreaProps) => {
-    const { clientSetting, serverSetting, workletNodeSetting, audioContext, setAudioOutputElementId, initializedRef } = useAppState()
+    const { setting, serverSetting, audioContext, setAudioOutputElementId, initializedRef, setVoiceChangerClientSetting, startOutputRecording, stopOutputRecording } = useAppState()
     const { isConverting, audioInputForGUI, inputAudioDeviceInfo, setAudioInputForGUI, fileInputEchoback, setFileInputEchoback, setAudioOutputForGUI, audioOutputForGUI, outputAudioDeviceInfo } = useGuiState()
     const [inputHostApi, setInputHostApi] = useState<string>("ALL")
     const [outputHostApi, setOutputHostApi] = useState<string>("ALL")
     const audioSrcNode = useRef<MediaElementAudioSourceNode>()
-    const { appGuiSettingState } = useAppRoot()
-    const clientType = appGuiSettingState.appGuiSetting.id
 
-    const { getItem, setItem } = useIndexedDB({ clientType: clientType })
+    const { getItem, setItem } = useIndexedDB({ clientType: null })
     const [outputRecordingStarted, setOutputRecordingStarted] = useState<boolean>(false)
 
     // (1) Audio Mode
@@ -57,15 +54,15 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
     // (2) Audio Input 
     // キャッシュの設定は反映（たぶん、設定操作の時も起動していしまう。が問題は起こらないはず）
     useEffect(() => {
-        if (typeof clientSetting.clientSetting.audioInput == "string") {
+        if (typeof setting.voiceChangerClientSetting.audioInput == "string") {
             if (inputAudioDeviceInfo.find(x => {
                 // console.log("COMPARE:", x.deviceId, appState.clientSetting.setting.audioInput)
-                return x.deviceId == clientSetting.clientSetting.audioInput
+                return x.deviceId == setting.voiceChangerClientSetting.audioInput
             })) {
-                setAudioInputForGUI(clientSetting.clientSetting.audioInput)
+                setAudioInputForGUI(setting.voiceChangerClientSetting.audioInput)
             }
         }
-    }, [inputAudioDeviceInfo, clientSetting.clientSetting.audioInput])
+    }, [inputAudioDeviceInfo, setting.voiceChangerClientSetting.audioInput])
 
     // (2-1) クライアント 
     const clientAudioInputRow = useMemo(() => {
@@ -81,12 +78,12 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                         setAudioInputForGUI(e.target.value)
                         if (audioInputForGUI != "file") {
                             try {
-                                await clientSetting.updateClientSetting({ ...clientSetting.clientSetting, audioInput: e.target.value })
+                                await setVoiceChangerClientSetting({ ...setting.voiceChangerClientSetting, audioInput: e.target.value })
                             } catch (e) {
                                 alert(e)
                                 console.error(e)
                                 setAudioInputForGUI("none")
-                                await clientSetting.updateClientSetting({ ...clientSetting.clientSetting, audioInput: null })
+                                await setVoiceChangerClientSetting({ ...setting.voiceChangerClientSetting, audioInput: null })
                             }
                         }
                     }}>
@@ -99,7 +96,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                 </div>
             </div>
         )
-    }, [clientSetting.updateClientSetting, clientSetting.clientSetting, inputAudioDeviceInfo, audioInputForGUI, serverSetting.serverSetting.enableServerAudio])
+    }, [setVoiceChangerClientSetting, setting.voiceChangerClientSetting, inputAudioDeviceInfo, audioInputForGUI, serverSetting.serverSetting.enableServerAudio])
 
 
     // (2-2) サーバ
@@ -175,7 +172,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
             const dst = audioContext.createMediaStreamDestination()
             audioSrcNode.current.connect(dst)
             try {
-                clientSetting.updateClientSetting({ ...clientSetting.clientSetting, audioInput: dst.stream })
+                setVoiceChangerClientSetting({ ...setting.voiceChangerClientSetting, audioInput: dst.stream })
             } catch (e) {
                 console.error(e)
             }
@@ -344,11 +341,11 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
         }
         const onOutputRecordStartClicked = async () => {
             setOutputRecordingStarted(true)
-            await workletNodeSetting.startOutputRecording()
+            await startOutputRecording()
         }
         const onOutputRecordStopClicked = async () => {
             setOutputRecordingStarted(false)
-            const record = await workletNodeSetting.stopOutputRecording()
+            const record = await stopOutputRecording()
             downloadRecord(record)
         }
 
@@ -366,7 +363,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
             </div>
         )
 
-    }, [outputRecordingStarted, workletNodeSetting])
+    }, [outputRecordingStarted, startOutputRecording, stopOutputRecording])
 
 
 

@@ -29,7 +29,6 @@ class GPUInfo:
 
 @dataclass()
 class VoiceChangerManagerSettings:
-    dummy: int
     modelSlotIndex: int = -1
     # ↓mutableな物だけ列挙
     intData: list[str] = field(default_factory=lambda: ["modelSlotIndex"])
@@ -59,7 +58,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
     def __init__(self, params: VoiceChangerParams):
         self.params = params
         self.voiceChanger: VoiceChanger = None
-        self.settings: VoiceChangerManagerSettings = VoiceChangerManagerSettings(dummy=0)
+        self.settings: VoiceChangerManagerSettings = VoiceChangerManagerSettings()
 
         self.modelSlotManager = ModelSlotManager.get_instance(self.params.model_dir)
         # スタティックな情報を収集

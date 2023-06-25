@@ -1,5 +1,5 @@
 import { VoiceChangerWorkletProcessorRequest } from "./@types/voice-changer-worklet-processor";
-import { DefaultWorkletNodeSetting, DownSamplingMode, VOICE_CHANGER_CLIENT_EXCEPTION, WorkletNodeSetting, WorkletSetting } from "./const";
+import { DefaultClientSettng, DownSamplingMode, VOICE_CHANGER_CLIENT_EXCEPTION, WorkletNodeSetting, WorkletSetting } from "./const";
 import { io, Socket } from "socket.io-client";
 import { DefaultEventsMap } from "@socket.io/component-emitter";
 
@@ -13,7 +13,7 @@ export type VoiceChangerWorkletListener = {
 export class VoiceChangerWorkletNode extends AudioWorkletNode {
     private listener: VoiceChangerWorkletListener
 
-    private setting: WorkletNodeSetting = DefaultWorkletNodeSetting
+    private setting: WorkletNodeSetting = DefaultClientSettng.workletNodeSetting
     private requestChunks: ArrayBuffer[] = []
     private socket: Socket<DefaultEventsMap, DefaultEventsMap> | null = null
     // performance monitor

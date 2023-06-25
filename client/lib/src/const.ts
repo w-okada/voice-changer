@@ -39,21 +39,6 @@ export const CrossFadeOverlapSize = {
 } as const
 export type CrossFadeOverlapSize = typeof CrossFadeOverlapSize[keyof typeof CrossFadeOverlapSize]
 
-
-export const OnnxExecutionProvider = {
-    "CPUExecutionProvider": "CPUExecutionProvider",
-    "CUDAExecutionProvider": "CUDAExecutionProvider",
-    "DmlExecutionProvider": "DmlExecutionProvider",
-    "OpenVINOExecutionProvider": "OpenVINOExecutionProvider",
-} as const
-export type OnnxExecutionProvider = typeof OnnxExecutionProvider[keyof typeof OnnxExecutionProvider]
-
-export const Framework = {
-    "PyTorch": "PyTorch",
-    "ONNX": "ONNX",
-} as const
-export type Framework = typeof Framework[keyof typeof Framework]
-
 export const F0Detector = {
     "dio": "dio",
     "harvest": "harvest",
@@ -146,9 +131,6 @@ export type VoiceChangerServerSetting = {
     crossFadeOffsetRate: number,
     crossFadeEndRate: number,
     crossFadeOverlapSize: CrossFadeOverlapSize,
-
-    framework: Framework
-    onnxExecutionProvider: OnnxExecutionProvider,
 
     f0Factor: number
     f0Detector: F0Detector // dio or harvest
@@ -280,11 +262,8 @@ type ServerAudioDevice = {
 }
 
 export type ServerInfo = VoiceChangerServerSetting & {
+    // コンフィグ対象外 (getInfoで取得のみ可能な情報)
     status: string
-    configFile: string,
-    pyTorchModelFile: string,
-    onnxModelFile: string,
-    onnxExecutionProviders: OnnxExecutionProvider[]
     modelSlots: ModelSlotUnion[]
     serverAudioInputDevices: ServerAudioDevice[]
     serverAudioOutputDevices: ServerAudioDevice[]
@@ -297,9 +276,6 @@ export type ServerInfo = VoiceChangerServerSetting & {
 
 }
 
-export type ServerInfoSoVitsSVC = ServerInfo & {
-    speakers: { [key: string]: number }
-}
 
 export type RVCSampleModel = {
     id: string
@@ -346,9 +322,7 @@ export const DefaultServerSetting: ServerInfo = {
     gpu: 0,
 
 
-    framework: Framework.PyTorch,
     f0Factor: 1.0,
-    onnxExecutionProvider: OnnxExecutionProvider.CPUExecutionProvider,
     f0Detector: F0Detector.dio,
 
     tran: 0,
@@ -379,32 +353,9 @@ export const DefaultServerSetting: ServerInfo = {
     enableDirectML: 0,
     // 
     status: "ok",
-    configFile: "",
-    pyTorchModelFile: "",
-    onnxModelFile: "",
-    onnxExecutionProviders: [],
     modelSlots: [],
     serverAudioInputDevices: [],
     serverAudioOutputDevices: []
-}
-export const DefaultServerSetting_MMVCv15: ServerInfo = {
-    ...DefaultServerSetting, dstId: 101,
-}
-export const DefaultServerSetting_MMVCv13: ServerInfo = {
-    ...DefaultServerSetting, srcId: 107, dstId: 100,
-}
-
-export const DefaultServerSetting_so_vits_svc_40: ServerInfo = {
-    ...DefaultServerSetting, tran: 10, noiseScale: 0.3, extraConvertSize: 1024 * 8, clusterInferRatio: 0.1,
-}
-
-export const DefaultServerSetting_DDSP_SVC: ServerInfo = {
-    ...DefaultServerSetting, dstId: 1, tran: 10, extraConvertSize: 1024 * 8
-}
-
-
-export const DefaultServerSetting_RVC: ServerInfo = {
-    ...DefaultServerSetting, tran: 10, extraConvertSize: 1024 * 4, f0Detector: F0Detector.harvest
 }
 
 ///////////////////////
@@ -415,11 +366,6 @@ export type WorkletSetting = {
     numTrancateTreshold: number,
     volTrancateThreshold: number,
     volTrancateLength: number
-}
-export const DefaultWorkletSetting: WorkletSetting = {
-    numTrancateTreshold: 100,
-    volTrancateThreshold: 0.0005,
-    volTrancateLength: 32
 }
 ///////////////////////
 // Worklet Nodeセッティング
@@ -451,13 +397,6 @@ export type WorkletNodeSetting = {
     inputChunkNum: number,
     downSamplingMode: DownSamplingMode,
 }
-export const DefaultWorkletNodeSetting: WorkletNodeSetting = {
-    serverUrl: "",
-    protocol: "sio",
-    sendingSampleRate: 48000,
-    inputChunkNum: 48,
-    downSamplingMode: "average"
-}
 
 
 ///////////////////////
@@ -479,14 +418,36 @@ export type VoiceChangerClientSetting = {
     outputGain: number
 }
 
-export const DefaultVoiceChangerClientSetting: VoiceChangerClientSetting = {
-    audioInput: null,
-    sampleRate: 48000,
-    echoCancel: false,
-    noiseSuppression: false,
-    noiseSuppression2: false,
-    inputGain: 1.0,
-    outputGain: 1.0
+///////////////////////
+// Client セッティング
+///////////////////////
+export type ClientSetting = {
+    workletSetting: WorkletSetting
+    workletNodeSetting: WorkletNodeSetting
+    voiceChangerClientSetting: VoiceChangerClientSetting
+}
+export const DefaultClientSettng: ClientSetting = {
+    workletSetting: {
+        numTrancateTreshold: 100,
+        volTrancateThreshold: 0.0005,
+        volTrancateLength: 32
+    },
+    workletNodeSetting: {
+        serverUrl: "",
+        protocol: "sio",
+        sendingSampleRate: 48000,
+        inputChunkNum: 48,
+        downSamplingMode: "average"
+    },
+    voiceChangerClientSetting: {
+        audioInput: null,
+        sampleRate: 48000,
+        echoCancel: false,
+        noiseSuppression: false,
+        noiseSuppression2: false,
+        inputGain: 1.0,
+        outputGain: 1.0
+    }
 }
 
 

@@ -8,7 +8,7 @@ export type ConvertProps = {
 
 
 export const ConvertArea = (props: ConvertProps) => {
-    const { clientSetting, serverSetting, workletNodeSetting } = useAppState()
+    const { setting, serverSetting, setWorkletNodeSetting, trancateBuffer } = useAppState()
     const { appGuiSettingState } = useAppRoot()
     const edition = appGuiSettingState.edition
     const convertArea = useMemo(() => {
@@ -62,9 +62,9 @@ export const ConvertArea = (props: ConvertProps) => {
                 <div className="config-sub-area-control">
                     <div className="config-sub-area-control-title">CHUNK:</div>
                     <div className="config-sub-area-control-field">
-                        <select className="body-select" value={workletNodeSetting.workletNodeSetting.inputChunkNum} onChange={(e) => {
-                            workletNodeSetting.updateWorkletNodeSetting({ ...workletNodeSetting.workletNodeSetting, inputChunkNum: Number(e.target.value) })
-                            workletNodeSetting.trancateBuffer()
+                        <select className="body-select" value={setting.workletNodeSetting.inputChunkNum} onChange={(e) => {
+                            setWorkletNodeSetting({ ...setting.workletNodeSetting, inputChunkNum: Number(e.target.value) })
+                            trancateBuffer()
                             serverSetting.updateServerSettings({ ...serverSetting.serverSetting, serverReadChunkSize: Number(e.target.value) })
                         }}>
                             {
@@ -81,7 +81,7 @@ export const ConvertArea = (props: ConvertProps) => {
                     <div className="config-sub-area-control-field">
                         <select className="body-select" value={serverSetting.serverSetting.extraConvertSize} onChange={(e) => {
                             serverSetting.updateServerSettings({ ...serverSetting.serverSetting, extraConvertSize: Number(e.target.value) })
-                            workletNodeSetting.trancateBuffer()
+                            trancateBuffer()
                         }}>
                             {
                                 [1024 * 4, 1024 * 8, 1024 * 16, 1024 * 32, 1024 * 64, 1024 * 128].map(x => {
@@ -94,7 +94,7 @@ export const ConvertArea = (props: ConvertProps) => {
                 {gpuSelect}
             </div>
         )
-    }, [serverSetting.serverSetting, clientSetting.clientSetting, workletNodeSetting.workletNodeSetting, serverSetting.updateServerSettings, clientSetting.updateClientSetting, workletNodeSetting.updateWorkletNodeSetting, edition])
+    }, [serverSetting.serverSetting, setting, serverSetting.updateServerSettings, setWorkletNodeSetting, edition])
 
 
     return convertArea

@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { VoiceChangerClient } from "../VoiceChangerClient"
-import { ClientSettingState, useClientSetting } from "./useClientSetting"
+import { useClientSetting } from "./useClientSetting"
 import { IndexedDBStateAndMethod, useIndexedDB } from "./useIndexedDB"
 import { ServerSettingState, useServerSetting } from "./useServerSetting"
-import { useWorkletNodeSetting, WorkletNodeSettingState } from "./useWorkletNodeSetting"
-import { useWorkletSetting, WorkletSettingState } from "./useWorkletSetting"
-import { DefaultVoiceChangerClientSetting, DefaultWorkletNodeSetting, DefaultWorkletSetting } from "../const"
+import { useWorkletNodeSetting } from "./useWorkletNodeSetting"
+import { useWorkletSetting } from "./useWorkletSetting"
+import { ClientSetting, DefaultClientSettng, VoiceChangerClientSetting, WorkletNodeSetting, WorkletSetting } from "../const"
 
 export type UseClientProps = {
     audioContext: AudioContext | null
@@ -13,10 +13,24 @@ export type UseClientProps = {
 
 export type ClientState = {
     initialized: boolean
+    setting: ClientSetting,
     // 各種設定I/Fへの参照
-    workletSetting: WorkletSettingState
-    clientSetting: ClientSettingState
-    workletNodeSetting: WorkletNodeSettingState
+    setVoiceChangerClientSetting: (_voiceChangerClientSetting: VoiceChangerClientSetting) => void
+    setServerUrl: (url: string) => void;
+    start: () => Promise<void>
+    stop: () => Promise<void>
+    reloadClientSetting: () => Promise<void>
+
+    setWorkletNodeSetting: (_workletNodeSetting: WorkletNodeSetting) => void
+    startOutputRecording: () => void
+    stopOutputRecording: () => Promise<Float32Array>
+    trancateBuffer: () => Promise<void>
+
+    setWorkletSetting: (_workletSetting: WorkletSetting) => void
+    // workletSetting: WorkletSetting
+    // workletSetting: WorkletSettingState
+    // clientSetting: ClientSettingState
+    // workletNodeSetting: WorkletNodeSettingState
     serverSetting: ServerSettingState
     indexedDBState: IndexedDBStateAndMethod
 
@@ -54,7 +68,7 @@ const InitialPerformanceData: PerformanceData = {
 export const useClient = (props: UseClientProps): ClientState => {
 
     const [initialized, setInitialized] = useState<boolean>(false)
-    // const [clientType, setClientType] = useState<ClientType | null>(null)
+    const [setting, setSetting] = useState<ClientSetting>(DefaultClientSettng)
     // (1-1) クライアント    
     const voiceChangerClientRef = useRef<VoiceChangerClient | null>(null)
     const [voiceChangerClient, setVoiceChangerClient] = useState<VoiceChangerClient | null>(voiceChangerClientRef.current)
@@ -68,9 +82,9 @@ export const useClient = (props: UseClientProps): ClientState => {
 
 
     // (1-2) 各種設定I/F
-    const clientSetting = useClientSetting({ voiceChangerClient, audioContext: props.audioContext, defaultVoiceChangerClientSetting: DefaultVoiceChangerClientSetting })
-    const workletNodeSetting = useWorkletNodeSetting({ voiceChangerClient: voiceChangerClient, defaultWorkletNodeSetting: DefaultWorkletNodeSetting })
-    const workletSetting = useWorkletSetting({ voiceChangerClient, defaultWorkletSetting: DefaultWorkletSetting })
+    const voiceChangerClientSetting = useClientSetting({ voiceChangerClient, audioContext: props.audioContext, defaultVoiceChangerClientSetting: setting.voiceChangerClientSetting })
+    const workletNodeSetting = useWorkletNodeSetting({ voiceChangerClient: voiceChangerClient, defaultWorkletNodeSetting: setting.workletNodeSetting })
+    useWorkletSetting({ voiceChangerClient, defaultWorkletSetting: setting.workletSetting })
     const serverSetting = useServerSetting({ voiceChangerClient })
     const indexedDBState = useIndexedDB({ clientType: null })
 
@@ -173,22 +187,56 @@ export const useClient = (props: UseClientProps): ClientState => {
     const getInfo = useMemo(() => {
         return async () => {
             await initializedPromise
-            await clientSetting.reloadClientSetting() // 実質的な処理の意味はない
+            await voiceChangerClientSetting.reloadClientSetting() // 実質的な処理の意味はない
             await serverSetting.reloadServerInfo()
         }
-    }, [clientSetting.reloadClientSetting, serverSetting.reloadServerInfo])
+    }, [voiceChangerClientSetting.reloadClientSetting, serverSetting.reloadServerInfo])
 
 
     const clearSetting = async () => {
         // TBD
     }
 
+    // 設定変更
+    const setVoiceChangerClientSetting = (_voiceChangerClientSetting: VoiceChangerClientSetting) => {
+        setting.voiceChangerClientSetting = _voiceChangerClientSetting
+        console.log("setting.voiceChangerClientSetting", setting.voiceChangerClientSetting)
+        // workletSettingIF.setSetting(_workletSetting)
+        setSetting({ ...setting })
+    }
+
+
+    const setWorkletNodeSetting = (_workletNodeSetting: WorkletNodeSetting) => {
+        setting.workletNodeSetting = _workletNodeSetting
+        console.log("setting.workletNodeSetting", setting.workletNodeSetting)
+        // workletSettingIF.setSetting(_workletSetting)
+        setSetting({ ...setting })
+    }
+
+    const setWorkletSetting = (_workletSetting: WorkletSetting) => {
+        setting.workletSetting = _workletSetting
+        console.log("setting.workletSetting", setting.workletSetting)
+        // workletSettingIF.setSetting(_workletSetting)
+        setSetting({ ...setting })
+    }
+
     return {
         initialized,
+        setting,
         // 各種設定I/Fへの参照
-        clientSetting,
-        workletNodeSetting,
-        workletSetting,
+        setVoiceChangerClientSetting,
+        setServerUrl: voiceChangerClientSetting.setServerUrl,
+        start: voiceChangerClientSetting.start,
+        stop: voiceChangerClientSetting.stop,
+        reloadClientSetting: voiceChangerClientSetting.reloadClientSetting,
+
+        setWorkletNodeSetting,
+        startOutputRecording: workletNodeSetting.startOutputRecording,
+        stopOutputRecording: workletNodeSetting.stopOutputRecording,
+        trancateBuffer: workletNodeSetting.trancateBuffer,
+
+        setWorkletSetting,
+        // workletSetting: workletSettingIF.setting,
         serverSetting,
         indexedDBState,
 

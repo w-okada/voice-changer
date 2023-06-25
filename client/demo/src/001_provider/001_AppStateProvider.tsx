@@ -39,8 +39,8 @@ export const AppStateProvider = ({ children }: Props) => {
     useEffect(() => {
         if (clientState.clientState.initialized) {
             initializedRef.current = true
-            clientState.clientState.clientSetting.updateClientSetting({
-                ...clientState.clientState.clientSetting.clientSetting
+            clientState.clientState.setVoiceChangerClientSetting({
+                ...clientState.clientState.setting.voiceChangerClientSetting
             })
         }
     }, [clientState.clientState.initialized])

@@ -15,7 +15,7 @@ export type CharacterAreaProps = {
 
 
 export const CharacterArea = (_props: CharacterAreaProps) => {
-    const { serverSetting, clientSetting, initializedRef, volume, bufferingTime, performance } = useAppState()
+    const { serverSetting, initializedRef, volume, bufferingTime, performance, setting, setVoiceChangerClientSetting, start, stop } = useAppState()
     const guiState = useGuiState()
     const messageBuilderState = useMessageBuilder()
 
@@ -80,7 +80,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
             return
         }
         guiState.setIsConverting(true)
-        clientSetting.start()
+        start()
     }, [startWithAudioContextCreate])
 
     const startControl = useMemo(() => {
@@ -98,7 +98,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
                     setStartWithAudioContextCreate(true)
                 } else {
                     guiState.setIsConverting(true)
-                    await clientSetting.start()
+                    await start()
                 }
             } else {
                 serverSetting.updateServerSettings({ ...serverSetting.serverSetting, serverAudioStated: 1 })
@@ -108,7 +108,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
         const onStopClicked = async () => {
             if (serverSetting.serverSetting.enableServerAudio == 0) {
                 guiState.setIsConverting(false)
-                await clientSetting.stop()
+                await stop()
             } else {
                 guiState.setIsConverting(false)
                 serverSetting.updateServerSettings({ ...serverSetting.serverSetting, serverAudioStated: 0 })
@@ -127,26 +127,26 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
         )
     }, [
         guiState.isConverting,
-        clientSetting.start,
-        clientSetting.stop,
+        start,
+        stop,
         serverSetting.serverSetting,
         serverSetting.updateServerSettings
     ])
 
     const gainControl = useMemo(() => {
-        const currentInputGain = serverSetting.serverSetting.enableServerAudio == 0 ? clientSetting.clientSetting.inputGain : serverSetting.serverSetting.serverInputAudioGain
+        const currentInputGain = serverSetting.serverSetting.enableServerAudio == 0 ? setting.voiceChangerClientSetting.inputGain : serverSetting.serverSetting.serverInputAudioGain
         const inputValueUpdatedAction = serverSetting.serverSetting.enableServerAudio == 0 ?
             async (val: number) => {
-                await clientSetting.updateClientSetting({ ...clientSetting.clientSetting, inputGain: val })
+                await setVoiceChangerClientSetting({ ...setting.voiceChangerClientSetting, inputGain: val })
             } :
             async (val: number) => {
                 await serverSetting.updateServerSettings({ ...serverSetting.serverSetting, serverInputAudioGain: val })
             }
 
-        const currentOutputGain = serverSetting.serverSetting.enableServerAudio == 0 ? clientSetting.clientSetting.outputGain : serverSetting.serverSetting.serverOutputAudioGain
+        const currentOutputGain = serverSetting.serverSetting.enableServerAudio == 0 ? setting.voiceChangerClientSetting.outputGain : serverSetting.serverSetting.serverOutputAudioGain
         const outputValueUpdatedAction = serverSetting.serverSetting.enableServerAudio == 0 ?
             async (val: number) => {
-                await clientSetting.updateClientSetting({ ...clientSetting.clientSetting, outputGain: val })
+                await setVoiceChangerClientSetting({ ...setting.voiceChangerClientSetting, outputGain: val })
             } :
             async (val: number) => {
                 await serverSetting.updateServerSettings({ ...serverSetting.serverSetting, serverOutputAudioGain: val })
@@ -182,7 +182,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
                 </div>
             </div>
         )
-    }, [serverSetting.serverSetting, clientSetting.clientSetting, clientSetting.updateClientSetting, serverSetting.updateServerSettings])
+    }, [serverSetting.serverSetting, setting, setVoiceChangerClientSetting, serverSetting.updateServerSettings])
 
 
 

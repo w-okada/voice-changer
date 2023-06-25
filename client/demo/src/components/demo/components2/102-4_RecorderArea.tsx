@@ -7,7 +7,7 @@ export type RecorderAreaProps = {
 }
 
 export const RecorderArea = (_props: RecorderAreaProps) => {
-    const { serverSetting, workletNodeSetting } = useAppState()
+    const { serverSetting } = useAppState()
     const { audioOutputForAnalyzer, setAudioOutputForAnalyzer, outputAudioDeviceInfo } = useGuiState()
 
     const [serverIORecording, setServerIORecording] = useState<boolean>(false)
@@ -106,7 +106,7 @@ export const RecorderArea = (_props: RecorderAreaProps) => {
             </>
         )
 
-    }, [serverIORecording, workletNodeSetting])
+    }, [serverIORecording])
 
     return (
         <div className="config-sub-area">

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 
 import { WorkletNodeSetting } from "../const"
 import { VoiceChangerClient } from "../VoiceChangerClient"
@@ -10,35 +10,33 @@ export type UseWorkletNodeSettingProps = {
 }
 
 export type WorkletNodeSettingState = {
-    workletNodeSetting: WorkletNodeSetting;
-    updateWorkletNodeSetting: (setting: WorkletNodeSetting) => void
     startOutputRecording: () => void
     stopOutputRecording: () => Promise<Float32Array>
     trancateBuffer: () => Promise<void>
 }
 
 export const useWorkletNodeSetting = (props: UseWorkletNodeSettingProps): WorkletNodeSettingState => {
-
+    // 更新比較用
     const [workletNodeSetting, _setWorkletNodeSetting] = useState<WorkletNodeSetting>(props.defaultWorkletNodeSetting)
 
     //////////////
     // 設定
     /////////////
+    useEffect(() => {
 
-    const updateWorkletNodeSetting = useMemo(() => {
-        return (_workletNodeSetting: WorkletNodeSetting) => {
-            if (!props.voiceChangerClient) return
-            for (let k in _workletNodeSetting) {
-                const cur_v = workletNodeSetting[k as keyof WorkletNodeSetting]
-                const new_v = _workletNodeSetting[k as keyof WorkletNodeSetting]
-                if (cur_v != new_v) {
-                    _setWorkletNodeSetting(_workletNodeSetting)
-                    props.voiceChangerClient.updateWorkletNodeSetting(_workletNodeSetting)
-                    break
-                }
+        if (!props.voiceChangerClient) return
+        for (let k in props.defaultWorkletNodeSetting) {
+            const cur_v = workletNodeSetting[k as keyof WorkletNodeSetting]
+            const new_v = props.defaultWorkletNodeSetting[k as keyof WorkletNodeSetting]
+            if (cur_v != new_v) {
+                _setWorkletNodeSetting(props.defaultWorkletNodeSetting)
+                props.voiceChangerClient.updateWorkletNodeSetting(props.defaultWorkletNodeSetting)
+                break
             }
         }
-    }, [props.voiceChangerClient, workletNodeSetting])
+
+    }, [props.voiceChangerClient, props.defaultWorkletNodeSetting])
+
 
     const startOutputRecording = useMemo(() => {
         return () => {
@@ -62,8 +60,6 @@ export const useWorkletNodeSetting = (props: UseWorkletNodeSettingProps): Workle
     }, [props.voiceChangerClient])
 
     return {
-        workletNodeSetting,
-        updateWorkletNodeSetting,
         startOutputRecording,
         stopOutputRecording,
         trancateBuffer

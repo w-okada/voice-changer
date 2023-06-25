@@ -6,7 +6,7 @@ import { CrossFadeOverlapSize, Protocol } from "@dannadori/voice-changer-client-
 
 export const AdvancedSettingDialog = () => {
     const guiState = useGuiState()
-    const { workletNodeSetting, workletSetting, serverSetting } = useAppState()
+    const { setting, serverSetting, setWorkletNodeSetting, setWorkletSetting } = useAppState()
     const dialog = useMemo(() => {
         const closeButtonRow = (
             <div className="body-row split-3-4-3 left-padding-1">
@@ -21,7 +21,7 @@ export const AdvancedSettingDialog = () => {
         )
 
         const onProtocolChanged = async (val: Protocol) => {
-            workletNodeSetting.updateWorkletNodeSetting({ ...workletNodeSetting.workletNodeSetting, protocol: val })
+            setWorkletNodeSetting({ ...setting.workletNodeSetting, protocol: val })
         }
         const protocolRow = (
             <div className="advanced-setting-container-row">
@@ -29,7 +29,7 @@ export const AdvancedSettingDialog = () => {
                     protocol
                 </div>
                 <div className="advanced-setting-container-row-field">
-                    <select value={workletNodeSetting.workletNodeSetting.protocol} onChange={(e) => {
+                    <select value={setting.workletNodeSetting.protocol} onChange={(e) => {
                         onProtocolChanged(e.target.value as
                             Protocol)
                     }}>
@@ -90,9 +90,9 @@ export const AdvancedSettingDialog = () => {
                     Trancate
                 </div>
                 <div className="advanced-setting-container-row-field">
-                    <input type="number" min={5} max={300} step={1} value={workletSetting.setting.numTrancateTreshold} onChange={(e) => {
-                        workletSetting.setSetting({
-                            ...workletSetting.setting,
+                    <input type="number" min={5} max={300} step={1} value={setting.workletSetting.numTrancateTreshold} onChange={(e) => {
+                        setWorkletSetting({
+                            ...setting.workletSetting,
                             numTrancateTreshold: Number(e.target.value)
                         })
                     }} />
@@ -176,7 +176,7 @@ export const AdvancedSettingDialog = () => {
                 </div>
             </div>
         );
-    }, [serverSetting.serverSetting, serverSetting.updateServerSettings, workletNodeSetting.workletNodeSetting, workletNodeSetting.updateWorkletNodeSetting, workletSetting.setting, workletSetting.setSetting]);
+    }, [serverSetting.serverSetting, serverSetting.updateServerSettings, setting.workletNodeSetting, setWorkletNodeSetting, setting.workletSetting, setWorkletSetting]);
     return dialog;
 
 };

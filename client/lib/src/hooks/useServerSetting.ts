@@ -93,11 +93,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 const new_v = setting[k]
                 if (cur_v != new_v) {
                     const res = await props.voiceChangerClient.updateServerSettings(k, "" + new_v)
-                    if (res.onnxExecutionProviders && res.onnxExecutionProviders.length > 0) {
-                        res.onnxExecutionProvider = res.onnxExecutionProviders[0]
-                    } else {
-                        res.onnxExecutionProvider = "CPUExecutionProvider"
-                    }
 
                     setServerSetting(res)
                     const storeData = { ...res }
