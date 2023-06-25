@@ -3,6 +3,7 @@ from typing import Any
 import math
 import torch
 import torch.nn.functional as F
+from torch.cuda.amp import autocast
 from Exceptions import (
     DeviceCannotSupportHalfPrecisionException,
     DeviceChangingException,
@@ -118,10 +119,6 @@ class Pipeline(object):
 
         # tensor型調整
         feats = audio_pad
-        if self.isHalf is True:
-            feats = feats.half()
-        else:
-            feats = feats.float()
         if feats.dim() == 2:  # double channels
             feats = feats.mean(-1)
         assert feats.dim() == 1, feats.dim()
@@ -129,19 +126,20 @@ class Pipeline(object):
 
         # embedding
         padding_mask = torch.BoolTensor(feats.shape).to(self.device).fill_(False)
-        try:
-            feats = self.embedder.extractFeatures(feats, embOutputLayer, useFinalProj)
-            if torch.isnan(feats).all():
-                raise DeviceCannotSupportHalfPrecisionException()
-        except RuntimeError as e:
-            if "HALF" in e.__str__().upper():
-                raise HalfPrecisionChangingException()
-            elif "same device" in e.__str__():
-                raise DeviceChangingException()
-            else:
-                raise e
-        if protect < 0.5 and search_index:
-            feats0 = feats.clone()
+        with autocast(enabled=self.isHalf):
+            try:
+                feats = self.embedder.extractFeatures(feats, embOutputLayer, useFinalProj)
+                if torch.isnan(feats).all():
+                    raise DeviceCannotSupportHalfPrecisionException()
+            except RuntimeError as e:
+                if "HALF" in e.__str__().upper():
+                    raise HalfPrecisionChangingException()
+                elif "same device" in e.__str__():
+                    raise DeviceChangingException()
+                else:
+                    raise e
+            if protect < 0.5 and search_index:
+                feats0 = feats.clone()
 
         # Index - feature抽出
         # if self.index is not None and self.feature is not None and index_rate != 0:
@@ -167,10 +165,8 @@ class Pipeline(object):
 
             # recover silient font
             npy = np.concatenate([np.zeros([npyOffset, npy.shape[1]]).astype("float32"), npy])
-            if self.isHalf is True:
-                npy = npy.astype("float16")
-
             feats = torch.from_numpy(npy).unsqueeze(0).to(self.device) * index_rate + (1 - index_rate) * feats
+
         feats = F.interpolate(feats.permute(0, 2, 1), scale_factor=2).permute(0, 2, 1)
         if protect < 0.5 and search_index:
             feats0 = F.interpolate(feats0.permute(0, 2, 1), scale_factor=2).permute(0, 2, 1)
@@ -207,14 +203,15 @@ class Pipeline(object):
         # 推論実行
         try:
             with torch.no_grad():
-                audio1 = (
-                    torch.clip(
-                        self.inferencer.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0].to(dtype=torch.float32),
-                        -1.0,
-                        1.0,
-                    )
-                    * 32767.5
-                ).data.to(dtype=torch.int16)
+                with autocast(enabled=self.isHalf):
+                    audio1 = (
+                        torch.clip(
+                            self.inferencer.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0].to(dtype=torch.float32),
+                            -1.0,
+                            1.0,
+                        )
+                        * 32767.5
+                    ).data.to(dtype=torch.int16)
         except RuntimeError as e:
             if "HALF" in e.__str__().upper():
                 print("11", e)
