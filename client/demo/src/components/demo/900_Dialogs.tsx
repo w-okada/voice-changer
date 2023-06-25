@@ -5,6 +5,7 @@ import { StartingNoticeDialog } from "./903_StartingNoticeDialog";
 import { ModelSlotManagerDialog } from "./904_ModelSlotManagerDialog";
 import { MergeLabDialog } from "./905_MergeLabDialog";
 import { AdvancedSettingDialog } from "./906_AdvancedSettingDialog";
+import { GetServerInfomationDialog } from "./907_GetServerInfomationDialog";
 
 export const Dialogs = () => {
     const guiState = useGuiState()
@@ -15,6 +16,7 @@ export const Dialogs = () => {
             {guiState.stateControls.showModelSlotManagerCheckbox.trigger}
             {guiState.stateControls.showMergeLabCheckbox.trigger}
             {guiState.stateControls.showAdvancedSettingCheckbox.trigger}
+            {guiState.stateControls.showGetServerInformationCheckbox.trigger}
             <div className="dialog-container" id="dialog">
                 {guiState.stateControls.showWaitingCheckbox.trigger}
                 <WaitingDialog></WaitingDialog>
@@ -26,6 +28,8 @@ export const Dialogs = () => {
                 <MergeLabDialog></MergeLabDialog>
                 {guiState.stateControls.showAdvancedSettingCheckbox.trigger}
                 <AdvancedSettingDialog></AdvancedSettingDialog>
+                {guiState.stateControls.showGetServerInformationCheckbox.trigger}
+                <GetServerInfomationDialog></GetServerInfomationDialog>
             </div>
 
         </div>

@@ -18,6 +18,7 @@ export const OpenStartingNoticeDialogCheckbox = "open-starting-notice-dialog-che
 export const OpenModelSlotManagerDialogCheckbox = "open-model-slot-manager-dialog-checkbox"
 export const OpenMergeLabDialogCheckbox = "open-merge-lab-dialog-checkbox"
 export const OpenAdvancedSettingDialogCheckbox = "open-advanced-setting-dialog-checkbox"
+export const OpenGetServerInformationDialogCheckbox = "open-get-server-information-dialog-checkbox"
 
 export const OpenTextInputDialogCheckbox = "open-text-input-dialog-checkbox"
 type Props = {
@@ -40,7 +41,7 @@ export type StateControls = {
 
     showMergeLabCheckbox: StateControlCheckbox
     showAdvancedSettingCheckbox: StateControlCheckbox
-
+    showGetServerInformationCheckbox: StateControlCheckbox
     showTextInputCheckbox: StateControlCheckbox
 }
 
@@ -169,6 +170,8 @@ export const GuiStateProvider = ({ children }: Props) => {
     const showModelSlotManagerCheckbox = useStateControlCheckbox(OpenModelSlotManagerDialogCheckbox);
     const showMergeLabCheckbox = useStateControlCheckbox(OpenMergeLabDialogCheckbox);
     const showAdvancedSettingCheckbox = useStateControlCheckbox(OpenAdvancedSettingDialogCheckbox);
+    const showGetServerInformationCheckbox = useStateControlCheckbox(OpenGetServerInformationDialogCheckbox);
+
 
 
     const showTextInputCheckbox = useStateControlCheckbox(OpenTextInputDialogCheckbox);
@@ -192,6 +195,7 @@ export const GuiStateProvider = ({ children }: Props) => {
         showModelSlotManagerCheckbox.updateState(false)
         showMergeLabCheckbox.updateState(false)
         showAdvancedSettingCheckbox.updateState(false)
+        showGetServerInformationCheckbox.updateState(false)
 
         showTextInputCheckbox.updateState(false)
 
@@ -232,6 +236,7 @@ export const GuiStateProvider = ({ children }: Props) => {
 
             showMergeLabCheckbox,
             showAdvancedSettingCheckbox,
+            showGetServerInformationCheckbox,
 
             showTextInputCheckbox
 

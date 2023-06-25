@@ -1493,6 +1493,9 @@ audio::-webkit-media-controls-overlay-enclosure{
                     }
                 }
             }
+            .config-sub-area-control-field-long {
+                width: 30rem;
+            }
         }
     }
 }
@@ -1580,7 +1583,13 @@ audio::-webkit-media-controls-overlay-enclosure{
         }
     }
 }
-
+.get-server-information-container {
+    margin: 10px;
+    .get-server-information-text-area {
+        width: 100%;
+        height: 20rem;
+    }
+}
 .merge-lab-container {
     display: flex;
     flex-direction: column;
