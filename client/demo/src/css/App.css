@@ -1191,15 +1191,29 @@ body {
     width: 5rem;
     height: 5rem;
     padding-top: 4px;
+    position: relative;
 }
 .model-slot-tile-icon {
     width: 5rem;
     height: 5rem;
     object-fit: contain;
     border-radius: 10px;
+    position: absolute;
+}
+.model-slot-tile-vctype {
+    position: absolute;
+    font-size: 0.6rem;
+    font-weight: 800;
+    top: 5px;
+    left: 2px;
+    background: RGBA(10, 200, 100, 0.6);
+    border-radius: 5px;
+    padding: 0px 2px 0px 2px;
 }
 .model-slot-tile-icon-no-entry {
     color: gray;
+    position: absolute;
+    top: 2rem;
 }
 .model-slot-tile-dscription {
     font-size: 0.7rem;
@@ -1231,11 +1245,15 @@ body {
                 background: rgba(100, 100, 100, 0.5);
                 color: white;
                 position: absolute;
-                paddig: 2px;
+                padding: 0px 0px 0px 3px;
                 font-size: 0.7rem;
                 left: 5px;
                 top: 5px;
                 border-radius: 2px;
+                .portrait-area-status-vctype {
+                    font-weight: 800;
+                    color: #866;
+                }
             }
             .portrait-area-terms-of-use {
                 width: 5rem;

@@ -61,6 +61,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
                 <div className="portrait-container">
                     <img className="portrait" src={icon} alt={selected.name} />
                     <div className="portrait-area-status">
+                        <p><span className="portrait-area-status-vctype">{selected.voiceChangerType}</span></p>
                         <p>vol: <span id="status-vol">0</span></p>
                         <p>buf: <span id="status-buf">0</span> ms</p>
                         <p>res: <span id="status-res">0</span> ms</p>
