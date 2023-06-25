@@ -6,7 +6,7 @@ import { VoiceChangerClient } from "../VoiceChangerClient"
 
 export type UseWorkletNodeSettingProps = {
     voiceChangerClient: VoiceChangerClient | null
-    defaultWorkletNodeSetting: WorkletNodeSetting
+    workletNodeSetting: WorkletNodeSetting
 }
 
 export type WorkletNodeSettingState = {
@@ -17,7 +17,7 @@ export type WorkletNodeSettingState = {
 
 export const useWorkletNodeSetting = (props: UseWorkletNodeSettingProps): WorkletNodeSettingState => {
     // 更新比較用
-    const [workletNodeSetting, _setWorkletNodeSetting] = useState<WorkletNodeSetting>(props.defaultWorkletNodeSetting)
+    const [workletNodeSetting, _setWorkletNodeSetting] = useState<WorkletNodeSetting>(props.workletNodeSetting)
 
     //////////////
     // 設定
@@ -25,17 +25,17 @@ export const useWorkletNodeSetting = (props: UseWorkletNodeSettingProps): Workle
     useEffect(() => {
 
         if (!props.voiceChangerClient) return
-        for (let k in props.defaultWorkletNodeSetting) {
+        for (let k in props.workletNodeSetting) {
             const cur_v = workletNodeSetting[k as keyof WorkletNodeSetting]
-            const new_v = props.defaultWorkletNodeSetting[k as keyof WorkletNodeSetting]
+            const new_v = props.workletNodeSetting[k as keyof WorkletNodeSetting]
             if (cur_v != new_v) {
-                _setWorkletNodeSetting(props.defaultWorkletNodeSetting)
-                props.voiceChangerClient.updateWorkletNodeSetting(props.defaultWorkletNodeSetting)
+                _setWorkletNodeSetting(props.workletNodeSetting)
+                props.voiceChangerClient.updateWorkletNodeSetting(props.workletNodeSetting)
                 break
             }
         }
 
-    }, [props.voiceChangerClient, props.defaultWorkletNodeSetting])
+    }, [props.voiceChangerClient, props.workletNodeSetting])
 
 
     const startOutputRecording = useMemo(() => {

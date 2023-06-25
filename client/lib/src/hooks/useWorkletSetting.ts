@@ -4,7 +4,7 @@ import { VoiceChangerClient } from "../VoiceChangerClient";
 
 export type UseWorkletSettingProps = {
     voiceChangerClient: VoiceChangerClient | null
-    defaultWorkletSetting: WorkletSetting
+    workletSetting: WorkletSetting
 }
 
 export type WorkletSettingState = {
@@ -14,12 +14,12 @@ export type WorkletSettingState = {
 }
 
 export const useWorkletSetting = (props: UseWorkletSettingProps): WorkletSettingState => {
-    const [setting, _setSetting] = useState<WorkletSetting>(props.defaultWorkletSetting)
+    const [setting, _setSetting] = useState<WorkletSetting>(props.workletSetting)
 
     useEffect(() => {
         if (!props.voiceChangerClient) return
         props.voiceChangerClient.configureWorklet(setting)
-    }, [props.voiceChangerClient, props.defaultWorkletSetting])
+    }, [props.voiceChangerClient, props.workletSetting])
 
 
 

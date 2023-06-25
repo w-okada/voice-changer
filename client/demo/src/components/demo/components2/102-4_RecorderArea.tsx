@@ -106,7 +106,7 @@ export const RecorderArea = (_props: RecorderAreaProps) => {
             </>
         )
 
-    }, [serverIORecording])
+    }, [serverIORecording, audioOutputForAnalyzer, outputAudioDeviceInfo])
 
     return (
         <div className="config-sub-area">

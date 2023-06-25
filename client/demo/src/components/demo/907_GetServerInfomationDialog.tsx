@@ -19,7 +19,7 @@ export const GetServerInfomationDialog = () => {
         )
         const content = (
             <div className="get-server-information-container">
-                <textarea className="get-server-information-text-area" id="get-server-information-text-area" value={JSON.stringify(serverSetting.serverSetting, null, 4)} />
+                <textarea className="get-server-information-text-area" id="get-server-information-text-area" value={JSON.stringify(serverSetting.serverSetting, null, 4)} onChange={() => { }} />
             </div>
         )
         return (

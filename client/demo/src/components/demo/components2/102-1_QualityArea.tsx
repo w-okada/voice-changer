@@ -82,7 +82,7 @@ export const QualityArea = (props: QualityAreaProps) => {
 
             </div>
         )
-    }, [serverSetting.serverSetting, setting.voiceChangerClientSetting, serverSetting.updateServerSettings, setVoiceChangerClientSetting])
+    }, [serverSetting.serverSetting, setting, serverSetting.updateServerSettings, setVoiceChangerClientSetting])
 
 
     return qualityArea

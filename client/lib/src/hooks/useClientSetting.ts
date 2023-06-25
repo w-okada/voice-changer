@@ -6,7 +6,7 @@ import { VoiceChangerClient } from "../VoiceChangerClient"
 export type UseClientSettingProps = {
     voiceChangerClient: VoiceChangerClient | null
     audioContext: AudioContext | null
-    defaultVoiceChangerClientSetting: VoiceChangerClientSetting
+    voiceChangerClientSetting: VoiceChangerClientSetting
 }
 
 export type ClientSettingState = {
@@ -19,23 +19,23 @@ export type ClientSettingState = {
 
 export const useClientSetting = (props: UseClientSettingProps): ClientSettingState => {
     // 更新比較用
-    const [voiceChangerClientSetting, setVoiceChangerClientSetting] = useState<VoiceChangerClientSetting>(props.defaultVoiceChangerClientSetting)
+    const [voiceChangerClientSetting, setVoiceChangerClientSetting] = useState<VoiceChangerClientSetting>(props.voiceChangerClientSetting)
 
     useEffect(() => {
         const update = async () => {
             if (!props.voiceChangerClient) return
-            for (let k in props.defaultVoiceChangerClientSetting) {
+            for (let k in props.voiceChangerClientSetting) {
                 const cur_v = voiceChangerClientSetting[k as keyof VoiceChangerClientSetting]
-                const new_v = props.defaultVoiceChangerClientSetting[k as keyof VoiceChangerClientSetting]
+                const new_v = props.voiceChangerClientSetting[k as keyof VoiceChangerClientSetting]
                 if (cur_v != new_v) {
-                    setVoiceChangerClientSetting(props.defaultVoiceChangerClientSetting)
-                    await props.voiceChangerClient.updateClientSetting(props.defaultVoiceChangerClientSetting)
+                    setVoiceChangerClientSetting(props.voiceChangerClientSetting)
+                    await props.voiceChangerClient.updateClientSetting(props.voiceChangerClientSetting)
                     break
                 }
             }
         }
         update()
-    }, [props.voiceChangerClient, props.defaultVoiceChangerClientSetting])
+    }, [props.voiceChangerClient, props.voiceChangerClientSetting])
 
 
     const setServerUrl = useMemo(() => {

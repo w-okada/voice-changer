@@ -96,7 +96,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                 </div>
             </div>
         )
-    }, [setVoiceChangerClientSetting, setting.voiceChangerClientSetting, inputAudioDeviceInfo, audioInputForGUI, serverSetting.serverSetting.enableServerAudio])
+    }, [setVoiceChangerClientSetting, setting, inputAudioDeviceInfo, audioInputForGUI, serverSetting.serverSetting.enableServerAudio])
 
 
     // (2-2) サーバ

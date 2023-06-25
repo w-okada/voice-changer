@@ -80,11 +80,10 @@ export const useClient = (props: UseClientProps): ClientState => {
         })
     }, [])
 
-
     // (1-2) 各種設定I/F
-    const voiceChangerClientSetting = useClientSetting({ voiceChangerClient, audioContext: props.audioContext, defaultVoiceChangerClientSetting: setting.voiceChangerClientSetting })
-    const workletNodeSetting = useWorkletNodeSetting({ voiceChangerClient: voiceChangerClient, defaultWorkletNodeSetting: setting.workletNodeSetting })
-    useWorkletSetting({ voiceChangerClient, defaultWorkletSetting: setting.workletSetting })
+    const voiceChangerClientSetting = useClientSetting({ voiceChangerClient, audioContext: props.audioContext, voiceChangerClientSetting: setting.voiceChangerClientSetting })
+    const workletNodeSetting = useWorkletNodeSetting({ voiceChangerClient: voiceChangerClient, workletNodeSetting: setting.workletNodeSetting })
+    useWorkletSetting({ voiceChangerClient, workletSetting: setting.workletSetting })
     const serverSetting = useServerSetting({ voiceChangerClient })
     const indexedDBState = useIndexedDB({ clientType: null })
 
@@ -128,7 +127,36 @@ export const useClient = (props: UseClientProps): ClientState => {
         setIoErrorCount(ioErrorCountRef.current)
     }
 
-    // (2-1) 初期化処理
+    // 設定データ管理
+    const { setItem, getItem } = useIndexedDB({ clientType: null })
+    // 設定データの更新と保存
+    const _setSetting = (_setting: ClientSetting) => {
+        const storeData = { ..._setting }
+        storeData.voiceChangerClientSetting = { ...storeData.voiceChangerClientSetting }
+        if (typeof storeData.voiceChangerClientSetting.audioInput != "string") {
+            storeData.voiceChangerClientSetting.audioInput = "none"
+        }
+        setItem("clientSetting", storeData)
+
+        setSetting(_setting)
+    }
+    // 設定データ初期化
+    useEffect(() => {
+        if (!voiceChangerClient) {
+            return
+        }
+        const loadCache = async () => {
+            const _setting = await getItem("clientSetting") as ClientSetting
+            setSetting(_setting)
+        }
+        loadCache()
+    }, [voiceChangerClient])
+
+
+
+
+
+    // (2-1) クライアント初期化処理
     useEffect(() => {
         const initialized = async () => {
             if (!props.audioContext) {
@@ -202,7 +230,7 @@ export const useClient = (props: UseClientProps): ClientState => {
         setting.voiceChangerClientSetting = _voiceChangerClientSetting
         console.log("setting.voiceChangerClientSetting", setting.voiceChangerClientSetting)
         // workletSettingIF.setSetting(_workletSetting)
-        setSetting({ ...setting })
+        _setSetting({ ...setting })
     }
 
 
@@ -210,14 +238,14 @@ export const useClient = (props: UseClientProps): ClientState => {
         setting.workletNodeSetting = _workletNodeSetting
         console.log("setting.workletNodeSetting", setting.workletNodeSetting)
         // workletSettingIF.setSetting(_workletSetting)
-        setSetting({ ...setting })
+        _setSetting({ ...setting })
     }
 
     const setWorkletSetting = (_workletSetting: WorkletSetting) => {
         setting.workletSetting = _workletSetting
         console.log("setting.workletSetting", setting.workletSetting)
         // workletSettingIF.setSetting(_workletSetting)
-        setSetting({ ...setting })
+        _setSetting({ ...setting })
     }
 
     return {

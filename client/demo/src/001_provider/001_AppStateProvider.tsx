@@ -36,14 +36,14 @@ export const AppStateProvider = ({ children }: Props) => {
     }, [])
 
     const initializedRef = useRef<boolean>(false)
-    useEffect(() => {
-        if (clientState.clientState.initialized) {
-            initializedRef.current = true
-            clientState.clientState.setVoiceChangerClientSetting({
-                ...clientState.clientState.setting.voiceChangerClientSetting
-            })
-        }
-    }, [clientState.clientState.initialized])
+    // useEffect(() => {
+    //     if (clientState.clientState.initialized) {
+    //         initializedRef.current = true
+    //         clientState.clientState.setVoiceChangerClientSetting({
+    //             ...clientState.clientState.setting.voiceChangerClientSetting
+    //         })
+    //     }
+    // }, [clientState.clientState.initialized])
 
     useEffect(() => {
         if (clientState.clientState.ioErrorCount > 100) {
