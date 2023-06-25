@@ -147,8 +147,11 @@ export const useClient = (props: UseClientProps): ClientState => {
         }
         const loadCache = async () => {
             const _setting = await getItem("clientSetting") as ClientSetting
-            setSetting(_setting)
-            serverSetting.reloadServerInfo()
+            if (_setting) {
+                setSetting(_setting)
+                serverSetting.reloadServerInfo()
+
+            }
         }
         loadCache()
     }, [voiceChangerClient])
