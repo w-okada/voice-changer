@@ -3,7 +3,7 @@
     "tab.activeBackground": "#65952acc"
   },
   "python.formatting.provider": "black",
-  "python.linting.mypyEnabled": true,
+  "python.linting.mypyEnabled": false,
   "[python]": {
     "editor.defaultFormatter": null, // Prettier を使わないようにする
     "editor.formatOnSave": true // ファイル保存時に自動フォーマット
@@ -13,5 +13,7 @@
     "--ignore=E501,E402,E722,E741,E203,W503"
     // "--max-line-length=150",
     // "--max-complexity=20"
-  ]
+  ],
+  "python.linting.flake8Enabled": true,
+  "python.linting.enabled": true
 }

@@ -25,27 +25,16 @@ $ cd voice-changer
 
 ## サーバ開発者向け
 
-1. 外部のリポジトリをサーバ内にクローンする
 
-```
-cd server
-git clone https://github.com/isletennos/MMVC_Client.git MMVC_Client_v13
-git clone https://github.com/isletennos/MMVC_Client.git MMVC_Client_v15
-git clone https://github.com/StarStringStudio/so-vits-svc.git so-vits-svc-40
-cd so-vits-svc-40 && git checkout 293fe0bc03a583df17846c715c179152745c1b8d && cd -
-git clone https://github.com/StarStringStudio/so-vits-svc.git so-vits-svc-40v2
-cd so-vits-svc-40v2 && git checkout 08c70ff3d2f7958820b715db2a2180f4b7f92f8d && cd -
-git clone https://github.com/yxlllc/DDSP-SVC.git DDSP-SVC
-git clone https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI.git RVC
-```
-
-2. モジュールをインストールする
+1. モジュールをインストールする
 
 ```
 $ pip install -r requirements.txt
 ```
 
-3. サーバを起動する
+
+
+2. サーバを起動する
 
 次のコマンドで起動します。各種重みについてのパスは環境に合わせて変えてください。
 
@@ -59,7 +48,20 @@ $ python3 MMVCServerSIO.py -p 18888 --https true \
  --model_dir model_dir
 ```
 
-4. 開発しましょう
+2-1. トラブルシュート
+
+(1) OSError: PortAudio library not found
+次のようなメッセージが表示される場合、追加でライブラリを追加する必要があります。
+```
+OSError: PortAudio library not found
+```
+ubuntu(wsl2)の場合下記のコマンドでインストールできます。
+```
+$ sudo apt-get install libportaudio2
+$ sudo apt-get install libasound-dev
+```
+
+3. 開発しましょう
 
 ## クライアント開発者向け
 

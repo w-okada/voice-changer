@@ -24,28 +24,13 @@ $ cd voice-changer
 ```
 
 ## For Server Developer
-
-1. Clone support VC repository
-
-```
-cd server
-git clone https://github.com/isletennos/MMVC_Client.git MMVC_Client_v13
-git clone https://github.com/isletennos/MMVC_Client.git MMVC_Client_v15
-git clone https://github.com/StarStringStudio/so-vits-svc.git so-vits-svc-40
-cd so-vits-svc-40 && git checkout 293fe0bc03a583df17846c715c179152745c1b8d && cd -
-git clone https://github.com/StarStringStudio/so-vits-svc.git so-vits-svc-40v2
-cd so-vits-svc-40v2 && git checkout 08c70ff3d2f7958820b715db2a2180f4b7f92f8d && cd -
-git clone https://github.com/yxlllc/DDSP-SVC.git DDSP-SVC
-git clone https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI.git RVC
-```
-
-2. Install requirements
+1. Install requirements
 
 ```
 $ pip install -r requirements.txt
 ```
 
-3. Run server
+2. Run server
 
 Run server with the below command. You can replace the path to each weight.
 
@@ -59,7 +44,22 @@ $ python3 MMVCServerSIO.py -p 18888 --https true \
  --model_dir model_dir
 ```
 
-4. Enjoy developing.
+2-1. Trouble shoot
+
+(1) OSError: PortAudio library not found
+If you get the message below, you shold install additional library.
+```
+OSError: PortAudio library not found
+```
+
+You can install the library this command.
+
+```
+$ sudo apt-get install libportaudio2
+$ sudo apt-get install libasound-dev
+```
+
+3. Enjoy developing.
 
 ## For Client Developer
 
