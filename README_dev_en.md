@@ -20,13 +20,13 @@ $ conda activate vcclient-dev
 
 ```
 $ git clone https://github.com/w-okada/voice-changer.git
-$ cd voice-changer
 ```
 
 ## For Server Developer
 1. Install requirements
 
 ```
+$ cd voice-changer/server
 $ pip install -r requirements.txt
 ```
 
