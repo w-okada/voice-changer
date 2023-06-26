@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+import threading
 import numpy as np
 from downloader.SampleDownloader import downloadSample, getSampleInfos
 from voice_changer.Local.ServerDevice import ServerDevice, ServerDeviceCallbacks
@@ -66,8 +67,8 @@ class VoiceChangerManager(ServerDeviceCallbacks):
 
         self.serverDevice = ServerDevice(self)
 
-        # thread = threading.Thread(target=self.serverDevice.start, args=())
-        # thread.start()
+        thread = threading.Thread(target=self.serverDevice.start, args=())
+        thread.start()
 
         # 設定保存用情報
         self.stored_setting: dict[str, str | int | float] = {}
