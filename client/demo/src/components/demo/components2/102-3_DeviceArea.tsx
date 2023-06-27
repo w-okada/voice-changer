@@ -76,7 +76,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                 <div className="config-sub-area-control-field">
                     <select className="body-select" value={audioInputForGUI} onChange={async (e) => {
                         setAudioInputForGUI(e.target.value)
-                        if (audioInputForGUI != "file") {
+                        if (e.target.value != "file") {
                             try {
                                 await setVoiceChangerClientSetting({ ...setting.voiceChangerClientSetting, audioInput: e.target.value })
                             } catch (e) {
