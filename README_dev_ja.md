@@ -20,7 +20,6 @@ $ conda activate vcclient-dev
 
 ```
 $ git clone https://github.com/w-okada/voice-changer.git
-$ cd voice-changer
 ```
 
 ## サーバ開発者向け
@@ -29,6 +28,7 @@ $ cd voice-changer
 1. モジュールをインストールする
 
 ```
+$ cd voice-changer/server
 $ pip install -r requirements.txt
 ```
 

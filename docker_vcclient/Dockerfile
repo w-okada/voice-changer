@@ -1,34 +1,3 @@
-# FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04 as base
-
-# ARG DEBIAN_FRONTEND=noninteractive
-
-# RUN apt-get update 
-# RUN apt-get install -y python3-pip git
-
-# RUN pip install torch==1.13.1
-# RUN pip install numpy==1.24.1
-# RUN pip install python-socketio==5.7.2
-
-# RUN pip install fastapi==0.89.1
-# RUN pip install python-multipart==0.0.5
-# RUN pip install uvicorn==0.20.0
-# RUN pip install websockets==10.4
-# RUN pip install pyOpenSSL==23.0.0
-# RUN pip install onnxruntime-gpu==1.13.1
-
-# RUN git clone https://github.com/isletennos/MMVC_Client.git
-# RUN cd MMVC_Client && git checkout 04f3fec4fd82dea6657026ec4e1cd80fb29a415c && cd -
-
-
-# WORKDIR /
-# ADD dummy /
-
-# RUN git clone --depth 1 https://github.com/w-okada/voice-changer.git
-
-
-#########
-# Prod  #
-#########
 FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
 # FROM nvidia/cuda:12.0.1-cudnn8-runtime-ubuntu22.04
 
@@ -40,7 +9,7 @@ RUN apt-get update \
 WORKDIR /
 ADD dummy /
 
-RUN git clone https://github.com/w-okada/voice-changer.git -b v.1.5.3.5a
+RUN git clone https://github.com/w-okada/voice-changer.git -b v.1.5.3.6
 
 
 
