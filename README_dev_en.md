@@ -61,6 +61,24 @@ $ sudo apt-get install libasound-dev
 
 3. Enjoy developing.
 
+
+### Appendix 
+1. Win + Anaconda (not supported)
+
+use conda to install pytorch
+```
+conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
+```
+
+Also run these command.
+```
+pip install chardet 
+pip install numpy==1.24.0
+```
+
+
+
+
 ## For Client Developer
 
 1. Import modules and initial build

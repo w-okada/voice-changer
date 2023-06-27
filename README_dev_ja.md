@@ -63,6 +63,20 @@ $ sudo apt-get install libasound-dev
 
 3. 開発しましょう
 
+### Appendix 
+1. Win + Anacondaのとき (not supported)
+
+pytorchをcondaで入れないとgpuを認識しないかもしれない。
+```
+conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
+```
+
+また、追加で下記も必要のようだ。
+```
+pip install chardet 
+pip install numpy==1.24.0
+```
+
 ## クライアント開発者向け
 
 1. モジュールをインストールして、一度ビルドします
