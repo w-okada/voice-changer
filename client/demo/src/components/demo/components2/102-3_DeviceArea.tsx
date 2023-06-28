@@ -47,7 +47,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                 </div>
             </div>
         )
-    }, [serverSetting.serverSetting, serverSetting.updateServerSettings])
+    }, [serverSetting.serverSetting, serverSetting.updateServerSettings, isConverting])
 
 
 

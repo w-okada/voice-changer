@@ -113,6 +113,9 @@ class VoiceChanger:
             print("[Voice Changer] Voice Changer is not selected.")
             return self.get_info()
 
+        if key == "serverAudioStated" and val == 0:
+            self.settings.inputSampleRate = 48000
+
         if key in self.settings.intData:
             setattr(self.settings, key, int(val))
             if key == "crossFadeOffsetRate" or key == "crossFadeEndRate":

@@ -82,9 +82,10 @@ class ServerDevice:
             indata = indata * self.settings.serverInputAudioGain
             with Timer("all_inference_time") as t:
                 unpackedData = librosa.to_mono(indata.T) * 32768.0
+                unpackedData = unpackedData.astype(np.int16)
                 out_wav, times = self.serverDeviceCallbacks.on_request(unpackedData)
-                outputChunnels = outdata.shape[1]
-                outdata[:] = np.repeat(out_wav, outputChunnels).reshape(-1, outputChunnels) / 32768.0
+                outputChannels = outdata.shape[1]
+                outdata[:] = np.repeat(out_wav, outputChannels).reshape(-1, outputChannels) / 32768.0
                 outdata[:] = outdata * self.settings.serverOutputAudioGain
             all_inference_time = t.secs
             self.performance = [all_inference_time] + times
@@ -100,7 +101,6 @@ class ServerDevice:
         currentModelSamplingRate = -1
         while True:
             if self.settings.serverAudioStated == 0 or self.settings.serverInputDeviceId == -1:
-                # self.settings.inputSampleRate = 48000
                 time.sleep(2)
             else:
                 sd._terminate()
@@ -135,6 +135,7 @@ class ServerDevice:
                         blocksize=block_frame,
                         # samplerate=currentModelSamplingRate,
                         dtype="float32",
+                        # dtype="int16",
                         # channels=[currentInputChannelNum, currentOutputChannelNum],
                     ):
                         pass
@@ -156,6 +157,7 @@ class ServerDevice:
                         # blocksize=block_frame,
                         # samplerate=vc.settings.serverInputAudioSampleRate,
                         dtype="float32",
+                        # dtype="int16",
                         # channels=[currentInputChannelNum, currentOutputChannelNum],
                     ):
                         while self.settings.serverAudioStated == 1 and sd.default.device[0] == self.settings.serverInputDeviceId and sd.default.device[1] == self.settings.serverOutputDeviceId and currentModelSamplingRate == self.serverDeviceCallbacks.get_processing_sampling_rate() and currentInputChunkNum == self.settings.serverReadChunkSize:
