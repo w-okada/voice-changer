@@ -12,6 +12,7 @@ export const useVCClient = (props: UseVCClientProps): VCClientState => {
     const clientState = useClient({
         audioContext: props.audioContext
     })
+    console.log("useVCClient", props.audioContext)
 
     const ret: VCClientState = {
         clientState
