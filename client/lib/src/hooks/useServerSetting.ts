@@ -92,12 +92,10 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
                 const k = Object.values(ServerSettingKey)[i] as keyof VoiceChangerServerSetting
                 const cur_v = serverSetting[k]
                 const new_v = setting[k]
+
                 if (cur_v != new_v) {
                     const res = await props.voiceChangerClient.updateServerSettings(k, "" + new_v)
-
                     setServerSetting(res)
-                    const storeData = { ...res }
-                    storeData.recordIO = 0
                 }
             }
         }
@@ -186,8 +184,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             if (!props.voiceChangerClient) return
             const res = await props.voiceChangerClient.getServerSettings()
             setServerSetting(res)
-            const storeData = { ...res }
-            storeData.recordIO = 0
         }
     }, [props.voiceChangerClient])
 
