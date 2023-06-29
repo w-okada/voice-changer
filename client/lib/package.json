@@ -1,6 +1,6 @@
 {
   "name": "@dannadori/voice-changer-client-js",
-  "version": "1.0.154",
+  "version": "1.0.155",
   "description": "",
   "main": "dist/index.js",
   "directories": {
@@ -39,9 +39,9 @@
     "prettier": "^2.8.8",
     "raw-loader": "^4.0.2",
     "rimraf": "^5.0.1",
-    "ts-loader": "^9.4.3",
-    "typescript": "^5.1.3",
-    "webpack": "^5.88.0",
+    "ts-loader": "^9.4.4",
+    "typescript": "^5.1.6",
+    "webpack": "^5.88.1",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1"
   },
@@ -52,6 +52,6 @@
     "localforage": "^1.10.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "socket.io-client": "^4.7.0"
+    "socket.io-client": "^4.7.1"
   }
 }
