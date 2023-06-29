@@ -92,6 +92,8 @@ Windows 版と Mac 版を提供しています。
 
 - RVC で使用する場合の GUI の各項目説明は[こちら](tutorials/tutorial_rvc_ja_latest.md)をご覧ください
 
+- AMDのGPUはDirectML版ONNXでのみ使用できる場合があります。（実験的実装です。）
+
 - ダウンロードはこちらから。
 
 | Version    | OS  | フレームワーク                            | link                                                                                                                                                            | サポート VC                                                                   | サイズ |

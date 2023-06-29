@@ -87,6 +87,8 @@ We offer Windows and Mac versions.
 
 - Please refer to [here](tutorials/tutorial_rvc_en_latest.md) for the description of each item of GUI to be used in RVC.
 
+- AMD GPUs may only be used with DirectML-version ONNX in some cases (as it is an experimental implementation).
+
 - Download (When you cannot download from google drive, try [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main))
 
 | Version    | OS  | Framework                                 | link                                                                                                                                                             | support VC                                                                    | size   |
