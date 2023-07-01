@@ -17,7 +17,7 @@ VC Client は図中の３か所で音声がどのような状態になってい�
 
 ### (1)(2)での音声の状態について確認
 
-<img src="https://github.com/w-okada/voice-changer/assets/48346627/fb0ee6fe-e543-4ea2-8351-bf95a5c8a063" width="720">
+<img src="https://github.com/w-okada/voice-changer/assets/48346627/f4845f1d-2e1a-49c1-a226-0e50be807f2d" width="720">
 
 Analyzer の Sampling を start させた状態で音声変換を開始してください。ある程度音声を入力した後に Sampling をストップすると in/out に再生ボタンが表示されます。
 
