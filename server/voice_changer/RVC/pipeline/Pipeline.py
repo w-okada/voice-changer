@@ -79,6 +79,7 @@ class Pipeline(object):
         useFinalProj,
         repeat,
         protect=0.5,
+        out_size=None,
     ):
         # 16000のサンプリングレートで入ってきている。以降この世界は16000で処理。
 
@@ -206,7 +207,7 @@ class Pipeline(object):
                 with autocast(enabled=self.isHalf):
                     audio1 = (
                         torch.clip(
-                            self.inferencer.infer(feats, p_len, pitch, pitchf, sid)[0][0, 0].to(dtype=torch.float32),
+                            self.inferencer.infer(feats, p_len, pitch, pitchf, sid, out_size)[0][0, 0].to(dtype=torch.float32),
                             -1.0,
                             1.0,
                         )

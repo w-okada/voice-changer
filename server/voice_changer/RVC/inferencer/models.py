@@ -129,12 +129,12 @@ class SynthesizerTrnMsNSFsid(nn.Module):
         o = self.dec(z_slice, pitchf, g=g)
         return o, ids_slice, x_mask, y_mask, (z, z_p, m_p, logs_p, m_q, logs_q)
 
-    def infer(self, phone, phone_lengths, pitch, nsff0, sid, max_len=None):
+    def infer(self, phone, phone_lengths, pitch, nsff0, sid, max_len=None, convert_length=None):
         g = self.emb_g(sid).unsqueeze(-1)
         m_p, logs_p, x_mask = self.enc_p(phone, pitch, phone_lengths)
         z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p) * 0.66666) * x_mask
         z = self.flow(z_p, x_mask, g=g, reverse=True)
-        o = self.dec((z * x_mask)[:, :, :max_len], nsff0, g=g)
+        o = self.dec.infer_realtime((z * x_mask)[:, :, :max_len], nsff0, g=g, convert_length=convert_length)
         return o, x_mask, (z, z_p, m_p, logs_p)
 
 
@@ -208,10 +208,10 @@ class SynthesizerTrnMsNSFsidNono(nn.Module):
         o = self.dec(z_slice, g=g)
         return o, ids_slice, x_mask, y_mask, (z, z_p, m_p, logs_p, m_q, logs_q)
 
-    def infer(self, phone, phone_lengths, sid, max_len=None):
+    def infer(self, phone, phone_lengths, sid, max_len=None, out_length=None):
         g = self.emb_g(sid).unsqueeze(-1)
         m_p, logs_p, x_mask = self.enc_p(phone, None, phone_lengths)
         z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p) * 0.66666) * x_mask
         z = self.flow(z_p, x_mask, g=g, reverse=True)
-        o = self.dec((z * x_mask)[:, :, :max_len], g=g)
+        o = self.dec.infer_realtime((z * x_mask)[:, :, :max_len], g=g, convert_length=out_length)
         return o, x_mask, (z, z_p, m_p, logs_p)

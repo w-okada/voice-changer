@@ -109,6 +109,7 @@ class RVC(VoiceChangerModel):
 
         if convertSize % 128 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
             convertSize = convertSize + (128 - (convertSize % 128))
+        outSize = convertSize - self.settings.extraConvertSize
 
         # バッファがたまっていない場合はzeroで補う
         if self.audio_buffer.shape[0] < convertSize:
@@ -132,15 +133,16 @@ class RVC(VoiceChangerModel):
         vol = max(vol, self.prevVol * 0.0)
         self.prevVol = vol
 
-        return (audio_buffer, convertSize, vol)
+        return (audio_buffer, convertSize, vol, outSize)
 
     def inference(self, data):
         audio = data[0]
         convertSize = data[1]
         vol = data[2]
+        outSize = data[3]
 
         if vol < self.settings.silentThreshold:
-            return np.zeros(convertSize).astype(np.int16)
+            return np.zeros(convertSize).astype(np.int16) * np.sqrt(vol)
 
         audio = torchaudio.functional.resample(audio, self.slotInfo.samplingRate, 16000, rolloff=0.99)
         repeat = 1 if self.settings.rvcQuality else 0
@@ -165,6 +167,7 @@ class RVC(VoiceChangerModel):
                 useFinalProj,
                 repeat,
                 protect,
+                outSize
             )
             result = audio_out.detach().cpu().numpy() * np.sqrt(vol)
 
