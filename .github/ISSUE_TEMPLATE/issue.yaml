@@ -68,9 +68,9 @@ body:
     validations:
       required: true
   - type: dropdown
-    id: sample-model
+    id: wait-for-launch
     attributes:
-      label: Sample model
+      label: Wait for a while
       description: If the GUI won't start up, wait a several minutes. Alternatively, have you excluded it from your virus-checking software (at your own risk)?
       options:
         - "The GUI successfully launched."
