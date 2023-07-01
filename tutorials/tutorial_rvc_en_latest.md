@@ -231,6 +231,8 @@ You can select audio output devices such as speakers and output.
 
 In monitor mode, you can select audio output devices such as speaker output. This is only available in server device mode.
 
+Please refer to [this document](tutorial_monitor_consept_ja.md) for an overview of the idea.
+
 #### REC.
 
 It will output the converted audio to a file.

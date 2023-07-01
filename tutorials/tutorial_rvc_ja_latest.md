@@ -236,6 +236,8 @@ onnxdirectML 版では GPU の ON/OFF を切り替えることができます。
 
 モニター用にスピーカー出力など音声出力デバイスを選択できます。server device モードの場合のみ有効です。
 
+詳細は[こちらの文書](./tutorial_monitor_consept_ja.md)をご確認ください。
+
 #### REC.
 
 変換後の音声をファイル出力します。
