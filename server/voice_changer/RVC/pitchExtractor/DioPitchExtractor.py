@@ -31,16 +31,18 @@ class DioPitchExtractor(PitchExtractor):
             frame_period=10,
         )
         f0 = pyworld.stonemask(audio.astype(np.double), _f0, t, sr)
-        f0 = np.pad(f0.astype("float"), (start_frame, n_frames - len(f0) - start_frame))
+       # f0 = np.pad(f0.astype("float"), (start_frame, n_frames - len(f0) - start_frame))
 
         f0 *= pow(2, f0_up_key / 12)
         pitchf[-f0.shape[0]:] = f0[:pitchf.shape[0]]
         f0bak = pitchf.copy()
-        f0_mel = 1127.0 * np.log(1.0 + f0bak / 700.0)
-        f0_mel = np.clip(
-            (f0_mel - f0_mel_min) * 254.0 / (f0_mel_max - f0_mel_min) + 1.0, 1.0, 255.0
-        )
-        pitch_coarse = f0_mel.astype(int)
+        f0_mel = 1127 * np.log(1 + f0bak / 700)
+        f0_mel[f0_mel > 0] = (f0_mel[f0_mel > 0] - f0_mel_min) * 254 / (
+            f0_mel_max - f0_mel_min
+        ) + 1
+        f0_mel[f0_mel <= 1] = 1
+        f0_mel[f0_mel > 255] = 255
+        pitch_coarse = np.rint(f0_mel).astype(int)
 
         return pitch_coarse, pitchf
 
