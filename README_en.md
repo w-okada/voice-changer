@@ -66,8 +66,16 @@ It can be used in two main ways, in order of difficulty:
 
 ## (1) Usage with pre-built binaries
 
-You can download and run executable binaries.
-We offer Windows and Mac versions.
+- You can download and run executable binaries.
+
+- Please see [here](tutorials/tutorial_rvc_ja_latest.md) for the tutorial.
+
+- We offer Windows and Mac versions.
+
+  - If you are using a Windows and Nvidia GPU, please download ONNX (cpu, cuda), PyTorch (cpu, cuda).
+  - If you are using a Windows and AMD/Intel GPU, please download ONNX (cpu, DirectML) and PyTorch (cpu, cuda). AMD/Intel GPUs are only enabled for ONNX models.
+  - In either case, for GPU support, PyTorch and Onnxruntime are only enabled if supported.
+  - If you are not using a GPU on Windows, please download ONNX (cpu, cuda) and PyTorch (cpu, cuda).
 
 - For Windows user, after unzipping the downloaded zip file, please run the `start_http.bat` file corresponding to your VC.
 
@@ -76,10 +84,6 @@ We offer Windows and Mac versions.
 - If you are connecting remotely, please use the `.command` file (Mac) or `.bat` file (Windows) with https instead of http.
 
 - The encoder of DDPS-SVC only supports hubert-soft.
-
-- Please refer to [here](tutorials/tutorial_rvc_en_latest.md) for the description of each item of GUI to be used in RVC.
-
-- AMD GPUs may only be used with DirectML-version ONNX in some cases (as it is an experimental implementation).
 
 - Download (When you cannot download from google drive, try [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main))
 
