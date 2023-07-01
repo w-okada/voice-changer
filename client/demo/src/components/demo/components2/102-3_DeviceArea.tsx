@@ -11,6 +11,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
     const { isConverting, audioInputForGUI, inputAudioDeviceInfo, setAudioInputForGUI, fileInputEchoback, setFileInputEchoback, setAudioOutputForGUI, audioOutputForGUI, outputAudioDeviceInfo } = useGuiState();
     const [inputHostApi, setInputHostApi] = useState<string>("ALL");
     const [outputHostApi, setOutputHostApi] = useState<string>("ALL");
+    const [monitorHostApi, setMonitorHostApi] = useState<string>("ALL");
     const audioSrcNode = useRef<MediaElementAudioSourceNode>();
 
     const { getItem, setItem } = useIndexedDB({ clientType: null });
@@ -510,7 +511,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
 
         const filteredDevice = devices
             .map((x, index) => {
-                if (outputHostApi != "ALL" && x.hostAPI != outputHostApi) {
+                if (monitorHostApi != "ALL" && x.hostAPI != monitorHostApi) {
                     return null;
                 }
                 return (
@@ -535,9 +536,9 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                             className="config-sub-area-control-field-auido-io-filter"
                             name="kinds"
                             id="kinds"
-                            value={outputHostApi}
+                            value={monitorHostApi}
                             onChange={(e) => {
-                                setOutputHostApi(e.target.value);
+                                setMonitorHostApi(e.target.value);
                             }}
                         >
                             <option value="ALL" key="ALL">
@@ -558,7 +559,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                 </div>
             </div>
         );
-    }, [outputHostApi, serverSetting.serverSetting, serverSetting.updateServerSettings, serverSetting.serverSetting.enableServerAudio]);
+    }, [monitorHostApi, serverSetting.serverSetting, serverSetting.updateServerSettings, serverSetting.serverSetting.enableServerAudio]);
 
     return (
         <div className="config-sub-area">

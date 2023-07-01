@@ -67,6 +67,17 @@ body:
         - "yes"
     validations:
       required: true
+  - type: dropdown
+    id: sample-model
+    attributes:
+      label: Sample model
+      description: If the GUI won't start up, wait a several minutes. Alternatively, have you excluded it from your virus-checking software (at your own risk)?
+      options:
+        - "The GUI successfully launched."
+        - "no"
+        - "yes"
+    validations:
+      required: true
   - type: input
     id: vc-type
     attributes:
