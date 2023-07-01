@@ -16,7 +16,7 @@ class CrepePitchExtractor(PitchExtractor):
         else:
             self.device = torch.device("cpu")
 
-    def extract(self, audio, f0_up_key, sr, window, silence_front=0):
+    def extract(self, audio, pitchf, f0_up_key, sr, window, silence_front=0):
         n_frames = int(len(audio) // window) + 1
         start_frame = int(silence_front * sr / window)
         real_silence_front = start_frame * window / sr
@@ -52,11 +52,12 @@ class CrepePitchExtractor(PitchExtractor):
         )
 
         f0 *= pow(2, f0_up_key / 12)
-        f0bak = f0.detach().cpu().numpy()
-        f0_mel = 1127.0 * torch.log(1.0 + f0 / 700.0)
-        f0_mel = torch.clip(
+        pitchf[-f0.shape[0]:] = f0.detach().cpu().numpy()[:pitchf.shape[0]]
+        f0bak = pitchf.copy()
+        f0_mel = 1127.0 * np.log(1.0 + f0bak / 700.0)
+        f0_mel = np.clip(
             (f0_mel - f0_mel_min) * 254.0 / (f0_mel_max - f0_mel_min) + 1.0, 1.0, 255.0
         )
-        f0_coarse = f0_mel.round().detach().cpu().numpy().astype(int)
+        pitch_coarse = f0_mel.astype(int)
 
-        return f0_coarse, f0bak
+        return pitch_coarse, pitchf

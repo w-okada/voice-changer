@@ -138,6 +138,7 @@ class SynthesizerTrnMsNSFsid(nn.Module):
         return o, x_mask, (z, z_p, m_p, logs_p)
 
 
+
 class SynthesizerTrnMsNSFsidNono(nn.Module):
     def __init__(self, spec_channels, segment_size, inter_channels, hidden_channels, filter_channels, n_heads, n_layers, kernel_size, p_dropout, resblock, resblock_kernel_sizes, resblock_dilation_sizes, upsample_rates, upsample_initial_channel, upsample_kernel_sizes, spk_embed_dim, gin_channels, emb_channels, sr=None, **kwargs):
         super().__init__()
@@ -208,10 +209,10 @@ class SynthesizerTrnMsNSFsidNono(nn.Module):
         o = self.dec(z_slice, g=g)
         return o, ids_slice, x_mask, y_mask, (z, z_p, m_p, logs_p, m_q, logs_q)
 
-    def infer(self, phone, phone_lengths, sid, max_len=None, out_length=None):
+    def infer(self, phone, phone_lengths, sid, max_len=None, convert_length=None):
         g = self.emb_g(sid).unsqueeze(-1)
         m_p, logs_p, x_mask = self.enc_p(phone, None, phone_lengths)
         z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p) * 0.66666) * x_mask
         z = self.flow(z_p, x_mask, g=g, reverse=True)
-        o = self.dec.infer_realtime((z * x_mask)[:, :, :max_len], g=g, convert_length=out_length)
+        o = self.dec.infer_realtime((z * x_mask)[:, :, :max_len], g=g, convert_length=convert_length)
         return o, x_mask, (z, z_p, m_p, logs_p)

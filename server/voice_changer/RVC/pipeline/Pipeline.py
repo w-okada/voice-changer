@@ -13,6 +13,9 @@ from Exceptions import (
 
 from voice_changer.RVC.embedder.Embedder import Embedder
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
+from voice_changer.RVC.inferencer.OnnxRVCInferencer import OnnxRVCInferencer
+from voice_changer.RVC.inferencer.OnnxRVCInferencerNono import OnnxRVCInferencerNono
+
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 
 
@@ -70,7 +73,9 @@ class Pipeline(object):
     def exec(
         self,
         sid,
-        audio,
+        audio, # torch.tensor [n]
+        pitchf, # np.array [m]
+        feature, # np.array [m, feat]
         f0_up_key,
         index_rate,
         if_f0,
@@ -98,13 +103,14 @@ class Pipeline(object):
 
         # RVC QualityがOnのときにはsilence_frontをオフに。
         silence_front = silence_front if repeat == 0 else 0
+        pitchf = pitchf if repeat == 0 else torch.zeros([pitchf.shape[0], pitchf.shape[1] * 2])
 
         # ピッチ検出
-        pitch, pitchf = None, None
         try:
             if if_f0 == 1:
                 pitch, pitchf = self.pitchExtractor.extract(
                     audio_pad,
+                    pitchf,
                     f0_up_key,
                     self.sr,
                     self.window,
@@ -114,6 +120,9 @@ class Pipeline(object):
                 pitchf = pitchf[:p_len]
                 pitch = torch.tensor(pitch, device=self.device).unsqueeze(0).long()
                 pitchf = torch.tensor(pitchf, device=self.device, dtype=torch.float).unsqueeze(0)
+            else:
+                pitch = None
+                pitchf = None
         except IndexError:
             # print(e)
             raise NotEnoughDataExtimateF0()
@@ -165,9 +174,8 @@ class Pipeline(object):
                 npy = np.sum(self.big_npy[ix] * np.expand_dims(weight, axis=2), axis=1)
 
             # recover silient font
-            npy = np.concatenate([np.zeros([npyOffset, npy.shape[1]]).astype("float32"), npy])
+            npy = np.concatenate([np.zeros([npyOffset, npy.shape[1]], dtype=np.float32), feature[:npyOffset:2].astype("float32"), npy])[-feats.shape[1]:]
             feats = torch.from_numpy(npy).unsqueeze(0).to(self.device) * index_rate + (1 - index_rate) * feats
-
         feats = F.interpolate(feats.permute(0, 2, 1), scale_factor=2).permute(0, 2, 1)
         if protect < 0.5 and search_index:
             feats0 = F.interpolate(feats0.permute(0, 2, 1), scale_factor=2).permute(0, 2, 1)
@@ -192,14 +200,21 @@ class Pipeline(object):
             feats = feats.to(feats0.dtype)
         p_len = torch.tensor([p_len], device=self.device).long()
 
+        feats_buffer = feats.squeeze(0).detach().cpu()
+        if pitchf is not None:
+            pitchf_buffer = pitchf.squeeze(0).detach().cpu()
+        else:
+            pitchf_buffer = None
         # apply silent front for inference
-        npyOffset = math.floor(silence_front * 16000) // 360
-        feats = feats[:, npyOffset * 2 :, :]
-        feats_len = feats.shape[1]
-        if pitch is not None and pitchf is not None:
-            pitch = pitch[:, -feats_len:]
-            pitchf = pitchf[:, -feats_len:]
-        p_len = torch.tensor([feats_len], device=self.device).long()
+        if type(self.inferencer) in [OnnxRVCInferencer, OnnxRVCInferencerNono]:
+            npyOffset = math.floor(silence_front * 16000) // 360
+            feats = feats[:, npyOffset * 2 :, :]
+            feats_len = feats.shape[1]
+            if pitch is not None and pitchf is not None:
+                pitch = pitch[:, -feats_len:]
+                pitchf = pitchf[:, -feats_len:]
+            p_len = torch.tensor([feats_len], device=self.device).long()
+        
 
         # 推論実行
         try:
@@ -220,7 +235,7 @@ class Pipeline(object):
             else:
                 raise e
 
-        del feats, p_len, padding_mask
+        del p_len, padding_mask, pitch, pitchf, feats
         torch.cuda.empty_cache()
 
         # inferで出力されるサンプリングレートはモデルのサンプリングレートになる。
@@ -230,6 +245,6 @@ class Pipeline(object):
             end = -1 * self.t_pad_tgt
             audio1 = audio1[offset:end]
 
-        del pitch, pitchf, sid
+        del sid
         torch.cuda.empty_cache()
-        return audio1
+        return audio1, pitchf_buffer, feats_buffer

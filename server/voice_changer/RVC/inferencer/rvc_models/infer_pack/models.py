@@ -203,6 +203,7 @@ class Generator(torch.nn.Module):
         super(Generator, self).__init__()
         self.num_kernels = len(resblock_kernel_sizes)
         self.num_upsamples = len(upsample_rates)
+        self.upsample_rates = upsample_rates
         self.conv_pre = Conv1d(initial_channel, upsample_initial_channel, 7, 1, padding=3)
         resblock = ResBlock1 if resblock == "1" else ResBlock2
 
@@ -245,7 +246,7 @@ class Generator(torch.nn.Module):
                     # conv2
                     self.ups_size[i] += (k - 1)//2
                     # conv1
-                    self.ups_size[i] += d * (k - 1)//2
+                    self.ups_size[i] += d[-1] * (k - 1)//2
                 # upsampling
                 self.ups_size[i] = -(-self.ups_size[i] // upsample_rates[i]) + (upsample_kernel_sizes[i] - upsample_rates[i]) // 2
                 if i:
@@ -297,7 +298,7 @@ class Generator(torch.nn.Module):
         x = F.leaky_relu(x)
         x = self.conv_post(x)
         x = torch.tanh(x)
-        out = torch.zeros([x.shape[0], 1, x.shape[0] * np.prod(self.upsample_rates)], device=x.device, dtype=x.dtype)
+        out = torch.zeros([x.shape[0], 1, out_length], device=x.device, dtype=x.dtype)
         out[:, :, -x.shape[2]:] = x[:, :, -out.shape[2]:]
         return out
 
