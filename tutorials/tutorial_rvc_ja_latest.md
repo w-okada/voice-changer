@@ -1,10 +1,10 @@
-# Realtime Voice Changer Client for RVC チュートリアル(v.1.5.3.3)
+# Realtime Voice Changer Client for RVC チュートリアル(v.1.5.3.7)
 
 [English](/tutorials/tutorial_rvc_en_latest.md)
 
 # はじめに
 
-本アプリケーションは、各種音声変換 AI(VC, Voice Conversion)を用いてリアルタイム音声変換を行うためのクライアントソフトウェアです。本ドキュメントでは[RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI)に限定した音声変換のためのチュートリアルを行います。
+本アプリケーションは、各種音声変換 AI(VC, Voice Conversion)を用いてリアルタイム音声変換を行うためのクライアントソフトウェアです。RVC, MMVCv13, MMVCv15, So-vits-svcv40 などのモデルに対応していますが本ドキュメントでは[RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI)を題材に音声変換のためのチュートリアルを行います。基本的な操作は大きく変わりません。
 
 以下、本家の[Retrieval-based-Voice-Conversion-WebUI](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)を本家 RVC と表記し、ddPn08 氏の作成した[RVC-WebUI](https://github.com/ddPn08/rvc-webui)を ddPn08RVC と記載します。
 
@@ -40,37 +40,53 @@
 
 ### GUI 表示
 
-起動に必要なデータのダウンロードが完了すると下記のような Launcher 画面が出ます。この画面から RVC を選択してください。
+起動に必要なデータのダウンロードが完了すると下記のような ダイアログが表示されます。よろしければ黄色いアイコンを押して開発者にコーヒーをご馳走してあげてください。スタートボタンを押すとダイアログが消えます。
 
-![クライアントの選択画面](https://user-images.githubusercontent.com/23290400/235131650-9eeee978-96fa-478a-b728-3581ae0b8b67.png)
+![image](https://github.com/w-okada/voice-changer/assets/48346627/a8d12b5c-d1e8-4ca6-aed0-72cee6bb97c1)
 
-## RVC 用の画面
+# GUI
 
-下記のような画面が出れば成功です。右上の?ボタンから[マニュアル](https://zenn.dev/wok/books/0004_vc-client-v_1_5_1_x)に移動できます。
+下記のような画面が出れば成功です。
 
-![v1.5.3.1 RVC初期画面](https://github.com/w-okada/voice-changer/assets/48346627/0f407779-7798-49f9-a542-663d80807cdb)
+![image](https://github.com/w-okada/voice-changer/assets/48346627/27add00d-5059-4cbf-a732-9deb6dc309ff)
 
 # クイックスタート
 
+## 操作方法
+
 起動時にダウンロードしたデータを用いて、すぐに音声変換を行うことができます。
 
-下図の(1)で使用するマイクとスピーカーを選択して、(2)のスタートボタンを押してみてください。
-数秒のデータロードの後に音声変換が開始されます。
-なお、慣れていない方は、(1)では client device を選択してかマイクとスピーカーを選択することを推奨します。（server device との違いは後述します。）
+(1) モデル選択エリアから使いたいモデルをクリックします。モデルがロードされるとモデルに設定されているキャラクタの画像が画面に表示されます。
 
-![image](https://github.com/w-okada/voice-changer/assets/48346627/ce2f8be7-852e-4b78-adce-1df8cad9fbab)
+(2) 使用するマイク(input)とスピーカー(output)を選択します。慣れていない方は、client を選択して、マイクとスピーカーを選択することを推奨します。（server との違いは後述します。）
 
-## GUI の項目の詳細
+(3) スタートボタンを押すと、数秒のデータロードの後に音声変換が開始されます。マイクに何かしゃべってみてください。スピーカーから変換後の音声が聞こえてくると思います。
 
-GUI で設定できる項目は下図のようなセクションに分かれています。それぞれのセクションはタイトルをクリックすることで開閉できます。
+![image](https://github.com/w-okada/voice-changer/assets/48346627/883b296e-e5ca-4571-8fed-dcf7495ebb92)
 
-![image](https://github.com/w-okada/voice-changer/assets/48346627/a5eab90c-c0af-42cd-abfb-e897d333d1ff)
+## クイックスタートにおける FAQ
 
-## Title
+Q1. 音がとぎれとぎれになってしまう。
 
-![image](https://github.com/w-okada/rvc-trainer-docker/assets/48346627/0ea2106d-9da9-493b-aee0-8320fa58e273)
+A1. PC の性能が十分ではない可能性があります。CHUNK の値を大きくしてみてください(下図(A))。(1024 など)。また F0 Det を dio にしてみてください(下図(B))。
 
-タイトル横のアイコンはリンクになっています。
+![image](https://github.com/w-okada/voice-changer/assets/48346627/3c485d9b-53be-47c1-85d9-8663363b06f9)
+
+Q2. 音声が変換されない。
+
+A2. こちらを参照して問題点の場所を明らかにして、対応を検討してください。
+
+Q3. 音程がおかしい
+
+A3. クイックスタートでは説明しませんでしたが、Pitch 変更可能なモデルであれば TUNE で変更できます。後述の詳細説明をご確認ください。
+
+# GUI の詳細
+
+## タイトルエリア
+
+![image](https://github.com/w-okada/voice-changer/assets/48346627/bb813fbb-4ea1-4c3b-87b0-da75b7eaac5e)
+
+タイトル下のアイコンはリンクになっています。
 
 | アイコン                                                                                                                                     | リンク                           |
 | :------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------- |
@@ -83,27 +99,27 @@ GUI で設定できる項目は下図のようなセクションに分かれて�
 
 設定を初期化します。
 
-### reload
+## モデル選択エリア
 
-強制的に画面をリロードします
+![image](https://github.com/w-okada/voice-changer/assets/48346627/503eb581-a560-42b2-985b-d229d186eac8)
 
-### re-select vc
+使用するモデルを選択します。
 
-ランチャー画面に戻ります
+編集ボタンを押すと、モデル一覧（モデルスロット）を編集することができます。詳細はモデルスロット編集画面をご確認ください。
 
-## server control
+## メインコントロールエリア
 
-### start
+![image](https://github.com/w-okada/voice-changer/assets/48346627/5a8dcf64-29d3-49cd-92f1-db7b539bfb3d)
 
-start でサーバーを起動、stop でサーバーを停止します
+左側にロードされたモデルのキャラクタ画像が表示されます。キャラクタ画像の左上にリアルタイム変換の状況がオーバレイ表示されます。
 
-### monitor
+右側のボタンやスライダーで各種コントロールを行います。
 
-リアルタイム変換の状況を示します。
+### リアルタイム変換の状況
 
 声を出してから変換までのラグは`buf + res秒`です。調整の際は buf の時間が res よりも長くなるように調整してください。
 
-なお、デバイスを server device モードで使用している場合はこの表示は行われません。コンソール側に表示されます。
+なお、デバイスを server device モードで使用している場合は buf の表示は行われません。CHUNK に表示されている値を目安に調整してください。
 
 #### vol
 
@@ -111,184 +127,153 @@ start でサーバーを起動、stop でサーバーを停止します
 
 #### buf
 
-音声を切り取る一回の区間の長さ(ms)です。Input Chunk を短くするとこの数値が減ります。
+音声を切り取る一回の区間の長さ(ms)です。CHUNK を短くするとこの数値が減ります。
 
 #### res
 
-Input Chunk と Extra Data Length を足したデータを変換にかかる時間です。Input Chunk と Extra Data Length のいずれでも短くすると数値が減ります。
+CHUNK と EXTRA を足したデータを変換にかかる時間です。CHUNK と EXTRA のいずれでも短くすると数値が減ります。
 
-### Switch Model
+### コントロール
 
-アップロードしたモデルについて切り替えることができます。
-モデルについては名前の下に[]で情報が示されます
+#### start/stop ボタン
 
-1. f0(=pitch)を考慮するモデルか
+start で音声変換を開始、stop で音声変換を停止します
 
-- f0: 考慮する
-- nof0: 考慮しない
+#### GAIN
 
-2. モデルの学習に用いられたサンプリングレート
-3. モデルが用いる特徴量のチャンネル数(大きいほど情報を持っていて重い)
-4. 学習に用いられたクライアント
+- in: モデルへの入力音声の音量の大きさを変化させます。
 
-- org: [本家 RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)で学習したモデルです。
-- webui:[ddPn08RVC](https://github.com/ddPn08/rvc-webui)で学習したモデルです。
+- out: 変換後の音声の音量の大きさを変化させます。
 
-### Operation
+#### TUNE
 
-モデル、サーバに対する処理を実行するボタンが配置されています。
-
-#### export onnx
-
-ONNX モデルを出力します。PyTorch のモデルを ONNX モデルに変換すると、推論が高速化される場合があります。
-
-#### download
-
-モデルをダウンロードします。主にモデルマージした結果を取得するために使います。
-
-## Model Setting
-
-#### Model Slot
-
-モデルをどの枠にセットするか選べます。セットしたモデルは Server Control の Switch Model で切り替えられます。
-
-モデルをセットする際に、ファイルから読み込むか、インターネットからダウンロードするかを選択できます。この選択結果に応じて設定できる項目が変化します。
-
-- file: ローカルファイルを選択してモデルを読み込みます。
-- from net: インターネットからモデルをダウンロードします。
-
-#### Model(.onnx or .pth)
-
-ファイルから読み込む設定にした場合に表示されます。
-
-学習済みモデルをここで指定します。必須項目です。
-ONNX 形式(.onnx)か PyTorch 形式(.pth)のいずれかを選択可能です。
-
-- [orginal-RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)で学習させた場合、`/logs/weights`に入っています。
-- [ddPn08RVC](https://github.com/ddPn08/rvc-webui)で学習させた場合、`/models/checkpoints`に入っています。
-
-#### index(.index)
-
-ファイルから読み込む設定にした場合に表示されます。
-
-HuBERT で抽出した特徴を訓練データに近づける追加機能です。feature(.npy)とペアで使用します。
-
-- [orginal-RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)で学習させた場合、`/logs/実験名/add_XXX.index`という名前で保存されています。
-- [ddPn08RVC](https://github.com/ddPn08/rvc-webui)で学習させた場合、`/models/checkpoints/モデル名_index/モデル名.0.index`という名前で保存されています。
-
-#### Select Model
-
-インターネットからダウロードする設定にした場合に表示されます。
-
-ダウンロードするモデルを選択します。利用規約へのリンクが表示されるので、ご使用の際にはご確認ください。
-
-#### Default Tune
-
-声のピッチをどれくらい変換するかデフォルトの値を入れます。推論中に変換もできます。以下は設定の目安です。
+声のピッチをどれくらい変換するかの値を入れます。推論中に変換もできます。以下は設定の目安です。
 
 - 男声 → 女声　の変換では+12
 - 女声 → 男声　の変換では-12
 
-#### upload
+#### INDEX (RVC のみ)
 
-ファイルから読み込む設定にした場合に表示されます。
-
-上記の項目を設定した後、押すと model を使用できる状態にします。
-
-#### select
-
-インターネットからダウロードする設定にした場合に表示されます。
-
-上記の項目を設定した後、押すと model を使用できる状態にします。
-
-## Speaker Setting
-
-### Tuning
-
-声のピッチを調整します。以下は設定の目安です。
-
-- 男声 → 女声　の変換では+12
-- 女声 → 男声　の変換では-12
-
-### index ratio
-
-学習で使用した特徴量に寄せる比率を指定します。Model Setting で feature と index を両方設定した時に有効です。
+学習で使用した特徴量に寄せる比率を指定します。index ファイルが登録されているモデルのみ有効です。
 0 で HuBERT の出力をそのまま使う、1 で元の特徴量にすべて寄せます。
 index ratio が 0 より大きいと検索に時間がかかる場合があります。
 
-### Silent Threshold
+#### Voice
+
+音声変換先の話者を設定します。
+
+#### 設定保存ボタン
+
+設定した内容を保存します。モデルを再度呼び出したときに設定内容が反映されます。（一部のぞく）
+
+#### ONNX 出力 (RVC のみ)
+
+PyTorch のモデルを ONNX に変換して出力します。ロードされているモデルが RVC の PyTorch モデルである場合のみ有効です。
+
+#### その他
+
+使用する音声変換 AI モデルにより設定可能な内容が増減します。モデル開発元のサイトなどで機能等をご確認ください。
+
+## 詳細設定エリア
+
+![image](https://github.com/w-okada/voice-changer/assets/48346627/cd04ba9f-f7e8-4a7e-8c93-cda3c81f3c1a)
+
+動作設定や変換処理の内容を確認することができます。
+
+#### NOISE
+
+ノイズ除去機能の ON/OFF を切り替えられます。Client Device モードでのみ有効です。
+
+- Echo: エコーキャンセル機能
+- Sup1, Sup2: ノイズ抑制機能です
+
+#### F0 Det (F0 Estimator)
+
+ピッチを抽出するためのアルゴリズムを選びます。次の中から選べます。
+
+- 軽量な`dio`
+- 高精度な`harvest`
+- GPU を使用する `crepe`
+
+#### S. Thresh (Noise Gate)
 
 音声変換を行う音量の閾地です。この値より小さい rms の時は音声変換をせず無音を返します。
 （この場合、変換処理がスキップされるので、あまり負荷がかかりません。）
 
-## Converter Setting
-
-### InputChunk Num(128sample / chunk)
+#### CHUNK (Input Chunk Num)
 
 一度の変換でどれくらいの長さを切り取って変換するかを決めます。これが大きいほど効率的に変換できますが、buf の値が大きくなり変換が開始されるまでの最大の時間が伸びます。 buff: におよその時間が表示されます。
 
-### Extra Data Length
+#### EXTRA (Extra Data Length)
 
 音声を変換する際、入力にどれくらいの長さの過去の音声を入れるかを決めます。過去の音声が長く入っているほど変換の精度はよくなりますが、その分計算に時間がかかるため res が長くなります。
 (おそらく Transformer がネックなので、これの長さの 2 乗で計算時間は増えます)
 
 詳細は[こちらの資料](https://github.com/w-okada/voice-changer/issues/154#issuecomment-1502534841)をご覧ください。
 
-### GPU
+#### GPU
 
-GPU を 2 枚以上持っている場合、ここで GPU を選べます。
+onnxgpu 版では使用する GPU を選択することができます。
 
-## Device Setting
+onnxdirectML 版では GPU の ON/OFF を切り替えることができます。
 
-### Device Mode
+#### AUDIO
 
-client device mode と server device mode のどちらを使用するか選択します。音声変換が停止している時のみ変更できます。
+使用するオーディオデバイスのタイプを選びます。詳細は[こちらの文書](./tutorial_device_mode.md)をご確認ください。
 
-それぞれのモードの詳細は[こちら](./tutorial_device_mode.md)をご覧ください。
+- client: ノイズ抑制機能など GUI(chrome)の機能を活用してマイク入力、スピーカー出力を行うことができます。
+- server: VCClient が直接マイクとスピーカーを操作します。遅延を抑えることができます。
 
-### AudioInput
+#### input
 
-入力端末を選びます
+マイク入力など音声入力デバイスを選択できます。音声ファイルからのインプットも可能です(サイズ上限あり)。
 
-### AudioOutput
+#### output
 
-出力端末を選びます
+スピーカー出力など音声出力デバイスを選択できます。
 
-### output record
+#### monitor
 
-client device mode の時のみ表示されます。
+モニター用にスピーカー出力など音声出力デバイスを選択できます。server device モードの場合のみ有効です。
 
-start をおしてから stop を押すまでの音声が記録されます。
-このボタンを押してもリアルタイム変換は始まりません。
-リアルタイム変換は Server Control を押してください
+#### REC.
 
-## Lab
+変換後の音声をファイル出力します。
 
-モデルマージを行うことができます。
+### ServerIO Analizer
 
-各マージ元モデルの成分量を設定します。成分量の比率に従って新しいモデルを生成します。
+音声変換 AI に入力される音声と音声変換 AI から出力される音声を録音し、確認することができます。
 
-## Quality Control
+大まかな考え方は[こちらの文書](trouble_shoot_communication_ja.md)を確認ください。
 
-### Noise Supression
+#### SIO rec.
 
-ブラウザ組み込みのノイズ除去機能の On/Off です。
+音声変換 AI に入力される音声と音声変換 AI から出力される音声を録音を開始/停止します。
 
-### Gain Control
+#### output
 
-- input:モデルへの入力音声の音量を増減します。１がデフォルト
-- output:モデルからの出力音声の音量を増減します。１がデフォルト
+録音した音声を再生するスピーカーを設定します。
 
-### F0Detector
+#### input
 
-ピッチを抽出するためのアルゴリズムを選びます。以下の二種類を選べます。
+音声変換 AI に入力される音声を再生します。
 
-- 軽量な`pm`
-- 高精度な`harvest`
-- GPU を使用する `crepe`
+#### out
 
-### Analyzer(Experimental)
+音声変換 AI から出力された音声を再生します。
 
-サーバ側で入力と出力を録音します。
-入力はマイクの音声がサーバに送られて、それがそのまま録音されます。マイク ⇒ サーバの通信路の確認に使えます。
-出力はモデルから出力されるデータがサーバ内で録音されます。(入力が正しいことが確認できたうえで)モデルの動作を確認できます。
+### more...
+
+より高度な操作を行うことができます。
+
+#### Merge Lab
+
+モデルの合成を行うことができます。
+
+#### Advanced Setting
+
+より高度な設定を行うことができます。
+
+#### Server Info
+
+現在のサーバの設定を確認することができます。

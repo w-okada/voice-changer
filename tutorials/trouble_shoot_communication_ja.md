@@ -17,7 +17,7 @@ VC Client は図中の３か所で音声がどのような状態になってい�
 
 ### (1)(2)での音声の状態について確認
 
-<img src="https://user-images.githubusercontent.com/48346627/235551159-907a8cbd-a3a7-4183-8d6f-31f235879eb9.png" width="720">
+<img src="https://github.com/w-okada/voice-changer/assets/48346627/fb0ee6fe-e543-4ea2-8351-bf95a5c8a063" width="720">
 
 Analyzer の Sampling を start させた状態で音声変換を開始してください。ある程度音声を入力した後に Sampling をストップすると in/out に再生ボタンが表示されます。
 
@@ -26,10 +26,15 @@ Analyzer の Sampling を start させた状態で音声変換を開始してく
 
 ### (3)での音声の状態について確認
 
-<img src="https://user-images.githubusercontent.com/48346627/235551182-f6bc172c-0225-44fd-a8a8-d5c0fce933b7.png" width="720">
+<img src="https://github.com/w-okada/voice-changer/assets/48346627/18ddfc2c-beb2-4e7a-8a06-1e00cc6ddb72" width="720">
 
 AudioOutput の output record を start させた状態で音声変換を開始してください。ある程度音声を入力した後に stop すると.wav ファイルがダウンロードされます。この.wav ファイルはサーバから受信した変換後の音声が録音されているはずです。
 
 ## 音声の状態の確認後
 
 前述の図の(1)~(3)のどこまで想定された音声が録音されているかを把握したら、想定された音声が録音された場所以降で問題がないかを検討してください。
+
+### (1)での音声の状態がおかしい場合
+
+マイク入力自体に問題がある可能性があります。録音ソフトなどを用いてマイク入力を確認してみてください。
+また、[こちらの録音サイト](https://w-okada.github.io/voice-changer/)は VCClient の姉妹品であり、ほぼ同等のマイク入力処理が行われているため参考になります。(インストール不要。ブラウザのみで動きます。)

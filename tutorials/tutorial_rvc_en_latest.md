@@ -1,10 +1,10 @@
-# Realtime Voice Changer Client for RVC Tutorial (v.1.5.3.3)
+# Realtime Voice Changer Client for RVC Tutorial (v.1.5.3.7)
 
 [Japanese/日本語](/tutorials/tutorial_rvc_en_latest.md)
 
 # Introduction
 
-This application is client software for real-time voice conversion that supports various voice conversion models. This document provides a description for voice conversion limited to [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI).
+This application is client software for real-time voice conversion that supports various voice conversion models. This application support the models including RVC, MMVCv13, MMVCv15, So-vits-svcv40, etc. However, this document focus on [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI) for voice conversion as the tutorial material. The basic operations for each model are essentially the same.
 
 From the following, the original [Retrieval-based-Voice-Conversion-WebUI](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI) is referred to as the original-RVC, [RVC-WebUI](https://github.com/ddPn08/rvc-webui) created by ddPn08 is referred to as ddPn08-RVC.
 
@@ -40,26 +40,51 @@ When you run a .bat file (Windows) or .command file (Mac), a screen like the fol
 
 ### GUI
 
-Once the download of required data for launching is complete, a Launcher screen like the following will appear. Please select RVC from this screen.
+Once the download of the required data is complete, a dialog like the one below will be displayed. If you wish, press the yellow icon to reward the developer with a cup of coffee. Pressing the Start button will make the dialog disappear.
 
-![v1.5.3.1 RVC](https://github.com/w-okada/voice-changer/assets/48346627/0f407779-7798-49f9-a542-663d80807cdb)
+![image](https://github.com/w-okada/voice-changer/assets/48346627/a8d12b5c-d1e8-4ca6-aed0-72cee6bb97c1)
+
+# GUI Overview
+
+Use this screen to operate.
+
+![image](https://github.com/w-okada/voice-changer/assets/48346627/27add00d-5059-4cbf-a732-9deb6dc309ff)
 
 # Quick start
 
-At startup, you can immediately perform voice conversion using the data downloaded.
-Select the microphone and speakers in (1) of the figure below, then press the start button in (2). After a few seconds of data loading, the voice conversion will start. For those who are not used to it, it is recommended to select client device in (1) to select the microphone and speakers. (The difference between server device will be described later.)
+You can immediately perform voice conversion using the data downloaded at startup.
 
-![image](https://github.com/w-okada/voice-changer/assets/48346627/ce2f8be7-852e-4b78-adce-1df8cad9fbab)
+## Operation
+
+(1) To get started, click on the Model Selection area to select the model you would like to use. Once the model is loaded, the images of the characters will be displayed on the screen.
+
+(2) Select the microphone (input) and speaker (output) you wish to use. If you are unfamiliar, we recommend selecting the client and then selecting your microphone and speaker. (We will explain the difference between server later).
+
+(3) When you press the start button, the audio conversion will start after a few seconds of data loading. Try saying something into the microphone. You should be able to hear the converted audio from the speaker.
+
+![image](https://github.com/w-okada/voice-changer/assets/48346627/883b296e-e5ca-4571-8fed-dcf7495ebb92)
+
+## FAQ on Quick Start
+
+Q1. The audio is becoming choppy and stuttering.
+
+A1. It is possible that your PC's performance is not adequate. Try increasing the CHUNK value (as shown in Figure as A, for example, 1024). Also try setting F0 Det to dio (as shown in Figure as B).
+
+![image](https://github.com/w-okada/voice-changer/assets/48346627/3c485d9b-53be-47c1-85d9-8663363b06f9)
+
+Q2. The voice is not being converted.
+
+A2. Refer to this and identify where the problem lies, and consider a solution.
+
+Q3. The pitch is off.
+
+A3. Although it wasn't explained in the Quick Start, if the model is pitch-changeable, you can change it with TUNE. Please refer to the more detailed explanation below.
 
 ## Configurable items
 
-The items that can be set with the GUI are divided into sections like the figure below. Each section can be opened and closed by clicking the title.
-
-![image](https://github.com/w-okada/voice-changer/assets/48346627/a5eab90c-c0af-42cd-abfb-e897d333d1ff)
-
 ## Title
 
-![image](https://github.com/w-okada/rvc-trainer-docker/assets/48346627/0ea2106d-9da9-493b-aee0-8320fa58e273)
+![image](https://github.com/w-okada/voice-changer/assets/48346627/bb813fbb-4ea1-4c3b-87b0-da75b7eaac5e)
 
 Icons are links.
 
@@ -74,27 +99,25 @@ Icons are links.
 
 Initialize configuration.
 
-### reload
+## Model Selection
 
-Reload the window.
+![image](https://github.com/w-okada/voice-changer/assets/48346627/503eb581-a560-42b2-985b-d229d186eac8)
 
-### re-select vc
+Select the model you wish to use.
 
-Return to launcher.
+By pressing the "edit" button, you can edit the list of models (model slots). Please refer to the model slots editing screen for more details.
 
-## server control
+## Main Control
 
-### start
+![image](https://github.com/w-okada/voice-changer/assets/48346627/5a8dcf64-29d3-49cd-92f1-db7b539bfb3d)
 
-`start` starts the server, `stop` stops the server
+A character image loaded on the left side will be displayed. The status of real-time voice changer is overlaid on the top left of the character image.
 
-### monitor
+You can use the buttons and sliders on the right side to control various settings.
 
-Indicates the status of real-time conversion.
+### status of real-time voice changer
 
-The lag from voicing to conversion is `buf + res seconds`. Adjust so that the buf time is longer than res.
-
-If you are using the device in server device mode, this display will not be shown. It will be displayed on the console side.
+The lag time from speaking to conversion is `buf + res` seconds. When adjusting, please adjust the buffer time to be longer than the res time.
 
 #### vol
 
@@ -102,174 +125,150 @@ This is the volume after voice conversion.
 
 #### buf
 
-It is the length (ms) of one section to cut the audio. Shortening the Input Chunk reduces this number.
+The length of each chunk in milliseconds when capturing audio. Shortening the CHUNK will decrease this number.
 
 #### res
 
-This is the time it takes to convert data that is the sum of Input Chunk and Extra Data Length. Shortening both Input Chunk and Extra Data Length will reduce the number.
+The time it takes to convert data with CHUNK and EXTRA added is measured. Decreasing either CHUNK or EXTRA will reduce the number.
 
-### Switch Model
+### Control
 
-### Switch Model
+#### start/stop button
 
-You can switch between uploaded models.
-Information about the model is shown in [] under the name
+Press "start" to begin voice conversion and "stop" to end it.
 
-1. Is the model considering f0(=pitch)?
-   - f0: consider
-   - nof0: don't consider
-2. Sampling rate used to train the model
-3. Number of feature channels used by the model
-4. Clients used for learning
-   - org: This is the model trained in [orginal-RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI).
-   - webui: The model trained on [ddPn08-RVC](https://github.com/ddPn08/rvc-webui).
+#### GAIN
 
-### Operation
+- in: Change the volume of the inputted audio for the model.
 
-A button is placed to perform operations on the model and server. and server.
+- out: Change the volume of the converted audio.
 
-#### export onnx
+#### TUNE
 
-We can output an ONNX model. Converting a PyTorch model to an ONNX model can sometimes speed up inference.
-
-#### download
-
-Download the model. It is mainly used to get the results of model merging.
-
-## Model Setting
-
-#### Model Slot
-
-You can choose which frame to set the model in. The set model can be switched with Switch Model in Server Control.
-
-When setting up the model, you can choose to either load the file or download it from the internet. Depending on your choice, the available settings will change.
-
-- file: Select a local file to load the model.
-- from net: Download the model from the internet.
-
-#### Model(.onnx or .pth)
-
-If you set it to load from a file, it will be displayed.
-
-Specify the trained model here. Required fields.
-You can choose either ONNX format (.onnx) or PyTorch format (.pth).
-
-- If trained with [orginal-RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI), it is in `/logs/weights`.
-- If trained with [ddPn08-RVC](https://github.com/ddPn08/rvc-webui), it is in `/models/checkpoints`.
-
-#### index(.index)
-
-If you set it to load from a file, it will be displayed.
-
-This is an additional function that brings the features extracted by HuBERT closer to the training data. Used in pairs with feature(.npy).
-
-- If trained with [orginal-RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI), it is in `/logs/your-expetiment-name/total_fea.npy`.
-- If trained with [ddPn08-RVC](https://github.com/ddPn08/rvc-webui), it is in `/models/checkpoints/your-model-name_index/your-model-name.0.big.npy`.
-
-#### Select Model
-
-If you choose to download from the internet, you will see the model to download. Please check the link to the terms of use before using it.
-
-#### Default Tune
-
-Enter the default value for how much the pitch of the voice should be converted. You can also convert during inference. Below is a guideline for the settings.
+Enter a value for how much to convert the pitch of the voice. Conversion can also be done during inference. Below are some guidelines for settings.
 
 - +12 for male voice to female voice conversion
 - -12 for female voice to male voice conversion
 
-#### upload
+#### INDEX (Only for RVC)
 
-After setting the above items, press to make the model ready for use.
+You can specify the rate of weight assigned to the features used in training. This is only valid for models which have an index file registered. 0 uses HuBERT's output as-is and 1 assigns all weights to the original features. If the index ratio is greater than 0, it may take longer to search.
 
-#### select
+#### Voice
 
-When you set the option to download from the internet, the items above will be displayed. After setting the items above, press to activate the model.
+Set the speaker of the audio conversion.
 
-## Speaker Setting
+#### save setting
 
-### Tuning
+Save the settings specified. When the model is recalled again, the settings will be reflected. (Excluding some parts).
 
-Adjust the pitch of your voice. Below is a guideline for the settings.
+#### export to onnx
 
-- +12 for male voice to female voice conversion
-- -12 for female voice to male voice conversion
+This output will convert the PyTorch model to ONNX. It is only valid if the loaded model is a RVC PyTorch model.
 
-### index ratio
+#### Others
 
-Specify the ratio to shift to the features used in training. Effective when both feature and index are set in Model Setting.
-0 uses the output of HuBERT as it is, 1 brings it all back to the original features.
-If the index ratio is greater than 0, the search may take a long time.
+The item that can be configured by the AI model used will vary. Please check the features and other information on the model manufacturer's website.
 
-### Silent Threshold
+## Configuration
 
-The volume threshold for audio conversion. If the rms is smaller than this value, no voice conversion is performed and silence is returned.
-(In this case, the conversion process is skipped, so the load is less.)
+![image](https://github.com/w-okada/voice-changer/assets/48346627/cd04ba9f-f7e8-4a7e-8c93-cda3c81f3c1a)
 
-## Converter Setting
+You can review the action settings and transformation processes.
 
-### InputChunk Num(128sample / chunk)
+#### NOISE
+
+You can switch the noise cancellation feature on and off, however it is only available in Client Device Mode.
+
+- Echo: Echo Cancellation Function
+- Sup1, Sup2: This is a noise suppression feature.
+
+#### F0 Det (F0 Estimator)
+
+Choose an algorithm for extracting the pitch. You can choose from the following options.
+
+- Lightweight `dio`
+- High-precision `harvest`
+- GPU-enabled `crepe`
+
+#### S. Thresh (Noise Gate)
+
+This is the threshold of the volume for performing speech conversion. When the rms is smaller than this value, speech conversion will be skipped and silence will be returned instead. (In this case, since the conversion process is skipped, the burden will not be so large.)
+
+#### CHUNK (Input Chunk Num)
 
 Decide how much length to cut and convert in one conversion. The higher the value, the more efficient the conversion, but the larger the buf value, the longer the maximum time before the conversion starts. The approximate time is displayed in buff:.
 
-### Extra Data Length
+#### EXTRA (Extra Data Length)
 
 Determines how much past audio to include in the input when converting audio. The longer the past voice is, the better the accuracy of the conversion, but the longer the res is, the longer the calculation takes.
 (Probably because Transformer is a bottleneck, the calculation time will increase by the square of this length)
 
 Detail is [here](https://github.com/w-okada/voice-changer/issues/154#issuecomment-1502534841)
 
-### GPU
+#### GPU
 
-If you have 2 or more GPUs, you can choose your GPU here.
+You can select the GPU to use in the onnxgpu version.
 
-## Device Setting
+In the onnxdirectML version, you can switch the GPU ON/OFF.
 
-Choose between client device mode and server device mode. You can only change it when the voice conversion is stopped.
+#### AUDIO
 
-For more details on each mode, please see [here](./tutorial_device_mode.md).
+Choose the type of audio device you want to use. For more information, please refer to the [document](./tutorial_device_mode.md).
 
-### Audio Input
+- Client: You can make use of the microphone input and speaker output with the GUI functions such as noise cancellation.
+- Server: VCClient can directly control the microphone and speaker to minimize latency.
 
-Choose an input device
+#### input
 
-### Audio Output
+You can select a sound input device such as a microphone input. It's also possible to input from audio files (size limit applies).
 
-Choose an output terminal
+#### output
 
-#### output record
+You can select audio output devices such as speakers and output.
 
-It will only be displayed when in client device mode.
+#### monitor
 
-Audio is recorded from when you press start until you press stop.
-Pressing this button does not start real-time conversion.
-Press Server Control for real-time conversion
+In monitor mode, you can select audio output devices such as speaker output. This is only available in server device mode.
 
-## Lab
+#### REC.
 
-You can do model merging.
-Set the component amounts for each source model for the merge. Create a new model according to the ratio of the component amounts.
+It will output the converted audio to a file.
 
-## Quality Control
+### ServerIO Analizer
 
-### Noise Supression
+We can record and confirm the input audio to the speech conversion AI and the output audio from the speech conversion AI.
 
-On/Off of the browser's built-in noise removal function.
+Please refer to [this document](trouble_shoot_communication_ja.md) for an overview of the idea.
 
-### Gain Control
+#### SIO rec.
 
-- input: Increase or decrease the volume of the input audio to the model. 1 is the default value
-- output: Increase or decrease the volume of the output audio from the model. 1 is the default value
+I will start/stop recording both the audio inputted into the voice conversion AI as well as the audio outputted from the voice conversion AI.
 
-### F0Detector
+#### output
 
-Choose an algorithm for extracting the pitch. You can choose from the following two types.
+The AI will play back any audio that is input into it.
 
-- Lightweight `dio`
-- Highly accurate `harvest`
-- Middle accurate with gpu `crepe`
+#### in
 
-### Analyzer(Experimental)
+I will play the audio inputted to the speech conversion AI.
 
-Record input and output on the server side.
-As for the input, the sound of the microphone is sent to the server and recorded as it is. It can be used to check the communication path from the microphone to the server.
-For output, the data output from the model is recorded in the server. You can see how the model behaves (once you've verified that your input is correct).
+#### out
+
+Play the audio output from the Speech Conversion AI.
+
+### more...
+
+You can do more advanced operations.
+
+#### Merge Lab
+
+It is possible to do synthesis of models.
+
+#### Advanced Setting
+
+You can set up more advanced settings.
+
+#### Server Info
+
+You can check the configuration of the current server.
