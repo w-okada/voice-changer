@@ -83,12 +83,15 @@ export const ServerSettingKey = {
 
     "enableServerAudio": "enableServerAudio",
     "serverAudioStated": "serverAudioStated",
+    "serverAudioSampleRate": "serverAudioSampleRate",
     "serverInputAudioSampleRate": "serverInputAudioSampleRate",
     "serverOutputAudioSampleRate": "serverOutputAudioSampleRate",
+    "serverMonitorAudioSampleRate": "serverMonitorAudioSampleRate",
     "serverInputAudioBufferSize": "serverInputAudioBufferSize",
     "serverOutputAudioBufferSize": "serverOutputAudioBufferSize",
     "serverInputDeviceId": "serverInputDeviceId",
     "serverOutputDeviceId": "serverOutputDeviceId",
+    "serverMonitorDeviceId": "serverMonitorDeviceId",
     "serverReadChunkSize": "serverReadChunkSize",
     "serverInputAudioGain": "serverInputAudioGain",
     "serverOutputAudioGain": "serverOutputAudioGain",
@@ -138,12 +141,15 @@ export type VoiceChangerServerSetting = {
 
     enableServerAudio: number // 0:off, 1:on
     serverAudioStated: number // 0:off, 1:on
+    serverAudioSampleRate: number
     serverInputAudioSampleRate: number
     serverOutputAudioSampleRate: number
+    serverMonitorAudioSampleRate: number
     serverInputAudioBufferSize: number
     serverOutputAudioBufferSize: number
     serverInputDeviceId: number
     serverOutputDeviceId: number
+    serverMonitorDeviceId: number
     serverReadChunkSize: number
     serverInputAudioGain: number
     serverOutputAudioGain: number
@@ -306,12 +312,15 @@ export const DefaultServerSetting: ServerInfo = {
 
     enableServerAudio: 0,
     serverAudioStated: 0,
+    serverAudioSampleRate: 48000,
     serverInputAudioSampleRate: 48000,
     serverOutputAudioSampleRate: 48000,
+    serverMonitorAudioSampleRate: 48000,
     serverInputAudioBufferSize: 1024 * 24,
     serverOutputAudioBufferSize: 1024 * 24,
     serverInputDeviceId: -1,
     serverOutputDeviceId: -1,
+    serverMonitorDeviceId: -1,
     serverReadChunkSize: 256,
     serverInputAudioGain: 1.0,
     serverOutputAudioGain: 1.0,

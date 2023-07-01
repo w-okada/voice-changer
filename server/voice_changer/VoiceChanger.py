@@ -13,7 +13,7 @@ from voice_changer.IORecorder import IORecorder
 from voice_changer.utils.LoadModelParams import LoadModelParams
 
 from voice_changer.utils.Timer import Timer
-from voice_changer.utils.VoiceChangerModel import AudioInOut
+from voice_changer.utils.VoiceChangerModel import AudioInOut, VoiceChangerModel
 from Exceptions import (
     DeviceCannotSupportHalfPrecisionException,
     DeviceChangingException,
@@ -32,6 +32,7 @@ STREAM_OUTPUT_FILE = os.path.join(TMP_DIR, "out.wav")
 @dataclass
 class VoiceChangerSettings:
     inputSampleRate: int = 48000  # 48000 or 24000
+    outputSampleRate: int = 48000  # 48000 or 24000
 
     crossFadeOffsetRate: float = 0.1
     crossFadeEndRate: float = 0.9
@@ -71,7 +72,7 @@ class VoiceChanger:
         self.currentCrossFadeOverlapSize = 0  # setting
         self.crossfadeSize = 0  # calculated
 
-        self.voiceChanger = None
+        self.voiceChanger: VoiceChangerModel | None = None
         self.modelType: ModelType | None = None
         self.params = params
         self.gpu_num = torch.cuda.device_count()
@@ -115,6 +116,7 @@ class VoiceChanger:
 
         if key == "serverAudioStated" and val == 0:
             self.settings.inputSampleRate = 48000
+            self.settings.outputSampleRate = 48000
 
         if key in self.settings.intData:
             setattr(self.settings, key, int(val))
@@ -123,7 +125,7 @@ class VoiceChanger:
             if key == "recordIO" and val == 1:
                 if hasattr(self, "ioRecorder"):
                     self.ioRecorder.close()
-                self.ioRecorder = IORecorder(STREAM_INPUT_FILE, STREAM_OUTPUT_FILE, self.settings.inputSampleRate)
+                self.ioRecorder = IORecorder(STREAM_INPUT_FILE, STREAM_OUTPUT_FILE, self.settings.inputSampleRate, self.settings.outputSampleRate)
             if key == "recordIO" and val == 0:
                 if hasattr(self, "ioRecorder"):
                     self.ioRecorder.close()
@@ -268,10 +270,10 @@ class VoiceChanger:
             # 後処理
             with Timer("post-process") as t:
                 result = result.astype(np.int16)
-                if self.settings.inputSampleRate != processing_sampling_rate:
+                if self.settings.outputSampleRate != processing_sampling_rate:
                     # print(
-                    #     "samplingrate",
-                    #     self.settings.inputSampleRate,
+                    #     "output samplingrate",
+                    #     self.settings.outputSampleRate,
                     #     processing_sampling_rate,
                     # )
                     outputData = cast(
@@ -279,13 +281,13 @@ class VoiceChanger:
                         resampy.resample(
                             result,
                             processing_sampling_rate,
-                            self.settings.inputSampleRate,
+                            self.settings.outputSampleRate,
                         ).astype(np.int16),
                     )
                 else:
                     outputData = result
 
-                print_convert_processing(f" Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
+                print_convert_processing(f" Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.outputSampleRate}hz")
 
                 if receivedData.shape[0] != outputData.shape[0]:
                     # print(

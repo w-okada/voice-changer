@@ -76,7 +76,6 @@ class MMVC_Rest_Fileuploader:
         except Exception as e:
             print("[Voice Changer] post_update_settings ex:", e)
             import traceback
-
             traceback.print_exc()
 
     def post_load_model(

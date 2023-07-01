@@ -9,11 +9,9 @@
     "editor.formatOnSave": true // ファイル保存時に自動フォーマット
   },
   "python.formatting.blackArgs": ["--line-length", "550"],
-  "flake8.args": [
-    "--ignore=E501,E402,E722,E741,E203,W503"
-    // "--max-line-length=150",
-    // "--max-complexity=20"
-  ],
   "python.linting.flake8Enabled": true,
+  "python.linting.flake8Args": [
+    "--max-line-length=99999"
+  ],
   "python.linting.enabled": true
 }

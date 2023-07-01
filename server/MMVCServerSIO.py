@@ -31,7 +31,7 @@ setup_loggers()
 
 def setupArgParser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--logLevel", type=str, default="critical", help="Log level info|critical. (default: critical)")
+    parser.add_argument("--logLevel", type=str, default="error", help="Log level info|critical|error. (default: error)")
     parser.add_argument("-p", type=int, default=18888, help="port")
     parser.add_argument("--https", type=strtobool, default=False, help="use https")
     parser.add_argument("--httpsKey", type=str, default="ssl.key", help="path for the key of https")
@@ -94,13 +94,16 @@ PORT = args.p
 
 
 def localServer(logLevel: str = "critical"):
-    uvicorn.run(
-        f"{os.path.basename(__file__)[:-3]}:app_socketio",
-        host="0.0.0.0",
-        port=int(PORT),
-        reload=False if hasattr(sys, "_MEIPASS") else True,
-        log_level=logLevel,
-    )
+    try:
+        uvicorn.run(
+            f"{os.path.basename(__file__)[:-3]}:app_socketio",
+            host="0.0.0.0",
+            port=int(PORT),
+            reload=False if hasattr(sys, "_MEIPASS") else True,
+            log_level=logLevel,
+        )
+    except Exception as e:
+        print("[Voice Changer] Web Server Launch Exception", e)
 
 
 if __name__ == "MMVCServerSIO":
@@ -204,15 +207,19 @@ if __name__ == "__main__":
     # サーバ起動
     if args.https:
         # HTTPS サーバ起動
-        uvicorn.run(
-            f"{os.path.basename(__file__)[:-3]}:app_socketio",
-            host="0.0.0.0",
-            port=int(PORT),
-            reload=False if hasattr(sys, "_MEIPASS") else True,
-            ssl_keyfile=key_path,
-            ssl_certfile=cert_path,
-            log_level=args.logLevel,
-        )
+        try:
+            uvicorn.run(
+                f"{os.path.basename(__file__)[:-3]}:app_socketio",
+                host="0.0.0.0",
+                port=int(PORT),
+                reload=False if hasattr(sys, "_MEIPASS") else True,
+                ssl_keyfile=key_path,
+                ssl_certfile=cert_path,
+                log_level=args.logLevel,
+            )
+        except Exception as e:
+            print("[Voice Changer] Web Server Launch Exception", e)
+
     else:
         p = mp.Process(name="p", target=localServer, args=(args.logLevel,))
         p.start()

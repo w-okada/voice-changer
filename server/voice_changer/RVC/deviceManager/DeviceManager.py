@@ -77,7 +77,7 @@ class DeviceManager(object):
     def getDeviceMemory(self, id: int):
         try:
             return torch.cuda.get_device_properties(id).total_memory
-            # except Exception as e:
-        except:
-            # print(e)
+        except Exception as e:
+            # except:
+            print(e)
             return 0

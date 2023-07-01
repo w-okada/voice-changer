@@ -23,6 +23,8 @@ ModelType: TypeAlias = Literal[
 
 STORED_SETTING_FILE = "stored_setting.json"
 
+SERVER_DEVICE_SAMPLE_RATES = [16000, 32000, 44100, 48000, 96000, 192000]
+
 tmpdir = tempfile.TemporaryDirectory()
 SSL_KEY_DIR = os.path.join(tmpdir.name, "keys") if hasattr(sys, "_MEIPASS") else "keys"
 MODEL_DIR = os.path.join(tmpdir.name, "logs") if hasattr(sys, "_MEIPASS") else "logs"

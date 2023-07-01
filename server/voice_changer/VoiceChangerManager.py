@@ -50,8 +50,11 @@ class VoiceChangerManager(ServerDeviceCallbacks):
     def get_processing_sampling_rate(self):
         return self.voiceChanger.get_processing_sampling_rate()
 
-    def setSamplingRate(self, sr: int):
+    def setInputSamplingRate(self, sr: int):
         self.voiceChanger.settings.inputSampleRate = sr
+
+    def setOutputSamplingRate(self, sr: int):
+        self.voiceChanger.settings.outputSampleRate = sr
 
     ############################
     # VoiceChangerManager
@@ -78,7 +81,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             self.update_settings(key, val)
 
     def store_setting(self, key: str, val: str | int | float):
-        saveItemForServerDevice = ["enableServerAudio", "serverInputDeviceId", "serverOutputDeviceId", "serverReadChunkSize", "serverInputAudioGain", "serverOutputAudioGain"]
+        saveItemForServerDevice = ["enableServerAudio", "serverAudioSampleRate", "serverInputDeviceId", "serverOutputDeviceId", "serverMonitorDeviceId", "serverReadChunkSize", "serverInputAudioGain", "serverOutputAudioGain"]
         saveItemForVoiceChanger = ["crossFadeOffsetRate", "crossFadeEndRate", "crossFadeOverlapSize"]
         saveItemForVoiceChangerManager = ["modelSlotIndex"]
         saveItemForRVC = ["extraConvertSize", "gpu", "silentThreshold"]
