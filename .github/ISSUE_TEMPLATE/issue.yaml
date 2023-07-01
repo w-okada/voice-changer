@@ -27,7 +27,7 @@ body:
     id: OS
     attributes:
       label: OS
-      description: OS name and version. e.g. Windows 10, Ubuntu 20.04, if you use mac, M1 or Intel.(Intel is not supported)
+      description: OS name and version. e.g. Windows 10, Ubuntu 20.04, if you use mac, M1 or Intel.(Intel is not supported) and version venture, monterey, big sur.
     validations:
       required: true
   - type: input
@@ -86,6 +86,6 @@ body:
     id: issue
     attributes:
       label: Situation
-      description: Please describe the situation in as much detail as possible.
+      description: Developers spend a lot of time developing new features and resolving issues. If you really want to get it solved, please provide as much reproducible information and logs as possible.
     validations:
       required: true
