@@ -68,7 +68,7 @@ It can be used in two main ways, in order of difficulty:
 
 - You can download and run executable binaries.
 
-- Please see [here](tutorials/tutorial_rvc_ja_latest.md) for the tutorial.
+- Please see [here](tutorials/tutorial_rvc_en_latest.md) for the tutorial.
 
 - We offer Windows and Mac versions.
 
