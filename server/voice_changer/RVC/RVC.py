@@ -144,7 +144,7 @@ class RVC(VoiceChangerModel):
 
         audio = torchaudio.functional.resample(audio, self.slotInfo.samplingRate, 16000, rolloff=0.99)
         repeat = 1 if self.settings.rvcQuality else 0
-        sid = 0
+        sid = self.settings.dstId
         f0_up_key = self.settings.tran
         index_rate = self.settings.indexRatio
         protect = self.settings.protect
