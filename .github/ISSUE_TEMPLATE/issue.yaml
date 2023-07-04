@@ -19,8 +19,8 @@ body:
     id: vc-client-version
     attributes:
       label: vc client version number
-      description: The version number of vc client used. Or filename of you download(.zip)
-      placeholder: x.x.x.x
+      description: filename of you download(.zip)
+      placeholder: MMVCServerSIO_xxx_yyyy-zzzz_v.x.x.x.x.zip
     validations:
       required: true
   - type: input
