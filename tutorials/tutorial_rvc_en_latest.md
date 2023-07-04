@@ -1,6 +1,6 @@
 # Realtime Voice Changer Client for RVC Tutorial (v.1.5.3.7)
 
-[Japanese/日本語](/tutorials/tutorial_rvc_en_latest.md)
+[Japanese/日本語](/tutorials/tutorial_rvc_ja_latest.md)
 
 # Introduction
 
@@ -74,7 +74,7 @@ A1. It is possible that your PC's performance is not adequate. Try increasing th
 
 Q2. The voice is not being converted.
 
-A2. Refer to this and identify where the problem lies, and consider a solution.
+A2. Refer to [this](https://github.com/w-okada/voice-changer/blob/master/tutorials/trouble_shoot_communication_ja.md) and identify where the problem lies, and consider a solution.
 
 Q3. The pitch is off.
 

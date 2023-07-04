@@ -78,6 +78,16 @@ body:
         - "yes"
     validations:
       required: true
+  - type: dropdown
+    id: read-tutorial
+    attributes:
+      label: read tutorial
+      description: Have you read the tutorial? https://github.com/w-okada/voice-changer/blob/master/tutorials/tutorial_rvc_en_latest.md
+      options:
+        - "no"
+        - "yes"
+    validations:
+      required: true
   - type: input
     id: vc-type
     attributes:
