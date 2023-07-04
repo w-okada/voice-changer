@@ -5,6 +5,9 @@ from voice_changer.utils.LoadModelParams import LoadModelParams
 
 
 AudioInOut: TypeAlias = np.ndarray[Any, np.dtype[np.int16]]
+PitchfInOut: TypeAlias = np.ndarray[Any, np.dtype[np.int16]]
+FeatureInOut: TypeAlias = np.ndarray[Any, np.dtype[np.int16]]
+
 
 
 class VoiceChangerModel(Protocol):

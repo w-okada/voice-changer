@@ -4,7 +4,6 @@ from const import EnumInferenceTypes
 
 from voice_changer.RVC.inferencer.OnnxRVCInferencer import OnnxRVCInferencer
 
-
 class OnnxRVCInferencerNono(OnnxRVCInferencer):
     def loadModel(self, file: str, gpu: int):
         super().loadModel(file, gpu)
@@ -18,6 +17,7 @@ class OnnxRVCInferencerNono(OnnxRVCInferencer):
         pitch: torch.Tensor | None,
         pitchf: torch.Tensor | None,
         sid: torch.Tensor,
+        convert_length: int | None,
     ) -> torch.Tensor:
         if self.isHalf:
             audio1 = self.model.run(

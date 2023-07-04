@@ -33,5 +33,6 @@ class RVCInferencerv2Nono(Inferencer):
         pitch: torch.Tensor | None,
         pitchf: torch.Tensor | None,
         sid: torch.Tensor,
+        convert_length: int | None,
     ) -> torch.Tensor:
-        return self.model.infer(feats, pitch_length, sid)
+        return self.model.infer(feats, pitch_length, sid, convert_length=convert_length)

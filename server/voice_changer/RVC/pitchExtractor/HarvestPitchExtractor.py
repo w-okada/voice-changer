@@ -9,7 +9,7 @@ from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 class HarvestPitchExtractor(PitchExtractor):
     pitchExtractorType: EnumPitchExtractorTypes = EnumPitchExtractorTypes.harvest
 
-    def extract(self, audio, f0_up_key, sr, window, silence_front=0):
+    def extract(self, audio, pitchf, f0_up_key, sr, window, silence_front=0):
         audio = audio.detach().cpu().numpy()
         n_frames = int(len(audio) // window) + 1
         start_frame = int(silence_front * sr / window)
@@ -32,16 +32,17 @@ class HarvestPitchExtractor(PitchExtractor):
         f0 = pyworld.stonemask(audio.astype(np.double), f0, t, sr)
         f0 = signal.medfilt(f0, 3)
 
-        f0 = np.pad(f0.astype("float"), (start_frame, n_frames - len(f0) - start_frame))
+        # f0 = np.pad(f0.astype("float"), (start_frame, n_frames - len(f0) - start_frame))
 
         f0 *= pow(2, f0_up_key / 12)
-        f0bak = f0.copy()
-        f0_mel = 1127 * np.log(1 + f0 / 700)
+        pitchf[-f0.shape[0]:] = f0[:pitchf.shape[0]]
+        f0bak = pitchf.copy()
+        f0_mel = 1127 * np.log(1 + f0bak / 700)
         f0_mel[f0_mel > 0] = (f0_mel[f0_mel > 0] - f0_mel_min) * 254 / (
             f0_mel_max - f0_mel_min
         ) + 1
         f0_mel[f0_mel <= 1] = 1
         f0_mel[f0_mel > 255] = 255
-        f0_coarse = np.rint(f0_mel).astype(int)
+        pitch_coarse = np.rint(f0_mel).astype(int)
 
-        return f0_coarse, f0bak
+        return pitch_coarse, pitchf

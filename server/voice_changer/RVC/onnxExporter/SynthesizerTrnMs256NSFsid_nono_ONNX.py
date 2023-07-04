@@ -57,10 +57,10 @@ class SynthesizerTrnMs256NSFsid_nono_ONNX(nn.Module):
         self.emb_g = nn.Embedding(self.spk_embed_dim, gin_channels)
         print("gin_channels:", gin_channels, "self.spk_embed_dim:", self.spk_embed_dim)
 
-    def forward(self, phone, phone_lengths, sid, max_len=None):
+    def forward(self, phone, phone_lengths, sid, max_len=None, convert_length=None):
         g = self.emb_g(sid).unsqueeze(-1)
         m_p, logs_p, x_mask = self.enc_p(phone, None, phone_lengths)
         z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p) * 0.66666) * x_mask
         z = self.flow(z_p, x_mask, g=g, reverse=True)
-        o = self.dec((z * x_mask)[:, :, :max_len], g=g)
+        o = self.dec.infer_realtime((z * x_mask)[:, :, :max_len], g=g, convert_length=convert_length)
         return o, x_mask, (z, z_p, m_p, logs_p)

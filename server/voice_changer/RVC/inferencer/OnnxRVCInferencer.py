@@ -35,6 +35,7 @@ class OnnxRVCInferencer(Inferencer):
         pitch: torch.Tensor,
         pitchf: torch.Tensor,
         sid: torch.Tensor,
+        convert_length: int | None,
     ) -> torch.Tensor:
         if pitch is None or pitchf is None:
             raise RuntimeError("[Voice Changer] Pitch or Pitchf is not found.")
@@ -50,7 +51,7 @@ class OnnxRVCInferencer(Inferencer):
                     "p_len": pitch_length.cpu().numpy().astype(np.int64),
                     "pitch": pitch.cpu().numpy().astype(np.int64),
                     "pitchf": pitchf.cpu().numpy().astype(np.float32),
-                    "sid": sid.cpu().numpy().astype(np.int64),
+                    "sid": sid.cpu().numpy().astype(np.int64)               
                 },
             )
         else:
@@ -61,7 +62,7 @@ class OnnxRVCInferencer(Inferencer):
                     "p_len": pitch_length.cpu().numpy().astype(np.int64),
                     "pitch": pitch.cpu().numpy().astype(np.int64),
                     "pitchf": pitchf.cpu().numpy().astype(np.float32),
-                    "sid": sid.cpu().numpy().astype(np.int64),
+                    "sid": sid.cpu().numpy().astype(np.int64) 
                 },
             )
 
