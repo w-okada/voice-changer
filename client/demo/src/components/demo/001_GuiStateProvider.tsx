@@ -3,76 +3,78 @@ import { ReactNode } from "react";
 import { useAppRoot } from "../../001_provider/001_AppRootProvider";
 import { StateControlCheckbox, useStateControlCheckbox } from "../../hooks/useStateControlCheckbox";
 
-export const OpenServerControlCheckbox = "open-server-control-checkbox"
-export const OpenModelSettingCheckbox = "open-model-setting-checkbox"
-export const OpenDeviceSettingCheckbox = "open-device-setting-checkbox"
-export const OpenQualityControlCheckbox = "open-quality-control-checkbox"
-export const OpenSpeakerSettingCheckbox = "open-speaker-setting-checkbox"
-export const OpenConverterSettingCheckbox = "open-converter-setting-checkbox"
-export const OpenAdvancedSettingCheckbox = "open-advanced-setting-checkbox"
-export const OpenLabCheckbox = "open-lab-checkbox"
+export const OpenServerControlCheckbox = "open-server-control-checkbox";
+export const OpenModelSettingCheckbox = "open-model-setting-checkbox";
+export const OpenDeviceSettingCheckbox = "open-device-setting-checkbox";
+export const OpenQualityControlCheckbox = "open-quality-control-checkbox";
+export const OpenSpeakerSettingCheckbox = "open-speaker-setting-checkbox";
+export const OpenConverterSettingCheckbox = "open-converter-setting-checkbox";
+export const OpenAdvancedSettingCheckbox = "open-advanced-setting-checkbox";
+export const OpenLabCheckbox = "open-lab-checkbox";
 
-export const OpenLicenseDialogCheckbox = "open-license-dialog-checkbox"
-export const OpenWaitingDialogCheckbox = "open-waiting-dialog-checkbox"
-export const OpenStartingNoticeDialogCheckbox = "open-starting-notice-dialog-checkbox"
-export const OpenModelSlotManagerDialogCheckbox = "open-model-slot-manager-dialog-checkbox"
-export const OpenMergeLabDialogCheckbox = "open-merge-lab-dialog-checkbox"
-export const OpenAdvancedSettingDialogCheckbox = "open-advanced-setting-dialog-checkbox"
-export const OpenGetServerInformationDialogCheckbox = "open-get-server-information-dialog-checkbox"
+export const OpenLicenseDialogCheckbox = "open-license-dialog-checkbox";
+export const OpenWaitingDialogCheckbox = "open-waiting-dialog-checkbox";
+export const OpenStartingNoticeDialogCheckbox = "open-starting-notice-dialog-checkbox";
+export const OpenModelSlotManagerDialogCheckbox = "open-model-slot-manager-dialog-checkbox";
+export const OpenMergeLabDialogCheckbox = "open-merge-lab-dialog-checkbox";
+export const OpenAdvancedSettingDialogCheckbox = "open-advanced-setting-dialog-checkbox";
+export const OpenGetServerInformationDialogCheckbox = "open-get-server-information-dialog-checkbox";
+export const OpenGetClientInformationDialogCheckbox = "open-get-client-information-dialog-checkbox";
 
-export const OpenTextInputDialogCheckbox = "open-text-input-dialog-checkbox"
+export const OpenTextInputDialogCheckbox = "open-text-input-dialog-checkbox";
 type Props = {
     children: ReactNode;
 };
 
 export type StateControls = {
-    openServerControlCheckbox: StateControlCheckbox
-    openModelSettingCheckbox: StateControlCheckbox
-    openDeviceSettingCheckbox: StateControlCheckbox
-    openQualityControlCheckbox: StateControlCheckbox
-    openSpeakerSettingCheckbox: StateControlCheckbox
-    openConverterSettingCheckbox: StateControlCheckbox
-    openAdvancedSettingCheckbox: StateControlCheckbox
-    openLabCheckbox: StateControlCheckbox
+    openServerControlCheckbox: StateControlCheckbox;
+    openModelSettingCheckbox: StateControlCheckbox;
+    openDeviceSettingCheckbox: StateControlCheckbox;
+    openQualityControlCheckbox: StateControlCheckbox;
+    openSpeakerSettingCheckbox: StateControlCheckbox;
+    openConverterSettingCheckbox: StateControlCheckbox;
+    openAdvancedSettingCheckbox: StateControlCheckbox;
+    openLabCheckbox: StateControlCheckbox;
 
-    showWaitingCheckbox: StateControlCheckbox
-    showStartingNoticeCheckbox: StateControlCheckbox
-    showModelSlotManagerCheckbox: StateControlCheckbox
+    showWaitingCheckbox: StateControlCheckbox;
+    showStartingNoticeCheckbox: StateControlCheckbox;
+    showModelSlotManagerCheckbox: StateControlCheckbox;
 
-    showMergeLabCheckbox: StateControlCheckbox
-    showAdvancedSettingCheckbox: StateControlCheckbox
-    showGetServerInformationCheckbox: StateControlCheckbox
-    showTextInputCheckbox: StateControlCheckbox
-}
+    showMergeLabCheckbox: StateControlCheckbox;
+    showAdvancedSettingCheckbox: StateControlCheckbox;
+    showGetServerInformationCheckbox: StateControlCheckbox;
+    showGetClientInformationCheckbox: StateControlCheckbox;
+    showTextInputCheckbox: StateControlCheckbox;
+};
 
 type GuiStateAndMethod = {
-    stateControls: StateControls
-    isConverting: boolean,
-    isAnalyzing: boolean,
-    showPyTorchModelUpload: boolean
-    setIsConverting: (val: boolean) => void
-    setIsAnalyzing: (val: boolean) => void
-    setShowPyTorchModelUpload: (val: boolean) => void
+    stateControls: StateControls;
+    isConverting: boolean;
+    isAnalyzing: boolean;
+    showPyTorchModelUpload: boolean;
+    setIsConverting: (val: boolean) => void;
+    setIsAnalyzing: (val: boolean) => void;
+    setShowPyTorchModelUpload: (val: boolean) => void;
 
-    inputAudioDeviceInfo: MediaDeviceInfo[]
-    outputAudioDeviceInfo: MediaDeviceInfo[]
-    audioInputForGUI: string
-    audioOutputForGUI: string
-    fileInputEchoback: boolean | undefined
-    audioOutputForAnalyzer: string
-    setInputAudioDeviceInfo: (val: MediaDeviceInfo[]) => void
-    setOutputAudioDeviceInfo: (val: MediaDeviceInfo[]) => void
-    setAudioInputForGUI: (val: string) => void
-    setAudioOutputForGUI: (val: string) => void
-    setFileInputEchoback: (val: boolean) => void
-    setAudioOutputForAnalyzer: (val: string) => void
+    inputAudioDeviceInfo: MediaDeviceInfo[];
+    outputAudioDeviceInfo: MediaDeviceInfo[];
+    audioInputForGUI: string;
+    audioOutputForGUI: string;
+    fileInputEchoback: boolean | undefined;
+    audioOutputForAnalyzer: string;
+    setInputAudioDeviceInfo: (val: MediaDeviceInfo[]) => void;
+    setOutputAudioDeviceInfo: (val: MediaDeviceInfo[]) => void;
+    setAudioInputForGUI: (val: string) => void;
+    setAudioOutputForGUI: (val: string) => void;
+    setFileInputEchoback: (val: boolean) => void;
+    setAudioOutputForAnalyzer: (val: string) => void;
 
-    modelSlotNum: number
-    setModelSlotNum: (val: number) => void
+    modelSlotNum: number;
+    setModelSlotNum: (val: number) => void;
 
-    textInputResolve: TextInputResolveType | null
-    setTextInputResolve: (val: TextInputResolveType | null) => void
-}
+    textInputResolve: TextInputResolveType | null;
+    setTextInputResolve: (val: TextInputResolveType | null) => void;
+};
 
 const GuiStateContext = React.createContext<GuiStateAndMethod | null>(null);
 export const useGuiState = (): GuiStateAndMethod => {
@@ -84,59 +86,64 @@ export const useGuiState = (): GuiStateAndMethod => {
 };
 
 type TextInputResolveType = {
-    resolve: ((value: string | PromiseLike<string>) => void) | null
-}
+    resolve: ((value: string | PromiseLike<string>) => void) | null;
+};
 
 export const GuiStateProvider = ({ children }: Props) => {
-    const { appGuiSettingState } = useAppRoot()
-    const [isConverting, setIsConverting] = useState<boolean>(false)
-    const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false)
-    const [modelSlotNum, setModelSlotNum] = useState<number>(0)
+    const { appGuiSettingState } = useAppRoot();
+    const [isConverting, setIsConverting] = useState<boolean>(false);
+    const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+    const [modelSlotNum, setModelSlotNum] = useState<number>(0);
 
-    const [showPyTorchModelUpload, setShowPyTorchModelUpload] = useState<boolean>(false)
+    const [showPyTorchModelUpload, setShowPyTorchModelUpload] = useState<boolean>(false);
 
+    const [inputAudioDeviceInfo, setInputAudioDeviceInfo] = useState<MediaDeviceInfo[]>([]);
+    const [outputAudioDeviceInfo, setOutputAudioDeviceInfo] = useState<MediaDeviceInfo[]>([]);
+    const [audioInputForGUI, setAudioInputForGUI] = useState<string>("none");
+    const [audioOutputForGUI, setAudioOutputForGUI] = useState<string>("none");
+    const [fileInputEchoback, setFileInputEchoback] = useState<boolean>(false); //最初のmuteが有効になるように。undefined <-- ??? falseしておけばよさそう。undefinedだとwarningがでる。
+    const [audioOutputForAnalyzer, setAudioOutputForAnalyzer] = useState<string>("default");
 
-    const [inputAudioDeviceInfo, setInputAudioDeviceInfo] = useState<MediaDeviceInfo[]>([])
-    const [outputAudioDeviceInfo, setOutputAudioDeviceInfo] = useState<MediaDeviceInfo[]>([])
-    const [audioInputForGUI, setAudioInputForGUI] = useState<string>("none")
-    const [audioOutputForGUI, setAudioOutputForGUI] = useState<string>("none")
-    const [fileInputEchoback, setFileInputEchoback] = useState<boolean>(false)//最初のmuteが有効になるように。undefined <-- ??? falseしておけばよさそう。undefinedだとwarningがでる。
-    const [audioOutputForAnalyzer, setAudioOutputForAnalyzer] = useState<string>("default")
-
-    const [textInputResolve, setTextInputResolve] = useState<TextInputResolveType | null>(null)
+    const [textInputResolve, setTextInputResolve] = useState<TextInputResolveType | null>(null);
 
     const reloadDeviceInfo = async () => {
         try {
             const ms = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
-            ms.getTracks().forEach(x => { x.stop() })
+            ms.getTracks().forEach((x) => {
+                x.stop();
+            });
         } catch (e) {
-            console.warn("Enumerate device error::", e)
+            console.warn("Enumerate device error::", e);
         }
         const mediaDeviceInfos = await navigator.mediaDevices.enumerateDevices();
 
-        const audioInputs = mediaDeviceInfos.filter(x => { return x.kind == "audioinput" })
+        const audioInputs = mediaDeviceInfos.filter((x) => {
+            return x.kind == "audioinput";
+        });
         audioInputs.push({
             deviceId: "none",
             groupId: "none",
             kind: "audioinput",
             label: "none",
-            toJSON: () => { }
-        })
+            toJSON: () => {},
+        });
         audioInputs.push({
             deviceId: "file",
             groupId: "file",
             kind: "audioinput",
             label: "file",
-            toJSON: () => { }
-        })
-        const audioOutputs = mediaDeviceInfos.filter(x => { return x.kind == "audiooutput" })
+            toJSON: () => {},
+        });
+        const audioOutputs = mediaDeviceInfos.filter((x) => {
+            return x.kind == "audiooutput";
+        });
         audioOutputs.push({
             deviceId: "none",
             groupId: "none",
             kind: "audiooutput",
             label: "none",
-            toJSON: () => { }
-        })
+            toJSON: () => {},
+        });
         // audioOutputs.push({
         //     deviceId: "record",
         //     groupId: "record",
@@ -144,16 +151,16 @@ export const GuiStateProvider = ({ children }: Props) => {
         //     label: "record",
         //     toJSON: () => { }
         // })
-        return [audioInputs, audioOutputs]
-    }
+        return [audioInputs, audioOutputs];
+    };
     useEffect(() => {
         const audioInitialize = async () => {
-            const audioInfo = await reloadDeviceInfo()
-            setInputAudioDeviceInfo(audioInfo[0])
-            setOutputAudioDeviceInfo(audioInfo[1])
-        }
-        audioInitialize()
-    }, [])
+            const audioInfo = await reloadDeviceInfo();
+            setInputAudioDeviceInfo(audioInfo[0]);
+            setOutputAudioDeviceInfo(audioInfo[1]);
+        };
+        audioInitialize();
+    }, []);
 
     // (1) Controller Switch
     const openServerControlCheckbox = useStateControlCheckbox(OpenServerControlCheckbox);
@@ -171,35 +178,31 @@ export const GuiStateProvider = ({ children }: Props) => {
     const showMergeLabCheckbox = useStateControlCheckbox(OpenMergeLabDialogCheckbox);
     const showAdvancedSettingCheckbox = useStateControlCheckbox(OpenAdvancedSettingDialogCheckbox);
     const showGetServerInformationCheckbox = useStateControlCheckbox(OpenGetServerInformationDialogCheckbox);
-
-
+    const showGetClientInformationCheckbox = useStateControlCheckbox(OpenGetClientInformationDialogCheckbox);
 
     const showTextInputCheckbox = useStateControlCheckbox(OpenTextInputDialogCheckbox);
 
-
     useEffect(() => {
-        openServerControlCheckbox.updateState(true)
-        openModelSettingCheckbox.updateState(false)
-        openDeviceSettingCheckbox.updateState(true)
-        openSpeakerSettingCheckbox.updateState(true)
-        openConverterSettingCheckbox.updateState(true)
-        openQualityControlCheckbox.updateState(false)
-        openLabCheckbox.updateState(false)
-        openAdvancedSettingCheckbox.updateState(false)
+        openServerControlCheckbox.updateState(true);
+        openModelSettingCheckbox.updateState(false);
+        openDeviceSettingCheckbox.updateState(true);
+        openSpeakerSettingCheckbox.updateState(true);
+        openConverterSettingCheckbox.updateState(true);
+        openQualityControlCheckbox.updateState(false);
+        openLabCheckbox.updateState(false);
+        openAdvancedSettingCheckbox.updateState(false);
 
+        showWaitingCheckbox.updateState(false);
 
-        showWaitingCheckbox.updateState(false)
+        showStartingNoticeCheckbox.updateState(false);
+        showModelSlotManagerCheckbox.updateState(false);
+        showMergeLabCheckbox.updateState(false);
+        showAdvancedSettingCheckbox.updateState(false);
+        showGetServerInformationCheckbox.updateState(false);
+        showGetClientInformationCheckbox.updateState(false);
 
-
-        showStartingNoticeCheckbox.updateState(false)
-        showModelSlotManagerCheckbox.updateState(false)
-        showMergeLabCheckbox.updateState(false)
-        showAdvancedSettingCheckbox.updateState(false)
-        showGetServerInformationCheckbox.updateState(false)
-
-        showTextInputCheckbox.updateState(false)
-
-    }, [])
+        showTextInputCheckbox.updateState(false);
+    }, []);
 
     useEffect(() => {
         const show = () => {
@@ -210,14 +213,12 @@ export const GuiStateProvider = ({ children }: Props) => {
             //     return
             // }
 
-            document.getElementById("dialog")?.classList.add("dialog-container-show")
-            showStartingNoticeCheckbox.updateState(true)
-            document.getElementById("dialog2")?.classList.add("dialog-container-show")
-        }
-        setTimeout(show)
-    }, [appGuiSettingState.edition])
-
-
+            document.getElementById("dialog")?.classList.add("dialog-container-show");
+            showStartingNoticeCheckbox.updateState(true);
+            document.getElementById("dialog2")?.classList.add("dialog-container-show");
+        };
+        setTimeout(show);
+    }, [appGuiSettingState.edition]);
 
     const providerValue = {
         stateControls: {
@@ -237,9 +238,9 @@ export const GuiStateProvider = ({ children }: Props) => {
             showMergeLabCheckbox,
             showAdvancedSettingCheckbox,
             showGetServerInformationCheckbox,
+            showGetClientInformationCheckbox,
 
-            showTextInputCheckbox
-
+            showTextInputCheckbox,
         },
         isConverting,
         setIsConverting,
@@ -247,7 +248,6 @@ export const GuiStateProvider = ({ children }: Props) => {
         setIsAnalyzing,
         showPyTorchModelUpload,
         setShowPyTorchModelUpload,
-
 
         reloadDeviceInfo,
         inputAudioDeviceInfo,
@@ -266,13 +266,8 @@ export const GuiStateProvider = ({ children }: Props) => {
         modelSlotNum,
         setModelSlotNum,
 
-
         textInputResolve,
-        setTextInputResolve
-
+        setTextInputResolve,
     };
     return <GuiStateContext.Provider value={providerValue}>{children}</GuiStateContext.Provider>;
 };
-
-
-

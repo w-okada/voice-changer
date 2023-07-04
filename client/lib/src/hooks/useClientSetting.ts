@@ -5,7 +5,6 @@ import { VoiceChangerClient } from "../VoiceChangerClient"
 
 export type UseClientSettingProps = {
     voiceChangerClient: VoiceChangerClient | null
-    audioContext: AudioContext | null
     voiceChangerClientSetting: VoiceChangerClientSetting
 }
 
