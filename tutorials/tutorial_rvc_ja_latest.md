@@ -74,7 +74,7 @@ A1. PC の性能が十分ではない可能性があります。CHUNK の値を�
 
 Q2. 音声が変換されない。
 
-A2. こちらを参照して問題点の場所を明らかにして、対応を検討してください。
+A2. [こちら](https://github.com/w-okada/voice-changer/blob/master/tutorials/trouble_shoot_communication_ja.md)を参照して問題点の場所を明らかにして、対応を検討してください。
 
 Q3. 音程がおかしい
 
