@@ -154,6 +154,11 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                 );
             })
             .filter((x) => x != null);
+        const currentValue = devices.find((x) => {
+            return (x.hostAPI == inputHostApi || inputHostApi == "ALL") && x.index == serverSetting.serverSetting.serverInputDeviceId;
+        })
+            ? serverSetting.serverSetting.serverInputDeviceId
+            : -1;
 
         return (
             <div className="config-sub-area-control">
@@ -176,12 +181,15 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                         </select>
                         <select
                             className="config-sub-area-control-field-auido-io-select"
-                            value={serverSetting.serverSetting.serverInputDeviceId}
+                            value={currentValue}
                             onChange={(e) => {
                                 serverSetting.updateServerSettings({ ...serverSetting.serverSetting, serverInputDeviceId: Number(e.target.value) });
                             }}
                         >
                             {filteredDevice}
+                            <option value="-1" key="none">
+                                none
+                            </option>
                         </select>
                     </div>
                 </div>
@@ -390,6 +398,12 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
             })
             .filter((x) => x != null);
 
+        const currentValue = devices.find((x) => {
+            return (x.hostAPI == outputHostApi || outputHostApi == "ALL") && x.index == serverSetting.serverSetting.serverOutputDeviceId;
+        })
+            ? serverSetting.serverSetting.serverOutputDeviceId
+            : -1;
+
         return (
             <div className="config-sub-area-control">
                 <div className="config-sub-area-control-title left-padding-1">output</div>
@@ -411,12 +425,15 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                         </select>
                         <select
                             className="config-sub-area-control-field-auido-io-select"
-                            value={serverSetting.serverSetting.serverOutputDeviceId}
+                            value={currentValue}
                             onChange={(e) => {
                                 serverSetting.updateServerSettings({ ...serverSetting.serverSetting, serverOutputDeviceId: Number(e.target.value) });
                             }}
                         >
                             {filteredDevice}
+                            <option value="-1" key="none">
+                                none
+                            </option>
                         </select>
                     </div>
                 </div>
@@ -523,9 +540,15 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
             .filter((x) => x != null);
         filteredDevice.unshift(
             <option value={-1} key={-1}>
-                None
+                none
             </option>
         );
+
+        const currentValue = devices.find((x) => {
+            return (x.hostAPI == monitorHostApi || monitorHostApi == "ALL") && x.index == serverSetting.serverSetting.serverMonitorDeviceId;
+        })
+            ? serverSetting.serverSetting.serverMonitorDeviceId
+            : -1;
 
         return (
             <div className="config-sub-area-control">
@@ -548,7 +571,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                         </select>
                         <select
                             className="config-sub-area-control-field-auido-io-select"
-                            value={serverSetting.serverSetting.serverMonitorDeviceId}
+                            value={currentValue}
                             onChange={(e) => {
                                 serverSetting.updateServerSettings({ ...serverSetting.serverSetting, serverMonitorDeviceId: Number(e.target.value) });
                             }}
