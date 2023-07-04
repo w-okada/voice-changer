@@ -4,6 +4,10 @@
 
 ## What's New!
 
+- v.1.5.3.8
+
+  - RVC: performance improvement ([PR](https://github.com/w-okada/voice-changer/pull/371) from [nadare881](https://github.com/nadare881))
+
 - v.1.5.3.7
 
   - Feature:
@@ -89,6 +93,9 @@ It can be used in two main ways, in order of difficulty:
 
 | Version    | OS  | Framework                                 | link                                                                                                                                                             | support VC                                                 | size   |
 | ---------- | --- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------ |
+| v.1.5.3.8  | mac | ONNX(cpu), PyTorch(cpu,mps)               | [normal](https://drive.google.com/uc?id=1ptmjFCRDW7M0l80072JVRII5tJpF13__&export=download), [hugging face](https://huggingface.co/wok000/vcclient000/tree/main)  | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC           | 794MB  |
+|            | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda)     | [normal](https://drive.google.com/uc?id=19DfeACmpnzqCVH5bIoFunS2pGPABRuso&export=download), [hugging face](https://huggingface.co/wok000/vcclient000/tree/main)  | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC | 3122MB |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)         | [normal](https://drive.google.com/uc?id=1AYP_hMdoeacX0KiF31Vd3oEjxwdreSbM&export=download), [hugging face](https://huggingface.co/wok000/vcclient000/tree/main)  | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC | 3237MB |
 | v.1.5.3.7  | mac | ONNX(cpu), PyTorch(cpu,mps)               | [normal](https://drive.google.com/uc?id=1HdJwgo0__vR6pAkOkekejUZJ0lu2NfDs&export=download), [hugging face](https://huggingface.co/wok000/vcclient000/tree/main)  | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC           | 794MB  |
 |            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)         | [normal](https://drive.google.com/uc?id=1JIF4PvKg-8HNUv_fMaXSM3AeYa-F_c4z&export=download) , [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC | 3237MB |
 |            | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda)     | [normal](https://drive.google.com/uc?id=1cJzRHmD3vk6av0Dvwj3v9Ef5KUsQYhKv&export=download) , [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC | 3122MB |
