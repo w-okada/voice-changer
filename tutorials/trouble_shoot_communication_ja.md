@@ -36,5 +36,16 @@ AudioOutput の output record を start させた状態で音声変換を開始�
 
 ### (1)での音声の状態がおかしい場合
 
+#### 音声ファイルでの確認
+
+音声ファイルを入力して変換できるか確認してみてください。
+
+例えばこちらのファイルを使用してみてください。
+
+- [sample_jvs001](https://drive.google.com/file/d/142aj-qFJOhoteWKqgRzvNoq02JbZIsaG/view) from [JVS](https://sites.google.com/site/shinnosuketakamichi/research-topics/jvs_corpus)
+- [sample_jvs001](https://drive.google.com/file/d/1aJlZwnJZxTF8-YH5Kz9TT3hcjlSM5YB1/view) from [JVS-MuSiC](https://sites.google.com/site/shinnosuketakamichi/research-topics/jvs_music)
+
+#### マイク入力の確認
+
 マイク入力自体に問題がある可能性があります。録音ソフトなどを用いてマイク入力を確認してみてください。
 また、[こちらの録音サイト](https://w-okada.github.io/voice-changer/)は VCClient の姉妹品であり、ほぼ同等のマイク入力処理が行われているため参考になります。(インストール不要。ブラウザのみで動きます。)
