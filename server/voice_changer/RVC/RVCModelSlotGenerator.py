@@ -100,6 +100,10 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
             if slot.embedder.endswith("768"):
                 slot.embedder = slot.embedder[:-3]
 
+            if "speaker_info" in cpt.keys():
+                for k, v in cpt["speaker_info"].items():
+                    slot.speakers[int(k)] = str(v)
+
             # if slot.embedder == EnumEmbedderTypes.hubert.value:
             #     slot.embedder = EnumEmbedderTypes.hubert
             # elif slot.embedder == EnumEmbedderTypes.contentvec.value:
