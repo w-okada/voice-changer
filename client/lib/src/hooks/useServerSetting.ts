@@ -113,8 +113,6 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
     const _uploadFile2 = useMemo(() => {
         return async (file: File, onprogress: (progress: number, end: boolean) => void, dir: string = "") => {
             if (!props.voiceChangerClient) return
-            console.log("uploading..1.", file)
-            console.log("uploading..2.", file.name)
             const num = await props.voiceChangerClient.uploadFile2(dir, file, onprogress)
             const res = await props.voiceChangerClient.concatUploadedFile(dir + file.name, num)
             console.log("uploaded", num, res)

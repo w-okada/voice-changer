@@ -36,6 +36,7 @@
 
 `.bat`ファイル(win)や`.command`ファイル(mac)を実行すると、次のような画面が表示され、初回起動時には各種データをインターネットからダウンロードします。
 お使いの環境によりますが、多くの場合１～２分かかります。
+
 ![image](https://github.com/w-okada/voice-changer/assets/48346627/88a30097-2fb3-4c50-8bf1-19c41f27c481)
 
 ### GUI 表示
@@ -79,6 +80,14 @@ A2. [こちら](https://github.com/w-okada/voice-changer/blob/master/tutorials/t
 Q3. 音程がおかしい
 
 A3. クイックスタートでは説明しませんでしたが、Pitch 変更可能なモデルであれば TUNE で変更できます。後述の詳細説明をご確認ください。
+
+Q4. ウィンドウが表示されない。あるいはウィンドウは表示されるが中身が表示されない。コンソールに`electron: Failed to load URL: http://localhost:18888/ with error: ERR_CONNECTION_REFUSED`のようなエラーが表示される。
+
+A4. ウィルスチェッカーが走っている可能性があります。しばらく待つか、自己責任でフォルダを除外指定してください。
+
+Q5. `[4716:0429/213736.103:ERROR:gpu_init.cc(523)] Passthrough is not supported, GL is disabled, ANGLE is`という表示が出る
+
+A5. 使用しているライブラリが出しているエラーです。影響はありませんので無視してください。
 
 # GUI の詳細
 
