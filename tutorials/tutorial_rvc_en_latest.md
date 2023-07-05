@@ -80,6 +80,14 @@ Q3. The pitch is off.
 
 A3. Although it wasn't explained in the Quick Start, if the model is pitch-changeable, you can change it with TUNE. Please refer to the more detailed explanation below.
 
+Q4. The window doesn't show up or the window shows up but the contents are not displayed. A console error such as `electron: Failed to load URL: http://localhost:18888/ with error: ERR_CONNECTION_REFUSED` is displayed.
+
+A4. There is a possibility that the virus checker is running. Please wait or designate the folder to be excluded at your own risk.
+
+Q5. `[4716:0429/213736.103:ERROR:gpu_init.cc(523)] Passthrough is not supported, GL is disabled, ANGLE is` is displayed
+
+A5. This is an error produced by the library used by this application, but it does not have any effect, so please ignore it.
+
 ## Configurable items
 
 ## Title
