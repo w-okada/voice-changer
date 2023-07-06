@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import shutil
 import threading
 import numpy as np
@@ -169,6 +170,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         data["gpus"] = self.gpus
         data["modelSlots"] = self.modelSlotManager.getAllSlotInfo(reload=True)
         data["sampleModels"] = getSampleInfos(self.params.sample_mode)
+        data["python"] = sys.version
 
         data["status"] = "OK"
 
