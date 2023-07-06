@@ -81,7 +81,7 @@ export const useClient = (props: UseClientProps): ClientState => {
     }, [])
 
     // (1-2) 各種設定I/F
-    const voiceChangerClientSetting = useClientSetting({ voiceChangerClient, audioContext: props.audioContext, voiceChangerClientSetting: setting.voiceChangerClientSetting })
+    const voiceChangerClientSetting = useClientSetting({ voiceChangerClient, voiceChangerClientSetting: setting.voiceChangerClientSetting })
     const workletNodeSetting = useWorkletNodeSetting({ voiceChangerClient: voiceChangerClient, workletNodeSetting: setting.workletNodeSetting })
     useWorkletSetting({ voiceChangerClient, workletSetting: setting.workletSetting })
     const serverSetting = useServerSetting({ voiceChangerClient })

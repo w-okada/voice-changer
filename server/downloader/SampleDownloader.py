@@ -166,7 +166,8 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
         slotInfo = modelSlotManager.get_slot_info(targetSlotIndex)
         if slotInfo.voiceChangerType == "RVC":
             if slotInfo.isONNX:
-                RVCModelSlotGenerator._setInfoByONNX(slotInfo)
+                slotInfo = RVCModelSlotGenerator._setInfoByONNX(slotInfo)
             else:
-                RVCModelSlotGenerator._setInfoByPytorch(slotInfo)
+                slotInfo = RVCModelSlotGenerator._setInfoByPytorch(slotInfo)
+            
             modelSlotManager.save_model_slot(targetSlotIndex, slotInfo)

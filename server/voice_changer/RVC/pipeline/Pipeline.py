@@ -73,9 +73,9 @@ class Pipeline(object):
     def exec(
         self,
         sid,
-        audio, # torch.tensor [n]
-        pitchf, # np.array [m]
-        feature, # np.array [m, feat]
+        audio,  # torch.tensor [n]
+        pitchf,  # np.array [m]
+        feature,  # np.array [m, feat]
         f0_up_key,
         index_rate,
         if_f0,

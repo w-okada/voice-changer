@@ -11,6 +11,8 @@ def downloadWeight(voiceChangerParams: VoiceChangerParams):
     hubert_base_jp = voiceChangerParams.hubert_base_jp
     hubert_soft = voiceChangerParams.hubert_soft
     nsf_hifigan = voiceChangerParams.nsf_hifigan
+    crepe_onnx_full = voiceChangerParams.crepe_onnx_full
+    crepe_onnx_tiny = voiceChangerParams.crepe_onnx_tiny
 
     # file exists check (currently only for rvc)
     downloadParams = []
@@ -54,6 +56,24 @@ def downloadWeight(voiceChangerParams: VoiceChangerParams):
                 "url": "https://huggingface.co/wok000/weights/raw/main/ddsp-svc30/nsf_hifigan_20221211/config.json",
                 "saveTo": nsf_hifigan_config,
                 "position": 4,
+            }
+        )
+
+    if os.path.exists(crepe_onnx_full) is False:
+        downloadParams.append(
+            {
+                "url": "https://huggingface.co/wok000/weights/resolve/main/crepe/onnx/full.onnx",
+                "saveTo": crepe_onnx_full,
+                "position": 5,
+            }
+        )
+    
+    if os.path.exists(crepe_onnx_tiny) is False:
+        downloadParams.append(
+            {
+                "url": "https://huggingface.co/wok000/weights/resolve/main/crepe/onnx/tiny.onnx",
+                "saveTo": crepe_onnx_tiny,
+                "position": 6,
             }
         )
 

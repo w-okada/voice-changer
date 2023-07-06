@@ -42,8 +42,9 @@ export type CrossFadeOverlapSize = typeof CrossFadeOverlapSize[keyof typeof Cros
 export const F0Detector = {
     "dio": "dio",
     "harvest": "harvest",
-    // "parselmouth": "parselmouth",
     "crepe": "crepe",
+    "crepe_full": "crepe_full",
+    "crepe_tiny": "crepe_tiny",
 } as const
 export type F0Detector = typeof F0Detector[keyof typeof F0Detector]
 

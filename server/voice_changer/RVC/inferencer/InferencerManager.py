@@ -31,7 +31,6 @@ class InferencerManager:
         file: str,
         gpu: int,
     ) -> Inferencer:
-        print("inferencerTypeinferencerTypeinferencerTypeinferencerType", inferencerType)
         if inferencerType == EnumInferenceTypes.pyTorchRVC or inferencerType == EnumInferenceTypes.pyTorchRVC.value:
             return RVCInferencer().loadModel(file, gpu)
         elif inferencerType == EnumInferenceTypes.pyTorchRVCNono or inferencerType == EnumInferenceTypes.pyTorchRVCNono.value:

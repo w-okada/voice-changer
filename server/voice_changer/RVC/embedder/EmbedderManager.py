@@ -1,6 +1,6 @@
 from torch import device
 
-from const import EnumEmbedderTypes
+from const import EmbedderType
 from voice_changer.RVC.embedder.Embedder import Embedder
 from voice_changer.RVC.embedder.FairseqContentvec import FairseqContentvec
 from voice_changer.RVC.embedder.FairseqHubert import FairseqHubert
@@ -18,7 +18,7 @@ class EmbedderManager:
 
     @classmethod
     def getEmbedder(
-        cls, embederType: EnumEmbedderTypes, isHalf: bool, dev: device
+        cls, embederType: EmbedderType, isHalf: bool, dev: device
     ) -> Embedder:
         if cls.currentEmbedder is None:
             print("[Voice Changer] generate new embedder. (no embedder)")
@@ -35,24 +35,15 @@ class EmbedderManager:
 
     @classmethod
     def loadEmbedder(
-        cls, embederType: EnumEmbedderTypes, isHalf: bool, dev: device
+        cls, embederType: EmbedderType, isHalf: bool, dev: device
     ) -> Embedder:
-        if (
-            embederType == EnumEmbedderTypes.hubert
-            or embederType == EnumEmbedderTypes.hubert.value
-        ):
+        if embederType == "hubert_base":
             file = cls.params.hubert_base
             return FairseqHubert().loadModel(file, dev, isHalf)
-        elif (
-            embederType == EnumEmbedderTypes.hubert_jp
-            or embederType == EnumEmbedderTypes.hubert_jp.value
-        ):
+        elif embederType == "hubert-base-japanese":
             file = cls.params.hubert_base_jp
             return FairseqHubertJp().loadModel(file, dev, isHalf)
-        elif (
-            embederType == EnumEmbedderTypes.contentvec
-            or embederType == EnumEmbedderTypes.contentvec.value
-        ):
+        elif embederType == "contentvec":
             file = cls.params.hubert_base
             return FairseqContentvec().loadModel(file, dev, isHalf)
         else:

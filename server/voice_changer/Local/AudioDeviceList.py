@@ -1,14 +1,15 @@
 import sounddevice as sd
 from dataclasses import dataclass, field
 
-from const import ServerAudioDeviceTypes
 import numpy as np
+
+from const import ServerAudioDeviceType
 # from const import SERVER_DEVICE_SAMPLE_RATES
 
 
 @dataclass
 class ServerAudioDevice:
-    kind: ServerAudioDeviceTypes = ServerAudioDeviceTypes.audioinput
+    kind: ServerAudioDeviceType = "audioinput"
     index: int = 0
     name: str = ""
     hostAPI: str = ""
@@ -22,7 +23,7 @@ def dummy_callback(data: np.ndarray, frames, times, status):
     pass
 
 
-def checkSamplingRate(deviceId: int, desiredSamplingRate: int, type: ServerAudioDeviceTypes):
+def checkSamplingRate(deviceId: int, desiredSamplingRate: int, type: ServerAudioDeviceType):
     if type == "input":
         try:
             with sd.InputStream(
@@ -71,7 +72,7 @@ def list_audio_device():
     serverAudioOutputDevices: list[ServerAudioDevice] = []
     for d in inputAudioDeviceList:
         serverInputAudioDevice: ServerAudioDevice = ServerAudioDevice(
-            kind=ServerAudioDeviceTypes.audioinput,
+            kind="audioinput",
             index=d["index"],
             name=d["name"],
             hostAPI=hostapis[d["hostapi"]]["name"],
@@ -82,7 +83,7 @@ def list_audio_device():
         serverAudioInputDevices.append(serverInputAudioDevice)
     for d in outputAudioDeviceList:
         serverOutputAudioDevice: ServerAudioDevice = ServerAudioDevice(
-            kind=ServerAudioDeviceTypes.audiooutput,
+            kind="audiooutput",
             index=d["index"],
             name=d["name"],
             hostAPI=hostapis[d["hostapi"]]["name"],

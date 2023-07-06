@@ -1,6 +1,6 @@
 import os
-from const import EnumEmbedderTypes, EnumInferenceTypes
-
+from const import EnumInferenceTypes
+from dataclasses import asdict
 import torch
 import onnxruntime
 import json
@@ -38,6 +38,8 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
         config_len = len(cpt["config"])
         version = cpt.get("version", "v1")
 
+        slot = RVCModelSlot(**asdict(slot))
+
         if version == "voras_beta":
             slot.f0 = True if cpt["f0"] == 1 else False
             slot.modelType = EnumInferenceTypes.pyTorchVoRASbeta.value
@@ -49,12 +51,12 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
             if slot.embedder.endswith("768"):
                 slot.embedder = slot.embedder[:-3]
 
-            if slot.embedder == EnumEmbedderTypes.hubert.value:
-                slot.embedder = EnumEmbedderTypes.hubert.value
-            elif slot.embedder == EnumEmbedderTypes.contentvec.value:
-                slot.embedder = EnumEmbedderTypes.contentvec.value
-            elif slot.embedder == EnumEmbedderTypes.hubert_jp.value:
-                slot.embedder = EnumEmbedderTypes.hubert_jp.value
+            # if slot.embedder == "hubert":
+            #     slot.embedder = "hubert"
+            # elif slot.embedder == "contentvec":
+            #     slot.embedder = "contentvec"
+            # elif slot.embedder == "hubert_jp":
+            #     slot.embedder = "hubert_jp"
             else:
                 raise RuntimeError("[Voice Changer][setInfoByONNX] unknown embedder")
 
@@ -67,14 +69,14 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
                 slot.embChannels = 256
                 slot.embOutputLayer = 9
                 slot.useFinalProj = True
-                slot.embedder = EnumEmbedderTypes.hubert.value
+                slot.embedder = "hubert_base"
                 print("[Voice Changer] Official Model(pyTorch) : v1")
             else:
                 slot.modelType = EnumInferenceTypes.pyTorchRVCv2.value if slot.f0 else EnumInferenceTypes.pyTorchRVCv2Nono.value
                 slot.embChannels = 768
                 slot.embOutputLayer = 12
                 slot.useFinalProj = False
-                slot.embedder = EnumEmbedderTypes.hubert.value
+                slot.embedder = "hubert_base"
                 print("[Voice Changer] Official Model(pyTorch) : v2")
 
         else:
@@ -104,24 +106,18 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
                 for k, v in cpt["speaker_info"].items():
                     slot.speakers[int(k)] = str(v)
 
-            # if slot.embedder == EnumEmbedderTypes.hubert.value:
-            #     slot.embedder = EnumEmbedderTypes.hubert
-            # elif slot.embedder == EnumEmbedderTypes.contentvec.value:
-            #     slot.embedder = EnumEmbedderTypes.contentvec
-            # elif slot.embedder == EnumEmbedderTypes.hubert_jp.value:
-            #     slot.embedder = EnumEmbedderTypes.hubert_jp
-            # else:
-            #     raise RuntimeError("[Voice Changer][setInfoByONNX] unknown embedder")
-
         slot.samplingRate = cpt["config"][-1]
 
         del cpt
+
+        return slot
 
     @classmethod
     def _setInfoByONNX(cls, slot: ModelSlot):
         tmp_onnx_session = onnxruntime.InferenceSession(slot.modelFile, providers=["CPUExecutionProvider"])
         modelmeta = tmp_onnx_session.get_modelmeta()
         try:
+            slot = RVCModelSlot(**asdict(slot))
             metadata = json.loads(modelmeta.custom_metadata_map["metadata"])
 
             # slot.modelType = metadata["modelType"]
@@ -144,17 +140,9 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
                 print(f"[Voice Changer] ONNX Model: ch:{slot.embChannels}, L:{slot.embOutputLayer}, FP:{slot.useFinalProj}")
 
             if "embedder" not in metadata:
-                slot.embedder = EnumEmbedderTypes.hubert.value
+                slot.embedder = "hubert_base"
             else:
                 slot.embedder = metadata["embedder"]
-            # elif metadata["embedder"] == EnumEmbedderTypes.hubert.value:
-            #     slot.embedder = EnumEmbedderTypes.hubert
-            # elif metadata["embedder"] == EnumEmbedderTypes.contentvec.value:
-            #     slot.embedder = EnumEmbedderTypes.contentvec
-            # elif metadata["embedder"] == EnumEmbedderTypes.hubert_jp.value:
-            #     slot.embedder = EnumEmbedderTypes.hubert_jp
-            # else:
-            #     raise RuntimeError("[Voice Changer][setInfoByONNX] unknown embedder")
 
             slot.f0 = metadata["f0"]
             slot.modelType = EnumInferenceTypes.onnxRVC.value if slot.f0 else EnumInferenceTypes.onnxRVCNono.value
@@ -164,7 +152,7 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
         except Exception as e:
             slot.modelType = EnumInferenceTypes.onnxRVC.value
             slot.embChannels = 256
-            slot.embedder = EnumEmbedderTypes.hubert.value
+            slot.embedder = "hubert_base"
             slot.f0 = True
             slot.samplingRate = 48000
             slot.deprecated = True
@@ -175,3 +163,4 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
             print("[Voice Changer] ############## !!!! CAUTION !!!! ####################")
 
         del tmp_onnx_session
+        return slot

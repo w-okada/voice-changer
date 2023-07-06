@@ -1,5 +1,5 @@
 from typing import TypeAlias, Union
-from const import MAX_SLOT_NUM, EnumInferenceTypes, EnumEmbedderTypes, VoiceChangerType
+from const import MAX_SLOT_NUM, EnumInferenceTypes, EmbedderType, VoiceChangerType
 
 from dataclasses import dataclass, asdict, field
 
@@ -34,7 +34,7 @@ class RVCModelSlot(ModelSlot):
     embOutputLayer: int = 9
     useFinalProj: bool = True
     deprecated: bool = False
-    embedder: str = EnumEmbedderTypes.hubert.value
+    embedder: EmbedderType = "hubert_base"
 
     sampleId: str = ""
     speakers: dict = field(default_factory=lambda: {0: "target"})

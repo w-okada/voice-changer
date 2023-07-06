@@ -54,11 +54,11 @@ def getFrontendPath():
     return frontend_path
 
 
-# "hubert_base",  "contentvec",  "distilhubert"
-class EnumEmbedderTypes(Enum):
-    hubert = "hubert_base"
-    contentvec = "contentvec"
-    hubert_jp = "hubert-base-japanese"
+EmbedderType: TypeAlias = Literal[
+    "hubert_base",
+    "contentvec",
+    "hubert-base-japanese"
+]
 
 
 class EnumInferenceTypes(Enum):
@@ -73,21 +73,18 @@ class EnumInferenceTypes(Enum):
     onnxRVCNono = "onnxRVCNono"
 
 
-class EnumPitchExtractorTypes(Enum):
-    harvest = "harvest"
-    dio = "dio"
-    crepe = "crepe"
+PitchExtractorType: TypeAlias = Literal[
+    "harvest",
+    "dio",
+    "crepe",
+    "crepe_full",
+    "crepe_tiny",
+]
 
-
-class EnumFrameworkTypes(Enum):
-    pyTorch = "pyTorch"
-    onnx = "onnx"
-
-
-class ServerAudioDeviceTypes(Enum):
-    audioinput = "audioinput"
-    audiooutput = "audiooutput"
-
+ServerAudioDeviceType: TypeAlias = Literal[
+    "audioinput",
+    "audiooutput"
+]
 
 RVCSampleMode: TypeAlias = Literal[
     "production",
