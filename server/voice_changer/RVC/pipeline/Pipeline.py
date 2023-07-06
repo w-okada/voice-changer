@@ -73,9 +73,9 @@ class Pipeline(object):
     def exec(
         self,
         sid,
-        audio, # torch.tensor [n]
-        pitchf, # np.array [m]
-        feature, # np.array [m, feat]
+        audio,  # torch.tensor [n]
+        pitchf,  # np.array [m]
+        feature,  # np.array [m, feat]
         f0_up_key,
         index_rate,
         if_f0,
@@ -208,13 +208,12 @@ class Pipeline(object):
         # apply silent front for inference
         if type(self.inferencer) in [OnnxRVCInferencer, OnnxRVCInferencerNono]:
             npyOffset = math.floor(silence_front * 16000) // 360
-            feats = feats[:, npyOffset * 2 :, :]
+            feats = feats[:, npyOffset * 2 :, :]  # NOQA
             feats_len = feats.shape[1]
             if pitch is not None and pitchf is not None:
                 pitch = pitch[:, -feats_len:]
                 pitchf = pitchf[:, -feats_len:]
             p_len = torch.tensor([feats_len], device=self.device).long()
-        
 
         # 推論実行
         try:

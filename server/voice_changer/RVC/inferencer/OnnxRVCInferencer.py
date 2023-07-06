@@ -51,7 +51,7 @@ class OnnxRVCInferencer(Inferencer):
                     "p_len": pitch_length.cpu().numpy().astype(np.int64),
                     "pitch": pitch.cpu().numpy().astype(np.int64),
                     "pitchf": pitchf.cpu().numpy().astype(np.float32),
-                    "sid": sid.cpu().numpy().astype(np.int64)               
+                    "sid": sid.cpu().numpy().astype(np.int64)
                 },
             )
         else:
@@ -62,7 +62,7 @@ class OnnxRVCInferencer(Inferencer):
                     "p_len": pitch_length.cpu().numpy().astype(np.int64),
                     "pitch": pitch.cpu().numpy().astype(np.int64),
                     "pitchf": pitchf.cpu().numpy().astype(np.float32),
-                    "sid": sid.cpu().numpy().astype(np.int64) 
+                    "sid": sid.cpu().numpy().astype(np.int64)
                 },
             )
 

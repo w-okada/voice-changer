@@ -34,7 +34,7 @@ def createPipeline(modelSlot: RVCModelSlot, gpu: int, f0Detector: str):
         traceback.print_exc()
 
     # pitchExtractor
-    pitchExtractor = PitchExtractorManager.getPitchExtractor(f0Detector)
+    pitchExtractor = PitchExtractorManager.getPitchExtractor(f0Detector, gpu)
 
     # index, feature
     index = _loadIndex(modelSlot)
@@ -67,7 +67,7 @@ def _loadIndex(modelSlot: RVCModelSlot):
     try:
         print("Try loading...", modelSlot.indexFile)
         index = faiss.read_index(modelSlot.indexFile)
-    except:
+    except: # NOQA
         print("[Voice Changer] load index failed. Use no index.")
         traceback.print_exc()
         return None

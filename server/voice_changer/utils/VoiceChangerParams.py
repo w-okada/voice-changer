@@ -12,3 +12,5 @@ class VoiceChangerParams:
     hubert_soft: str
     nsf_hifigan: str
     sample_mode: str
+    crepe_onnx_full: str
+    crepe_onnx_tiny: str

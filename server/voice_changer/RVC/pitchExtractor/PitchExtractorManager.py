@@ -1,40 +1,42 @@
 from typing import Protocol
-from const import EnumPitchExtractorTypes
+from const import PitchExtractorType
+from voice_changer.RVC.pitchExtractor.CrepeOnnxPitchExtractor import CrepeOnnxPitchExtractor
 from voice_changer.RVC.pitchExtractor.DioPitchExtractor import DioPitchExtractor
 from voice_changer.RVC.pitchExtractor.HarvestPitchExtractor import HarvestPitchExtractor
 from voice_changer.RVC.pitchExtractor.CrepePitchExtractor import CrepePitchExtractor
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
+from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 
 
 class PitchExtractorManager(Protocol):
     currentPitchExtractor: PitchExtractor | None = None
+    params: VoiceChangerParams
+
+    @classmethod
+    def initialize(cls, params: VoiceChangerParams):
+        cls.params = params
 
     @classmethod
     def getPitchExtractor(
-        cls, pitchExtractorType: EnumPitchExtractorTypes
+        cls, pitchExtractorType: PitchExtractorType, gpu: int
     ) -> PitchExtractor:
-        cls.currentPitchExtractor = cls.loadPitchExtractor(pitchExtractorType)
+        cls.currentPitchExtractor = cls.loadPitchExtractor(pitchExtractorType,  gpu)
         return cls.currentPitchExtractor
 
     @classmethod
     def loadPitchExtractor(
-        cls, pitchExtractorType: EnumPitchExtractorTypes
+        cls, pitchExtractorType: PitchExtractorType, gpu: int
     ) -> PitchExtractor:
-        if (
-            pitchExtractorType == EnumPitchExtractorTypes.harvest
-            or pitchExtractorType == EnumPitchExtractorTypes.harvest.value
-        ):
+        if pitchExtractorType == "harvest":
             return HarvestPitchExtractor()
-        elif (
-            pitchExtractorType == EnumPitchExtractorTypes.dio
-            or pitchExtractorType == EnumPitchExtractorTypes.dio.value
-        ):
+        elif pitchExtractorType == "dio":
             return DioPitchExtractor()
-        elif (
-            pitchExtractorType == EnumPitchExtractorTypes.crepe
-            or pitchExtractorType == EnumPitchExtractorTypes.crepe.value
-        ):
+        elif pitchExtractorType == "crepe":
             return CrepePitchExtractor()
+        elif pitchExtractorType == "crepe_tiny":
+            return CrepeOnnxPitchExtractor(pitchExtractorType, cls.params.crepe_onnx_tiny, gpu)
+        elif pitchExtractorType == "crepe_full":
+            return CrepeOnnxPitchExtractor(pitchExtractorType, cls.params.crepe_onnx_full, gpu)
         else:
             # return hubert as default
             raise RuntimeError(

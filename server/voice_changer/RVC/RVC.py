@@ -1,5 +1,5 @@
-import sys
-import os
+# import sys
+# import os
 from dataclasses import asdict
 import numpy as np
 import torch
@@ -7,18 +7,18 @@ import torchaudio
 from data.ModelSlot import RVCModelSlot
 
 
-# avoiding parse arg error in RVC
-sys.argv = ["MMVCServerSIO.py"]
+# # avoiding parse arg error in RVC
+# sys.argv = ["MMVCServerSIO.py"]
 
-if sys.platform.startswith("darwin"):
-    baseDir = [x for x in sys.path if x.endswith("Contents/MacOS")]
-    if len(baseDir) != 1:
-        print("baseDir should be only one ", baseDir)
-        sys.exit()
-    modulePath = os.path.join(baseDir[0], "RVC")
-    sys.path.append(modulePath)
-else:
-    sys.path.append("RVC")
+# if sys.platform.startswith("darwin"):
+#     baseDir = [x for x in sys.path if x.endswith("Contents/MacOS")]
+#     if len(baseDir) != 1:
+#         print("baseDir should be only one ", baseDir)
+#         sys.exit()
+#     modulePath = os.path.join(baseDir[0], "RVC")
+#     sys.path.append(modulePath)
+# else:
+#     sys.path.append("RVC")
 
 
 from voice_changer.RVC.RVCSettings import RVCSettings
@@ -39,9 +39,10 @@ class RVC(VoiceChangerModel):
         print("[Voice Changer] [RVC] Creating instance ")
         self.deviceManager = DeviceManager.get_instance()
         EmbedderManager.initialize(params)
+        PitchExtractorManager.initialize(params)
         self.settings = RVCSettings()
         self.params = params
-        self.pitchExtractor = PitchExtractorManager.getPitchExtractor(self.settings.f0Detector)
+        self.pitchExtractor = PitchExtractorManager.getPitchExtractor(self.settings.f0Detector, self.settings.gpu)
 
         self.pipeline: Pipeline | None = None
 
@@ -76,7 +77,7 @@ class RVC(VoiceChangerModel):
         elif key in self.settings.strData:
             setattr(self.settings, key, str(val))
             if key == "f0Detector" and self.pipeline is not None:
-                pitchExtractor = PitchExtractorManager.getPitchExtractor(self.settings.f0Detector)
+                pitchExtractor = PitchExtractorManager.getPitchExtractor(self.settings.f0Detector, self.settings.gpu)
                 self.pipeline.setPitchExtractor(pitchExtractor)
         else:
             return False
@@ -112,7 +113,7 @@ class RVC(VoiceChangerModel):
             self.audio_buffer = newData
             if self.slotInfo.f0:
                 self.pitchf_buffer = np.zeros(new_feature_length)
-            self.feature_buffer =  np.zeros([new_feature_length, self.slotInfo.embChannels])
+            self.feature_buffer = np.zeros([new_feature_length, self.slotInfo.embChannels])
 
         convertSize = inputSize + crossfadeSize + solaSearchFrame + self.settings.extraConvertSize
 
@@ -201,21 +202,21 @@ class RVC(VoiceChangerModel):
     def __del__(self):
         del self.pipeline
 
-        print("---------- REMOVING ---------------")
+        # print("---------- REMOVING ---------------")
 
-        remove_path = os.path.join("RVC")
-        sys.path = [x for x in sys.path if x.endswith(remove_path) is False]
+        # remove_path = os.path.join("RVC")
+        # sys.path = [x for x in sys.path if x.endswith(remove_path) is False]
 
-        for key in list(sys.modules):
-            val = sys.modules.get(key)
-            try:
-                file_path = val.__file__
-                if file_path.find("RVC" + os.path.sep) >= 0:
-                    # print("remove", key, file_path)
-                    sys.modules.pop(key)
-            except Exception:  # type:ignore
-                # print(e)
-                pass
+        # for key in list(sys.modules):
+        #     val = sys.modules.get(key)
+        #     try:
+        #         file_path = val.__file__
+        #         if file_path.find("RVC" + os.path.sep) >= 0:
+        #             # print("remove", key, file_path)
+        #             sys.modules.pop(key)
+        #     except Exception:  # type:ignore
+        #         # print(e)
+        #         pass
 
     def export2onnx(self):
         modelSlot = self.slotInfo

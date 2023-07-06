@@ -1,16 +1,19 @@
 import pyworld
 import numpy as np
-from const import EnumPitchExtractorTypes
+from const import PitchExtractorType
 
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 
 
 class DioPitchExtractor(PitchExtractor):
-    pitchExtractorType: EnumPitchExtractorTypes = EnumPitchExtractorTypes.dio
+
+    def __init__(self):
+        super().__init__()
+        self.pitchExtractorType: PitchExtractorType = "dio"
 
     def extract(self, audio, pitchf, f0_up_key, sr, window, silence_front=0):
         audio = audio.detach().cpu().numpy()
-        n_frames = int(len(audio) // window) + 1
+        n_frames = int(len(audio) // window) + 1  # NOQA
         start_frame = int(silence_front * sr / window)
         real_silence_front = start_frame * window / sr
 
@@ -31,7 +34,7 @@ class DioPitchExtractor(PitchExtractor):
             frame_period=10,
         )
         f0 = pyworld.stonemask(audio.astype(np.double), _f0, t, sr)
-       # f0 = np.pad(f0.astype("float"), (start_frame, n_frames - len(f0) - start_frame))
+        # f0 = np.pad(f0.astype("float"), (start_frame, n_frames - len(f0) - start_frame))
 
         f0 *= pow(2, f0_up_key / 12)
         pitchf[-f0.shape[0]:] = f0[:pitchf.shape[0]]
@@ -45,4 +48,3 @@ class DioPitchExtractor(PitchExtractor):
         pitch_coarse = np.rint(f0_mel).astype(int)
 
         return pitch_coarse, pitchf
-

@@ -300,5 +300,5 @@ class MMVCv15:
                 if file_path.find(remove_path + os.path.sep) >= 0:
                     # print("remove", key, file_path)
                     sys.modules.pop(key)
-            except:  # type:ignore
+            except: # NOQA
                 pass

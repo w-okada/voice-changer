@@ -1,17 +1,20 @@
 import pyworld
 import numpy as np
 import scipy.signal as signal
-from const import EnumPitchExtractorTypes
+from const import PitchExtractorType
 
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 
 
 class HarvestPitchExtractor(PitchExtractor):
-    pitchExtractorType: EnumPitchExtractorTypes = EnumPitchExtractorTypes.harvest
+
+    def __init__(self):
+        super().__init__()
+        self.pitchExtractorType: PitchExtractorType = "harvest"
 
     def extract(self, audio, pitchf, f0_up_key, sr, window, silence_front=0):
         audio = audio.detach().cpu().numpy()
-        n_frames = int(len(audio) // window) + 1
+        n_frames = int(len(audio) // window) + 1  # NOQA
         start_frame = int(silence_front * sr / window)
         real_silence_front = start_frame * window / sr
 

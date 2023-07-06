@@ -73,15 +73,13 @@ class EnumInferenceTypes(Enum):
     onnxRVCNono = "onnxRVCNono"
 
 
-class EnumPitchExtractorTypes(Enum):
-    harvest = "harvest"
-    dio = "dio"
-    crepe = "crepe"
-
-
-class EnumFrameworkTypes(Enum):
-    pyTorch = "pyTorch"
-    onnx = "onnx"
+PitchExtractorType: TypeAlias = Literal[
+    "harvest",
+    "dio",
+    "crepe",
+    "crepe_full",
+    "crepe_tiny",
+]
 
 
 class ServerAudioDeviceTypes(Enum):

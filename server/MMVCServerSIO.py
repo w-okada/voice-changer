@@ -34,6 +34,7 @@ def setupArgParser():
     parser.add_argument("--logLevel", type=str, default="error", help="Log level info|critical|error. (default: error)")
     parser.add_argument("-p", type=int, default=18888, help="port")
     parser.add_argument("--https", type=strtobool, default=False, help="use https")
+    parser.add_argument("--test_connect", type=str, default="8.8.8.8", help="test connect to detect ip in https mode. default 8.8.8.8")
     parser.add_argument("--httpsKey", type=str, default="ssl.key", help="path for the key of https")
     parser.add_argument("--httpsCert", type=str, default="ssl.cert", help="path for the cert of https")
     parser.add_argument("--httpsSelfSigned", type=strtobool, default=True, help="generate self-signed certificate")
@@ -48,6 +49,8 @@ def setupArgParser():
     parser.add_argument("--hubert_base_jp", type=str, help="path to hubert_base_jp model(pytorch)")
     parser.add_argument("--hubert_soft", type=str, help="path to hubert_soft model(pytorch)")
     parser.add_argument("--nsf_hifigan", type=str, help="path to nsf_hifigan model(pytorch)")
+    parser.add_argument("--crepe_onnx_full", type=str, help="path to crepe_onnx_full")
+    parser.add_argument("--crepe_onnx_tiny", type=str, help="path to crepe_onnx_tiny")
 
     return parser
 
@@ -85,6 +88,9 @@ voiceChangerParams = VoiceChangerParams(
     hubert_base_jp=args.hubert_base_jp,
     hubert_soft=args.hubert_soft,
     nsf_hifigan=args.nsf_hifigan,
+    crepe_onnx_full=args.crepe_onnx_full,
+    crepe_onnx_tiny=args.crepe_onnx_tiny,
+    
     sample_mode=args.sample_mode,
 )
 
@@ -120,6 +126,7 @@ if __name__ == "__mp_main__":
 if __name__ == "__main__":
     mp.freeze_support()
 
+    printMessage(f"PYTHON:{sys.version}", level=2)
     printMessage("Voice Changerを起動しています。", level=2)
     # ダウンロード(Weight)
     try:
@@ -195,10 +202,10 @@ if __name__ == "__main__":
         else:
             printMessage(f"http://localhost:{EX_PORT}/", level=1)
     else:  # 直接python起動
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        hostname = s.getsockname()[0]
         if args.https == 1:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect((args.test_connect, 80))
+            hostname = s.getsockname()[0]
             printMessage(f"https://localhost:{PORT}/", level=1)
             printMessage(f"https://{hostname}:{PORT}/", level=1)
         else:
