@@ -54,11 +54,11 @@ def getFrontendPath():
     return frontend_path
 
 
-# "hubert_base",  "contentvec",  "distilhubert"
-class EnumEmbedderTypes(Enum):
-    hubert = "hubert_base"
-    contentvec = "contentvec"
-    hubert_jp = "hubert-base-japanese"
+EmbedderType: TypeAlias = Literal[
+    "hubert_base",
+    "contentvec",
+    "hubert-base-japanese"
+]
 
 
 class EnumInferenceTypes(Enum):

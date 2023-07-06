@@ -90,7 +90,6 @@ voiceChangerParams = VoiceChangerParams(
     nsf_hifigan=args.nsf_hifigan,
     crepe_onnx_full=args.crepe_onnx_full,
     crepe_onnx_tiny=args.crepe_onnx_tiny,
-    
     sample_mode=args.sample_mode,
 )
 

@@ -3,11 +3,11 @@ from typing import Any, Protocol
 import torch
 from torch import device
 
-from const import EnumEmbedderTypes
+from const import EmbedderType
 
 
 class Embedder(Protocol):
-    embedderType: EnumEmbedderTypes = EnumEmbedderTypes.hubert
+    embedderType: EmbedderType = "hubert_base"
     file: str
     isHalf: bool = True
     dev: device
@@ -24,7 +24,7 @@ class Embedder(Protocol):
 
     def getEmbedderInfo(self):
         return {
-            "embedderType": self.embedderType.value,
+            "embedderType": self.embedderType,
             "file": self.file,
             "isHalf": self.isHalf,
             "devType": self.dev.type,
@@ -33,7 +33,7 @@ class Embedder(Protocol):
 
     def setProps(
         self,
-        embedderType: EnumEmbedderTypes,
+        embedderType: EmbedderType,
         file: str,
         dev: device,
         isHalf: bool = True,
@@ -56,7 +56,7 @@ class Embedder(Protocol):
             self.model = self.model.to(self.dev)
         return self
 
-    def matchCondition(self, embedderType: EnumEmbedderTypes) -> bool:
+    def matchCondition(self, embedderType: EmbedderType) -> bool:
         # Check Type
         if self.embedderType != embedderType:
             print(
