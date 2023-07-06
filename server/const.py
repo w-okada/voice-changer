@@ -81,11 +81,10 @@ PitchExtractorType: TypeAlias = Literal[
     "crepe_tiny",
 ]
 
-
-class ServerAudioDeviceTypes(Enum):
-    audioinput = "audioinput"
-    audiooutput = "audiooutput"
-
+ServerAudioDeviceType: TypeAlias = Literal[
+    "audioinput",
+    "audiooutput"
+]
 
 RVCSampleMode: TypeAlias = Literal[
     "production",
