@@ -103,7 +103,8 @@ class Pipeline(object):
 
         # RVC QualityがOnのときにはsilence_frontをオフに。
         silence_front = silence_front if repeat == 0 else 0
-        pitchf = pitchf if repeat == 0 else torch.zeros([pitchf.shape[0], pitchf.shape[1] * 2])
+        pitchf = pitchf if repeat == 0 else np.zeros(p_len)
+        out_size = out_size if repeat == 0 else None
 
         # ピッチ検出
         try:
@@ -116,8 +117,8 @@ class Pipeline(object):
                     self.window,
                     silence_front=silence_front,
                 )
-                pitch = pitch[:p_len]
-                pitchf = pitchf[:p_len]
+                # pitch = pitch[:p_len]
+                # pitchf = pitchf[:p_len]
                 pitch = torch.tensor(pitch, device=self.device).unsqueeze(0).long()
                 pitchf = torch.tensor(pitchf, device=self.device, dtype=torch.float).unsqueeze(0)
             else:
@@ -208,12 +209,14 @@ class Pipeline(object):
         # apply silent front for inference
         if type(self.inferencer) in [OnnxRVCInferencer, OnnxRVCInferencerNono]:
             npyOffset = math.floor(silence_front * 16000) // 360
-            feats = feats[:, npyOffset * 2 :, :]  # NOQA
-            feats_len = feats.shape[1]
-            if pitch is not None and pitchf is not None:
-                pitch = pitch[:, -feats_len:]
-                pitchf = pitchf[:, -feats_len:]
-            p_len = torch.tensor([feats_len], device=self.device).long()
+            feats = feats[:, npyOffset * 2 :, :]
+
+        feats_len = feats.shape[1]
+        if pitch is not None and pitchf is not None:
+            pitch = pitch[:, -feats_len:]
+            pitchf = pitchf[:, -feats_len:]
+        p_len = torch.tensor([feats_len], device=self.device).long()
+        
 
         # 推論実行
         try:
