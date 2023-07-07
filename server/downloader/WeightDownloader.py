@@ -7,6 +7,7 @@ from Exceptions import WeightDownladException
 
 
 def downloadWeight(voiceChangerParams: VoiceChangerParams):
+    content_vec_500_onnx = voiceChangerParams.content_vec_500_onnx
     hubert_base = voiceChangerParams.hubert_base
     hubert_base_jp = voiceChangerParams.hubert_base_jp
     hubert_soft = voiceChangerParams.hubert_soft
@@ -67,13 +68,21 @@ def downloadWeight(voiceChangerParams: VoiceChangerParams):
                 "position": 5,
             }
         )
-    
     if os.path.exists(crepe_onnx_tiny) is False:
         downloadParams.append(
             {
                 "url": "https://huggingface.co/wok000/weights/resolve/main/crepe/onnx/tiny.onnx",
                 "saveTo": crepe_onnx_tiny,
                 "position": 6,
+            }
+        )
+
+    if os.path.exists(content_vec_500_onnx) is False:
+        downloadParams.append(
+            {
+                "url": "https://huggingface.co/wok000/weights_gpl/resolve/main/content-vec/contentvec-f.onnx",
+                "saveTo": content_vec_500_onnx,
+                "position": 7,
             }
         )
 

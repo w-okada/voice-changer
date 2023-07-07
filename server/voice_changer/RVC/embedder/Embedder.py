@@ -1,18 +1,19 @@
-from typing import Any, Protocol
+from typing import Any
 
 import torch
 from torch import device
 
 from const import EmbedderType
+from voice_changer.RVC.embedder.EmbedderProtocol import EmbedderProtocol
 
 
-class Embedder(Protocol):
-    embedderType: EmbedderType = "hubert_base"
-    file: str
-    isHalf: bool = True
-    dev: device
+class Embedder(EmbedderProtocol):
+    def __init__(self):
+        self.embedderType: EmbedderType = "hubert_base"
+        self.file: str
+        self.dev: device
 
-    model: Any | None = None
+        self.model: Any | None = None
 
     def loadModel(self, file: str, dev: device, isHalf: bool = True):
         ...

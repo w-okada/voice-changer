@@ -169,5 +169,5 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
                 slotInfo = RVCModelSlotGenerator._setInfoByONNX(slotInfo)
             else:
                 slotInfo = RVCModelSlotGenerator._setInfoByPytorch(slotInfo)
-            
+
             modelSlotManager.save_model_slot(targetSlotIndex, slotInfo)
