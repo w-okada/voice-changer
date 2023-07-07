@@ -41,6 +41,8 @@ class EmbedderManager:
     ) -> Embedder:
         if embederType == "hubert_base":
             try:
+                if cls.params.content_vec_500_onnx_on is False:
+                    raise Exception("[Voice Changer][Embedder] onnx is off")
                 file = cls.params.content_vec_500_onnx
                 return OnnxContentvec().loadModel(file, dev)
             except Exception as e:
@@ -52,6 +54,8 @@ class EmbedderManager:
             return FairseqHubertJp().loadModel(file, dev, isHalf)
         elif embederType == "contentvec":
             try:
+                if cls.params.content_vec_500_onnx_on is False:
+                    raise Exception("[Voice Changer][Embedder] onnx is off")
                 file = cls.params.content_vec_500_onnx
                 return OnnxContentvec().loadModel(file, dev)
             except Exception as e:
