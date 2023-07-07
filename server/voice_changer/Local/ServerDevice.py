@@ -3,6 +3,8 @@ from dataclasses import dataclass, asdict
 import numpy as np
 from const import SERVER_DEVICE_SAMPLE_RATES
 
+from queue import Queue
+
 from voice_changer.Local.AudioDeviceList import checkSamplingRate, list_audio_device
 import time
 import sounddevice as sd
@@ -11,6 +13,7 @@ import librosa
 
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 from typing import Protocol
+from typing import Union
 from typing import Literal, TypeAlias
 AudioDeviceKind: TypeAlias = Literal["input", "output"]
 
@@ -61,7 +64,7 @@ EditableServerDeviceSettings = {
 
 
 class ServerDeviceCallbacks(Protocol):
-    def on_request(self, unpackedData: AudioInOut):
+    def on_request(self, unpackedData: AudioInOut) -> tuple[AudioInOut, list[Union[int, float]]]:
         ...
 
     def emitTo(self, performance: list[float]):
@@ -85,6 +88,8 @@ class ServerDevice:
         self.mon_wav = None
         self.serverAudioInputDevices = None
         self.serverAudioOutputDevices = None
+        self.outQueue = Queue()
+        self.monQueue = Queue()
 
     def getServerInputAudioDevice(self, index: int):
         audioinput, _audiooutput = list_audio_device()
@@ -126,8 +131,8 @@ class ServerDevice:
                 unpackedData = librosa.to_mono(indata.T) * 32768.0
                 unpackedData = unpackedData.astype(np.int16)
                 out_wav, times = self.serverDeviceCallbacks.on_request(unpackedData)
-                self.out_wav = out_wav
-                self.mon_wav = out_wav
+                self.outQueue.put(out_wav)
+                self.monQueue.put(out_wav)
             all_inference_time = t.secs
             self.performance = [all_inference_time] + times
             self.serverDeviceCallbacks.emitTo(self.performance)
@@ -139,9 +144,9 @@ class ServerDevice:
 
     def audioOutput_callback(self, outdata: np.ndarray, frames, times, status):
         try:
-            if self.out_wav is None:
-                return
-            out_wav = self.out_wav
+            out_wav = self.outQueue.get()
+            while self.outQueue.qsize() > 0:
+                self.outQueue.get()
             outputChannels = outdata.shape[1]
             outdata[:] = np.repeat(out_wav, outputChannels).reshape(-1, outputChannels) / 32768.0
             outdata[:] = outdata * self.settings.serverOutputAudioGain
@@ -152,9 +157,9 @@ class ServerDevice:
 
     def audioMonitor_callback(self, outdata: np.ndarray, frames, times, status):
         try:
-            if self.mon_wav is None:
-                return
-            mon_wav = self.mon_wav
+            mon_wav = self.monQueue.get()
+            while self.monQueue.qsize() > 0:
+                self.monQueue.get()
             outputChannels = outdata.shape[1]
             outdata[:] = np.repeat(mon_wav, outputChannels).reshape(-1, outputChannels) / 32768.0
             outdata[:] = outdata * self.settings.serverOutputAudioGain  # GainはOutputのものをを流用
