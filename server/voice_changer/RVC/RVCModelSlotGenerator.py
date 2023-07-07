@@ -27,9 +27,9 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
         # slotInfo.iconFile = "/assets/icons/noimage.png"
 
         if slotInfo.isONNX:
-            cls._setInfoByONNX(slotInfo)
+            slotInfo = cls._setInfoByONNX(slotInfo)
         else:
-            cls._setInfoByPytorch(slotInfo)
+            slotInfo = cls._setInfoByPytorch(slotInfo)
         return slotInfo
 
     @classmethod
@@ -106,7 +106,10 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
                 for k, v in cpt["speaker_info"].items():
                     slot.speakers[int(k)] = str(v)
 
+        print("=========================> config::::::::::::1", cpt["config"])
+        print("=========================> config::::::::::::2", cpt["config"][-1])
         slot.samplingRate = cpt["config"][-1]
+        print("=========================> config::::::::::::3", slot.samplingRate)
 
         del cpt
 
