@@ -189,6 +189,12 @@ class Pipeline(object):
                 pitch = pitch[:, :p_len]
                 pitchf = pitchf[:, :p_len]
 
+        feats_len = feats.shape[1]
+        if pitch is not None and pitchf is not None:
+            pitch = pitch[:, -feats_len:]
+            pitchf = pitchf[:, -feats_len:]
+        p_len = torch.tensor([feats_len], device=self.device).long()
+
         # pitchの推定が上手くいかない(pitchf=0)場合、検索前の特徴を混ぜる
         # pitchffの作り方の疑問はあるが、本家通りなので、このまま使うことにする。
         # https://github.com/w-okada/voice-changer/pull/276#issuecomment-1571336929
@@ -201,11 +207,6 @@ class Pipeline(object):
             feats = feats.to(feats0.dtype)
         p_len = torch.tensor([p_len], device=self.device).long()
 
-        feats_buffer = feats.squeeze(0).detach().cpu()
-        if pitchf is not None:
-            pitchf_buffer = pitchf.squeeze(0).detach().cpu()
-        else:
-            pitchf_buffer = None
         # apply silent front for inference
         if type(self.inferencer) in [OnnxRVCInferencer, OnnxRVCInferencerNono]:
             npyOffset = math.floor(silence_front * 16000) // 360
@@ -235,6 +236,12 @@ class Pipeline(object):
                 raise HalfPrecisionChangingException()
             else:
                 raise e
+
+        feats_buffer = feats.squeeze(0).detach().cpu()
+        if pitchf is not None:
+            pitchf_buffer = pitchf.squeeze(0).detach().cpu()
+        else:
+            pitchf_buffer = None
 
         del p_len, padding_mask, pitch, pitchf, feats
         torch.cuda.empty_cache()
