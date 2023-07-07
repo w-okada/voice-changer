@@ -24,9 +24,13 @@ From the following, the original [Retrieval-based-Voice-Conversion-WebUI](https:
 
 Unzip the downloaded zip file and run `start_http.bat`.
 
+If you have the old version, be sure to unzip it into a separate folder.
+
 ### Mac version
 
 After extracting the download file, execute `startHttp.command`. If it shows that the developer cannot be verified, press the control key again and click to execute (or right-click to execute).
+
+If you have the old version, be sure to unzip it into a separate folder.
 
 ### Precautions when connecting remotely
 
