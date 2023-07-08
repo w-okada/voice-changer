@@ -43,7 +43,7 @@ AudioOutput の output record を start させた状態で音声変換を開始�
 例えばこちらのファイルを使用してみてください。
 
 - [sample_jvs001](https://drive.google.com/file/d/142aj-qFJOhoteWKqgRzvNoq02JbZIsaG/view) from [JVS](https://sites.google.com/site/shinnosuketakamichi/research-topics/jvs_corpus)
-- [sample_jvs001](https://drive.google.com/file/d/1aJlZwnJZxTF8-YH5Kz9TT3hcjlSM5YB1/view) from [JVS-MuSiC](https://sites.google.com/site/shinnosuketakamichi/research-topics/jvs_music)
+- [sample_jvs001](https://drive.google.com/file/d/1iCErRzCt5-6ftALcic9w5zXWrzVXryIA/view) from [JVS-MuSiC](https://sites.google.com/site/shinnosuketakamichi/research-topics/jvs_music)
 
 #### マイク入力の確認
 
