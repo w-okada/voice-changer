@@ -7,7 +7,7 @@ import traceback
 import numpy as np
 from dataclasses import dataclass, asdict, field
 import resampy
-
+import onnxruntime
 
 from voice_changer.IORecorder import IORecorder
 
@@ -65,7 +65,6 @@ class VoiceChanger:
     def __init__(self, params: VoiceChangerParams):
         # 初期化
         self.settings = VoiceChangerSettings()
-        self.onnx_session = None
         self.currentCrossFadeOffsetRate = 0.0
         self.currentCrossFadeEndRate = 0.0
         self.currentCrossFadeOverlapSize = 0  # setting
@@ -77,8 +76,9 @@ class VoiceChanger:
         self.gpu_num = torch.cuda.device_count()
         self.prev_audio = np.zeros(4096)
         self.mps_enabled: bool = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
+        self.onnx_device = onnxruntime.get_device()
 
-        print(f"VoiceChanger Initialized (GPU_NUM:{self.gpu_num}, mps_enabled:{self.mps_enabled})")
+        print(f"VoiceChanger Initialized (GPU_NUM(cuda):{self.gpu_num}, mps_enabled:{self.mps_enabled}, onnx_device:{self.onnx_device})")
 
     def setModel(self, model: Any):
         self.voiceChanger = model
