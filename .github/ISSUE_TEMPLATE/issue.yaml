@@ -88,6 +88,16 @@ body:
         - "yes"
     validations:
       required: true
+  - type: dropdown
+    id: extract-to-new-folder
+    attributes:
+      label: Extract files to a new folder.
+      description: Extract files from a zip file to a new folder, different from the previous version.(If you have.)
+      options:
+        - "no"
+        - "yes"
+    validations:
+      required: true
   - type: input
     id: vc-type
     attributes:

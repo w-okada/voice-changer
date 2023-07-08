@@ -106,10 +106,7 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
                 for k, v in cpt["speaker_info"].items():
                     slot.speakers[int(k)] = str(v)
 
-        print("=========================> config::::::::::::1", cpt["config"])
-        print("=========================> config::::::::::::2", cpt["config"][-1])
         slot.samplingRate = cpt["config"][-1]
-        print("=========================> config::::::::::::3", slot.samplingRate)
 
         del cpt
 
