@@ -191,11 +191,11 @@ class RVC(VoiceChangerModel):
             result = audio_out.detach().cpu().numpy() * np.sqrt(vol)
 
             return result
-        except DeviceCannotSupportHalfPrecisionException as e:
+        except DeviceCannotSupportHalfPrecisionException as e:  # NOQA
             print("[Device Manager] Device cannot support half precision. Fallback to float....")
             self.deviceManager.setForceTensor(True)
-            self.prepareModel(self.settings.modelSlotIndex)
-            raise e
+            self.initialize()
+            # raise e
 
         return
 

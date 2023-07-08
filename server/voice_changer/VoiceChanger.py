@@ -10,7 +10,6 @@ import resampy
 
 
 from voice_changer.IORecorder import IORecorder
-from voice_changer.utils.LoadModelParams import LoadModelParams
 
 from voice_changer.utils.Timer import Timer
 from voice_changer.utils.VoiceChangerModel import AudioInOut, VoiceChangerModel
@@ -89,16 +88,6 @@ class VoiceChanger:
             return {"status": "OK", "vc": self.modelType}
         else:
             return {"status": "OK", "vc": "none"}
-
-    def loadModel(self, props: LoadModelParams):
-        try:
-            if self.voiceChanger is None:
-                raise VoiceChangerIsNotSelectedException("Voice Changer is not selected.")
-            return self.voiceChanger.loadModel(props)
-        except Exception as e:
-            print(traceback.format_exc())
-            print("[Voice Changer] Model Load Error! Check your model is valid.", e)
-            return {"status": "NG"}
 
     def get_info(self):
         data = asdict(self.settings)
