@@ -134,7 +134,7 @@ class RVC(VoiceChangerModel):
         if self.slotInfo.f0:
             self.pitchf_buffer = self.pitchf_buffer[featureOffset:]
         self.feature_buffer = self.feature_buffer[featureOffset:]
-        
+
         # 出力部分だけ切り出して音量を確認。(TODO:段階的消音にする)
         cropOffset = -1 * (inputSize + crossfadeSize)
         cropEnd = -1 * (crossfadeSize)

@@ -86,12 +86,14 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         saveItemForVoiceChanger = ["crossFadeOffsetRate", "crossFadeEndRate", "crossFadeOverlapSize"]
         saveItemForVoiceChangerManager = ["modelSlotIndex"]
         saveItemForRVC = ["extraConvertSize", "gpu", "silentThreshold"]
+        saveItemForAllVoiceChanger = ["f0Detector"]  # 設定されたf0DetectorがVCに存在しない値の場合はデフォルトに落ちるように実装すること
 
         saveItem = []
         saveItem.extend(saveItemForServerDevice)
         saveItem.extend(saveItemForVoiceChanger)
         saveItem.extend(saveItemForVoiceChangerManager)
         saveItem.extend(saveItemForRVC)
+        saveItem.extend(saveItemForAllVoiceChanger)
         if key in saveItem:
             self.stored_setting[key] = val
             json.dump(self.stored_setting, open(STORED_SETTING_FILE, "w"))
