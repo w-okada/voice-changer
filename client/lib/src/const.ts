@@ -280,6 +280,7 @@ export type ServerInfo = VoiceChangerServerSetting & {
         name: string,
         memory: number,
     }[]
+    maxInputLength: number  // MMVCv15
 
 }
 
@@ -365,7 +366,9 @@ export const DefaultServerSetting: ServerInfo = {
     status: "ok",
     modelSlots: [],
     serverAudioInputDevices: [],
-    serverAudioOutputDevices: []
+    serverAudioOutputDevices: [],
+
+    maxInputLength:  128 * 2048
 }
 
 ///////////////////////

@@ -17,6 +17,11 @@ export const ConvertArea = (props: ConvertProps) => {
         } else {
             nums = props.inputChunkNums;
         }
+        if (serverSetting.serverSetting.maxInputLength) {
+            nums = nums.filter((x) => {
+                return x < serverSetting.serverSetting.maxInputLength / 128;
+            });
+        }
 
         const gpusEntry = [...serverSetting.serverSetting.gpus];
         gpusEntry.push({

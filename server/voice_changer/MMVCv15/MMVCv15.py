@@ -47,6 +47,8 @@ class MMVCv15Settings:
     f0Factor: float = 1.0
     f0Detector: str = "dio"  # dio or harvest
 
+    maxInputLength: int = 1024
+
     # ↓mutableな物だけ列挙
     intData = ["gpu", "srcId", "dstId"]
     floatData = ["f0Factor"]
@@ -88,6 +90,7 @@ class MMVCv15:
             requires_grad_text_enc=self.hps.requires_grad.text_enc,
             requires_grad_dec=self.hps.requires_grad.dec,
         )
+        self.settings.maxInputLength = 128 * 2048  # Torchの時は無制限。とりあえずでかい値で初期化
 
         if self.slotInfo.isONNX:
             self.onxx_input_length = 8192
@@ -102,6 +105,7 @@ class MMVCv15:
                 # print("ONNX INPUT SHAPE", i.name, i.shape)
                 if i.name == "sin":
                     self.onxx_input_length = i.shape[2]
+                    self.settings.maxInputLength = self.onxx_input_length - (0.012 * self.hps.data.sampling_rate) - 1024 # onnxの場合は入力長固(crossfadeの1024は仮) # NOQA
         else:
             self.net_g.eval()
             load_checkpoint(self.slotInfo.modelFile, self.net_g, None)
@@ -144,6 +148,7 @@ class MMVCv15:
                 for i in inputs_info:
                     if i.name == "sin":
                         self.onxx_input_length = i.shape[2]
+                        self.settings.maxInputLength = self.onxx_input_length - (0.012 * self.hps.data.sampling_rate) - 1024 # onnxの場合は入力長固(crossfadeの1024は仮) # NOQA
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
@@ -202,6 +207,9 @@ class MMVCv15:
         crossfadeSize: int,
         solaSearchFrame: int = 0,
     ):
+        # maxInputLength を更新(ここでやると非効率だが、とりあえず。)
+        self.settings.maxInputLength = self.onxx_input_length - crossfadeSize - solaSearchFrame # onnxの場合は入力長固(crossfadeの1024は仮) # NOQA
+
         newData = newData.astype(np.float32) / self.hps.data.max_wav_value
 
         if self.audio_buffer is not None:
