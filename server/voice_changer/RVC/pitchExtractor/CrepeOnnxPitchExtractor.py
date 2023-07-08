@@ -54,8 +54,6 @@ class CrepeOnnxPitchExtractor(PitchExtractor):
         f0[pd < 0.1] = 0
         f0 = f0.squeeze()
 
-        f0 = np.pad(f0, (start_frame, n_frames - f0.shape[0] - start_frame), 'constant', constant_values=(0, 0))
-
         f0 *= pow(2, f0_up_key / 12)
         pitchf[-f0.shape[0]:] = f0[:pitchf.shape[0]]
         f0bak = pitchf.copy()

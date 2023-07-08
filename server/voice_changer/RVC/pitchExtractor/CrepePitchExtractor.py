@@ -47,10 +47,6 @@ class CrepePitchExtractor(PitchExtractor):
         f0[pd < 0.1] = 0
         f0 = f0.squeeze()
 
-        f0 = torch.nn.functional.pad(
-            f0, (start_frame, n_frames - f0.shape[0] - start_frame)
-        )
-
         f0 *= pow(2, f0_up_key / 12)
         pitchf[-f0.shape[0]:] = f0.detach().cpu().numpy()[:pitchf.shape[0]]
         f0bak = pitchf.copy()

@@ -35,8 +35,6 @@ class HarvestPitchExtractor(PitchExtractor):
         f0 = pyworld.stonemask(audio.astype(np.double), f0, t, sr)
         f0 = signal.medfilt(f0, 3)
 
-        # f0 = np.pad(f0.astype("float"), (start_frame, n_frames - len(f0) - start_frame))
-
         f0 *= pow(2, f0_up_key / 12)
         pitchf[-f0.shape[0]:] = f0[:pitchf.shape[0]]
         f0bak = pitchf.copy()
