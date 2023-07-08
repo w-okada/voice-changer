@@ -273,7 +273,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                 </div>
             </div>
         );
-    }, [audioInputForGUI, fileInputEchoback, serverSetting.serverSetting]);
+    }, [audioInputForGUI, fileInputEchoback, setting, serverSetting.serverSetting]);
 
     // (3) Audio Output
     useEffect(() => {
