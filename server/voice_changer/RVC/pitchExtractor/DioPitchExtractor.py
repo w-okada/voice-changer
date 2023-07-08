@@ -17,7 +17,7 @@ class DioPitchExtractor(PitchExtractor):
         start_frame = int(silence_front * sr / window)
         real_silence_front = start_frame * window / sr
 
-        silence_front_offset = int(np.round(real_silence_front * sr))
+        silence_front_offset = max(min(int(np.round(real_silence_front * sr)), len(audio) - 3000), 0)
         audio = audio[silence_front_offset:]
 
         f0_min = 50
@@ -34,7 +34,6 @@ class DioPitchExtractor(PitchExtractor):
             frame_period=10,
         )
         f0 = pyworld.stonemask(audio.astype(np.double), _f0, t, sr)
-        # f0 = np.pad(f0.astype("float"), (start_frame, n_frames - len(f0) - start_frame))
 
         f0 *= pow(2, f0_up_key / 12)
         pitchf[-f0.shape[0]:] = f0[:pitchf.shape[0]]
