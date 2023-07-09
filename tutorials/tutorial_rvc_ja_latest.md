@@ -93,6 +93,10 @@ Q5. `[4716:0429/213736.103:ERROR:gpu_init.cc(523)] Passthrough is not supported,
 
 A5. 使用しているライブラリが出しているエラーです。影響はありませんので無視してください。
 
+Q6. (AMD ユーザ) GPU が使用されていないような気がする。
+
+A6. DirectML 版を使用してください。また、AMD の GPU は ONNX モデルでのみ有効になります。パフォーマンスモニターで GPU の使用率が上がっていることで判断できます。([see here](https://github.com/w-okada/voice-changer/issues/383))
+
 # GUI の詳細
 
 ## タイトルエリア

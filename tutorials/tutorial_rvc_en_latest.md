@@ -92,6 +92,10 @@ Q5. `[4716:0429/213736.103:ERROR:gpu_init.cc(523)] Passthrough is not supported,
 
 A5. This is an error produced by the library used by this application, but it does not have any effect, so please ignore it.
 
+Q6. My AMD GPU isn't being used.
+
+A6. Please use the DirectML version. Additionally, AMD GPUs are only enabled for ONNX models. You can judge this by the GPU utilization rate going up in the Performance Monitor.([see here](https://github.com/w-okada/voice-changer/issues/383))
+
 ## Configurable items
 
 ## Title
