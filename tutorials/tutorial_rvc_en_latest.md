@@ -290,3 +290,39 @@ You can set up more advanced settings.
 #### Server Info
 
 You can check the configuration of the current server.
+
+# Model Slot Edit Screen
+
+By pressing the edit button in the Model Slot Selection Area, you can edit the model slot.
+
+![image](https://github.com/w-okada/voice-changer/assets/48346627/a4735a2e-540e-4e7c-aa70-ba5b91ff09eb)
+
+## Icon Area
+
+You can change the image by clicking on the icon.
+
+## File Area
+
+You can download the file by clicking on the file name.
+
+## Upload Button
+
+You can upload the model.
+
+In the upload screen, you can select the voice changer type to upload.
+
+You can go back to the Model Slot Edit Screen by pressing the back button.
+
+![image](https://github.com/w-okada/voice-changer/assets/48346627/012c3585-0be2-4846-969a-882dcc07837b)
+
+## Sample Button
+
+You can download a sample.
+
+You can go back to the Model Slot Edit Screen by pressing the back button.
+
+![image](https://github.com/w-okada/voice-changer/assets/48346627/1c6e2529-af80-479a-8002-c37ebeb0c807)
+
+## Edit Button
+
+You can edit the details of the model slot.
