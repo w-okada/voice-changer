@@ -234,7 +234,8 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             self.voiceChanger.setModel(self.voiceChangerModel)
         else:
             print(f"[Voice Changer] unknown voice changer model: {slotInfo.voiceChangerType}")
-            del self.voiceChangerModel
+            if hasattr(self, "voiceChangerModel"):
+                del self.voiceChangerModel
             return
 
     def update_settings(self, key: str, val: str | int | float):
