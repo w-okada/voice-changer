@@ -23,6 +23,7 @@ $ git clone https://github.com/w-okada/voice-changer.git
 ```
 
 ## For Server Developer
+
 1. Install requirements
 
 ```
@@ -36,18 +37,25 @@ Run server with the below command. You can replace the path to each weight.
 
 ```
 $ python3 MMVCServerSIO.py -p 18888 --https true \
- --content_vec_500 pretrain/checkpoint_best_legacy_500.pt  \
- --hubert_base pretrain/hubert_base.pt \
- --hubert_soft pretrain/hubert/hubert-soft-0d54a1f4.pt \
- --nsf_hifigan pretrain/nsf_hifigan/model \
- --hubert_base_jp pretrain/rinna_hubert_base_jp.pt \
- --model_dir model_dir
+    --content_vec_500 pretrain/checkpoint_best_legacy_500.pt  \
+    --content_vec_500_onnx pretrain/content_vec_500.onnx \
+    --content_vec_500_onnx_on true \
+    --hubert_base pretrain/hubert_base.pt \
+    --hubert_base_jp pretrain/rinna_hubert_base_jp.pt \
+    --hubert_soft pretrain/hubert/hubert-soft-0d54a1f4.pt \
+    --nsf_hifigan pretrain/nsf_hifigan/model \
+    --crepe_onnx_full pretrain/crepe_onnx_full.onnx \
+    --crepe_onnx_tiny pretrain/crepe_onnx_tiny.onnx \
+    --model_dir model_dir \
+    --samples samples.json
+
 ```
 
 2-1. Trouble shoot
 
 (1) OSError: PortAudio library not found
 If you get the message below, you shold install additional library.
+
 ```
 OSError: PortAudio library not found
 ```
@@ -61,23 +69,22 @@ $ sudo apt-get install libasound-dev
 
 3. Enjoy developing.
 
+### Appendix
 
-### Appendix 
 1. Win + Anaconda (not supported)
 
 use conda to install pytorch
+
 ```
 conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
 ```
 
 Also run these command.
+
 ```
-pip install chardet 
+pip install chardet
 pip install numpy==1.24.0
 ```
-
-
-
 
 ## For Client Developer
 
