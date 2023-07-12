@@ -9,7 +9,7 @@ from fastapi import UploadFile, File, Form
 from restapi.mods.FileUploader import upload_file, concat_file_chunks
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 
-from const import MODEL_DIR, UPLOAD_DIR, ModelType
+from const import MODEL_DIR, UPLOAD_DIR
 from voice_changer.utils.LoadModelParams import LoadModelParamFile, LoadModelParams
 
 
@@ -27,8 +27,6 @@ class MMVC_Rest_Fileuploader:
         self.router.add_api_route("/concat_uploaded_file", self.post_concat_uploaded_file, methods=["POST"])
         self.router.add_api_route("/update_settings", self.post_update_settings, methods=["POST"])
         self.router.add_api_route("/load_model", self.post_load_model, methods=["POST"])
-        self.router.add_api_route("/model_type", self.post_model_type, methods=["POST"])
-        self.router.add_api_route("/model_type", self.get_model_type, methods=["GET"])
         self.router.add_api_route("/onnx", self.get_onnx, methods=["GET"])
         self.router.add_api_route("/merge_model", self.post_merge_models, methods=["POST"])
         self.router.add_api_route("/update_model_default", self.post_update_model_default, methods=["POST"])
@@ -96,22 +94,6 @@ class MMVC_Rest_Fileuploader:
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:
             print("[Voice Changer] post_load_model ex:", e)
-
-    def post_model_type(self, modelType: ModelType = Form(...)):
-        try:
-            info = self.voiceChangerManager.switchModelType(modelType)
-            json_compatible_item_data = jsonable_encoder(info)
-            return JSONResponse(content=json_compatible_item_data)
-        except Exception as e:
-            print("[Voice Changer] post_model_type ex:", e)
-
-    def get_model_type(self):
-        try:
-            info = self.voiceChangerManager.getModelType()
-            json_compatible_item_data = jsonable_encoder(info)
-            return JSONResponse(content=json_compatible_item_data)
-        except Exception as e:
-            print("[Voice Changer] get_model_type ex:", e)
 
     def get_onnx(self):
         try:

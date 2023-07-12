@@ -78,6 +78,9 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
                     !!setting.files.find(x => { return x.kind == "ddspSvcDiffusion" }) &&
                     !!setting.files.find(x => { return x.kind == "ddspSvcDiffusionConfig" })
                 return enough
+            } else if (setting.voiceChangerType == "Diffusion-SVC") {
+                const enough = !!setting.files.find(x => { return x.kind == "diffusionSVCModel" })
+                return enough
             }
             return false
         }
@@ -132,6 +135,8 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
                 rows.push(generateFileRow(uploadSetting!, "Model", "ddspSvcModel", ["pth", "pt"], "model/"))
                 rows.push(generateFileRow(uploadSetting!, "Config(diff)", "ddspSvcDiffusionConfig", ["yaml"], "diff/"))
                 rows.push(generateFileRow(uploadSetting!, "Model(diff)", "ddspSvcDiffusion", ["pth", "pt"], "diff/"))
+            } else if(vcType == "Diffusion-SVC") {
+                rows.push(generateFileRow(uploadSetting!, "Model", "diffusionSVCModel", ["ptc"]))
             }
             return rows
         }

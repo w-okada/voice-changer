@@ -1,6 +1,6 @@
 from typing import Any, Union, cast
 
-from const import TMP_DIR, ModelType
+from const import TMP_DIR
 import torch
 import os
 import traceback
@@ -71,7 +71,6 @@ class VoiceChanger:
         self.crossfadeSize = 0  # calculated
 
         self.voiceChanger: VoiceChangerModel | None = None
-        self.modelType: ModelType | None = None
         self.params = params
         self.gpu_num = torch.cuda.device_count()
         self.prev_audio = np.zeros(4096)
@@ -84,10 +83,7 @@ class VoiceChanger:
         self.voiceChanger = model
 
     def getModelType(self):
-        if self.modelType is not None:
-            return {"status": "OK", "vc": self.modelType}
-        else:
-            return {"status": "OK", "vc": "none"}
+        return {"status": "OK", "vc": "-----"}
 
     def get_info(self):
         data = asdict(self.settings)

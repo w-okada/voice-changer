@@ -27,6 +27,8 @@ export const ModelFileKind = {
     "ddspSvcDiffusion": "ddspSvcDiffusion",
     "ddspSvcDiffusionConfig": "ddspSvcDiffusionConfig",
 
+    "diffusionSVCModel": "diffusionSVCModel",
+
 } as const
 export type ModelFileKind = typeof ModelFileKind[keyof typeof ModelFileKind]
 

@@ -9,7 +9,7 @@ from voice_changer.Local.ServerDevice import ServerDevice, ServerDeviceCallbacks
 from voice_changer.ModelSlotManager import ModelSlotManager
 from voice_changer.RVC.RVCModelMerger import RVCModelMerger
 from voice_changer.VoiceChanger import VoiceChanger
-from const import STORED_SETTING_FILE, UPLOAD_DIR, ModelType
+from const import STORED_SETTING_FILE, UPLOAD_DIR
 from voice_changer.utils.LoadModelParams import LoadModelParamFile, LoadModelParams
 from voice_changer.utils.ModelMerger import MergeElement, ModelMergerRequest
 from voice_changer.utils.VoiceChangerModel import AudioInOut
@@ -165,6 +165,11 @@ class VoiceChangerManager(ServerDeviceCallbacks):
 
                 slotInfo = DDSP_SVCModelSlotGenerator.loadModel(params)
                 self.modelSlotManager.save_model_slot(params.slot, slotInfo)
+            elif params.voiceChangerType == "Diffusion-SVC":
+                from voice_changer.DiffusionSVC.DiffusionSVCModelSlotGenerator import DiffusionSVCModelSlotGenerator
+
+                slotInfo = DiffusionSVCModelSlotGenerator.loadModel(params)
+                self.modelSlotManager.save_model_slot(params.slot, slotInfo)
             print("params", params)
 
     def get_info(self):
@@ -232,6 +237,13 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             self.voiceChangerModel = DDSP_SVC(self.params, slotInfo)
             self.voiceChanger = VoiceChanger(self.params)
             self.voiceChanger.setModel(self.voiceChangerModel)
+        elif slotInfo.voiceChangerType == "Diffusion-SVC":
+            print("................Diffusion-SVC")
+            from voice_changer.DiffusionSVC.DiffusionSVC import DiffusionSVC
+
+            self.voiceChangerModel = DiffusionSVC(self.params, slotInfo)
+            self.voiceChanger = VoiceChanger(self.params)
+            self.voiceChanger.setModel(self.voiceChangerModel)
         else:
             print(f"[Voice Changer] unknown voice changer model: {slotInfo.voiceChangerType}")
             if hasattr(self, "voiceChangerModel"):
@@ -266,9 +278,6 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         else:
             print("Voice Change is not loaded. Did you load a correct model?")
             return np.zeros(1).astype(np.int16), []
-
-    def switchModelType(self, modelType: ModelType):
-        return self.voiceChanger.switchModelType(modelType)
 
     def getModelType(self):
         return self.voiceChanger.getModelType()

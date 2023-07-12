@@ -11,14 +11,7 @@ VoiceChangerType: TypeAlias = Literal[
     "so-vits-svc-40",
     "DDSP-SVC",
     "RVC",
-]
-
-ModelType: TypeAlias = Literal[
-    "MMVCv15",
-    "MMVCv13",
-    "so-vits-svc-40",
-    "DDSP-SVC",
-    "RVC",
+    "Diffusion-SVC"
 ]
 
 STORED_SETTING_FILE = "stored_setting.json"

@@ -102,7 +102,22 @@ class DDSPSVCModelSlot(ModelSlot):
     speakers: dict = field(default_factory=lambda: {1: "user"})
 
 
-ModelSlots: TypeAlias = Union[ModelSlot, RVCModelSlot, MMVCv13ModelSlot, MMVCv15ModelSlot, SoVitsSvc40ModelSlot, DDSPSVCModelSlot]
+@dataclass
+class DiffusionSVCModelSlot(ModelSlot):
+    voiceChangerType: VoiceChangerType = "Diffusion-SVC"
+    modelFile: str = ""
+    isONNX: bool = False
+    modelType: str = "combo"
+    dstId: int = 1
+
+    sampleId: str = ""
+    defaultTune: int = 0
+    kstep: int = 100
+    speakers: dict = field(default_factory=lambda: {1: "user"})
+    embedder: EmbedderType = "hubert_base"
+
+
+ModelSlots: TypeAlias = Union[ModelSlot, RVCModelSlot, MMVCv13ModelSlot, MMVCv15ModelSlot, SoVitsSvc40ModelSlot, DDSPSVCModelSlot, DiffusionSVCModelSlot]
 
 
 def loadSlotInfo(model_dir: str, slotIndex: int) -> ModelSlots:
@@ -122,6 +137,8 @@ def loadSlotInfo(model_dir: str, slotIndex: int) -> ModelSlots:
         return SoVitsSvc40ModelSlot(**jsonDict)
     elif slotInfo.voiceChangerType == "DDSP-SVC":
         return DDSPSVCModelSlot(**jsonDict)
+    elif slotInfo.voiceChangerType == "Diffusion-SVC":
+        return DiffusionSVCModelSlot(**jsonDict)
     else:
         return ModelSlot()
 

@@ -9,7 +9,8 @@ export const VoiceChangerType = {
     "MMVCv13": "MMVCv13",
     "so-vits-svc-40": "so-vits-svc-40",
     "DDSP-SVC": "DDSP-SVC",
-    "RVC": "RVC"
+    "RVC": "RVC",
+    "Diffusion-SVC":"Diffusion-SVC"
 
 } as const
 export type VoiceChangerType = typeof VoiceChangerType[keyof typeof VoiceChangerType]
