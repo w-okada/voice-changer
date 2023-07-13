@@ -21,6 +21,7 @@ class DiffusionSVCModelSlotGenerator(ModelSlotGenerator):
         slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
         slotInfo.name = os.path.splitext(os.path.basename(slotInfo.modelFile))[0]
         slotInfo.iconFile = "/assets/icons/noimage.png"
+        slotInfo.embChannels = 768
 
         # if slotInfo.isONNX:
         #     slotInfo = cls._setInfoByONNX(slotInfo)

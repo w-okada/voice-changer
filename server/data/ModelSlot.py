@@ -1,5 +1,5 @@
 from typing import TypeAlias, Union
-from const import MAX_SLOT_NUM, EnumInferenceTypes, EmbedderType, VoiceChangerType
+from const import MAX_SLOT_NUM, DiffusionSVCInferenceType, EnumInferenceTypes, EmbedderType, VoiceChangerType
 
 from dataclasses import dataclass, asdict, field
 
@@ -107,7 +107,7 @@ class DiffusionSVCModelSlot(ModelSlot):
     voiceChangerType: VoiceChangerType = "Diffusion-SVC"
     modelFile: str = ""
     isONNX: bool = False
-    modelType: str = "combo"
+    modelType: DiffusionSVCInferenceType = "combo"
     dstId: int = 1
 
     sampleId: str = ""
@@ -115,6 +115,8 @@ class DiffusionSVCModelSlot(ModelSlot):
     kstep: int = 100
     speakers: dict = field(default_factory=lambda: {1: "user"})
     embedder: EmbedderType = "hubert_base"
+    samplingRate: int = 44100
+    embChannels: int = 768
 
 
 ModelSlots: TypeAlias = Union[ModelSlot, RVCModelSlot, MMVCv13ModelSlot, MMVCv15ModelSlot, SoVitsSvc40ModelSlot, DDSPSVCModelSlot, DiffusionSVCModelSlot]

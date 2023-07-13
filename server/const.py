@@ -66,6 +66,11 @@ class EnumInferenceTypes(Enum):
     onnxRVCNono = "onnxRVCNono"
 
 
+DiffusionSVCInferenceType: TypeAlias = Literal[
+    "combo",
+]
+
+
 PitchExtractorType: TypeAlias = Literal[
     "harvest",
     "dio",

@@ -94,9 +94,12 @@ class PCmer(nn.Module):
     def forward(self, phone, mask=None):
         
         # apply all layers to the input
+        print("[[[[[PCmer]]]]1]", phone, mask)
         for (i, layer) in enumerate(self._layers):
             phone = layer(phone, mask)
+            # print("[[[[[PCmer]]]]  2  ]", phone)
         # provide the final sequence
+        print("[[[[[PCmer]]]]3]", phone)
         return phone
 
 
@@ -136,9 +139,13 @@ class _EncoderLayer(nn.Module):
     def forward(self, phone, mask=None):
         
         # compute attention sub-layer
+        print("Phone:::::1:", phone)
+        print("Phone:::::16:", self.norm(phone))
         phone = phone + (self.attn(self.norm(phone), mask=mask))
+        print("Phone:::::2:", phone)
         
         phone = phone + (self.conformer(phone))
+        print("Phone:::::3:", phone)
         
         return phone 
 

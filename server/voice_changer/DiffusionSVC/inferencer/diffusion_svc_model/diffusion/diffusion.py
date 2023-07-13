@@ -252,7 +252,7 @@ class GaussianDiffusion(nn.Module):
                         
             if method is not None and infer_speedup > 1:
                 if method == 'dpm-solver':
-                    from .dpm_solver_pytorch import NoiseScheduleVP, model_wrapper, DPM_Solver
+                    from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.diffusion.dpm_solver_pytorch import NoiseScheduleVP, model_wrapper, DPM_Solver
                     # 1. Define the noise schedule.
                     noise_schedule = NoiseScheduleVP(schedule='discrete', betas=self.betas[:t])
 

@@ -1,6 +1,6 @@
 import torch
-from nsf_hifigan.nvSTFT import STFT
-from nsf_hifigan.models import load_model, load_config
+from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.nsf_hifigan.nvSTFT import STFT
+from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.nsf_hifigan.models import load_model, load_config
 from torchaudio.transforms import Resample
 
 

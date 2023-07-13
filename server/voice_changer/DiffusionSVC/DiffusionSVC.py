@@ -52,7 +52,7 @@ class DiffusionSVC(VoiceChangerModel):
         print("[Voice Changer] [DiffusionSVC] Initializing... done")
 
     def update_settings(self, key: str, val: int | float | str):
-        print("[Voice Changer][RVC]: update_settings", key, val)
+        print("[Voice Changer][DiffusionSVC]: update_settings", key, val)
         if key in self.settings.intData:
             setattr(self.settings, key, int(val))
             if key == "gpu":
@@ -86,19 +86,18 @@ class DiffusionSVC(VoiceChangerModel):
         crossfadeSize: int,
         solaSearchFrame: int = 0,
     ):
-        newData = newData.astype(np.float32) / 32768.0  # RVCのモデルのサンプリングレートで入ってきている。（extraDataLength, Crossfade等も同じSRで処理）(★１)
+        newData = newData.astype(np.float32) / 32768.0  # DiffusionSVCのモデルのサンプリングレートで入ってきている。（extraDataLength, Crossfade等も同じSRで処理）(★１)
 
-        new_feature_length = newData.shape[0] * 100 // self.slotInfo.samplingRate
+        new_feature_length = newData.shape[0] * 100 // self.slotInfo.samplingRate  # 100 は hubertのhosizeから (16000 / 160)
         if self.audio_buffer is not None:
             # 過去のデータに連結
             self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)
-            if self.slotInfo.f0:
-                self.pitchf_buffer = np.concatenate([self.pitchf_buffer, np.zeros(new_feature_length)], 0)
+            self.pitchf_buffer = np.concatenate([self.pitchf_buffer, np.zeros(new_feature_length)], 0)
+            print("^^^self.feature_buffer.shape, self.slotInfo.embChannels",self.feature_buffer.shape, self.slotInfo.embChannels)
             self.feature_buffer = np.concatenate([self.feature_buffer, np.zeros([new_feature_length, self.slotInfo.embChannels])], 0)
         else:
             self.audio_buffer = newData
-            if self.slotInfo.f0:
-                self.pitchf_buffer = np.zeros(new_feature_length)
+            self.pitchf_buffer = np.zeros(new_feature_length)
             self.feature_buffer = np.zeros([new_feature_length, self.slotInfo.embChannels])
 
         convertSize = inputSize + crossfadeSize + solaSearchFrame + self.settings.extraConvertSize
@@ -110,15 +109,13 @@ class DiffusionSVC(VoiceChangerModel):
         # バッファがたまっていない場合はzeroで補う
         if self.audio_buffer.shape[0] < convertSize:
             self.audio_buffer = np.concatenate([np.zeros([convertSize]), self.audio_buffer])
-            if self.slotInfo.f0:
-                self.pitchf_buffer = np.concatenate([np.zeros([convertSize * 100 // self.slotInfo.samplingRate]), self.pitchf_buffer])
+            self.pitchf_buffer = np.concatenate([np.zeros([convertSize * 100 // self.slotInfo.samplingRate]), self.pitchf_buffer])
             self.feature_buffer = np.concatenate([np.zeros([convertSize * 100 // self.slotInfo.samplingRate, self.slotInfo.embChannels]), self.feature_buffer])
 
         convertOffset = -1 * convertSize
         featureOffset = -convertSize * 100 // self.slotInfo.samplingRate
         self.audio_buffer = self.audio_buffer[convertOffset:]  # 変換対象の部分だけ抽出
-        if self.slotInfo.f0:
-            self.pitchf_buffer = self.pitchf_buffer[featureOffset:]
+        self.pitchf_buffer = self.pitchf_buffer[featureOffset:]
         self.feature_buffer = self.feature_buffer[featureOffset:]
 
         # 出力部分だけ切り出して音量を確認。(TODO:段階的消音にする)
@@ -145,18 +142,18 @@ class DiffusionSVC(VoiceChangerModel):
         if self.pipeline is not None:
             device = self.pipeline.device
         else:
-            device = torch.device("cpu")
+            device = torch.device("cpu")  # TODO:pipelineが存在しない場合はzeroを返してもいいかも(要確認)。
         audio = torch.from_numpy(audio).to(device=device, dtype=torch.float32)
         audio = torchaudio.functional.resample(audio, self.slotInfo.samplingRate, 16000, rolloff=0.99)
-        repeat = 1 if self.settings.rvcQuality else 0
+        repeat = 0
         sid = self.settings.dstId
         f0_up_key = self.settings.tran
-        index_rate = self.settings.indexRatio
-        protect = self.settings.protect
+        index_rate = 0
+        protect = 0
 
-        if_f0 = 1 if self.slotInfo.f0 else 0
-        embOutputLayer = self.slotInfo.embOutputLayer
-        useFinalProj = self.slotInfo.useFinalProj
+        if_f0 = 1
+        embOutputLayer = 12
+        useFinalProj = False
 
         try:
             audio_out, self.pitchf_buffer, self.feature_buffer = self.pipeline.exec(
@@ -167,14 +164,17 @@ class DiffusionSVC(VoiceChangerModel):
                 f0_up_key,
                 index_rate,
                 if_f0,
-                self.settings.extraConvertSize / self.slotInfo.samplingRate if self.settings.silenceFront else 0.,  # extaraDataSizeの秒数。RVCのモデルのサンプリングレートで処理(★１)。
+                self.settings.extraConvertSize / self.slotInfo.samplingRate if self.settings.silenceFront else 0.,  # extaraConvertSize(既にモデルのサンプリングレートにリサンプリング済み)の秒数。モデルのサンプリングレートで処理(★１)。
                 embOutputLayer,
                 useFinalProj,
                 repeat,
                 protect,
                 outSize
             )
-            result = audio_out.detach().cpu().numpy() * np.sqrt(vol)
+            # result = audio_out.detach().cpu().numpy() * np.sqrt(vol)
+            result = audio_out.detach().cpu().numpy()
+
+            print("RESULT", result)
 
             return result
         except DeviceCannotSupportHalfPrecisionException as e:  # NOQA

@@ -3,10 +3,10 @@ import yaml
 import torch
 import torch.nn as nn
 import numpy as np
-from .diffusion import GaussianDiffusion
-from .wavenet import WaveNet
-from .vocoder import Vocoder
-from .naive.naive import Unit2MelNaive
+from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.diffusion.diffusion import GaussianDiffusion
+from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.diffusion.wavenet import WaveNet
+from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.diffusion.vocoder import Vocoder
+from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.diffusion.naive.naive import Unit2MelNaive
 
 
 class DotDict(dict):

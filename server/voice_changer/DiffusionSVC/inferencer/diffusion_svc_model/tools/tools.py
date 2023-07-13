@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import torch.nn.functional as F
-import torch.nn as nn
+
 import pyworld as pw
 import parselmouth
 import torchcrepe
@@ -788,15 +788,6 @@ def median_pool_1d(x, kernel_size):
     x = x.unfold(1, kernel_size, 1)
     x, _ = torch.sort(x, dim=-1)
     return x[:, :, (kernel_size - 1) // 2]
-
-
-def upsample(signal, factor):
-    signal = signal.permute(0, 2, 1)
-    signal = nn.functional.interpolate(torch.cat((signal, signal[:, :, -1:]), 2), size=signal.shape[-1] * factor + 1,
-                                       mode='linear', align_corners=True)
-    signal = signal[:, :, :-1]
-    return signal.permute(0, 2, 1)
-
 
 def cross_fade(a: np.ndarray, b: np.ndarray, idx: int):
     result = np.zeros(idx + b.shape[0])
