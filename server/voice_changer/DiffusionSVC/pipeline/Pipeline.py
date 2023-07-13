@@ -1,5 +1,4 @@
 from typing import Any
-import math
 import torch
 import torch.nn.functional as F
 from torch.cuda.amp import autocast
@@ -12,8 +11,6 @@ from Exceptions import (
 from voice_changer.DiffusionSVC.inferencer.Inferencer import Inferencer
 
 from voice_changer.RVC.embedder.Embedder import Embedder
-from voice_changer.RVC.inferencer.OnnxRVCInferencer import OnnxRVCInferencer
-from voice_changer.RVC.inferencer.OnnxRVCInferencerNono import OnnxRVCInferencerNono
 
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 from voice_changer.common.VolumeExtractor import VolumeExtractor
@@ -42,31 +39,31 @@ class Pipeline(object):
         device,
         isHalf,
     ):
-        model_block_size, model_sampling_rate = inferencer.getConfig()
-        self.hop_size = model_block_size * 16000 / model_sampling_rate  # 16000はオーディオのサンプルレート。この時点で16Kになっている。
-
-        self.volumeExtractor = VolumeExtractor(self.hop_size, model_block_size, model_sampling_rate, audio_sampling_rate=16000)
-        self.embedder = embedder
-
         self.inferencer = inferencer
+        inferencer_block_size, inferencer_sampling_rate = inferencer.getConfig()
+        self.hop_size = inferencer_block_size * 16000 / inferencer_sampling_rate  # 16000はオーディオのサンプルレート。この時点で16Kになっている。
+        self.inferencer_block_size = inferencer_block_size
+        self.inferencer_sampling_rate = inferencer_sampling_rate
+
+        self.volumeExtractor = VolumeExtractor(self.hop_size)
+        self.embedder = embedder
         self.pitchExtractor = pitchExtractor
+
+        print("VOLUME EXTRACTOR", self.volumeExtractor)
         print("GENERATE INFERENCER", self.inferencer)
         print("GENERATE EMBEDDER", self.embedder)
         print("GENERATE PITCH EXTRACTOR", self.pitchExtractor)
 
         self.targetSR = targetSR
         self.device = device
-        # self.isHalf = isHalf
         self.isHalf = False
 
-        # self.sr = 16000
-        # self.window = 160
-
     def getPipelineInfo(self):
+        volumeExtractorInfo = self.volumeExtractor.getVolumeExtractorInfo()
         inferencerInfo = self.inferencer.getInferencerInfo() if self.inferencer else {}
         embedderInfo = self.embedder.getEmbedderInfo()
         pitchExtractorInfo = self.pitchExtractor.getPitchExtractorInfo()
-        return {"inferencer": inferencerInfo, "embedder": embedderInfo, "pitchExtractor": pitchExtractorInfo, "isHalf": self.isHalf}
+        return {"volumeExtractor": volumeExtractorInfo, "inferencer": inferencerInfo, "embedder": embedderInfo, "pitchExtractor": pitchExtractorInfo, "isHalf": self.isHalf}
 
     def setPitchExtractor(self, pitchExtractor: PitchExtractor):
         self.pitchExtractor = pitchExtractor
@@ -74,7 +71,7 @@ class Pipeline(object):
     @torch.no_grad()
     def extract_volume_and_mask(self, audio, threhold):
         volume = self.volumeExtractor.extract(audio)
-        mask = self.volumeExtractor.get_mask_from_volume(volume, threhold=threhold, device=self.device)
+        mask = self.volumeExtractor.get_mask_from_volume(volume, self.inferencer_block_size, threhold=threhold, device=self.device)
         volume = torch.from_numpy(volume).float().to(self.device).unsqueeze(-1).unsqueeze(0)
         return volume, mask
 
@@ -85,14 +82,10 @@ class Pipeline(object):
         pitchf,  # np.array [m]
         feature,  # np.array [m, feat]
         f0_up_key,
-        index_rate,
-        if_f0,
         silence_front,
         embOutputLayer,
         useFinalProj,
-        repeat,
-        protect=0.5,
-        out_size=None,
+        protect=0.5
     ):
         # 16000のサンプリングレートで入ってきている。以降この世界は16000で処理。
         audio = audio.unsqueeze(0)
@@ -101,10 +94,7 @@ class Pipeline(object):
         sid = torch.tensor(sid, device=self.device).unsqueeze(0).long()
 
         n_frames = int(audio_pad.size(-1) // self.hop_size + 1)
-        print("-------------------->  n_frames:",  n_frames)
-
         volume, mask = self.extract_volume_and_mask(audio, threhold=-60.0)
-        print("--------------------> volume:", volume.shape)
         # ピッチ検出
         try:
             pitch, pitchf = self.pitchExtractor.extract(
@@ -116,16 +106,13 @@ class Pipeline(object):
                 int(self.hop_size),    # 処理のwindowサイズ (44100における512)
                 silence_front=silence_front,
             )
-            print("--------------------> pitch11111111111111111111111111111111:", pitch[1:], pitch.shape)
+            print("[Pitch]", pitch)
 
             pitch = torch.tensor(pitch[-n_frames:], device=self.device).unsqueeze(0).long()  # 160window sizeを前提にバッファを作っているので切る。
             pitchf = torch.tensor(pitchf[-n_frames:], device=self.device, dtype=torch.float).unsqueeze(0)  # 160window sizeを前提にバッファを作っているので切る。
-        except IndexError as e:
-            print(e)
+        except IndexError as e:  # NOQA
             # print(e)
             raise NotEnoughDataExtimateF0()
-
-        print("--------------------> pitch:", pitch, pitch.shape)
 
         # tensor型調整
         feats = audio_pad
@@ -146,15 +133,10 @@ class Pipeline(object):
                     raise DeviceChangingException()
                 else:
                     raise e
-
-        print("--------------------> feats1:", feats, feats.shape)
-
-        # feats = F.interpolate(feats.permute(0, 2, 1), scale_factor=2).permute(0, 2, 1)
         feats = F.interpolate(feats.permute(0, 2, 1), size=int(n_frames), mode='nearest').permute(0, 2, 1)
 
         if protect < 0.5:
             feats0 = feats.clone()
-        print("--------------------> feats2:", feats, feats.shape)
 
         # # ピッチサイズ調整
         # p_len = audio_pad.shape[0] // self.window
@@ -180,7 +162,6 @@ class Pipeline(object):
             pitchff = pitchff.unsqueeze(-1)
             feats = feats * pitchff + feats0 * (1 - pitchff)
             feats = feats.to(feats0.dtype)
-        # p_len = torch.tensor([p_len], device=self.device).long()
 
         # # apply silent front for inference
         # if type(self.inferencer) in [OnnxRVCInferencer, OnnxRVCInferencerNono]:

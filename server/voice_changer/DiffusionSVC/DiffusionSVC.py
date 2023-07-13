@@ -93,7 +93,6 @@ class DiffusionSVC(VoiceChangerModel):
             # 過去のデータに連結
             self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)
             self.pitchf_buffer = np.concatenate([self.pitchf_buffer, np.zeros(new_feature_length)], 0)
-            print("^^^self.feature_buffer.shape, self.slotInfo.embChannels",self.feature_buffer.shape, self.slotInfo.embChannels)
             self.feature_buffer = np.concatenate([self.feature_buffer, np.zeros([new_feature_length, self.slotInfo.embChannels])], 0)
         else:
             self.audio_buffer = newData
@@ -134,7 +133,6 @@ class DiffusionSVC(VoiceChangerModel):
         feature = data[2]
         convertSize = data[3]
         vol = data[4]
-        outSize = data[5]
 
         if vol < self.settings.silentThreshold:
             return np.zeros(convertSize).astype(np.int16) * np.sqrt(vol)
@@ -145,13 +143,10 @@ class DiffusionSVC(VoiceChangerModel):
             device = torch.device("cpu")  # TODO:pipelineが存在しない場合はzeroを返してもいいかも(要確認)。
         audio = torch.from_numpy(audio).to(device=device, dtype=torch.float32)
         audio = torchaudio.functional.resample(audio, self.slotInfo.samplingRate, 16000, rolloff=0.99)
-        repeat = 0
         sid = self.settings.dstId
         f0_up_key = self.settings.tran
-        index_rate = 0
         protect = 0
 
-        if_f0 = 1
         embOutputLayer = 12
         useFinalProj = False
 
@@ -162,14 +157,10 @@ class DiffusionSVC(VoiceChangerModel):
                 pitchf,
                 feature,
                 f0_up_key,
-                index_rate,
-                if_f0,
                 self.settings.extraConvertSize / self.slotInfo.samplingRate if self.settings.silenceFront else 0.,  # extaraConvertSize(既にモデルのサンプリングレートにリサンプリング済み)の秒数。モデルのサンプリングレートで処理(★１)。
                 embOutputLayer,
                 useFinalProj,
-                repeat,
-                protect,
-                outSize
+                protect
             )
             # result = audio_out.detach().cpu().numpy() * np.sqrt(vol)
             result = audio_out.detach().cpu().numpy()

@@ -56,7 +56,6 @@ class Unit2MelNaive(nn.Module):
                 residual_dropout=0.1,
                 attention_dropout=0.1)
         else:
-            print("[[[[[PCmer]]]]]")
             self.decoder = PCmer(
                 num_layers=n_layers,
                 num_heads=8,
@@ -84,7 +83,6 @@ class Unit2MelNaive(nn.Module):
         '''
         x = self.stack(units.transpose(1, 2)).transpose(1, 2)
         x = x + self.f0_embed((1 + f0 / 700).log()) + self.volume_embed(volume)
-        print("-----------------x1>", x)
         if self.use_speaker_encoder:
             if spk_mix_dict is not None:
                 assert spk_emb_dict is not None
@@ -106,13 +104,9 @@ class Unit2MelNaive(nn.Module):
         if self.aug_shift_embed is not None and aug_shift is not None:
             x = x + self.aug_shift_embed(aug_shift / 5)
 
-        print("-----------------x2>", x)
         x = self.decoder(x)
-        print("-----------------x3>", x)
         x = self.norm(x)
-        print("-----------------x4>", x)
         x = self.dense_out(x)
-        print("-----------------x5>", x)
         if not infer:
             x = F.mse_loss(x, gt_spec)
             if self.l2reg_loss > 0:

@@ -25,8 +25,7 @@ class DiffusionSVCInferencer(Inferencer):
         self.naive_model = naive_model
         self.vocoder = vocoder
         self.diff_args = diff_args
-        print("-----------------> diff_args", diff_args)
-        print("-----------------> naive_args", naive_args)
+        self.naive_args = naive_args
 
         # cpt = torch.load(file, map_location="cpu")
         # model = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=isHalf)
@@ -59,7 +58,6 @@ class DiffusionSVCInferencer(Inferencer):
             if gt_spec is None:
                 raise ValueError("gt_spec must not None when Shallow Diffusion Model inferring, gt_spec can from "
                                  "input mel or output of naive model")
-            print(f' [INFO] k_step_max is {self.diff_args.model.k_step_max}.')
 
         aug_shift = torch.from_numpy(np.array([[float(aug_shift)]])).float().to(self.dev)
 
@@ -71,11 +69,6 @@ class DiffusionSVCInferencer(Inferencer):
         else:
             spk_id = torch.LongTensor(np.array([[int(spk_id)]])).to(self.dev)
 
-        if k_step is not None:
-            print(f' [INFO] get k_step, do shallow diffusion {k_step} steps')
-        else:
-            print(f' [INFO] Do full 1000 steps depth diffusion {k_step}')
-        print(f" [INFO] method:{method}; infer_speedup:{infer_speedup}")
         return self.diff_model(units, f0, volume, spk_id=spk_id, spk_mix_dict=spk_mix_dict, aug_shift=aug_shift, gt_spec=gt_spec, infer=True, infer_speedup=infer_speedup, method=method, k_step=k_step, use_tqdm=use_tqdm, spk_emb=spk_emb, spk_emb_dict=spk_emb_dict)
 
     @torch.no_grad()
@@ -89,10 +82,6 @@ class DiffusionSVCInferencer(Inferencer):
         else:
             spk_id = torch.LongTensor(np.array([[int(spk_id)]])).to(self.dev)
         aug_shift = torch.from_numpy(np.array([[float(aug_shift)]])).float().to(self.dev)
-        print("====> unit, f0, vol", units.shape, f0.shape, volume.shape)
-        print("====> *unit, f0, vol", units)
-        print("====> unit, *f0, vol", f0)
-        print("====> unit, f0, *vol", volume)
         out_spec = self.naive_model(units, f0, volume, spk_id=spk_id, spk_mix_dict=spk_mix_dict,
                                     aug_shift=aug_shift, infer=True,
                                     spk_emb=spk_emb, spk_emb_dict=spk_emb_dict)
@@ -120,15 +109,10 @@ class DiffusionSVCInferencer(Inferencer):
         k_step: int,
         silence_front: float,
     ) -> torch.Tensor:
-        print("---------------------------------shape", feats.shape, pitch.shape, volume.shape)
         gt_spec = self.naive_model_call(feats, pitch, volume, spk_id=sid, spk_mix_dict=None, aug_shift=0, spk_emb=None)
-        print("======================>>>>>gt_spec", gt_spec)
         out_mel = self.__call__(feats, pitch, volume, spk_id=sid, spk_mix_dict=None, aug_shift=0, gt_spec=gt_spec, infer_speedup=infer_speedup, method='dpm-solver', k_step=k_step, use_tqdm=False, spk_emb=None)
-        print("======================>>>>>out_mel", out_mel)
         start_frame = int(silence_front * self.vocoder.vocoder_sample_rate / self.vocoder.vocoder_hop_size)
         out_wav = self.mel2wav(out_mel, pitch, start_frame=start_frame)
 
-        print("======================>>>>>out_wav.shape, mask.shape", out_wav.shape, mask.shape)
         out_wav *= mask
-        print("out_wav:::::::::::", out_wav)
         return out_wav.squeeze()
