@@ -9,10 +9,11 @@ from Exceptions import (
     NotEnoughDataExtimateF0,
 )
 from voice_changer.DiffusionSVC.inferencer.Inferencer import Inferencer
+from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.F0Extractor import F0_Extractor
+from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractor import PitchExtractor
 
 from voice_changer.RVC.embedder.Embedder import Embedder
 
-from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 from voice_changer.common.VolumeExtractor import VolumeExtractor
 
 
@@ -48,6 +49,7 @@ class Pipeline(object):
         self.volumeExtractor = VolumeExtractor(self.hop_size)
         self.embedder = embedder
         self.pitchExtractor = pitchExtractor
+        # self.f0ex = self.load_f0_extractor(f0_model="harvest", f0_min=50, f0_max=1100)
 
         print("VOLUME EXTRACTOR", self.volumeExtractor)
         print("GENERATE INFERENCER", self.inferencer)
@@ -57,6 +59,18 @@ class Pipeline(object):
         self.targetSR = targetSR
         self.device = device
         self.isHalf = False
+
+    def load_f0_extractor(self, f0_model, f0_min=None, f0_max=None):
+        f0_extractor = F0_Extractor(
+            f0_extractor=f0_model,
+            sample_rate=44100,
+            hop_size=512,
+            f0_min=f0_min,
+            f0_max=f0_max,
+            block_size=512,
+            model_sampling_rate=44100
+        )
+        return f0_extractor
 
     def getPipelineInfo(self):
         volumeExtractorInfo = self.volumeExtractor.getVolumeExtractorInfo()
@@ -95,8 +109,10 @@ class Pipeline(object):
 
         n_frames = int(audio_pad.size(-1) // self.hop_size + 1)
         volume, mask = self.extract_volume_and_mask(audio, threhold=-60.0)
+
         # ピッチ検出
         try:
+            # print("[SRC AUDIO----]", audio_pad)
             pitch, pitchf = self.pitchExtractor.extract(
                 audio_pad,
                 pitchf,
@@ -106,13 +122,15 @@ class Pipeline(object):
                 int(self.hop_size),    # 処理のwindowサイズ (44100における512)
                 silence_front=silence_front,
             )
-            print("[Pitch]", pitch)
 
             pitch = torch.tensor(pitch[-n_frames:], device=self.device).unsqueeze(0).long()  # 160window sizeを前提にバッファを作っているので切る。
             pitchf = torch.tensor(pitchf[-n_frames:], device=self.device, dtype=torch.float).unsqueeze(0)  # 160window sizeを前提にバッファを作っているので切る。
         except IndexError as e:  # NOQA
             # print(e)
             raise NotEnoughDataExtimateF0()
+
+        # f0 = self.f0ex.extract_f0(audio_pad, key=4, sr=44100)
+        # print("[Pitch_f0]", f0)
 
         # tensor型調整
         feats = audio_pad
@@ -155,13 +173,13 @@ class Pipeline(object):
         # pitchの推定が上手くいかない(pitchf=0)場合、検索前の特徴を混ぜる
         # pitchffの作り方の疑問はあるが、本家通りなので、このまま使うことにする。
         # https://github.com/w-okada/voice-changer/pull/276#issuecomment-1571336929
-        if protect < 0.5:
-            pitchff = pitchf.clone()
-            pitchff[pitchf > 0] = 1
-            pitchff[pitchf < 1] = protect
-            pitchff = pitchff.unsqueeze(-1)
-            feats = feats * pitchff + feats0 * (1 - pitchff)
-            feats = feats.to(feats0.dtype)
+        # if protect < 0.5:
+        #     pitchff = pitchf.clone()
+        #     pitchff[pitchf > 0] = 1
+        #     pitchff[pitchf < 1] = protect
+        #     pitchff = pitchff.unsqueeze(-1)
+        #     feats = feats * pitchff + feats0 * (1 - pitchff)
+        #     feats = feats.to(feats0.dtype)
 
         # # apply silent front for inference
         # if type(self.inferencer) in [OnnxRVCInferencer, OnnxRVCInferencerNono]:
@@ -176,7 +194,7 @@ class Pipeline(object):
                         torch.clip(
                             self.inferencer.infer(
                                 feats,
-                                pitch.unsqueeze(-1),
+                                pitchf.unsqueeze(-1),
                                 volume,
                                 mask,
                                 sid,

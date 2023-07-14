@@ -6,15 +6,15 @@ import torch
 import torchaudio
 from data.ModelSlot import DiffusionSVCModelSlot
 from voice_changer.DiffusionSVC.DiffusionSVCSettings import DiffusionSVCSettings
+from voice_changer.DiffusionSVC.pipeline.Pipeline import Pipeline
 from voice_changer.DiffusionSVC.pipeline.PipelineGenerator import createPipeline
+from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
 
-from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 from voice_changer.utils.VoiceChangerModel import AudioInOut, PitchfInOut, FeatureInOut, VoiceChangerModel
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
+from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 from voice_changer.RVC.onnxExporter.export2onnx import export2onnx
-from voice_changer.RVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
-from voice_changer.RVC.pipeline.Pipeline import Pipeline
 
 from Exceptions import DeviceCannotSupportHalfPrecisionException
 
@@ -164,8 +164,6 @@ class DiffusionSVC(VoiceChangerModel):
             )
             # result = audio_out.detach().cpu().numpy() * np.sqrt(vol)
             result = audio_out.detach().cpu().numpy()
-
-            print("RESULT", result)
 
             return result
         except DeviceCannotSupportHalfPrecisionException as e:  # NOQA

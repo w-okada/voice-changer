@@ -255,6 +255,7 @@ class VoiceChanger:
             # 後処理
             with Timer("post-process") as t:
                 result = result.astype(np.int16)
+
                 if self.settings.outputSampleRate != processing_sampling_rate:
                     # print(
                     #     "output samplingrate",
@@ -291,6 +292,7 @@ class VoiceChanger:
 
             print_convert_processing(f" [fin] Input/Output size:{receivedData.shape[0]},{outputData.shape[0]}")
             perf = [preprocess_time, mainprocess_time, postprocess_time]
+
             return outputData, perf
 
         except NoModeLoadedException as e:
