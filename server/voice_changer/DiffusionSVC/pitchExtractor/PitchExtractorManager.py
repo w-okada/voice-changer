@@ -1,5 +1,6 @@
 from typing import Protocol
 from const import PitchExtractorType
+from voice_changer.DiffusionSVC.pitchExtractor.CrepePitchExtractor import CrepePitchExtractor
 from voice_changer.DiffusionSVC.pitchExtractor.DioPitchExtractor import DioPitchExtractor
 from voice_changer.DiffusionSVC.pitchExtractor.HarvestPitchExtractor import HarvestPitchExtractor
 from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractor import PitchExtractor
@@ -29,8 +30,8 @@ class PitchExtractorManager(Protocol):
             return HarvestPitchExtractor()
         elif pitchExtractorType == "dio":
             return DioPitchExtractor()
-        # elif pitchExtractorType == "crepe":
-        #     return CrepePitchExtractor()
+        elif pitchExtractorType == "crepe":
+            return CrepePitchExtractor()
         # elif pitchExtractorType == "crepe_tiny":
         #     return CrepeOnnxPitchExtractor(pitchExtractorType, cls.params.crepe_onnx_tiny, gpu)
         # elif pitchExtractorType == "crepe_full":

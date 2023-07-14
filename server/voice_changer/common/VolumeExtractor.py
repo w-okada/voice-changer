@@ -2,6 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+
 class VolumeExtractor:
 
     def __init__(self, hop_size: float):
