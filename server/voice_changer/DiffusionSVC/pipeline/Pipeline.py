@@ -110,7 +110,6 @@ class Pipeline(object):
         # -> [Perform]: 0.029046058654785156 0.0025115013122558594 (CPU i9 13900KF)
         # ---> これくらいの処理ならCPU上のTorchでやった方が早い？
         '''
-        # volume_t = self.volumeExtractor.extract_t(audio)
         volume_t = self.volumeExtractor.extract_t(audio)
         mask = self.volumeExtractor.get_mask_from_volume_t(volume_t, self.inferencer_block_size, threshold=threshold)
         volume = volume_t.unsqueeze(-1).unsqueeze(0)
@@ -136,8 +135,7 @@ class Pipeline(object):
 
         # ピッチ検出
         try:
-            # print("[SRC AUDIO----]", audio_pad)
-            pitch, pitchf = self.pitchExtractor.extract(
+            pitch = self.pitchExtractor.extract(
                 audio16k.squeeze(),
                 pitchf,
                 f0_up_key,
@@ -146,8 +144,7 @@ class Pipeline(object):
                 silence_front=silence_front,
             )
 
-            pitch = torch.tensor(pitch[-n_frames:], device=self.device).unsqueeze(0).long()  # 160window sizeを前提にバッファを作っているので切る。
-            pitchf = torch.tensor(pitchf[-n_frames:], device=self.device, dtype=torch.float).unsqueeze(0)  # 160window sizeを前提にバッファを作っているので切る。
+            pitch = torch.tensor(pitch[-n_frames:], device=self.device).unsqueeze(0).long()  
         except IndexError as e:  # NOQA
             # print(e)
             raise NotEnoughDataExtimateF0()
@@ -217,12 +214,12 @@ class Pipeline(object):
         try:
             with torch.no_grad():
                 with autocast(enabled=self.isHalf):
-                    print("[EMBEDDER EXTRACT:::]", feats.shape, pitchf.unsqueeze(-1).shape, volume.shape, mask.shape)
+                    print("[EMBEDDER EXTRACT:::]", feats.shape, pitch.unsqueeze(-1).shape, volume.shape, mask.shape)
                     audio1 = (
                         torch.clip(
                             self.inferencer.infer(
                                 feats,
-                                pitchf.unsqueeze(-1),
+                                pitch.unsqueeze(-1),
                                 volume,
                                 mask,
                                 sid,
@@ -243,12 +240,12 @@ class Pipeline(object):
                 raise e
 
         feats_buffer = feats.squeeze(0).detach().cpu()
-        if pitchf is not None:
-            pitchf_buffer = pitchf.squeeze(0).detach().cpu()
+        if pitch is not None:
+            pitch_buffer = pitch.squeeze(0).detach().cpu()
         else:
-            pitchf_buffer = None
+            pitch_buffer = None
 
         del pitch, pitchf, feats, sid
         torch.cuda.empty_cache()
         audio1 = self.resamplerOut(audio1.float())
-        return audio1, pitchf_buffer, feats_buffer
+        return audio1, pitch_buffer, feats_buffer

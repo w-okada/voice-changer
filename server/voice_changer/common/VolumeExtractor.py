@@ -2,9 +2,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from voice_changer.utils.VoiceChangerModel import AudioInOut
-
-
 class VolumeExtractor:
 
     def __init__(self, hop_size: float):
@@ -56,7 +53,6 @@ class VolumeExtractor:
         mask = torch.max(mask.unfold(-1, 9, 1), -1)[0]
         mask = mask.to(device).unsqueeze(-1).unsqueeze(0)
         mask = upsample(mask, block_size).squeeze(-1)
-        print("[get_mask_from_volume_t 3]", mask.shape)
         return mask
 
 
