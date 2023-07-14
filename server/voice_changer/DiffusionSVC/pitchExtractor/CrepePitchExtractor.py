@@ -24,7 +24,7 @@ class CrepePitchExtractor(PitchExtractor):
         start_frame = int(silence_front * self.sapmle_rate / window)
         real_silence_front = start_frame * window / self.sapmle_rate
         audio = audio[int(np.round(real_silence_front * self.sapmle_rate)):]
-        
+
         f0, pd = torchcrepe.predict(
             audio.unsqueeze(0),
             self.sapmle_rate,
