@@ -1,5 +1,6 @@
 from typing import Protocol
 from const import PitchExtractorType
+from voice_changer.DiffusionSVC.pitchExtractor.DioPitchExtractor import DioPitchExtractor
 from voice_changer.DiffusionSVC.pitchExtractor.HarvestPitchExtractor import HarvestPitchExtractor
 from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractor import PitchExtractor
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
@@ -26,8 +27,8 @@ class PitchExtractorManager(Protocol):
     ) -> PitchExtractor:
         if pitchExtractorType == "harvest":
             return HarvestPitchExtractor()
-        # elif pitchExtractorType == "dio":
-        #     return DioPitchExtractor()
+        elif pitchExtractorType == "dio":
+            return DioPitchExtractor()
         # elif pitchExtractorType == "crepe":
         #     return CrepePitchExtractor()
         # elif pitchExtractorType == "crepe_tiny":
