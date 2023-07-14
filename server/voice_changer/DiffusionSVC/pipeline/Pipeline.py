@@ -17,8 +17,6 @@ from voice_changer.RVC.embedder.Embedder import Embedder
 from voice_changer.common.VolumeExtractor import VolumeExtractor
 from torchaudio.transforms import Resample
 
-from voice_changer.utils.Timer import Timer
-
 
 class Pipeline(object):
     embedder: Embedder
@@ -144,23 +142,15 @@ class Pipeline(object):
                 silence_front=silence_front,
             )
 
-            pitch = torch.tensor(pitch[-n_frames:], device=self.device).unsqueeze(0).long()  
+            pitch = torch.tensor(pitch[-n_frames:], device=self.device).unsqueeze(0).long()
         except IndexError as e:  # NOQA
-            # print(e)
             raise NotEnoughDataExtimateF0()
-        print("[EMBEDDER EXTRACT:audio:4:]", audio_t.shape)
-
-        # f0 = self.f0ex.extract_f0(audio_pad, key=4, sr=44100)
-        # print("[Pitch_f0]", f0)
 
         # tensor型調整
         feats = audio16k.squeeze()
         if feats.dim() == 2:  # double channels
             feats = feats.mean(-1)
         feats = feats.view(1, -1)
-        print("[EMBEDDER EXTRACT:audio:5:]", audio_t.shape)
-
-        print("[EMBEDDER EXTRACT:::]", feats.shape)
 
         # embedding
         with autocast(enabled=self.isHalf):
@@ -176,39 +166,6 @@ class Pipeline(object):
                 else:
                     raise e
         feats = F.interpolate(feats.permute(0, 2, 1), size=int(n_frames), mode='nearest').permute(0, 2, 1)
-
-        if protect < 0.5:
-            feats0 = feats.clone()
-
-        # # ピッチサイズ調整
-        # p_len = audio_pad.shape[0] // self.window
-        # feats_len = feats.shape[1]
-        # if feats.shape[1] < p_len:
-        #     p_len = feats_len
-        #     pitch = pitch[:, :feats_len]
-        #     pitchf = pitchf[:, :feats_len]
-
-        # pitch = pitch[:, -feats_len:]
-        # pitchf = pitchf[:, -feats_len:]
-        # p_len = torch.tensor([feats_len], device=self.device).long()
-
-        # print("----------plen::1:", p_len)
-
-        # pitchの推定が上手くいかない(pitchf=0)場合、検索前の特徴を混ぜる
-        # pitchffの作り方の疑問はあるが、本家通りなので、このまま使うことにする。
-        # https://github.com/w-okada/voice-changer/pull/276#issuecomment-1571336929
-        # if protect < 0.5:
-        #     pitchff = pitchf.clone()
-        #     pitchff[pitchf > 0] = 1
-        #     pitchff[pitchf < 1] = protect
-        #     pitchff = pitchff.unsqueeze(-1)
-        #     feats = feats * pitchff + feats0 * (1 - pitchff)
-        #     feats = feats.to(feats0.dtype)
-
-        # # apply silent front for inference
-        # if type(self.inferencer) in [OnnxRVCInferencer, OnnxRVCInferencerNono]:
-        #     npyOffset = math.floor(silence_front * 16000) // 360  # 160x2 = 360
-        #     feats = feats[:, npyOffset * 2 :, :]  # NOQA
 
         # 推論実行
         try:
