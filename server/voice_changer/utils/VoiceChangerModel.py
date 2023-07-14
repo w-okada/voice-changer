@@ -9,7 +9,6 @@ PitchfInOut: TypeAlias = np.ndarray[Any, np.dtype[np.int16]]
 FeatureInOut: TypeAlias = np.ndarray[Any, np.dtype[np.int16]]
 
 
-
 class VoiceChangerModel(Protocol):
     # loadModel: Callable[..., dict[str, Any]]
     def loadModel(self, params: LoadModelParams):

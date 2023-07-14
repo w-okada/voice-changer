@@ -1,4 +1,15 @@
-from typing import Any, Union, cast
+'''
+■ VoiceChangerV2
+- VoiceChangerとの差分
+・リサンプル処理の無駄を省くため、VoiceChangerModelにリサンプル処理を移譲
+・前処理、メイン処理の分割を廃止(VoiceChangeModelでの無駄な型変換などを回避するため)
+
+- 適用VoiceChangerModel
+・DiffusionSVC
+
+'''
+
+from typing import Any, Union
 
 from const import TMP_DIR
 import torch
@@ -6,7 +17,6 @@ import os
 import traceback
 import numpy as np
 from dataclasses import dataclass, asdict, field
-import resampy
 import onnxruntime
 
 from voice_changer.IORecorder import IORecorder
@@ -29,7 +39,7 @@ STREAM_OUTPUT_FILE = os.path.join(TMP_DIR, "out.wav")
 
 
 @dataclass
-class VoiceChangerSettings:
+class VoiceChangerV2Settings:
     inputSampleRate: int = 48000  # 48000 or 24000
     outputSampleRate: int = 48000  # 48000 or 24000
 
@@ -59,13 +69,13 @@ class VoiceChangerSettings:
     strData: list[str] = field(default_factory=lambda: [])
 
 
-class VoiceChanger:
+class VoiceChangerV2:
     ioRecorder: IORecorder
     sola_buffer: AudioInOut
 
     def __init__(self, params: VoiceChangerParams):
         # 初期化
-        self.settings = VoiceChangerSettings()
+        self.settings = VoiceChangerV2Settings()
         self.currentCrossFadeOffsetRate = 0.0
         self.currentCrossFadeEndRate = 0.0
         self.currentCrossFadeOverlapSize = 0  # setting
@@ -78,13 +88,11 @@ class VoiceChanger:
         self.mps_enabled: bool = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
         self.onnx_device = onnxruntime.get_device()
 
-        print(f"VoiceChanger Initialized (GPU_NUM(cuda):{self.gpu_num}, mps_enabled:{self.mps_enabled}, onnx_device:{self.onnx_device})")
+        print(f"VoiceChangerV2 Initialized (GPU_NUM(cuda):{self.gpu_num}, mps_enabled:{self.mps_enabled}, onnx_device:{self.onnx_device})")
 
-    def setModel(self, model: Any):
+    def setModel(self, model: VoiceChangerModel):
         self.voiceChanger = model
-
-    def getModelType(self):
-        return {"status": "OK", "vc": "-----"}
+        self.voiceChanger.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
 
     def get_info(self):
         data = asdict(self.settings)
@@ -103,6 +111,7 @@ class VoiceChanger:
         if key == "serverAudioStated" and val == 0:
             self.settings.inputSampleRate = 48000
             self.settings.outputSampleRate = 48000
+            self.voiceChanger.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
 
         if key in self.settings.intData:
             setattr(self.settings, key, int(val))
@@ -119,7 +128,8 @@ class VoiceChanger:
             if key == "recordIO" and val == 2:
                 if hasattr(self, "ioRecorder"):
                     self.ioRecorder.close()
-
+            if key == "inputSampleRate" or key == "outputSampleRate":
+                self.voiceChanger.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
@@ -177,42 +187,23 @@ class VoiceChanger:
 
     #  receivedData: tuple of short
     def on_request(self, receivedData: AudioInOut) -> tuple[AudioInOut, list[Union[int, float]]]:
-        return self.on_request_sola(receivedData)
-
-    def on_request_sola(self, receivedData: AudioInOut) -> tuple[AudioInOut, list[Union[int, float]]]:
         try:
             if self.voiceChanger is None:
                 raise VoiceChangerIsNotSelectedException("Voice Changer is not selected.")
 
-            processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
-            # 前処理
-            with Timer("pre-process") as t:
-                if self.settings.inputSampleRate != processing_sampling_rate:
-                    newData = cast(
-                        AudioInOut,
-                        resampy.resample(
-                            receivedData,
-                            self.settings.inputSampleRate,
-                            processing_sampling_rate,
-                        ),
-                    )
-                else:
-                    newData = receivedData
+            with Timer("main-process") as t:
 
+                processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
                 sola_search_frame = int(0.012 * processing_sampling_rate)
-                # sola_search_frame = 0
-                block_frame = newData.shape[0]
+                block_frame = receivedData.shape[0]
                 crossfade_frame = min(self.settings.crossFadeOverlapSize, block_frame)
                 self._generate_strength(crossfade_frame)
-
-                data = self.voiceChanger.generate_input(newData, block_frame, crossfade_frame, sola_search_frame)
-            preprocess_time = t.secs
-
-            # 変換処理
-            with Timer("main-process") as t:
-                # Inference
-                audio = self.voiceChanger.inference(data)
-
+                # data = self.voiceChanger.generate_input(newData, block_frame, crossfade_frame, sola_search_frame)            
+                audio = self.voiceChanger.inference(
+                    receivedData,
+                    crossfade_frame=crossfade_frame,
+                    sola_search_frame=sola_search_frame
+                )
                 if hasattr(self, "sola_buffer") is True:
                     np.set_printoptions(threshold=10000)
                     audio_offset = -1 * (sola_search_frame + crossfade_frame + block_frame)
@@ -251,39 +242,20 @@ class VoiceChanger:
                 else:
                     self.sola_buffer = audio[-crossfade_frame:] * self.np_prev_strength
                     # self.sola_buffer = audio[- crossfade_frame:]
+                
             mainprocess_time = t.secs
 
             # 後処理
             with Timer("post-process") as t:
                 result = result.astype(np.int16)
 
-                if self.settings.outputSampleRate != processing_sampling_rate:
-                    # print(
-                    #     "output samplingrate",
-                    #     self.settings.outputSampleRate,
-                    #     processing_sampling_rate,
-                    # )
-                    outputData = cast(
-                        AudioInOut,
-                        resampy.resample(
-                            result,
-                            processing_sampling_rate,
-                            self.settings.outputSampleRate,
-                        ).astype(np.int16),
-                    )
+                print_convert_processing(f" Output data size of {result.shape[0]}/{processing_sampling_rate}hz {result .shape[0]}/{self.settings.outputSampleRate}hz")
+
+                if receivedData.shape[0] != result .shape[0]:
+                    outputData = pad_array(result, receivedData.shape[0])
+                    pass
                 else:
                     outputData = result
-
-                print_convert_processing(f" Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.outputSampleRate}hz")
-
-                if receivedData.shape[0] != outputData.shape[0]:
-                    # print(
-                    #     f"Padding, in:{receivedData.shape[0]} out:{outputData.shape[0]}"
-                    # )
-                    outputData = pad_array(outputData, receivedData.shape[0])
-                    # print_convert_processing(
-                    #     f" Padded!, Output data size of {result.shape[0]}/{processing_sampling_rate}hz {outputData.shape[0]}/{self.settings.inputSampleRate}hz")
-                    pass
 
                 if self.settings.recordIO == 1:
                     self.ioRecorder.writeInput(receivedData)
@@ -292,7 +264,7 @@ class VoiceChanger:
             postprocess_time = t.secs
 
             print_convert_processing(f" [fin] Input/Output size:{receivedData.shape[0]},{outputData.shape[0]}")
-            perf = [preprocess_time, mainprocess_time, postprocess_time]
+            perf = [0, mainprocess_time, postprocess_time]
 
             return outputData, perf
 

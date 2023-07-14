@@ -7,8 +7,11 @@ from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractorManager import Pitc
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 
+import torch
+from torchaudio.transforms import Resample
 
-def createPipeline(modelSlot: DiffusionSVCModelSlot, gpu: int, f0Detector: str):
+
+def createPipeline(modelSlot: DiffusionSVCModelSlot, gpu: int, f0Detector: str, inputSampleRate: int, outputSampleRate: int):
     dev = DeviceManager.get_instance().getDevice(gpu)
     # half = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
     half = False
@@ -35,6 +38,9 @@ def createPipeline(modelSlot: DiffusionSVCModelSlot, gpu: int, f0Detector: str):
     # pitchExtractor
     pitchExtractor = PitchExtractorManager.getPitchExtractor(f0Detector, gpu)
 
+    resamplerIn = Resample(inputSampleRate, 16000, dtype=torch.int16).to(dev)
+    resamplerOut = Resample(modelSlot.samplingRate, outputSampleRate, dtype=torch.int16).to(dev)
+
     pipeline = Pipeline(
         embedder,
         inferencer,
@@ -42,6 +48,8 @@ def createPipeline(modelSlot: DiffusionSVCModelSlot, gpu: int, f0Detector: str):
         modelSlot.samplingRate,
         dev,
         half,
+        resamplerIn,
+        resamplerOut
     )
 
     return pipeline

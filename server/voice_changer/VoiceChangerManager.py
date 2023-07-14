@@ -10,6 +10,7 @@ from voice_changer.ModelSlotManager import ModelSlotManager
 from voice_changer.RVC.RVCModelMerger import RVCModelMerger
 from voice_changer.VoiceChanger import VoiceChanger
 from const import STORED_SETTING_FILE, UPLOAD_DIR
+from voice_changer.VoiceChangerV2 import VoiceChangerV2
 from voice_changer.utils.LoadModelParams import LoadModelParamFile, LoadModelParams
 from voice_changer.utils.ModelMerger import MergeElement, ModelMergerRequest
 from voice_changer.utils.VoiceChangerModel import AudioInOut
@@ -242,7 +243,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             from voice_changer.DiffusionSVC.DiffusionSVC import DiffusionSVC
 
             self.voiceChangerModel = DiffusionSVC(self.params, slotInfo)
-            self.voiceChanger = VoiceChanger(self.params)
+            self.voiceChanger = VoiceChangerV2(self.params)
             self.voiceChanger.setModel(self.voiceChangerModel)
         else:
             print(f"[Voice Changer] unknown voice changer model: {slotInfo.voiceChangerType}")

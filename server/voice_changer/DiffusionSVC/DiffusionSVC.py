@@ -1,9 +1,5 @@
-# import sys
-# import os
 from dataclasses import asdict
 import numpy as np
-import torch
-import torchaudio
 from data.ModelSlot import DiffusionSVCModelSlot
 from voice_changer.DiffusionSVC.DiffusionSVCSettings import DiffusionSVCSettings
 from voice_changer.DiffusionSVC.pipeline.Pipeline import Pipeline
@@ -13,7 +9,7 @@ from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractorManager import Pitc
 from voice_changer.utils.VoiceChangerModel import AudioInOut, PitchfInOut, FeatureInOut, VoiceChangerModel
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
-from voice_changer.RVC.onnxExporter.export2onnx import export2onnx
+# from voice_changer.RVC.onnxExporter.export2onnx import export2onnx
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 
 from Exceptions import DeviceCannotSupportHalfPrecisionException
@@ -36,13 +32,12 @@ class DiffusionSVC(VoiceChangerModel):
         self.feature_buffer: FeatureInOut | None = None
         self.prevVol = 0.0
         self.slotInfo = slotInfo
-        self.initialize()
-
+        
     def initialize(self):
         print("[Voice Changer] [DiffusionSVC] Initializing... ")
 
         # pipelineの生成
-        self.pipeline = createPipeline(self.slotInfo, self.settings.gpu, self.settings.f0Detector)
+        self.pipeline = createPipeline(self.slotInfo, self.settings.gpu, self.settings.f0Detector, self.inputSampleRate, self.outputSampleRate)
 
         # その他の設定
         self.settings.tran = self.slotInfo.defaultTune
@@ -50,6 +45,11 @@ class DiffusionSVC(VoiceChangerModel):
         self.settings.kstep = self.slotInfo.kstep
 
         print("[Voice Changer] [DiffusionSVC] Initializing... done")
+
+    def setSamplingRate(self, inputSampleRate, outputSampleRate):
+        self.inputSampleRate = inputSampleRate
+        self.outputSampleRate = outputSampleRate
+        self.initialize()
 
     def update_settings(self, key: str, val: int | float | str):
         print("[Voice Changer][DiffusionSVC]: update_settings", key, val)
@@ -82,7 +82,6 @@ class DiffusionSVC(VoiceChangerModel):
     def generate_input(
         self,
         newData: AudioInOut,
-        inputSize: int,
         crossfadeSize: int,
         solaSearchFrame: int = 0,
     ):
@@ -99,11 +98,10 @@ class DiffusionSVC(VoiceChangerModel):
             self.pitchf_buffer = np.zeros(new_feature_length)
             self.feature_buffer = np.zeros([new_feature_length, self.slotInfo.embChannels])
 
-        convertSize = inputSize + crossfadeSize + solaSearchFrame + self.settings.extraConvertSize
+        convertSize = newData.shape[0] + crossfadeSize + solaSearchFrame + self.settings.extraConvertSize
 
         if convertSize % 128 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
             convertSize = convertSize + (128 - (convertSize % 128))
-        outSize = convertSize - self.settings.extraConvertSize
 
         # バッファがたまっていない場合はzeroで補う
         if self.audio_buffer.shape[0] < convertSize:
@@ -118,37 +116,39 @@ class DiffusionSVC(VoiceChangerModel):
         self.feature_buffer = self.feature_buffer[featureOffset:]
 
         # 出力部分だけ切り出して音量を確認。(TODO:段階的消音にする)
-        cropOffset = -1 * (inputSize + crossfadeSize)
+        cropOffset = -1 * (newData.shape[0] + crossfadeSize)
         cropEnd = -1 * (crossfadeSize)
         crop = self.audio_buffer[cropOffset:cropEnd]
         vol = np.sqrt(np.square(crop).mean())
-        vol = max(vol, self.prevVol * 0.0)
+        vol = float(max(vol, self.prevVol * 0.0))
         self.prevVol = vol
 
-        return (self.audio_buffer, self.pitchf_buffer, self.feature_buffer, convertSize, vol, outSize)
+        return (self.audio_buffer, self.pitchf_buffer, self.feature_buffer, convertSize, vol)
 
-    def inference(self, data):
-        audio = data[0]
-        pitchf = data[1]
-        feature = data[2]
-        convertSize = data[3]
-        vol = data[4]
+    def inference(self, receivedData: AudioInOut, crossfade_frame: int, sola_search_frame: int):
+        data = self.generate_input(receivedData, crossfade_frame, sola_search_frame)
+        audio: AudioInOut = data[0]
+        pitchf: PitchfInOut = data[1]
+        feature: FeatureInOut = data[2]
+        convertSize: int = data[3]
+        vol: float = data[4]
 
         if vol < self.settings.silentThreshold:
             return np.zeros(convertSize).astype(np.int16) * np.sqrt(vol)
 
-        if self.pipeline is not None:
-            device = self.pipeline.device
-        else:
-            device = torch.device("cpu")  # TODO:pipelineが存在しない場合はzeroを返してもいいかも(要確認)。
-        audio = torch.from_numpy(audio).to(device=device, dtype=torch.float32)
-        audio = torchaudio.functional.resample(audio, self.slotInfo.samplingRate, 16000, rolloff=0.99)
+        if self.pipeline is None:
+            return np.zeros(convertSize).astype(np.int16) * np.sqrt(vol)
+        
+        # device = self.pipeline.device
+        # audio = torch.from_numpy(audio).to(device=device, dtype=torch.float32)
+        # audio = self.resampler16K(audio)
         sid = self.settings.dstId
         f0_up_key = self.settings.tran
         protect = 0
 
         embOutputLayer = 12
         useFinalProj = False
+        silenceFrontSec = self.settings.extraConvertSize / self.slotInfo.samplingRate if self.settings.silenceFront else 0.  # extaraConvertSize(既にモデルのサンプリングレートにリサンプリング済み)の秒数。モデルのサンプリングレートで処理(★１)。
 
         try:
             audio_out, self.pitchf_buffer, self.feature_buffer = self.pipeline.exec(
@@ -157,12 +157,11 @@ class DiffusionSVC(VoiceChangerModel):
                 pitchf,
                 feature,
                 f0_up_key,
-                self.settings.extraConvertSize / self.slotInfo.samplingRate if self.settings.silenceFront else 0.,  # extaraConvertSize(既にモデルのサンプリングレートにリサンプリング済み)の秒数。モデルのサンプリングレートで処理(★１)。
+                silenceFrontSec,
                 embOutputLayer,
                 useFinalProj,
                 protect
             )
-            # result = audio_out.detach().cpu().numpy() * np.sqrt(vol)
             result = audio_out.detach().cpu().numpy()
 
             return result
@@ -173,36 +172,36 @@ class DiffusionSVC(VoiceChangerModel):
             # raise e
 
         return
-
+    
     def __del__(self):
         del self.pipeline
 
-    def export2onnx(self):
-        modelSlot = self.slotInfo
+    # def export2onnx(self):
+    #     modelSlot = self.slotInfo
 
-        if modelSlot.isONNX:
-            print("[Voice Changer] export2onnx, No pyTorch filepath.")
-            return {"status": "ng", "path": ""}
+    #     if modelSlot.isONNX:
+    #         print("[Voice Changer] export2onnx, No pyTorch filepath.")
+    #         return {"status": "ng", "path": ""}
 
-        output_file_simple = export2onnx(self.settings.gpu, modelSlot)
-        return {
-            "status": "ok",
-            "path": f"/tmp/{output_file_simple}",
-            "filename": output_file_simple,
-        }
+    #     output_file_simple = export2onnx(self.settings.gpu, modelSlot)
+    #     return {
+    #         "status": "ok",
+    #         "path": f"/tmp/{output_file_simple}",
+    #         "filename": output_file_simple,
+    #     }
 
-    def get_model_current(self):
-        return [
-            {
-                "key": "defaultTune",
-                "val": self.settings.tran,
-            },
-            {
-                "key": "defaultIndexRatio",
-                "val": self.settings.indexRatio,
-            },
-            {
-                "key": "defaultProtect",
-                "val": self.settings.protect,
-            },
-        ]
+    # def get_model_current(self):
+    #     return [
+    #         {
+    #             "key": "defaultTune",
+    #             "val": self.settings.tran,
+    #         },
+    #         {
+    #             "key": "defaultIndexRatio",
+    #             "val": self.settings.indexRatio,
+    #         },
+    #         {
+    #             "key": "defaultProtect",
+    #             "val": self.settings.protect,
+    #         },
+    #     ]
