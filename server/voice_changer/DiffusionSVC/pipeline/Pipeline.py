@@ -137,7 +137,6 @@ class Pipeline(object):
                 audio16k.squeeze(),
                 pitchf,
                 f0_up_key,
-                16000,                 # 音声のサンプリングレート(既に16000)
                 int(self.hop_size),    # 処理のwindowサイズ (44100における512)
                 silence_front=silence_front,
             )

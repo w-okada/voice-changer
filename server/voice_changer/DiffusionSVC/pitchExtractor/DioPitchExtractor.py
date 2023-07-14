@@ -16,7 +16,7 @@ class DioPitchExtractor(PitchExtractor):
         self.sapmle_rate = 16000
         self.uv_interp = True
 
-    def extract(self, audio: torch.Tensor, pitch, f0_up_key, sr, window, silence_front=0):
+    def extract(self, audio: torch.Tensor, pitch, f0_up_key, window, silence_front=0):
         audio = audio.detach().cpu().numpy()
         start_frame = int(silence_front * self.sapmle_rate / window)
         real_silence_front = start_frame * window / self.sapmle_rate

@@ -45,13 +45,13 @@ class VolumeExtractor:
         mask = upsample(mask, block_size).squeeze(-1)
         return mask
 
-    def get_mask_from_volume_t(self, volume: torch.Tensor, block_size: int, threshold=-60.0, device='cpu') -> torch.Tensor:
+    def get_mask_from_volume_t(self, volume: torch.Tensor, block_size: int, threshold=-60.0) -> torch.Tensor:
         volume = volume.squeeze()
-        mask = (volume > 10.0 ** (float(threshold) / 20)).float()
+        mask = (volume > 10.0 ** (float(threshold) / 20)).to(volume.device).float()
         mask = nn.functional.pad(mask, (4, 0), 'constant', mask[0])
         mask = nn.functional.pad(mask, (0, 4), 'constant', mask[-1])
         mask = torch.max(mask.unfold(-1, 9, 1), -1)[0]
-        mask = mask.to(device).unsqueeze(-1).unsqueeze(0)
+        mask = mask.unsqueeze(-1).unsqueeze(0)
         mask = upsample(mask, block_size).squeeze(-1)
         return mask
 
