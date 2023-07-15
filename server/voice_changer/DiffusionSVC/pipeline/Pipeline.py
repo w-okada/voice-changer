@@ -55,8 +55,6 @@ class Pipeline(object):
 
         self.resamplerIn = resamplerIn
         self.resamplerOut = resamplerOut
-        
-        # self.f0ex = self.load_f0_extractor(f0_model="harvest", f0_min=50, f0_max=1100)
 
         print("VOLUME EXTRACTOR", self.volumeExtractor)
         print("GENERATE INFERENCER", self.inferencer)
@@ -66,18 +64,6 @@ class Pipeline(object):
         self.targetSR = targetSR
         self.device = device
         self.isHalf = False
-
-    def load_f0_extractor(self, f0_model, f0_min=None, f0_max=None):
-        f0_extractor = F0_Extractor(
-            f0_extractor=f0_model,
-            sample_rate=44100,
-            hop_size=512,
-            f0_min=f0_min,
-            f0_max=f0_max,
-            block_size=512,
-            model_sampling_rate=44100
-        )
-        return f0_extractor
 
     def getPipelineInfo(self):
         volumeExtractorInfo = self.volumeExtractor.getVolumeExtractorInfo()

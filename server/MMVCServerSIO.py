@@ -51,6 +51,7 @@ def setupArgParser():
     parser.add_argument("--nsf_hifigan", type=str, help="path to nsf_hifigan model(pytorch)")
     parser.add_argument("--crepe_onnx_full", type=str, help="path to crepe_onnx_full")
     parser.add_argument("--crepe_onnx_tiny", type=str, help="path to crepe_onnx_tiny")
+    parser.add_argument("--rmvpe", type=str, help="path to rmvpe")
 
     return parser
 
@@ -90,6 +91,7 @@ voiceChangerParams = VoiceChangerParams(
     nsf_hifigan=args.nsf_hifigan,
     crepe_onnx_full=args.crepe_onnx_full,
     crepe_onnx_tiny=args.crepe_onnx_tiny,
+    rmvpe=args.rmvpe,
     sample_mode=args.sample_mode,
 )
 

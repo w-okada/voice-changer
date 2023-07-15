@@ -1,10 +1,11 @@
 import numpy as np
 from const import PitchExtractorType
+from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractor import PitchExtractor
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
-from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 import onnxruntime
-from voice_changer.RVC.pitchExtractor import onnxcrepe
 import torch
+
+from voice_changer.RVC.pitchExtractor import onnxcrepe
 
 
 class CrepeOnnxPitchExtractor(PitchExtractor):

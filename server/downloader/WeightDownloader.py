@@ -14,6 +14,7 @@ def downloadWeight(voiceChangerParams: VoiceChangerParams):
     nsf_hifigan = voiceChangerParams.nsf_hifigan
     crepe_onnx_full = voiceChangerParams.crepe_onnx_full
     crepe_onnx_tiny = voiceChangerParams.crepe_onnx_tiny
+    rmvpe = voiceChangerParams.rmvpe
 
     # file exists check (currently only for rvc)
     downloadParams = []
@@ -83,6 +84,15 @@ def downloadWeight(voiceChangerParams: VoiceChangerParams):
                 "url": "https://huggingface.co/wok000/weights_gpl/resolve/main/content-vec/contentvec-f.onnx",
                 "saveTo": content_vec_500_onnx,
                 "position": 7,
+            }
+        )
+
+    if os.path.exists(content_vec_500_onnx) is False:
+        downloadParams.append(
+            {
+                "url": "https://huggingface.co/wok000/weights/resolve/main/rmvpe/rmvpe.pt",
+                "saveTo": rmvpe,
+                "position": 8,
             }
         )
 

@@ -2,8 +2,7 @@ import torchcrepe
 import torch
 import numpy as np
 from const import PitchExtractorType
-
-from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
+from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractor import PitchExtractor
 
 
 class CrepePitchExtractor(PitchExtractor):

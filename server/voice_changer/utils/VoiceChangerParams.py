@@ -14,3 +14,5 @@ class VoiceChangerParams:
     sample_mode: str
     crepe_onnx_full: str
     crepe_onnx_tiny: str
+    rmvpe: str
+

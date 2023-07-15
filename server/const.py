@@ -77,6 +77,7 @@ PitchExtractorType: TypeAlias = Literal[
     "crepe",
     "crepe_full",
     "crepe_tiny",
+    "rmvpe",
 ]
 
 ServerAudioDeviceType: TypeAlias = Literal[
