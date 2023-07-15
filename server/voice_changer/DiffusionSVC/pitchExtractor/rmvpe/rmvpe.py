@@ -249,7 +249,7 @@ class E2E(nn.Module):
             )
         # else:
         #     self.fc = nn.Sequential(
-        #         nn.Linear(3 * N_MELS, N_CLASS), nn.Dropout(0.25), nn.Sigmoid() 
+        #         nn.Linear(3 * N_MELS, N_CLASS), nn.Dropout(0.25), nn.Sigmoid()
         #     )
 
     def forward(self, mel):
@@ -392,7 +392,7 @@ class RMVPE:
             hidden = hidden.astype("float32")
         f0 = self.decode(hidden, thred=thred)
         return f0
-    
+
     def to_local_average_cents(self, salience, thred=0.05):
         # t0 = ttime()
         center = np.argmax(salience, axis=1)  # 帧长#index

@@ -9,7 +9,6 @@ from Exceptions import (
     NotEnoughDataExtimateF0,
 )
 from voice_changer.DiffusionSVC.inferencer.Inferencer import Inferencer
-from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.F0Extractor import F0_Extractor
 from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractor import PitchExtractor
 
 from voice_changer.RVC.embedder.Embedder import Embedder
