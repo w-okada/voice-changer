@@ -122,6 +122,8 @@ export const ServerSettingKey = {
     "kStep": "kStep",
     "threshold": "threshold",
 
+    "speedUp": "speedUp",
+
     "inputSampleRate": "inputSampleRate",
     "enableDirectML": "enableDirectML",
 } as const
@@ -180,6 +182,9 @@ export type VoiceChangerServerSetting = {
     diffSpkId: number// DDSP-SVC
     kStep: number// DDSP-SVC
     threshold: number// DDSP-SVC
+
+    speedUp: number // Diffusion-SVC
+
 
     inputSampleRate: InputSampleRate
     enableDirectML: number
@@ -260,7 +265,21 @@ export type DDSPSVCModelSlot = ModelSlot & {
     speakers: { [key: number]: string }
 }
 
-export type ModelSlotUnion = RVCModelSlot | MMVCv13ModelSlot | MMVCv15ModelSlot | SoVitsSvc40ModelSlot | DDSPSVCModelSlot
+
+export type DiffusionSVCModelSlot = ModelSlot & {
+    modelFile: string
+    dstId: number
+
+    samplingRate: number
+
+    defaultTune: number
+    defaultKstep : number
+    defaultSpeedup: number
+    kStepMax: number
+    speakers: { [key: number]: string }
+}
+
+export type ModelSlotUnion = RVCModelSlot | MMVCv13ModelSlot | MMVCv15ModelSlot | SoVitsSvc40ModelSlot | DDSPSVCModelSlot | DiffusionSVCModelSlot
 
 type ServerAudioDevice = {
     kind: "audioinput" | "audiooutput",
@@ -361,6 +380,8 @@ export const DefaultServerSetting: ServerInfo = {
     diffSpkId: 1,
     kStep: 120,
     threshold: -45,
+
+    speedUp: 10,
 
     enableDirectML: 0,
     // 

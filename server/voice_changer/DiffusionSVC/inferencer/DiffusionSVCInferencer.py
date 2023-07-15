@@ -105,8 +105,8 @@ class DiffusionSVCInferencer(Inferencer):
         volume: torch.Tensor,
         mask: torch.Tensor,
         sid: torch.Tensor,
-        infer_speedup: int,
         k_step: int,
+        infer_speedup: int,
         silence_front: float,
     ) -> torch.Tensor:
         gt_spec = self.naive_model_call(feats, pitch, volume, spk_id=sid, spk_mix_dict=None, aug_shift=0, spk_emb=None)

@@ -32,7 +32,7 @@ class DiffusionSVC(VoiceChangerModel):
         self.feature_buffer: FeatureInOut | None = None
         self.prevVol = 0.0
         self.slotInfo = slotInfo
-        
+
     def initialize(self):
         print("[Voice Changer] [DiffusionSVC] Initializing... ")
 
@@ -138,7 +138,7 @@ class DiffusionSVC(VoiceChangerModel):
 
         if self.pipeline is None:
             return np.zeros(convertSize).astype(np.int16) * np.sqrt(vol)
-        
+
         # device = self.pipeline.device
         # audio = torch.from_numpy(audio).to(device=device, dtype=torch.float32)
         # audio = self.resampler16K(audio)
@@ -146,6 +146,8 @@ class DiffusionSVC(VoiceChangerModel):
         f0_up_key = self.settings.tran
         protect = 0
 
+        kStep = self.settings.kStep
+        speedUp = self.settings.speedUp
         embOutputLayer = 12
         useFinalProj = False
         silenceFrontSec = self.settings.extraConvertSize / self.slotInfo.samplingRate if self.settings.silenceFront else 0.  # extaraConvertSize(既にモデルのサンプリングレートにリサンプリング済み)の秒数。モデルのサンプリングレートで処理(★１)。
@@ -157,6 +159,8 @@ class DiffusionSVC(VoiceChangerModel):
                 pitchf,
                 feature,
                 f0_up_key,
+                kStep,
+                speedUp,
                 silenceFrontSec,
                 embOutputLayer,
                 useFinalProj,
@@ -172,7 +176,7 @@ class DiffusionSVC(VoiceChangerModel):
             # raise e
 
         return
-    
+
     def __del__(self):
         del self.pipeline
 

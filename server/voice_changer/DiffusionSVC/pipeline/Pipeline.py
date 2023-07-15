@@ -105,6 +105,8 @@ class Pipeline(object):
         pitchf,  # np.array [m]
         feature,  # np.array [m, feat]
         f0_up_key,
+        k_step,
+        infer_speedup,
         silence_front,
         embOutputLayer,
         useFinalProj,
@@ -164,8 +166,8 @@ class Pipeline(object):
                                 volume,
                                 mask,
                                 sid,
-                                infer_speedup=10,
-                                k_step=20,
+                                k_step,
+                                infer_speedup,
                                 silence_front=silence_front
                                 ).to(dtype=torch.float32),
                             -1.0,

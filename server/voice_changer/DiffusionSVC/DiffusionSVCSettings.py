@@ -11,8 +11,8 @@ class DiffusionSVCSettings:
     silentThreshold: float = 0.00001
     extraConvertSize: int = 1024 * 4
 
-    kstep: int = 20
-    speedup: int = 10
+    kStep: int = 20
+    speedUp: int = 10
 
     silenceFront: int = 1  # 0:off, 1:on
     modelSamplingRate: int = 44100
@@ -26,7 +26,8 @@ class DiffusionSVCSettings:
         "dstId",
         "tran",
         "extraConvertSize",
-        "kstep",
+        "kStep",
+        "speedUp",
         "silenceFront",
     ]
     floatData = ["silentThreshold"]
