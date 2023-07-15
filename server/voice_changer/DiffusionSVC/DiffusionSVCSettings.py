@@ -11,7 +11,8 @@ class DiffusionSVCSettings:
     silentThreshold: float = 0.00001
     extraConvertSize: int = 1024 * 4
 
-    kstep: int = 100
+    kstep: int = 20
+    speedup: int = 10
 
     silenceFront: int = 1  # 0:off, 1:on
     modelSamplingRate: int = 44100

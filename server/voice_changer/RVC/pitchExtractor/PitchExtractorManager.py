@@ -39,6 +39,6 @@ class PitchExtractorManager(Protocol):
             return CrepeOnnxPitchExtractor(pitchExtractorType, cls.params.crepe_onnx_full, gpu)
         else:
             # return hubert as default
-            raise RuntimeError(
-                "[Voice Changer] PitchExctractor not found", pitchExtractorType
-            )
+            print("[Voice Changer] PitchExctractor not found", pitchExtractorType)
+            print("                fallback to dio")
+            return DioPitchExtractor()

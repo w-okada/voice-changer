@@ -42,7 +42,7 @@ class DiffusionSVC(VoiceChangerModel):
         # その他の設定
         self.settings.tran = self.slotInfo.defaultTune
         self.settings.dstId = self.slotInfo.dstId
-        self.settings.kstep = self.slotInfo.kstep
+        self.settings.kstep = self.slotInfo.defaultKstep
 
         print("[Voice Changer] [DiffusionSVC] Initializing... done")
 
@@ -190,18 +190,18 @@ class DiffusionSVC(VoiceChangerModel):
     #         "filename": output_file_simple,
     #     }
 
-    # def get_model_current(self):
-    #     return [
-    #         {
-    #             "key": "defaultTune",
-    #             "val": self.settings.tran,
-    #         },
-    #         {
-    #             "key": "defaultIndexRatio",
-    #             "val": self.settings.indexRatio,
-    #         },
-    #         {
-    #             "key": "defaultProtect",
-    #             "val": self.settings.protect,
-    #         },
-    #     ]
+    def get_model_current(self):
+        return [
+            {
+                "key": "defaultTune",
+                "val": self.settings.tran,
+            },
+            {
+                "key": "defaultKstep",
+                "val": self.settings.kstep,
+            },
+            {
+                "key": "defaultSpeedup",
+                "val": self.settings.speedup,
+            },
+        ]

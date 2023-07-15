@@ -1,11 +1,11 @@
 import os
 from const import EnumInferenceTypes
 from dataclasses import asdict
-import torch
 import onnxruntime
 import json
 
 from data.ModelSlot import DiffusionSVCModelSlot, ModelSlot, RVCModelSlot
+from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.diffusion.unit2mel import load_model_vocoder_from_combo
 from voice_changer.utils.LoadModelParams import LoadModelParams
 from voice_changer.utils.ModelSlotGenerator import ModelSlotGenerator
 
@@ -23,90 +23,16 @@ class DiffusionSVCModelSlotGenerator(ModelSlotGenerator):
         slotInfo.iconFile = "/assets/icons/noimage.png"
         slotInfo.embChannels = 768
 
-        # if slotInfo.isONNX:
-        #     slotInfo = cls._setInfoByONNX(slotInfo)
-        # else:
-        #     slotInfo = cls._setInfoByPytorch(slotInfo)
+        if slotInfo.isONNX:
+            slotInfo = cls._setInfoByONNX(slotInfo)
+        else:
+            slotInfo = cls._setInfoByPytorch(slotInfo)
         return slotInfo
 
     @classmethod
-    def _setInfoByPytorch(cls, slot: ModelSlot):
-        cpt = torch.load(slot.modelFile, map_location="cpu")
-        config_len = len(cpt["config"])
-        version = cpt.get("version", "v1")
-
-        slot = RVCModelSlot(**asdict(slot))
-
-        if version == "voras_beta":
-            slot.f0 = True if cpt["f0"] == 1 else False
-            slot.modelType = EnumInferenceTypes.pyTorchVoRASbeta.value
-            slot.embChannels = 768
-            slot.embOutputLayer = cpt["embedder_output_layer"] if "embedder_output_layer" in cpt else 9
-            slot.useFinalProj = False
-
-            slot.embedder = cpt["embedder_name"]
-            if slot.embedder.endswith("768"):
-                slot.embedder = slot.embedder[:-3]
-
-            # if slot.embedder == "hubert":
-            #     slot.embedder = "hubert"
-            # elif slot.embedder == "contentvec":
-            #     slot.embedder = "contentvec"
-            # elif slot.embedder == "hubert_jp":
-            #     slot.embedder = "hubert_jp"
-            else:
-                raise RuntimeError("[Voice Changer][setInfoByONNX] unknown embedder")
-
-        elif config_len == 18:
-            # Original RVC
-            slot.f0 = True if cpt["f0"] == 1 else False
-            version = cpt.get("version", "v1")
-            if version is None or version == "v1":
-                slot.modelType = EnumInferenceTypes.pyTorchRVC.value if slot.f0 else EnumInferenceTypes.pyTorchRVCNono.value
-                slot.embChannels = 256
-                slot.embOutputLayer = 9
-                slot.useFinalProj = True
-                slot.embedder = "hubert_base"
-                print("[Voice Changer] Official Model(pyTorch) : v1")
-            else:
-                slot.modelType = EnumInferenceTypes.pyTorchRVCv2.value if slot.f0 else EnumInferenceTypes.pyTorchRVCv2Nono.value
-                slot.embChannels = 768
-                slot.embOutputLayer = 12
-                slot.useFinalProj = False
-                slot.embedder = "hubert_base"
-                print("[Voice Changer] Official Model(pyTorch) : v2")
-
-        else:
-            # DDPN RVC
-            slot.f0 = True if cpt["f0"] == 1 else False
-            slot.modelType = EnumInferenceTypes.pyTorchWebUI.value if slot.f0 else EnumInferenceTypes.pyTorchWebUINono.value
-            slot.embChannels = cpt["config"][17]
-            slot.embOutputLayer = cpt["embedder_output_layer"] if "embedder_output_layer" in cpt else 9
-            if slot.embChannels == 256:
-                slot.useFinalProj = True
-            else:
-                slot.useFinalProj = False
-
-            # DDPNモデルの情報を表示
-            if slot.embChannels == 256 and slot.embOutputLayer == 9 and slot.useFinalProj is True:
-                print("[Voice Changer] DDPN Model(pyTorch) : Official v1 like")
-            elif slot.embChannels == 768 and slot.embOutputLayer == 12 and slot.useFinalProj is False:
-                print("[Voice Changer] DDPN Model(pyTorch): Official v2 like")
-            else:
-                print(f"[Voice Changer] DDPN Model(pyTorch): ch:{slot.embChannels}, L:{slot.embOutputLayer}, FP:{slot.useFinalProj}")
-
-            slot.embedder = cpt["embedder_name"]
-            if slot.embedder.endswith("768"):
-                slot.embedder = slot.embedder[:-3]
-
-            if "speaker_info" in cpt.keys():
-                for k, v in cpt["speaker_info"].items():
-                    slot.speakers[int(k)] = str(v)
-
-        slot.samplingRate = cpt["config"][-1]
-
-        del cpt
-
+    def _setInfoByPytorch(cls, slot: DiffusionSVCModelSlot):
+        diff_model, diff_args, naive_model, naive_args, vocoder = load_model_vocoder_from_combo(slot.modelFile, device="cpu")
+        slot.kStepMax = diff_args.model.k_step_max
         return slot
 
     @classmethod

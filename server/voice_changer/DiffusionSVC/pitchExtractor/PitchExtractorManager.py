@@ -39,9 +39,13 @@ class PitchExtractorManager(Protocol):
         elif pitchExtractorType == "crepe_full":
             return CrepeOnnxPitchExtractor(pitchExtractorType, cls.params.crepe_onnx_full, gpu)
         elif pitchExtractorType == "rmvpe":
+            print("pitchExtractorType", pitchExtractorType)
             return RMVPEPitchExtractor(cls.params.rmvpe, gpu)
         else:
             # return hubert as default
-            raise RuntimeError(
-                "[Voice Changer] PitchExctractor not found", pitchExtractorType
-            )
+            print("[Voice Changer] PitchExctractor not found", pitchExtractorType)
+            print("                fallback to dio")
+            return DioPitchExtractor()
+            # raise RuntimeError(
+            #     "[Voice Changer] PitchExctractor not found", pitchExtractorType
+            # )
