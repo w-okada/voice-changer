@@ -280,9 +280,6 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             print("Voice Change is not loaded. Did you load a correct model?")
             return np.zeros(1).astype(np.int16), []
 
-    def getModelType(self):
-        return self.voiceChanger.getModelType()
-
     def export2onnx(self):
         return self.voiceChanger.export2onnx()
 

@@ -12,6 +12,7 @@ import onnxruntime
 from voice_changer.IORecorder import IORecorder
 
 from voice_changer.utils.Timer import Timer
+from voice_changer.utils.VoiceChangerIF import VoiceChangerIF
 from voice_changer.utils.VoiceChangerModel import AudioInOut, VoiceChangerModel
 from Exceptions import (
     DeviceCannotSupportHalfPrecisionException,
@@ -59,7 +60,7 @@ class VoiceChangerSettings:
     strData: list[str] = field(default_factory=lambda: [])
 
 
-class VoiceChanger:
+class VoiceChanger(VoiceChangerIF):
     ioRecorder: IORecorder
     sola_buffer: AudioInOut
 
@@ -82,9 +83,6 @@ class VoiceChanger:
 
     def setModel(self, model: Any):
         self.voiceChanger = model
-
-    def getModelType(self):
-        return {"status": "OK", "vc": "-----"}
 
     def get_info(self):
         data = asdict(self.settings)

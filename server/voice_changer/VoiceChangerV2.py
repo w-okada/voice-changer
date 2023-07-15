@@ -22,6 +22,7 @@ import onnxruntime
 from voice_changer.IORecorder import IORecorder
 
 from voice_changer.utils.Timer import Timer
+from voice_changer.utils.VoiceChangerIF import VoiceChangerIF
 from voice_changer.utils.VoiceChangerModel import AudioInOut, VoiceChangerModel
 from Exceptions import (
     DeviceCannotSupportHalfPrecisionException,
@@ -69,7 +70,7 @@ class VoiceChangerV2Settings:
     strData: list[str] = field(default_factory=lambda: [])
 
 
-class VoiceChangerV2:
+class VoiceChangerV2(VoiceChangerIF):
     ioRecorder: IORecorder
     sola_buffer: AudioInOut
 
@@ -198,7 +199,7 @@ class VoiceChangerV2:
                 block_frame = receivedData.shape[0]
                 crossfade_frame = min(self.settings.crossFadeOverlapSize, block_frame)
                 self._generate_strength(crossfade_frame)
-                # data = self.voiceChanger.generate_input(newData, block_frame, crossfade_frame, sola_search_frame)            
+                # data = self.voiceChanger.generate_input(newData, block_frame, crossfade_frame, sola_search_frame)
                 audio = self.voiceChanger.inference(
                     receivedData,
                     crossfade_frame=crossfade_frame,
@@ -242,7 +243,7 @@ class VoiceChangerV2:
                 else:
                     self.sola_buffer = audio[-crossfade_frame:] * self.np_prev_strength
                     # self.sola_buffer = audio[- crossfade_frame:]
-                
+
             mainprocess_time = t.secs
 
             # 後処理
