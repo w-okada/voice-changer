@@ -276,6 +276,8 @@ export type DiffusionSVCModelSlot = ModelSlot & {
     defaultKstep : number
     defaultSpeedup: number
     kStepMax: number
+    nLayers: number
+    nnLayers: number
     speakers: { [key: number]: string }
 }
 
