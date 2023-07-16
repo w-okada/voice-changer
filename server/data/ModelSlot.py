@@ -115,6 +115,8 @@ class DiffusionSVCModelSlot(ModelSlot):
     defaultKstep: int = 20
     defaultSpeedup: int = 10
     kStepMax: int = 100
+    nLayers: int = 20
+    nnLayers: int = 20
     speakers: dict = field(default_factory=lambda: {1: "user"})
     embedder: EmbedderType = "hubert_base"
     samplingRate: int = 44100

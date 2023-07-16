@@ -33,8 +33,10 @@ class DiffusionSVCModelSlotGenerator(ModelSlotGenerator):
     def _setInfoByPytorch(cls, slot: DiffusionSVCModelSlot):
         diff_model, diff_args, naive_model, naive_args, vocoder = load_model_vocoder_from_combo(slot.modelFile, device="cpu")
         slot.kStepMax = diff_args.model.k_step_max
-        slot.n_layers = diff_args.model.n_layers
-
+        slot.nLayers = diff_args.model.n_layers
+        slot.nnLayers = naive_args.model.n_layers
+        diff_args.model.n_spk
+        slot.speakers = {(x+1): f"user{x+1}" for x in range(diff_args.model.n_spk)}
         return slot
 
     @classmethod

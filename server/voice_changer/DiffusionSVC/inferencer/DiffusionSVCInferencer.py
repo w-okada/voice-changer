@@ -40,7 +40,7 @@ class DiffusionSVCInferencer(Inferencer):
 
         # self.model = model
         return self
-    
+
     def getConfig(self) -> tuple[int, int]:
         model_sampling_rate = int(self.diff_args.data.sampling_rate)
         model_block_size = int(self.diff_args.data.block_size)
@@ -128,5 +128,5 @@ class DiffusionSVCInferencer(Inferencer):
 
             out_wav *= mask
         # print("[    ----Timer::3: ]", t.secs, start_frame, out_mel.shape)
-            
+
         return out_wav.squeeze()
