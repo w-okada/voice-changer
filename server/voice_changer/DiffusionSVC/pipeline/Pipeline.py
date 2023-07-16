@@ -16,6 +16,8 @@ from voice_changer.RVC.embedder.Embedder import Embedder
 from voice_changer.common.VolumeExtractor import VolumeExtractor
 from torchaudio.transforms import Resample
 
+from voice_changer.utils.Timer import Timer
+
 
 class Pipeline(object):
     embedder: Embedder
@@ -112,83 +114,95 @@ class Pipeline(object):
         useFinalProj,
         protect=0.5
     ):
-        audio_t = torch.from_numpy(audio).float().unsqueeze(0).to(self.device)
-        audio16k = self.resamplerIn(audio_t)
-        volume, mask = self.extract_volume_and_mask(audio16k, threshold=-60.0)
-        sid = torch.tensor(sid, device=self.device).unsqueeze(0).long()
-        n_frames = int(audio16k.size(-1) // self.hop_size + 1)
+        # print("---------- pipe line --------------------")
+        with Timer("pre-process") as t:
+            audio_t = torch.from_numpy(audio).float().unsqueeze(0).to(self.device)
+            audio16k = self.resamplerIn(audio_t)
+            volume, mask = self.extract_volume_and_mask(audio16k, threshold=-60.0)
+            sid = torch.tensor(sid, device=self.device).unsqueeze(0).long()
+            n_frames = int(audio16k.size(-1) // self.hop_size + 1)
+        # print("[Timer::1: ]", t.secs)
 
-        # ピッチ検出
-        try:
-            pitch = self.pitchExtractor.extract(
-                audio16k.squeeze(),
-                pitchf,
-                f0_up_key,
-                int(self.hop_size),    # 処理のwindowサイズ (44100における512)
-                silence_front=silence_front,
-            )
-
-            pitch = torch.tensor(pitch[-n_frames:], device=self.device).unsqueeze(0).long()
-        except IndexError as e:  # NOQA
-            raise NotEnoughDataExtimateF0()
-
-        # tensor型調整
-        feats = audio16k.squeeze()
-        if feats.dim() == 2:  # double channels
-            feats = feats.mean(-1)
-        feats = feats.view(1, -1)
-
-        # embedding
-        with autocast(enabled=self.isHalf):
+        with Timer("pre-process") as t:
+            # ピッチ検出
             try:
-                feats = self.embedder.extractFeatures(feats, embOutputLayer, useFinalProj)
-                if torch.isnan(feats).all():
-                    raise DeviceCannotSupportHalfPrecisionException()
+                pitch = self.pitchExtractor.extract(
+                    audio16k.squeeze(),
+                    pitchf,
+                    f0_up_key,
+                    int(self.hop_size),    # 処理のwindowサイズ (44100における512)
+                    silence_front=silence_front,
+                )
+
+                pitch = torch.tensor(pitch[-n_frames:], device=self.device).unsqueeze(0).long()
+            except IndexError as e:  # NOQA
+                raise NotEnoughDataExtimateF0()
+
+            # tensor型調整
+            feats = audio16k.squeeze()
+            if feats.dim() == 2:  # double channels
+                feats = feats.mean(-1)
+            feats = feats.view(1, -1)
+        # print("[Timer::2: ]", t.secs)
+
+        with Timer("pre-process") as t:
+
+            # embedding
+            with autocast(enabled=self.isHalf):
+                try:
+                    feats = self.embedder.extractFeatures(feats, embOutputLayer, useFinalProj)
+                    if torch.isnan(feats).all():
+                        raise DeviceCannotSupportHalfPrecisionException()
+                except RuntimeError as e:
+                    if "HALF" in e.__str__().upper():
+                        raise HalfPrecisionChangingException()
+                    elif "same device" in e.__str__():
+                        raise DeviceChangingException()
+                    else:
+                        raise e
+            feats = F.interpolate(feats.permute(0, 2, 1), size=int(n_frames), mode='nearest').permute(0, 2, 1)
+        # print("[Timer::3: ]", t.secs)
+
+        with Timer("pre-process") as t:
+            # 推論実行
+            try:
+                with torch.no_grad():
+                    with autocast(enabled=self.isHalf):
+                        audio1 = (
+                            torch.clip(
+                                self.inferencer.infer(
+                                    audio16k,
+                                    feats,
+                                    pitch.unsqueeze(-1),
+                                    volume,
+                                    mask,
+                                    sid,
+                                    k_step,
+                                    infer_speedup,
+                                    silence_front=silence_front
+                                    ).to(dtype=torch.float32),
+                                -1.0,
+                                1.0,
+                            )
+                            * 32767.5
+                        ).data.to(dtype=torch.int16)
             except RuntimeError as e:
                 if "HALF" in e.__str__().upper():
+                    print("11", e)
                     raise HalfPrecisionChangingException()
-                elif "same device" in e.__str__():
-                    raise DeviceChangingException()
                 else:
                     raise e
-        feats = F.interpolate(feats.permute(0, 2, 1), size=int(n_frames), mode='nearest').permute(0, 2, 1)
+        # print("[Timer::4: ]", t.secs)
 
-        # 推論実行
-        try:
-            with torch.no_grad():
-                with autocast(enabled=self.isHalf):
-                    print("[EMBEDDER EXTRACT:::]", feats.shape, pitch.unsqueeze(-1).shape, volume.shape, mask.shape)
-                    audio1 = (
-                        torch.clip(
-                            self.inferencer.infer(
-                                feats,
-                                pitch.unsqueeze(-1),
-                                volume,
-                                mask,
-                                sid,
-                                k_step,
-                                infer_speedup,
-                                silence_front=silence_front
-                                ).to(dtype=torch.float32),
-                            -1.0,
-                            1.0,
-                        )
-                        * 32767.5
-                    ).data.to(dtype=torch.int16)
-        except RuntimeError as e:
-            if "HALF" in e.__str__().upper():
-                print("11", e)
-                raise HalfPrecisionChangingException()
+        with Timer("pre-process") as t:  # NOQA
+            feats_buffer = feats.squeeze(0).detach().cpu()
+            if pitch is not None:
+                pitch_buffer = pitch.squeeze(0).detach().cpu()
             else:
-                raise e
+                pitch_buffer = None
 
-        feats_buffer = feats.squeeze(0).detach().cpu()
-        if pitch is not None:
-            pitch_buffer = pitch.squeeze(0).detach().cpu()
-        else:
-            pitch_buffer = None
-
-        del pitch, pitchf, feats, sid
-        torch.cuda.empty_cache()
-        audio1 = self.resamplerOut(audio1.float())
+            del pitch, pitchf, feats, sid
+            torch.cuda.empty_cache()
+            audio1 = self.resamplerOut(audio1.float())
+        # print("[Timer::5: ]", t.secs)
         return audio1, pitch_buffer, feats_buffer

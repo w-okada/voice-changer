@@ -6,6 +6,7 @@ from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.diffusion.unit2me
 from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.diffusion.vocoder import Vocoder
 
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
+from voice_changer.utils.Timer import Timer
 
 
 class DiffusionSVCInferencer(Inferencer):
@@ -100,6 +101,7 @@ class DiffusionSVCInferencer(Inferencer):
     @torch.no_grad()
     def infer(
         self,
+        audio_t: torch.Tensor,
         feats: torch.Tensor,
         pitch: torch.Tensor,
         volume: torch.Tensor,
@@ -109,10 +111,22 @@ class DiffusionSVCInferencer(Inferencer):
         infer_speedup: int,
         silence_front: float,
     ) -> torch.Tensor:
-        gt_spec = self.naive_model_call(feats, pitch, volume, spk_id=sid, spk_mix_dict=None, aug_shift=0, spk_emb=None)
-        out_mel = self.__call__(feats, pitch, volume, spk_id=sid, spk_mix_dict=None, aug_shift=0, gt_spec=gt_spec, infer_speedup=infer_speedup, method='dpm-solver', k_step=k_step, use_tqdm=False, spk_emb=None)
-        start_frame = int(silence_front * self.vocoder.vocoder_sample_rate / self.vocoder.vocoder_hop_size)
-        out_wav = self.mel2wav(out_mel, pitch, start_frame=start_frame)
+        with Timer("pre-process") as t:
+            gt_spec = self.naive_model_call(feats, pitch, volume, spk_id=sid, spk_mix_dict=None, aug_shift=0, spk_emb=None)
+            # gt_spec = self.vocoder.extract(audio_t, 16000)
+            # gt_spec = torch.cat((gt_spec, gt_spec[:, -1:, :]), 1)
 
-        out_wav *= mask
+        # print("[    ----Timer::1: ]", t.secs)
+
+        with Timer("pre-process") as t:
+            out_mel = self.__call__(feats, pitch, volume, spk_id=sid, spk_mix_dict=None, aug_shift=0, gt_spec=gt_spec, infer_speedup=infer_speedup, method='dpm-solver', k_step=k_step, use_tqdm=False, spk_emb=None)
+
+        # print("[    ----Timer::2: ]", t.secs)
+        with Timer("pre-process") as t:  # NOQA
+            start_frame = int(silence_front * self.vocoder.vocoder_sample_rate / self.vocoder.vocoder_hop_size)
+            out_wav = self.mel2wav(out_mel, pitch, start_frame=start_frame)
+
+            out_wav *= mask
+        # print("[    ----Timer::3: ]", t.secs, start_frame, out_mel.shape)
+            
         return out_wav.squeeze()

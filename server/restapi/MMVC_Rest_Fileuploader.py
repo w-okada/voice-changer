@@ -119,6 +119,8 @@ class MMVC_Rest_Fileuploader:
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:
             print("[Voice Changer] post_update_model_default ex:", e)
+            import traceback
+            traceback.print_exc()
 
     def post_update_model_info(self, newData: str = Form(...)):
         try:

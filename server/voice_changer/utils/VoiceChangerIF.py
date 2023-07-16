@@ -10,7 +10,7 @@ class VoiceChangerIF(Protocol):
 
     def get_info(self) -> dict[str, Any]:
         ...
-        
+
     def get_performance(self) -> list[int]:
         ...
 
@@ -25,4 +25,3 @@ class VoiceChangerIF(Protocol):
 
     def export2onnx() -> Any:
         ...
-

@@ -202,10 +202,10 @@ class DiffusionSVC(VoiceChangerModel):
             },
             {
                 "key": "defaultKstep",
-                "val": self.settings.kstep,
+                "val": self.settings.kStep,
             },
             {
                 "key": "defaultSpeedup",
-                "val": self.settings.speedup,
+                "val": self.settings.speedUp,
             },
         ]

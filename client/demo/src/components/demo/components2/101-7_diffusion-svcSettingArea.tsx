@@ -23,6 +23,9 @@ export const DiffusionSVCSettingArea = (_props: DiffusionSVCSettingAreaProps) =>
             return <></>;
         }
 
+        const skipValues = getDivisors(serverSetting.serverSetting.kStep);
+        skipValues.pop();
+
         const kStepRow = (
             <div className="character-area-control">
                 <div className="character-area-control-title">k-step:</div>
@@ -32,12 +35,15 @@ export const DiffusionSVCSettingArea = (_props: DiffusionSVCSettingAreaProps) =>
                         <span className="character-area-slider-control-slider">
                             <input
                                 type="range"
-                                min="0"
+                                min="2"
                                 max={(selected as DiffusionSVCModelSlot).kStepMax}
                                 step="1"
                                 value={serverSetting.serverSetting.kStep}
                                 onChange={(e) => {
-                                    serverSetting.updateServerSettings({ ...serverSetting.serverSetting, kStep: Number(e.target.value) });
+                                    const newKStep = Number(e.target.value);
+                                    const newSkipValues = getDivisors(Number(e.target.value));
+                                    newSkipValues.pop();
+                                    serverSetting.updateServerSettings({ ...serverSetting.serverSetting, speedUp: Math.max(...newSkipValues), kStep: newKStep });
                                 }}
                             ></input>
                         </span>
@@ -48,23 +54,28 @@ export const DiffusionSVCSettingArea = (_props: DiffusionSVCSettingAreaProps) =>
         );
         const speedUpRow = (
             <div className="character-area-control">
-                <div className="character-area-control-title">speedup</div>
+                <div className="character-area-control-title">skip</div>
                 <div className="character-area-control-field">
                     <div className="character-area-slider-control">
                         <span className="character-area-slider-control-kind"></span>
                         <span className="character-area-slider-control-slider">
-                            <input
-                                type="range"
-                                min="0"
-                                max={serverSetting.serverSetting.kStep}
-                                step="1"
+                            <select
+                                name=""
+                                id=""
                                 value={serverSetting.serverSetting.speedUp}
                                 onChange={(e) => {
                                     serverSetting.updateServerSettings({ ...serverSetting.serverSetting, speedUp: Number(e.target.value) });
                                 }}
-                            ></input>
+                            >
+                                {skipValues.map((v) => {
+                                    return (
+                                        <option value={v} key={v}>
+                                            {v}
+                                        </option>
+                                    );
+                                })}
+                            </select>
                         </span>
-                        <span className="character-area-slider-control-val">{serverSetting.serverSetting.speedUp}</span>
                     </div>
                 </div>
             </div>
@@ -78,4 +89,20 @@ export const DiffusionSVCSettingArea = (_props: DiffusionSVCSettingAreaProps) =>
     }, [serverSetting.serverSetting, serverSetting.updateServerSettings, selected]);
 
     return settingArea;
+};
+
+const getDivisors = (num: number) => {
+    var divisors = [];
+    var end = Math.sqrt(num);
+
+    for (var i = 1; i <= end; i++) {
+        if (num % i === 0) {
+            divisors.push(i);
+            if (i !== num / i) {
+                divisors.push(num / i);
+            }
+        }
+    }
+
+    return divisors.sort((a, b) => a - b);
 };
