@@ -42,7 +42,7 @@ class DiffusionSVC(VoiceChangerModel):
         # その他の設定
         self.settings.tran = self.slotInfo.defaultTune
         self.settings.dstId = self.slotInfo.dstId
-        self.settings.kstep = self.slotInfo.defaultKstep
+        self.settings.kStep = self.slotInfo.defaultKstep
 
         print("[Voice Changer] [DiffusionSVC] Initializing... done")
 
@@ -86,8 +86,8 @@ class DiffusionSVC(VoiceChangerModel):
         solaSearchFrame: int = 0,
     ):
         newData = newData.astype(np.float32) / 32768.0  # DiffusionSVCのモデルのサンプリングレートで入ってきている。（extraDataLength, Crossfade等も同じSRで処理）(★１)
-
-        new_feature_length = newData.shape[0] * 100 // self.slotInfo.samplingRate  # 100 は hubertのhosizeから (16000 / 160)
+        new_feature_length = int(((newData.shape[0] / self.inputSampleRate) * self.slotInfo.samplingRate) / 512)  # 100 は hubertのhosizeから (16000 / 160).
+        # ↑newData.shape[0]//sampleRate でデータ秒数。これに16000かけてhubertの世界でのデータ長。これにhop数(160)でわるとfeatsのデータサイズになる。
         if self.audio_buffer is not None:
             # 過去のデータに連結
             self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)
@@ -104,13 +104,14 @@ class DiffusionSVC(VoiceChangerModel):
             convertSize = convertSize + (128 - (convertSize % 128))
 
         # バッファがたまっていない場合はzeroで補う
+        generateFeatureLength = int(((convertSize / self.inputSampleRate) * self.slotInfo.samplingRate) / 512) + 1        
         if self.audio_buffer.shape[0] < convertSize:
             self.audio_buffer = np.concatenate([np.zeros([convertSize]), self.audio_buffer])
-            self.pitchf_buffer = np.concatenate([np.zeros([convertSize * 100 // self.slotInfo.samplingRate]), self.pitchf_buffer])
-            self.feature_buffer = np.concatenate([np.zeros([convertSize * 100 // self.slotInfo.samplingRate, self.slotInfo.embChannels]), self.feature_buffer])
+            self.pitchf_buffer = np.concatenate([np.zeros(generateFeatureLength), self.pitchf_buffer])
+            self.feature_buffer = np.concatenate([np.zeros([generateFeatureLength, self.slotInfo.embChannels]), self.feature_buffer])
 
         convertOffset = -1 * convertSize
-        featureOffset = -convertSize * 100 // self.slotInfo.samplingRate
+        featureOffset = -1 * generateFeatureLength
         self.audio_buffer = self.audio_buffer[convertOffset:]  # 変換対象の部分だけ抽出
         self.pitchf_buffer = self.pitchf_buffer[featureOffset:]
         self.feature_buffer = self.feature_buffer[featureOffset:]

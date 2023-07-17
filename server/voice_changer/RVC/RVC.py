@@ -101,7 +101,7 @@ class RVC(VoiceChangerModel):
         solaSearchFrame: int = 0,
     ):
         newData = newData.astype(np.float32) / 32768.0  # RVCのモデルのサンプリングレートで入ってきている。（extraDataLength, Crossfade等も同じSRで処理）(★１)
-
+        # ↑newData.shape[0]//sampleRate でデータ秒数。これに16000かけてhubertの世界でのデータ長。これにhop数(160)でわるとfeatsのデータサイズになる。
         new_feature_length = newData.shape[0] * 100 // self.slotInfo.samplingRate
         if self.audio_buffer is not None:
             # 過去のデータに連結

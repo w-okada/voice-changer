@@ -143,8 +143,6 @@ class Pipeline(object):
                     f0_up_key,
                     silence_front=silence_front,
                 )
-#    def extract(self, audio: AudioInOut, sr: int, block_size: int, model_sr: int, pitch, f0_up_key, silence_front=0):
-
                 pitch = torch.tensor(pitch[-n_frames:], device=self.device).unsqueeze(0).long()
             except IndexError as e:  # NOQA
                 raise NotEnoughDataExtimateF0()

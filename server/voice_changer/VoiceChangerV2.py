@@ -95,6 +95,14 @@ class VoiceChangerV2(VoiceChangerIF):
         self.voiceChanger = model
         self.voiceChanger.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
 
+    def setInputSampleRate(self, sr: int):
+        self.settings.inputSampleRate = sr
+        self.voiceChanger.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
+
+    def setOutputSampleRate(self, sr: int):
+        self.settings.outputSampleRate = sr
+        self.voiceChanger.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
+
     def get_info(self):
         data = asdict(self.settings)
         if self.voiceChanger is not None:

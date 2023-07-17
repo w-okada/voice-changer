@@ -25,3 +25,9 @@ class VoiceChangerIF(Protocol):
 
     def export2onnx() -> Any:
         ...
+
+    def setInputSampleRate(self, sr: int):
+        ...
+
+    def setOutputSampleRate(self, sr: int):
+        ...

@@ -84,6 +84,12 @@ class VoiceChanger(VoiceChangerIF):
     def setModel(self, model: Any):
         self.voiceChanger = model
 
+    def setInputSampleRate(self, sr: int):
+        self.settings.inputSampleRate = sr
+
+    def setOutputSampleRate(self, sr: int):
+        self.settings.outputSampleRate = sr
+
     def get_info(self):
         data = asdict(self.settings)
         if self.voiceChanger is not None:

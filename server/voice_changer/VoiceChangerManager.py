@@ -53,10 +53,10 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         return self.voiceChanger.get_processing_sampling_rate()
 
     def setInputSamplingRate(self, sr: int):
-        self.voiceChanger.settings.inputSampleRate = sr
+        self.voiceChanger.setInputSampleRate(sr)
 
     def setOutputSamplingRate(self, sr: int):
-        self.voiceChanger.settings.outputSampleRate = sr
+        self.voiceChanger.setOutputSampleRate(sr)
 
     ############################
     # VoiceChangerManager
