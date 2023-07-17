@@ -240,7 +240,6 @@ class E2E(nn.Module):
         )
         self.cnn = nn.Conv2d(en_out_channels, 3, (3, 3), padding=(1, 1))
         if n_gru:
-            print("N_GRUE")
             self.fc = nn.Sequential(
                 BiGRU(3 * 128, 256, n_gru),
                 nn.Linear(512, 360),

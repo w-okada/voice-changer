@@ -104,6 +104,7 @@ class Pipeline(object):
         self,
         sid,
         audio,  # torch.tensor [n]
+        sr,
         pitchf,  # np.array [m]
         feature,  # np.array [m, feat]
         f0_up_key,
@@ -126,13 +127,23 @@ class Pipeline(object):
         with Timer("pre-process") as t:
             # ピッチ検出
             try:
+                # pitch = self.pitchExtractor.extract(
+                #     audio16k.squeeze(),
+                #     pitchf,
+                #     f0_up_key,
+                #     int(self.hop_size),    # 処理のwindowサイズ (44100における512)
+                #     silence_front=silence_front,
+                # )
                 pitch = self.pitchExtractor.extract(
-                    audio16k.squeeze(),
+                    audio,
+                    sr,
+                    self.inferencer_block_size,
+                    self.inferencer_sampling_rate,
                     pitchf,
                     f0_up_key,
-                    int(self.hop_size),    # 処理のwindowサイズ (44100における512)
                     silence_front=silence_front,
                 )
+#    def extract(self, audio: AudioInOut, sr: int, block_size: int, model_sr: int, pitch, f0_up_key, silence_front=0):
 
                 pitch = torch.tensor(pitch[-n_frames:], device=self.device).unsqueeze(0).long()
             except IndexError as e:  # NOQA

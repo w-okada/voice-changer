@@ -3,9 +3,9 @@ from const import PitchExtractorType
 from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractor import PitchExtractor
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 import onnxruntime
-import torch
 
 from voice_changer.RVC.pitchExtractor import onnxcrepe
+from voice_changer.utils.VoiceChangerModel import AudioInOut
 
 
 class CrepeOnnxPitchExtractor(PitchExtractor):
@@ -26,18 +26,20 @@ class CrepeOnnxPitchExtractor(PitchExtractor):
         self.sapmle_rate = 16000
         self.uv_interp = True
 
-    def extract(self, audio: torch.Tensor, pitch, f0_up_key, window, silence_front=0):
-        start_frame = int(silence_front * self.sapmle_rate / window)
-        real_silence_front = start_frame * window / self.sapmle_rate
-        audio = audio[int(np.round(real_silence_front * self.sapmle_rate)):]
+    def extract(self, audio: AudioInOut, sr: int, block_size: int, model_sr: int, pitch, f0_up_key, silence_front=0):
+        hop_size = block_size * sr / model_sr
 
-        precision = (1000 * window / self.sapmle_rate)
+        offset_frame_number = silence_front * sr
+        start_frame = int(offset_frame_number / hop_size)  # frame
+        real_silence_front = start_frame * hop_size / sr  # 秒
+        audio = audio[int(np.round(real_silence_front * sr)):].astype(np.float32)
 
-        audio_num = audio.cpu()
+        precision = (1000 * hop_size / sr)
+
         onnx_f0, onnx_pd = onnxcrepe.predict(
             self.onnx_session,
-            audio_num,
-            self.sapmle_rate,
+            audio,
+            sr,
             precision=precision,
             fmin=self.f0_min,
             fmax=self.f0_max,

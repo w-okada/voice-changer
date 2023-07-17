@@ -3,6 +3,7 @@ import torch
 import numpy as np
 from const import PitchExtractorType
 from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractor import PitchExtractor
+from voice_changer.utils.VoiceChangerModel import AudioInOut
 
 
 class CrepePitchExtractor(PitchExtractor):
@@ -12,22 +13,25 @@ class CrepePitchExtractor(PitchExtractor):
         self.pitchExtractorType: PitchExtractorType = "crepe"
         self.f0_min = 50
         self.f0_max = 1100
-        self.sapmle_rate = 16000
         self.uv_interp = True
         if torch.cuda.is_available():
             self.device = torch.device("cuda:" + str(torch.cuda.current_device()))
         else:
             self.device = torch.device("cpu")
 
-    def extract(self, audio: torch.Tensor, pitch, f0_up_key, window, silence_front=0):
-        start_frame = int(silence_front * self.sapmle_rate / window)
-        real_silence_front = start_frame * window / self.sapmle_rate
-        audio = audio[int(np.round(real_silence_front * self.sapmle_rate)):]
+    def extract(self, audio: AudioInOut, sr: int, block_size: int, model_sr: int, pitch, f0_up_key, silence_front=0):
+        hop_size = block_size * sr / model_sr
+        audio_t = torch.from_numpy(audio).float().unsqueeze(0).to(self.device)
+
+        offset_frame_number = silence_front * 16000
+        start_frame = int(offset_frame_number / hop_size)  # frame
+        real_silence_front = start_frame * hop_size / 16000  # 秒
+        audio_t = audio_t[:, int(np.round(real_silence_front * 16000)):]
 
         f0, pd = torchcrepe.predict(
-            audio.unsqueeze(0),
-            self.sapmle_rate,
-            hop_length=window,
+            audio_t,
+            sr,
+            hop_length=hop_size,
             fmin=self.f0_min,
             fmax=self.f0_max,
             # model="tiny",

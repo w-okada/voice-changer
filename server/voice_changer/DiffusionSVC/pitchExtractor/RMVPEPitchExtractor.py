@@ -1,9 +1,12 @@
+from torchaudio.transforms import Resample
 import torch
 import numpy as np
 from const import PitchExtractorType
 from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractor import PitchExtractor
 from voice_changer.DiffusionSVC.pitchExtractor.rmvpe.rmvpe import RMVPE
 from scipy.ndimage import zoom
+
+from voice_changer.utils.VoiceChangerModel import AudioInOut
 
 
 class RMVPEPitchExtractor(PitchExtractor):
@@ -13,8 +16,8 @@ class RMVPEPitchExtractor(PitchExtractor):
         self.pitchExtractorType: PitchExtractorType = "rmvpe"
         self.f0_min = 50
         self.f0_max = 1100
-        self.sapmle_rate = 16000
         self.uv_interp = True
+        self.input_sr = -1
         if torch.cuda.is_available() and gpu >= 0:
             self.device = torch.device("cuda:" + str(torch.cuda.current_device()))
         else:
@@ -22,32 +25,24 @@ class RMVPEPitchExtractor(PitchExtractor):
 
         self.rmvpe = RMVPE(model_path=file, is_half=False, device=self.device)
 
-    def extract(self, audio: torch.Tensor, pitch, f0_up_key, window, silence_front=0):
-        start_frame = int(silence_front * self.sapmle_rate / window)
-        real_silence_front = start_frame * window / self.sapmle_rate
+    def extract(self, audio: AudioInOut, sr: int, block_size: int, model_sr: int, pitch, f0_up_key, silence_front=0):
+        if sr != self.input_sr:
+            self.resamle = Resample(sr, 16000, dtype=torch.int16).to(self.device)
+            self.input_sr = sr
+        audio_t = torch.from_numpy(audio).float().unsqueeze(0).to(self.device)
+        audio_t = self.resamle(audio_t)
+        hop_size = 160  # RMVPE固定
 
-        audio = audio[int(np.round(real_silence_front * self.sapmle_rate)):]
-        silented_frames = int(audio.size(0) // window) + 1
+        offset_frame_number = silence_front * 16000
+        start_frame = int(offset_frame_number / hop_size)  # frame
+        real_silence_front = start_frame * hop_size / 16000  # 秒
+        audio_t = audio_t[:, int(np.round(real_silence_front * 16000)):]
 
-        f0 = self.rmvpe.infer_from_audio_t(audio, thred=0.03)
-        # f0, pd = torchcrepe.predict(
-        #     audio.unsqueeze(0),
-        #     self.sapmle_rate,
-        #     hop_length=window,
-        #     fmin=self.f0_min,
-        #     fmax=self.f0_max,
-        #     # model="tiny",
-        #     model="full",
-        #     batch_size=256,
-        #     decoder=torchcrepe.decode.weighted_argmax,
-        #     device=self.device,
-        #     return_periodicity=True,
-        # )
-        # f0 = torchcrepe.filter.median(f0, 3)  # 本家だとmeanですが、harvestに合わせmedianフィルタ
-        # pd = torchcrepe.filter.median(pd, 3)
-        # f0[pd < 0.1] = 0
-        # f0 = f0.squeeze()
-        resize_factor = silented_frames / len(f0)
+        f0 = self.rmvpe.infer_from_audio_t(audio_t.squeeze(), thred=0.03)
+
+        desired_hop_size = block_size * 16000 / model_sr
+        desired_f0_length = int(audio_t.shape[1] // desired_hop_size) + 1
+        resize_factor = desired_f0_length / len(f0)
         f0 = zoom(f0, resize_factor, order=0)
 
         pitch[-f0.shape[0]:] = f0[:pitch.shape[0]]

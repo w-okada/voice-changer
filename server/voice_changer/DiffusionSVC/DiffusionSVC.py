@@ -156,6 +156,7 @@ class DiffusionSVC(VoiceChangerModel):
             audio_out, self.pitchf_buffer, self.feature_buffer = self.pipeline.exec(
                 sid,
                 audio,
+                self.inputSampleRate,
                 pitchf,
                 feature,
                 f0_up_key,
