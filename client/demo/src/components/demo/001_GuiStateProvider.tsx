@@ -22,6 +22,8 @@ export const OpenGetServerInformationDialogCheckbox = "open-get-server-informati
 export const OpenGetClientInformationDialogCheckbox = "open-get-client-information-dialog-checkbox";
 
 export const OpenTextInputDialogCheckbox = "open-text-input-dialog-checkbox";
+export const OpenShowLicenseDialogCheckbox = "open-show-license-dialog-checkbox";
+
 type Props = {
     children: ReactNode;
 };
@@ -45,6 +47,7 @@ export type StateControls = {
     showGetServerInformationCheckbox: StateControlCheckbox;
     showGetClientInformationCheckbox: StateControlCheckbox;
     showTextInputCheckbox: StateControlCheckbox;
+    showLicenseCheckbox: StateControlCheckbox;
 };
 
 type GuiStateAndMethod = {
@@ -181,6 +184,7 @@ export const GuiStateProvider = ({ children }: Props) => {
     const showGetClientInformationCheckbox = useStateControlCheckbox(OpenGetClientInformationDialogCheckbox);
 
     const showTextInputCheckbox = useStateControlCheckbox(OpenTextInputDialogCheckbox);
+    const showLicenseCheckbox = useStateControlCheckbox(OpenShowLicenseDialogCheckbox);
 
     useEffect(() => {
         openServerControlCheckbox.updateState(true);
@@ -202,6 +206,7 @@ export const GuiStateProvider = ({ children }: Props) => {
         showGetClientInformationCheckbox.updateState(false);
 
         showTextInputCheckbox.updateState(false);
+        showLicenseCheckbox.updateState(false);
     }, []);
 
     useEffect(() => {
@@ -241,6 +246,7 @@ export const GuiStateProvider = ({ children }: Props) => {
             showGetClientInformationCheckbox,
 
             showTextInputCheckbox,
+            showLicenseCheckbox,
         },
         isConverting,
         setIsConverting,
