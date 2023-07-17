@@ -46,6 +46,7 @@ $ python3 MMVCServerSIO.py -p 18888 --https true \
     --nsf_hifigan pretrain/nsf_hifigan/model \
     --crepe_onnx_full pretrain/crepe_onnx_full.onnx \
     --crepe_onnx_tiny pretrain/crepe_onnx_tiny.onnx \
+    --rmvpe pretrain/rmvpe.pt \
     --model_dir model_dir \
     --samples samples.json
 
