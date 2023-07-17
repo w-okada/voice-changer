@@ -29,9 +29,6 @@ class RMVPEPitchExtractor(PitchExtractor):
         audio = audio[int(np.round(real_silence_front * self.sapmle_rate)):]
         silented_frames = int(audio.size(0) // window) + 1
 
-        print("[RMVPE AUDI]", audio.device)
-        print("[RMVPE RMVPE]", self.rmvpe.device)
-
         f0 = self.rmvpe.infer_from_audio_t(audio, thred=0.03)
         # f0, pd = torchcrepe.predict(
         #     audio.unsqueeze(0),
