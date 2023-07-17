@@ -136,7 +136,6 @@ class Pipeline(object):
         feats = feats.view(1, -1)
 
         # embedding
-        padding_mask = torch.BoolTensor(feats.shape).to(self.device).fill_(False)
         with autocast(enabled=self.isHalf):
             try:
                 feats = self.embedder.extractFeatures(feats, embOutputLayer, useFinalProj)
@@ -149,8 +148,6 @@ class Pipeline(object):
                     raise DeviceChangingException()
                 else:
                     raise e
-            if protect < 0.5 and search_index:
-                feats0 = feats.clone()
 
         # Index - feature抽出
         # if self.index is not None and self.feature is not None and index_rate != 0:
@@ -179,7 +176,7 @@ class Pipeline(object):
             feats = torch.from_numpy(npy).unsqueeze(0).to(self.device) * index_rate + (1 - index_rate) * feats
         feats = F.interpolate(feats.permute(0, 2, 1), scale_factor=2).permute(0, 2, 1)
         if protect < 0.5 and search_index:
-            feats0 = F.interpolate(feats0.permute(0, 2, 1), scale_factor=2).permute(0, 2, 1)
+            feats0 = feats.clone()
 
         # ピッチサイズ調整
         p_len = audio_pad.shape[0] // self.window
@@ -243,7 +240,7 @@ class Pipeline(object):
         else:
             pitchf_buffer = None
 
-        del p_len, padding_mask, pitch, pitchf, feats
+        del p_len, pitch, pitchf, feats
         torch.cuda.empty_cache()
 
         # inferで出力されるサンプリングレートはモデルのサンプリングレートになる。
