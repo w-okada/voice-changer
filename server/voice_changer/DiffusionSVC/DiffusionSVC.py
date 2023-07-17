@@ -104,7 +104,7 @@ class DiffusionSVC(VoiceChangerModel):
             convertSize = convertSize + (128 - (convertSize % 128))
 
         # バッファがたまっていない場合はzeroで補う
-        generateFeatureLength = int(((convertSize / self.inputSampleRate) * self.slotInfo.samplingRate) / 512) + 1        
+        generateFeatureLength = int(((convertSize / self.inputSampleRate) * self.slotInfo.samplingRate) / 512) + 1
         if self.audio_buffer.shape[0] < convertSize:
             self.audio_buffer = np.concatenate([np.zeros([convertSize]), self.audio_buffer])
             self.pitchf_buffer = np.concatenate([np.zeros(generateFeatureLength), self.pitchf_buffer])
@@ -151,7 +151,7 @@ class DiffusionSVC(VoiceChangerModel):
         speedUp = self.settings.speedUp
         embOutputLayer = 12
         useFinalProj = False
-        silenceFrontSec = self.settings.extraConvertSize / self.slotInfo.samplingRate if self.settings.silenceFront else 0.  # extaraConvertSize(既にモデルのサンプリングレートにリサンプリング済み)の秒数。モデルのサンプリングレートで処理(★１)。
+        silenceFrontSec = self.settings.extraConvertSize / self.inputSampleRate if self.settings.silenceFront else 0.  # extaraConvertSize(既にモデルのサンプリングレートにリサンプリング済み)の秒数。モデルのサンプリングレートで処理(★１)。
 
         try:
             audio_out, self.pitchf_buffer, self.feature_buffer = self.pipeline.exec(
@@ -169,7 +169,6 @@ class DiffusionSVC(VoiceChangerModel):
                 protect
             )
             result = audio_out.detach().cpu().numpy()
-
             return result
         except DeviceCannotSupportHalfPrecisionException as e:  # NOQA
             print("[Device Manager] Device cannot support half precision. Fallback to float....")

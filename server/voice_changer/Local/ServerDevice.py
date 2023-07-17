@@ -271,7 +271,9 @@ class ServerDevice:
 
                 # Blockサイズを計算
                 currentInputChunkNum = self.settings.serverReadChunkSize
-                block_frame = currentInputChunkNum * 128
+                # block_frame = currentInputChunkNum * 128
+                block_frame = int(currentInputChunkNum * 128 * (self.settings.serverInputAudioSampleRate / 48000))
+
                 sd.default.blocksize = block_frame
 
                 # main loop

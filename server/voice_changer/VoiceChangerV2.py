@@ -260,7 +260,7 @@ class VoiceChangerV2(VoiceChangerIF):
 
                 print_convert_processing(f" Output data size of {result.shape[0]}/{processing_sampling_rate}hz {result .shape[0]}/{self.settings.outputSampleRate}hz")
 
-                if receivedData.shape[0] != result .shape[0]:
+                if receivedData.shape[0] != result.shape[0]:
                     outputData = pad_array(result, receivedData.shape[0])
                     pass
                 else:

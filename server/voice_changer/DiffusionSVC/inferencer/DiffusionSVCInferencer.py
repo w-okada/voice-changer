@@ -125,7 +125,6 @@ class DiffusionSVCInferencer(Inferencer):
         with Timer("pre-process") as t:  # NOQA
             start_frame = int(silence_front * self.vocoder.vocoder_sample_rate / self.vocoder.vocoder_hop_size)
             out_wav = self.mel2wav(out_mel, pitch, start_frame=start_frame)
-
             out_wav *= mask
         # print("[    ----Timer::3: ]", t.secs, start_frame, out_mel.shape)
 
