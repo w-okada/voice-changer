@@ -30,7 +30,7 @@ def createPipeline(modelSlot: RVCModelSlot, gpu: int, f0Detector: str):
             dev,
         )
     except Exception as e:
-        print("[Voice Changer]  exception! loading embedder", e)
+        print("[Voice Changer]  exception! loading embedder", e, dev)
         traceback.print_exc()
 
     # pitchExtractor

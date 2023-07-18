@@ -25,16 +25,30 @@ class DeviceManager(object):
         elif self.mps_enabled:
             dev = torch.device("mps")
         else:
-            dev = torch.device("cuda", index=id)
+            if id < self.gpu_num:
+                dev = torch.device("cuda", index=id)
+            else:
+                print("[Voice Changer] device detection error, fallback to cpu")
+                dev = torch.device("cpu")
         return dev
 
     def getOnnxExecutionProvider(self, gpu: int):
         availableProviders = onnxruntime.get_available_providers()
         devNum = torch.cuda.device_count()
         if gpu >= 0 and "CUDAExecutionProvider" in availableProviders and devNum > 0:
-            return ["CUDAExecutionProvider"], [{"device_id": gpu}]
+            if gpu < devNum:  # ひとつ前のif文で弾いてもよいが、エラーの解像度を上げるため一段下げ。
+                return ["CUDAExecutionProvider"], [{"device_id": gpu}]
+            else:
+                print("[Voice Changer] device detection error, fallback to cpu")
+                return ["CPUExecutionProvider"], [
+                    {
+                        "intra_op_num_threads": 8,
+                        "execution_mode": onnxruntime.ExecutionMode.ORT_PARALLEL,
+                        "inter_op_num_threads": 8,
+                    }
+                ]                
         elif gpu >= 0 and "DmlExecutionProvider" in availableProviders:
-            return ["DmlExecutionProvider"], [{}]
+            return ["DmlExecutionProvider"], [{"device_id": gpu}]
         else:
             return ["CPUExecutionProvider"], [
                 {

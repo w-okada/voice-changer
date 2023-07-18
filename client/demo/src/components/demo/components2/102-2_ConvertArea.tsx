@@ -33,6 +33,12 @@ export const ConvertArea = (props: ConvertProps) => {
         const onClassName = serverSetting.serverSetting.gpu == 0 ? "config-sub-area-button-active" : "config-sub-area-button";
         const offClassName = serverSetting.serverSetting.gpu == 0 ? "config-sub-area-button" : "config-sub-area-button-active";
 
+        const cpuClassName = serverSetting.serverSetting.gpu == -1 ? "config-sub-area-button-active" : "config-sub-area-button";
+        const gpu0ClassName = serverSetting.serverSetting.gpu == 0 ? "config-sub-area-button-active" : "config-sub-area-button";
+        const gpu1ClassName = serverSetting.serverSetting.gpu == 1 ? "config-sub-area-button-active" : "config-sub-area-button";
+        const gpu2ClassName = serverSetting.serverSetting.gpu == 2 ? "config-sub-area-button-active" : "config-sub-area-button";
+        const gpu3ClassName = serverSetting.serverSetting.gpu == 3 ? "config-sub-area-button-active" : "config-sub-area-button";
+
         const gpuSelect =
             edition.indexOf("onnxdirectML-cuda") >= 0 ? (
                 <div className="config-sub-area-control">
@@ -43,23 +49,56 @@ export const ConvertArea = (props: ConvertProps) => {
                                 onClick={async () => {
                                     await serverSetting.updateServerSettings({
                                         ...serverSetting.serverSetting,
-                                        gpu: 0,
+                                        gpu: -1,
                                     });
                                 }}
-                                className={onClassName}
+                                className={cpuClassName}
                             >
-                                on
+                                cpu
                             </div>
                             <div
                                 onClick={async () => {
                                     await serverSetting.updateServerSettings({
                                         ...serverSetting.serverSetting,
-                                        gpu: -1,
+                                        gpu: 0,
                                     });
                                 }}
-                                className={offClassName}
+                                className={gpu0ClassName}
                             >
-                                off
+                                0
+                            </div>
+                            <div
+                                onClick={async () => {
+                                    await serverSetting.updateServerSettings({
+                                        ...serverSetting.serverSetting,
+                                        gpu: 1,
+                                    });
+                                }}
+                                className={gpu1ClassName}
+                            >
+                                1
+                            </div>
+                            <div
+                                onClick={async () => {
+                                    await serverSetting.updateServerSettings({
+                                        ...serverSetting.serverSetting,
+                                        gpu: 2,
+                                    });
+                                }}
+                                className={gpu2ClassName}
+                            >
+                                2
+                            </div>
+                            <div
+                                onClick={async () => {
+                                    await serverSetting.updateServerSettings({
+                                        ...serverSetting.serverSetting,
+                                        gpu: 3,
+                                    });
+                                }}
+                                className={gpu3ClassName}
+                            >
+                                3
                             </div>
                         </div>
                     </div>
