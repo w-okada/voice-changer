@@ -5,6 +5,7 @@ from voice_changer.RVC.pitchExtractor.DioPitchExtractor import DioPitchExtractor
 from voice_changer.RVC.pitchExtractor.HarvestPitchExtractor import HarvestPitchExtractor
 from voice_changer.RVC.pitchExtractor.CrepePitchExtractor import CrepePitchExtractor
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
+from voice_changer.RVC.pitchExtractor.RMVPEPitchExtractor import RMVPEPitchExtractor
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 
 
@@ -37,6 +38,8 @@ class PitchExtractorManager(Protocol):
             return CrepeOnnxPitchExtractor(pitchExtractorType, cls.params.crepe_onnx_tiny, gpu)
         elif pitchExtractorType == "crepe_full":
             return CrepeOnnxPitchExtractor(pitchExtractorType, cls.params.crepe_onnx_full, gpu)
+        elif pitchExtractorType == "rmvpe":
+            return RMVPEPitchExtractor(cls.params.rmvpe, gpu)
         else:
             # return hubert as default
             print("[Voice Changer] PitchExctractor not found", pitchExtractorType)

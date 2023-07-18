@@ -124,8 +124,10 @@ class Pipeline(object):
             else:
                 pitch = None
                 pitchf = None
-        except IndexError:
+        except IndexError as e:  # NOQA
             # print(e)
+            # import traceback
+            # traceback.print_exc()
             raise NotEnoughDataExtimateF0()
 
         # tensor型調整
