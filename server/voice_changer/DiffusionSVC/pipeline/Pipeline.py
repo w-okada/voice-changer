@@ -143,7 +143,7 @@ class Pipeline(object):
                     f0_up_key,
                     silence_front=silence_front,
                 )
-                pitch = torch.tensor(pitch[-n_frames:], device=self.device).unsqueeze(0).long()
+                pitch = torch.tensor(pitch[-n_frames:], device=self.device, dtype=torch.float).unsqueeze(0).long()
             except IndexError as e:  # NOQA
                 raise NotEnoughDataExtimateF0()
 
