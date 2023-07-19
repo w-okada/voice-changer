@@ -49,22 +49,23 @@ def load_model_vocoder_from_combo(combo_model_path, device='cpu'):
     # args
     diff_args = DotDict(read_dict["diff_config_dict"])
     naive_args = DotDict(read_dict["naive_config_dict"])
-    # vocoder
-    vocoder = Vocoder(diff_args.vocoder.type, diff_args.vocoder.ckpt, device=device)
+    # # vocoder
+    # vocoder = Vocoder(diff_args.vocoder.type, diff_args.vocoder.ckpt, device=device)
 
     # diff_model
     print(' [Loading] ' + combo_model_path)
-    diff_model = load_svc_model(args=diff_args, vocoder_dimension=vocoder.dimension)
+    # diff_model = load_svc_model(args=diff_args, vocoder_dimension=vocoder.dimension)
+    diff_model = load_svc_model(args=diff_args, vocoder_dimension=128)
     diff_model.to(device)
     diff_model.load_state_dict(read_dict["diff_model"]['model'])
     diff_model.eval()
 
     # naive_model
-    naive_model = load_svc_model(args=naive_args, vocoder_dimension=vocoder.dimension)
+    naive_model = load_svc_model(args=naive_args, vocoder_dimension=128)
     naive_model.to(device)
     naive_model.load_state_dict(read_dict["naive_model"]['model'])
     naive_model.eval()
-    return diff_model, diff_args, naive_model, naive_args, vocoder
+    return diff_model, diff_args, naive_model, naive_args  # , vocoder
 
 
 def load_svc_model(args, vocoder_dimension):

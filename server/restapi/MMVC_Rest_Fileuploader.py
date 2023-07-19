@@ -94,7 +94,9 @@ class MMVC_Rest_Fileuploader:
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:
             print("[Voice Changer] post_load_model ex:", e)
-
+            import traceback
+            traceback.print_exc()
+            
     def get_onnx(self):
         try:
             info = self.voiceChangerManager.export2onnx()

@@ -4,41 +4,43 @@ from voice_changer.DiffusionSVC.inferencer.Inferencer import Inferencer
 from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.diffusion.naive.naive import Unit2MelNaive
 from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.diffusion.unit2mel import Unit2Mel, load_model_vocoder_from_combo
 from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.diffusion.vocoder import Vocoder
+from voice_changer.DiffusionSVC.inferencer.onnx.VocoderOnnx import VocoderOnnx
 
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.utils.Timer import Timer
 
 
 class DiffusionSVCInferencer(Inferencer):
-    def __init__(self):
+    def __init__(self, vocoder_torch_path, vocoder_onnx_path):
         self.diff_model: Unit2Mel | None = None
         self.naive_model: Unit2MelNaive | None = None
         self.vocoder: Vocoder | None = None
+        self.vocoder_onnx_path = vocoder_onnx_path
+        self.vocoder_torch_path = vocoder_torch_path
+        self.vocoder_onnx = None
 
     def loadModel(self, file: str, gpu: int):
         self.setProps("DiffusionSVCCombo", file, True, gpu)
-
         self.dev = DeviceManager.get_instance().getDevice(gpu)
-        # isHalf = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
 
-        diff_model, diff_args, naive_model, naive_args, vocoder = load_model_vocoder_from_combo(file, device=self.dev)
+        diff_model, diff_args, naive_model, naive_args = load_model_vocoder_from_combo(file, device=self.dev)
+        # vocoder
+        try:  # try onnx
+            self.vocoder_onnx = VocoderOnnx()
+            self.vocoder_onnx.initialize(self.vocoder_onnx_path, gpu)
+            print("[Voice Changer] load onnx nsf-hifigan")
+            vocoder = None
+        except Exception as e:  # noqa
+            print("[Voice Changer] load torch nsf-hifigan")
+            vocoder = Vocoder("nsf-hifigan", self.vocoder_torch_path, device=self.dev)
+            self.vocoder_onnx = None
+
         self.diff_model = diff_model
         self.naive_model = naive_model
         self.vocoder = vocoder
         self.diff_args = diff_args
         self.naive_args = naive_args
 
-        # cpt = torch.load(file, map_location="cpu")
-        # model = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=isHalf)
-
-        # model.eval()
-        # model.load_state_dict(cpt["weight"], strict=False)
-
-        # model = model.to(dev)
-        # if isHalf:
-        #     model = model.half()
-
-        # self.model = model
         return self
 
     def getConfig(self) -> tuple[int, int]:
@@ -123,9 +125,12 @@ class DiffusionSVCInferencer(Inferencer):
 
         # print("[    ----Timer::2: ]", t.secs)
         with Timer("pre-process") as t:  # NOQA
-            start_frame = int(silence_front * self.vocoder.vocoder_sample_rate / self.vocoder.vocoder_hop_size)
-            out_wav = self.mel2wav(out_mel, pitch, start_frame=start_frame)
-            out_wav *= mask
-        # print("[    ----Timer::3: ]", t.secs, start_frame, out_mel.shape)
+            if self.vocoder_onnx is None:
+                start_frame = int(silence_front * self.vocoder.vocoder_sample_rate / self.vocoder.vocoder_hop_size)
+                out_wav = self.mel2wav(out_mel, pitch, start_frame=start_frame)
+                out_wav *= mask
+            else:
+                out_wav = self.vocoder_onnx.infer(out_mel, pitch, silence_front, mask)
+        # print("[    ----Timer::3: ]", t.secs)
 
         return out_wav.squeeze()

@@ -2,6 +2,7 @@ from dataclasses import asdict
 import numpy as np
 from data.ModelSlot import DiffusionSVCModelSlot
 from voice_changer.DiffusionSVC.DiffusionSVCSettings import DiffusionSVCSettings
+from voice_changer.DiffusionSVC.inferencer.InferencerManager import InferencerManager
 from voice_changer.DiffusionSVC.pipeline.Pipeline import Pipeline
 from voice_changer.DiffusionSVC.pipeline.PipelineGenerator import createPipeline
 from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
@@ -21,6 +22,7 @@ class DiffusionSVC(VoiceChangerModel):
         self.deviceManager = DeviceManager.get_instance()
         EmbedderManager.initialize(params)
         PitchExtractorManager.initialize(params)
+        InferencerManager.initialize(params)
         self.settings = DiffusionSVCSettings()
         self.params = params
         self.pitchExtractor = PitchExtractorManager.getPitchExtractor(self.settings.f0Detector, self.settings.gpu)

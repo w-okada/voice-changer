@@ -60,6 +60,15 @@ def downloadWeight(voiceChangerParams: VoiceChangerParams):
                 "position": 4,
             }
         )
+    nsf_hifigan_onnx = os.path.join(os.path.dirname(nsf_hifigan), "nsf_hifigan.onnx")
+    if os.path.exists(nsf_hifigan_onnx) is False:
+        downloadParams.append(
+            {
+                "url": "https://huggingface.co/wok000/weights/resolve/main/ddsp-svc30/nsf_hifigan_onnx_20221211/nsf_hifigan.onnx",
+                "saveTo": nsf_hifigan_onnx,
+                "position": 4,
+            }
+        )
 
     if os.path.exists(crepe_onnx_full) is False:
         downloadParams.append(
@@ -86,8 +95,7 @@ def downloadWeight(voiceChangerParams: VoiceChangerParams):
                 "position": 7,
             }
         )
-
-    if os.path.exists(content_vec_500_onnx) is False:
+    if os.path.exists(rmvpe) is False:
         downloadParams.append(
             {
                 "url": "https://huggingface.co/wok000/weights/resolve/main/rmvpe/rmvpe.pt",
