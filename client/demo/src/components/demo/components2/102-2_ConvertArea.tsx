@@ -30,8 +30,8 @@ export const ConvertArea = (props: ConvertProps) => {
             memory: 0,
         });
 
-        const onClassName = serverSetting.serverSetting.gpu == 0 ? "config-sub-area-button-active" : "config-sub-area-button";
-        const offClassName = serverSetting.serverSetting.gpu == 0 ? "config-sub-area-button" : "config-sub-area-button-active";
+        // const onClassName = serverSetting.serverSetting.gpu == 0 ? "config-sub-area-button-active" : "config-sub-area-button";
+        // const offClassName = serverSetting.serverSetting.gpu == 0 ? "config-sub-area-button" : "config-sub-area-button-active";
 
         const cpuClassName = serverSetting.serverSetting.gpu == -1 ? "config-sub-area-button-active" : "config-sub-area-button";
         const gpu0ClassName = serverSetting.serverSetting.gpu == 0 ? "config-sub-area-button-active" : "config-sub-area-button";

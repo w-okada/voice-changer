@@ -8,11 +8,12 @@ export type DeviceAreaProps = {};
 
 export const DeviceArea = (_props: DeviceAreaProps) => {
     const { setting, serverSetting, audioContext, setAudioOutputElementId, initializedRef, setVoiceChangerClientSetting, startOutputRecording, stopOutputRecording } = useAppState();
-    const { isConverting, audioInputForGUI, inputAudioDeviceInfo, setAudioInputForGUI, fileInputEchoback, setFileInputEchoback, setAudioOutputForGUI, audioOutputForGUI, outputAudioDeviceInfo } = useGuiState();
+    const { isConverting, audioInputForGUI, inputAudioDeviceInfo, setAudioInputForGUI, fileInputEchoback, setFileInputEchoback, setAudioOutputForGUI, audioOutputForGUI, outputAudioDeviceInfo, shareScreenEnabled, setShareScreenEnabled } = useGuiState();
     const [inputHostApi, setInputHostApi] = useState<string>("ALL");
     const [outputHostApi, setOutputHostApi] = useState<string>("ALL");
     const [monitorHostApi, setMonitorHostApi] = useState<string>("ALL");
     const audioSrcNode = useRef<MediaElementAudioSourceNode>();
+    const displayMediaStream = useRef<MediaStream | null>(null);
 
     const { getItem, setItem } = useIndexedDB({ clientType: null });
     const [outputRecordingStarted, setOutputRecordingStarted] = useState<boolean>(false);
@@ -97,7 +98,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                         value={audioInputForGUI}
                         onChange={async (e) => {
                             setAudioInputForGUI(e.target.value);
-                            if (e.target.value != "file") {
+                            if (e.target.value != "file" && e.target.value != "screen") {
                                 try {
                                     await setVoiceChangerClientSetting({ ...setting.voiceChangerClientSetting, audioInput: e.target.value });
                                 } catch (e) {
@@ -132,7 +133,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
         const hostAPIs = new Set(
             devices.map((x) => {
                 return x.hostAPI;
-            })
+            }),
         );
         const hostAPIOptions = Array.from(hostAPIs).map((x, index) => {
             return (
@@ -275,6 +276,74 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
         );
     }, [audioInputForGUI, fileInputEchoback, setting, serverSetting.serverSetting]);
 
+    const audioInputScreenRow = useMemo(() => {
+        if (audioInputForGUI != "screen" || serverSetting.serverSetting.enableServerAudio == 1) {
+            return <></>;
+        }
+
+        const onSelectScreenClicked = async () => {
+            // 既存msをクローズ
+            if (displayMediaStream.current) {
+                displayMediaStream.current.getTracks().forEach((x) => {
+                    x.stop();
+                });
+                displayMediaStream.current = null;
+            }
+
+            // 共有ストップ
+            if (shareScreenEnabled == true) {
+                setShareScreenEnabled(false);
+                return;
+            }
+
+            // 共有スタート
+            try {
+                displayMediaStream.current = await navigator.mediaDevices.getDisplayMedia({
+                    video: true,
+                    audio: true,
+                });
+            } catch (e) {
+                return;
+            }
+            if (!displayMediaStream.current) {
+                return;
+            }
+            if (displayMediaStream.current?.getAudioTracks().length == 0) {
+                displayMediaStream.current.getTracks().forEach((x) => {
+                    x.stop();
+                });
+                displayMediaStream.current = null;
+            }
+
+            try {
+                setVoiceChangerClientSetting({ ...setting.voiceChangerClientSetting, audioInput: displayMediaStream.current });
+            } catch (e) {
+                console.error(e);
+            }
+
+            setShareScreenEnabled(!shareScreenEnabled);
+        };
+
+        const echobackClass = shareScreenEnabled ? "config-sub-area-control-field-screen-select-button-active" : "config-sub-area-control-field-screen-select-button";
+        return (
+            <div className="config-sub-area-control">
+                <div className="config-sub-area-control-title left-padding-1"></div>
+                <div className="config-sub-area-control-field">
+                    <div className="config-sub-area-control-field-screen-select">
+                        <div
+                            className={echobackClass}
+                            onClick={() => {
+                                onSelectScreenClicked();
+                            }}
+                        >
+                            capture
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }, [audioInputForGUI, setting, serverSetting.serverSetting, shareScreenEnabled, setShareScreenEnabled]);
+
     // (3) Audio Output
     useEffect(() => {
         const loadCache = async () => {
@@ -375,7 +444,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
         const hostAPIs = new Set(
             devices.map((x) => {
                 return x.hostAPI;
-            })
+            }),
         );
         const hostAPIOptions = Array.from(hostAPIs).map((x, index) => {
             return (
@@ -516,7 +585,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
         const hostAPIs = new Set(
             devices.map((x) => {
                 return x.hostAPI;
-            })
+            }),
         );
         const hostAPIOptions = Array.from(hostAPIs).map((x, index) => {
             return (
@@ -541,7 +610,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
         filteredDevice.unshift(
             <option value={-1} key={-1}>
                 none
-            </option>
+            </option>,
         );
 
         const currentValue = devices.find((x) => {
@@ -591,6 +660,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
             {clientAudioInputRow}
             {serverAudioInputRow}
             {audioInputMediaRow}
+            {audioInputScreenRow}
             {clientAudioOutputRow}
             {serverAudioOutputRow}
             {serverMonitorRow}

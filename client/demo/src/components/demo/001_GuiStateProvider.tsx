@@ -64,12 +64,14 @@ type GuiStateAndMethod = {
     audioInputForGUI: string;
     audioOutputForGUI: string;
     fileInputEchoback: boolean | undefined;
+    shareScreenEnabled: boolean;
     audioOutputForAnalyzer: string;
     setInputAudioDeviceInfo: (val: MediaDeviceInfo[]) => void;
     setOutputAudioDeviceInfo: (val: MediaDeviceInfo[]) => void;
     setAudioInputForGUI: (val: string) => void;
     setAudioOutputForGUI: (val: string) => void;
     setFileInputEchoback: (val: boolean) => void;
+    setShareScreenEnabled: (val: boolean) => void;
     setAudioOutputForAnalyzer: (val: string) => void;
 
     modelSlotNum: number;
@@ -105,6 +107,7 @@ export const GuiStateProvider = ({ children }: Props) => {
     const [audioInputForGUI, setAudioInputForGUI] = useState<string>("none");
     const [audioOutputForGUI, setAudioOutputForGUI] = useState<string>("none");
     const [fileInputEchoback, setFileInputEchoback] = useState<boolean>(false); //最初のmuteが有効になるように。undefined <-- ??? falseしておけばよさそう。undefinedだとwarningがでる。
+    const [shareScreenEnabled, setShareScreenEnabled] = useState<boolean>(false);
     const [audioOutputForAnalyzer, setAudioOutputForAnalyzer] = useState<string>("default");
 
     const [textInputResolve, setTextInputResolve] = useState<TextInputResolveType | null>(null);
@@ -135,6 +138,13 @@ export const GuiStateProvider = ({ children }: Props) => {
             groupId: "file",
             kind: "audioinput",
             label: "file",
+            toJSON: () => {},
+        });
+        audioInputs.push({
+            deviceId: "screen",
+            groupId: "screen",
+            kind: "audioinput",
+            label: "screen",
             toJSON: () => {},
         });
         const audioOutputs = mediaDeviceInfos.filter((x) => {
@@ -261,12 +271,14 @@ export const GuiStateProvider = ({ children }: Props) => {
         audioInputForGUI,
         audioOutputForGUI,
         fileInputEchoback,
+        shareScreenEnabled,
         audioOutputForAnalyzer,
         setInputAudioDeviceInfo,
         setOutputAudioDeviceInfo,
         setAudioInputForGUI,
         setAudioOutputForGUI,
         setFileInputEchoback,
+        setShareScreenEnabled,
         setAudioOutputForAnalyzer,
 
         modelSlotNum,

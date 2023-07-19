@@ -1455,6 +1455,31 @@ audio::-webkit-media-controls-overlay-enclosure{
                         max-width: 70%;
                     }
                 }
+                .config-sub-area-control-field-screen-select {
+                    display: flex;
+                    flex-direction: row-reverse;
+                    gap: 5px;
+                    .config-sub-area-control-field-screen-select-button-active {
+                        font-size: 0.8rem;
+                        border: solid 1px #333;
+                        border-radius: 5px;
+                        background: #ada;
+                        height: 1.2rem;
+                        padding-left: 2px;
+                        padding-right: 2px;
+                        cursor: pointer;
+                    }
+                    .config-sub-area-control-field-screen-select-button {
+                        border: solid 1px #333;
+                        background: #fff;
+                        font-size: 0.8rem;
+                        border-radius: 5px;
+                        height: 1.2rem;
+                        padding-left: 2px;
+                        padding-right: 2px;
+                        cursor: pointer;
+                    }
+                }
                 .config-sub-area-control-field-wav-file {
                     display: flex;
                     flex-direction: row;
