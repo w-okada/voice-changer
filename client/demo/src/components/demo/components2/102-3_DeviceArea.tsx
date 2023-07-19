@@ -3,6 +3,7 @@ import { useAppState } from "../../../001_provider/001_AppStateProvider";
 import { fileSelectorAsDataURL, useIndexedDB } from "@dannadori/voice-changer-client-js";
 import { useGuiState } from "../001_GuiStateProvider";
 import { AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_CONVERTED, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, INDEXEDDB_KEY_AUDIO_OUTPUT } from "../../../const";
+import { isDesktopApp } from "../../../const";
 
 export type DeviceAreaProps = {};
 
@@ -298,24 +299,27 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
 
             // 共有スタート
             try {
-                // displayMediaStream.current = await navigator.mediaDevices.getDisplayMedia({
-                //     video: true,
-                //     audio: true,
-                // });
-                const constraints = {
-                    audio: {
-                        mandatory: {
-                            chromeMediaSource: "desktop",
+                if (isDesktopApp()) {
+                    const constraints = {
+                        audio: {
+                            mandatory: {
+                                chromeMediaSource: "desktop",
+                            },
                         },
-                    },
-                    video: {
-                        mandatory: {
-                            chromeMediaSource: "desktop",
+                        video: {
+                            mandatory: {
+                                chromeMediaSource: "desktop",
+                            },
                         },
-                    },
-                };
-                // @ts-ignore
-                displayMediaStream.current = await navigator.mediaDevices.getUserMedia(constraints);
+                    };
+                    // @ts-ignore
+                    displayMediaStream.current = await navigator.mediaDevices.getUserMedia(constraints);
+                } else {
+                    displayMediaStream.current = await navigator.mediaDevices.getDisplayMedia({
+                        video: true,
+                        audio: true,
+                    });
+                }
             } catch (e) {
                 console.log(e);
                 return;

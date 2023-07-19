@@ -49,12 +49,12 @@
         "ts-loader": "^9.4.4",
         "tsconfig-paths": "^4.2.0",
         "typescript": "^5.1.6",
-        "webpack": "^5.88.1",
+        "webpack": "^5.88.2",
         "webpack-cli": "^5.1.4",
         "webpack-dev-server": "^4.15.1"
     },
     "dependencies": {
-        "@dannadori/voice-changer-client-js": "^1.0.161",
+        "@dannadori/voice-changer-client-js": "^1.0.162",
         "@fortawesome/fontawesome-svg-core": "^6.4.0",
         "@fortawesome/free-brands-svg-icons": "^6.4.0",
         "@fortawesome/free-regular-svg-icons": "^6.4.0",
