@@ -298,14 +298,30 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
 
             // 共有スタート
             try {
-                displayMediaStream.current = await navigator.mediaDevices.getDisplayMedia({
-                    video: true,
-                    audio: true,
-                });
+                // displayMediaStream.current = await navigator.mediaDevices.getDisplayMedia({
+                //     video: true,
+                //     audio: true,
+                // });
+                const constraints = {
+                    audio: {
+                        mandatory: {
+                            chromeMediaSource: "desktop",
+                        },
+                    },
+                    video: {
+                        mandatory: {
+                            chromeMediaSource: "desktop",
+                        },
+                    },
+                };
+                // @ts-ignore
+                displayMediaStream.current = await navigator.mediaDevices.getUserMedia(constraints);
             } catch (e) {
+                console.log(e);
                 return;
             }
             if (!displayMediaStream.current) {
+                console.log("no ms");
                 return;
             }
             if (displayMediaStream.current?.getAudioTracks().length == 0) {
@@ -313,6 +329,8 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                     x.stop();
                 });
                 displayMediaStream.current = null;
+                console.log("no audio track");
+                return;
             }
 
             try {
