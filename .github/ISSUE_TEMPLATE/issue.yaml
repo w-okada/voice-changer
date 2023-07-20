@@ -117,6 +117,6 @@ body:
     id: issue
     attributes:
       label: Situation
-      description: Developers spend a lot of time developing new features and resolving issues. If you really want to get it solved, please provide as much reproducible information and logs as possible.
+      description: Developers spend a lot of time developing new features and resolving issues. If you really want to get it solved, please provide as much reproducible information and logs as possible. Provide logs on the terminal and capture the window.
     validations:
       required: true
