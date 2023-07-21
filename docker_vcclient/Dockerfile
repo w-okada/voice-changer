@@ -9,13 +9,15 @@ RUN apt-get update \
 WORKDIR /
 ADD dummy /
 
-RUN git clone https://github.com/w-okada/voice-changer.git -b v.1.5.3.9a
+RUN git clone https://github.com/w-okada/voice-changer.git -b v.1.5.3.10
 
 
 
 RUN chmod 0777 /voice-changer/server
 WORKDIR /voice-changer/server
-RUN pip install -r requirements.txt
+RUN pip install numpy==1.23.5 \
+        && pip install pyworld==0.3.3 --no-build-isolation \
+        && pip install -r requirements.txt
 
 # RUN git clone https://github.com/isletennos/MMVC_Client.git MMVC_Client_v13
 # RUN cd MMVC_Client_v13 && git checkout 04f3fec4fd82dea6657026ec4e1cd80fb29a415c && cd -
