@@ -13,22 +13,14 @@ from downloader.Downloader import download, download_no_tqdm
 
 
 def downloadInitialSamples(mode: RVCSampleMode, model_dir: str):
-    print("1111111111111")
     sampleJsonUrls, sampleModels = getSampleJsonAndModelIds(mode)
-    print("11111111111112")
     sampleJsons = _downloadSampleJsons(sampleJsonUrls)
-    print("11111111111113")
     if os.path.exists(model_dir):
         print("[Voice Changer] model_dir is already exists. skip download samples.")
         return
-    print("11111111111114")
     samples = _generateSampleList(sampleJsons)
-    print("11111111111115")
     slotIndex = list(range(len(sampleModels)))
-    print("11111111111116")
     _downloadSamples(samples, sampleModels, model_dir, slotIndex)
-    print("11111111111117")
-
     pass
 
 
