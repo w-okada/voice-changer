@@ -4,6 +4,18 @@
 
 ## What's New!
 
+- v.1.5.3.10
+
+  - New Feature
+    - Support Diffusion SVC
+    - System audio capture
+    - Support RMVPE
+  - improvement
+    - directml: set device id
+  - some bugfixes:
+    - noise suppression2
+  - etc.
+
 - v.1.5.3.9a
 
   - some improvements:
