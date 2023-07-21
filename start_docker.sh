@@ -35,6 +35,7 @@ if [ "${USE_GPU}" = "on" ]; then
         --nsf_hifigan pretrain/nsf_hifigan/model \
         --crepe_onnx_full pretrain/crepe_onnx_full.onnx \
         --crepe_onnx_tiny pretrain/crepe_onnx_tiny.onnx \
+        --rmvpe pretrain/rmvpe.pt \
         --model_dir model_dir \
         --samples samples.json
 else
@@ -55,6 +56,7 @@ else
         --nsf_hifigan pretrain/nsf_hifigan/model \
         --crepe_onnx_full pretrain/crepe_onnx_full.onnx \
         --crepe_onnx_tiny pretrain/crepe_onnx_tiny.onnx \
+        --rmvpe pretrain/rmvpe.pt \
         --model_dir model_dir \
         --samples samples.json
 fi
