@@ -36,7 +36,7 @@
         "eslint": "^8.45.0",
         "eslint-config-prettier": "^8.8.0",
         "eslint-plugin-prettier": "^5.0.0",
-        "eslint-plugin-react": "^7.32.2",
+        "eslint-plugin-react": "^7.33.0",
         "eslint-webpack-plugin": "^4.0.1",
         "html-loader": "^4.2.0",
         "html-webpack-plugin": "^5.5.3",
@@ -54,7 +54,7 @@
         "webpack-dev-server": "^4.15.1"
     },
     "dependencies": {
-        "@dannadori/voice-changer-client-js": "^1.0.162",
+        "@dannadori/voice-changer-client-js": "^1.0.163",
         "@fortawesome/fontawesome-svg-core": "^6.4.0",
         "@fortawesome/free-brands-svg-icons": "^6.4.0",
         "@fortawesome/free-regular-svg-icons": "^6.4.0",

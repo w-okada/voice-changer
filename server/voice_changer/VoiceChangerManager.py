@@ -119,7 +119,8 @@ class VoiceChangerManager(ServerDeviceCallbacks):
     def loadModel(self, params: LoadModelParams):
         if params.isSampleMode:
             # サンプルダウンロード
-            downloadSample(self.params.sample_mode, params.sampleId, self.params.model_dir, params.slot, {"useIndex": params.params["rvcIndexDownload"]})
+            print("[Voice Changer] sample download....", params)
+            downloadSample(self.params.sample_mode, params.sampleId, self.params.model_dir, params.slot, params.params)
             self.modelSlotManager.getAllSlotInfo(reload=True)
             info = {"status": "OK"}
             return info

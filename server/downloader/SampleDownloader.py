@@ -5,21 +5,29 @@ from typing import Any, Tuple
 
 from const import RVCSampleMode, getSampleJsonAndModelIds
 from data.ModelSample import ModelSamples, generateModelSample
-from data.ModelSlot import RVCModelSlot
+from data.ModelSlot import DiffusionSVCModelSlot, ModelSlot, RVCModelSlot
+from voice_changer.DiffusionSVC.DiffusionSVCModelSlotGenerator import DiffusionSVCModelSlotGenerator
 from voice_changer.ModelSlotManager import ModelSlotManager
 from voice_changer.RVC.RVCModelSlotGenerator import RVCModelSlotGenerator
 from downloader.Downloader import download, download_no_tqdm
 
 
 def downloadInitialSamples(mode: RVCSampleMode, model_dir: str):
+    print("1111111111111")
     sampleJsonUrls, sampleModels = getSampleJsonAndModelIds(mode)
+    print("11111111111112")
     sampleJsons = _downloadSampleJsons(sampleJsonUrls)
+    print("11111111111113")
     if os.path.exists(model_dir):
         print("[Voice Changer] model_dir is already exists. skip download samples.")
         return
+    print("11111111111114")
     samples = _generateSampleList(sampleJsons)
+    print("11111111111115")
     slotIndex = list(range(len(sampleModels)))
+    print("11111111111116")
     _downloadSamples(samples, sampleModels, model_dir, slotIndex)
+    print("11111111111117")
 
     pass
 
@@ -90,6 +98,7 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
 
         # 検出されたら、、、
         slotDir = os.path.join(model_dir, str(targetSlotIndex))
+        slotInfo: ModelSlot = ModelSlot()
         if sample.voiceChangerType == "RVC":
             slotInfo: RVCModelSlot = RVCModelSlot()
 
@@ -148,6 +157,50 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
             slotInfo.defaultProtect = 0.5
             slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
             modelSlotManager.save_model_slot(targetSlotIndex, slotInfo)
+        elif sample.voiceChangerType == "Diffusion-SVC":
+            slotInfo: DiffusionSVCModelSlot = DiffusionSVCModelSlot()
+
+            os.makedirs(slotDir, exist_ok=True)
+            modelFilePath = os.path.join(
+                slotDir,
+                os.path.basename(sample.modelUrl),
+            )
+            downloadParams.append(
+                {
+                    "url": sample.modelUrl,
+                    "saveTo": modelFilePath,
+                    "position": line_num,
+                }
+            )
+            slotInfo.modelFile = modelFilePath
+            line_num += 1
+
+            if hasattr(sample, "icon") and sample.icon != "":
+                iconPath = os.path.join(
+                    slotDir,
+                    os.path.basename(sample.icon),
+                )
+                downloadParams.append(
+                    {
+                        "url": sample.icon,
+                        "saveTo": iconPath,
+                        "position": line_num,
+                    }
+                )
+                slotInfo.iconFile = iconPath
+                line_num += 1
+
+            slotInfo.sampleId = sample.id
+            slotInfo.credit = sample.credit
+            slotInfo.description = sample.description
+            slotInfo.name = sample.name
+            slotInfo.termsOfUseUrl = sample.termsOfUseUrl
+            slotInfo.defaultTune = 0
+            slotInfo.defaultKstep = 0
+            slotInfo.defaultSpeedup = 0
+            slotInfo.kStepMax = 0
+            slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
+            modelSlotManager.save_model_slot(targetSlotIndex, slotInfo)
         else:
             print(f"[Voice Changer] {sample.voiceChangerType} is not supported.")
 
@@ -170,4 +223,10 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
             else:
                 slotInfo = RVCModelSlotGenerator._setInfoByPytorch(slotInfo)
 
+            modelSlotManager.save_model_slot(targetSlotIndex, slotInfo)
+        elif slotInfo.voiceChangerType == "Diffusion-SVC":
+            if slotInfo.isONNX:
+                pass
+            else:
+                slotInfo = DiffusionSVCModelSlotGenerator._setInfoByPytorch(slotInfo)
             modelSlotManager.save_model_slot(targetSlotIndex, slotInfo)

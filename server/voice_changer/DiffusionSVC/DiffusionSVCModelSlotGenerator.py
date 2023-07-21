@@ -9,6 +9,15 @@ from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.diffusion.unit2me
 from voice_changer.utils.LoadModelParams import LoadModelParams
 from voice_changer.utils.ModelSlotGenerator import ModelSlotGenerator
 
+def get_divisors(n):
+    divisors = []
+    for i in range(1, int(n**0.5)+1):
+        if n % i == 0:
+            divisors.append(i)
+            if i != n // i:
+                divisors.append(n //i)
+    return sorted(divisors)
+
 
 class DiffusionSVCModelSlotGenerator(ModelSlotGenerator):
     @classmethod
@@ -20,7 +29,7 @@ class DiffusionSVCModelSlotGenerator(ModelSlotGenerator):
         slotInfo.defaultTune = 0
         slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
         slotInfo.name = os.path.splitext(os.path.basename(slotInfo.modelFile))[0]
-        slotInfo.iconFile = "/assets/icons/noimage.png"
+        # slotInfo.iconFile = "/assets/icons/noimage.png"
         slotInfo.embChannels = 768
 
         if slotInfo.isONNX:
@@ -35,7 +44,9 @@ class DiffusionSVCModelSlotGenerator(ModelSlotGenerator):
         slot.kStepMax = diff_args.model.k_step_max
         slot.nLayers = diff_args.model.n_layers
         slot.nnLayers = naive_args.model.n_layers
-        diff_args.model.n_spk
+        slot.defaultKstep = slot.kStepMax
+        divs = get_divisors(slot.defaultKstep)
+        slot.defaultSpeedup = divs[-2]
         slot.speakers = {(x+1): f"user{x+1}" for x in range(diff_args.model.n_spk)}
         return slot
 

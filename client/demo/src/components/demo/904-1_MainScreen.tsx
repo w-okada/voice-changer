@@ -223,7 +223,7 @@ export const MainScreen = (props: MainScreenProps) => {
                 iconArea = generateIconArea(index, slotInfo.iconFile, true);
                 nameRow = generateNameRow(index, slotInfo.name, slotInfo.termsOfUseUrl);
                 fileRows.push(generateFileRow("model", slotInfo.modelFile));
-                infoRow = generateInfoRow(`tune:${slotInfo.defaultTune},ks(max):${slotInfo.kStepMax},ks:${slotInfo.defaultKstep}, sp:${slotInfo.defaultSpeedup}, l:${slotInfo.nLayers},${slotInfo.nnLayers},`);
+                infoRow = generateInfoRow(`tune:${slotInfo.defaultTune},mks:${slotInfo.kStepMax},ks:${slotInfo.defaultKstep}, sp:${slotInfo.defaultSpeedup}, l:${slotInfo.nLayers},${slotInfo.nnLayers},`);
             } else {
                 iconArea = generateIconArea(index, "/assets/icons/blank.png", false);
                 nameRow = generateNameRow(index, "", "");

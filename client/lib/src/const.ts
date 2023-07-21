@@ -296,7 +296,7 @@ export type ServerInfo = VoiceChangerServerSetting & {
     modelSlots: ModelSlotUnion[]
     serverAudioInputDevices: ServerAudioDevice[]
     serverAudioOutputDevices: ServerAudioDevice[]
-    sampleModels: RVCSampleModel[]
+    sampleModels: (RVCSampleModel|DiffusionSVCSampleModel)[]
     gpus: {
         id: number,
         name: string,
@@ -306,23 +306,36 @@ export type ServerInfo = VoiceChangerServerSetting & {
 
 }
 
-
-export type RVCSampleModel = {
+export type SampleModel = {
     id: string
-    name: string
-    modelUrl: string
-    indexUrl: string
-    featureUrl: string
-    termsOfUseUrl: string
-    credit: string
-    description: string
+    voiceChangerType: VoiceChangerType
     lang: string
     tag: string[]
+    name: string
+    modelUrl: string
+    termsOfUseUrl: string
     icon: string
-    f0: boolean
+    credit: string
+    description: string
     sampleRate: number
     modelType: string
+    f0: boolean
 }
+
+export type RVCSampleModel =SampleModel & {
+    indexUrl: string
+    featureUrl: string
+}
+
+
+export type DiffusionSVCSampleModel =SampleModel & {
+    numOfDiffLayers: number
+    numOfNativeLayers: number
+    maxKStep: number
+}
+
+
+
 
 export const DefaultServerSetting: ServerInfo = {
     // VC Common 

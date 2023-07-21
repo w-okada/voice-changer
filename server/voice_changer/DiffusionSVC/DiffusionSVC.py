@@ -45,6 +45,7 @@ class DiffusionSVC(VoiceChangerModel):
         self.settings.tran = self.slotInfo.defaultTune
         self.settings.dstId = self.slotInfo.dstId
         self.settings.kStep = self.slotInfo.defaultKstep
+        self.settings.speedUp = self.slotInfo.defaultSpeedup
 
         print("[Voice Changer] [DiffusionSVC] Initializing... done")
 
