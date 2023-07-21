@@ -7,7 +7,7 @@
 - v.1.5.3.10
 
   - New Feature
-    - Support Diffusion SVC
+    - Support Diffusion SVC(only combo model)
     - System audio capture
     - Support RMVPE
   - improvement
