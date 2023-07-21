@@ -8,7 +8,7 @@
 
   - New Feature
     - Support Diffusion SVC(only combo model)
-    - System audio capture
+    - System audio capture(only for win)
     - Support RMVPE
   - improvement
     - directml: set device id
