@@ -28,7 +28,15 @@ If you have the old version, be sure to unzip it into a separate folder.
 
 ### Mac version
 
-After extracting the download file, execute `startHttp.command`. If it shows that the developer cannot be verified, press the control key again and click to execute (or right-click to execute).
+It is launched as follows.
+
+1. Unzip the downloaded file.
+
+1. Next, run MMVCServerSIO by hold down the control key and clicking it (or right-click to run it). If a message appears stating that the developer cannot be verified, run it again by holding down the control key and clicking it (or right-click to run it). The terminal will open and the process will finish within a few seconds.
+
+1. Next, execute the startHTTP.command by holding down the control key and clicking on it (or you can also right-click to run it). If a message appears stating that the developer cannot be verified, repeat the process by holding down the control key and clicking on it (or perform a right-click to run it). A terminal will open, and the launch process will begin.
+
+- In other words, the key is to run both MMVCServerSIO and startHTTP.command. Moreover, you need to run MMVCServerSIO first.
 
 If you have the old version, be sure to unzip it into a separate folder.
 
