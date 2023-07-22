@@ -243,7 +243,7 @@ class Pipeline(object):
             pitchf_buffer = None
 
         del p_len, pitch, pitchf, feats
-        torch.cuda.empty_cache()
+        # torch.cuda.empty_cache()
 
         # inferで出力されるサンプリングレートはモデルのサンプリングレートになる。
         # pipelineに（入力されるときはhubertように16k）
@@ -253,5 +253,11 @@ class Pipeline(object):
             audio1 = audio1[offset:end]
 
         del sid
-        torch.cuda.empty_cache()
+        # torch.cuda.empty_cache()
         return audio1, pitchf_buffer, feats_buffer
+
+    def __del__(self):
+        del self.embedder
+        del self.inferencer
+        del self.pitchExtractor
+        print('Pipeline has been deleted')

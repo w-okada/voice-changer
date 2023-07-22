@@ -211,7 +211,6 @@ class Pipeline(object):
                 pitch_buffer = None
 
             del pitch, pitchf, feats, sid
-            torch.cuda.empty_cache()
             audio1 = self.resamplerOut(audio1.float())
         # print("[Timer::5: ]", t.secs)
         return audio1, pitch_buffer, feats_buffer

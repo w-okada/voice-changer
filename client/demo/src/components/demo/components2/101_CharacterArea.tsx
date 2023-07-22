@@ -249,7 +249,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
                 </div>
             </div>
         );
-    }, [selected, serverSetting.getOnnx, serverSetting.updateModelDefault]);
+    }, [selected, serverSetting.getOnnx, serverSetting.updateModelDefault, guiState.isConverting]);
 
     const characterArea = useMemo(() => {
         return (

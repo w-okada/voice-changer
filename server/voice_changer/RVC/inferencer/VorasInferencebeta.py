@@ -12,7 +12,7 @@ class VoRASInferencer(Inferencer):
         super().setProps(EnumInferenceTypes.pyTorchVoRASbeta, file, False, gpu)
 
         dev = DeviceManager.get_instance().getDevice(gpu)
-        self.isHalf = False # DeviceManager.get_instance().halfPrecisionAvailable(gpu)
+        self.isHalf = False  # DeviceManager.get_instance().halfPrecisionAvailable(gpu)
 
         cpt = torch.load(file, map_location="cpu")
         model = Synthesizer(**cpt["params"])

@@ -138,7 +138,6 @@ class SynthesizerTrnMsNSFsid(nn.Module):
         return o, x_mask, (z, z_p, m_p, logs_p)
 
 
-
 class SynthesizerTrnMsNSFsidNono(nn.Module):
     def __init__(self, spec_channels, segment_size, inter_channels, hidden_channels, filter_channels, n_heads, n_layers, kernel_size, p_dropout, resblock, resblock_kernel_sizes, resblock_dilation_sizes, upsample_rates, upsample_initial_channel, upsample_kernel_sizes, spk_embed_dim, gin_channels, emb_channels, sr=None, **kwargs):
         super().__init__()

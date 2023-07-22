@@ -225,7 +225,15 @@ class RVC(VoiceChangerModel):
             print("[Voice Changer] export2onnx, No pyTorch filepath.")
             return {"status": "ng", "path": ""}
 
+        if self.pipeline is not None:
+            del self.pipeline
+            self.pipeline = None
+
+        torch.cuda.empty_cache()
+        self.initialize()
+        
         output_file_simple = export2onnx(self.settings.gpu, modelSlot)
+        
         return {
             "status": "ok",
             "path": f"/tmp/{output_file_simple}",
