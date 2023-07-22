@@ -883,10 +883,10 @@ body {
                     flex-direction: row;
                     margin: 0.2rem;
                     .file-uploader-file-select-row-label {
-                        width: 5rem;
+                        width: 10rem;
                     }
                     .file-uploader-file-select-row-value {
-                        width: 20rem;
+                        width: 15rem;
                         color: #f00;
                         white-space: nowrap;
                     }

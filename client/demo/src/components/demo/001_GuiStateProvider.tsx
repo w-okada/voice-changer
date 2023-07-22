@@ -144,7 +144,7 @@ export const GuiStateProvider = ({ children }: Props) => {
             deviceId: "screen",
             groupId: "screen",
             kind: "audioinput",
-            label: "screen",
+            label: "system(only win)",
             toJSON: () => {},
         });
         const audioOutputs = mediaDeviceInfos.filter((x) => {
