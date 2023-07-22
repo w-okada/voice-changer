@@ -7,14 +7,14 @@ from Exceptions import WeightDownladException
 
 
 def downloadWeight(voiceChangerParams: VoiceChangerParams):
-    content_vec_500_onnx = voiceChangerParams.content_vec_500_onnx
-    hubert_base = voiceChangerParams.hubert_base
-    hubert_base_jp = voiceChangerParams.hubert_base_jp
-    hubert_soft = voiceChangerParams.hubert_soft
-    nsf_hifigan = voiceChangerParams.nsf_hifigan
-    crepe_onnx_full = voiceChangerParams.crepe_onnx_full
-    crepe_onnx_tiny = voiceChangerParams.crepe_onnx_tiny
-    rmvpe = voiceChangerParams.rmvpe
+    content_vec_500_onnx = str(voiceChangerParams.content_vec_500_onnx)
+    hubert_base = str(voiceChangerParams.hubert_base)
+    hubert_base_jp = str(voiceChangerParams.hubert_base_jp)
+    hubert_soft = str(voiceChangerParams.hubert_soft)
+    nsf_hifigan = str(voiceChangerParams.nsf_hifigan)
+    crepe_onnx_full = str(voiceChangerParams.crepe_onnx_full)
+    crepe_onnx_tiny = str(voiceChangerParams.crepe_onnx_tiny)
+    rmvpe = str(voiceChangerParams.rmvpe)
 
     # file exists check (currently only for rvc)
     downloadParams = []
