@@ -207,18 +207,13 @@ You can switch the noise cancellation feature on and off, however it is only ava
 - Echo: Echo Cancellation Function
 - Sup1, Sup2: This is a noise suppression feature.
 
-#### F0 Det (F0 Extractor)
+#### F0 Det (F0 Estimator)
 
-Choose an algorithm for extracting the pitch. You can choose from the following options. AMD is available for only onnx.
+Choose an algorithm for extracting the pitch. You can choose from the following options.
 
-| F0 Extractor | type  | description                 |
-| ------------ | ----- | --------------------------- |
-| dio          | cpu   | lightweight                 |
-| harvest      | cpu   | High-precision              |
-| crepe        | torch | GPU-enabled、high-precision |
-| crepe full   | onnx  | GPU-enabled、high-precision |
-| crepe tiny   | onnx  | GPU-enabled、lightweight    |
-| rnvpe        | torch | GPU-enabled、high-precision |
+- Lightweight `dio`
+- High-precision `harvest`
+- GPU-enabled `crepe`
 
 #### S. Thresh (Noise Gate)
 
@@ -251,8 +246,6 @@ Choose the type of audio device you want to use. For more information, please re
 #### input
 
 You can select a sound input device such as a microphone input. It's also possible to input from audio files (size limit applies).
-
-For win user, system sound is available as input. Please note if you set the system sound as output, the sound loop occurs.
 
 #### output
 

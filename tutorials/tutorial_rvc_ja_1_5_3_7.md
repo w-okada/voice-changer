@@ -1,4 +1,4 @@
-# Realtime Voice Changer Client for RVC チュートリアル(v.1.5.3.10)
+# Realtime Voice Changer Client for RVC チュートリアル(v.1.5.3.7)
 
 [English](/tutorials/tutorial_rvc_en_latest.md)
 
@@ -212,18 +212,13 @@ PyTorch のモデルを ONNX に変換して出力します。ロードされて
 - Echo: エコーキャンセル機能
 - Sup1, Sup2: ノイズ抑制機能です
 
-#### F0 Det (F0 Extractor)
+#### F0 Det (F0 Estimator)
 
-ピッチを抽出するためのアルゴリズムを選びます。次の中から選べます。AMD の GPU は onnx に対してのみ有効です。
+ピッチを抽出するためのアルゴリズムを選びます。次の中から選べます。
 
-| F0 Extractor | type  | description                |
-| ------------ | ----- | -------------------------- |
-| dio          | cpu   | 軽量                       |
-| harvest      | cpu   | 高精度                     |
-| crepe        | torch | GPU を使用する高速、高精度 |
-| crepe full   | onnx  | GPU を使用する高速、高精度 |
-| crepe tiny   | onnx  | GPU を使用する高速、軽量版 |
-| rnvpe        | torch | GPU を使用する高速、高精度 |
+- 軽量な`dio`
+- 高精度な`harvest`
+- GPU を使用する `crepe`
 
 #### S. Thresh (Noise Gate)
 
@@ -257,8 +252,6 @@ onnxdirectML 版では GPU の ON/OFF を切り替えることができます。
 #### input
 
 マイク入力など音声入力デバイスを選択できます。音声ファイルからのインプットも可能です(サイズ上限あり)。
-
-ウィンドウズ版では、システムサウンドをインプットとして使用することができます。ただし、システムサウンドをアウトプットとして使用すると、音がループするので注意してください。
 
 #### output
 
