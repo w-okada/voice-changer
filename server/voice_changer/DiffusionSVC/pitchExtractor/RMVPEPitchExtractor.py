@@ -5,6 +5,7 @@ from const import PitchExtractorType
 from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractor import PitchExtractor
 from voice_changer.DiffusionSVC.pitchExtractor.rmvpe.rmvpe import RMVPE
 from scipy.ndimage import zoom
+from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 
@@ -18,10 +19,7 @@ class RMVPEPitchExtractor(PitchExtractor):
         self.f0_max = 1100
         self.uv_interp = True
         self.input_sr = -1
-        if torch.cuda.is_available() and gpu >= 0:
-            self.device = torch.device("cuda:" + str(torch.cuda.current_device()))
-        else:
-            self.device = torch.device("cpu")
+        self.device = DeviceManager.get_instance().getDevice(gpu)
 
         self.rmvpe = RMVPE(model_path=file, is_half=False, device=self.device)
 

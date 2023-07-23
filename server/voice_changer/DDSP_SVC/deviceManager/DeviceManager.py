@@ -18,10 +18,11 @@ class DeviceManager(object):
         )
 
     def getDevice(self, id: int):
-        if id < 0 or (self.gpu_num == 0 and self.mps_enabled is False):
-            dev = torch.device("cpu")
-        elif self.mps_enabled:
-            dev = torch.device("mps")
+        if id < 0 or self.gpu_num == 0:
+            if self.mps_enabled is False:
+                dev = torch.device("cpu")
+            else:
+                dev = torch.device("mps")
         else:
             dev = torch.device("cuda", index=id)
         return dev
@@ -51,6 +52,6 @@ class DeviceManager(object):
         try:
             return torch.cuda.get_device_properties(id).total_memory
             # except Exception as e:
-        except:
+        except:  # NOQA
             # print(e)
             return 0

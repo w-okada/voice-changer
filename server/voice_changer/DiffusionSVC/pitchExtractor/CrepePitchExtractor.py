@@ -3,21 +3,19 @@ import torch
 import numpy as np
 from const import PitchExtractorType
 from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractor import PitchExtractor
+from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 
 
 class CrepePitchExtractor(PitchExtractor):
 
-    def __init__(self):
+    def __init__(self, gpu: int):
         super().__init__()
         self.pitchExtractorType: PitchExtractorType = "crepe"
         self.f0_min = 50
         self.f0_max = 1100
         self.uv_interp = True
-        if torch.cuda.is_available():
-            self.device = torch.device("cuda:" + str(torch.cuda.current_device()))
-        else:
-            self.device = torch.device("cpu")
+        self.device = DeviceManager.get_instance().getDevice(gpu)
 
     def extract(self, audio: AudioInOut, sr: int, block_size: int, model_sr: int, pitch, f0_up_key, silence_front=0):
         hop_size = block_size * sr / model_sr

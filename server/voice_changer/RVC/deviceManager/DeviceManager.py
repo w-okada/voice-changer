@@ -20,10 +20,11 @@ class DeviceManager(object):
         )
 
     def getDevice(self, id: int):
-        if id < 0 or (self.gpu_num == 0 and self.mps_enabled is False):
-            dev = torch.device("cpu")
-        elif self.mps_enabled:
-            dev = torch.device("mps")
+        if id < 0 or self.gpu_num == 0:
+            if self.mps_enabled is False:
+                dev = torch.device("cpu")
+            else:
+                dev = torch.device("mps")
         else:
             if id < self.gpu_num:
                 dev = torch.device("cuda", index=id)
@@ -46,7 +47,7 @@ class DeviceManager(object):
                         "execution_mode": onnxruntime.ExecutionMode.ORT_PARALLEL,
                         "inter_op_num_threads": 8,
                     }
-                ]                
+                ]
         elif gpu >= 0 and "DmlExecutionProvider" in availableProviders:
             return ["DmlExecutionProvider"], [{"device_id": gpu}]
         else:
