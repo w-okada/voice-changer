@@ -1,17 +1,17 @@
-import React, { ErrorInfo } from 'react';
+import React, { ErrorInfo } from "react";
 
 type ErrorBoundaryProps = {
     children: React.ReactNode;
     fallback: React.ReactNode;
-    onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
-}
+    onError: (error: Error, errorInfo: React.ErrorInfo | null, reason: any) => void;
+};
 
 type ErrorBoundaryState = {
     hasError: boolean;
-}
+};
 
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-    private eventHandler: () => void
+    private eventHandler: () => void;
     constructor(props: ErrorBoundaryProps) {
         super(props);
         this.state = { hasError: false };
@@ -24,24 +24,31 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
     }
     componentDidCatch(error: Error, errorInfo: ErrorInfo) {
         // For logging
-        console.warn("React Error Boundary Catch", error, errorInfo)
+        console.warn("React Error Boundary Catch", error, errorInfo);
         const { onError } = this.props;
         if (onError) {
-            onError(error, errorInfo);
+            onError(error, errorInfo, null);
         }
     }
-
 
     // 非同期例外対応
     updateError() {
         this.setState({ hasError: true });
     }
+    handledRejection = (event: PromiseRejectionEvent) => {
+        const { onError } = this.props;
+        const error = new Error(event.type);
+        onError(error, null, event.reason);
+        this.setState({ hasError: true });
+    };
     componentDidMount() {
-        window.addEventListener('unhandledrejection', this.eventHandler)
+        // window.addEventListener('unhandledrejection', this.eventHandler)
+        window.addEventListener("unhandledrejection", this.handledRejection);
     }
 
     componentWillUnmount() {
-        window.removeEventListener('unhandledrejection', this.eventHandler)
+        // window.removeEventListener('unhandledrejection', this.eventHandler)
+        window.removeEventListener("unhandledrejection", this.handledRejection);
     }
 
     render() {
@@ -51,6 +58,5 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
         return this.props.children;
     }
 }
-
 
 export default ErrorBoundary;
