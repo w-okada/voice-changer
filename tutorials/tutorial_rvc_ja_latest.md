@@ -105,6 +105,10 @@ Q6. (AMD ユーザ) GPU が使用されていないような気がする。
 
 A6. DirectML 版を使用してください。また、AMD の GPU は ONNX モデルでのみ有効になります。パフォーマンスモニターで GPU の使用率が上がっていることで判断できます。([see here](https://github.com/w-okada/voice-changer/issues/383))
 
+Q7. onxxruntime がエラーを出力して起動しない。
+
+A7. フォルダのパスに unicode が含まれるとエラーが出るようです。unicode を使わないパス(英数字のみ)に解凍してください。（参考：https://github.com/w-okada/voice-changer/issues/528）
+
 # GUI の詳細
 
 ## タイトルエリア

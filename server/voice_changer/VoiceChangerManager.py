@@ -79,8 +79,10 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         self.stored_setting: dict[str, str | int | float] = {}
         if os.path.exists(STORED_SETTING_FILE):
             self.stored_setting = json.load(open(STORED_SETTING_FILE, "r", encoding="utf-8"))
-        for key, val in self.stored_setting.items():
-            self.update_settings(key, val)
+        if "modelSlotIndex" in self.stored_setting:
+            self.update_settings("modelSlotIndex", self.stored_setting["modelSlotIndex"])
+        # for key, val in self.stored_setting.items():
+        #     self.update_settings(key, val)
 
     def store_setting(self, key: str, val: str | int | float):
         saveItemForServerDevice = ["enableServerAudio", "serverAudioSampleRate", "serverInputDeviceId", "serverOutputDeviceId", "serverMonitorDeviceId", "serverReadChunkSize", "serverInputAudioGain", "serverOutputAudioGain"]

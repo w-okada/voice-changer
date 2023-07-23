@@ -40,7 +40,7 @@ providers = [
 
 @dataclass
 class MMVCv15Settings:
-    gpu: int = 0
+    gpu: int = -9999
     srcId: int = 0
     dstId: int = 101
 

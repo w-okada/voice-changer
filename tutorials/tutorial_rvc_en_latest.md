@@ -104,6 +104,10 @@ Q6. My AMD GPU isn't being used.
 
 A6. Please use the DirectML version. Additionally, AMD GPUs are only enabled for ONNX models. You can judge this by the GPU utilization rate going up in the Performance Monitor.([see here](https://github.com/w-okada/voice-changer/issues/383))
 
+Q7. onxxruntime is not launching and it's producing an error.
+
+A7. It appears that an error occurs if the folder path contains unicode. Please extract to a path that does not use unicode (just alphanumeric characters). (Reference: https://github.com/w-okada/voice-changer/issues/528)
+
 ## Configurable items
 
 ## Title

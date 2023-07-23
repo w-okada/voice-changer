@@ -51,7 +51,7 @@ class RVC(VoiceChangerModel):
         self.feature_buffer: FeatureInOut | None = None
         self.prevVol = 0.0
         self.slotInfo = slotInfo
-        self.initialize()
+        # self.initialize()
 
     def initialize(self):
         print("[Voice Changer] [RVC] Initializing... ")
@@ -231,7 +231,7 @@ class RVC(VoiceChangerModel):
 
         torch.cuda.empty_cache()
         self.initialize()
-        
+
         output_file_simple = export2onnx(self.settings.gpu, modelSlot)
         
         return {
