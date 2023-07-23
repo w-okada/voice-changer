@@ -81,6 +81,8 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             self.stored_setting = json.load(open(STORED_SETTING_FILE, "r", encoding="utf-8"))
         if "modelSlotIndex" in self.stored_setting:
             self.update_settings("modelSlotIndex", self.stored_setting["modelSlotIndex"])
+        if "gpu" not in self.stored_setting:
+            self.update_settings("gpu", 0)
         # for key, val in self.stored_setting.items():
         #     self.update_settings(key, val)
 

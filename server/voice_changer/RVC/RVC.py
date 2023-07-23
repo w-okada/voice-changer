@@ -233,7 +233,7 @@ class RVC(VoiceChangerModel):
         self.initialize()
 
         output_file_simple = export2onnx(self.settings.gpu, modelSlot)
-        
+
         return {
             "status": "ok",
             "path": f"/tmp/{output_file_simple}",
