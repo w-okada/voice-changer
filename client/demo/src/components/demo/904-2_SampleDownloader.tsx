@@ -115,7 +115,7 @@ export const SampleDownloaderScreen = (props: SampleDownloaderScreenProps) => {
                                 onClick={() => {
                                     if (x.voiceChangerType == "RVC") {
                                         onDownloadSampleClicked(x.id, x.voiceChangerType, {
-                                            rvcIndexDownload: true,
+                                            useIndex: true,
                                         });
                                     } else if (x.voiceChangerType == "Diffusion-SVC") {
                                         onDownloadSampleClicked(x.id, x.voiceChangerType, {});
