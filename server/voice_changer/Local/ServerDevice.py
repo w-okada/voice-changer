@@ -90,6 +90,7 @@ class ServerDevice:
         self.serverAudioOutputDevices = None
         self.outQueue = Queue()
         self.monQueue = Queue()
+        self.performance = []
 
     def getServerInputAudioDevice(self, index: int):
         audioinput, _audiooutput = list_audio_device()
