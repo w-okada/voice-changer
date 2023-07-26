@@ -4,6 +4,10 @@ import torch
 import numpy as np
 from librosa.filters import mel
 
+from mods.log_control import VoiceChangaerLogger
+
+logger = VoiceChangaerLogger.get_instance().getLogger()
+
 
 class BiGRU(nn.Module):
     def __init__(self, input_features, hidden_features, num_layers):
@@ -318,6 +322,9 @@ class MelSpectrogram(torch.nn.Module):
             if resize < size:
                 magnitude = F.pad(magnitude, (0, 0, 0, size - resize))
             magnitude = magnitude[:, :size, :] * self.win_length / win_length_new
+        if self.mel_basis.device != magnitude.device:
+            logger.warn(f"[RMVPE] Device is not same. mel_basis:{self.mel_basis.device}, magnitude:{magnitude.device}")
+            self.mel_basis.to(magnitude.device)
         mel_output = torch.matmul(self.mel_basis, magnitude)
         if self.is_half is True:
             mel_output = mel_output.half()
