@@ -1,6 +1,7 @@
 import os
 import traceback
 import faiss
+from Exceptions import PipelineCreateException
 from data.ModelSlot import RVCModelSlot
 
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
@@ -20,6 +21,7 @@ def createPipeline(modelSlot: RVCModelSlot, gpu: int, f0Detector: str):
     except Exception as e:
         print("[Voice Changer] exception! loading inferencer", e)
         traceback.print_exc()
+        raise PipelineCreateException("[Voice Changer] exception! loading inferencer")
 
     # Embedder 生成
     try:
@@ -30,8 +32,9 @@ def createPipeline(modelSlot: RVCModelSlot, gpu: int, f0Detector: str):
             dev,
         )
     except Exception as e:
-        print("[Voice Changer]  exception! loading embedder", e, dev)
+        print("[Voice Changer] exception! loading embedder", e, dev)
         traceback.print_exc()
+        raise PipelineCreateException("[Voice Changer] exception! loading embedder")
 
     # pitchExtractor
     pitchExtractor = PitchExtractorManager.getPitchExtractor(f0Detector, gpu)

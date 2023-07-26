@@ -10,6 +10,7 @@ from Exceptions import (
     HalfPrecisionChangingException,
     NotEnoughDataExtimateF0,
 )
+from mods.log_control import VoiceChangaerLogger
 
 from voice_changer.RVC.embedder.Embedder import Embedder
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
@@ -17,9 +18,8 @@ from voice_changer.RVC.inferencer.OnnxRVCInferencer import OnnxRVCInferencer
 from voice_changer.RVC.inferencer.OnnxRVCInferencerNono import OnnxRVCInferencerNono
 
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
-import logging
 
-logger = logging.getLogger("vcclient")
+logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
 class Pipeline(object):
@@ -49,9 +49,6 @@ class Pipeline(object):
         self.embedder = embedder
         self.inferencer = inferencer
         self.pitchExtractor = pitchExtractor
-        print("GENERATE INFERENCER", self.inferencer)
-        print("GENERATE EMBEDDER", self.embedder)
-        print("GENERATE PITCH EXTRACTOR", self.pitchExtractor)
         logger.info("GENERATE INFERENCER" + str(self.inferencer))
         logger.info("GENERATE EMBEDDER" + str(self.embedder))
         logger.info("GENERATE PITCH EXTRACTOR" + str(self.pitchExtractor))

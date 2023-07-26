@@ -9,16 +9,15 @@
 
 '''
 
-import logging
 from typing import Any, Union
 
 from const import TMP_DIR
 import torch
 import os
-import traceback
 import numpy as np
 from dataclasses import dataclass, asdict, field
 import onnxruntime
+from mods.log_control import VoiceChangaerLogger
 
 from voice_changer.IORecorder import IORecorder
 
@@ -38,7 +37,7 @@ from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 
 STREAM_INPUT_FILE = os.path.join(TMP_DIR, "in.wav")
 STREAM_OUTPUT_FILE = os.path.join(TMP_DIR, "out.wav")
-logger = logging.getLogger("vcclient")
+logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
 @dataclass
@@ -91,7 +90,6 @@ class VoiceChangerV2(VoiceChangerIF):
         self.mps_enabled: bool = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
         self.onnx_device = onnxruntime.get_device()
 
-        print(f"VoiceChangerV2 Initialized (GPU_NUM(cuda):{self.gpu_num}, mps_enabled:{self.mps_enabled}, onnx_device:{self.onnx_device})")
         logger.info(f"VoiceChangerV2 Initialized (GPU_NUM(cuda):{self.gpu_num}, mps_enabled:{self.mps_enabled}, onnx_device:{self.onnx_device})")
 
     def setModel(self, model: VoiceChangerModel):
@@ -117,7 +115,7 @@ class VoiceChangerV2(VoiceChangerIF):
 
     def update_settings(self, key: str, val: Any):
         if self.voiceChanger is None:
-            print("[Voice Changer] Voice Changer is not selected.")
+            logger.warn("[Voice Changer] Voice Changer is not selected.")
             return self.get_info()
 
         if key == "serverAudioStated" and val == 0:
@@ -183,7 +181,7 @@ class VoiceChangerV2(VoiceChangerIF):
                 ]
             )
 
-            print(f"Generated Strengths: for prev:{self.np_prev_strength.shape}, for cur:{self.np_cur_strength.shape}")
+            logger.info(f"Generated Strengths: for prev:{self.np_prev_strength.shape}, for cur:{self.np_cur_strength.shape}")
 
             # ひとつ前の結果とサイズが変わるため、記録は消去する。
             if hasattr(self, "np_prev_audio1") is True:
@@ -243,7 +241,7 @@ class VoiceChangerV2(VoiceChangerIF):
 
                     result = output_wav
                 else:
-                    print("[Voice Changer] warming up... generating sola buffer.")
+                    logger.info("[Voice Changer] warming up... generating sola buffer.")
                     result = np.zeros(4096).astype(np.int16)
 
                 if hasattr(self, "sola_buffer") is True and sola_offset < sola_search_frame:
@@ -281,29 +279,29 @@ class VoiceChangerV2(VoiceChangerIF):
             return outputData, perf
 
         except NoModeLoadedException as e:
-            print("[Voice Changer] [Exception]", e)
+            logger.warn(f"[Voice Changer] [Exception], {e}")
             return np.zeros(1).astype(np.int16), [0, 0, 0]
         except ONNXInputArgumentException as e:
-            print("[Voice Changer] [Exception] onnx are waiting valid input.", e)
+            logger.warn(f"[Voice Changer] [Exception] onnx are waiting valid input., {e}")
             return np.zeros(1).astype(np.int16), [0, 0, 0]
         except HalfPrecisionChangingException:
-            print("[Voice Changer] Switching model configuration....")
+            logger.warn("[Voice Changer] Switching model configuration....")
             return np.zeros(1).astype(np.int16), [0, 0, 0]
         except NotEnoughDataExtimateF0:
-            print("[Voice Changer] warming up... waiting more data.")
+            logger.warn("[Voice Changer] warming up... waiting more data.")
             return np.zeros(1).astype(np.int16), [0, 0, 0]
         except DeviceChangingException as e:
-            print("[Voice Changer] embedder:", e)
+            logger.warn(f"[Voice Changer] embedder: {e}")
             return np.zeros(1).astype(np.int16), [0, 0, 0]
         except VoiceChangerIsNotSelectedException:
-            print("[Voice Changer] Voice Changer is not selected. Wait a bit and if there is no improvement, please re-select vc.")
+            logger.warn("[Voice Changer] Voice Changer is not selected. Wait a bit and if there is no improvement, please re-select vc.")
             return np.zeros(1).astype(np.int16), [0, 0, 0]
         except DeviceCannotSupportHalfPrecisionException:
             # RVC.pyでfallback処理をするので、ここはダミーデータ返すだけ。
             return np.zeros(1).astype(np.int16), [0, 0, 0]
         except Exception as e:
-            print("[Voice Changer] VC PROCESSING EXCEPTION!!!", e)
-            print(traceback.format_exc())
+            logger.warn(f"[Voice Changer] VC PROCESSING EXCEPTION!!! {e}")
+            logger.exception(e)
             return np.zeros(1).astype(np.int16), [0, 0, 0]
 
     def export2onnx(self):
@@ -313,7 +311,7 @@ class VoiceChangerV2(VoiceChangerIF):
 
     def merge_models(self, request: str):
         if self.voiceChanger is None:
-            print("[Voice Changer] Voice Changer is not selected.")
+            logger.info("[Voice Changer] Voice Changer is not selected.")
             return
         self.voiceChanger.merge_models(request)
         return self.get_info()
@@ -325,7 +323,7 @@ PRINT_CONVERT_PROCESSING: bool = False
 
 def print_convert_processing(mess: str):
     if PRINT_CONVERT_PROCESSING is True:
-        print(mess)
+        logger.info(mess)
 
 
 def pad_array(arr: AudioInOut, target_length: int):

@@ -1,11 +1,12 @@
-import logging
 from const import UPLOAD_DIR
 from data.ModelSlot import ModelSlots, loadAllSlotInfo, saveSlotInfo
 import json
 import os
 import shutil
 
-logger = logging.getLogger("vcclient")
+from mods.log_control import VoiceChangaerLogger
+
+logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
 class ModelSlotManager:
@@ -14,7 +15,7 @@ class ModelSlotManager:
     def __init__(self, model_dir: str):
         self.model_dir = model_dir
         self.modelSlots = loadAllSlotInfo(self.model_dir)
-        logger.info(f"[MODEL SLOT INFO] {self.modelSlots}")
+        logger.debug(f"[MODEL SLOT INFO] {self.modelSlots}")
 
     @classmethod
     def get_instance(cls, model_dir: str):
@@ -41,7 +42,7 @@ class ModelSlotManager:
         self._save_model_slot(slotIndex, slotInfo)
 
     def update_model_info(self, newData: str):
-        print("[Voice Changer] UPDATE MODEL INFO", newData)
+        logger.info(f"[Voice Changer] UPDATE MODEL INFO, {newData}")
         newDataDict = json.loads(newData)
         slotInfo = self._load_model_slot(newDataDict["slot"])
         if newDataDict["key"] == "speakers":
@@ -64,4 +65,5 @@ class ModelSlotManager:
             setattr(slotInfo, paramsDict["name"], storePath)
             self._save_model_slot(paramsDict["slot"], slotInfo)
         except Exception as e:
-            print("Exception::::", e)
+            logger.info(f"[Voice Changer] Exception: {e}")
+            logger.error(e)

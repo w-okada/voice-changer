@@ -1,25 +1,9 @@
-# import sys
-# import os
 from dataclasses import asdict
 import numpy as np
 import torch
 import torchaudio
 from data.ModelSlot import RVCModelSlot
-
-
-# # avoiding parse arg error in RVC
-# sys.argv = ["MMVCServerSIO.py"]
-
-# if sys.platform.startswith("darwin"):
-#     baseDir = [x for x in sys.path if x.endswith("Contents/MacOS")]
-#     if len(baseDir) != 1:
-#         print("baseDir should be only one ", baseDir)
-#         sys.exit()
-#     modulePath = os.path.join(baseDir[0], "RVC")
-#     sys.path.append(modulePath)
-# else:
-#     sys.path.append("RVC")
-
+from mods.log_control import VoiceChangaerLogger
 
 from voice_changer.RVC.RVCSettings import RVCSettings
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
@@ -31,18 +15,20 @@ from voice_changer.RVC.pipeline.PipelineGenerator import createPipeline
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.pipeline.Pipeline import Pipeline
 
-from Exceptions import DeviceCannotSupportHalfPrecisionException
+from Exceptions import DeviceCannotSupportHalfPrecisionException, PipelineCreateException, PipelineNotInitializedException
+
+logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
 class RVC(VoiceChangerModel):
     def __init__(self, params: VoiceChangerParams, slotInfo: RVCModelSlot):
-        print("[Voice Changer] [RVC] Creating instance ")
+        logger.info("[Voice Changer] [RVC] Creating instance ")
         self.deviceManager = DeviceManager.get_instance()
         EmbedderManager.initialize(params)
         PitchExtractorManager.initialize(params)
         self.settings = RVCSettings()
         self.params = params
-        self.pitchExtractor = PitchExtractorManager.getPitchExtractor(self.settings.f0Detector, self.settings.gpu)
+        # self.pitchExtractor = PitchExtractorManager.getPitchExtractor(self.settings.f0Detector, self.settings.gpu)
 
         self.pipeline: Pipeline | None = None
 
@@ -54,19 +40,23 @@ class RVC(VoiceChangerModel):
         # self.initialize()
 
     def initialize(self):
-        print("[Voice Changer] [RVC] Initializing... ")
+        logger.info("[Voice Changer][RVC] Initializing... ")
 
         # pipelineの生成
-        self.pipeline = createPipeline(self.slotInfo, self.settings.gpu, self.settings.f0Detector)
+        try:
+            self.pipeline = createPipeline(self.slotInfo, self.settings.gpu, self.settings.f0Detector)
+        except PipelineCreateException as e:  # NOQA
+            logger.error("[Voice Changer] pipeline create failed. check your model is valid.")
+            return
 
         # その他の設定
         self.settings.tran = self.slotInfo.defaultTune
         self.settings.indexRatio = self.slotInfo.defaultIndexRatio
         self.settings.protect = self.slotInfo.defaultProtect
-        print("[Voice Changer] [RVC] Initializing... done")
+        logger.info("[Voice Changer] [RVC] Initializing... done")
 
     def update_settings(self, key: str, val: int | float | str):
-        print("[Voice Changer][RVC]: update_settings", key, val)
+        logger.info(f"[Voice Changer][RVC]: update_settings {key}:{val}")
         if key in self.settings.intData:
             setattr(self.settings, key, int(val))
             if key == "gpu":
@@ -88,6 +78,8 @@ class RVC(VoiceChangerModel):
         if self.pipeline is not None:
             pipelineInfo = self.pipeline.getPipelineInfo()
             data["pipelineInfo"] = pipelineInfo
+        else:
+            data["pipelineInfo"] = "None"
         return data
 
     def get_processing_sampling_rate(self):
@@ -146,6 +138,9 @@ class RVC(VoiceChangerModel):
         return (self.audio_buffer, self.pitchf_buffer, self.feature_buffer, convertSize, vol, outSize)
 
     def inference(self, data):
+        if self.pipeline is None:
+            logger.info("[Voice Changer] Pipeline is not initialized.111")
+            raise PipelineNotInitializedException()
         audio = data[0]
         pitchf = data[1]
         feature = data[2]
@@ -192,7 +187,7 @@ class RVC(VoiceChangerModel):
 
             return result
         except DeviceCannotSupportHalfPrecisionException as e:  # NOQA
-            print("[Device Manager] Device cannot support half precision. Fallback to float....")
+            logger.warn("[Device Manager] Device cannot support half precision. Fallback to float....")
             self.deviceManager.setForceTensor(True)
             self.initialize()
             # raise e
@@ -222,7 +217,7 @@ class RVC(VoiceChangerModel):
         modelSlot = self.slotInfo
 
         if modelSlot.isONNX:
-            print("[Voice Changer] export2onnx, No pyTorch filepath.")
+            logger.warn("[Voice Changer] export2onnx, No pyTorch filepath.")
             return {"status": "ng", "path": ""}
 
         if self.pipeline is not None:

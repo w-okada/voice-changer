@@ -1,5 +1,8 @@
 import wave
 import os
+from mods.log_control import VoiceChangaerLogger
+
+logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
 class IORecorder:
@@ -19,10 +22,10 @@ class IORecorder:
 
     def _clearFile(self, filename: str):
         if os.path.exists(filename):
-            print("[IORecorder] delete old analyze file.", filename)
+            logger.info(f"[IORecorder] delete old analyze file. {filename}")
             os.remove(filename)
         else:
-            print("[IORecorder] old analyze file not exist.", filename)
+            logger.info(f"[IORecorder] old analyze file not exist. {filename}")
 
     def writeInput(self, wav):
         self.fi.writeframes(wav)

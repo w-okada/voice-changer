@@ -1,6 +1,7 @@
 from dataclasses import asdict
 import numpy as np
 from data.ModelSlot import DiffusionSVCModelSlot
+from mods.log_control import VoiceChangaerLogger
 from voice_changer.DiffusionSVC.DiffusionSVCSettings import DiffusionSVCSettings
 from voice_changer.DiffusionSVC.inferencer.InferencerManager import InferencerManager
 from voice_changer.DiffusionSVC.pipeline.Pipeline import Pipeline
@@ -13,12 +14,14 @@ from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 # from voice_changer.RVC.onnxExporter.export2onnx import export2onnx
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 
-from Exceptions import DeviceCannotSupportHalfPrecisionException
+from Exceptions import DeviceCannotSupportHalfPrecisionException, PipelineCreateException
+
+logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
 class DiffusionSVC(VoiceChangerModel):
     def __init__(self, params: VoiceChangerParams, slotInfo: DiffusionSVCModelSlot):
-        print("[Voice Changer] [DiffusionSVC] Creating instance ")
+        logger.info("[Voice Changer] [DiffusionSVC] Creating instance ")
         self.deviceManager = DeviceManager.get_instance()
         EmbedderManager.initialize(params)
         PitchExtractorManager.initialize(params)
@@ -36,10 +39,14 @@ class DiffusionSVC(VoiceChangerModel):
         self.slotInfo = slotInfo
 
     def initialize(self):
-        print("[Voice Changer] [DiffusionSVC] Initializing... ")
+        logger.info("[Voice Changer] [DiffusionSVC] Initializing... ")
 
         # pipelineの生成
-        self.pipeline = createPipeline(self.slotInfo, self.settings.gpu, self.settings.f0Detector, self.inputSampleRate, self.outputSampleRate)
+        try:
+            self.pipeline = createPipeline(self.slotInfo, self.settings.gpu, self.settings.f0Detector, self.inputSampleRate, self.outputSampleRate)
+        except PipelineCreateException as e:  # NOQA
+            logger.error("[Voice Changer] pipeline create failed. check your model is valid.")
+            return
 
         # その他の設定
         self.settings.tran = self.slotInfo.defaultTune
@@ -47,7 +54,7 @@ class DiffusionSVC(VoiceChangerModel):
         self.settings.kStep = self.slotInfo.defaultKstep
         self.settings.speedUp = self.slotInfo.defaultSpeedup
 
-        print("[Voice Changer] [DiffusionSVC] Initializing... done")
+        logger.info("[Voice Changer] [DiffusionSVC] Initializing... done")
 
     def setSamplingRate(self, inputSampleRate, outputSampleRate):
         self.inputSampleRate = inputSampleRate
@@ -55,7 +62,7 @@ class DiffusionSVC(VoiceChangerModel):
         self.initialize()
 
     def update_settings(self, key: str, val: int | float | str):
-        print("[Voice Changer][DiffusionSVC]: update_settings", key, val)
+        logger.info(f"[Voice Changer][DiffusionSVC]: update_settings {key}:{val}")
         if key in self.settings.intData:
             setattr(self.settings, key, int(val))
             if key == "gpu":
@@ -174,7 +181,7 @@ class DiffusionSVC(VoiceChangerModel):
             result = audio_out.detach().cpu().numpy()
             return result
         except DeviceCannotSupportHalfPrecisionException as e:  # NOQA
-            print("[Device Manager] Device cannot support half precision. Fallback to float....")
+            logger.warn("[Device Manager] Device cannot support half precision. Fallback to float....")
             self.deviceManager.setForceTensor(True)
             self.initialize()
             # raise e

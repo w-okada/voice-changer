@@ -4,7 +4,7 @@ import sys
 import json
 import logging
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+# logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logger = logging
 
 hann_window = {}

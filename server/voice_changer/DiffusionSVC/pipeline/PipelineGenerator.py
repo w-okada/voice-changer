@@ -1,4 +1,5 @@
 import traceback
+from Exceptions import PipelineCreateException
 from data.ModelSlot import DiffusionSVCModelSlot
 from voice_changer.DiffusionSVC.inferencer.InferencerManager import InferencerManager
 from voice_changer.DiffusionSVC.pipeline.Pipeline import Pipeline
@@ -22,6 +23,7 @@ def createPipeline(modelSlot: DiffusionSVCModelSlot, gpu: int, f0Detector: str, 
     except Exception as e:
         print("[Voice Changer] exception! loading inferencer", e)
         traceback.print_exc()
+        raise PipelineCreateException("[Voice Changer] exception! loading inferencer")
 
     # Embedder 生成
     try:
@@ -34,6 +36,7 @@ def createPipeline(modelSlot: DiffusionSVCModelSlot, gpu: int, f0Detector: str, 
     except Exception as e:
         print("[Voice Changer]  exception! loading embedder", e)
         traceback.print_exc()
+        raise PipelineCreateException("[Voice Changer] exception! loading embedder")
 
     # pitchExtractor
     pitchExtractor = PitchExtractorManager.getPitchExtractor(f0Detector, gpu)

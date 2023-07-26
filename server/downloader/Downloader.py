@@ -2,6 +2,10 @@ import requests  # type: ignore
 import os
 from tqdm import tqdm
 
+from mods.log_control import VoiceChangaerLogger
+
+logger = VoiceChangaerLogger.get_instance().getLogger()
+
 
 def download(params):
     url = params["url"]
@@ -31,7 +35,7 @@ def download(params):
                     f.write(chunk)
 
     except Exception as e:
-        print(e)
+        logger.warning(e)
 
 
 def download_no_tqdm(params):
@@ -51,6 +55,6 @@ def download_no_tqdm(params):
                     if countToDot % 1024 == 0:
                         print(".", end="", flush=True)
 
-        print("+", end="", flush=True)
+        logger.info(f"[Voice Changer] download sample catalog. {saveTo}")
     except Exception as e:
-        print(e)
+        logger.warning(e)

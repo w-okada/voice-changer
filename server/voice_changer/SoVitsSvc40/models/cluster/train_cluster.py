@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.cluster import KMeans, MiniBatchKMeans
 import tqdm
 
-logging.basicConfig(level=logging.INFO)
+#logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 import time
 

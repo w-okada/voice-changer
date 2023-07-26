@@ -39,3 +39,13 @@ class VoiceChangerIsNotSelectedException(Exception):
 class WeightDownladException(Exception):
     def __str__(self):
         return repr("Failed to download weight.")
+
+
+class PipelineCreateException(Exception):
+    def __str__(self):
+        return repr("Failed to create Pipeline.")
+
+
+class PipelineNotInitializedException(Exception):
+    def __str__(self):
+        return repr("Pipeline is not initialized.")

@@ -6,17 +6,20 @@ from typing import Any, Tuple
 from const import RVCSampleMode, getSampleJsonAndModelIds
 from data.ModelSample import ModelSamples, generateModelSample
 from data.ModelSlot import DiffusionSVCModelSlot, ModelSlot, RVCModelSlot
+from mods.log_control import VoiceChangaerLogger
 from voice_changer.DiffusionSVC.DiffusionSVCModelSlotGenerator import DiffusionSVCModelSlotGenerator
 from voice_changer.ModelSlotManager import ModelSlotManager
 from voice_changer.RVC.RVCModelSlotGenerator import RVCModelSlotGenerator
 from downloader.Downloader import download, download_no_tqdm
+
+logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
 def downloadInitialSamples(mode: RVCSampleMode, model_dir: str):
     sampleJsonUrls, sampleModels = getSampleJsonAndModelIds(mode)
     sampleJsons = _downloadSampleJsons(sampleJsonUrls)
     if os.path.exists(model_dir):
-        print("[Voice Changer] model_dir is already exists. skip download samples.")
+        logger.info("[Voice Changer] model_dir is already exists. skip download samples.")
         return
     samples = _generateSampleList(sampleJsons)
     slotIndex = list(range(len(sampleModels)))
@@ -85,7 +88,7 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
                 match = True
                 break
         if match is False:
-            print(f"[Voice Changer] initiail sample not found. {targetSampleId}")
+            logger.warn(f"[Voice Changer] initiail sample not found. {targetSampleId}")
             continue
 
         # 検出されたら、、、
@@ -194,10 +197,10 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
             slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
             modelSlotManager.save_model_slot(targetSlotIndex, slotInfo)
         else:
-            print(f"[Voice Changer] {sample.voiceChangerType} is not supported.")
+            logger.warn(f"[Voice Changer] {sample.voiceChangerType} is not supported.")
 
     # ダウンロード
-    print("[Voice Changer] Downloading model files...")
+    logger.info("[Voice Changer] Downloading model files...")
     if withoutTqdm:
         with ThreadPoolExecutor() as pool:
             pool.map(download_no_tqdm, downloadParams)
@@ -206,7 +209,7 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
             pool.map(download, downloadParams)
 
     # メタデータ作成
-    print("[Voice Changer] Generating metadata...")
+    logger.info("[Voice Changer] Generating metadata...")
     for targetSlotIndex in slotIndex:
         slotInfo = modelSlotManager.get_slot_info(targetSlotIndex)
         if slotInfo.voiceChangerType == "RVC":

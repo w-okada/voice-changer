@@ -8,6 +8,7 @@ from Exceptions import (
     HalfPrecisionChangingException,
     NotEnoughDataExtimateF0,
 )
+from mods.log_control import VoiceChangaerLogger
 from voice_changer.DiffusionSVC.inferencer.Inferencer import Inferencer
 from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractor import PitchExtractor
 
@@ -17,9 +18,8 @@ from voice_changer.common.VolumeExtractor import VolumeExtractor
 from torchaudio.transforms import Resample
 
 from voice_changer.utils.Timer import Timer
-import logging
 
-logger = logging.getLogger("vcclient")
+logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
 class Pipeline(object):
@@ -60,17 +60,11 @@ class Pipeline(object):
         self.resamplerIn = resamplerIn
         self.resamplerOut = resamplerOut
 
-        print("VOLUME EXTRACTOR", self.volumeExtractor)
-        print("GENERATE INFERENCER", self.inferencer)
-        print("GENERATE EMBEDDER", self.embedder)
-        print("GENERATE PITCH EXTRACTOR", self.pitchExtractor)
         logger.info("VOLUME EXTRACTOR" + str(self.volumeExtractor))
         logger.info("GENERATE INFERENCER" + str(self.inferencer))
         logger.info("GENERATE EMBEDDER" + str(self.embedder))
         logger.info("GENERATE PITCH EXTRACTOR" + str(self.pitchExtractor))
         
-
-
         self.targetSR = targetSR
         self.device = device
         self.isHalf = False

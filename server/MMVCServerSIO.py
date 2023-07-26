@@ -1,4 +1,3 @@
-import logging
 import sys
 
 from distutils.util import strtobool
@@ -25,10 +24,10 @@ from const import (
 )
 import subprocess
 import multiprocessing as mp
-from mods.log_control import setup_loggers
+from mods.log_control import VoiceChangaerLogger
 
-setup_loggers(f"Booting PHASE :{__name__}")
-logger = logging.getLogger("vcclient")
+logger = VoiceChangaerLogger.get_instance().getLogger()
+logger.debug(f"---------------- Booting PHASE :{__name__} -----------------")
 
 
 def setupArgParser():
@@ -62,22 +61,23 @@ def printMessage(message, level=0):
     pf = platform.system()
     if pf == "Windows":
         if level == 0:
-            print(f"{message}")
+            message = f"{message}"
         elif level == 1:
-            print(f"    {message}")
+            message = f"    {message}"
         elif level == 2:
-            print(f"    {message}")
+            message = f"    {message}"
         else:
-            print(f"    {message}")
+            message = f"    {message}"
     else:
         if level == 0:
-            print(f"\033[17m{message}\033[0m")
+            message = f"\033[17m{message}\033[0m"
         elif level == 1:
-            print(f"\033[34m    {message}\033[0m")
+            message = f"\033[34m    {message}\033[0m"
         elif level == 2:
-            print(f"\033[32m    {message}\033[0m")
+            message = f"\033[32m    {message}\033[0m"
         else:
-            print(f"\033[47m    {message}\033[0m")
+            message = f"\033[47m    {message}\033[0m"
+    logger.info(message)
 
 
 parser = setupArgParser()
@@ -112,7 +112,7 @@ def localServer(logLevel: str = "critical"):
             log_level=logLevel,
         )
     except Exception as e:
-        print("[Voice Changer] Web Server Launch Exception", e)
+        logger.error(f"[Voice Changer] Web Server Launch Exception, {e}")
 
 
 if __name__ == "MMVCServerSIO":
@@ -129,7 +129,7 @@ if __name__ == "__mp_main__":
 if __name__ == "__main__":
     mp.freeze_support()
 
-    logger.info(args)
+    logger.debug(args)
 
     printMessage(f"PYTHON:{sys.version}", level=2)
     printMessage("Voice Changerを起動しています。", level=2)
@@ -139,14 +139,12 @@ if __name__ == "__main__":
     except WeightDownladException:
         printMessage("RVC用のモデルファイルのダウンロードに失敗しました。", level=2)
         printMessage("failed to download weight for rvc", level=2)
-        logger.warn("failed to download weight for rvc")
 
     # ダウンロード(Sample)
     try:
         downloadInitialSamples(args.sample_mode, args.model_dir)
     except Exception as e:
-        print("[Voice Changer] loading sample failed", e)
-        logger.warn(f"[Voice Changer] loading sample failed {e}",)
+        printMessage(f"[Voice Changer] loading sample failed {e}", level=2)
 
     # PORT = args.p
 
@@ -232,7 +230,7 @@ if __name__ == "__main__":
                 log_level=args.logLevel,
             )
         except Exception as e:
-            print("[Voice Changer] Web Server Launch Exception", e)
+            logger.error(f"[Voice Changer] Web Server(https) Launch Exception, {e}")
 
     else:
         p = mp.Process(name="p", target=localServer, args=(args.logLevel,))
@@ -241,13 +239,13 @@ if __name__ == "__main__":
             if sys.platform.startswith("win"):
                 process = subprocess.Popen([NATIVE_CLIENT_FILE_WIN, "--disable-gpu", "-u", f"http://localhost:{PORT}/"])
                 return_code = process.wait()
-                print("client closed.")
+                logger.info("client closed.")                
                 p.terminate()
             elif sys.platform.startswith("darwin"):
                 process = subprocess.Popen([NATIVE_CLIENT_FILE_MAC, "--disable-gpu", "-u", f"http://localhost:{PORT}/"])
                 return_code = process.wait()
-                print("client closed.")
+                logger.info("client closed.")                
                 p.terminate()
 
         except Exception as e:
-            print(e)
+            logger.error(f"[Voice Changer] Launch Exception, {e}")

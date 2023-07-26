@@ -5,6 +5,7 @@ import shutil
 import threading
 import numpy as np
 from downloader.SampleDownloader import downloadSample, getSampleInfos
+from mods.log_control import VoiceChangaerLogger
 from voice_changer.Local.ServerDevice import ServerDevice, ServerDeviceCallbacks
 from voice_changer.ModelSlotManager import ModelSlotManager
 from voice_changer.RVC.RVCModelMerger import RVCModelMerger
@@ -21,6 +22,9 @@ import torch
 # import threading
 from typing import Callable
 from typing import Any
+
+
+logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
 @dataclass()
@@ -123,7 +127,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
     def loadModel(self, params: LoadModelParams):
         if params.isSampleMode:
             # サンプルダウンロード
-            print("[Voice Changer] sample download....", params)
+            logger.info(f"[Voice Changer] sample download...., {params}")
             downloadSample(self.params.sample_mode, params.sampleId, self.params.model_dir, params.slot, params.params)
             self.modelSlotManager.getAllSlotInfo(reload=True)
             info = {"status": "OK"}
@@ -132,7 +136,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             # アップローダ
             # ファイルをslotにコピー
             for file in params.files:
-                print("FILE", file)
+                logger.info(f"FILE: {file}")
                 srcPath = os.path.join(UPLOAD_DIR, file.dir, file.name)
                 dstDir = os.path.join(
                     self.params.model_dir,
@@ -141,7 +145,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
                 )
                 dstPath = os.path.join(dstDir, file.name)
                 os.makedirs(dstDir, exist_ok=True)
-                print(f"move to {srcPath} -> {dstPath}")
+                logger.info(f"move to {srcPath} -> {dstPath}")
                 shutil.move(srcPath, dstPath)
                 file.name = dstPath
 
@@ -176,7 +180,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
 
                 slotInfo = DiffusionSVCModelSlotGenerator.loadModel(params)
                 self.modelSlotManager.save_model_slot(params.slot, slotInfo)
-            print("params", params)
+            logger.info(f"params, {params}")
 
     def get_info(self):
         data = asdict(self.settings)
@@ -206,52 +210,52 @@ class VoiceChangerManager(ServerDeviceCallbacks):
     def generateVoiceChanger(self, val: int):
         slotInfo = self.modelSlotManager.get_slot_info(val)
         if slotInfo is None:
-            print(f"[Voice Changer] model slot is not found {val}")
+            logger.info(f"[Voice Changer] model slot is not found {val}")
             return
         elif slotInfo.voiceChangerType == "RVC":
-            print("................RVC")
+            logger.info("................RVC")
             from voice_changer.RVC.RVC import RVC
 
             self.voiceChangerModel = RVC(self.params, slotInfo)
             self.voiceChanger = VoiceChanger(self.params)
             self.voiceChanger.setModel(self.voiceChangerModel)
         elif slotInfo.voiceChangerType == "MMVCv13":
-            print("................MMVCv13")
+            logger.info("................MMVCv13")
             from voice_changer.MMVCv13.MMVCv13 import MMVCv13
 
             self.voiceChangerModel = MMVCv13(slotInfo)
             self.voiceChanger = VoiceChanger(self.params)
             self.voiceChanger.setModel(self.voiceChangerModel)
         elif slotInfo.voiceChangerType == "MMVCv15":
-            print("................MMVCv15")
+            logger.info("................MMVCv15")
             from voice_changer.MMVCv15.MMVCv15 import MMVCv15
 
             self.voiceChangerModel = MMVCv15(slotInfo)
             self.voiceChanger = VoiceChanger(self.params)
             self.voiceChanger.setModel(self.voiceChangerModel)
         elif slotInfo.voiceChangerType == "so-vits-svc-40":
-            print("................so-vits-svc-40")
+            logger.info("................so-vits-svc-40")
             from voice_changer.SoVitsSvc40.SoVitsSvc40 import SoVitsSvc40
 
             self.voiceChangerModel = SoVitsSvc40(self.params, slotInfo)
             self.voiceChanger = VoiceChanger(self.params)
             self.voiceChanger.setModel(self.voiceChangerModel)
         elif slotInfo.voiceChangerType == "DDSP-SVC":
-            print("................DDSP-SVC")
+            logger.info("................DDSP-SVC")
             from voice_changer.DDSP_SVC.DDSP_SVC import DDSP_SVC
 
             self.voiceChangerModel = DDSP_SVC(self.params, slotInfo)
             self.voiceChanger = VoiceChanger(self.params)
             self.voiceChanger.setModel(self.voiceChangerModel)
         elif slotInfo.voiceChangerType == "Diffusion-SVC":
-            print("................Diffusion-SVC")
+            logger.info("................Diffusion-SVC")
             from voice_changer.DiffusionSVC.DiffusionSVC import DiffusionSVC
 
             self.voiceChangerModel = DiffusionSVC(self.params, slotInfo)
             self.voiceChanger = VoiceChangerV2(self.params)
             self.voiceChanger.setModel(self.voiceChangerModel)
         else:
-            print(f"[Voice Changer] unknown voice changer model: {slotInfo.voiceChangerType}")
+            logger.info(f"[Voice Changer] unknown voice changer model: {slotInfo.voiceChangerType}")
             if hasattr(self, "voiceChangerModel"):
                 del self.voiceChangerModel
             return
@@ -263,7 +267,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             newVal = int(val)
             if key == "modelSlotIndex":
                 newVal = newVal % 1000
-                print(f"[Voice Changer] model slot is changed {self.settings.modelSlotIndex} -> {newVal}")
+                logger.info(f"[Voice Changer] model slot is changed {self.settings.modelSlotIndex} -> {newVal}")
                 self.generateVoiceChanger(newVal)
                 # キャッシュ設定の反映
                 for k, v in self.stored_setting.items():
@@ -282,7 +286,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         if hasattr(self, "voiceChanger") is True:
             return self.voiceChanger.on_request(receivedData)
         else:
-            print("Voice Change is not loaded. Did you load a correct model?")
+            logger.info("Voice Change is not loaded. Did you load a correct model?")
             return np.zeros(1).astype(np.int16), []
 
     def export2onnx(self):

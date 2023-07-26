@@ -20,7 +20,7 @@ from .config import TrainConfig
 matplotlib.use("Agg")
 logging.getLogger("matplotlib").setLevel(logging.WARNING)
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+# logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logger = logging
 
 

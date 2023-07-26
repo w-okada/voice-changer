@@ -4,7 +4,10 @@ from dataclasses import dataclass, field
 import numpy as np
 
 from const import ServerAudioDeviceType
+from mods.log_control import VoiceChangaerLogger
 # from const import SERVER_DEVICE_SAMPLE_RATES
+
+logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
 @dataclass
@@ -56,8 +59,8 @@ def list_audio_device():
     try:
         audioDeviceList = sd.query_devices()
     except Exception as e:
-        print("[Voice Changer] ex:query_devices")
-        print(e)
+        logger.error("[Voice Changer] ex:query_devices")
+        logger.exception(e)
         raise e
 
     inputAudioDeviceList = [d for d in audioDeviceList if d["max_input_channels"] > 0]

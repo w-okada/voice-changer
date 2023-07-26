@@ -4,6 +4,7 @@ import numpy as np
 from const import SERVER_DEVICE_SAMPLE_RATES
 
 from queue import Queue
+from mods.log_control import VoiceChangaerLogger
 
 from voice_changer.Local.AudioDeviceList import checkSamplingRate, list_audio_device
 import time
@@ -16,6 +17,8 @@ from typing import Protocol
 from typing import Union
 from typing import Literal, TypeAlias
 AudioDeviceKind: TypeAlias = Literal["input", "output"]
+
+logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
 @dataclass

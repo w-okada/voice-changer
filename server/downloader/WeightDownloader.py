@@ -1,12 +1,12 @@
-import logging
 import os
 from concurrent.futures import ThreadPoolExecutor
 
 from downloader.Downloader import download
+from mods.log_control import VoiceChangaerLogger
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from Exceptions import WeightDownladException
 
-logger = logging.getLogger("vcclient")
+logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
 def downloadWeight(voiceChangerParams: VoiceChangerParams):
@@ -120,7 +120,7 @@ def downloadWeight(voiceChangerParams: VoiceChangerParams):
     for weight in weight_files:
         if os.path.exists(weight):
             file_size = os.path.getsize(weight)
-            logger.info(f"weight file [{weight}]: {file_size}")
+            logger.debug(f"weight file [{weight}]: {file_size}")
         else:
-            logger.warn(f"weight file is missing. {weight}")
+            logger.warning(f"weight file is missing. {weight}")
             raise WeightDownladException()
