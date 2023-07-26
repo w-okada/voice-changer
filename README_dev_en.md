@@ -4,7 +4,7 @@
 
 ## Prerequisit
 
-- Linux or WSL2 (not tested for Mac )
+- Linux(ubuntu, debian) or WSL2, (not tested for other linux distributions and Mac)
 - Anaconda
 
 ## Preparation
