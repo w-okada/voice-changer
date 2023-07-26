@@ -68,6 +68,22 @@ $ sudo apt-get install libportaudio2
 $ sudo apt-get install libasound-dev
 ```
 
+(2) It's not starting up! Damn software!
+
+The client will not start automatically. Please launch your browser and access the URL displayed on the console. And watch your words.
+
+(3) Could not load library libcudnn_cnn_infer.so.8
+
+When using WSL, you might encounter a message saying `Could not load library libcudnn_cnn_infer.so.8. Error: libcuda.so: cannot open shared object file: No such file or directory`. This often happens because the path hasn't been properly set. Please set the path as shown below. It might be handy to add this to your launch script, such as .bashrc.
+
+```
+export LD_LIBRARY_PATH=/usr/lib/wsl/lib:$LD_LIBRARY_PATH
+```
+
+- reference
+  - https://qiita.com/cacaoMath/items/811146342946cdde5b83
+  - https://github.com/microsoft/WSL/issues/8587
+
 3. Enjoy developing.
 
 ### Appendix
