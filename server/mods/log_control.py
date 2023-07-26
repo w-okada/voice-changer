@@ -8,7 +8,7 @@ class UvicornSuppressFilter(logging.Filter):
         return False
 
 
-def setup_loggers():
+def setup_loggers(startMessage: str):
     # logger = logging.getLogger("uvicorn.error")
     # logger.addFilter(UvicornSuppressFilter())
 
@@ -36,3 +36,12 @@ def setup_loggers():
     logger.propagate = False
 
     logging.getLogger("asyncio").setLevel(logging.WARNING)
+
+    logger = logging.getLogger("vcclient")
+    logger.setLevel(logging.INFO)
+    fh = logging.FileHandler('vvclient.log', encoding='utf-8')
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    fh.setLevel(logging.INFO)
+    logger.addHandler(fh)
+    logger.info(f"Start Logging, {startMessage}")

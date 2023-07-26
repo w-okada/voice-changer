@@ -1,6 +1,7 @@
 import os
 from OpenSSL import crypto
 
+
 def create_self_signed_cert(certfile, keyfile, certargs, cert_dir="."):
     C_F = os.path.join(cert_dir, certfile)
     K_F = os.path.join(cert_dir, keyfile)

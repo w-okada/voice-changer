@@ -1,8 +1,11 @@
+import logging
 from const import UPLOAD_DIR
 from data.ModelSlot import ModelSlots, loadAllSlotInfo, saveSlotInfo
 import json
 import os
 import shutil
+
+logger = logging.getLogger("vcclient")
 
 
 class ModelSlotManager:
@@ -11,7 +14,7 @@ class ModelSlotManager:
     def __init__(self, model_dir: str):
         self.model_dir = model_dir
         self.modelSlots = loadAllSlotInfo(self.model_dir)
-        print("[MODEL SLOT INFO]", self.modelSlots)
+        logger.info(f"[MODEL SLOT INFO] {self.modelSlots}")
 
     @classmethod
     def get_instance(cls, model_dir: str):

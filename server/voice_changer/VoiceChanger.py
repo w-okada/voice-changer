@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Union, cast
 
 from const import TMP_DIR
@@ -27,6 +28,7 @@ from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 
 STREAM_INPUT_FILE = os.path.join(TMP_DIR, "in.wav")
 STREAM_OUTPUT_FILE = os.path.join(TMP_DIR, "out.wav")
+logger = logging.getLogger("vcclient")
 
 
 @dataclass
@@ -80,6 +82,7 @@ class VoiceChanger(VoiceChangerIF):
         self.onnx_device = onnxruntime.get_device()
 
         print(f"VoiceChanger Initialized (GPU_NUM(cuda):{self.gpu_num}, mps_enabled:{self.mps_enabled}, onnx_device:{self.onnx_device})")
+        logger.info(f"VoiceChanger Initialized (GPU_NUM(cuda):{self.gpu_num}, mps_enabled:{self.mps_enabled}, onnx_device:{self.onnx_device})")
 
     def setModel(self, model: Any):
         self.voiceChanger = model

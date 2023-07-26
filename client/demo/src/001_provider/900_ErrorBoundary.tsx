@@ -11,6 +11,7 @@ type ErrorBoundaryState = {
 };
 
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+    // @ts-ignore
     private eventHandler: () => void;
     constructor(props: ErrorBoundaryProps) {
         super(props);

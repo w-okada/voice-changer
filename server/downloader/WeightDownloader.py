@@ -1,9 +1,12 @@
+import logging
 import os
 from concurrent.futures import ThreadPoolExecutor
 
 from downloader.Downloader import download
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from Exceptions import WeightDownladException
+
+logger = logging.getLogger("vcclient")
 
 
 def downloadWeight(voiceChangerParams: VoiceChangerParams):
@@ -15,6 +18,9 @@ def downloadWeight(voiceChangerParams: VoiceChangerParams):
     crepe_onnx_full = voiceChangerParams.crepe_onnx_full
     crepe_onnx_tiny = voiceChangerParams.crepe_onnx_tiny
     rmvpe = voiceChangerParams.rmvpe
+
+    weight_files = [content_vec_500_onnx, hubert_base, hubert_base_jp, hubert_soft,
+                    nsf_hifigan, crepe_onnx_full, crepe_onnx_tiny, rmvpe]
 
     # file exists check (currently only for rvc)
     downloadParams = []
@@ -109,3 +115,12 @@ def downloadWeight(voiceChangerParams: VoiceChangerParams):
 
     if os.path.exists(hubert_base) is False or os.path.exists(hubert_base_jp) is False or os.path.exists(hubert_soft) is False or os.path.exists(nsf_hifigan) is False or os.path.exists(nsf_hifigan_config) is False:
         raise WeightDownladException()
+
+    # ファイルサイズをログに書き込む。（デバッグ用）
+    for weight in weight_files:
+        if os.path.exists(weight):
+            file_size = os.path.getsize(weight)
+            logger.info(f"weight file [{weight}]: {file_size}")
+        else:
+            logger.warn(f"weight file is missing. {weight}")
+            raise WeightDownladException()

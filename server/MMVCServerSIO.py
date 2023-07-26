@@ -1,3 +1,4 @@
+import logging
 import sys
 
 from distutils.util import strtobool
@@ -26,7 +27,8 @@ import subprocess
 import multiprocessing as mp
 from mods.log_control import setup_loggers
 
-setup_loggers()
+setup_loggers(f"Booting PHASE :{__name__}")
+logger = logging.getLogger("vcclient")
 
 
 def setupArgParser():
@@ -127,6 +129,8 @@ if __name__ == "__mp_main__":
 if __name__ == "__main__":
     mp.freeze_support()
 
+    logger.info(args)
+
     printMessage(f"PYTHON:{sys.version}", level=2)
     printMessage("Voice Changerを起動しています。", level=2)
     # ダウンロード(Weight)
@@ -135,12 +139,14 @@ if __name__ == "__main__":
     except WeightDownladException:
         printMessage("RVC用のモデルファイルのダウンロードに失敗しました。", level=2)
         printMessage("failed to download weight for rvc", level=2)
+        logger.warn("failed to download weight for rvc")
 
     # ダウンロード(Sample)
     try:
         downloadInitialSamples(args.sample_mode, args.model_dir)
     except Exception as e:
         print("[Voice Changer] loading sample failed", e)
+        logger.warn(f"[Voice Changer] loading sample failed {e}",)
 
     # PORT = args.p
 
@@ -233,12 +239,12 @@ if __name__ == "__main__":
         p.start()
         try:
             if sys.platform.startswith("win"):
-                process = subprocess.Popen([NATIVE_CLIENT_FILE_WIN, "-u", f"http://localhost:{PORT}/"])
+                process = subprocess.Popen([NATIVE_CLIENT_FILE_WIN, "--disable-gpu", "-u", f"http://localhost:{PORT}/"])
                 return_code = process.wait()
                 print("client closed.")
                 p.terminate()
             elif sys.platform.startswith("darwin"):
-                process = subprocess.Popen([NATIVE_CLIENT_FILE_MAC, "-u", f"http://localhost:{PORT}/"])
+                process = subprocess.Popen([NATIVE_CLIENT_FILE_MAC, "--disable-gpu", "-u", f"http://localhost:{PORT}/"])
                 return_code = process.wait()
                 print("client closed.")
                 p.terminate()
