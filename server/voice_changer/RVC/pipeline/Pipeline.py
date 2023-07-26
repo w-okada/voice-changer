@@ -17,6 +17,9 @@ from voice_changer.RVC.inferencer.OnnxRVCInferencer import OnnxRVCInferencer
 from voice_changer.RVC.inferencer.OnnxRVCInferencerNono import OnnxRVCInferencerNono
 
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
+import logging
+
+logger = logging.getLogger("vcclient")
 
 
 class Pipeline(object):
@@ -49,6 +52,9 @@ class Pipeline(object):
         print("GENERATE INFERENCER", self.inferencer)
         print("GENERATE EMBEDDER", self.embedder)
         print("GENERATE PITCH EXTRACTOR", self.pitchExtractor)
+        logger.info("GENERATE INFERENCER" + str(self.inferencer))
+        logger.info("GENERATE EMBEDDER" + str(self.embedder))
+        logger.info("GENERATE PITCH EXTRACTOR" + str(self.pitchExtractor))
 
         self.index = index
         self.big_npy = index.reconstruct_n(0, index.ntotal) if index is not None else None

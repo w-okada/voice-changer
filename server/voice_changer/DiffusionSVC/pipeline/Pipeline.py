@@ -17,6 +17,9 @@ from voice_changer.common.VolumeExtractor import VolumeExtractor
 from torchaudio.transforms import Resample
 
 from voice_changer.utils.Timer import Timer
+import logging
+
+logger = logging.getLogger("vcclient")
 
 
 class Pipeline(object):
@@ -61,6 +64,12 @@ class Pipeline(object):
         print("GENERATE INFERENCER", self.inferencer)
         print("GENERATE EMBEDDER", self.embedder)
         print("GENERATE PITCH EXTRACTOR", self.pitchExtractor)
+        logger.info("VOLUME EXTRACTOR" + str(self.volumeExtractor))
+        logger.info("GENERATE INFERENCER" + str(self.inferencer))
+        logger.info("GENERATE EMBEDDER" + str(self.embedder))
+        logger.info("GENERATE PITCH EXTRACTOR" + str(self.pitchExtractor))
+        
+
 
         self.targetSR = targetSR
         self.device = device
