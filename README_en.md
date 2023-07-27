@@ -4,6 +4,14 @@
 
 ## What's New!
 
+- v.1.5.3.10b
+
+  - improve:
+    - logger
+  - bugfix:
+    - RMVPE:different device bug (not finding root caused yet)
+    - RVC: when loading sample model, useIndex issue
+
 - v.1.5.3.10a
 
   - Improvement:
