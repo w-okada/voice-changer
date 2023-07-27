@@ -122,7 +122,7 @@ class RVCr2(VoiceChangerModel):
 
         if convertSize % 160 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
             convertSize = convertSize + (160 - (convertSize % 160))
-        outSize = convertSize - extra_frame
+        outSize = int(((convertSize - extra_frame) / 16000) * self.slotInfo.samplingRate) 
 
         # バッファがたまっていない場合はzeroで補う
         if self.audio_buffer.shape[0] < convertSize:
@@ -193,6 +193,7 @@ class RVCr2(VoiceChangerModel):
         embOutputLayer = self.slotInfo.embOutputLayer
         useFinalProj = self.slotInfo.useFinalProj
 
+        
         try:
             audio_out, self.pitchf_buffer, self.feature_buffer = self.pipeline.exec(
                 sid,
@@ -202,14 +203,16 @@ class RVCr2(VoiceChangerModel):
                 f0_up_key,
                 index_rate,
                 if_f0,
-                self.settings.extraConvertSize / self.slotInfo.samplingRate if self.settings.silenceFront else 0.,  # extaraDataSizeの秒数。RVCのモデルのサンプリングレートで処理(★１)。
+                # 0,
+                self.settings.extraConvertSize / self.inputSampleRate if self.settings.silenceFront else 0.,  # extaraDataSizeの秒数。入力のサンプリングレートで算出
                 embOutputLayer,
                 useFinalProj,
                 repeat,
-                protect
+                protect,
+                outSize
             )
-            outSize = outSize // 16000 * self.slotInfo.samplingRate
-            result = audio_out[-outSize:].detach().cpu().numpy() * np.sqrt(vol)
+            # result = audio_out[-outSize:].detach().cpu().numpy() * np.sqrt(vol)
+            result = audio_out.detach().cpu().numpy() * np.sqrt(vol)
 
             result = cast(
                 AudioInOut,

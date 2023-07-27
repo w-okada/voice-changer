@@ -208,12 +208,13 @@ class VoiceChangerV2(VoiceChangerIF):
                 block_frame = receivedData.shape[0]
                 crossfade_frame = min(self.settings.crossFadeOverlapSize, block_frame)
                 self._generate_strength(crossfade_frame)
-                # data = self.voiceChanger.generate_input(newData, block_frame, crossfade_frame, sola_search_frame)
+
                 audio = self.voiceChanger.inference(
                     receivedData,
                     crossfade_frame=crossfade_frame,
                     sola_search_frame=sola_search_frame
                 )
+
                 if hasattr(self, "sola_buffer") is True:
                     np.set_printoptions(threshold=10000)
                     audio_offset = -1 * (sola_search_frame + crossfade_frame + block_frame)

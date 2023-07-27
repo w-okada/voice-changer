@@ -90,7 +90,10 @@ class Pipeline(object):
         protect=0.5,
         out_size=None,
     ):
-        with Timer("main-process") as t:
+        # print(f"pipeline exec input, audio:{audio.shape}, pitchf:{pitchf.shape}, feature:{feature.shape}")
+        # print(f"pipeline exec input, silence_front:{silence_front}, out_size:{out_size}")
+
+        with Timer("main-process", False) as t:  # NOQA
             # 16000のサンプリングレートで入ってきている。以降この世界は16000で処理。
             search_index = self.index is not None and self.big_npy is not None and index_rate != 0
             # self.t_pad = self.sr * repeat  # 1秒
@@ -241,6 +244,7 @@ class Pipeline(object):
                     raise e
 
             feats_buffer = feats.squeeze(0).detach().cpu()
+
             if pitchf is not None:
                 pitchf_buffer = pitchf.squeeze(0).detach().cpu()
             else:
@@ -258,6 +262,7 @@ class Pipeline(object):
 
             del sid
             # torch.cuda.empty_cache()
+        # print("EXEC AVERAGE:", t.avrSecs)
         return audio1, pitchf_buffer, feats_buffer
 
     def __del__(self):
