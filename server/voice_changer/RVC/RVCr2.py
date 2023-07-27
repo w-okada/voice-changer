@@ -192,7 +192,6 @@ class RVCr2(VoiceChangerModel):
         if_f0 = 1 if self.slotInfo.f0 else 0
         embOutputLayer = self.slotInfo.embOutputLayer
         useFinalProj = self.slotInfo.useFinalProj
-
         
         try:
             audio_out, self.pitchf_buffer, self.feature_buffer = self.pipeline.exec(
@@ -211,8 +210,8 @@ class RVCr2(VoiceChangerModel):
                 protect,
                 outSize
             )
-            # result = audio_out[-outSize:].detach().cpu().numpy() * np.sqrt(vol)
-            result = audio_out.detach().cpu().numpy() * np.sqrt(vol)
+            # result = audio_out.detach().cpu().numpy() * np.sqrt(vol)
+            result = audio_out[-outSize:].detach().cpu().numpy() * np.sqrt(vol)
 
             result = cast(
                 AudioInOut,
