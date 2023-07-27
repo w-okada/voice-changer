@@ -6,7 +6,7 @@
 
 - 適用VoiceChangerModel
 ・DiffusionSVC
-
+・RVC
 '''
 
 from typing import Any, Union

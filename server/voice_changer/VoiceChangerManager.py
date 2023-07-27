@@ -214,11 +214,18 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             return
         elif slotInfo.voiceChangerType == "RVC":
             logger.info("................RVC")
-            from voice_changer.RVC.RVC import RVC
+            # from voice_changer.RVC.RVC import RVC
 
-            self.voiceChangerModel = RVC(self.params, slotInfo)
-            self.voiceChanger = VoiceChanger(self.params)
+            # self.voiceChangerModel = RVC(self.params, slotInfo)
+            # self.voiceChanger = VoiceChanger(self.params)
+            # self.voiceChanger.setModel(self.voiceChangerModel)
+
+            from voice_changer.RVC.RVCr2 import RVCr2
+
+            self.voiceChangerModel = RVCr2(self.params, slotInfo)
+            self.voiceChanger = VoiceChangerV2(self.params)
             self.voiceChanger.setModel(self.voiceChangerModel)
+
         elif slotInfo.voiceChangerType == "MMVCv13":
             logger.info("................MMVCv13")
             from voice_changer.MMVCv13.MMVCv13 import MMVCv13
