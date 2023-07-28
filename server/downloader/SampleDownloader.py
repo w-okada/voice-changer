@@ -153,6 +153,8 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
             slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
             modelSlotManager.save_model_slot(targetSlotIndex, slotInfo)
         elif sample.voiceChangerType == "Diffusion-SVC":
+            if sys.platform.startswith("darwin") is True:
+                continue
             slotInfo: DiffusionSVCModelSlot = DiffusionSVCModelSlot()
 
             os.makedirs(slotDir, exist_ok=True)
