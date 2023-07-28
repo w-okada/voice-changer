@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Tuple
 
@@ -7,7 +8,6 @@ from const import RVCSampleMode, getSampleJsonAndModelIds
 from data.ModelSample import ModelSamples, generateModelSample
 from data.ModelSlot import DiffusionSVCModelSlot, ModelSlot, RVCModelSlot
 from mods.log_control import VoiceChangaerLogger
-from voice_changer.DiffusionSVC.DiffusionSVCModelSlotGenerator import DiffusionSVCModelSlotGenerator
 from voice_changer.ModelSlotManager import ModelSlotManager
 from voice_changer.RVC.RVCModelSlotGenerator import RVCModelSlotGenerator
 from downloader.Downloader import download, download_no_tqdm
@@ -220,8 +220,10 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
 
             modelSlotManager.save_model_slot(targetSlotIndex, slotInfo)
         elif slotInfo.voiceChangerType == "Diffusion-SVC":
-            if slotInfo.isONNX:
-                pass
-            else:
-                slotInfo = DiffusionSVCModelSlotGenerator._setInfoByPytorch(slotInfo)
-            modelSlotManager.save_model_slot(targetSlotIndex, slotInfo)
+            if sys.platform.startswith("darwin") is False:
+                from voice_changer.DiffusionSVC.DiffusionSVCModelSlotGenerator import DiffusionSVCModelSlotGenerator
+                if slotInfo.isONNX:
+                    pass
+                else:
+                    slotInfo = DiffusionSVCModelSlotGenerator._setInfoByPytorch(slotInfo)
+                modelSlotManager.save_model_slot(targetSlotIndex, slotInfo)
