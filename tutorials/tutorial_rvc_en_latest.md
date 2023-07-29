@@ -44,6 +44,8 @@ If you have the old version, be sure to unzip it into a separate folder.
 
 When connecting remotely, please use `.bat` file (win) and `.command` file (mac) where http is replaced with https.
 
+Access with Browser (currently only chrome is supported), then you can see gui.
+
 ### Console
 
 When you run a .bat file (Windows) or .command file (Mac), a screen like the following will be displayed and various data will be downloaded from the Internet at the initial start-up. Depending on your environment, it may take 1-2 minutes in many cases.

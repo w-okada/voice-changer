@@ -36,6 +36,10 @@ In root folder of repos.
 bash start_docker.sh
 ```
 
+Access with Browser (currently only chrome is supported), then you can see gui.
+
+## RUN with options
+
 Without GPU
 
 ```
