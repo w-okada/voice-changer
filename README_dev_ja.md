@@ -51,6 +51,8 @@ $ python3 MMVCServerSIO.py -p 18888 --https true \
     --samples samples.json
 ```
 
+ブラウザ(Chrome のみサポート)でアクセスすると画面が表示されます。
+
 2-1. トラブルシュート
 
 (1) OSError: PortAudio library not found

@@ -52,6 +52,8 @@ $ python3 MMVCServerSIO.py -p 18888 --https true \
 
 ```
 
+Access with Browser (currently only chrome is supported), then you can see gui.
+
 2-1. Trouble shoot
 
 (1) OSError: PortAudio library not found
