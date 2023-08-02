@@ -19,7 +19,7 @@ export const MainScreen = (props: MainScreenProps) => {
     const guiState = useGuiState();
     const messageBuilderState = useMessageBuilder();
     useMemo(() => {
-        messageBuilderState.setMessage(__filename, "change_icon", { ja: "アイコン変更", en: "chage icon" });
+        messageBuilderState.setMessage(__filename, "change_icon", { ja: "アイコン変更", en: "change icon" });
         messageBuilderState.setMessage(__filename, "rename", { ja: "リネーム", en: "rename" });
         messageBuilderState.setMessage(__filename, "download", { ja: "ダウンロード", en: "download" });
         messageBuilderState.setMessage(__filename, "terms_of_use", { ja: "利用規約", en: "terms of use" });
