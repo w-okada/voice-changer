@@ -46,7 +46,7 @@ class EmbedderManager:
                 file = cls.params.content_vec_500_onnx
                 return OnnxContentvec().loadModel(file, dev)
             except Exception as e:  # noqa
-                print("[Voice Changer] use torch contentvec")
+                print("[Voice Changer] use torch contentvec", e)
                 file = cls.params.hubert_base
                 return FairseqHubert().loadModel(file, dev, isHalf)
         elif embederType == "hubert-base-japanese":

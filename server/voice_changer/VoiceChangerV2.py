@@ -208,7 +208,7 @@ class VoiceChangerV2(VoiceChangerIF):
                 block_frame = receivedData.shape[0]
                 crossfade_frame = min(self.settings.crossFadeOverlapSize, block_frame)
                 self._generate_strength(crossfade_frame)
-
+            
                 audio = self.voiceChanger.inference(
                     receivedData,
                     crossfade_frame=crossfade_frame,

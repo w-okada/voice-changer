@@ -141,7 +141,6 @@ class DiffusionSVC(VoiceChangerModel):
         if self.pipeline is None:
             logger.info("[Voice Changer] Pipeline is not initialized.")
             raise PipelineNotInitializedException()
-        
         data = self.generate_input(receivedData, crossfade_frame, sola_search_frame)
         audio: AudioInOut = data[0]
         pitchf: PitchfInOut = data[1]
