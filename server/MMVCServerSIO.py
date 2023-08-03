@@ -124,7 +124,8 @@ if __name__ == "MMVCServerSIO":
 
 
 if __name__ == "__mp_main__":
-    printMessage("サーバプロセスを起動しています。", level=2)
+#    printMessage("サーバプロセスを起動しています。", level=2)
+    printMessage("The server process is starting up.", level=2)
 
 if __name__ == "__main__":
     mp.freeze_support()
@@ -132,12 +133,13 @@ if __name__ == "__main__":
     logger.debug(args)
 
     printMessage(f"PYTHON:{sys.version}", level=2)
-    printMessage("Voice Changerを起動しています。", level=2)
+    # printMessage("Voice Changerを起動しています。", level=2)
+    printMessage("Activating the Voice Changer.", level=2)
     # ダウンロード(Weight)
     try:
         downloadWeight(voiceChangerParams)
     except WeightDownladException:
-        printMessage("RVC用のモデルファイルのダウンロードに失敗しました。", level=2)
+        # printMessage("RVC用のモデルファイルのダウンロードに失敗しました。", level=2)
         printMessage("failed to download weight for rvc", level=2)
 
     # ダウンロード(Sample)
@@ -192,13 +194,15 @@ if __name__ == "__main__":
     printMessage("-- ---- -- ", level=1)
 
     # アドレス表示
-    printMessage("ブラウザで次のURLを開いてください.", level=2)
+    printMessage("Please open the following URL in your browser.", level=2)
+    # printMessage("ブラウザで次のURLを開いてください.", level=2)
     if args.https == 1:
         printMessage("https://<IP>:<PORT>/", level=1)
     else:
         printMessage("http://<IP>:<PORT>/", level=1)
 
-    printMessage("多くの場合は次のいずれかのURLにアクセスすると起動します。", level=2)
+    # printMessage("多くの場合は次のいずれかのURLにアクセスすると起動します。", level=2)
+    printMessage("In many cases, it will launch when you access any of the following URLs.", level=2)
     if "EX_PORT" in locals() and "EX_IP" in locals():  # シェルスクリプト経由起動(docker)
         if args.https == 1:
             printMessage(f"https://localhost:{EX_PORT}/", level=1)
