@@ -265,6 +265,9 @@ export class VoiceChangerClient {
         if (!this.inputGainNode) {
             return
         }
+        if(!val){
+            return
+        }
         this.inputGainNode.gain.value = val
     }
 
@@ -272,11 +275,17 @@ export class VoiceChangerClient {
         if (!this.outputGainNode) {
             return
         }
+        if(!val){
+            return
+        }
         this.outputGainNode.gain.value = val
     }
 
     setMonitorGain = (val: number) => {
         if (!this.monitorGainNode) {
+            return
+        }
+        if(!val){
             return
         }
         this.monitorGainNode.gain.value = val
