@@ -65,7 +65,7 @@ export const ConvertArea = (props: ConvertProps) => {
                                 }}
                                 className={gpu0ClassName}
                             >
-                                0
+                                gpu-0
                             </div>
                             <div
                                 onClick={async () => {
@@ -76,7 +76,7 @@ export const ConvertArea = (props: ConvertProps) => {
                                 }}
                                 className={gpu1ClassName}
                             >
-                                1
+                                gpu-1
                             </div>
                             <div
                                 onClick={async () => {
@@ -87,7 +87,7 @@ export const ConvertArea = (props: ConvertProps) => {
                                 }}
                                 className={gpu2ClassName}
                             >
-                                2
+                                gpu-2
                             </div>
                             <div
                                 onClick={async () => {
@@ -98,7 +98,10 @@ export const ConvertArea = (props: ConvertProps) => {
                                 }}
                                 className={gpu3ClassName}
                             >
-                                3
+                                gpu-3
+                            </div>
+                            <div>
+                                <a href="https://github.com/w-okada/voice-changer/issues/410">more info</a>
                             </div>
                         </div>
                     </div>
