@@ -223,7 +223,7 @@ export const useClient = (props: UseClientProps): ClientState => {
         }
         const audio = document.getElementById(elemId) as HTMLAudioElement
         if (audio.paused) {
-            audio.srcObject = voiceChangerClientRef.current.stream
+            audio.srcObject = voiceChangerClientRef.current.monitorStream
             audio.play()
         }
     }

@@ -23,9 +23,11 @@ export class VoiceChangerClient {
     private currentMediaStreamAudioSourceNode: MediaStreamAudioSourceNode | null = null
     private inputGainNode: GainNode | null = null
     private outputGainNode: GainNode | null = null
+    private monitorGainNode: GainNode | null = null
     private vcInNode!: VoiceChangerWorkletNode
     private vcOutNode!: VoiceChangerWorkletNode
     private currentMediaStreamAudioDestinationNode!: MediaStreamAudioDestinationNode
+    private currentMediaStreamAudioDestinationMonitorNode!: MediaStreamAudioDestinationNode
 
 
     private promiseForInitialize: Promise<void>
@@ -71,6 +73,12 @@ export class VoiceChangerClient {
             this.outputGainNode.gain.value = this.setting.outputGain
             this.vcOutNode.connect(this.outputGainNode) // vc node -> output node
             this.outputGainNode.connect(this.currentMediaStreamAudioDestinationNode)
+
+            this.currentMediaStreamAudioDestinationMonitorNode = ctx44k.createMediaStreamDestination() // output node
+            this.monitorGainNode = ctx44k.createGain()
+            this.monitorGainNode.gain.value = this.setting.monitorGain
+            this.vcOutNode.connect(this.monitorGainNode) // vc node -> monitor node
+            this.monitorGainNode.connect(this.currentMediaStreamAudioDestinationMonitorNode)
 
             if (this.vfEnable) {
                 this.vf = await VoiceFocusDeviceTransformer.create({ variant: 'c20' })
@@ -185,6 +193,9 @@ export class VoiceChangerClient {
     get stream(): MediaStream {
         return this.currentMediaStreamAudioDestinationNode.stream
     }
+    get monitorStream(): MediaStream {
+        return this.currentMediaStreamAudioDestinationMonitorNode.stream
+    }
 
     start = async () => {
         await this.vcInNode.start()
@@ -239,6 +250,9 @@ export class VoiceChangerClient {
         if (this.setting.outputGain != setting.outputGain) {
             this.setOutputGain(setting.outputGain)
         }
+        if (this.setting.monitorGain != setting.monitorGain) {
+            this.setMonitorGain(setting.monitorGain)
+        }
 
         this.setting = setting
         if (reconstructInputRequired) {
@@ -259,6 +273,13 @@ export class VoiceChangerClient {
             return
         }
         this.outputGainNode.gain.value = val
+    }
+
+    setMonitorGain = (val: number) => {
+        if (!this.monitorGainNode) {
+            return
+        }
+        this.monitorGainNode.gain.value = val
     }
 
     /////////////////////////////////////////////////////

@@ -469,6 +469,7 @@ export type VoiceChangerClientSetting = {
 
     inputGain: number
     outputGain: number
+    monitorGain: number
 }
 
 ///////////////////////
@@ -499,7 +500,8 @@ export const DefaultClientSettng: ClientSetting = {
         noiseSuppression: false,
         noiseSuppression2: false,
         inputGain: 1.0,
-        outputGain: 1.0
+        outputGain: 1.0,
+        monitorGain: 1.0
     }
 }
 

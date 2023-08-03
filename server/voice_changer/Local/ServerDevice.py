@@ -46,6 +46,7 @@ class ServerDeviceSettings:
     serverReadChunkSize: int = 256
     serverInputAudioGain: float = 1.0
     serverOutputAudioGain: float = 1.0
+    serverMonitorAudioGain: float = 1.0
 
     exclusiveMode: bool = False
 
@@ -66,6 +67,7 @@ EditableServerDeviceSettings = {
     "floatData": [
         "serverInputAudioGain",
         "serverOutputAudioGain",
+        "serverMonitorAudioGain",
     ],
     "boolData": [
         "exclusiveMode"
@@ -153,7 +155,7 @@ class ServerDevice:
             self.outQueue.put(out_wav)
             outputChannels = outdata.shape[1]  # Monitorへのアウトプット
             outdata[:] = np.repeat(out_wav, outputChannels).reshape(-1, outputChannels) / 32768.0
-            outdata[:] = outdata * self.settings.serverOutputAudioGain
+            outdata[:] = outdata * self.settings.serverMonitorAudioGain
         except Exception as e:
             print("[Voice Changer] ex:", e)
 
@@ -196,8 +198,7 @@ class ServerDevice:
                 self.monQueue.get()
             outputChannels = outdata.shape[1]
             outdata[:] = np.repeat(mon_wav, outputChannels).reshape(-1, outputChannels) / 32768.0
-            outdata[:] = outdata * self.settings.serverOutputAudioGain  # GainはOutputのものをを流用
-            # Monitorモードが有効の場合はサンプリングレートはmonitorデバイスが優先されているためリサンプリング不要
+            outdata[:] = outdata * self.settings.serverMonitorAudioGain
         except Exception as e:
             print("[Voice Changer][ServerDevice][audioMonitor_callback]  ex:", e)
             # import traceback

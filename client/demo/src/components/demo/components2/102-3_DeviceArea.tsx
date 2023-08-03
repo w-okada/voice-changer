@@ -757,6 +757,41 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
         );
     }, [monitorHostApi, serverSetting.serverSetting, serverSetting.updateServerSettings, serverSetting.serverSetting.enableServerAudio]);
 
+    const monitorGainControl = useMemo(() => {
+        const currentMonitorGain = serverSetting.serverSetting.enableServerAudio == 0 ? setting.voiceChangerClientSetting.monitorGain : serverSetting.serverSetting.serverMonitorAudioGain;
+        const monitorValueUpdatedAction =
+            serverSetting.serverSetting.enableServerAudio == 0
+                ? async (val: number) => {
+                      await setVoiceChangerClientSetting({ ...setting.voiceChangerClientSetting, monitorGain: val });
+                  }
+                : async (val: number) => {
+                      await serverSetting.updateServerSettings({ ...serverSetting.serverSetting, serverMonitorAudioGain: val });
+                  };
+
+        return (
+            <div className="config-sub-area-control">
+                <div className="config-sub-area-control-title left-padding-2">gain</div>
+                <div className="config-sub-area-control-field">
+                    <div className="config-sub-area-control-field-auido-io">
+                        <span className="character-area-slider-control-slider">
+                            <input
+                                type="range"
+                                min="0.1"
+                                max="10.0"
+                                step="0.1"
+                                value={currentMonitorGain}
+                                onChange={(e) => {
+                                    monitorValueUpdatedAction(Number(e.target.value));
+                                }}
+                            ></input>
+                        </span>
+                        <span className="character-area-slider-control-val">{currentMonitorGain}</span>
+                    </div>
+                </div>
+            </div>
+        );
+    }, [serverSetting.serverSetting, setting, setVoiceChangerClientSetting, serverSetting.updateServerSettings]);
+
     return (
         <div className="config-sub-area">
             {deviceModeRow}
@@ -769,6 +804,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
             {serverAudioOutputRow}
             {clientMonitorRow}
             {serverMonitorRow}
+            {monitorGainControl}
 
             {outputRecorderRow}
             <audio hidden id={AUDIO_ELEMENT_FOR_PLAY_RESULT}></audio>
