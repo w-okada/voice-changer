@@ -40,19 +40,19 @@ def setupArgParser():
     parser.add_argument("--httpsCert", type=str, default="ssl.cert", help="path for the cert of https")
     parser.add_argument("--httpsSelfSigned", type=strtobool, default=True, help="generate self-signed certificate")
 
-    parser.add_argument("--model_dir", type=str, help="path to model files")
+    parser.add_argument("--model_dir", type=str, default="model_dir", help="path to model files")
     parser.add_argument("--sample_mode", type=str, default="production", help="rvc_sample_mode")
 
-    parser.add_argument("--content_vec_500", type=str, help="path to content_vec_500 model(pytorch)")
-    parser.add_argument("--content_vec_500_onnx", type=str, help="path to content_vec_500 model(onnx)")
-    parser.add_argument("--content_vec_500_onnx_on", type=strtobool, default=False, help="use or not onnx for  content_vec_500")
-    parser.add_argument("--hubert_base", type=str, help="path to hubert_base model(pytorch)")
-    parser.add_argument("--hubert_base_jp", type=str, help="path to hubert_base_jp model(pytorch)")
-    parser.add_argument("--hubert_soft", type=str, help="path to hubert_soft model(pytorch)")
-    parser.add_argument("--nsf_hifigan", type=str, help="path to nsf_hifigan model(pytorch)")
-    parser.add_argument("--crepe_onnx_full", type=str, help="path to crepe_onnx_full")
-    parser.add_argument("--crepe_onnx_tiny", type=str, help="path to crepe_onnx_tiny")
-    parser.add_argument("--rmvpe", type=str, help="path to rmvpe")
+    parser.add_argument("--content_vec_500", type=str, default="pretrain/checkpoint_best_legacy_500.pt", help="path to content_vec_500 model(pytorch)")
+    parser.add_argument("--content_vec_500_onnx", type=str, default="pretrain/content_vec_500.onnx", help="path to content_vec_500 model(onnx)")
+    parser.add_argument("--content_vec_500_onnx_on", type=strtobool, default=True, help="use or not onnx for  content_vec_500")
+    parser.add_argument("--hubert_base", type=str, default="pretrain/hubert_base.pt", help="path to hubert_base model(pytorch)")
+    parser.add_argument("--hubert_base_jp", type=str, default="pretrain/rinna_hubert_base_jp.pt", help="path to hubert_base_jp model(pytorch)")
+    parser.add_argument("--hubert_soft", type=str, default="pretrain/hubert/hubert-soft-0d54a1f4.pt", help="path to hubert_soft model(pytorch)")
+    parser.add_argument("--nsf_hifigan", type=str, default="pretrain/nsf_hifigan/model", help="path to nsf_hifigan model(pytorch)")
+    parser.add_argument("--crepe_onnx_full", type=str, default="pretrain/crepe_onnx_full.onnx", help="path to crepe_onnx_full")
+    parser.add_argument("--crepe_onnx_tiny", type=str, default="pretrain/crepe_onnx_tiny.onnx", help="path to crepe_onnx_tiny")
+    parser.add_argument("--rmvpe", type=str, default="pretrain/rmvpe.pt", help="path to rmvpe")
 
     return parser
 
@@ -248,4 +248,4 @@ if __name__ == "__main__":
                 p.terminate()
 
         except Exception as e:
-            logger.error(f"[Voice Changer] Launch Exception, {e}")
+            logger.error(f"[Voice Changer] Client Launch Exception, {e}")
