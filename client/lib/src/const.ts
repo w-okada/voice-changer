@@ -540,7 +540,6 @@ export type OnnxExporterInfo = {
 // Merge
 export type MergeElement = {
     slotIndex: number
-    filename: string // 一意性は保障されない場合がある（フォルダコピーされたときとか）
     strength: number
 }
 export type MergeModelRequest = {

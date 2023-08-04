@@ -6,7 +6,6 @@ from dataclasses import dataclass
 @dataclass
 class MergeElement:
     slotIndex: int
-    filename: str
     strength: int
 
 

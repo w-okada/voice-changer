@@ -107,7 +107,7 @@ export const MergeLabDialog = () => {
         const onMergeElementsChanged = (slotIndex: number, strength: number) => {
             const newMergeElements = mergeElements.map((x) => {
                 if (x.slotIndex == slotIndex) {
-                    return { slotIndex: x.slotIndex, filename: x.filename, strength: strength };
+                    return { slotIndex: x.slotIndex, strength: strength };
                 } else {
                     return x;
                 }
