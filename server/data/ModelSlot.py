@@ -9,6 +9,7 @@ import json
 
 @dataclass
 class ModelSlot:
+    id: int = -1
     voiceChangerType: VoiceChangerType | None = None
     name: str = ""
     description: str = ""
@@ -153,6 +154,7 @@ def loadAllSlotInfo(model_dir: str):
     slotInfos: list[ModelSlots] = []
     for slotIndex in range(MAX_SLOT_NUM):
         slotInfo = loadSlotInfo(model_dir, slotIndex)
+        slotInfo.id = slotIndex
         slotInfos.append(slotInfo)
     return slotInfos
 

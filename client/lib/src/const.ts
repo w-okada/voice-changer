@@ -193,6 +193,7 @@ export type VoiceChangerServerSetting = {
 }
 
 type ModelSlot = {
+    id: number
     voiceChangerType: VoiceChangerType
     name: string,
     description: string,

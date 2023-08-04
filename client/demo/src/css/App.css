@@ -757,6 +757,18 @@ body {
                 max-height: 60vh;
                 width: 100%;
                 overflow-y: scroll;
+                &::-webkit-scrollbar {
+                    width: 10px;
+                    height: 10px;
+                }
+                &::-webkit-scrollbar-track {
+                    background-color: #eee;
+                    border-radius: 3px;
+                }
+                &::-webkit-scrollbar-thumb {
+                    background: #f7cfec80;
+                    border-radius: 3px;
+                }
 
                 .model-slot {
                     height: 5rem;
@@ -1152,12 +1164,28 @@ body {
             flex-wrap: wrap;
             overflow-y: scroll;
             max-height: 12rem;
+            &::-webkit-scrollbar {
+                width: 10px;
+                height: 10px;
+            }
+            &::-webkit-scrollbar-track {
+                background-color: #eee;
+                border-radius: 3px;
+            }
+            &::-webkit-scrollbar-thumb {
+                background: #f7cfec80;
+                border-radius: 3px;
+            }
+
             /* width: calc(30rem + 40px + 10px); */
         }
 
         .model-slot-buttons {
             display: flex;
-            flex-direction: column-reverse;
+            gap: 5px;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 4rem;
             .model-slot-button {
                 border: solid 2px #999;
                 color: white;
@@ -1166,9 +1194,40 @@ body {
                 background: #333;
                 cursor: pointer;
                 padding: 5px;
+                text-align: center;
+                width: 3rem;
             }
             .model-slot-button:hover {
                 border: solid 2px #faa;
+            }
+            .model-slot-sort-buttons {
+                height: 50%;
+                .model-slot-sort-button {
+                    color: white;
+                    font-size: 0.8rem;
+                    border-radius: 4px;
+                    background: #333;
+                    border: solid 2px #444;
+                    cursor: pointer;
+                    padding: 1px;
+                    text-align: center;
+                    width: 3rem;
+                }
+                .model-slot-sort-button-active {
+                    color: white;
+                    font-size: 0.8rem;
+                    border-radius: 4px;
+                    background: #595;
+                    border: solid 2px #595;
+                    cursor: pointer;
+                    padding: 1px;
+                    text-align: center;
+                    width: 3rem;
+                }
+                .model-slot-sort-button:hover {
+                    border: solid 2px #faa;
+                    background: #343;
+                }
             }
         }
     }
@@ -1639,6 +1698,19 @@ audio::-webkit-media-controls-overlay-enclosure{
             width: 70%;
             overflow-y: scroll;
             max-height: 20rem;
+            &::-webkit-scrollbar {
+                width: 10px;
+                height: 10px;
+            }
+            &::-webkit-scrollbar-track {
+                background-color: #eee;
+                border-radius: 3px;
+            }
+            &::-webkit-scrollbar-thumb {
+                background: #f7cfec80;
+                border-radius: 3px;
+            }
+
             .merge-lab-model-item {
                 display: flex;
                 flex-direction: row;
