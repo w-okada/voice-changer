@@ -1150,6 +1150,8 @@ body {
             flex-direction: row;
             gap: 2px;
             flex-wrap: wrap;
+            overflow-y: scroll;
+            max-height: 12rem;
             /* width: calc(30rem + 40px + 10px); */
         }
 
@@ -1635,6 +1637,8 @@ audio::-webkit-media-controls-overlay-enclosure{
         flex-direction: row;
         .merge-lab-model-list {
             width: 70%;
+            overflow-y: scroll;
+            max-height: 20rem;
             .merge-lab-model-item {
                 display: flex;
                 flex-direction: row;
