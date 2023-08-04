@@ -1,12 +1,14 @@
 from typing import Dict, Any
-
+import os
 from collections import OrderedDict
 import torch
+from voice_changer.ModelSlotManager import ModelSlotManager
 
 from voice_changer.utils.ModelMerger import ModelMergerRequest
+from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 
 
-def merge_model(request: ModelMergerRequest):
+def merge_model(params: VoiceChangerParams, request: ModelMergerRequest):
     def extract(ckpt: Dict[str, Any]):
         a = ckpt["model"]
         opt: Dict[str, Any] = OrderedDict()
@@ -34,11 +36,16 @@ def merge_model(request: ModelMergerRequest):
 
     weights = []
     alphas = []
+    slotManager = ModelSlotManager.get_instance(params.model_dir)
     for f in files:
         strength = f.strength
         if strength == 0:
             continue
-        weight, state_dict = load_weight(f.filename)
+        slotInfo = slotManager.get_slot_info(f.slotIndex)
+
+        filename = os.path.join(params.model_dir, str(f.slotIndex), os.path.basename(slotInfo.modelFile))  # slotInfo.modelFileはv.1.5.3.11以前はmodel_dirから含まれている。
+
+        weight, state_dict = load_weight(filename)
         weights.append(weight)
         alphas.append(f.strength)
 

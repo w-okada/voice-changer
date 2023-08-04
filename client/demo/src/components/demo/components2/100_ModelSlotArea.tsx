@@ -38,7 +38,7 @@ export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
                 if (!x.modelFile || x.modelFile.length == 0) {
                     return null;
                 }
-                const tileContainerClass = x.id == serverSetting.serverSetting.modelSlotIndex ? "model-slot-tile-container-selected" : "model-slot-tile-container";
+                const tileContainerClass = x.slotIndex == serverSetting.serverSetting.modelSlotIndex ? "model-slot-tile-container-selected" : "model-slot-tile-container";
                 const name = x.name.length > 8 ? x.name.substring(0, 7) + "..." : x.name;
                 const iconElem =
                     x.iconFile.length > 0 ? (
@@ -54,7 +54,7 @@ export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
                     );
 
                 const clickAction = async () => {
-                    const dummyModelSlotIndex = Math.floor(Date.now() / 1000) * 1000 + x.id;
+                    const dummyModelSlotIndex = Math.floor(Date.now() / 1000) * 1000 + x.slotIndex;
                     await serverSetting.updateServerSettings({ ...serverSetting.serverSetting, modelSlotIndex: dummyModelSlotIndex });
                     setTimeout(() => {
                         // quick hack

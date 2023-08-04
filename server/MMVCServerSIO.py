@@ -124,7 +124,7 @@ if __name__ == "MMVCServerSIO":
 
 
 if __name__ == "__mp_main__":
-#    printMessage("サーバプロセスを起動しています。", level=2)
+    # printMessage("サーバプロセスを起動しています。", level=2)
     printMessage("The server process is starting up.", level=2)
 
 if __name__ == "__main__":

@@ -193,7 +193,7 @@ export type VoiceChangerServerSetting = {
 }
 
 type ModelSlot = {
-    id: number
+    slotIndex: number
     voiceChangerType: VoiceChangerType
     name: string,
     description: string,
@@ -539,7 +539,8 @@ export type OnnxExporterInfo = {
 
 // Merge
 export type MergeElement = {
-    filename: string
+    slotIndex: number
+    filename: string // 一意性は保障されない場合がある（フォルダコピーされたときとか）
     strength: number
 }
 export type MergeModelRequest = {

@@ -306,8 +306,8 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         req.files = [MergeElement(**f) for f in req.files]
         slot = len(self.modelSlotManager.getAllSlotInfo()) - 1
         if req.voiceChangerType == "RVC":
-            merged = RVCModelMerger.merge_models(req, slot)
-            loadParam = LoadModelParams(voiceChangerType="RVC", slot=slot, isSampleMode=False, sampleId="", files=[LoadModelParamFile(name=os.path.basename(merged), kind="rvcModel", dir=f"{slot}")], params={})
+            merged = RVCModelMerger.merge_models(self.params, req, slot)
+            loadParam = LoadModelParams(voiceChangerType="RVC", slot=slot, isSampleMode=False, sampleId="", files=[LoadModelParamFile(name=os.path.basename(merged), kind="rvcModel", dir="")], params={})
             self.loadModel(loadParam)
         return self.get_info()
 
