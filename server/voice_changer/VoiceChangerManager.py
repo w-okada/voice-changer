@@ -277,14 +277,11 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         self.store_setting(key, val)
 
         if key in self.settings.boolData:
-            print("self.settings.boolData1", val, self.settings.passThrough)
             if val == "true":
                 newVal = True
             elif val == "false":
                 newVal = False
-            print("self.settings.boolData2", val, newVal, self.settings.passThrough)
             setattr(self.settings, key, newVal)
-            print("self.settings.boolData3", val, newVal, self.settings.passThrough)
         elif key in self.settings.intData:
             newVal = int(val)
             if key == "modelSlotIndex":
