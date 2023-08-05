@@ -68,6 +68,7 @@ export const RVCModelType = {
 export type RVCModelType = typeof RVCModelType[keyof typeof RVCModelType]
 
 export const ServerSettingKey = {
+    "passThrough":"passThrough",
     "srcId": "srcId",
     "dstId": "dstId",
     "gpu": "gpu",
@@ -133,6 +134,7 @@ export type ServerSettingKey = typeof ServerSettingKey[keyof typeof ServerSettin
 
 
 export type VoiceChangerServerSetting = {
+    passThrough: boolean
     srcId: number,
     dstId: number,
     gpu: number,
@@ -345,6 +347,7 @@ export type DiffusionSVCSampleModel =SampleModel & {
 
 export const DefaultServerSetting: ServerInfo = {
     // VC Common 
+    passThrough: false,
     inputSampleRate: 48000,
 
     crossFadeOffsetRate: 0.0,

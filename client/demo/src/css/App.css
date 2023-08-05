@@ -1363,6 +1363,34 @@ body {
                         border: solid 1px #000;
                     }
                 }
+                .character-area-control-passthru-button-stanby {
+                    width: 5rem;
+                    border: solid 1px #999;
+                    border-radius: 15px;
+                    padding: 2px;
+                    background: #aba;
+                    cursor: pointer;
+                    font-weight: 700;
+                    font-size: 0.8rem;
+                    text-align: center;
+                    &:hover {
+                        border: solid 1px #000;
+                    }
+                }
+                .character-area-control-passthru-button-active {
+                    width: 5rem;
+                    border: solid 1px #955;
+                    border-radius: 15px;
+                    padding: 2px;
+                    background: #fdd;
+                    cursor: pointer;
+                    font-weight: 700;
+                    font-size: 0.8rem;
+                    text-align: center;
+                    &:hover {
+                        border: solid 1px #000;
+                    }
+                }
             }
 
             .character-area-control-title {
@@ -1777,5 +1805,20 @@ audio::-webkit-media-controls-overlay-enclosure{
                 text-align: center;
             }
         }
+    }
+}
+
+.blinking {
+    animation: flash 0.7s cubic-bezier(0.91, -0.14, 0, 1.4) infinite;
+}
+
+@keyframes flash {
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
     }
 }

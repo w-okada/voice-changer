@@ -11,7 +11,6 @@ from voice_changer.ModelSlotManager import ModelSlotManager
 from voice_changer.RVC.RVCModelMerger import RVCModelMerger
 from voice_changer.VoiceChanger import VoiceChanger
 from const import STORED_SETTING_FILE, UPLOAD_DIR
-from voice_changer.VoiceChangerParamsManager import VoiceChangerParamsManager
 from voice_changer.VoiceChangerV2 import VoiceChangerV2
 from voice_changer.utils.LoadModelParams import LoadModelParamFile, LoadModelParams
 from voice_changer.utils.ModelMerger import MergeElement, ModelMergerRequest
@@ -38,8 +37,14 @@ class GPUInfo:
 @dataclass()
 class VoiceChangerManagerSettings:
     modelSlotIndex: int = -1
+    passThrough: bool = False  # 0: off, 1: on
     # ↓mutableな物だけ列挙
-    intData: list[str] = field(default_factory=lambda: ["modelSlotIndex"])
+    boolData: list[str] = field(default_factory=lambda: [
+        "passThrough"
+    ])
+    intData: list[str] = field(default_factory=lambda: [
+        "modelSlotIndex",
+    ])
 
 
 class VoiceChangerManager(ServerDeviceCallbacks):
@@ -268,10 +273,19 @@ class VoiceChangerManager(ServerDeviceCallbacks):
                 del self.voiceChangerModel
             return
 
-    def update_settings(self, key: str, val: str | int | float):
+    def update_settings(self, key: str, val: str | int | float | bool):
         self.store_setting(key, val)
 
-        if key in self.settings.intData:
+        if key in self.settings.boolData:
+            print("self.settings.boolData1", val, self.settings.passThrough)
+            if val == "true":
+                newVal = True
+            elif val == "false":
+                newVal = False
+            print("self.settings.boolData2", val, newVal, self.settings.passThrough)
+            setattr(self.settings, key, newVal)
+            print("self.settings.boolData3", val, newVal, self.settings.passThrough)
+        elif key in self.settings.intData:
             newVal = int(val)
             if key == "modelSlotIndex":
                 newVal = newVal % 1000
@@ -291,6 +305,9 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         return self.get_info()
 
     def changeVoice(self, receivedData: AudioInOut):
+        if self.settings.passThrough is True:  # パススルー
+            return receivedData, []
+
         if hasattr(self, "voiceChanger") is True:
             return self.voiceChanger.on_request(receivedData)
         else:
