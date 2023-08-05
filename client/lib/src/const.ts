@@ -306,7 +306,9 @@ export type ServerInfo = VoiceChangerServerSetting & {
         memory: number,
     }[]
     maxInputLength: number  // MMVCv15
-
+    voiceChangerParams: {
+        model_dir: string
+    }
 }
 
 export type SampleModel = {
@@ -409,7 +411,10 @@ export const DefaultServerSetting: ServerInfo = {
     serverAudioInputDevices: [],
     serverAudioOutputDevices: [],
 
-    maxInputLength:  128 * 2048
+    maxInputLength:  128 * 2048,
+    voiceChangerParams: {
+        model_dir: ""
+    }
 }
 
 ///////////////////////

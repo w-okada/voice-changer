@@ -48,7 +48,7 @@ class RVCr2(VoiceChangerModel):
 
         # pipelineの生成
         try:
-            self.pipeline = createPipeline(self.slotInfo, self.settings.gpu, self.settings.f0Detector)
+            self.pipeline = createPipeline(self.params, self.slotInfo, self.settings.gpu, self.settings.f0Detector)
         except PipelineCreateException as e:  # NOQA
             logger.error("[Voice Changer] pipeline create failed. check your model is valid.")
             return

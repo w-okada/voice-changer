@@ -11,6 +11,7 @@ from voice_changer.ModelSlotManager import ModelSlotManager
 from voice_changer.RVC.RVCModelMerger import RVCModelMerger
 from voice_changer.VoiceChanger import VoiceChanger
 from const import STORED_SETTING_FILE, UPLOAD_DIR
+from voice_changer.VoiceChangerParamsManager import VoiceChangerParamsManager
 from voice_changer.VoiceChangerV2 import VoiceChangerV2
 from voice_changer.utils.LoadModelParams import LoadModelParamFile, LoadModelParams
 from voice_changer.utils.ModelMerger import MergeElement, ModelMergerRequest
@@ -120,8 +121,9 @@ class VoiceChangerManager(ServerDeviceCallbacks):
     @classmethod
     def get_instance(cls, params: VoiceChangerParams):
         if cls._instance is None:
+            vcparams = VoiceChangerParamsManager.get_instance()
+            vcparams.setParams(params)
             cls._instance = cls(params)
-            # cls._instance.voiceChanger = VoiceChanger(params)
         return cls._instance
 
     def loadModel(self, params: LoadModelParams):
@@ -147,7 +149,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
                 os.makedirs(dstDir, exist_ok=True)
                 logger.info(f"move to {srcPath} -> {dstPath}")
                 shutil.move(srcPath, dstPath)
-                file.name = dstPath
+                file.name = os.path.basename(dstPath)
 
             # メタデータ作成(各VCで定義)
             if params.voiceChangerType == "RVC":
@@ -188,6 +190,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         data["modelSlots"] = self.modelSlotManager.getAllSlotInfo(reload=True)
         data["sampleModels"] = getSampleInfos(self.params.sample_mode)
         data["python"] = sys.version
+        data["voiceChangerParams"] = self.params
 
         data["status"] = "OK"
 

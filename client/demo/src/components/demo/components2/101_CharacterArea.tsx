@@ -49,7 +49,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
             return <></>;
         }
 
-        const icon = selected.iconFile.length > 0 ? selected.iconFile : "./assets/icons/human.png";
+        const icon = selected.iconFile.length > 0 ? serverSetting.serverSetting.voiceChangerParams.model_dir + "/" + selected.slotIndex + "/" + selected.iconFile.split(/[\/\\]/).pop() : "./assets/icons/human.png";
         const selectedTermOfUseUrlLink = selected.termsOfUseUrl ? (
             <a href={selected.termsOfUseUrl} target="_blank" rel="noopener noreferrer" className="portrait-area-terms-of-use-link">
                 [{messageBuilderState.getMessage(__filename, "terms_of_use")}]

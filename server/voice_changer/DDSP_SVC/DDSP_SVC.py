@@ -6,6 +6,7 @@ import torch
 from data.ModelSlot import DDSPSVCModelSlot
 
 from voice_changer.DDSP_SVC.deviceManager.DeviceManager import DeviceManager
+from voice_changer.VoiceChangerParamsManager import VoiceChangerParamsManager
 
 if sys.platform.startswith("darwin"):
     baseDir = [x for x in sys.path if x.endswith("Contents/MacOS")]
@@ -69,12 +70,15 @@ class DDSP_SVC:
 
     def initialize(self):
         self.device = self.deviceManager.getDevice(self.settings.gpu)
+        vcparams = VoiceChangerParamsManager.get_instance().params
+        modelPath = os.path.join(vcparams.model_dir, str(self.slotInfo.slotIndex), "model",  self.slotInfo.modelFile)
+        diffPath = os.path.join(vcparams.model_dir, str(self.slotInfo.slotIndex), "diff", self.slotInfo.diffModelFile)
 
         self.svc_model = SvcDDSP()
         self.svc_model.setVCParams(self.params)
-        self.svc_model.update_model(self.slotInfo.modelFile, self.device)
+        self.svc_model.update_model(modelPath, self.device)
         self.diff_model = DiffGtMel(device=self.device)
-        self.diff_model.flush_model(self.slotInfo.diffModelFile, ddsp_config=self.svc_model.args)
+        self.diff_model.flush_model(diffPath, ddsp_config=self.svc_model.args)
 
     def update_settings(self, key: str, val: int | float | str):
         if key in self.settings.intData:
@@ -174,5 +178,9 @@ class DDSP_SVC:
                 if file_path.find("DDSP-SVC" + os.path.sep) >= 0:
                     # print("remove", key, file_path)
                     sys.modules.pop(key)
-            except:  # type:ignore
+            except:  # type:ignore # noqa
                 pass
+
+    def get_model_current(self):
+        return [
+        ]

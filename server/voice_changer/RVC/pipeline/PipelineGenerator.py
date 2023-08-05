@@ -9,15 +9,17 @@ from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 from voice_changer.RVC.inferencer.InferencerManager import InferencerManager
 from voice_changer.RVC.pipeline.Pipeline import Pipeline
 from voice_changer.RVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
+from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 
 
-def createPipeline(modelSlot: RVCModelSlot, gpu: int, f0Detector: str):
+def createPipeline(params: VoiceChangerParams, modelSlot: RVCModelSlot, gpu: int, f0Detector: str):
     dev = DeviceManager.get_instance().getDevice(gpu)
     half = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
 
     # Inferencer 生成
     try:
-        inferencer = InferencerManager.getInferencer(modelSlot.modelType, modelSlot.modelFile, gpu)
+        modelPath = os.path.join(params.model_dir, str(modelSlot.slotIndex), os.path.basename(modelSlot.modelFile))
+        inferencer = InferencerManager.getInferencer(modelSlot.modelType, modelPath, gpu)
     except Exception as e:
         print("[Voice Changer] exception! loading inferencer", e)
         traceback.print_exc()
@@ -40,7 +42,8 @@ def createPipeline(modelSlot: RVCModelSlot, gpu: int, f0Detector: str):
     pitchExtractor = PitchExtractorManager.getPitchExtractor(f0Detector, gpu)
 
     # index, feature
-    index = _loadIndex(modelSlot)
+    indexPath = os.path.join(params.model_dir, str(modelSlot.slotIndex), os.path.basename(modelSlot.indexFile))
+    index = _loadIndex(indexPath)
 
     pipeline = Pipeline(
         embedder,
@@ -55,21 +58,17 @@ def createPipeline(modelSlot: RVCModelSlot, gpu: int, f0Detector: str):
     return pipeline
 
 
-def _loadIndex(modelSlot: RVCModelSlot):
+def _loadIndex(indexPath: str):
     # Indexのロード
     print("[Voice Changer] Loading index...")
-    # ファイル指定がない場合はNone
-    if modelSlot.indexFile is None:
-        print("[Voice Changer] Index is None, not used")
-        return None
-
     # ファイル指定があってもファイルがない場合はNone
-    if os.path.exists(modelSlot.indexFile) is not True:
+    if os.path.exists(indexPath) is not True or os.path.isfile(indexPath) is not True:
+        print("[Voice Changer] Index file is not found")
         return None
 
     try:
-        print("Try loading...", modelSlot.indexFile)
-        index = faiss.read_index(modelSlot.indexFile)
+        print("Try loading...", indexPath)
+        index = faiss.read_index(indexPath)
     except: # NOQA
         print("[Voice Changer] load index failed. Use no index.")
         traceback.print_exc()

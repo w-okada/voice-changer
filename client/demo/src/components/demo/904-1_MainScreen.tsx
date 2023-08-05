@@ -99,7 +99,7 @@ export const MainScreen = (props: MainScreenProps) => {
         const slotRow = serverSetting.serverSetting.modelSlots.map((x, index) => {
             // モデルのアイコン
             const generateIconArea = (slotIndex: number, iconUrl: string, tooltip: boolean) => {
-                const realIconUrl = iconUrl.length > 0 ? iconUrl : "/assets/icons/noimage.png";
+                const realIconUrl = iconUrl.length > 0 ? serverSetting.serverSetting.voiceChangerParams.model_dir + "/" + slotIndex + "/" + iconUrl.split(/[\/\\]/).pop() : "/assets/icons/noimage.png";
                 const iconDivClass = tooltip ? "tooltip" : "";
                 const iconClass = tooltip ? "model-slot-icon-pointable" : "model-slot-icon";
                 return (

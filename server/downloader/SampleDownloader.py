@@ -109,7 +109,7 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
                     "position": line_num,
                 }
             )
-            slotInfo.modelFile = modelFilePath
+            slotInfo.modelFile = os.path.basename(sample.modelUrl)
             line_num += 1
 
             if targetSampleParams["useIndex"] is True and hasattr(sample, "indexUrl") and sample.indexUrl != "":
@@ -124,7 +124,7 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
                         "position": line_num,
                     }
                 )
-                slotInfo.indexFile = indexPath
+                slotInfo.indexFile = os.path.basename(sample.indexUrl)
                 line_num += 1
 
             if hasattr(sample, "icon") and sample.icon != "":
@@ -139,7 +139,7 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
                         "position": line_num,
                     }
                 )
-                slotInfo.iconFile = iconPath
+                slotInfo.iconFile = os.path.basename(sample.icon)
                 line_num += 1
 
             slotInfo.sampleId = sample.id
@@ -169,7 +169,7 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
                     "position": line_num,
                 }
             )
-            slotInfo.modelFile = modelFilePath
+            slotInfo.modelFile = os.path.basename(sample.modelUrl)
             line_num += 1
 
             if hasattr(sample, "icon") and sample.icon != "":
@@ -184,7 +184,7 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
                         "position": line_num,
                     }
                 )
-                slotInfo.iconFile = iconPath
+                slotInfo.iconFile = os.path.basename(sample.icon)
                 line_num += 1
 
             slotInfo.sampleId = sample.id
@@ -214,11 +214,12 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
     logger.info("[Voice Changer] Generating metadata...")
     for targetSlotIndex in slotIndex:
         slotInfo = modelSlotManager.get_slot_info(targetSlotIndex)
+        modelPath = os.path.join(model_dir, str(slotInfo.slotIndex), os.path.basename(slotInfo.modelFile))
         if slotInfo.voiceChangerType == "RVC":
             if slotInfo.isONNX:
-                slotInfo = RVCModelSlotGenerator._setInfoByONNX(slotInfo)
+                slotInfo = RVCModelSlotGenerator._setInfoByONNX(modelPath, slotInfo)
             else:
-                slotInfo = RVCModelSlotGenerator._setInfoByPytorch(slotInfo)
+                slotInfo = RVCModelSlotGenerator._setInfoByPytorch(modelPath, slotInfo)
 
             modelSlotManager.save_model_slot(targetSlotIndex, slotInfo)
         elif slotInfo.voiceChangerType == "Diffusion-SVC":

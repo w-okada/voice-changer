@@ -1,6 +1,7 @@
 import sys
 import os
 from data.ModelSlot import MMVCv15ModelSlot
+from voice_changer.VoiceChangerParamsManager import VoiceChangerParamsManager
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 
 if sys.platform.startswith("darwin"):
@@ -70,7 +71,11 @@ class MMVCv15:
 
     def initialize(self):
         print("[Voice Changer] [MMVCv15] Initializing... ")
-        self.hps = get_hparams_from_file(self.slotInfo.configFile)
+        vcparams = VoiceChangerParamsManager.get_instance().params
+        configPath = os.path.join(vcparams.model_dir, str(self.slotInfo.slotIndex), self.slotInfo.configFile)
+        modelPath = os.path.join(vcparams.model_dir, str(self.slotInfo.slotIndex), self.slotInfo.modelFile)
+
+        self.hps = get_hparams_from_file(configPath)
 
         self.net_g = SynthesizerTrn(
             spec_channels=self.hps.data.filter_length // 2 + 1,
@@ -96,7 +101,7 @@ class MMVCv15:
             self.onxx_input_length = 8192
             providers, options = self.getOnnxExecutionProvider()
             self.onnx_session = onnxruntime.InferenceSession(
-                self.slotInfo.modelFile,
+                modelPath,
                 providers=providers,
                 provider_options=options,
             )
@@ -108,7 +113,7 @@ class MMVCv15:
                     self.settings.maxInputLength = self.onxx_input_length - (0.012 * self.hps.data.sampling_rate) - 1024 # onnxの場合は入力長固(crossfadeの1024は仮) # NOQA
         else:
             self.net_g.eval()
-            load_checkpoint(self.slotInfo.modelFile, self.net_g, None)
+            load_checkpoint(modelPath, self.net_g, None)
 
         # その他の設定
         self.settings.srcId = self.slotInfo.srcId
@@ -139,8 +144,10 @@ class MMVCv15:
             setattr(self.settings, key, val)
             if key == "gpu" and self.slotInfo.isONNX:
                 providers, options = self.getOnnxExecutionProvider()
+                vcparams = VoiceChangerParamsManager.get_instance().params
+                modelPath = os.path.join(vcparams.model_dir, str(self.slotInfo.slotIndex), self.slotInfo.modelFile)
                 self.onnx_session = onnxruntime.InferenceSession(
-                    self.slotInfo.modelFile,
+                    modelPath,
                     providers=providers,
                     provider_options=options,
                 )
@@ -208,7 +215,8 @@ class MMVCv15:
         solaSearchFrame: int = 0,
     ):
         # maxInputLength を更新(ここでやると非効率だが、とりあえず。)
-        self.settings.maxInputLength = self.onxx_input_length - crossfadeSize - solaSearchFrame # onnxの場合は入力長固(crossfadeの1024は仮) # NOQA
+        if self.slotInfo.isONNX:
+            self.settings.maxInputLength = self.onxx_input_length - crossfadeSize - solaSearchFrame # onnxの場合は入力長固(crossfadeの1024は仮) # NOQA get_infoで返る値。この関数内の処理では使わない。
 
         newData = newData.astype(np.float32) / self.hps.data.max_wav_value
 
@@ -310,3 +318,19 @@ class MMVCv15:
                     sys.modules.pop(key)
             except: # NOQA
                 pass
+
+    def get_model_current(self):
+        return [
+            {
+                "key": "srcId",
+                "val": self.settings.srcId,
+            },
+            {
+                "key": "dstId",
+                "val": self.settings.dstId,
+            },
+            {
+                "key": "f0Factor",
+                "val": self.settings.f0Factor,
+            }
+        ]

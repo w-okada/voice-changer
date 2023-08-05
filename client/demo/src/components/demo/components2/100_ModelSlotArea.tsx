@@ -40,10 +40,11 @@ export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
                 }
                 const tileContainerClass = x.slotIndex == serverSetting.serverSetting.modelSlotIndex ? "model-slot-tile-container-selected" : "model-slot-tile-container";
                 const name = x.name.length > 8 ? x.name.substring(0, 7) + "..." : x.name;
+
                 const iconElem =
                     x.iconFile.length > 0 ? (
                         <>
-                            <img className="model-slot-tile-icon" src={x.iconFile} alt={x.name} />
+                            <img className="model-slot-tile-icon" src={serverSetting.serverSetting.voiceChangerParams.model_dir + "/" + x.slotIndex + "/" + x.iconFile.split(/[\/\\]/).pop()} alt={x.name} />
                             <div className="model-slot-tile-vctype">{x.voiceChangerType}</div>
                         </>
                     ) : (

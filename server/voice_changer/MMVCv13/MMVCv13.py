@@ -1,6 +1,7 @@
 import sys
 import os
 from data.ModelSlot import MMVCv13ModelSlot
+from voice_changer.VoiceChangerParamsManager import VoiceChangerParamsManager
 
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 
@@ -63,19 +64,22 @@ class MMVCv13:
 
     def initialize(self):
         print("[Voice Changer] [MMVCv13] Initializing... ")
+        vcparams = VoiceChangerParamsManager.get_instance().params
+        configPath = os.path.join(vcparams.model_dir, str(self.slotInfo.slotIndex), self.slotInfo.configFile)
+        modelPath = os.path.join(vcparams.model_dir, str(self.slotInfo.slotIndex), self.slotInfo.modelFile)
 
-        self.hps = get_hparams_from_file(self.slotInfo.configFile)
+        self.hps = get_hparams_from_file(configPath)
         if self.slotInfo.isONNX:
             providers, options = self.getOnnxExecutionProvider()
             self.onnx_session = onnxruntime.InferenceSession(
-                self.slotInfo.modelFile,
+                modelPath,
                 providers=providers,
                 provider_options=options,
             )
         else:
             self.net_g = SynthesizerTrn(len(symbols), self.hps.data.filter_length // 2 + 1, self.hps.train.segment_size // self.hps.data.hop_length, n_speakers=self.hps.data.n_speakers, **self.hps.model)
             self.net_g.eval()
-            load_checkpoint(self.slotInfo.modelFile, self.net_g, None)
+            load_checkpoint(modelPath, self.net_g, None)
 
         # その他の設定
         self.settings.srcId = self.slotInfo.srcId
@@ -105,8 +109,10 @@ class MMVCv13:
 
             if key == "gpu" and self.slotInfo.isONNX:
                 providers, options = self.getOnnxExecutionProvider()
+                vcparams = VoiceChangerParamsManager.get_instance().params
+                modelPath = os.path.join(vcparams.model_dir, str(self.slotInfo.slotIndex), self.slotInfo.modelFile)
                 self.onnx_session = onnxruntime.InferenceSession(
-                    self.slotInfo.modelFile,
+                    modelPath,
                     providers=providers,
                     provider_options=options,
                 )
@@ -249,3 +255,15 @@ class MMVCv13:
                     sys.modules.pop(key)
             except:  # NOQA
                 pass
+
+    def get_model_current(self):
+        return [
+            {
+                "key": "srcId",
+                "val": self.settings.srcId,
+            },
+            {
+                "key": "dstId",
+                "val": self.settings.dstId,
+            }
+        ]

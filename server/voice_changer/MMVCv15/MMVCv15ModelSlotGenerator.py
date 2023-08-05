@@ -1,6 +1,7 @@
 import os
 
 from data.ModelSlot import MMVCv15ModelSlot
+from voice_changer.VoiceChangerParamsManager import VoiceChangerParamsManager
 from voice_changer.utils.LoadModelParams import LoadModelParams
 from voice_changer.utils.ModelSlotGenerator import ModelSlotGenerator
 
@@ -15,7 +16,9 @@ class MMVCv15ModelSlotGenerator(ModelSlotGenerator):
             elif file.kind == "mmvcv15Config":
                 slotInfo.configFile = file.name
             elif file.kind == "mmvcv15Correspondence":
-                with open(file.name, "r") as f:
+                vcparams = VoiceChangerParamsManager.get_instance().params
+                filePath = os.path.join(vcparams.model_dir, str(props.slot), file.name)
+                with open(filePath, "r") as f:
                     slotInfo.speakers = {}
                     while True:
                         line = f.readline()

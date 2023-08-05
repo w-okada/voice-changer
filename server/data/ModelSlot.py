@@ -170,4 +170,4 @@ def saveSlotInfo(model_dir: str, slotIndex: int, slotInfo: ModelSlots):
     slotDir = os.path.join(model_dir, str(slotIndex))
     slotInfoDict = asdict(slotInfo)
     slotInfo.slotIndex = -1  # スロットインデックスは動的に注入
-    json.dump(slotInfoDict, open(os.path.join(slotDir, "params.json"), "w"))
+    json.dump(slotInfoDict, open(os.path.join(slotDir, "params.json"), "w"), indent=4)

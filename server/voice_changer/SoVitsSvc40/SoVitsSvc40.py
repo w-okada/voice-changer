@@ -1,6 +1,7 @@
 import sys
 import os
 from data.ModelSlot import SoVitsSvc40ModelSlot
+from voice_changer.VoiceChangerParamsManager import VoiceChangerParamsManager
 
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
@@ -92,13 +93,17 @@ class SoVitsSvc40:
 
     def initialize(self):
         print("[Voice Changer] [so-vits-svc40] Initializing... ")
-        self.hps = get_hparams_from_file(self.slotInfo.configFile)
+        vcparams = VoiceChangerParamsManager.get_instance().params
+        configPath = os.path.join(vcparams.model_dir, str(self.slotInfo.slotIndex), self.slotInfo.configFile)
+        modelPath = os.path.join(vcparams.model_dir, str(self.slotInfo.slotIndex), self.slotInfo.modelFile)
+        self.hps = get_hparams_from_file(configPath)
         self.settings.speakers = self.hps.spk
 
         # cluster
         try:
             if self.slotInfo.clusterFile is not None:
-                self.cluster_model = get_cluster_model(self.slotInfo.clusterFile)
+                clusterPath = os.path.join(vcparams.model_dir, str(self.slotInfo.slotIndex), self.slotInfo.clusterFile)
+                self.cluster_model = get_cluster_model(clusterPath)
             else:
                 self.cluster_model = None
         except Exception as e:
@@ -110,7 +115,7 @@ class SoVitsSvc40:
         if self.slotInfo.isONNX:
             providers, options = self.getOnnxExecutionProvider()
             self.onnx_session = onnxruntime.InferenceSession(
-                self.slotInfo.modelFile,
+                modelPath,
                 providers=providers,
                 provider_options=options,
             )
@@ -122,7 +127,7 @@ class SoVitsSvc40:
             )
             net_g.eval()
             self.net_g = net_g
-            load_checkpoint(self.slotInfo.modelFile, self.net_g, None)
+            load_checkpoint(modelPath, self.net_g, None)
 
     def getOnnxExecutionProvider(self):
         availableProviders = onnxruntime.get_available_providers()
@@ -378,6 +383,10 @@ class SoVitsSvc40:
                     sys.modules.pop(key)
             except Exception:  # type:ignore
                 pass
+
+    def get_model_current(self):
+        return [
+        ]
 
 
 def resize_f0(x, target_len):

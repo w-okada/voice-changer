@@ -4,7 +4,7 @@ import torch
 from onnxsim import simplify
 import onnx
 from const import TMP_DIR, EnumInferenceTypes
-from data.ModelSlot import ModelSlot
+from data.ModelSlot import RVCModelSlot
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.onnxExporter.SynthesizerTrnMs256NSFsid_ONNX import (
     SynthesizerTrnMs256NSFsid_ONNX,
@@ -24,10 +24,12 @@ from voice_changer.RVC.onnxExporter.SynthesizerTrnMsNSFsidNono_webui_ONNX import
 from voice_changer.RVC.onnxExporter.SynthesizerTrnMsNSFsid_webui_ONNX import (
     SynthesizerTrnMsNSFsid_webui_ONNX,
 )
+from voice_changer.VoiceChangerParamsManager import VoiceChangerParamsManager
 
 
-def export2onnx(gpu: int, modelSlot: ModelSlot):
-    modelFile = modelSlot.modelFile
+def export2onnx(gpu: int, modelSlot: RVCModelSlot):
+    vcparams = VoiceChangerParamsManager.get_instance().params
+    modelFile = os.path.join(vcparams.model_dir, str(modelSlot.slotIndex), os.path.basename(modelSlot.modelFile))
 
     output_file = os.path.splitext(os.path.basename(modelFile))[0] + ".onnx"
     output_file_simple = os.path.splitext(os.path.basename(modelFile))[0] + "_simple.onnx"
