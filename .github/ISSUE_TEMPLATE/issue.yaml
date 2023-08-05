@@ -117,6 +117,16 @@ body:
     id: issue
     attributes:
       label: Situation
-      description: Developers spend a lot of time developing new features and resolving issues. If you really want to get it solved, please provide as much reproducible information and logs as possible. Provide logs on the terminal and capture the window.
+      description: Developers spend a lot of time developing new features and resolving issues. If you really want to get it solved, please provide as much reproducible information and logs as possible. Provide logs on the terminal and capture the appkication window.
+  - type: textarea
+    id: capture
+    attributes:
+      label: application window capture
+      description: the appkication window.
+  - type: textarea
+    id: logs-on-terminal
+    attributes:
+      label: logs on terminal
+      description: logs on terminal.
     validations:
       required: true
