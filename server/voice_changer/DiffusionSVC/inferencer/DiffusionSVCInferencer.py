@@ -119,11 +119,11 @@ class DiffusionSVCInferencer(Inferencer):
 
         # print("[    ----Timer::1: ]", t.secs)
 
-        with Timer("pre-process", True) as t:
+        with Timer("pre-process", False) as t:
             if skip_diffusion == 0:
                 out_mel = self.__call__(feats, pitch, volume, spk_id=sid, spk_mix_dict=None, aug_shift=0, gt_spec=gt_spec, infer_speedup=infer_speedup, method='dpm-solver', k_step=k_step, use_tqdm=False, spk_emb=None)
                 gt_spec = out_mel
-        print("[    ----Timer::2: ]", t.secs)
+        # print("[    ----Timer::2: ]", t.secs)
 
 
         with Timer("pre-process", False) as t:  # NOQA
@@ -133,6 +133,7 @@ class DiffusionSVCInferencer(Inferencer):
                 out_wav *= mask
             else:
                 out_wav = self.vocoder_onnx.infer(gt_spec, pitch, silence_front, mask)
+                # out_wav = self.vocoder_onnx.infer(gt_spec, pitch, 0, mask)
         # print("[    ----Timer::3: ]", t.secs)
 
         return out_wav.squeeze()

@@ -145,18 +145,20 @@ class Pipeline(object):
             feats = feats.view(1, -1)
 
             # embedding
-            with autocast(enabled=self.isHalf):
-                try:
-                    feats = self.embedder.extractFeatures(feats, embOutputLayer, useFinalProj)
-                    if torch.isnan(feats).all():
-                        raise DeviceCannotSupportHalfPrecisionException()
-                except RuntimeError as e:
-                    if "HALF" in e.__str__().upper():
-                        raise HalfPrecisionChangingException()
-                    elif "same device" in e.__str__():
-                        raise DeviceChangingException()
-                    else:
-                        raise e
+            with Timer("main-process", False) as te:
+                with autocast(enabled=self.isHalf):
+                    try:
+                        feats = self.embedder.extractFeatures(feats, embOutputLayer, useFinalProj)
+                        if torch.isnan(feats).all():
+                            raise DeviceCannotSupportHalfPrecisionException()
+                    except RuntimeError as e:
+                        if "HALF" in e.__str__().upper():
+                            raise HalfPrecisionChangingException()
+                        elif "same device" in e.__str__():
+                            raise DeviceChangingException()
+                        else:
+                            raise e
+            # print(f"[Embedding] {te.secs}")
 
             # Index - feature抽出
             # if self.index is not None and self.feature is not None and index_rate != 0:

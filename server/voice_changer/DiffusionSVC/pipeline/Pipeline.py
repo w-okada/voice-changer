@@ -99,7 +99,8 @@ class Pipeline(object):
         silence_front,
         embOutputLayer,
         useFinalProj,
-        protect=0.5
+        protect=0.5,
+        skip_diffusion=True,
     ):
         # print("---------- pipe line --------------------")
         with Timer("pre-process", False) as t:
@@ -174,7 +175,8 @@ class Pipeline(object):
                                     sid,
                                     k_step,
                                     infer_speedup,
-                                    silence_front=silence_front
+                                    silence_front=silence_front,
+                                    skip_diffusion=skip_diffusion
                                     ).to(dtype=torch.float32),
                                 -1.0,
                                 1.0,
