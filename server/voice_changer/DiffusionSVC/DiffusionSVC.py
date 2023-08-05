@@ -216,6 +216,10 @@ class DiffusionSVC(VoiceChangerModel):
                 "val": self.settings.tran,
             },
             {
+                "key": "dstId",
+                "val": self.settings.dstId,
+            },
+            {
                 "key": "defaultKstep",
                 "val": self.settings.kStep,
             },

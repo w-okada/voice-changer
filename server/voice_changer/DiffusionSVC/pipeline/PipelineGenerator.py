@@ -7,19 +7,23 @@ from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractorManager import Pitc
 
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
-
+import os
 import torch
 from torchaudio.transforms import Resample
+
+from voice_changer.VoiceChangerParamsManager import VoiceChangerParamsManager
 
 
 def createPipeline(modelSlot: DiffusionSVCModelSlot, gpu: int, f0Detector: str, inputSampleRate: int, outputSampleRate: int):
     dev = DeviceManager.get_instance().getDevice(gpu)
+    vcparams = VoiceChangerParamsManager.get_instance().params
     # half = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
     half = False
 
     # Inferencer 生成
-    try:
-        inferencer = InferencerManager.getInferencer(modelSlot.modelType, modelSlot.modelFile, gpu)
+    try:        
+        modelPath = os.path.join(vcparams.model_dir, str(modelSlot.slotIndex), os.path.basename(modelSlot.modelFile))
+        inferencer = InferencerManager.getInferencer(modelSlot.modelType, modelPath, gpu)
     except Exception as e:
         print("[Voice Changer] exception! loading inferencer", e)
         traceback.print_exc()
