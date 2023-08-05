@@ -180,7 +180,8 @@ class DiffusionSVC(VoiceChangerModel):
                 silenceFrontSec,
                 embOutputLayer,
                 useFinalProj,
-                protect
+                protect,
+                skip_diffusion=self.settings.skipDiffusion,
             )
             result = audio_out.detach().cpu().numpy()
             return result

@@ -13,7 +13,7 @@ class DiffusionSVCSettings:
 
     kStep: int = 20
     speedUp: int = 10
-    skipDiffusion: int = 0  # 0:off, 1:on
+    skipDiffusion: int = 1  # 0:off, 1:on
 
     silenceFront: int = 1  # 0:off, 1:on
     modelSamplingRate: int = 44100
@@ -30,6 +30,7 @@ class DiffusionSVCSettings:
         "kStep",
         "speedUp",
         "silenceFront",
+        "skipDiffusion",
     ]
     floatData = ["silentThreshold"]
     strData = ["f0Detector"]

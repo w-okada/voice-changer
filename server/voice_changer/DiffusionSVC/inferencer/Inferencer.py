@@ -21,11 +21,16 @@ class Inferencer(Protocol):
 
     def infer(
         self,
+        audio_t: torch.Tensor,
         feats: torch.Tensor,
-        pitch_length: torch.Tensor,
-        pitch: torch.Tensor | None,
-        pitchf: torch.Tensor | None,
+        pitch: torch.Tensor,
+        volume: torch.Tensor,
+        mask: torch.Tensor,
         sid: torch.Tensor,
+        k_step: int,
+        infer_speedup: int,
+        silence_front: float,
+        skip_diffusion: bool = True,
     ) -> torch.Tensor:
         ...
 

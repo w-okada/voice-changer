@@ -23,6 +23,26 @@ export const DiffusionSVCSettingArea = (_props: DiffusionSVCSettingAreaProps) =>
             return <></>;
         }
 
+        const skipDiffusionClass = serverSetting.serverSetting.skipDiffusion == 0 ? "character-area-toggle-button" : "character-area-toggle-button-active";
+
+        const skipDiffRow = (
+            <div className="character-area-control">
+                <div className="character-area-control-title">Boost</div>
+                <div className="character-area-control-field">
+                    <div className="character-area-buttons">
+                        <div
+                            className={skipDiffusionClass}
+                            onClick={() => {
+                                serverSetting.updateServerSettings({ ...serverSetting.serverSetting, skipDiffusion: serverSetting.serverSetting.skipDiffusion == 0 ? 1 : 0 });
+                            }}
+                        >
+                            skip diff
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+
         const skipValues = getDivisors(serverSetting.serverSetting.kStep);
         skipValues.pop();
 
@@ -82,6 +102,7 @@ export const DiffusionSVCSettingArea = (_props: DiffusionSVCSettingAreaProps) =>
         );
         return (
             <>
+                {skipDiffRow}
                 {kStepRow}
                 {speedUpRow}
             </>

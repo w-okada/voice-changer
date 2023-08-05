@@ -1338,6 +1338,7 @@ body {
         .character-area-control {
             display: flex;
             gap: 3px;
+            align-items: center;
             .character-area-control-buttons {
                 display: flex;
                 flex-direction: row;
@@ -1404,6 +1405,35 @@ body {
                     }
                     .character-area-button:hover {
                         border: solid 2px #faa;
+                    }
+                    .character-area-toggle-button {
+                        border: solid 2px #999;
+                        color: white;
+                        background: #666;
+
+                        cursor: pointer;
+
+                        font-size: 0.8rem;
+                        border-radius: 5px;
+                        height: 1.2rem;
+                        padding-left: 2px;
+                        padding-right: 2px;
+                    }
+                    .character-area-toggle-button:hover {
+                        border: solid 2px #faa;
+                    }
+                    .character-area-toggle-button-active {
+                        border: solid 2px #999;
+                        color: white;
+                        background: #844;
+
+                        cursor: pointer;
+
+                        font-size: 0.8rem;
+                        border-radius: 5px;
+                        height: 1.2rem;
+                        padding-left: 2px;
+                        padding-right: 2px;
                     }
                 }
             }

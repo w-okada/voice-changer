@@ -124,6 +124,7 @@ export const ServerSettingKey = {
     "threshold": "threshold",
 
     "speedUp": "speedUp",
+    "skipDiffusion": "skipDiffusion",
 
     "inputSampleRate": "inputSampleRate",
     "enableDirectML": "enableDirectML",
@@ -186,7 +187,7 @@ export type VoiceChangerServerSetting = {
     threshold: number// DDSP-SVC
 
     speedUp: number // Diffusion-SVC
-
+    skipDiffusion: number // Diffusion-SVC 0:off, 1:on
 
     inputSampleRate: InputSampleRate
     enableDirectML: number
@@ -403,6 +404,7 @@ export const DefaultServerSetting: ServerInfo = {
     threshold: -45,
 
     speedUp: 10,
+    skipDiffusion: 1,
 
     enableDirectML: 0,
     // 
