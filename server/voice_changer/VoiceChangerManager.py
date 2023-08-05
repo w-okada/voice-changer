@@ -121,8 +121,6 @@ class VoiceChangerManager(ServerDeviceCallbacks):
     @classmethod
     def get_instance(cls, params: VoiceChangerParams):
         if cls._instance is None:
-            vcparams = VoiceChangerParamsManager.get_instance()
-            vcparams.setParams(params)
             cls._instance = cls(params)
         return cls._instance
 

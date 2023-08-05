@@ -1,8 +1,6 @@
 import os
-from const import EnumInferenceTypes
 from dataclasses import asdict
-import onnxruntime
-import json
+
 
 from data.ModelSlot import DiffusionSVCModelSlot, ModelSlot, RVCModelSlot
 from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.diffusion.unit2mel import load_model_vocoder_from_combo
@@ -45,7 +43,7 @@ class DiffusionSVCModelSlotGenerator(ModelSlotGenerator):
     def _setInfoByPytorch(cls, slot: DiffusionSVCModelSlot):
         vcparams = VoiceChangerParamsManager.get_instance().params
         modelPath = os.path.join(vcparams.model_dir, str(slot.slotIndex), os.path.basename(slot.modelFile))
-        
+
         diff_model, diff_args, naive_model, naive_args = load_model_vocoder_from_combo(modelPath, device="cpu")
         slot.kStepMax = diff_args.model.k_step_max
         slot.nLayers = diff_args.model.n_layers

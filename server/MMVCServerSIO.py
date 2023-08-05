@@ -9,6 +9,7 @@ import argparse
 from Exceptions import WeightDownladException
 from downloader.SampleDownloader import downloadInitialSamples
 from downloader.WeightDownloader import downloadWeight
+from voice_changer.VoiceChangerParamsManager import VoiceChangerParamsManager
 
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 
@@ -96,6 +97,8 @@ voiceChangerParams = VoiceChangerParams(
     rmvpe=args.rmvpe,
     sample_mode=args.sample_mode,
 )
+vcparams = VoiceChangerParamsManager.get_instance()
+vcparams.setParams(voiceChangerParams)
 
 printMessage(f"Booting PHASE :{__name__}", level=2)
 

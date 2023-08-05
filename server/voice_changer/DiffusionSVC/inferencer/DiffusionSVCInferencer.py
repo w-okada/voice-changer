@@ -133,7 +133,6 @@ class DiffusionSVCInferencer(Inferencer):
                 out_wav *= mask
             else:
                 out_wav = self.vocoder_onnx.infer(gt_spec, pitch, silence_front, mask)
-                # out_wav = self.vocoder_onnx.infer(gt_spec, pitch, 0, mask)
         # print("[    ----Timer::3: ]", t.secs)
 
         return out_wav.squeeze()
