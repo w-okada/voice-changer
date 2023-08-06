@@ -1562,6 +1562,10 @@ audio::-webkit-media-controls-overlay-enclosure{
                         height: 1.2rem;
                         padding-left: 2px;
                         padding-right: 2px;
+                        white-space: nowrap;
+                    }
+                    .config-sub-area-button-text-small {
+                        font-size: 0.5rem;
                     }
                 }
                 .config-sub-area-control-field-auido-io {

@@ -41,71 +41,75 @@ export const ConvertArea = (props: ConvertProps) => {
 
         const gpuSelect =
             edition.indexOf("onnxdirectML-cuda") >= 0 ? (
-                <div className="config-sub-area-control">
-                    <div className="config-sub-area-control-title">GPU(dml):</div>
-                    <div className="config-sub-area-control-field">
-                        <div className="config-sub-area-buttons">
-                            <div
-                                onClick={async () => {
-                                    await serverSetting.updateServerSettings({
-                                        ...serverSetting.serverSetting,
-                                        gpu: -1,
-                                    });
-                                }}
-                                className={cpuClassName}
-                            >
-                                cpu
-                            </div>
-                            <div
-                                onClick={async () => {
-                                    await serverSetting.updateServerSettings({
-                                        ...serverSetting.serverSetting,
-                                        gpu: 0,
-                                    });
-                                }}
-                                className={gpu0ClassName}
-                            >
-                                gpu-0
-                            </div>
-                            <div
-                                onClick={async () => {
-                                    await serverSetting.updateServerSettings({
-                                        ...serverSetting.serverSetting,
-                                        gpu: 1,
-                                    });
-                                }}
-                                className={gpu1ClassName}
-                            >
-                                gpu-1
-                            </div>
-                            <div
-                                onClick={async () => {
-                                    await serverSetting.updateServerSettings({
-                                        ...serverSetting.serverSetting,
-                                        gpu: 2,
-                                    });
-                                }}
-                                className={gpu2ClassName}
-                            >
-                                gpu-2
-                            </div>
-                            <div
-                                onClick={async () => {
-                                    await serverSetting.updateServerSettings({
-                                        ...serverSetting.serverSetting,
-                                        gpu: 3,
-                                    });
-                                }}
-                                className={gpu3ClassName}
-                            >
-                                gpu-3
-                            </div>
-                            <div>
-                                <a href="https://github.com/w-okada/voice-changer/issues/410">more info</a>
+                <>
+                    <div className="config-sub-area-control">
+                        <div className="config-sub-area-control-title">GPU(dml):</div>
+                        <div className="config-sub-area-control-field">
+                            <div className="config-sub-area-buttons">
+                                <div
+                                    onClick={async () => {
+                                        await serverSetting.updateServerSettings({
+                                            ...serverSetting.serverSetting,
+                                            gpu: -1,
+                                        });
+                                    }}
+                                    className={cpuClassName}
+                                >
+                                    <span className="config-sub-area-button-text-small">cpu</span>
+                                </div>
+                                <div
+                                    onClick={async () => {
+                                        await serverSetting.updateServerSettings({
+                                            ...serverSetting.serverSetting,
+                                            gpu: 0,
+                                        });
+                                    }}
+                                    className={gpu0ClassName}
+                                >
+                                    <span className="config-sub-area-button-text-small">gpu0</span>
+                                </div>
+                                <div
+                                    onClick={async () => {
+                                        await serverSetting.updateServerSettings({
+                                            ...serverSetting.serverSetting,
+                                            gpu: 1,
+                                        });
+                                    }}
+                                    className={gpu1ClassName}
+                                >
+                                    <span className="config-sub-area-button-text-small">gpu1</span>
+                                </div>
+                                <div
+                                    onClick={async () => {
+                                        await serverSetting.updateServerSettings({
+                                            ...serverSetting.serverSetting,
+                                            gpu: 2,
+                                        });
+                                    }}
+                                    className={gpu2ClassName}
+                                >
+                                    <span className="config-sub-area-button-text-small">gpu2</span>
+                                </div>
+                                <div
+                                    onClick={async () => {
+                                        await serverSetting.updateServerSettings({
+                                            ...serverSetting.serverSetting,
+                                            gpu: 3,
+                                        });
+                                    }}
+                                    className={gpu3ClassName}
+                                >
+                                    <span className="config-sub-area-button-text-small">gpu3</span>
+                                </div>
+                                <div className="config-sub-area-control">
+                                    <span className="config-sub-area-button-text-small">
+                                        <a href="https://github.com/w-okada/voice-changer/issues/410">more info</a>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </>
             ) : (
                 <div className="config-sub-area-control">
                     <div className="config-sub-area-control-title">GPU:</div>
