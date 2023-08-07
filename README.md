@@ -185,4 +185,4 @@ Github Pages 上で実行できるため、ブラウザのみあれば様々な�
 
 # For Contributor
 
-TODO_TODO_TODO_TODO
+TODO_TODO_TODO_TODO_TODO
