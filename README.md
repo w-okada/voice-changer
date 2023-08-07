@@ -185,4 +185,4 @@ Github Pages 上で実行できるため、ブラウザのみあれば様々な�
 
 # For Contributor
 
-TODO_TODO_TODO_TODO_TODO
+このリポジトリは[CLA](https://raw.githubusercontent.com/w-okada/voice-changer/master/LICENSE-CLA)を設定しています。
