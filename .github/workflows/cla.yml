@@ -21,7 +21,7 @@ jobs:
           path-to-signatures: "signatures/version1/cla.json"
           path-to-document: "https://github.com/cla-assistant/github-action/blob/master/SAPCLA.md" # e.g. a CLA or a DCO document
           # branch should not be protected
-          branch: "main"
+          branch: "master"
           #allowlist: user1,bot*
 
           #below are the optional inputs - If the optional inputs are not given, then default values will be taken
