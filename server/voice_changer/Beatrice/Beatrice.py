@@ -1,20 +1,11 @@
-from typing import Union
-import os
-import numpy as np
 from data.ModelSlot import BeatriceModelSlot
 from mods.log_control import VoiceChangaerLogger
 
 from voice_changer.utils.VoiceChangerModel import AudioInOut, VoiceChangerModel
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 
-from beatrice_internal_api import BeatriceInternalAPI
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
-
-
-class BeatriceAPI(BeatriceInternalAPI):
-    def __init__(self, sample_rate: float = 48000.0):
-        pass
 
 
 class Beatrice(VoiceChangerModel):
