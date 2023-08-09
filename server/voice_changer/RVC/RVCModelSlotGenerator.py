@@ -63,7 +63,7 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
             # elif slot.embedder == "hubert_jp":
             #     slot.embedder = "hubert_jp"
             else:
-                raise RuntimeError("[Voice Changer][setInfoByONNX] unknown embedder")
+                raise RuntimeError("[Voice Changer][setInfoByPytorch] unknown embedder")
 
         elif config_len == 18:
             # Original RVC

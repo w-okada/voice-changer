@@ -61,3 +61,6 @@ start_trainer.sh
 
 # venv
 venv/
+
+
+beatrice_internal_api.cp310-win_amd64.pyd

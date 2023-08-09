@@ -29,6 +29,8 @@ export const ModelFileKind = {
 
     "diffusionSVCModel": "diffusionSVCModel",
 
+    "beatriceModel": "beatriceModel",
+
 } as const
 export type ModelFileKind = typeof ModelFileKind[keyof typeof ModelFileKind]
 

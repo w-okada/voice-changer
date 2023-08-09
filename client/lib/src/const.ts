@@ -10,7 +10,8 @@ export const VoiceChangerType = {
     "so-vits-svc-40": "so-vits-svc-40",
     "DDSP-SVC": "DDSP-SVC",
     "RVC": "RVC",
-    "Diffusion-SVC":"Diffusion-SVC"
+    "Diffusion-SVC":"Diffusion-SVC",
+    "Beatrice": "Beatrice"
 
 } as const
 export type VoiceChangerType = typeof VoiceChangerType[keyof typeof VoiceChangerType]
@@ -287,7 +288,15 @@ export type DiffusionSVCModelSlot = ModelSlot & {
     speakers: { [key: number]: string }
 }
 
-export type ModelSlotUnion = RVCModelSlot | MMVCv13ModelSlot | MMVCv15ModelSlot | SoVitsSvc40ModelSlot | DDSPSVCModelSlot | DiffusionSVCModelSlot
+
+export type BeatriceModelSlot = ModelSlot & {
+    modelFile: string
+    dstId: number
+
+    speakers: { [key: number]: string }
+}
+
+export type ModelSlotUnion = RVCModelSlot | MMVCv13ModelSlot | MMVCv15ModelSlot | SoVitsSvc40ModelSlot | DDSPSVCModelSlot | DiffusionSVCModelSlot | BeatriceModelSlot
 
 type ServerAudioDevice = {
     kind: "audioinput" | "audiooutput",

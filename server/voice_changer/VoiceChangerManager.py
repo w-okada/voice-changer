@@ -185,6 +185,11 @@ class VoiceChangerManager(ServerDeviceCallbacks):
 
                 slotInfo = DiffusionSVCModelSlotGenerator.loadModel(params)
                 self.modelSlotManager.save_model_slot(params.slot, slotInfo)
+            elif params.voiceChangerType == "Beatrice":
+                from voice_changer.Beatrice.BeatriceModelSlotGenerator import BeatriceModelSlotGenerator
+
+                slotInfo = BeatriceModelSlotGenerator.loadModel(params)
+                self.modelSlotManager.save_model_slot(params.slot, slotInfo)
             logger.info(f"params, {params}")
 
     def get_info(self):
@@ -265,6 +270,13 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             from voice_changer.DiffusionSVC.DiffusionSVC import DiffusionSVC
 
             self.voiceChangerModel = DiffusionSVC(self.params, slotInfo)
+            self.voiceChanger = VoiceChangerV2(self.params)
+            self.voiceChanger.setModel(self.voiceChangerModel)
+        elif slotInfo.voiceChangerType == "Beatrice":
+            logger.info("................Beatrice")
+            from voice_changer.Beatrice.Beatrice import Beatrice
+
+            self.voiceChangerModel = Beatrice(self.params, slotInfo)
             self.voiceChanger = VoiceChangerV2(self.params)
             self.voiceChanger.setModel(self.voiceChangerModel)
         else:

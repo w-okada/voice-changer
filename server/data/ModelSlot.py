@@ -124,7 +124,15 @@ class DiffusionSVCModelSlot(ModelSlot):
     embChannels: int = 768
 
 
-ModelSlots: TypeAlias = Union[ModelSlot, RVCModelSlot, MMVCv13ModelSlot, MMVCv15ModelSlot, SoVitsSvc40ModelSlot, DDSPSVCModelSlot, DiffusionSVCModelSlot]
+@dataclass
+class BeatriceModelSlot(ModelSlot):
+    voiceChangerType: VoiceChangerType = "Beatrice"
+    modelFile: str = ""
+    dstId: int = 1
+    speakers: dict = field(default_factory=lambda: {1: "user1", 2: "user2"})
+
+
+ModelSlots: TypeAlias = Union[ModelSlot, RVCModelSlot, MMVCv13ModelSlot, MMVCv15ModelSlot, SoVitsSvc40ModelSlot, DDSPSVCModelSlot, DiffusionSVCModelSlot, BeatriceModelSlot]
 
 
 def loadSlotInfo(model_dir: str, slotIndex: int) -> ModelSlots:
@@ -153,6 +161,9 @@ def loadSlotInfo(model_dir: str, slotIndex: int) -> ModelSlots:
     elif slotInfo.voiceChangerType == "Diffusion-SVC":
         slotInfoKey.extend(list(DiffusionSVCModelSlot.__annotations__.keys()))
         return DiffusionSVCModelSlot(**{k: v for k, v in jsonDict.items() if k in slotInfoKey})
+    elif slotInfo.voiceChangerType == "Beatrice":
+        slotInfoKey.extend(list(BeatriceModelSlot.__annotations__.keys()))
+        return BeatriceModelSlot(**{k: v for k, v in jsonDict.items() if k in slotInfoKey})
     else:
         return ModelSlot()
 
@@ -168,6 +179,7 @@ def loadAllSlotInfo(model_dir: str):
 
 def saveSlotInfo(model_dir: str, slotIndex: int, slotInfo: ModelSlots):
     slotDir = os.path.join(model_dir, str(slotIndex))
+    print("SlotInfo:::", slotInfo)
     slotInfoDict = asdict(slotInfo)
     slotInfo.slotIndex = -1  # スロットインデックスは動的に注入
     json.dump(slotInfoDict, open(os.path.join(slotDir, "params.json"), "w"), indent=4)

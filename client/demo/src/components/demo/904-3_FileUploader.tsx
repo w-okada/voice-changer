@@ -111,6 +111,11 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
                     return x.kind == "diffusionSVCModel";
                 });
                 return enough;
+            } else if (setting.voiceChangerType == "Beatrice") {
+                const enough = !!setting.files.find((x) => {
+                    return x.kind == "beatriceModel";
+                });
+                return enough;
             }
             return false;
         };
@@ -170,6 +175,8 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
                 rows.push(generateFileRow(uploadSetting!, "Model(diff)", "ddspSvcDiffusion", ["pth", "pt"], "diff/"));
             } else if (vcType == "Diffusion-SVC") {
                 rows.push(generateFileRow(uploadSetting!, "Model(combo)", "diffusionSVCModel", ["ptc"]));
+            } else if (vcType == "Beatrice") {
+                rows.push(generateFileRow(uploadSetting!, "Beatrice", "beatriceModel", ["bin"]));
             }
             return rows;
         };

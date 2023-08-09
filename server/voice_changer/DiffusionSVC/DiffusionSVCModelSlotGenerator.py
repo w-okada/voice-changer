@@ -1,8 +1,5 @@
 import os
-from dataclasses import asdict
-
-
-from data.ModelSlot import DiffusionSVCModelSlot, ModelSlot, RVCModelSlot
+from data.ModelSlot import DiffusionSVCModelSlot, ModelSlot
 from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.diffusion.unit2mel import load_model_vocoder_from_combo
 from voice_changer.VoiceChangerParamsManager import VoiceChangerParamsManager
 from voice_changer.utils.LoadModelParams import LoadModelParams
@@ -15,7 +12,7 @@ def get_divisors(n):
         if n % i == 0:
             divisors.append(i)
             if i != n // i:
-                divisors.append(n //i)
+                divisors.append(n // i)
     return sorted(divisors)
 
 
