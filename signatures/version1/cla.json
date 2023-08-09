@@ -1,0 +1,20 @@
+{
+  "signedContributors": [
+    {
+      "name": "w-okada",
+      "id": 48346627,
+      "comment_id": 1667673774,
+      "created_at": "2023-08-07T11:21:42Z",
+      "repoId": 527419347,
+      "pullRequestNo": 661
+    },
+    {
+      "name": "w-okada",
+      "id": 48346627,
+      "comment_id": 1667674735,
+      "created_at": "2023-08-07T11:22:28Z",
+      "repoId": 527419347,
+      "pullRequestNo": 661
+    }
+  ]
+}

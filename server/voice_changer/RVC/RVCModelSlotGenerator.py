@@ -5,7 +5,8 @@ import torch
 import onnxruntime
 import json
 
-from data.ModelSlot import ModelSlot, RVCModelSlot
+from data.ModelSlot import RVCModelSlot
+from voice_changer.VoiceChangerParamsManager import VoiceChangerParamsManager
 from voice_changer.utils.LoadModelParams import LoadModelParams
 from voice_changer.utils.ModelSlotGenerator import ModelSlotGenerator
 
@@ -13,6 +14,7 @@ from voice_changer.utils.ModelSlotGenerator import ModelSlotGenerator
 class RVCModelSlotGenerator(ModelSlotGenerator):
     @classmethod
     def loadModel(cls, props: LoadModelParams):
+        vcparams = VoiceChangerParamsManager.get_instance().params
         slotInfo: RVCModelSlot = RVCModelSlot()
         for file in props.files:
             if file.kind == "rvcModel":
@@ -24,17 +26,20 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
         slotInfo.defaultProtect = 0.5
         slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
         slotInfo.name = os.path.splitext(os.path.basename(slotInfo.modelFile))[0]
+        print("RVC:: slotInfo.modelFile", slotInfo.modelFile)
+
         # slotInfo.iconFile = "/assets/icons/noimage.png"
 
+        modelPath = os.path.join(vcparams.model_dir, str(props.slot), os.path.basename(slotInfo.modelFile))
         if slotInfo.isONNX:
-            slotInfo = cls._setInfoByONNX(slotInfo)
+            slotInfo = cls._setInfoByONNX(modelPath, slotInfo)
         else:
-            slotInfo = cls._setInfoByPytorch(slotInfo)
+            slotInfo = cls._setInfoByPytorch(modelPath, slotInfo)
         return slotInfo
 
     @classmethod
-    def _setInfoByPytorch(cls, slot: ModelSlot):
-        cpt = torch.load(slot.modelFile, map_location="cpu")
+    def _setInfoByPytorch(cls, modelPath: str, slot: RVCModelSlot):
+        cpt = torch.load(modelPath, map_location="cpu")
         config_len = len(cpt["config"])
         version = cpt.get("version", "v1")
 
@@ -113,8 +118,8 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
         return slot
 
     @classmethod
-    def _setInfoByONNX(cls, slot: ModelSlot):
-        tmp_onnx_session = onnxruntime.InferenceSession(slot.modelFile, providers=["CPUExecutionProvider"])
+    def _setInfoByONNX(cls, modelPath: str, slot: RVCModelSlot):
+        tmp_onnx_session = onnxruntime.InferenceSession(modelPath, providers=["CPUExecutionProvider"])
         modelmeta = tmp_onnx_session.get_modelmeta()
         try:
             slot = RVCModelSlot(**asdict(slot))

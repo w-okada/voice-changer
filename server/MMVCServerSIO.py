@@ -9,6 +9,7 @@ import argparse
 from Exceptions import WeightDownladException
 from downloader.SampleDownloader import downloadInitialSamples
 from downloader.WeightDownloader import downloadWeight
+from voice_changer.VoiceChangerParamsManager import VoiceChangerParamsManager
 
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 
@@ -40,19 +41,19 @@ def setupArgParser():
     parser.add_argument("--httpsCert", type=str, default="ssl.cert", help="path for the cert of https")
     parser.add_argument("--httpsSelfSigned", type=strtobool, default=True, help="generate self-signed certificate")
 
-    parser.add_argument("--model_dir", type=str, help="path to model files")
+    parser.add_argument("--model_dir", type=str, default="model_dir", help="path to model files")
     parser.add_argument("--sample_mode", type=str, default="production", help="rvc_sample_mode")
 
-    parser.add_argument("--content_vec_500", type=str, help="path to content_vec_500 model(pytorch)")
-    parser.add_argument("--content_vec_500_onnx", type=str, help="path to content_vec_500 model(onnx)")
-    parser.add_argument("--content_vec_500_onnx_on", type=strtobool, default=False, help="use or not onnx for  content_vec_500")
-    parser.add_argument("--hubert_base", type=str, help="path to hubert_base model(pytorch)")
-    parser.add_argument("--hubert_base_jp", type=str, help="path to hubert_base_jp model(pytorch)")
-    parser.add_argument("--hubert_soft", type=str, help="path to hubert_soft model(pytorch)")
-    parser.add_argument("--nsf_hifigan", type=str, help="path to nsf_hifigan model(pytorch)")
-    parser.add_argument("--crepe_onnx_full", type=str, help="path to crepe_onnx_full")
-    parser.add_argument("--crepe_onnx_tiny", type=str, help="path to crepe_onnx_tiny")
-    parser.add_argument("--rmvpe", type=str, help="path to rmvpe")
+    parser.add_argument("--content_vec_500", type=str, default="pretrain/checkpoint_best_legacy_500.pt", help="path to content_vec_500 model(pytorch)")
+    parser.add_argument("--content_vec_500_onnx", type=str, default="pretrain/content_vec_500.onnx", help="path to content_vec_500 model(onnx)")
+    parser.add_argument("--content_vec_500_onnx_on", type=strtobool, default=True, help="use or not onnx for  content_vec_500")
+    parser.add_argument("--hubert_base", type=str, default="pretrain/hubert_base.pt", help="path to hubert_base model(pytorch)")
+    parser.add_argument("--hubert_base_jp", type=str, default="pretrain/rinna_hubert_base_jp.pt", help="path to hubert_base_jp model(pytorch)")
+    parser.add_argument("--hubert_soft", type=str, default="pretrain/hubert/hubert-soft-0d54a1f4.pt", help="path to hubert_soft model(pytorch)")
+    parser.add_argument("--nsf_hifigan", type=str, default="pretrain/nsf_hifigan/model", help="path to nsf_hifigan model(pytorch)")
+    parser.add_argument("--crepe_onnx_full", type=str, default="pretrain/crepe_onnx_full.onnx", help="path to crepe_onnx_full")
+    parser.add_argument("--crepe_onnx_tiny", type=str, default="pretrain/crepe_onnx_tiny.onnx", help="path to crepe_onnx_tiny")
+    parser.add_argument("--rmvpe", type=str, default="pretrain/rmvpe.pt", help="path to rmvpe")
 
     return parser
 
@@ -96,6 +97,8 @@ voiceChangerParams = VoiceChangerParams(
     rmvpe=args.rmvpe,
     sample_mode=args.sample_mode,
 )
+vcparams = VoiceChangerParamsManager.get_instance()
+vcparams.setParams(voiceChangerParams)
 
 printMessage(f"Booting PHASE :{__name__}", level=2)
 
@@ -124,7 +127,8 @@ if __name__ == "MMVCServerSIO":
 
 
 if __name__ == "__mp_main__":
-    printMessage("サーバプロセスを起動しています。", level=2)
+    # printMessage("サーバプロセスを起動しています。", level=2)
+    printMessage("The server process is starting up.", level=2)
 
 if __name__ == "__main__":
     mp.freeze_support()
@@ -132,12 +136,13 @@ if __name__ == "__main__":
     logger.debug(args)
 
     printMessage(f"PYTHON:{sys.version}", level=2)
-    printMessage("Voice Changerを起動しています。", level=2)
+    # printMessage("Voice Changerを起動しています。", level=2)
+    printMessage("Activating the Voice Changer.", level=2)
     # ダウンロード(Weight)
     try:
         downloadWeight(voiceChangerParams)
     except WeightDownladException:
-        printMessage("RVC用のモデルファイルのダウンロードに失敗しました。", level=2)
+        # printMessage("RVC用のモデルファイルのダウンロードに失敗しました。", level=2)
         printMessage("failed to download weight for rvc", level=2)
 
     # ダウンロード(Sample)
@@ -192,29 +197,31 @@ if __name__ == "__main__":
     printMessage("-- ---- -- ", level=1)
 
     # アドレス表示
-    printMessage("ブラウザで次のURLを開いてください.", level=2)
+    printMessage("Please open the following URL in your browser.", level=2)
+    # printMessage("ブラウザで次のURLを開いてください.", level=2)
     if args.https == 1:
         printMessage("https://<IP>:<PORT>/", level=1)
     else:
         printMessage("http://<IP>:<PORT>/", level=1)
 
-    printMessage("多くの場合は次のいずれかのURLにアクセスすると起動します。", level=2)
+    # printMessage("多くの場合は次のいずれかのURLにアクセスすると起動します。", level=2)
+    printMessage("In many cases, it will launch when you access any of the following URLs.", level=2)
     if "EX_PORT" in locals() and "EX_IP" in locals():  # シェルスクリプト経由起動(docker)
         if args.https == 1:
-            printMessage(f"https://localhost:{EX_PORT}/", level=1)
+            printMessage(f"https://127.0.0.1:{EX_PORT}/", level=1)
             for ip in EX_IP.strip().split(" "):
                 printMessage(f"https://{ip}:{EX_PORT}/", level=1)
         else:
-            printMessage(f"http://localhost:{EX_PORT}/", level=1)
+            printMessage(f"http://127.0.0.1:{EX_PORT}/", level=1)
     else:  # 直接python起動
         if args.https == 1:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.connect((args.test_connect, 80))
             hostname = s.getsockname()[0]
-            printMessage(f"https://localhost:{PORT}/", level=1)
+            printMessage(f"https://127.0.0.1:{PORT}/", level=1)
             printMessage(f"https://{hostname}:{PORT}/", level=1)
         else:
-            printMessage(f"http://localhost:{PORT}/", level=1)
+            printMessage(f"http://127.0.0.1:{PORT}/", level=1)
 
     # サーバ起動
     if args.https:
@@ -237,15 +244,15 @@ if __name__ == "__main__":
         p.start()
         try:
             if sys.platform.startswith("win"):
-                process = subprocess.Popen([NATIVE_CLIENT_FILE_WIN, "--disable-gpu", "-u", f"http://localhost:{PORT}/"])
+                process = subprocess.Popen([NATIVE_CLIENT_FILE_WIN, "--disable-gpu", "-u", f"http://127.0.0.1:{PORT}/"])
                 return_code = process.wait()
-                logger.info("client closed.")                
+                logger.info("client closed.")
                 p.terminate()
             elif sys.platform.startswith("darwin"):
-                process = subprocess.Popen([NATIVE_CLIENT_FILE_MAC, "--disable-gpu", "-u", f"http://localhost:{PORT}/"])
+                process = subprocess.Popen([NATIVE_CLIENT_FILE_MAC, "--disable-gpu", "-u", f"http://127.0.0.1:{PORT}/"])
                 return_code = process.wait()
-                logger.info("client closed.")                
+                logger.info("client closed.")
                 p.terminate()
 
         except Exception as e:
-            logger.error(f"[Voice Changer] Launch Exception, {e}")
+            logger.error(f"[Voice Changer] Client Launch Exception, {e}")

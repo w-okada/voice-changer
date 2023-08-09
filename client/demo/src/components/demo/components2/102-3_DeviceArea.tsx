@@ -2,14 +2,14 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAppState } from "../../../001_provider/001_AppStateProvider";
 import { fileSelectorAsDataURL, useIndexedDB } from "@dannadori/voice-changer-client-js";
 import { useGuiState } from "../001_GuiStateProvider";
-import { AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_CONVERTED, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, INDEXEDDB_KEY_AUDIO_OUTPUT } from "../../../const";
+import { AUDIO_ELEMENT_FOR_PLAY_MONITOR, AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_CONVERTED, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, INDEXEDDB_KEY_AUDIO_MONITR, INDEXEDDB_KEY_AUDIO_OUTPUT } from "../../../const";
 import { isDesktopApp } from "../../../const";
 
 export type DeviceAreaProps = {};
 
 export const DeviceArea = (_props: DeviceAreaProps) => {
-    const { setting, serverSetting, audioContext, setAudioOutputElementId, initializedRef, setVoiceChangerClientSetting, startOutputRecording, stopOutputRecording } = useAppState();
-    const { isConverting, audioInputForGUI, inputAudioDeviceInfo, setAudioInputForGUI, fileInputEchoback, setFileInputEchoback, setAudioOutputForGUI, audioOutputForGUI, outputAudioDeviceInfo, shareScreenEnabled, setShareScreenEnabled } = useGuiState();
+    const { setting, serverSetting, audioContext, setAudioOutputElementId, setAudioMonitorElementId, initializedRef, setVoiceChangerClientSetting, startOutputRecording, stopOutputRecording } = useAppState();
+    const { isConverting, audioInputForGUI, inputAudioDeviceInfo, setAudioInputForGUI, fileInputEchoback, setFileInputEchoback, setAudioOutputForGUI, setAudioMonitorForGUI, audioOutputForGUI, audioMonitorForGUI, outputAudioDeviceInfo, shareScreenEnabled, setShareScreenEnabled } = useGuiState();
     const [inputHostApi, setInputHostApi] = useState<string>("ALL");
     const [outputHostApi, setOutputHostApi] = useState<string>("ALL");
     const [monitorHostApi, setMonitorHostApi] = useState<string>("ALL");
@@ -244,10 +244,10 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
             audio_echo.volume = 0;
             setFileInputEchoback(false);
 
-            // original stream to play.
-            const audio_org = document.getElementById(AUDIO_ELEMENT_FOR_TEST_ORIGINAL) as HTMLAudioElement;
-            audio_org.src = url;
-            audio_org.pause();
+            // // original stream to play.
+            // const audio_org = document.getElementById(AUDIO_ELEMENT_FOR_TEST_ORIGINAL) as HTMLAudioElement;
+            // audio_org.src = url;
+            // audio_org.pause();
         };
 
         const echobackClass = fileInputEchoback ? "config-sub-area-control-field-wav-file-echoback-button-active" : "config-sub-area-control-field-wav-file-echoback-button";
@@ -256,7 +256,7 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                 <div className="config-sub-area-control-field">
                     <div className="config-sub-area-control-field-wav-file left-padding-1">
                         <div className="config-sub-area-control-field-wav-file-audio-container">
-                            <audio id={AUDIO_ELEMENT_FOR_TEST_ORIGINAL} controls hidden></audio>
+                            {/* <audio id={AUDIO_ELEMENT_FOR_TEST_ORIGINAL} controls hidden></audio> */}
                             <audio className="config-sub-area-control-field-wav-file-audio" id={AUDIO_ELEMENT_FOR_TEST_CONVERTED} controls controlsList="nodownload noplaybackrate"></audio>
                             <audio id={AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK} controls hidden></audio>
                         </div>
@@ -381,7 +381,8 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
         const setAudioOutput = async () => {
             const mediaDeviceInfos = await navigator.mediaDevices.enumerateDevices();
 
-            [AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK].forEach((x) => {
+            // [AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK].forEach((x) => {
+            [AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK].forEach((x) => {
                 const audio = document.getElementById(x) as HTMLAudioElement;
                 if (audio) {
                     if (serverSetting.serverSetting.enableServerAudio == 1) {
@@ -598,7 +599,88 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
         );
     }, [serverSetting.serverSetting, serverSetting.updateServerSettings, serverSetting.serverSetting.enableServerAudio]);
 
-    // (6) Monitor
+    // (6) モニター
+    useEffect(() => {
+        const loadCache = async () => {
+            const key = await getItem(INDEXEDDB_KEY_AUDIO_MONITR);
+            if (key) {
+                setAudioMonitorForGUI(key as string);
+            }
+        };
+        loadCache();
+    }, []);
+    useEffect(() => {
+        const setAudioMonitor = async () => {
+            const mediaDeviceInfos = await navigator.mediaDevices.enumerateDevices();
+
+            [AUDIO_ELEMENT_FOR_PLAY_MONITOR].forEach((x) => {
+                const audio = document.getElementById(x) as HTMLAudioElement;
+                if (audio) {
+                    if (serverSetting.serverSetting.enableServerAudio == 1) {
+                        // Server Audio を使う場合はElementから音は出さない。
+                        audio.volume = 0;
+                    } else if (audioMonitorForGUI == "none") {
+                        // @ts-ignore
+                        audio.setSinkId("");
+                        audio.volume = 0;
+                    } else {
+                        const audioOutputs = mediaDeviceInfos.filter((x) => {
+                            return x.kind == "audiooutput";
+                        });
+                        const found = audioOutputs.some((x) => {
+                            return x.deviceId == audioMonitorForGUI;
+                        });
+                        if (found) {
+                            // @ts-ignore // 例外キャッチできないので事前にIDチェックが必要らしい。！？
+                            audio.setSinkId(audioMonitorForGUI);
+                            audio.volume = 1;
+                        } else {
+                            console.warn("No audio output device. use default");
+                        }
+                    }
+                }
+            });
+        };
+        setAudioMonitor();
+    }, [audioMonitorForGUI, serverSetting.serverSetting.enableServerAudio]);
+
+    // (6-1) クライアント
+    const clientMonitorRow = useMemo(() => {
+        if (serverSetting.serverSetting.enableServerAudio == 1) {
+            return <></>;
+        }
+
+        return (
+            <div className="config-sub-area-control">
+                <div className="config-sub-area-control-title left-padding-1">monitor</div>
+                <div className="config-sub-area-control-field">
+                    <select
+                        className="body-select"
+                        value={audioMonitorForGUI}
+                        onChange={(e) => {
+                            setAudioMonitorForGUI(e.target.value);
+                            setItem(INDEXEDDB_KEY_AUDIO_MONITR, e.target.value);
+                        }}
+                    >
+                        {outputAudioDeviceInfo.map((x) => {
+                            return (
+                                <option key={x.deviceId} value={x.deviceId}>
+                                    {x.label}
+                                </option>
+                            );
+                        })}
+                    </select>
+                </div>
+            </div>
+        );
+    }, [serverSetting.serverSetting.enableServerAudio, outputAudioDeviceInfo, audioMonitorForGUI]);
+
+    useEffect(() => {
+        console.log("initializedRef.current", initializedRef.current);
+        setAudioMonitorElementId(AUDIO_ELEMENT_FOR_PLAY_MONITOR);
+    }, [initializedRef.current]);
+
+    // (6-2) サーバ
     const serverMonitorRow = useMemo(() => {
         if (serverSetting.serverSetting.enableServerAudio == 0) {
             return <></>;
@@ -675,6 +757,41 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
         );
     }, [monitorHostApi, serverSetting.serverSetting, serverSetting.updateServerSettings, serverSetting.serverSetting.enableServerAudio]);
 
+    const monitorGainControl = useMemo(() => {
+        const currentMonitorGain = serverSetting.serverSetting.enableServerAudio == 0 ? setting.voiceChangerClientSetting.monitorGain : serverSetting.serverSetting.serverMonitorAudioGain;
+        const monitorValueUpdatedAction =
+            serverSetting.serverSetting.enableServerAudio == 0
+                ? async (val: number) => {
+                      await setVoiceChangerClientSetting({ ...setting.voiceChangerClientSetting, monitorGain: val });
+                  }
+                : async (val: number) => {
+                      await serverSetting.updateServerSettings({ ...serverSetting.serverSetting, serverMonitorAudioGain: val });
+                  };
+
+        return (
+            <div className="config-sub-area-control">
+                <div className="config-sub-area-control-title left-padding-2">gain</div>
+                <div className="config-sub-area-control-field">
+                    <div className="config-sub-area-control-field-auido-io">
+                        <span className="character-area-slider-control-slider">
+                            <input
+                                type="range"
+                                min="0.1"
+                                max="10.0"
+                                step="0.1"
+                                value={currentMonitorGain}
+                                onChange={(e) => {
+                                    monitorValueUpdatedAction(Number(e.target.value));
+                                }}
+                            ></input>
+                        </span>
+                        <span className="character-area-slider-control-val">{currentMonitorGain}</span>
+                    </div>
+                </div>
+            </div>
+        );
+    }, [serverSetting.serverSetting, setting, setVoiceChangerClientSetting, serverSetting.updateServerSettings]);
+
     return (
         <div className="config-sub-area">
             {deviceModeRow}
@@ -685,10 +802,13 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
             {audioInputScreenRow}
             {clientAudioOutputRow}
             {serverAudioOutputRow}
+            {clientMonitorRow}
             {serverMonitorRow}
+            {monitorGainControl}
 
             {outputRecorderRow}
             <audio hidden id={AUDIO_ELEMENT_FOR_PLAY_RESULT}></audio>
+            <audio hidden id={AUDIO_ELEMENT_FOR_PLAY_MONITOR}></audio>
         </div>
     );
 };

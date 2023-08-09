@@ -37,8 +37,14 @@ class GPUInfo:
 @dataclass()
 class VoiceChangerManagerSettings:
     modelSlotIndex: int = -1
+    passThrough: bool = False  # 0: off, 1: on
     # ↓mutableな物だけ列挙
-    intData: list[str] = field(default_factory=lambda: ["modelSlotIndex"])
+    boolData: list[str] = field(default_factory=lambda: [
+        "passThrough"
+    ])
+    intData: list[str] = field(default_factory=lambda: [
+        "modelSlotIndex",
+    ])
 
 
 class VoiceChangerManager(ServerDeviceCallbacks):
@@ -121,7 +127,6 @@ class VoiceChangerManager(ServerDeviceCallbacks):
     def get_instance(cls, params: VoiceChangerParams):
         if cls._instance is None:
             cls._instance = cls(params)
-            # cls._instance.voiceChanger = VoiceChanger(params)
         return cls._instance
 
     def loadModel(self, params: LoadModelParams):
@@ -147,7 +152,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
                 os.makedirs(dstDir, exist_ok=True)
                 logger.info(f"move to {srcPath} -> {dstPath}")
                 shutil.move(srcPath, dstPath)
-                file.name = dstPath
+                file.name = os.path.basename(dstPath)
 
             # メタデータ作成(各VCで定義)
             if params.voiceChangerType == "RVC":
@@ -188,6 +193,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         data["modelSlots"] = self.modelSlotManager.getAllSlotInfo(reload=True)
         data["sampleModels"] = getSampleInfos(self.params.sample_mode)
         data["python"] = sys.version
+        data["voiceChangerParams"] = self.params
 
         data["status"] = "OK"
 
@@ -214,11 +220,18 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             return
         elif slotInfo.voiceChangerType == "RVC":
             logger.info("................RVC")
-            from voice_changer.RVC.RVC import RVC
+            # from voice_changer.RVC.RVC import RVC
 
-            self.voiceChangerModel = RVC(self.params, slotInfo)
-            self.voiceChanger = VoiceChanger(self.params)
+            # self.voiceChangerModel = RVC(self.params, slotInfo)
+            # self.voiceChanger = VoiceChanger(self.params)
+            # self.voiceChanger.setModel(self.voiceChangerModel)
+
+            from voice_changer.RVC.RVCr2 import RVCr2
+
+            self.voiceChangerModel = RVCr2(self.params, slotInfo)
+            self.voiceChanger = VoiceChangerV2(self.params)
             self.voiceChanger.setModel(self.voiceChangerModel)
+
         elif slotInfo.voiceChangerType == "MMVCv13":
             logger.info("................MMVCv13")
             from voice_changer.MMVCv13.MMVCv13 import MMVCv13
@@ -260,10 +273,16 @@ class VoiceChangerManager(ServerDeviceCallbacks):
                 del self.voiceChangerModel
             return
 
-    def update_settings(self, key: str, val: str | int | float):
+    def update_settings(self, key: str, val: str | int | float | bool):
         self.store_setting(key, val)
 
-        if key in self.settings.intData:
+        if key in self.settings.boolData:
+            if val == "true":
+                newVal = True
+            elif val == "false":
+                newVal = False
+            setattr(self.settings, key, newVal)
+        elif key in self.settings.intData:
             newVal = int(val)
             if key == "modelSlotIndex":
                 newVal = newVal % 1000
@@ -283,6 +302,9 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         return self.get_info()
 
     def changeVoice(self, receivedData: AudioInOut):
+        if self.settings.passThrough is True:  # パススルー
+            return receivedData, []
+
         if hasattr(self, "voiceChanger") is True:
             return self.voiceChanger.on_request(receivedData)
         else:
@@ -299,8 +321,8 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         req.files = [MergeElement(**f) for f in req.files]
         slot = len(self.modelSlotManager.getAllSlotInfo()) - 1
         if req.voiceChangerType == "RVC":
-            merged = RVCModelMerger.merge_models(req, slot)
-            loadParam = LoadModelParams(voiceChangerType="RVC", slot=slot, isSampleMode=False, sampleId="", files=[LoadModelParamFile(name=os.path.basename(merged), kind="rvcModel", dir=f"{slot}")], params={})
+            merged = RVCModelMerger.merge_models(self.params, req, slot)
+            loadParam = LoadModelParams(voiceChangerType="RVC", slot=slot, isSampleMode=False, sampleId="", files=[LoadModelParamFile(name=os.path.basename(merged), kind="rvcModel", dir="")], params={})
             self.loadModel(loadParam)
         return self.get_info()
 

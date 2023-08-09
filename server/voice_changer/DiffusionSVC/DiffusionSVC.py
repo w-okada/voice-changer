@@ -14,7 +14,7 @@ from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 # from voice_changer.RVC.onnxExporter.export2onnx import export2onnx
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 
-from Exceptions import DeviceCannotSupportHalfPrecisionException, PipelineCreateException
+from Exceptions import DeviceCannotSupportHalfPrecisionException, PipelineCreateException, PipelineNotInitializedException
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
 
@@ -28,7 +28,6 @@ class DiffusionSVC(VoiceChangerModel):
         InferencerManager.initialize(params)
         self.settings = DiffusionSVCSettings()
         self.params = params
-        self.pitchExtractor = PitchExtractorManager.getPitchExtractor(self.settings.f0Detector, self.settings.gpu)
 
         self.pipeline: Pipeline | None = None
 
@@ -84,6 +83,8 @@ class DiffusionSVC(VoiceChangerModel):
         if self.pipeline is not None:
             pipelineInfo = self.pipeline.getPipelineInfo()
             data["pipelineInfo"] = pipelineInfo
+        else:
+            data["pipelineInfo"] = "None"
         return data
 
     def get_processing_sampling_rate(self):
@@ -137,6 +138,9 @@ class DiffusionSVC(VoiceChangerModel):
         return (self.audio_buffer, self.pitchf_buffer, self.feature_buffer, convertSize, vol)
 
     def inference(self, receivedData: AudioInOut, crossfade_frame: int, sola_search_frame: int):
+        if self.pipeline is None:
+            logger.info("[Voice Changer] Pipeline is not initialized.")
+            raise PipelineNotInitializedException()
         data = self.generate_input(receivedData, crossfade_frame, sola_search_frame)
         audio: AudioInOut = data[0]
         pitchf: PitchfInOut = data[1]
@@ -176,7 +180,8 @@ class DiffusionSVC(VoiceChangerModel):
                 silenceFrontSec,
                 embOutputLayer,
                 useFinalProj,
-                protect
+                protect,
+                skip_diffusion=self.settings.skipDiffusion,
             )
             result = audio_out.detach().cpu().numpy()
             return result
@@ -210,6 +215,10 @@ class DiffusionSVC(VoiceChangerModel):
             {
                 "key": "defaultTune",
                 "val": self.settings.tran,
+            },
+            {
+                "key": "dstId",
+                "val": self.settings.dstId,
             },
             {
                 "key": "defaultKstep",

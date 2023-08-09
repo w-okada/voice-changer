@@ -47,6 +47,7 @@ export type ClientState = {
     clearSetting: () => Promise<void>
     // AudioOutputElement  設定
     setAudioOutputElementId: (elemId: string) => void
+    setAudioMonitorElementId: (elemId: string) => void
 
     ioErrorCount: number
     resetIoErrorCount: () => void
@@ -215,6 +216,18 @@ export const useClient = (props: UseClientProps): ClientState => {
         }
     }
 
+    const setAudioMonitorElementId = (elemId: string) => {
+        if (!voiceChangerClientRef.current) {
+            console.warn("[voiceChangerClient] is not ready for set audio output.")
+            return
+        }
+        const audio = document.getElementById(elemId) as HTMLAudioElement
+        if (audio.paused) {
+            audio.srcObject = voiceChangerClientRef.current.monitorStream
+            audio.play()
+        }
+    }
+
     // (2-2) 情報リロード
     const getInfo = useMemo(() => {
         return async () => {
@@ -286,6 +299,7 @@ export const useClient = (props: UseClientProps): ClientState => {
 
         // AudioOutputElement  設定
         setAudioOutputElementId,
+        setAudioMonitorElementId,
 
         ioErrorCount,
         resetIoErrorCount

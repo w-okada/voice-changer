@@ -1,6 +1,6 @@
 {
   "name": "@dannadori/voice-changer-client-js",
-  "version": "1.0.164",
+  "version": "1.0.167",
   "description": "",
   "main": "dist/index.js",
   "directories": {
@@ -26,33 +26,33 @@
   "author": "wataru.okada@flect.co.jp",
   "license": "ISC",
   "devDependencies": {
-    "@types/audioworklet": "^0.0.48",
-    "@types/node": "^20.4.2",
-    "@types/react": "18.2.15",
+    "@types/audioworklet": "^0.0.50",
+    "@types/node": "^20.4.8",
+    "@types/react": "18.2.18",
     "@types/react-dom": "18.2.7",
-    "eslint": "^8.45.0",
-    "eslint-config-prettier": "^8.8.0",
+    "eslint": "^8.46.0",
+    "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
-    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react": "^7.33.1",
     "eslint-webpack-plugin": "^4.0.1",
     "npm-run-all": "^4.1.5",
-    "prettier": "^3.0.0",
+    "prettier": "^3.0.1",
     "raw-loader": "^4.0.2",
     "rimraf": "^5.0.1",
     "ts-loader": "^9.4.4",
     "typescript": "^5.1.6",
-    "webpack": "^5.88.1",
+    "webpack": "^5.88.2",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
-    "@types/readable-stream": "^2.3.15",
+    "@types/readable-stream": "^4.0.0",
     "amazon-chime-sdk-js": "^3.15.0",
     "buffer": "^6.0.3",
     "localforage": "^1.10.0",
     "protobufjs": "^7.2.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "socket.io-client": "^4.7.1"
+    "socket.io-client": "^4.7.2"
   }
 }

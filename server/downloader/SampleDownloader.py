@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Tuple
 
@@ -7,7 +8,6 @@ from const import RVCSampleMode, getSampleJsonAndModelIds
 from data.ModelSample import ModelSamples, generateModelSample
 from data.ModelSlot import DiffusionSVCModelSlot, ModelSlot, RVCModelSlot
 from mods.log_control import VoiceChangaerLogger
-from voice_changer.DiffusionSVC.DiffusionSVCModelSlotGenerator import DiffusionSVCModelSlotGenerator
 from voice_changer.ModelSlotManager import ModelSlotManager
 from voice_changer.RVC.RVCModelSlotGenerator import RVCModelSlotGenerator
 from downloader.Downloader import download, download_no_tqdm
@@ -109,7 +109,7 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
                     "position": line_num,
                 }
             )
-            slotInfo.modelFile = modelFilePath
+            slotInfo.modelFile = os.path.basename(sample.modelUrl)
             line_num += 1
 
             if targetSampleParams["useIndex"] is True and hasattr(sample, "indexUrl") and sample.indexUrl != "":
@@ -124,7 +124,7 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
                         "position": line_num,
                     }
                 )
-                slotInfo.indexFile = indexPath
+                slotInfo.indexFile = os.path.basename(sample.indexUrl)
                 line_num += 1
 
             if hasattr(sample, "icon") and sample.icon != "":
@@ -139,7 +139,7 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
                         "position": line_num,
                     }
                 )
-                slotInfo.iconFile = iconPath
+                slotInfo.iconFile = os.path.basename(sample.icon)
                 line_num += 1
 
             slotInfo.sampleId = sample.id
@@ -153,6 +153,8 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
             slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
             modelSlotManager.save_model_slot(targetSlotIndex, slotInfo)
         elif sample.voiceChangerType == "Diffusion-SVC":
+            if sys.platform.startswith("darwin") is True:
+                continue
             slotInfo: DiffusionSVCModelSlot = DiffusionSVCModelSlot()
 
             os.makedirs(slotDir, exist_ok=True)
@@ -167,7 +169,7 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
                     "position": line_num,
                 }
             )
-            slotInfo.modelFile = modelFilePath
+            slotInfo.modelFile = os.path.basename(sample.modelUrl)
             line_num += 1
 
             if hasattr(sample, "icon") and sample.icon != "":
@@ -182,7 +184,7 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
                         "position": line_num,
                     }
                 )
-                slotInfo.iconFile = iconPath
+                slotInfo.iconFile = os.path.basename(sample.icon)
                 line_num += 1
 
             slotInfo.sampleId = sample.id
@@ -212,16 +214,19 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
     logger.info("[Voice Changer] Generating metadata...")
     for targetSlotIndex in slotIndex:
         slotInfo = modelSlotManager.get_slot_info(targetSlotIndex)
+        modelPath = os.path.join(model_dir, str(slotInfo.slotIndex), os.path.basename(slotInfo.modelFile))
         if slotInfo.voiceChangerType == "RVC":
             if slotInfo.isONNX:
-                slotInfo = RVCModelSlotGenerator._setInfoByONNX(slotInfo)
+                slotInfo = RVCModelSlotGenerator._setInfoByONNX(modelPath, slotInfo)
             else:
-                slotInfo = RVCModelSlotGenerator._setInfoByPytorch(slotInfo)
+                slotInfo = RVCModelSlotGenerator._setInfoByPytorch(modelPath, slotInfo)
 
             modelSlotManager.save_model_slot(targetSlotIndex, slotInfo)
         elif slotInfo.voiceChangerType == "Diffusion-SVC":
-            if slotInfo.isONNX:
-                pass
-            else:
-                slotInfo = DiffusionSVCModelSlotGenerator._setInfoByPytorch(slotInfo)
-            modelSlotManager.save_model_slot(targetSlotIndex, slotInfo)
+            if sys.platform.startswith("darwin") is False:
+                from voice_changer.DiffusionSVC.DiffusionSVCModelSlotGenerator import DiffusionSVCModelSlotGenerator
+                if slotInfo.isONNX:
+                    pass
+                else:
+                    slotInfo = DiffusionSVCModelSlotGenerator._setInfoByPytorch(slotInfo)
+                modelSlotManager.save_model_slot(targetSlotIndex, slotInfo)

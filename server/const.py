@@ -169,4 +169,4 @@ def getSampleJsonAndModelIds(mode: RVCSampleMode):
 
 
 RVC_MODEL_DIRNAME = "rvc"
-MAX_SLOT_NUM = 10
+MAX_SLOT_NUM = 200

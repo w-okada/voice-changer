@@ -9,6 +9,7 @@ import json
 
 @dataclass
 class ModelSlot:
+    slotIndex: int = -1
     voiceChangerType: VoiceChangerType | None = None
     name: str = ""
     description: str = ""
@@ -132,19 +133,26 @@ def loadSlotInfo(model_dir: str, slotIndex: int) -> ModelSlots:
     if not os.path.exists(jsonFile):
         return ModelSlot()
     jsonDict = json.load(open(os.path.join(slotDir, "params.json")))
-    slotInfo = ModelSlot(**{k: v for k, v in jsonDict.items() if k in ModelSlot.__annotations__})
+    slotInfoKey = list(ModelSlot.__annotations__.keys())
+    slotInfo = ModelSlot(**{k: v for k, v in jsonDict.items() if k in slotInfoKey})
     if slotInfo.voiceChangerType == "RVC":
-        return RVCModelSlot(**jsonDict)
+        slotInfoKey.extend(list(RVCModelSlot.__annotations__.keys()))
+        return RVCModelSlot(**{k: v for k, v in jsonDict.items() if k in slotInfoKey})
     elif slotInfo.voiceChangerType == "MMVCv13":
-        return MMVCv13ModelSlot(**jsonDict)
+        slotInfoKey.extend(list(MMVCv13ModelSlot.__annotations__.keys()))
+        return MMVCv13ModelSlot(**{k: v for k, v in jsonDict.items() if k in slotInfoKey})
     elif slotInfo.voiceChangerType == "MMVCv15":
-        return MMVCv15ModelSlot(**jsonDict)
+        slotInfoKey.extend(list(MMVCv15ModelSlot.__annotations__.keys()))
+        return MMVCv15ModelSlot(**{k: v for k, v in jsonDict.items() if k in slotInfoKey})
     elif slotInfo.voiceChangerType == "so-vits-svc-40":
-        return SoVitsSvc40ModelSlot(**jsonDict)
+        slotInfoKey.extend(list(SoVitsSvc40ModelSlot.__annotations__.keys()))
+        return SoVitsSvc40ModelSlot(**{k: v for k, v in jsonDict.items() if k in slotInfoKey})
     elif slotInfo.voiceChangerType == "DDSP-SVC":
-        return DDSPSVCModelSlot(**jsonDict)
+        slotInfoKey.extend(list(DDSPSVCModelSlot.__annotations__.keys()))
+        return DDSPSVCModelSlot(**{k: v for k, v in jsonDict.items() if k in slotInfoKey})
     elif slotInfo.voiceChangerType == "Diffusion-SVC":
-        return DiffusionSVCModelSlot(**jsonDict)
+        slotInfoKey.extend(list(DiffusionSVCModelSlot.__annotations__.keys()))
+        return DiffusionSVCModelSlot(**{k: v for k, v in jsonDict.items() if k in slotInfoKey})
     else:
         return ModelSlot()
 
@@ -153,10 +161,13 @@ def loadAllSlotInfo(model_dir: str):
     slotInfos: list[ModelSlots] = []
     for slotIndex in range(MAX_SLOT_NUM):
         slotInfo = loadSlotInfo(model_dir, slotIndex)
+        slotInfo.slotIndex = slotIndex  # スロットインデックスは動的に注入
         slotInfos.append(slotInfo)
     return slotInfos
 
 
 def saveSlotInfo(model_dir: str, slotIndex: int, slotInfo: ModelSlots):
     slotDir = os.path.join(model_dir, str(slotIndex))
-    json.dump(asdict(slotInfo), open(os.path.join(slotDir, "params.json"), "w"))
+    slotInfoDict = asdict(slotInfo)
+    slotInfo.slotIndex = -1  # スロットインデックスは動的に注入
+    json.dump(slotInfoDict, open(os.path.join(slotDir, "params.json"), "w"), indent=4)

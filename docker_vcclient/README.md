@@ -18,6 +18,10 @@ npm run build:docker:vcclient
 bash start_docker.sh
 ```
 
+ブラウザ(Chrome のみサポート)でアクセスすると画面が表示されます。
+
+## RUN with options
+
 GPU を使用しない場合は
 
 ```

@@ -19,7 +19,7 @@ export const MainScreen = (props: MainScreenProps) => {
     const guiState = useGuiState();
     const messageBuilderState = useMessageBuilder();
     useMemo(() => {
-        messageBuilderState.setMessage(__filename, "change_icon", { ja: "アイコン変更", en: "chage icon" });
+        messageBuilderState.setMessage(__filename, "change_icon", { ja: "アイコン変更", en: "change icon" });
         messageBuilderState.setMessage(__filename, "rename", { ja: "リネーム", en: "rename" });
         messageBuilderState.setMessage(__filename, "download", { ja: "ダウンロード", en: "download" });
         messageBuilderState.setMessage(__filename, "terms_of_use", { ja: "利用規約", en: "terms of use" });
@@ -99,7 +99,7 @@ export const MainScreen = (props: MainScreenProps) => {
         const slotRow = serverSetting.serverSetting.modelSlots.map((x, index) => {
             // モデルのアイコン
             const generateIconArea = (slotIndex: number, iconUrl: string, tooltip: boolean) => {
-                const realIconUrl = iconUrl.length > 0 ? iconUrl : "/assets/icons/noimage.png";
+                const realIconUrl = iconUrl.length > 0 ? serverSetting.serverSetting.voiceChangerParams.model_dir + "/" + slotIndex + "/" + iconUrl.split(/[\/\\]/).pop() : "/assets/icons/noimage.png";
                 const iconDivClass = tooltip ? "tooltip" : "";
                 const iconClass = tooltip ? "model-slot-icon-pointable" : "model-slot-icon";
                 return (

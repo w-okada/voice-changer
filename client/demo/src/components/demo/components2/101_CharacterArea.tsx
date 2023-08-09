@@ -49,7 +49,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
             return <></>;
         }
 
-        const icon = selected.iconFile.length > 0 ? selected.iconFile : "./assets/icons/human.png";
+        const icon = selected.iconFile.length > 0 ? serverSetting.serverSetting.voiceChangerParams.model_dir + "/" + selected.slotIndex + "/" + selected.iconFile.split(/[\/\\]/).pop() : "./assets/icons/human.png";
         const selectedTermOfUseUrlLink = selected.termsOfUseUrl ? (
             <a href={selected.termsOfUseUrl} target="_blank" rel="noopener noreferrer" className="portrait-area-terms-of-use-link">
                 [{messageBuilderState.getMessage(__filename, "terms_of_use")}]
@@ -122,9 +122,13 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
                 serverSetting.updateServerSettings({ ...serverSetting.serverSetting, serverAudioStated: 0 });
             }
         };
+        const onPassThroughClicked = async () => {
+            serverSetting.updateServerSettings({ ...serverSetting.serverSetting, passThrough: !serverSetting.serverSetting.passThrough });
+        };
         const startClassName = guiState.isConverting ? "character-area-control-button-active" : "character-area-control-button-stanby";
         const stopClassName = guiState.isConverting ? "character-area-control-button-stanby" : "character-area-control-button-active";
-
+        const passThruClassName = serverSetting.serverSetting.passThrough == false ? "character-area-control-passthru-button-stanby" : "character-area-control-passthru-button-active blinking";
+        console.log("serverSetting.serverSetting.passThrough", passThruClassName, serverSetting.serverSetting.passThrough);
         return (
             <div className="character-area-control">
                 <div className="character-area-control-buttons">
@@ -133,6 +137,9 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
                     </div>
                     <div onClick={onStopClicked} className={stopClassName}>
                         stop
+                    </div>
+                    <div onClick={onPassThroughClicked} className={passThruClassName}>
+                        passthru
                     </div>
                 </div>
             </div>

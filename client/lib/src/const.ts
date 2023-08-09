@@ -68,6 +68,7 @@ export const RVCModelType = {
 export type RVCModelType = typeof RVCModelType[keyof typeof RVCModelType]
 
 export const ServerSettingKey = {
+    "passThrough":"passThrough",
     "srcId": "srcId",
     "dstId": "dstId",
     "gpu": "gpu",
@@ -97,6 +98,7 @@ export const ServerSettingKey = {
     "serverReadChunkSize": "serverReadChunkSize",
     "serverInputAudioGain": "serverInputAudioGain",
     "serverOutputAudioGain": "serverOutputAudioGain",
+    "serverMonitorAudioGain": "serverMonitorAudioGain",
 
     "tran": "tran",
     "noiseScale": "noiseScale",
@@ -123,6 +125,7 @@ export const ServerSettingKey = {
     "threshold": "threshold",
 
     "speedUp": "speedUp",
+    "skipDiffusion": "skipDiffusion",
 
     "inputSampleRate": "inputSampleRate",
     "enableDirectML": "enableDirectML",
@@ -131,6 +134,7 @@ export type ServerSettingKey = typeof ServerSettingKey[keyof typeof ServerSettin
 
 
 export type VoiceChangerServerSetting = {
+    passThrough: boolean
     srcId: number,
     dstId: number,
     gpu: number,
@@ -157,6 +161,7 @@ export type VoiceChangerServerSetting = {
     serverReadChunkSize: number
     serverInputAudioGain: number
     serverOutputAudioGain: number
+    serverMonitorAudioGain: number
 
 
     tran: number // so-vits-svc
@@ -184,13 +189,14 @@ export type VoiceChangerServerSetting = {
     threshold: number// DDSP-SVC
 
     speedUp: number // Diffusion-SVC
-
+    skipDiffusion: number // Diffusion-SVC 0:off, 1:on
 
     inputSampleRate: InputSampleRate
     enableDirectML: number
 }
 
 type ModelSlot = {
+    slotIndex: number
     voiceChangerType: VoiceChangerType
     name: string,
     description: string,
@@ -303,7 +309,9 @@ export type ServerInfo = VoiceChangerServerSetting & {
         memory: number,
     }[]
     maxInputLength: number  // MMVCv15
-
+    voiceChangerParams: {
+        model_dir: string
+    }
 }
 
 export type SampleModel = {
@@ -339,6 +347,7 @@ export type DiffusionSVCSampleModel =SampleModel & {
 
 export const DefaultServerSetting: ServerInfo = {
     // VC Common 
+    passThrough: false,
     inputSampleRate: 48000,
 
     crossFadeOffsetRate: 0.0,
@@ -361,6 +370,7 @@ export const DefaultServerSetting: ServerInfo = {
     serverReadChunkSize: 256,
     serverInputAudioGain: 1.0,
     serverOutputAudioGain: 1.0,
+    serverMonitorAudioGain: 1.0,
 
     // VC Specific
     srcId: 0,
@@ -397,6 +407,7 @@ export const DefaultServerSetting: ServerInfo = {
     threshold: -45,
 
     speedUp: 10,
+    skipDiffusion: 1,
 
     enableDirectML: 0,
     // 
@@ -405,7 +416,10 @@ export const DefaultServerSetting: ServerInfo = {
     serverAudioInputDevices: [],
     serverAudioOutputDevices: [],
 
-    maxInputLength:  128 * 2048
+    maxInputLength:  128 * 2048,
+    voiceChangerParams: {
+        model_dir: ""
+    }
 }
 
 ///////////////////////
@@ -466,6 +480,7 @@ export type VoiceChangerClientSetting = {
 
     inputGain: number
     outputGain: number
+    monitorGain: number
 }
 
 ///////////////////////
@@ -496,7 +511,8 @@ export const DefaultClientSettng: ClientSetting = {
         noiseSuppression: false,
         noiseSuppression2: false,
         inputGain: 1.0,
-        outputGain: 1.0
+        outputGain: 1.0,
+        monitorGain: 1.0
     }
 }
 
@@ -533,7 +549,7 @@ export type OnnxExporterInfo = {
 
 // Merge
 export type MergeElement = {
-    filename: string
+    slotIndex: number
     strength: number
 }
 export type MergeModelRequest = {

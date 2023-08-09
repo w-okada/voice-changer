@@ -63,6 +63,7 @@ type GuiStateAndMethod = {
     outputAudioDeviceInfo: MediaDeviceInfo[];
     audioInputForGUI: string;
     audioOutputForGUI: string;
+    audioMonitorForGUI: string;
     fileInputEchoback: boolean | undefined;
     shareScreenEnabled: boolean;
     audioOutputForAnalyzer: string;
@@ -70,6 +71,7 @@ type GuiStateAndMethod = {
     setOutputAudioDeviceInfo: (val: MediaDeviceInfo[]) => void;
     setAudioInputForGUI: (val: string) => void;
     setAudioOutputForGUI: (val: string) => void;
+    setAudioMonitorForGUI: (val: string) => void;
     setFileInputEchoback: (val: boolean) => void;
     setShareScreenEnabled: (val: boolean) => void;
     setAudioOutputForAnalyzer: (val: string) => void;
@@ -106,6 +108,7 @@ export const GuiStateProvider = ({ children }: Props) => {
     const [outputAudioDeviceInfo, setOutputAudioDeviceInfo] = useState<MediaDeviceInfo[]>([]);
     const [audioInputForGUI, setAudioInputForGUI] = useState<string>("none");
     const [audioOutputForGUI, setAudioOutputForGUI] = useState<string>("none");
+    const [audioMonitorForGUI, setAudioMonitorForGUI] = useState<string>("none");
     const [fileInputEchoback, setFileInputEchoback] = useState<boolean>(false); //最初のmuteが有効になるように。undefined <-- ??? falseしておけばよさそう。undefinedだとwarningがでる。
     const [shareScreenEnabled, setShareScreenEnabled] = useState<boolean>(false);
     const [audioOutputForAnalyzer, setAudioOutputForAnalyzer] = useState<string>("default");
@@ -270,6 +273,7 @@ export const GuiStateProvider = ({ children }: Props) => {
         outputAudioDeviceInfo,
         audioInputForGUI,
         audioOutputForGUI,
+        audioMonitorForGUI,
         fileInputEchoback,
         shareScreenEnabled,
         audioOutputForAnalyzer,
@@ -277,6 +281,7 @@ export const GuiStateProvider = ({ children }: Props) => {
         setOutputAudioDeviceInfo,
         setAudioInputForGUI,
         setAudioOutputForGUI,
+        setAudioMonitorForGUI,
         setFileInputEchoback,
         setShareScreenEnabled,
         setAudioOutputForAnalyzer,
