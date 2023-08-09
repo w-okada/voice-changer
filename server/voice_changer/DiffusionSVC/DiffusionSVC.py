@@ -7,6 +7,7 @@ from voice_changer.DiffusionSVC.inferencer.InferencerManager import InferencerMa
 from voice_changer.DiffusionSVC.pipeline.Pipeline import Pipeline
 from voice_changer.DiffusionSVC.pipeline.PipelineGenerator import createPipeline
 from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
+from voice_changer.ModelSlotManager import ModelSlotManager
 
 from voice_changer.utils.VoiceChangerModel import AudioInOut, PitchfInOut, FeatureInOut, VoiceChangerModel
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
@@ -37,8 +38,11 @@ class DiffusionSVC(VoiceChangerModel):
         self.prevVol = 0.0
         self.slotInfo = slotInfo
 
+        self.modelSlotManager = ModelSlotManager.get_instance(self.params.model_dir)
+
     def initialize(self):
         logger.info("[Voice Changer] [DiffusionSVC] Initializing... ")
+        self.slotInfo = self.modelSlotManager.get_slot_info(self.slotInfo.slotIndex)
 
         # pipelineの生成
         try:

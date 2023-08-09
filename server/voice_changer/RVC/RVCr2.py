@@ -62,7 +62,7 @@ class RVCr2(VoiceChangerModel):
     def setSamplingRate(self, inputSampleRate, outputSampleRate):
         self.inputSampleRate = inputSampleRate
         self.outputSampleRate = outputSampleRate
-        self.initialize()
+        # self.initialize()
 
     def update_settings(self, key: str, val: int | float | str):
         logger.info(f"[Voice Changer][RVC]: update_settings {key}:{val}")

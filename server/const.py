@@ -111,6 +111,43 @@ def getSampleJsonAndModelIds(mode: RVCSampleMode):
             ("diffusion_combo_spk5_nl3_dl20_k50_500ep", {}),
             ("diffusion_combo_spk5_nl3_dl1_k50_500ep", {}),
         ]
+    elif mode == "testAll":
+        return [
+            "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_official_v1_v2.json",
+            "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_ddpn_v1_v2.json",
+        ], [
+            ("test-official-v1-f0-48k-l9-hubert_t", {"useIndex": True}),
+            ("test-official-v1-nof0-48k-l9-hubert_t", {"useIndex": False}),
+            ("test-official-v2-f0-40k-l12-hubert_t", {"useIndex": False}),
+            ("test-official-v2-nof0-40k-l12-hubert_t", {"useIndex": False}),
+            ("test-official-v1-f0-48k-l9-hubert_o", {"useIndex": True}),
+            ("test-official-v1-nof0-48k-l9-hubert_o", {"useIndex": False}),
+            ("test-official-v2-f0-40k-l12-hubert_o", {"useIndex": False}),
+            ("test-official-v2-nof0-40k-l12-hubert_o", {"useIndex": False}),
+            ("test-ddpn-v1-f0-48k-l9-hubert_t", {"useIndex": False}),
+            ("test-ddpn-v1-nof0-48k-l9-hubert_t", {"useIndex": False}),
+            ("test-ddpn-v2-f0-40k-l12-hubert_t", {"useIndex": False}),
+            ("test-ddpn-v2-nof0-40k-l12-hubert_t", {"useIndex": False}),
+            ("test-ddpn-v2-f0-40k-l12-hubert_jp_t", {"useIndex": False}),
+            ("test-ddpn-v2-nof0-40k-l12-hubert_jp_t", {"useIndex": False}),
+            ("test-ddpn-v1-f0-48k-l9-hubert_o", {"useIndex": False}),
+            ("test-ddpn-v1-nof0-48k-l9-hubert_o", {"useIndex": False}),
+            ("test-ddpn-v2-f0-40k-l12-hubert_o", {"useIndex": False}),
+            ("test-ddpn-v2-nof0-40k-l12-hubert_o", {"useIndex": False}),
+            ("test-ddpn-v2-f0-40k-l12-hubert_jp_o", {"useIndex": False}),
+            ("test-ddpn-v2-nof0-40k-l12-hubert_jp_o", {"useIndex": False}),
+            ("test-official-v1-f0-48k-l9-hubert_o_full", {"useIndex": False}),
+            ("test-official-v1-nof0-48k-l9-hubert_o_full", {"useIndex": False}),
+            ("test-official-v2-f0-40k-l12-hubert_o_full", {"useIndex": False}),
+            ("test-official-v2-nof0-40k-l12-hubert_o_full", {"useIndex": False}),
+            ("test-ddpn-v1-f0-48k-l9-hubert_o_full", {"useIndex": False}),
+            ("test-ddpn-v1-nof0-48k-l9-hubert_o_full", {"useIndex": False}),
+            ("test-ddpn-v2-f0-40k-l12-hubert_o_full", {"useIndex": False}),
+            ("test-ddpn-v2-nof0-40k-l12-hubert_o_full", {"useIndex": False}),
+            ("test-ddpn-v2-f0-40k-l12-hubert_jp_o_full", {"useIndex": False}),
+            ("test-ddpn-v2-nof0-40k-l12-hubert_jp_o_full", {"useIndex": False}),
+
+        ]
     elif mode == "testOfficial":
         return [
             "https://huggingface.co/wok000/vcclient_model/raw/main/test/test_official_v1_v2.json",
