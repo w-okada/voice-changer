@@ -5,6 +5,7 @@ import { DDSPSVCModelSlot, DiffusionSVCModelSlot, MMVCv13ModelSlot, MMVCv15Model
 import { useMessageBuilder } from "../../hooks/useMessageBuilder";
 import { ModelSlotManagerDialogScreen } from "./904_ModelSlotManagerDialog";
 import { checkExtention, trimfileName } from "../../utils/utils";
+import { MODEL_ICON_BLANK_URL } from "../../const";
 
 export type MainScreenProps = {
     screen: ModelSlotManagerDialogScreen;
@@ -98,8 +99,11 @@ export const MainScreen = (props: MainScreenProps) => {
 
         const slotRow = serverSetting.serverSetting.modelSlots.map((x, index) => {
             // モデルのアイコン
-            const generateIconArea = (slotIndex: number, iconUrl: string, tooltip: boolean) => {
-                const realIconUrl = iconUrl.length > 0 ? serverSetting.serverSetting.voiceChangerParams.model_dir + "/" + slotIndex + "/" + iconUrl.split(/[\/\\]/).pop() : "/assets/icons/noimage.png";
+            const generateIconArea = (slotIndex: number, iconUrl: string | null, tooltip: boolean) => {
+                let realIconUrl = MODEL_ICON_BLANK_URL;
+                if (iconUrl) {
+                    realIconUrl = iconUrl.length > 0 ? serverSetting.serverSetting.voiceChangerParams.model_dir + "/" + slotIndex + "/" + iconUrl.split(/[\/\\]/).pop() : "/assets/icons/noimage.png";
+                }
                 const iconDivClass = tooltip ? "tooltip" : "";
                 const iconClass = tooltip ? "model-slot-icon-pointable" : "model-slot-icon";
                 return (
@@ -225,7 +229,7 @@ export const MainScreen = (props: MainScreenProps) => {
                 fileRows.push(generateFileRow("model", slotInfo.modelFile));
                 infoRow = generateInfoRow(`tune:${slotInfo.defaultTune},mks:${slotInfo.kStepMax},ks:${slotInfo.defaultKstep}, sp:${slotInfo.defaultSpeedup}, l:${slotInfo.nLayers},${slotInfo.nnLayers},`);
             } else {
-                iconArea = generateIconArea(index, "/assets/icons/blank.png", false);
+                iconArea = generateIconArea(index, null, false);
                 nameRow = generateNameRow(index, "", "");
             }
             return (

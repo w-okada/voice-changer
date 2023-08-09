@@ -12,6 +12,7 @@ export const INDEXEDDB_KEY_AUDIO_OUTPUT = "INDEXEDDB_KEY_AUDIO_OUTPUT"
 export const INDEXEDDB_KEY_AUDIO_MONITR = "INDEXEDDB_KEY_AUDIO_MONITOR"
 export const INDEXEDDB_KEY_DEFAULT_MODEL_TYPE = "INDEXEDDB_KEY_DEFALT_MODEL_TYPE"
 
+export const MODEL_ICON_BLANK_URL = "/assets/icons/blank.png"
 
 export const isDesktopApp = () => {
     if (navigator.userAgent.indexOf('Electron') >= 0) {
