@@ -20,6 +20,7 @@ export const OpenMergeLabDialogCheckbox = "open-merge-lab-dialog-checkbox";
 export const OpenAdvancedSettingDialogCheckbox = "open-advanced-setting-dialog-checkbox";
 export const OpenGetServerInformationDialogCheckbox = "open-get-server-information-dialog-checkbox";
 export const OpenGetClientInformationDialogCheckbox = "open-get-client-information-dialog-checkbox";
+export const OpenEnablePassThroughDialogCheckbox = "open-enable-pass-through-dialog-checkbox";
 
 export const OpenTextInputDialogCheckbox = "open-text-input-dialog-checkbox";
 export const OpenShowLicenseDialogCheckbox = "open-show-license-dialog-checkbox";
@@ -46,6 +47,7 @@ export type StateControls = {
     showAdvancedSettingCheckbox: StateControlCheckbox;
     showGetServerInformationCheckbox: StateControlCheckbox;
     showGetClientInformationCheckbox: StateControlCheckbox;
+    showEnablePassThroughDialogCheckbox: StateControlCheckbox;
     showTextInputCheckbox: StateControlCheckbox;
     showLicenseCheckbox: StateControlCheckbox;
 };
@@ -195,6 +197,7 @@ export const GuiStateProvider = ({ children }: Props) => {
     const showAdvancedSettingCheckbox = useStateControlCheckbox(OpenAdvancedSettingDialogCheckbox);
     const showGetServerInformationCheckbox = useStateControlCheckbox(OpenGetServerInformationDialogCheckbox);
     const showGetClientInformationCheckbox = useStateControlCheckbox(OpenGetClientInformationDialogCheckbox);
+    const showEnablePassThroughDialogCheckbox = useStateControlCheckbox(OpenEnablePassThroughDialogCheckbox);
 
     const showTextInputCheckbox = useStateControlCheckbox(OpenTextInputDialogCheckbox);
     const showLicenseCheckbox = useStateControlCheckbox(OpenShowLicenseDialogCheckbox);
@@ -217,6 +220,7 @@ export const GuiStateProvider = ({ children }: Props) => {
         showAdvancedSettingCheckbox.updateState(false);
         showGetServerInformationCheckbox.updateState(false);
         showGetClientInformationCheckbox.updateState(false);
+        showEnablePassThroughDialogCheckbox.updateState(false);
 
         showTextInputCheckbox.updateState(false);
         showLicenseCheckbox.updateState(false);
@@ -257,6 +261,7 @@ export const GuiStateProvider = ({ children }: Props) => {
             showAdvancedSettingCheckbox,
             showGetServerInformationCheckbox,
             showGetClientInformationCheckbox,
+            showEnablePassThroughDialogCheckbox,
 
             showTextInputCheckbox,
             showLicenseCheckbox,

@@ -123,7 +123,11 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
             }
         };
         const onPassThroughClicked = async () => {
-            serverSetting.updateServerSettings({ ...serverSetting.serverSetting, passThrough: !serverSetting.serverSetting.passThrough });
+            if (serverSetting.serverSetting.passThrough == false) {
+                guiState.stateControls.showEnablePassThroughDialogCheckbox.updateState(true);
+            } else {
+                serverSetting.updateServerSettings({ ...serverSetting.serverSetting, passThrough: false });
+            }
         };
         const startClassName = guiState.isConverting ? "character-area-control-button-active" : "character-area-control-button-stanby";
         const stopClassName = guiState.isConverting ? "character-area-control-button-stanby" : "character-area-control-button-active";

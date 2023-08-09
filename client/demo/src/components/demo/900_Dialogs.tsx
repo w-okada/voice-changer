@@ -7,6 +7,7 @@ import { MergeLabDialog } from "./905_MergeLabDialog";
 import { AdvancedSettingDialog } from "./906_AdvancedSettingDialog";
 import { GetServerInfomationDialog } from "./907_GetServerInfomationDialog";
 import { GetClientInfomationDialog } from "./908_GetClientInfomationDialog";
+import { EnablePassThroughDialog } from "./909_EnablePassThroughDialog";
 
 export const Dialogs = () => {
     const guiState = useGuiState();
@@ -19,6 +20,7 @@ export const Dialogs = () => {
             {guiState.stateControls.showAdvancedSettingCheckbox.trigger}
             {guiState.stateControls.showGetServerInformationCheckbox.trigger}
             {guiState.stateControls.showGetClientInformationCheckbox.trigger}
+            {guiState.stateControls.showEnablePassThroughDialogCheckbox.trigger}
             <div className="dialog-container" id="dialog">
                 {guiState.stateControls.showWaitingCheckbox.trigger}
                 <WaitingDialog></WaitingDialog>
@@ -34,6 +36,8 @@ export const Dialogs = () => {
                 <GetServerInfomationDialog></GetServerInfomationDialog>
                 {guiState.stateControls.showGetClientInformationCheckbox.trigger}
                 <GetClientInfomationDialog></GetClientInfomationDialog>
+                {guiState.stateControls.showEnablePassThroughDialogCheckbox.trigger}
+                <EnablePassThroughDialog></EnablePassThroughDialog>
             </div>
         </div>
     );
