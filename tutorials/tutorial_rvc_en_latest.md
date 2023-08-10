@@ -247,6 +247,18 @@ You can select the GPU to use in the onnxgpu version.
 
 In the onnxdirectML version, you can switch the GPU ON/OFF.
 
+On DirectML Version, these buottns is displayed.
+
+![image](https://github.com/w-okada/voice-changer/assets/48346627/5a66f237-e5b5-4819-9409-ff5eebb6e514)
+
+- cpu: use cpu
+- gpu0: use gpu0
+- gpu1: use gpu1
+- gpu2: use gpu2
+- gpu3: use gpu3
+
+Even if a GPU is not detected, gpu0 - gpu3 will still be displayed. If you specify a GPU that doesn't exist, the CPU will be used instead.[reference](https://github.com/w-okada/voice-changer/issues/410)
+
 #### AUDIO
 
 Choose the type of audio device you want to use. For more information, please refer to the [document](./tutorial_device_mode.md).
