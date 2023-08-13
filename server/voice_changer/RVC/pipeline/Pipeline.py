@@ -18,7 +18,7 @@ from voice_changer.RVC.inferencer.OnnxRVCInferencer import OnnxRVCInferencer
 from voice_changer.RVC.inferencer.OnnxRVCInferencerNono import OnnxRVCInferencerNono
 
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
-from voice_changer.utils.Timer import Timer
+from voice_changer.utils.Timer import Timer2
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
 
@@ -153,7 +153,7 @@ class Pipeline(object):
         # print(f"pipeline exec input, audio:{audio.shape}, pitchf:{pitchf.shape}, feature:{feature.shape}")
         # print(f"pipeline exec input, silence_front:{silence_front}, out_size:{out_size}")
 
-        with Timer("main-process", False) as t:  # NOQA
+        with Timer2("Pipeline-Exec", False) as t:  # NOQA
             # 16000のサンプリングレートで入ってきている。以降この世界は16000で処理。
             search_index = self.index is not None and self.big_npy is not None and index_rate != 0
             # self.t_pad = self.sr * repeat  # 1秒
@@ -180,27 +180,14 @@ class Pipeline(object):
             assert feats.dim() == 1, feats.dim()
             feats = feats.view(1, -1)
 
+            t.record("pre-process")
             # ピッチ検出
-            with Timer("main-process", True) as t:
-                pitch, pitchf = self.extractPitch(audio_pad, if_f0, pitchf, f0_up_key, silence_front)
-            print(f"[Perform(Pit)] {t.secs}")
+            pitch, pitchf = self.extractPitch(audio_pad, if_f0, pitchf, f0_up_key, silence_front)
+            t.record("extract-pitch")
 
             # embedding
-            with Timer("main-process", True) as t:
-                # with autocast(enabled=self.isHalf):
-                #     try:
-                #         feats = self.embedder.extractFeatures(feats, embOutputLayer, useFinalProj)
-                #         if torch.isnan(feats).all():
-                #             raise DeviceCannotSupportHalfPrecisionException()
-                #     except RuntimeError as e:
-                #         if "HALF" in e.__str__().upper():
-                #             raise HalfPrecisionChangingException()
-                #         elif "same device" in e.__str__():
-                #             raise DeviceChangingException()
-                #         else:
-                #             raise e
-                feats = self.extractFeatures(feats, embOutputLayer, useFinalProj)
-            print(f"[Perform(Emb)] {t.secs}")
+            feats = self.extractFeatures(feats, embOutputLayer, useFinalProj)
+            t.record("extract-feats")
 
             # Index - feature抽出
             # if self.index is not None and self.feature is not None and index_rate != 0:
@@ -268,10 +255,10 @@ class Pipeline(object):
                 pitchf = pitchf[:, -feats_len:]
             p_len = torch.tensor([feats_len], device=self.device).long()
 
+            t.record("mid-precess")
             # 推論実行
-            with Timer("main-process", True) as t:
-                audio1 = self.infer(feats, p_len, pitch, pitchf, sid, out_size)
-            print(f"[Perform(Inf)] {t.secs}")
+            audio1 = self.infer(feats, p_len, pitch, pitchf, sid, out_size)
+            t.record("infer")
 
             feats_buffer = feats.squeeze(0).detach().cpu()
             if pitchf is not None:
@@ -290,6 +277,7 @@ class Pipeline(object):
                 audio1 = audio1[offset:end]
 
             del sid
+            t.record("post-process")
             # torch.cuda.empty_cache()
         # print("EXEC AVERAGE:", t.avrSecs)
         return audio1, pitchf_buffer, feats_buffer
