@@ -25,7 +25,15 @@ from const import (
 )
 import subprocess
 import multiprocessing as mp
+
 from mods.log_control import VoiceChangaerLogger
+
+
+if __name__ == "__main__":
+    VoiceChangaerLogger.get_instance().initialize(initialize=True)
+else:
+    VoiceChangaerLogger.get_instance().initialize(initialize=False)
+
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
 logger.debug(f"---------------- Booting PHASE :{__name__} -----------------")
