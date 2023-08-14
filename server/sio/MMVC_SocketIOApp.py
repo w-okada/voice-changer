@@ -1,8 +1,11 @@
 import socketio
+from mods.log_control import VoiceChangaerLogger
 
 from sio.MMVC_SocketIOServer import MMVC_SocketIOServer
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 from const import getFrontendPath
+
+logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
 class MMVC_SocketIOApp:
@@ -11,6 +14,7 @@ class MMVC_SocketIOApp:
     @classmethod
     def get_instance(cls, app_fastapi, voiceChangerManager: VoiceChangerManager):
         if cls._instance is None:
+            logger.info("[Voice Changer] MMVC_SocketIOApp initializing...")
             sio = MMVC_SocketIOServer.get_instance(voiceChangerManager)
             app_socketio = socketio.ASGIApp(
                 sio,
@@ -42,6 +46,7 @@ class MMVC_SocketIOApp:
             )
 
             cls._instance = app_socketio
+            logger.info("[Voice Changer] MMVC_SocketIOApp initializing... done.")
             return cls._instance
 
         return cls._instance

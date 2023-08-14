@@ -72,6 +72,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
     # VoiceChangerManager
     ############################
     def __init__(self, params: VoiceChangerParams):
+        logger.info("[Voice Changer] VoiceChangerManager initializing...")
         self.params = params
         self.voiceChanger: VoiceChanger = None
         self.settings: VoiceChangerManagerSettings = VoiceChangerManagerSettings()
@@ -95,6 +96,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             self.update_settings("gpu", 0)
         # for key, val in self.stored_setting.items():
         #     self.update_settings(key, val)
+        logger.info("[Voice Changer] VoiceChangerManager initializing... done.")
 
     def store_setting(self, key: str, val: str | int | float):
         saveItemForServerDevice = ["enableServerAudio", "serverAudioSampleRate", "serverInputDeviceId", "serverOutputDeviceId", "serverMonitorDeviceId", "serverReadChunkSize", "serverInputAudioGain", "serverOutputAudioGain"]

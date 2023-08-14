@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
 from typing import Callable
+from mods.log_control import VoiceChangaerLogger
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 
 from restapi.MMVC_Rest_Hello import MMVC_Rest_Hello
@@ -14,6 +15,8 @@ from restapi.MMVC_Rest_VoiceChanger import MMVC_Rest_VoiceChanger
 from restapi.MMVC_Rest_Fileuploader import MMVC_Rest_Fileuploader
 from const import UPLOAD_DIR, getFrontendPath, TMP_DIR
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
+
+logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
 class ValidationErrorLoggingRoute(APIRoute):
@@ -42,6 +45,7 @@ class MMVC_Rest:
         voiceChangerParams: VoiceChangerParams,
     ):
         if cls._instance is None:
+            logger.info("[Voice Changer] MMVC_Rest initializing...")
             app_fastapi = FastAPI()
             app_fastapi.router.route_class = ValidationErrorLoggingRoute
             app_fastapi.add_middleware(
@@ -102,6 +106,7 @@ class MMVC_Rest:
             app_fastapi.include_router(fileUploader.router)
 
             cls._instance = app_fastapi
+            logger.info("[Voice Changer] MMVC_Rest initializing... done.")
             return cls._instance
 
         return cls._instance
