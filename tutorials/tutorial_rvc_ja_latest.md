@@ -1,4 +1,4 @@
-# Realtime Voice Changer Client for RVC チュートリアル(v.1.5.3.10)
+# Realtime Voice Changer Client for RVC チュートリアル(v.1.5.3.13)
 
 [English](/tutorials/tutorial_rvc_en_latest.md)
 
