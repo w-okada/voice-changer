@@ -42,6 +42,6 @@ export const EnablePassThroughDialog = () => {
                 <div className="dialog-content">{buttonRow}</div>
             </div>
         );
-    }, [setting, audioContextState]);
+    }, [setting, audioContextState, serverSetting.serverSetting]);
     return dialog;
 };
