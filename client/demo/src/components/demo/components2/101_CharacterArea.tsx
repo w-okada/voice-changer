@@ -124,7 +124,12 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
         };
         const onPassThroughClicked = async () => {
             if (serverSetting.serverSetting.passThrough == false) {
-                guiState.stateControls.showEnablePassThroughDialogCheckbox.updateState(true);
+                if (setting.voiceChangerClientSetting.passThroughConfirmationSkip) {
+                    serverSetting.updateServerSettings({ ...serverSetting.serverSetting, passThrough: true });
+                    guiState.stateControls.showEnablePassThroughDialogCheckbox.updateState(false);
+                } else {
+                    guiState.stateControls.showEnablePassThroughDialogCheckbox.updateState(true);
+                }
             } else {
                 serverSetting.updateServerSettings({ ...serverSetting.serverSetting, passThrough: false });
             }

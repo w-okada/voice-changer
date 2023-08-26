@@ -1709,6 +1709,11 @@ audio::-webkit-media-controls-overlay-enclosure{
             font-weight: 700;
             font-size: 0.9rem;
         }
+        .advanced-setting-container-row-title-long {
+            width: 20rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
         .advanced-setting-container-row-field {
             width: 15rem;
             font-size: 0.9rem;

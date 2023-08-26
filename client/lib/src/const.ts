@@ -490,6 +490,8 @@ export type VoiceChangerClientSetting = {
     inputGain: number
     outputGain: number
     monitorGain: number
+
+    passThroughConfirmationSkip: boolean
 }
 
 ///////////////////////
@@ -521,7 +523,8 @@ export const DefaultClientSettng: ClientSetting = {
         noiseSuppression2: false,
         inputGain: 1.0,
         outputGain: 1.0,
-        monitorGain: 1.0
+        monitorGain: 1.0,
+        passThroughConfirmationSkip: false
     }
 }
 
