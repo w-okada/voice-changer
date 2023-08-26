@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-DOCKER_IMAGE=dannadori/vcclient:20230710_031922
+DOCKER_IMAGE=dannadori/vcclient:20230826_211406
 #DOCKER_IMAGE=vcclient
 
 ### DEFAULT VAR ###
