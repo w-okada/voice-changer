@@ -139,7 +139,7 @@ By pressing the "edit" button, you can edit the list of models (model slots). Pl
 
 ## Main Control
 
-![image](https://github.com/w-okada/voice-changer/assets/48346627/5a8dcf64-29d3-49cd-92f1-db7b539bfb3d)
+![image](https://github.com/w-okada/voice-changer/assets/48346627/4401acdb-eb58-40e1-9609-5a82ee5eb570)
 
 A character image loaded on the left side will be displayed. The status of real-time voice changer is overlaid on the top left of the character image.
 
@@ -166,6 +166,12 @@ The time it takes to convert data with CHUNK and EXTRA added is measured. Decrea
 #### start/stop button
 
 Press "start" to begin voice conversion and "stop" to end it.
+
+#### pass through button
+
+When this button is pressed, the sound inputted will be outputted as is.
+
+The sound inputted will be outputted as is.. By default, a confirmation dialog will appear when it's activated, but you can skip this dialog through the Advanced Settings.
 
 #### GAIN
 

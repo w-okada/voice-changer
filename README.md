@@ -50,7 +50,7 @@
 
 - 実行形式のバイナリをダウンロードして実行することができます。
 
-- チュートリアルは[こちら](tutorials/tutorial_rvc_ja_latest.md)をご覧ください。
+- チュートリアルは[こちら](tutorials/tutorial_rvc_ja_latest.md)をご覧ください。([ネットワークのトラブルシュート](https://github.com/w-okada/voice-changer/blob/master/tutorials/trouble_shoot_communication_ja.md))
 
 - [Google Colaboratory](https://github.com/w-okada/voice-changer/blob/master/Realtime_Voice_Changer_on_Colab.ipynb) で簡単にお試しいただけるようになりました。左上の Open in Colab のボタンから起動できます。
 

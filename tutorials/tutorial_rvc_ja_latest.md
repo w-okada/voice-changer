@@ -140,7 +140,7 @@ A7. フォルダのパスに unicode が含まれるとエラーが出るよう�
 
 ## メインコントロールエリア
 
-![image](https://github.com/w-okada/voice-changer/assets/48346627/5a8dcf64-29d3-49cd-92f1-db7b539bfb3d)
+![image](https://github.com/w-okada/voice-changer/assets/48346627/4401acdb-eb58-40e1-9609-5a82ee5eb570)
 
 左側にロードされたモデルのキャラクタ画像が表示されます。キャラクタ画像の左上にリアルタイム変換の状況がオーバレイ表示されます。
 
@@ -169,6 +169,10 @@ CHUNK と EXTRA を足したデータを変換にかかる時間です。CHUNK �
 #### start/stop ボタン
 
 start で音声変換を開始、stop で音声変換を停止します
+
+#### pass through ボタン
+
+音声を変換せずにそのまま出力します。デフォルトでは有効時に確認ダイアログが表示されますが、Advanced Setting で確認ダイアログをスキップする設定ができます。
 
 #### GAIN
 
