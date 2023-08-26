@@ -18,6 +18,7 @@ def downloadWeight(voiceChangerParams: VoiceChangerParams):
     crepe_onnx_full = voiceChangerParams.crepe_onnx_full
     crepe_onnx_tiny = voiceChangerParams.crepe_onnx_tiny
     rmvpe = voiceChangerParams.rmvpe
+    rmvpe_onnx = voiceChangerParams.rmvpe_onnx
 
     weight_files = [content_vec_500_onnx, hubert_base, hubert_base_jp, hubert_soft,
                     nsf_hifigan, crepe_onnx_full, crepe_onnx_tiny, rmvpe]
@@ -107,6 +108,14 @@ def downloadWeight(voiceChangerParams: VoiceChangerParams):
                 "url": "https://huggingface.co/wok000/weights/resolve/main/rmvpe/rmvpe.pt",
                 "saveTo": rmvpe,
                 "position": 8,
+            }
+        )
+    if os.path.exists(rmvpe_onnx) is False:
+        downloadParams.append(
+            {
+                "url": "https://huggingface.co/wok000/weights_gpl/resolve/main/rmvpe/rmvpe_s.onnx",
+                "saveTo": rmvpe_onnx,
+                "position": 9,
             }
         )
 

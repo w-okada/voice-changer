@@ -47,6 +47,8 @@ export const F0Detector = {
     "crepe": "crepe",
     "crepe_full": "crepe_full",
     "crepe_tiny": "crepe_tiny",
+    "rmvpe": "rmvpe",
+    "rmvpe_onnx": "rmvpe_onnx",
 } as const
 export type F0Detector = typeof F0Detector[keyof typeof F0Detector]
 
