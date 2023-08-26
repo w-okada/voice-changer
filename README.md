@@ -19,20 +19,6 @@
     - server mode: change chunk size causes tune change
     - show blank icon
 
-- v.1.5.3.12
-
-  - Feature:
-    - Pass through mode
-  - bugfix:
-    - Adapted the GUI to the number of slots.
-
-- v.1.5.3.11
-
-  - improve:
-    - increase slot size
-  - bugfix:
-    - m1 mac: eliminate torchaudio
-
 # VC Client とは
 
 1. 各種音声変換 AI(VC, Voice Conversion)を用いてリアルタイム音声変換を行うためのクライアントソフトウェアです。サポートしている音声変換 AI は次のものになります。
