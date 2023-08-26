@@ -24,6 +24,8 @@ if [ "${USE_GPU}" = "on" ]; then
     -e EX_PORT=${EX_PORT} \
     -e LOCAL_UID=$(id -u $USER) \
     -e LOCAL_GID=$(id -g $USER) \
+    -v `pwd`/docker_folder/model_dir:/voice-changer/server/model_dir
+    -v `pwd`/docker_folder/pretrain:/voice-changer/server/pretrain
     -p ${EX_PORT}:18888 \
     $DOCKER_IMAGE -p 18888 --https true \
         --content_vec_500 pretrain/checkpoint_best_legacy_500.pt  \
