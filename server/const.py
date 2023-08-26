@@ -108,9 +108,7 @@ def getSampleJsonAndModelIds(mode: RVCSampleMode):
             ("Tsukuyomi-chan_o", {"useIndex": False}),
             ("Amitaro_o", {"useIndex": False}),
             ("KikotoMahiro_o", {"useIndex": False}),
-            ("TokinaShigure_o", {"useIndex": True}),
-            ("diffusion_combo_spk5_nl3_dl20_k50_500ep", {}),
-            ("diffusion_combo_spk5_nl3_dl1_k50_500ep", {}),
+            ("TokinaShigure_o", {"useIndex": True})
         ]
     elif mode == "testAll":
         return [

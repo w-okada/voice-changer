@@ -142,6 +142,13 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         else:
             # アップローダ
             # ファイルをslotにコピー
+            slotDir = os.path.join(
+                self.params.model_dir,
+                str(params.slot),
+            )
+            if os.path.isdir(slotDir):
+                shutil.rmtree(slotDir)
+
             for file in params.files:
                 logger.info(f"FILE: {file}")
                 srcPath = os.path.join(UPLOAD_DIR, file.dir, file.name)
