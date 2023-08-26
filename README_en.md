@@ -4,6 +4,13 @@
 
 ## What's New!
 
+- v.1.5.3.13
+
+  - Improve:
+    - overwrite models when upload new model
+    - Skip pass through confirm dialog
+  - some bugfixes:
+
 - v.1.5.3.12a
 
   - Improve:
@@ -58,6 +65,10 @@ It can be used in two main ways, in order of difficulty:
 
 - Please see [here](tutorials/tutorial_rvc_en_latest.md) for the tutorial.
 
+- It's now easy to try it out on [Google Colaboratory](https://github.com/w-okada/voice-changer/blob/master/Realtime_Voice_Changer_on_Colab.ipynb) (requires a ngrok account). You can launch it from the 'Open in Colab' button in the top left corner.
+
+<img src="https://github.com/w-okada/voice-changer/assets/48346627/3f092e2d-6834-42f6-bbfd-7d389111604e" width="400" height="150">
+
 - We offer Windows and Mac versions.
 
   - If you are using a Windows and Nvidia GPU, please download ONNX (cpu, cuda), PyTorch (cpu, cuda).
@@ -77,6 +88,9 @@ It can be used in two main ways, in order of difficulty:
 
 | Version     | OS  | Framework                             | link                                                                                                                                                            | support VC                                                                | size   |
 | ----------- | --- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------ |
+| v.1.5.3.13  | mac | ONNX(cpu), PyTorch(cpu,mps)           | [google](https://drive.google.com/uc?id=1nD1jsDhqKtRt1m6LYZW9Xx02guVTYECi&export=download), [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                          | 797MB  |
+|             | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [google](https://drive.google.com/uc?id=1MCqHpJEzqo17QmaTRsvg74KVh-4g8S1o&export=download), [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC | 3240MB |
+|             | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [google](https://drive.google.com/uc?id=18p5O_DBTE7296Eh-j8oi-8R5tBKxcDVB&export=download), [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC | 3125MB |
 | v.1.5.3.12a | mac | ONNX(cpu), PyTorch(cpu,mps)           | [google](https://drive.google.com/uc?id=1nD1jsDhqKtRt1m6LYZW9Xx02guVTYECi&export=download), [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                          | 797MB  |
 |             | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [google](https://drive.google.com/uc?id=1MCqHpJEzqo17QmaTRsvg74KVh-4g8S1o&export=download), [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC | 3240MB |
 |             | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [google](https://drive.google.com/uc?id=18p5O_DBTE7296Eh-j8oi-8R5tBKxcDVB&export=download), [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC | 3125MB |
