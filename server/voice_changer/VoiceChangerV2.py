@@ -32,6 +32,7 @@ from Exceptions import (
     NoModeLoadedException,
     NotEnoughDataExtimateF0,
     ONNXInputArgumentException,
+    PipelineNotInitializedException,
     VoiceChangerIsNotSelectedException,
 )
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
@@ -316,6 +317,9 @@ class VoiceChangerV2(VoiceChangerIF):
         except DeviceCannotSupportHalfPrecisionException:
             # RVC.pyでfallback処理をするので、ここはダミーデータ返すだけ。
             return np.zeros(1).astype(np.int16), [0, 0, 0]
+        except PipelineNotInitializedException:
+            logger.warn("[Voice Changer] Waiting generate pipeline...")
+            return np.zeros(1024).astype(np.int16), [0, 0, 0]
         except Exception as e:
             logger.warn(f"[Voice Changer] VC PROCESSING EXCEPTION!!! {e}")
             logger.exception(e)
