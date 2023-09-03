@@ -60,9 +60,9 @@ class VoiceChangaerLogger:
     def initialize(self, initialize: bool):
         if not self.logger.handlers:
             if initialize:
-                file_handler = logging.FileHandler('vvclient.log', encoding='utf-8', mode='w')
+                file_handler = logging.FileHandler('vcclient.log', encoding='utf-8', mode='w')
             else:
-                file_handler = logging.FileHandler('vvclient.log', encoding='utf-8')
+                file_handler = logging.FileHandler('vcclient.log', encoding='utf-8')
             file_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(process)d - %(message)s')
             file_handler.setFormatter(file_formatter)
             file_handler.setLevel(logging.DEBUG)
