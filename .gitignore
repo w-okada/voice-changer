@@ -56,7 +56,7 @@ server/samples_0003_d2.json
 
 server/test_official_v1_v2.json
 server/test_ddpn_v1_v2.json
-server/vvclient.log
+server/vcclient.log
 start_trainer.sh
 
 # venv
