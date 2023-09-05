@@ -63,7 +63,7 @@ class SynthesizerTrnMs256NSFsid_ONNX(nn.Module):
         m_p, logs_p, x_mask = self.enc_p(phone, pitch, phone_lengths)
         z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p) * 0.66666) * x_mask
         z = self.flow(z_p, x_mask, g=g, reverse=True)
-        o = self.dec.infer_realtime((z * x_mask)[:, :, :max_len], nsff0, g=g, convert_length=convert_length)
-        return o, x_mask, (z, z_p, m_p, logs_p)
-
-
+        # o = self.dec.infer_realtime((z * x_mask)[:, :, :max_len], nsff0, g=g, convert_length=convert_length)
+        o = self.dec((z * x_mask)[:, :, :max_len], nsff0, g=g)
+        o = torch.clip(o[0, 0], -1.0, 1.0)
+        return o
