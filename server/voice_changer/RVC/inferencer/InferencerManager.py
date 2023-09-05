@@ -20,8 +20,9 @@ class InferencerManager:
         inferencerType: EnumInferenceTypes,
         file: str,
         gpu: int,
+        inferencerTypeVersion: str | None = None,
     ) -> Inferencer:
-        cls.currentInferencer = cls.loadInferencer(inferencerType, file, gpu)
+        cls.currentInferencer = cls.loadInferencer(inferencerType, file, gpu, inferencerTypeVersion)
         return cls.currentInferencer
 
     @classmethod
@@ -30,6 +31,7 @@ class InferencerManager:
         inferencerType: EnumInferenceTypes,
         file: str,
         gpu: int,
+        inferencerTypeVersion: str | None = None,
     ) -> Inferencer:
         if inferencerType == EnumInferenceTypes.pyTorchRVC or inferencerType == EnumInferenceTypes.pyTorchRVC.value:
             return RVCInferencer().loadModel(file, gpu)
@@ -50,8 +52,8 @@ class InferencerManager:
         elif inferencerType == EnumInferenceTypes.pyTorchWebUINono or inferencerType == EnumInferenceTypes.pyTorchWebUINono.value:
             return WebUIInferencerNono().loadModel(file, gpu)
         elif inferencerType == EnumInferenceTypes.onnxRVC or inferencerType == EnumInferenceTypes.onnxRVC.value:
-            return OnnxRVCInferencer().loadModel(file, gpu)
+            return OnnxRVCInferencer().loadModel(file, gpu, inferencerTypeVersion)
         elif inferencerType == EnumInferenceTypes.onnxRVCNono or inferencerType == EnumInferenceTypes.onnxRVCNono.value:
-            return OnnxRVCInferencerNono().loadModel(file, gpu)
+            return OnnxRVCInferencerNono().loadModel(file, gpu, inferencerTypeVersion)
         else:
             raise RuntimeError("[Voice Changer] Inferencer not found", inferencerType)

@@ -118,14 +118,8 @@ class Pipeline(object):
         try:
             with torch.no_grad():
                 with autocast(enabled=self.isHalf):
-                    audio1 = (
-                        torch.clip(
-                            self.inferencer.infer(feats, p_len, pitch, pitchf, sid, out_size)[0][0, 0].to(dtype=torch.float32),
-                            -1.0,
-                            1.0,
-                        )
-                        * 32767.5
-                    ).data.to(dtype=torch.int16)
+                    audio1 = self.inferencer.infer(feats,  p_len, pitch, pitchf, sid, out_size)                    
+                    audio1 = (audio1 * 32767.5).data.to(dtype=torch.int16)
             return audio1
         except RuntimeError as e:
             if "HALF" in e.__str__().upper():

@@ -40,6 +40,8 @@ class RVCModelSlot(ModelSlot):
     sampleId: str = ""
     speakers: dict = field(default_factory=lambda: {0: "target"})
 
+    version:str =  "v2"
+
 
 @dataclass
 class MMVCv13ModelSlot(ModelSlot):

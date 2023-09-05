@@ -7,7 +7,7 @@ import numpy as np
 
 
 class OnnxRVCInferencer(Inferencer):
-    def loadModel(self, file: str, gpu: int):
+    def loadModel(self, file: str, gpu: int, inferencerTypeVersion: str | None = None):
         self.setProps(EnumInferenceTypes.onnxRVC, file, True, gpu)
         (
             onnxProviders,
@@ -26,6 +26,9 @@ class OnnxRVCInferencer(Inferencer):
             self.isHalf = True
 
         self.model = onnx_session
+
+        self.inferencerTypeVersion = inferencerTypeVersion
+
         return self
 
     def infer(
@@ -66,7 +69,14 @@ class OnnxRVCInferencer(Inferencer):
                 },
             )
 
-        return torch.tensor(np.array(audio1))
+        if self.inferencerTypeVersion == "v2.1" or self.inferencerTypeVersion == "v1.1":
+            res = audio1[0]
+        else:
+            res = np.array(audio1)[0][0, 0]
+            res = np.clip(res, -1.0, 1.0)
+        return torch.tensor(res)
+
+        # return torch.tensor(np.array(audio1))
 
     def getInferencerInfo(self):
         inferencer = super().getInferencerInfo()

@@ -6,8 +6,8 @@ from voice_changer.RVC.inferencer.OnnxRVCInferencer import OnnxRVCInferencer
 
 
 class OnnxRVCInferencerNono(OnnxRVCInferencer):
-    def loadModel(self, file: str, gpu: int):
-        super().loadModel(file, gpu)
+    def loadModel(self, file: str, gpu: int, inferencerTypeVersion: str | None = None):
+        super().loadModel(file, gpu,  inferencerTypeVersion)
         self.setProps(EnumInferenceTypes.onnxRVCNono, file, self.isHalf, gpu)
         return self
 
@@ -39,4 +39,9 @@ class OnnxRVCInferencerNono(OnnxRVCInferencer):
                 },
             )
 
-        return torch.tensor(np.array(audio1))
+        if self.inferencerTypeVersion == "v2.1" or self.inferencerTypeVersion == "v1.1":
+            res = audio1[0]
+        else:
+            res = np.array(audio1)[0][0, 0]
+            res = np.clip(res, -1.0, 1.0)
+        return torch.tensor(res)

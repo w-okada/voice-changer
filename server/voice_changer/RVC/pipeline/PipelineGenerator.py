@@ -19,7 +19,7 @@ def createPipeline(params: VoiceChangerParams, modelSlot: RVCModelSlot, gpu: int
     # Inferencer 生成
     try:
         modelPath = os.path.join(params.model_dir, str(modelSlot.slotIndex), os.path.basename(modelSlot.modelFile))
-        inferencer = InferencerManager.getInferencer(modelSlot.modelType, modelPath, gpu)
+        inferencer = InferencerManager.getInferencer(modelSlot.modelType, modelPath, gpu, modelSlot.version)
     except Exception as e:
         print("[Voice Changer] exception! loading inferencer", e)
         traceback.print_exc()

@@ -37,7 +37,7 @@ def export2onnx(gpu: int, modelSlot: RVCModelSlot):
     output_path_simple = os.path.join(TMP_DIR, output_file_simple)
     metadata = {
         "application": "VC_CLIENT",
-        "version": "2",
+        "version": "2.1",
         "modelType": modelSlot.modelType,
         "samplingRate": modelSlot.samplingRate,
         "f0": modelSlot.f0,
