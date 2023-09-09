@@ -5,7 +5,7 @@ from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 import onnxruntime
 
 
-class RMVPOnnxEPitchExtractor(PitchExtractor):
+class RMVPEOnnxPitchExtractor(PitchExtractor):
 
     def __init__(self, file: str, gpu: int):
         super().__init__()

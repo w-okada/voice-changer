@@ -88,17 +88,19 @@ def _export2onnx(input_model, output_model, output_model_simple, is_half, metada
     net_g_onnx.load_state_dict(cpt["weight"], strict=False)
     if is_half:
         net_g_onnx = net_g_onnx.half()
+    
+    featsLength = 64
 
     if is_half:
-        feats = torch.HalfTensor(1, 2192, metadata["embChannels"]).to(dev)
+        feats = torch.HalfTensor(1, featsLength, metadata["embChannels"]).to(dev)
     else:
-        feats = torch.FloatTensor(1, 2192, metadata["embChannels"]).to(dev)
-    p_len = torch.LongTensor([2192]).to(dev)
+        feats = torch.FloatTensor(1, featsLength, metadata["embChannels"]).to(dev)
+    p_len = torch.LongTensor([featsLength]).to(dev)
     sid = torch.LongTensor([0]).to(dev)
 
     if metadata["f0"] is True:
-        pitch = torch.zeros(1, 2192, dtype=torch.int64).to(dev)
-        pitchf = torch.FloatTensor(1, 2192).to(dev)
+        pitch = torch.zeros(1, featsLength, dtype=torch.int64).to(dev)
+        pitchf = torch.FloatTensor(1, featsLength).to(dev)
         input_names = ["feats", "p_len", "pitch", "pitchf", "sid"]
         inputs = (
             feats,
