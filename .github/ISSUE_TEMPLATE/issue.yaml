@@ -5,7 +5,6 @@ body:
   - type: markdown
     attributes:
       value: ### Please read our [FAQ](https://github.com/w-okada/voice-changer/blob/master/.github/FAQ.md) before making a bug report!
-  
   - type: input
     id: vc-client-version
     attributes:
