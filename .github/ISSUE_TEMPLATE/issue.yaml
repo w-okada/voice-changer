@@ -31,7 +31,7 @@ body:
   - type: checkboxes
     id: checks
     attributes:
-      label: Checks 
+      label: Read carefully and check the options
       options:
         - label: I've tried to Clear Settings
         - label: Sample/Default Models are working 
