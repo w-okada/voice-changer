@@ -5,8 +5,18 @@ body:
   - type: markdown
     attributes:
       value: When creating a feature request, please be aware that <b>we do not guarantee that your idea will be implemented. We are always working to make our software better, so please be pacient and do not put pressure on our devs.
+  - type: input
+    id: few-words
+    attributes:
+      label: In a few words, describe your idea
+      description: With a few words, briefly describe your idea
+      placeholder: ex. My idea is to implement rmvpe!
+    validations:
+      required: true
   - type: textarea
     id: request
     attributes:
-      label: Describe your idea
-      description: Please provide enough information so we can understand and implement your idea
+      label: More information
+      description: If you have a complex idea, please use this field to describe it more, please provide enough information so we can understand and implement your idea
+    validations:
+      required: false
