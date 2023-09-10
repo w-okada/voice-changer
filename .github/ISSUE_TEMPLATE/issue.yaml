@@ -8,7 +8,6 @@ body:
       description: What type of issue would you like to report?
       multiple: true
       options:
-        - Feature Request
         - Documentation Feature Request
         - Bug Report
         - Question
