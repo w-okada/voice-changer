@@ -31,18 +31,12 @@ body:
     id: checks
     attributes:
       options:
-        - label: I've tried to clear settings
-          description: Check if you have pressed "Clear Settings" and restarted application
-        - label: Sample models are working
-          description: Check if default models are working properly
+        - label: I've tried to Clear Settings
+        - label: Sample/Default Models are working 
         - label: I've tried to change the Chunk Size
-          description: Check this if you tried to decrease/increase your chunk size
         - label: GUI was successfully launched
-          description: Check this if you can see the GUI
-        - label: I've read the tutorial
-          description: Check if you have read the [tutorial](https://github.com/w-okada/voice-changer/blob/master/tutorials/tutorial_rvc_en_latest.md)
-        - label: I've tried to extract to another folder (or re-extracted)
-          description: Check if you have tried another folder and re-extracted the files
+        - label: I've read the [tutorial](https://github.com/w-okada/voice-changer/blob/master/tutorials/tutorial_rvc_en_latest.md)
+        - label: I've tried to extract to another folder (or re-extract) the .zip file
   - type: input
     id: vc-type
     attributes:
