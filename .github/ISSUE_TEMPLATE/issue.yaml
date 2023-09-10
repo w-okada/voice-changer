@@ -1,5 +1,6 @@
 name: Issue
 description: Please provide as much detail as possible to convey the history of your problem.
+title: "[ISSUE]: "
 body:
   - type: input
     id: vc-client-version
