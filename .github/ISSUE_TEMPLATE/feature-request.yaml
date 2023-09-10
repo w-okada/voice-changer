@@ -1,5 +1,6 @@
 name: Feature Request
 description: Do you have some feature request? Use this template
+title: "[REQUEST]: "
 body:
   - type: markdown
     attributes:
