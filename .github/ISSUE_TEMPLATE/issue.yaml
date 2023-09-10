@@ -42,8 +42,8 @@ body:
   - type: input
     id: vc-type
     attributes:
-      label: Voice Changer type
-      description: Which type of voice changer you use? e.g. MMVC v1.3, RVC
+      label: Model Type
+      description: MMVC, so-vits-rvc, RVC, DDSP-SVC
       placeholder: RVC
     validations:
       required: true
