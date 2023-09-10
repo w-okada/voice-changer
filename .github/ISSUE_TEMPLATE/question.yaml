@@ -1,6 +1,5 @@
-name: Question | Others
+name: Question or Other
 description: Do you any question? Use this template
-title: "[QUESTION]: "
 body:
   - type: markdown
     attributes:
@@ -8,7 +7,7 @@ body:
   - type: textarea
     id: question  
     attributes:
-      label: My Question
-      description: What is your question?
+      label: Description
+      description: What is your question? (or other non-related to bugs/feature-request)
     validations:
       required: true
