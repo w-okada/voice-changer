@@ -1,0 +1,14 @@
+name: Question
+description: Do you any question? Use this template
+title: "[QUESTION]: "
+body:
+  - type: markdown
+    attributes:
+      value: We are always working to make our software better, so please be pacient and wait for a response
+  - type: textarea
+    id: question  
+    attributes:
+      label: My Question
+      description: What is your question?
+    validations:
+      required: true
