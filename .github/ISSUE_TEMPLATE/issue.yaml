@@ -47,23 +47,16 @@ body:
       placeholder: RVC
     validations:
       required: true
-  - type: input
-    id: model-type
-    attributes:
-      label: Model Type
-      description: List up the type of model you use? e.g. pyTorch, ONNX, f0, no f0
-    validations:
-      required: true
   - type: textarea
     id: issue
     attributes:
-      label: Situation
-      description: Developers spend a lot of time developing new features and resolving issues. If you really want to get it solved, please provide as much reproducible information and logs as possible. Provide logs on the terminal and capture the appkication window.
+      label: Issue Description
+      description: Please provide as much reproducible information and logs as possible
   - type: textarea
     id: capture
     attributes:
       label: Application Screenshot
-      description: Please provide a screenshot of your application so we can see your settings
+      description: Please provide a screenshot of your application so we can see your settings (you can paste or drag-n-drop)
   - type: textarea
     id: logs-on-terminal
     attributes:
