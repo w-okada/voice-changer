@@ -10,7 +10,6 @@ body:
       options:
         - Documentation Feature Request
         - Bug Report
-        - Question
         - Others
     validations:
       required: true
