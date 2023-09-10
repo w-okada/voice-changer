@@ -8,9 +8,9 @@ body:
   - type: input
     id: vc-client-version
     attributes:
-      label: vc client version number
-      description: filename of you download(.zip)
-      placeholder: MMVCServerSIO_xxx_yyyy-zzzz_v.x.x.x.x.zip
+      label: Voice Changer Version
+      description: Downloaded File Name (.zip)
+      placeholder: e.g. MMVCServerSIO_xxx_yyyy-zzzz_v.x.x.x.x.zip
     validations:
       required: true
   - type: input
@@ -24,70 +24,25 @@ body:
     id: GPU
     attributes:
       label: GPU
-      description: GPU. If you have no gpu, please input none.
+      description: If you have no gpu, please input none.
     validations:
       required: true
-  - type: dropdown
-    id: clear-setting
+  - type: checkboxes
+    id: checks
     attributes:
-      label: Clear setting
-      description: Have you tried clear setting?
       options:
-        - "no"
-        - "yes"
-    validations:
-      required: true
-  - type: dropdown
-    id: sample-model
-    attributes:
-      label: Sample model
-      description: Sample model work fine
-      options:
-        - "no"
-        - "yes"
-    validations:
-      required: true
-  - type: dropdown
-    id: input-chunk-num
-    attributes:
-      label: Input chunk num
-      description: Have you tried to change input chunk num?
-      options:
-        - "no"
-        - "yes"
-    validations:
-      required: true
-  - type: dropdown
-    id: wait-for-launch
-    attributes:
-      label: Wait for a while
-      description: If the GUI won't start up, wait a several minutes. Alternatively, have you excluded it from your virus-checking software (at your own risk)?
-      options:
-        - "The GUI successfully launched."
-        - "no"
-        - "yes"
-    validations:
-      required: true
-  - type: dropdown
-    id: read-tutorial
-    attributes:
-      label: read tutorial
-      description: Have you read the tutorial? https://github.com/w-okada/voice-changer/blob/master/tutorials/tutorial_rvc_en_latest.md
-      options:
-        - "no"
-        - "yes"
-    validations:
-      required: true
-  - type: dropdown
-    id: extract-to-new-folder
-    attributes:
-      label: Extract files to a new folder.
-      description: Extract files from a zip file to a new folder, different from the previous version.(If you have.)
-      options:
-        - "no"
-        - "yes"
-    validations:
-      required: true
+        - label: I've tried to clear settings
+          description: Check if you have pressed "Clear Settings" and restarted application
+        - label: Sample models are working
+          description: Check if default models are working properly
+        - label: I've tried to change the Chunk Size
+          description: Check this if you tried to decrease/increase your chunk size
+        - label: GUI was successfully launched
+          description: Check this if you can see the GUI
+        - label: I've read the tutorial
+          description: Check if you have read the [tutorial](https://github.com/w-okada/voice-changer/blob/master/tutorials/tutorial_rvc_en_latest.md)
+        - label: I've tried to extract to another folder (or re-extracted)
+          description: Check if you have tried another folder and re-extracted the files
   - type: input
     id: vc-type
     attributes:
