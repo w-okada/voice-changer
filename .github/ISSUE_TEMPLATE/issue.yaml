@@ -10,14 +10,15 @@ body:
     attributes:
       label: Voice Changer Version
       description: Downloaded File Name (.zip)
-      placeholder: e.g. MMVCServerSIO_xxx_yyyy-zzzz_v.x.x.x.x.zip
+      placeholder: MMVCServerSIO_xxx_yyyy-zzzz_v.x.x.x.x.zip
     validations:
       required: true
   - type: input
     id: OS
     attributes:
-      label: OS
-      description: OS name and version. e.g. Windows 10, Ubuntu 20.04, if you use mac, M1 or Intel.(Intel is not supported) and version venture, monterey, big sur.
+      label: Operational System
+      description: e.g. Windows 10, Ubuntu 20.04, MacOS Venture, MacOS Monterey, etc...
+      placeholder: Windows 10
     validations:
       required: true
   - type: input
@@ -49,7 +50,7 @@ body:
   - type: input
     id: model-type
     attributes:
-      label: Model type
+      label: Model Type
       description: List up the type of model you use? e.g. pyTorch, ONNX, f0, no f0
     validations:
       required: true
@@ -61,12 +62,12 @@ body:
   - type: textarea
     id: capture
     attributes:
-      label: application window capture
-      description: the appkication window.
+      label: Application Screenshot
+      description: Please provide a screenshot of your application so we can see your settings
   - type: textarea
     id: logs-on-terminal
     attributes:
-      label: logs on terminal
-      description: logs on terminal.
+      label: Logs on console
+      description: Copy and paste the log on your console here
     validations:
       required: true
