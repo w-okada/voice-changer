@@ -15,7 +15,6 @@ python-multipart==0.0.6
 onnxruntime-gpu==1.13.1
 scipy==1.10.1
 matplotlib==3.7.1
-fairseq==0.12.2
 websockets==11.0.2
 faiss-cpu==1.7.3
 torchcrepe==0.0.18
