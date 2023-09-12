@@ -3,7 +3,6 @@
 # # wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh
 # # bash Anaconda3-2022.10-Linux-x86_64.sh
 
-Cython==3.0.2
 uvicorn==0.21.1
 pyOpenSSL==23.1.1
 numpy==1.23.5
@@ -14,7 +13,6 @@ python-socketio==5.8.0
 fastapi==0.95.1
 python-multipart==0.0.6
 onnxruntime-gpu==1.13.1
-pyworld==0.3.3
 scipy==1.10.1
 matplotlib==3.7.1
 fairseq==0.12.2
