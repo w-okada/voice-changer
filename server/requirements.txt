@@ -28,3 +28,4 @@ sounddevice==0.4.6
 dataclasses_json==0.5.7
 onnxsim==0.4.28
 fairseq==0.12.2
+pyworld==0.3.3
