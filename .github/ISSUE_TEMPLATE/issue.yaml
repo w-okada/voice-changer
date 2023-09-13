@@ -1,132 +1,66 @@
-name: Issue
+name: Issue or Bug Report
 description: Please provide as much detail as possible to convey the history of your problem.
+title: "[ISSUE]: "
 body:
-  - type: dropdown
-    id: issue-type
+  - type: markdown
     attributes:
-      label: Issue Type
-      description: What type of issue would you like to report?
-      multiple: true
-      options:
-        - Feature Request
-        - Documentation Feature Request
-        - Bug Report
-        - Question
-        - Others
-    validations:
-      required: true
+      value: Please read our [FAQ](https://github.com/w-okada/voice-changer/blob/master/.github/FAQ.md) before making a bug report!
   - type: input
     id: vc-client-version
     attributes:
-      label: vc client version number
-      description: filename of you download(.zip)
+      label: Voice Changer Version
+      description: Downloaded File Name (.zip)
       placeholder: MMVCServerSIO_xxx_yyyy-zzzz_v.x.x.x.x.zip
     validations:
       required: true
   - type: input
     id: OS
     attributes:
-      label: OS
-      description: OS name and version. e.g. Windows 10, Ubuntu 20.04, if you use mac, M1 or Intel.(Intel is not supported) and version venture, monterey, big sur.
+      label: Operational System
+      description: e.g. Windows 10, Ubuntu 20.04, MacOS Venture, MacOS Monterey, etc...
+      placeholder: Windows 10
     validations:
       required: true
   - type: input
     id: GPU
     attributes:
       label: GPU
-      description: GPU. If you have no gpu, please input none.
+      description: If you have no gpu, please input none.
     validations:
       required: true
-  - type: dropdown
-    id: clear-setting
+  - type: checkboxes
+    id: checks
     attributes:
-      label: Clear setting
-      description: Have you tried clear setting?
+      label: Read carefully and check the options
       options:
-        - "no"
-        - "yes"
-    validations:
-      required: true
-  - type: dropdown
-    id: sample-model
-    attributes:
-      label: Sample model
-      description: Sample model work fine
-      options:
-        - "no"
-        - "yes"
-    validations:
-      required: true
-  - type: dropdown
-    id: input-chunk-num
-    attributes:
-      label: Input chunk num
-      description: Have you tried to change input chunk num?
-      options:
-        - "no"
-        - "yes"
-    validations:
-      required: true
-  - type: dropdown
-    id: wait-for-launch
-    attributes:
-      label: Wait for a while
-      description: If the GUI won't start up, wait a several minutes. Alternatively, have you excluded it from your virus-checking software (at your own risk)?
-      options:
-        - "The GUI successfully launched."
-        - "no"
-        - "yes"
-    validations:
-      required: true
-  - type: dropdown
-    id: read-tutorial
-    attributes:
-      label: read tutorial
-      description: Have you read the tutorial? https://github.com/w-okada/voice-changer/blob/master/tutorials/tutorial_rvc_en_latest.md
-      options:
-        - "no"
-        - "yes"
-    validations:
-      required: true
-  - type: dropdown
-    id: extract-to-new-folder
-    attributes:
-      label: Extract files to a new folder.
-      description: Extract files from a zip file to a new folder, different from the previous version.(If you have.)
-      options:
-        - "no"
-        - "yes"
-    validations:
-      required: true
+        - label: I've tried to Clear Settings
+        - label: Sample/Default Models are working 
+        - label: I've tried to change the Chunk Size
+        - label: GUI was successfully launched
+        - label: I've read the [tutorial](https://github.com/w-okada/voice-changer/blob/master/tutorials/tutorial_rvc_en_latest.md)
+        - label: I've tried to extract to another folder (or re-extract) the .zip file
   - type: input
     id: vc-type
     attributes:
-      label: Voice Changer type
-      description: Which type of voice changer you use? e.g. MMVC v1.3, RVC
+      label: Model Type
+      description: MMVC, so-vits-rvc, RVC, DDSP-SVC
       placeholder: RVC
-    validations:
-      required: true
-  - type: input
-    id: model-type
-    attributes:
-      label: Model type
-      description: List up the type of model you use? e.g. pyTorch, ONNX, f0, no f0
     validations:
       required: true
   - type: textarea
     id: issue
     attributes:
-      label: Situation
-      description: Developers spend a lot of time developing new features and resolving issues. If you really want to get it solved, please provide as much reproducible information and logs as possible. Provide logs on the terminal and capture the appkication window.
+      label: Issue Description
+      description: Please provide as much reproducible information and logs as possible
   - type: textarea
     id: capture
     attributes:
-      label: application window capture
-      description: the appkication window.
+      label: Application Screenshot
+      description: Please provide a screenshot of your application so we can see your settings (you can paste or drag-n-drop)
   - type: textarea
     id: logs-on-terminal
     attributes:
-      label: logs on terminal
-      description: logs on terminal.
+      label: Logs on console
+      description: Copy and paste the log on your console here
     validations:
       required: true
