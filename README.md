@@ -106,6 +106,10 @@ Docker での実行は、[Docker を使用する](docker_vcclient/README.md)を�
 
 Anaconda の仮想環境上での実行は、[サーバ開発者向けのページ](README_dev_ja.md)を参考にサーバを起動してください。
 
+# モデルの検索
+
+ボイスチェンジャー リポジトリには、デフォルトでは事前に作成されたモデルは含まれません。 ただし、インターネットまたは https://www.weights.gg/ のようなサイトからモデルを取得することはできます。
+
 # トラブルシュート
 
 - [通信編](tutorials/trouble_shoot_communication_ja.md)
