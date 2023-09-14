@@ -103,6 +103,10 @@ To run docker, see [start docker](docker_vcclient/README_en.md).
 
 To run on Anaconda venv, see [server developer's guide](README_dev_en.md)
 
+# Finding models
+
+The voice-changer repo does not contain pre-created models by default. However, you can pull models from the internet, or from sites like https://www.weights.gg/
+
 # Real-time performance
 
 Conversion is almost instantaneous when using GPU.
