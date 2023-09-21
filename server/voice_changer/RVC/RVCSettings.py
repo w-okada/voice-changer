@@ -6,7 +6,7 @@ class RVCSettings:
     gpu: int = -9999
     dstId: int = 0
 
-    f0Detector: str = "harvest"  # dio or harvest
+    f0Detector: str = "rmvpe_onnx"  # dio or harvest
     tran: int = 12
     silentThreshold: float = 0.00001
     extraConvertSize: int = 1024 * 4

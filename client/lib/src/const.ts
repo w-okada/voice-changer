@@ -390,7 +390,7 @@ export const DefaultServerSetting: ServerInfo = {
 
 
     f0Factor: 1.0,
-    f0Detector: F0Detector.dio,
+    f0Detector: F0Detector.rmvpe_onnx,
 
     tran: 0,
     noiseScale: 0,
