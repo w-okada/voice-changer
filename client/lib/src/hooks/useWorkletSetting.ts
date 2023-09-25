@@ -1,27 +1,24 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import { WorkletSetting } from "../const";
 import { VoiceChangerClient } from "../VoiceChangerClient";
 
 export type UseWorkletSettingProps = {
-    voiceChangerClient: VoiceChangerClient | null
-    workletSetting: WorkletSetting
-}
+    voiceChangerClient: VoiceChangerClient | null;
+    workletSetting: WorkletSetting;
+};
 
 export type WorkletSettingState = {
     // setting: WorkletSetting;
     // setSetting: (setting: WorkletSetting) => void;
-
-}
+};
 
 export const useWorkletSetting = (props: UseWorkletSettingProps): WorkletSettingState => {
-    const [setting, _setSetting] = useState<WorkletSetting>(props.workletSetting)
+    const [setting, _setSetting] = useState<WorkletSetting>(props.workletSetting);
 
     useEffect(() => {
-        if (!props.voiceChangerClient) return
-        props.voiceChangerClient.configureWorklet(setting)
-    }, [props.voiceChangerClient, props.workletSetting])
-
-
+        if (!props.voiceChangerClient) return;
+        props.voiceChangerClient.configureWorklet(setting);
+    }, [props.voiceChangerClient, props.workletSetting]);
 
     // // 設定 _setSettingがトリガでuseEffectが呼ばれて、workletに設定が飛ぶ
     // const setSetting = useMemo(() => {
@@ -34,5 +31,5 @@ export const useWorkletSetting = (props: UseWorkletSettingProps): WorkletSetting
     return {
         // setting,
         // setSetting,
-    }
-}
+    };
+};

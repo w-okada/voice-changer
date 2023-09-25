@@ -5,8 +5,8 @@ module.exports = {
     resolve: {
         extensions: [".ts", ".js"],
         fallback: {
-            "buffer": require.resolve("buffer/")
-        }
+            buffer: require.resolve("buffer/"),
+        },
     },
     module: {
         rules: [
@@ -32,11 +32,11 @@ module.exports = {
 
     plugins: [
         new webpack.ProvidePlugin({
-            Buffer: ['buffer', 'Buffer'],
+            Buffer: ["buffer", "Buffer"],
         }),
     ],
     externals: {
         react: "react",
         "react-dom": "reactDOM",
-    }
+    },
 };

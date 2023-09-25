@@ -1,5 +1,5 @@
 export class ModelLoadException extends Error {
-    public causeFileType: string = ""
+    public causeFileType: string = "";
     constructor(causeFileType: string) {
         super(`Model Load Exception:${causeFileType}`);
         this.causeFileType = causeFileType;

@@ -1,20 +1,18 @@
-
 // (★1) chunk sizeは 128サンプル, 256byte(int16)と定義。
 // (★2) 256byte(最低バッファサイズ256から間引いた個数x2byte)をchunkとして管理。
 // 24000sample -> 1sec, 128sample(1chunk) -> 5.333msec
 // 187.5chunk -> 1sec
 
 export const VoiceChangerType = {
-    "MMVCv15": "MMVCv15",
-    "MMVCv13": "MMVCv13",
+    MMVCv15: "MMVCv15",
+    MMVCv13: "MMVCv13",
     "so-vits-svc-40": "so-vits-svc-40",
     "DDSP-SVC": "DDSP-SVC",
-    "RVC": "RVC",
-    "Diffusion-SVC":"Diffusion-SVC",
-    "Beatrice": "Beatrice"
-
-} as const
-export type VoiceChangerType = typeof VoiceChangerType[keyof typeof VoiceChangerType]
+    RVC: "RVC",
+    "Diffusion-SVC": "Diffusion-SVC",
+    Beatrice: "Beatrice",
+} as const;
+export type VoiceChangerType = (typeof VoiceChangerType)[keyof typeof VoiceChangerType];
 
 ///////////////////////
 // サーバセッティング
@@ -22,342 +20,333 @@ export type VoiceChangerType = typeof VoiceChangerType[keyof typeof VoiceChanger
 export const InputSampleRate = {
     "48000": 48000,
     "44100": 44100,
-    "24000": 24000
-} as const
-export type InputSampleRate = typeof InputSampleRate[keyof typeof InputSampleRate]
+    "24000": 24000,
+} as const;
+export type InputSampleRate = (typeof InputSampleRate)[keyof typeof InputSampleRate];
 
 export const ModelSamplingRate = {
     "48000": 48000,
     "40000": 40000,
-    "32000": 32000
-} as const
-export type ModelSamplingRate = typeof InputSampleRate[keyof typeof InputSampleRate]
-
+    "32000": 32000,
+} as const;
+export type ModelSamplingRate = (typeof InputSampleRate)[keyof typeof InputSampleRate];
 
 export const CrossFadeOverlapSize = {
     "1024": 1024,
     "2048": 2048,
     "4096": 4096,
-} as const
-export type CrossFadeOverlapSize = typeof CrossFadeOverlapSize[keyof typeof CrossFadeOverlapSize]
+} as const;
+export type CrossFadeOverlapSize = (typeof CrossFadeOverlapSize)[keyof typeof CrossFadeOverlapSize];
 
 export const F0Detector = {
-    "dio": "dio",
-    "harvest": "harvest",
-    "crepe": "crepe",
-    "crepe_full": "crepe_full",
-    "crepe_tiny": "crepe_tiny",
-    "rmvpe": "rmvpe",
-    "rmvpe_onnx": "rmvpe_onnx",
-} as const
-export type F0Detector = typeof F0Detector[keyof typeof F0Detector]
+    dio: "dio",
+    harvest: "harvest",
+    crepe: "crepe",
+    crepe_full: "crepe_full",
+    crepe_tiny: "crepe_tiny",
+    rmvpe: "rmvpe",
+    rmvpe_onnx: "rmvpe_onnx",
+} as const;
+export type F0Detector = (typeof F0Detector)[keyof typeof F0Detector];
 
 export const DiffMethod = {
-    "pndm": "pndm",
+    pndm: "pndm",
     "dpm-solver": "dpm-solver",
-} as const
-export type DiffMethod = typeof DiffMethod[keyof typeof DiffMethod]
+} as const;
+export type DiffMethod = (typeof DiffMethod)[keyof typeof DiffMethod];
 
 export const RVCModelType = {
-    "pyTorchRVC": "pyTorchRVC",
-    "pyTorchRVCNono": "pyTorchRVCNono",
-    "pyTorchRVCv2": "pyTorchRVCv2",
-    "pyTorchRVCv2Nono": "pyTorchRVCv2Nono",
-    "pyTorchWebUI": "pyTorchWebUI",
-    "pyTorchWebUINono": "pyTorchWebUINono",
-    "onnxRVC": "onnxRVC",
-    "onnxRVCNono": "onnxRVCNono",
-} as const
-export type RVCModelType = typeof RVCModelType[keyof typeof RVCModelType]
+    pyTorchRVC: "pyTorchRVC",
+    pyTorchRVCNono: "pyTorchRVCNono",
+    pyTorchRVCv2: "pyTorchRVCv2",
+    pyTorchRVCv2Nono: "pyTorchRVCv2Nono",
+    pyTorchWebUI: "pyTorchWebUI",
+    pyTorchWebUINono: "pyTorchWebUINono",
+    onnxRVC: "onnxRVC",
+    onnxRVCNono: "onnxRVCNono",
+} as const;
+export type RVCModelType = (typeof RVCModelType)[keyof typeof RVCModelType];
 
 export const ServerSettingKey = {
-    "passThrough":"passThrough",
-    "srcId": "srcId",
-    "dstId": "dstId",
-    "gpu": "gpu",
+    passThrough: "passThrough",
+    srcId: "srcId",
+    dstId: "dstId",
+    gpu: "gpu",
 
-    "crossFadeOffsetRate": "crossFadeOffsetRate",
-    "crossFadeEndRate": "crossFadeEndRate",
-    "crossFadeOverlapSize": "crossFadeOverlapSize",
+    crossFadeOffsetRate: "crossFadeOffsetRate",
+    crossFadeEndRate: "crossFadeEndRate",
+    crossFadeOverlapSize: "crossFadeOverlapSize",
 
-    "framework": "framework",
-    "onnxExecutionProvider": "onnxExecutionProvider",
+    framework: "framework",
+    onnxExecutionProvider: "onnxExecutionProvider",
 
-    "f0Factor": "f0Factor",
-    "f0Detector": "f0Detector",
-    "recordIO": "recordIO",
+    f0Factor: "f0Factor",
+    f0Detector: "f0Detector",
+    recordIO: "recordIO",
 
-    "enableServerAudio": "enableServerAudio",
-    "serverAudioStated": "serverAudioStated",
-    "serverAudioSampleRate": "serverAudioSampleRate",
-    "serverInputAudioSampleRate": "serverInputAudioSampleRate",
-    "serverOutputAudioSampleRate": "serverOutputAudioSampleRate",
-    "serverMonitorAudioSampleRate": "serverMonitorAudioSampleRate",
-    "serverInputAudioBufferSize": "serverInputAudioBufferSize",
-    "serverOutputAudioBufferSize": "serverOutputAudioBufferSize",
-    "serverInputDeviceId": "serverInputDeviceId",
-    "serverOutputDeviceId": "serverOutputDeviceId",
-    "serverMonitorDeviceId": "serverMonitorDeviceId",
-    "serverReadChunkSize": "serverReadChunkSize",
-    "serverInputAudioGain": "serverInputAudioGain",
-    "serverOutputAudioGain": "serverOutputAudioGain",
-    "serverMonitorAudioGain": "serverMonitorAudioGain",
+    enableServerAudio: "enableServerAudio",
+    serverAudioStated: "serverAudioStated",
+    serverAudioSampleRate: "serverAudioSampleRate",
+    serverInputAudioSampleRate: "serverInputAudioSampleRate",
+    serverOutputAudioSampleRate: "serverOutputAudioSampleRate",
+    serverMonitorAudioSampleRate: "serverMonitorAudioSampleRate",
+    serverInputAudioBufferSize: "serverInputAudioBufferSize",
+    serverOutputAudioBufferSize: "serverOutputAudioBufferSize",
+    serverInputDeviceId: "serverInputDeviceId",
+    serverOutputDeviceId: "serverOutputDeviceId",
+    serverMonitorDeviceId: "serverMonitorDeviceId",
+    serverReadChunkSize: "serverReadChunkSize",
+    serverInputAudioGain: "serverInputAudioGain",
+    serverOutputAudioGain: "serverOutputAudioGain",
+    serverMonitorAudioGain: "serverMonitorAudioGain",
 
-    "tran": "tran",
-    "noiseScale": "noiseScale",
-    "predictF0": "predictF0",
-    "silentThreshold": "silentThreshold",
-    "extraConvertSize": "extraConvertSize",
-    "clusterInferRatio": "clusterInferRatio",
+    tran: "tran",
+    noiseScale: "noiseScale",
+    predictF0: "predictF0",
+    silentThreshold: "silentThreshold",
+    extraConvertSize: "extraConvertSize",
+    clusterInferRatio: "clusterInferRatio",
 
-    "indexRatio": "indexRatio",
-    "protect": "protect",
-    "rvcQuality": "rvcQuality",
-    "modelSamplingRate": "modelSamplingRate",
-    "silenceFront": "silenceFront",
-    "modelSlotIndex": "modelSlotIndex",
+    indexRatio: "indexRatio",
+    protect: "protect",
+    rvcQuality: "rvcQuality",
+    modelSamplingRate: "modelSamplingRate",
+    silenceFront: "silenceFront",
+    modelSlotIndex: "modelSlotIndex",
 
-    "useEnhancer": "useEnhancer",
-    "useDiff": "useDiff",
+    useEnhancer: "useEnhancer",
+    useDiff: "useDiff",
     // "useDiffDpm": "useDiffDpm",
-    "diffMethod": "diffMethod",
-    "useDiffSilence": "useDiffSilence",
-    "diffAcc": "diffAcc",
-    "diffSpkId": "diffSpkId",
-    "kStep": "kStep",
-    "threshold": "threshold",
+    diffMethod: "diffMethod",
+    useDiffSilence: "useDiffSilence",
+    diffAcc: "diffAcc",
+    diffSpkId: "diffSpkId",
+    kStep: "kStep",
+    threshold: "threshold",
 
-    "speedUp": "speedUp",
-    "skipDiffusion": "skipDiffusion",
+    speedUp: "speedUp",
+    skipDiffusion: "skipDiffusion",
 
-    "inputSampleRate": "inputSampleRate",
-    "enableDirectML": "enableDirectML",
-} as const
-export type ServerSettingKey = typeof ServerSettingKey[keyof typeof ServerSettingKey]
-
+    inputSampleRate: "inputSampleRate",
+    enableDirectML: "enableDirectML",
+} as const;
+export type ServerSettingKey = (typeof ServerSettingKey)[keyof typeof ServerSettingKey];
 
 export type VoiceChangerServerSetting = {
-    passThrough: boolean
-    srcId: number,
-    dstId: number,
-    gpu: number,
+    passThrough: boolean;
+    srcId: number;
+    dstId: number;
+    gpu: number;
 
-    crossFadeOffsetRate: number,
-    crossFadeEndRate: number,
-    crossFadeOverlapSize: CrossFadeOverlapSize,
+    crossFadeOffsetRate: number;
+    crossFadeEndRate: number;
+    crossFadeOverlapSize: CrossFadeOverlapSize;
 
-    f0Factor: number
-    f0Detector: F0Detector // dio or harvest
-    recordIO: number // 0:off, 1:on
+    f0Factor: number;
+    f0Detector: F0Detector; // dio or harvest
+    recordIO: number; // 0:off, 1:on
 
-    enableServerAudio: number // 0:off, 1:on
-    serverAudioStated: number // 0:off, 1:on
-    serverAudioSampleRate: number
-    serverInputAudioSampleRate: number
-    serverOutputAudioSampleRate: number
-    serverMonitorAudioSampleRate: number
-    serverInputAudioBufferSize: number
-    serverOutputAudioBufferSize: number
-    serverInputDeviceId: number
-    serverOutputDeviceId: number
-    serverMonitorDeviceId: number
-    serverReadChunkSize: number
-    serverInputAudioGain: number
-    serverOutputAudioGain: number
-    serverMonitorAudioGain: number
+    enableServerAudio: number; // 0:off, 1:on
+    serverAudioStated: number; // 0:off, 1:on
+    serverAudioSampleRate: number;
+    serverInputAudioSampleRate: number;
+    serverOutputAudioSampleRate: number;
+    serverMonitorAudioSampleRate: number;
+    serverInputAudioBufferSize: number;
+    serverOutputAudioBufferSize: number;
+    serverInputDeviceId: number;
+    serverOutputDeviceId: number;
+    serverMonitorDeviceId: number;
+    serverReadChunkSize: number;
+    serverInputAudioGain: number;
+    serverOutputAudioGain: number;
+    serverMonitorAudioGain: number;
 
+    tran: number; // so-vits-svc
+    noiseScale: number; // so-vits-svc
+    predictF0: number; // so-vits-svc
+    silentThreshold: number; // so-vits-svc
+    extraConvertSize: number; // so-vits-svc
+    clusterInferRatio: number; // so-vits-svc
 
-    tran: number // so-vits-svc
-    noiseScale: number // so-vits-svc
-    predictF0: number // so-vits-svc
-    silentThreshold: number // so-vits-svc
-    extraConvertSize: number// so-vits-svc
-    clusterInferRatio: number // so-vits-svc
+    indexRatio: number; // RVC
+    protect: number; // RVC
+    rvcQuality: number; // 0:low, 1:high
+    silenceFront: number; // 0:off, 1:on
+    modelSamplingRate: ModelSamplingRate; // 32000,40000,48000
+    modelSlotIndex: number;
 
-    indexRatio: number // RVC
-    protect: number // RVC
-    rvcQuality: number // 0:low, 1:high
-    silenceFront: number // 0:off, 1:on
-    modelSamplingRate: ModelSamplingRate // 32000,40000,48000
-    modelSlotIndex: number,
-
-    useEnhancer: number// DDSP-SVC
-    useDiff: number// DDSP-SVC
+    useEnhancer: number; // DDSP-SVC
+    useDiff: number; // DDSP-SVC
     // useDiffDpm: number// DDSP-SVC
-    diffMethod: DiffMethod, // DDSP-SVC
-    useDiffSilence: number// DDSP-SVC
-    diffAcc: number// DDSP-SVC
-    diffSpkId: number// DDSP-SVC
-    kStep: number// DDSP-SVC
-    threshold: number// DDSP-SVC
+    diffMethod: DiffMethod; // DDSP-SVC
+    useDiffSilence: number; // DDSP-SVC
+    diffAcc: number; // DDSP-SVC
+    diffSpkId: number; // DDSP-SVC
+    kStep: number; // DDSP-SVC
+    threshold: number; // DDSP-SVC
 
-    speedUp: number // Diffusion-SVC
-    skipDiffusion: number // Diffusion-SVC 0:off, 1:on
+    speedUp: number; // Diffusion-SVC
+    skipDiffusion: number; // Diffusion-SVC 0:off, 1:on
 
-    inputSampleRate: InputSampleRate
-    enableDirectML: number
-}
+    inputSampleRate: InputSampleRate;
+    enableDirectML: number;
+};
 
 type ModelSlot = {
-    slotIndex: number
-    voiceChangerType: VoiceChangerType
-    name: string,
-    description: string,
-    credit: string,
-    termsOfUseUrl: string,
-    iconFile: string
-    speakers: { [key: number]: string }
-}
+    slotIndex: number;
+    voiceChangerType: VoiceChangerType;
+    name: string;
+    description: string;
+    credit: string;
+    termsOfUseUrl: string;
+    iconFile: string;
+    speakers: { [key: number]: string };
+};
 
 export type RVCModelSlot = ModelSlot & {
-    modelFile: string
-    indexFile: string,
-    defaultIndexRatio: number,
-    defaultProtect: number,
-    defaultTune: number,
-    modelType: RVCModelType,
+    modelFile: string;
+    indexFile: string;
+    defaultIndexRatio: number;
+    defaultProtect: number;
+    defaultTune: number;
+    modelType: RVCModelType;
 
-    embChannels: number,
-    f0: boolean,
-    samplingRate: number
-    deprecated: boolean
-}
+    embChannels: number;
+    f0: boolean;
+    samplingRate: number;
+    deprecated: boolean;
+};
 
 export type MMVCv13ModelSlot = ModelSlot & {
-    modelFile: string
-    configFile: string,
-    srcId: number
-    dstId: number
+    modelFile: string;
+    configFile: string;
+    srcId: number;
+    dstId: number;
 
-    samplingRate: number
-    speakers: { [key: number]: string }
-}
+    samplingRate: number;
+    speakers: { [key: number]: string };
+};
 
 export type MMVCv15ModelSlot = ModelSlot & {
-    modelFile: string
-    configFile: string,
-    srcId: number
-    dstId: number
-    f0Factor: number
-    samplingRate: number
-    f0: { [key: number]: number }
-}
+    modelFile: string;
+    configFile: string;
+    srcId: number;
+    dstId: number;
+    f0Factor: number;
+    samplingRate: number;
+    f0: { [key: number]: number };
+};
 
 export type SoVitsSvc40ModelSlot = ModelSlot & {
-    modelFile: string
-    configFile: string,
-    clusterFile: string,
-    dstId: number
+    modelFile: string;
+    configFile: string;
+    clusterFile: string;
+    dstId: number;
 
-    samplingRate: number
+    samplingRate: number;
 
-    defaultTune: number
-    defaultClusterInferRatio: number
-    noiseScale: number
-    speakers: { [key: number]: string }
-}
+    defaultTune: number;
+    defaultClusterInferRatio: number;
+    noiseScale: number;
+    speakers: { [key: number]: string };
+};
 
 export type DDSPSVCModelSlot = ModelSlot & {
-    modelFile: string
-    configFile: string,
-    diffModelFile: string
-    diffConfigFile: string
-    dstId: number
+    modelFile: string;
+    configFile: string;
+    diffModelFile: string;
+    diffConfigFile: string;
+    dstId: number;
 
-    samplingRate: number
+    samplingRate: number;
 
-    defaultTune: number
-    enhancer: boolean
-    diffusion: boolean
-    acc: number
-    kstep: number
-    speakers: { [key: number]: string }
-}
-
+    defaultTune: number;
+    enhancer: boolean;
+    diffusion: boolean;
+    acc: number;
+    kstep: number;
+    speakers: { [key: number]: string };
+};
 
 export type DiffusionSVCModelSlot = ModelSlot & {
-    modelFile: string
-    dstId: number
+    modelFile: string;
+    dstId: number;
 
-    samplingRate: number
+    samplingRate: number;
 
-    defaultTune: number
-    defaultKstep : number
-    defaultSpeedup: number
-    kStepMax: number
-    nLayers: number
-    nnLayers: number
-    speakers: { [key: number]: string }
-}
-
+    defaultTune: number;
+    defaultKstep: number;
+    defaultSpeedup: number;
+    kStepMax: number;
+    nLayers: number;
+    nnLayers: number;
+    speakers: { [key: number]: string };
+};
 
 export type BeatriceModelSlot = ModelSlot & {
-    modelFile: string
-    dstId: number
+    modelFile: string;
+    dstId: number;
 
-    speakers: { [key: number]: string }
-}
+    speakers: { [key: number]: string };
+};
 
-export type ModelSlotUnion = RVCModelSlot | MMVCv13ModelSlot | MMVCv15ModelSlot | SoVitsSvc40ModelSlot | DDSPSVCModelSlot | DiffusionSVCModelSlot | BeatriceModelSlot
+export type ModelSlotUnion = RVCModelSlot | MMVCv13ModelSlot | MMVCv15ModelSlot | SoVitsSvc40ModelSlot | DDSPSVCModelSlot | DiffusionSVCModelSlot | BeatriceModelSlot;
 
 type ServerAudioDevice = {
-    kind: "audioinput" | "audiooutput",
-    index: number,
-    name: string
-    hostAPI: string
-}
+    kind: "audioinput" | "audiooutput";
+    index: number;
+    name: string;
+    hostAPI: string;
+};
 
 export type ServerInfo = VoiceChangerServerSetting & {
     // コンフィグ対象外 (getInfoで取得のみ可能な情報)
-    status: string
-    modelSlots: ModelSlotUnion[]
-    serverAudioInputDevices: ServerAudioDevice[]
-    serverAudioOutputDevices: ServerAudioDevice[]
-    sampleModels: (RVCSampleModel|DiffusionSVCSampleModel)[]
+    status: string;
+    modelSlots: ModelSlotUnion[];
+    serverAudioInputDevices: ServerAudioDevice[];
+    serverAudioOutputDevices: ServerAudioDevice[];
+    sampleModels: (RVCSampleModel | DiffusionSVCSampleModel)[];
     gpus: {
-        id: number,
-        name: string,
-        memory: number,
-    }[]
-    maxInputLength: number  // MMVCv15
+        id: number;
+        name: string;
+        memory: number;
+    }[];
+    maxInputLength: number; // MMVCv15
     voiceChangerParams: {
-        model_dir: string
-    }
-}
+        model_dir: string;
+    };
+};
 
 export type SampleModel = {
-    id: string
-    voiceChangerType: VoiceChangerType
-    lang: string
-    tag: string[]
-    name: string
-    modelUrl: string
-    termsOfUseUrl: string
-    icon: string
-    credit: string
-    description: string
-    sampleRate: number
-    modelType: string
-    f0: boolean
-}
+    id: string;
+    voiceChangerType: VoiceChangerType;
+    lang: string;
+    tag: string[];
+    name: string;
+    modelUrl: string;
+    termsOfUseUrl: string;
+    icon: string;
+    credit: string;
+    description: string;
+    sampleRate: number;
+    modelType: string;
+    f0: boolean;
+};
 
-export type RVCSampleModel =SampleModel & {
-    indexUrl: string
-    featureUrl: string
-}
+export type RVCSampleModel = SampleModel & {
+    indexUrl: string;
+    featureUrl: string;
+};
 
-
-export type DiffusionSVCSampleModel =SampleModel & {
-    numOfDiffLayers: number
-    numOfNativeLayers: number
-    maxKStep: number
-}
-
-
-
+export type DiffusionSVCSampleModel = SampleModel & {
+    numOfDiffLayers: number;
+    numOfNativeLayers: number;
+    maxKStep: number;
+};
 
 export const DefaultServerSetting: ServerInfo = {
-    // VC Common 
+    // VC Common
     passThrough: false,
     inputSampleRate: 48000,
 
@@ -387,7 +376,6 @@ export const DefaultServerSetting: ServerInfo = {
     srcId: 0,
     dstId: 1,
     gpu: 0,
-
 
     f0Factor: 1.0,
     f0Detector: F0Detector.rmvpe_onnx,
@@ -421,101 +409,99 @@ export const DefaultServerSetting: ServerInfo = {
     skipDiffusion: 1,
 
     enableDirectML: 0,
-    // 
+    //
     status: "ok",
     modelSlots: [],
     serverAudioInputDevices: [],
     serverAudioOutputDevices: [],
 
-    maxInputLength:  128 * 2048,
+    maxInputLength: 128 * 2048,
     voiceChangerParams: {
-        model_dir: ""
-    }
-}
+        model_dir: "",
+    },
+};
 
 ///////////////////////
 // Workletセッティング
 ///////////////////////
 
 export type WorkletSetting = {
-    numTrancateTreshold: number,
-    volTrancateThreshold: number,
-    volTrancateLength: number
-}
+    numTrancateTreshold: number;
+    volTrancateThreshold: number;
+    volTrancateLength: number;
+};
 ///////////////////////
 // Worklet Nodeセッティング
 ///////////////////////
 export const Protocol = {
-    "sio": "sio",
-    "rest": "rest",
-} as const
-export type Protocol = typeof Protocol[keyof typeof Protocol]
+    sio: "sio",
+    rest: "rest",
+} as const;
+export type Protocol = (typeof Protocol)[keyof typeof Protocol];
 
 export const SendingSampleRate = {
     "48000": 48000,
     "44100": 44100,
-    "24000": 24000
-} as const
-export type SendingSampleRate = typeof SendingSampleRate[keyof typeof SendingSampleRate]
+    "24000": 24000,
+} as const;
+export type SendingSampleRate = (typeof SendingSampleRate)[keyof typeof SendingSampleRate];
 
 export const DownSamplingMode = {
-    "decimate": "decimate",
-    "average": "average"
-} as const
-export type DownSamplingMode = typeof DownSamplingMode[keyof typeof DownSamplingMode]
-
+    decimate: "decimate",
+    average: "average",
+} as const;
+export type DownSamplingMode = (typeof DownSamplingMode)[keyof typeof DownSamplingMode];
 
 export type WorkletNodeSetting = {
-    serverUrl: string,
-    protocol: Protocol,
-    sendingSampleRate: SendingSampleRate,
-    inputChunkNum: number,
-    downSamplingMode: DownSamplingMode,
-}
-
+    serverUrl: string;
+    protocol: Protocol;
+    sendingSampleRate: SendingSampleRate;
+    inputChunkNum: number;
+    downSamplingMode: DownSamplingMode;
+};
 
 ///////////////////////
 // クライアントセッティング
 ///////////////////////
 export const SampleRate = {
     "48000": 48000,
-} as const
-export type SampleRate = typeof SampleRate[keyof typeof SampleRate]
+} as const;
+export type SampleRate = (typeof SampleRate)[keyof typeof SampleRate];
 
 export type VoiceChangerClientSetting = {
-    audioInput: string | MediaStream | null,
-    sampleRate: SampleRate, // 48000Hz
-    echoCancel: boolean,
-    noiseSuppression: boolean,
-    noiseSuppression2: boolean
+    audioInput: string | MediaStream | null;
+    sampleRate: SampleRate; // 48000Hz
+    echoCancel: boolean;
+    noiseSuppression: boolean;
+    noiseSuppression2: boolean;
 
-    inputGain: number
-    outputGain: number
-    monitorGain: number
+    inputGain: number;
+    outputGain: number;
+    monitorGain: number;
 
-    passThroughConfirmationSkip: boolean
-}
+    passThroughConfirmationSkip: boolean;
+};
 
 ///////////////////////
 // Client セッティング
 ///////////////////////
 export type ClientSetting = {
-    workletSetting: WorkletSetting
-    workletNodeSetting: WorkletNodeSetting
-    voiceChangerClientSetting: VoiceChangerClientSetting
-}
+    workletSetting: WorkletSetting;
+    workletNodeSetting: WorkletNodeSetting;
+    voiceChangerClientSetting: VoiceChangerClientSetting;
+};
 export const DefaultClientSettng: ClientSetting = {
     workletSetting: {
         numTrancateTreshold: 100,
         volTrancateThreshold: 0.0005,
-        volTrancateLength: 32
+        volTrancateLength: 32,
     },
     workletNodeSetting: {
         serverUrl: "",
         protocol: "sio",
         sendingSampleRate: 48000,
         inputChunkNum: 48,
-        downSamplingMode: "average"
+        downSamplingMode: "average",
     },
     voiceChangerClientSetting: {
         audioInput: null,
@@ -526,10 +512,9 @@ export const DefaultClientSettng: ClientSetting = {
         inputGain: 1.0,
         outputGain: 1.0,
         monitorGain: 1.0,
-        passThroughConfirmationSkip: false
-    }
-}
-
+        passThroughConfirmationSkip: false,
+    },
+};
 
 ////////////////////////////////////
 // Exceptions
@@ -538,36 +523,33 @@ export const VOICE_CHANGER_CLIENT_EXCEPTION = {
     ERR_SIO_CONNECT_FAILED: "ERR_SIO_CONNECT_FAILED",
     ERR_SIO_INVALID_RESPONSE: "ERR_SIO_INVALID_RESPONSE",
     ERR_REST_INVALID_RESPONSE: "ERR_REST_INVALID_RESPONSE",
-    ERR_MIC_STREAM_NOT_INITIALIZED: "ERR_MIC_STREAM_NOT_INITIALIZED"
-
-} as const
-export type VOICE_CHANGER_CLIENT_EXCEPTION = typeof VOICE_CHANGER_CLIENT_EXCEPTION[keyof typeof VOICE_CHANGER_CLIENT_EXCEPTION]
-
+    ERR_MIC_STREAM_NOT_INITIALIZED: "ERR_MIC_STREAM_NOT_INITIALIZED",
+} as const;
+export type VOICE_CHANGER_CLIENT_EXCEPTION = (typeof VOICE_CHANGER_CLIENT_EXCEPTION)[keyof typeof VOICE_CHANGER_CLIENT_EXCEPTION];
 
 ////////////////////////////////////
 // indexedDB
 ////////////////////////////////////
-export const INDEXEDDB_DB_APP_NAME = "INDEXEDDB_KEY_VOICE_CHANGER"
-export const INDEXEDDB_DB_NAME = "INDEXEDDB_KEY_VOICE_CHANGER_DB"
-export const INDEXEDDB_KEY_CLIENT = "INDEXEDDB_KEY_VOICE_CHANGER_LIB_CLIENT"
-export const INDEXEDDB_KEY_SERVER = "INDEXEDDB_KEY_VOICE_CHANGER_LIB_SERVER"
-export const INDEXEDDB_KEY_MODEL_DATA = "INDEXEDDB_KEY_VOICE_CHANGER_LIB_MODEL_DATA"
-
+export const INDEXEDDB_DB_APP_NAME = "INDEXEDDB_KEY_VOICE_CHANGER";
+export const INDEXEDDB_DB_NAME = "INDEXEDDB_KEY_VOICE_CHANGER_DB";
+export const INDEXEDDB_KEY_CLIENT = "INDEXEDDB_KEY_VOICE_CHANGER_LIB_CLIENT";
+export const INDEXEDDB_KEY_SERVER = "INDEXEDDB_KEY_VOICE_CHANGER_LIB_SERVER";
+export const INDEXEDDB_KEY_MODEL_DATA = "INDEXEDDB_KEY_VOICE_CHANGER_LIB_MODEL_DATA";
 
 // ONNX
 export type OnnxExporterInfo = {
-    "status": string
-    "path": string
-    "filename": string
-}
+    status: string;
+    path: string;
+    filename: string;
+};
 
 // Merge
 export type MergeElement = {
-    slotIndex: number
-    strength: number
-}
+    slotIndex: number;
+    strength: number;
+};
 export type MergeModelRequest = {
-    voiceChangerType: VoiceChangerType
-    command: "mix",
-    files: MergeElement[]
-}
+    voiceChangerType: VoiceChangerType;
+    command: "mix";
+    files: MergeElement[];
+};
