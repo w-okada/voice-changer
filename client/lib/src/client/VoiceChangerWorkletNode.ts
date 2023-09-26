@@ -2,6 +2,7 @@ import { VoiceChangerWorkletProcessorRequest } from "../@types/voice-changer-wor
 import { DefaultClientSettng, DownSamplingMode, VOICE_CHANGER_CLIENT_EXCEPTION, WorkletNodeSetting, WorkletSetting } from "../const";
 import { io, Socket } from "socket.io-client";
 import { DefaultEventsMap } from "@socket.io/component-emitter";
+import { ServerRestClient } from "./ServerRestClient";
 
 export type VoiceChangerWorkletListener = {
     notifyVolume: (vol: number) => void;
@@ -261,7 +262,8 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
             // console.log("emit!")
             this.socket.emit("request_message", [timestamp, newBuffer.buffer]);
         } else {
-            const res = await postVoice(this.setting.serverUrl + "/test", timestamp, newBuffer.buffer);
+            const restClient = new ServerRestClient(this.setting.serverUrl);
+            const res = await restClient.postVoice(timestamp, newBuffer.buffer);
 
             if (res.byteLength < 128 * 2) {
                 this.listener.notifyException(VOICE_CHANGER_CLIENT_EXCEPTION.ERR_REST_INVALID_RESPONSE, `[REST] recevied data is too short ${res.byteLength}`);
@@ -347,35 +349,3 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
         return samples;
     };
 }
-
-export const postVoice = async (url: string, timestamp: number, buffer: ArrayBuffer) => {
-    const obj = {
-        timestamp,
-        buffer: Buffer.from(buffer).toString("base64"),
-    };
-    const body = JSON.stringify(obj);
-
-    const res = await fetch(`${url}`, {
-        method: "POST",
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-        },
-        body: body,
-    });
-
-    try {
-        const receivedJson = await res.json();
-        const changedVoiceBase64 = receivedJson["changedVoiceBase64"];
-        const buf = Buffer.from(changedVoiceBase64, "base64");
-        const ab = new ArrayBuffer(buf.length);
-        const view = new Uint8Array(ab);
-        for (let i = 0; i < buf.length; ++i) {
-            view[i] = buf[i];
-        }
-        return ab;
-    } catch (e) {
-        console.log("Exception:", e);
-        return new ArrayBuffer(10);
-    }
-};
