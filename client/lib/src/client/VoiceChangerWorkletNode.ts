@@ -11,6 +11,10 @@ export type VoiceChangerWorkletListener = {
     notifyException: (code: VOICE_CHANGER_CLIENT_EXCEPTION, message: string) => void;
 };
 
+export type InternalCallback = {
+    processAudio: (data: Uint8Array) => Uint8Array;
+};
+
 export class VoiceChangerWorkletNode extends AudioWorkletNode {
     private listener: VoiceChangerWorkletListener;
 
@@ -27,6 +31,9 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
     // Promises
     private startPromiseResolve: ((value: void | PromiseLike<void>) => void) | null = null;
     private stopPromiseResolve: ((value: void | PromiseLike<void>) => void) | null = null;
+
+    // InternalCallback
+    private internalCallback: InternalCallback | null = null;
 
     constructor(context: AudioContext, listener: VoiceChangerWorkletListener) {
         super(context, "voice-changer-worklet-processor");
@@ -51,6 +58,10 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
         if (recreateSocketIoRequired) {
             this.createSocketIO();
         }
+    };
+
+    setInternalAudioProcessCallback = (internalCallback: InternalCallback) => {
+        this.internalCallback = internalCallback;
     };
 
     getSettings = (): WorkletNodeSetting => {
@@ -192,7 +203,7 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
             this.listener.notifyVolume(event.data.volume as number);
         } else if (event.data.responseType === "inputData") {
             const inputData = event.data.inputData as Float32Array;
-            // console.log("receive input data", inputData)
+            // console.log("receive input data", inputData);
 
             // ダウンサンプリング
             let downsampledBuffer: Float32Array | null = null;
@@ -261,10 +272,9 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
             }
             // console.log("emit!")
             this.socket.emit("request_message", [timestamp, newBuffer.buffer]);
-        } else {
+        } else if (this.setting.protocol === "rest") {
             const restClient = new ServerRestClient(this.setting.serverUrl);
             const res = await restClient.postVoice(timestamp, newBuffer.buffer);
-
             if (res.byteLength < 128 * 2) {
                 this.listener.notifyException(VOICE_CHANGER_CLIENT_EXCEPTION.ERR_REST_INVALID_RESPONSE, `[REST] recevied data is too short ${res.byteLength}`);
             } else {
@@ -275,9 +285,23 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
                 }
                 this.listener.notifyResponseTime(Date.now() - timestamp);
             }
+        } else if (this.setting.protocol == "internal") {
+            if (!this.internalCallback) {
+                this.listener.notifyException(VOICE_CHANGER_CLIENT_EXCEPTION.ERR_INTERNAL_AUDIO_PROCESS_CALLBACK_IS_NOT_INITIALIZED, `[AudioWorkletNode] internal audio process callback is not initialized`);
+                return;
+            }
+            const res = this.internalCallback.processAudio(newBuffer);
+            if (this.outputNode != null) {
+                this.outputNode.postReceivedVoice(res.buffer);
+            } else {
+                this.postReceivedVoice(res.buffer);
+            }
+        } else {
+            throw "unknown protocol";
         }
     };
 
+    // Worklet操作
     configure = (setting: WorkletSetting) => {
         const req: VoiceChangerWorkletProcessorRequest = {
             requestType: "config",

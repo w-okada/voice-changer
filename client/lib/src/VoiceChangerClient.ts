@@ -1,4 +1,4 @@
-import { VoiceChangerWorkletNode, VoiceChangerWorkletListener } from "./client/VoiceChangerWorkletNode";
+import { VoiceChangerWorkletNode, VoiceChangerWorkletListener, InternalCallback } from "./client/VoiceChangerWorkletNode";
 // @ts-ignore
 import workerjs from "raw-loader!../worklet/dist/index.js";
 import { VoiceFocusDeviceTransformer, VoiceFocusTransformDevice } from "amazon-chime-sdk-js";
@@ -341,6 +341,9 @@ export class VoiceChangerClient {
     updateWorkletNodeSetting = (setting: WorkletNodeSetting) => {
         this.vcInNode.updateSetting(setting);
         this.vcOutNode.updateSetting(setting);
+    };
+    setInternalAudioProcessCallback = (internalCallback: InternalCallback) => {
+        this.vcInNode.setInternalAudioProcessCallback(internalCallback);
     };
 
     /////////////////////////////////////////////////////

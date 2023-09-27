@@ -10,9 +10,9 @@ type Props = {
 };
 
 type AppStateValue = ClientState & {
-    audioContext: AudioContext
-    initializedRef: React.MutableRefObject<boolean>
-}
+    audioContext: AudioContext;
+    initializedRef: React.MutableRefObject<boolean>;
+};
 
 const AppStateContext = React.createContext<AppStateValue | null>(null);
 export const useAppState = (): AppStateValue => {
@@ -24,36 +24,44 @@ export const useAppState = (): AppStateValue => {
 };
 
 export const AppStateProvider = ({ children }: Props) => {
-    const appRoot = useAppRoot()
-    const clientState = useVCClient({ audioContext: appRoot.audioContextState.audioContext })
-    const messageBuilderState = useMessageBuilder()
+    const appRoot = useAppRoot();
+    const clientState = useVCClient({ audioContext: appRoot.audioContextState.audioContext });
+    const messageBuilderState = useMessageBuilder();
 
     useEffect(() => {
         messageBuilderState.setMessage(__filename, "ioError", {
-            "ja": "エラーが頻発しています。対象としているフレームワークのモデルがロードされているか確認してください。",
-            "en": "Frequent errors occur. Please check if the model of the framework being targeted is loaded."
-        })
-    }, [])
+            ja: "エラーが頻発しています。対象としているフレームワークのモデルがロードされているか確認してください。",
+            en: "Frequent errors occur. Please check if the model of the framework being targeted is loaded.",
+        });
+    }, []);
 
-    const initializedRef = useRef<boolean>(false)
+    const initializedRef = useRef<boolean>(false);
     useEffect(() => {
         if (clientState.clientState.initialized) {
-            initializedRef.current = true
-            clientState.clientState.getInfo()
+            initializedRef.current = true;
+            clientState.clientState.getInfo();
             // clientState.clientState.setVoiceChangerClientSetting({
             //     ...clientState.clientState.setting.voiceChangerClientSetting
             // })
         }
-    }, [clientState.clientState.initialized])
+    }, [clientState.clientState.initialized]);
 
     useEffect(() => {
         if (clientState.clientState.ioErrorCount > 100) {
-            alert(messageBuilderState.getMessage(__filename, "ioError"))
-            clientState.clientState.resetIoErrorCount()
+            alert(messageBuilderState.getMessage(__filename, "ioError"));
+            clientState.clientState.resetIoErrorCount();
         }
+    }, [clientState.clientState.ioErrorCount]);
 
-    }, [clientState.clientState.ioErrorCount])
-
+    useEffect(() => {
+        if (clientState.clientState.initialized) {
+            clientState.clientState.setInternalAudioProcessCallback({
+                processAudio: (data: Uint8Array) => {
+                    return data;
+                },
+            });
+        }
+    }, [clientState.clientState.initialized]);
 
     const providerValue: AppStateValue = {
         audioContext: appRoot.audioContextState.audioContext!,

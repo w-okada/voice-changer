@@ -436,6 +436,7 @@ export type WorkletSetting = {
 export const Protocol = {
     sio: "sio",
     rest: "rest",
+    internal: "internal",
 } as const;
 export type Protocol = (typeof Protocol)[keyof typeof Protocol];
 
@@ -524,6 +525,7 @@ export const VOICE_CHANGER_CLIENT_EXCEPTION = {
     ERR_SIO_INVALID_RESPONSE: "ERR_SIO_INVALID_RESPONSE",
     ERR_REST_INVALID_RESPONSE: "ERR_REST_INVALID_RESPONSE",
     ERR_MIC_STREAM_NOT_INITIALIZED: "ERR_MIC_STREAM_NOT_INITIALIZED",
+    ERR_INTERNAL_AUDIO_PROCESS_CALLBACK_IS_NOT_INITIALIZED: "ERR_INTERNAL_AUDIO_PROCESS_CALLBACK_IS_NOT_INITIALIZED",
 } as const;
 export type VOICE_CHANGER_CLIENT_EXCEPTION = (typeof VOICE_CHANGER_CLIENT_EXCEPTION)[keyof typeof VOICE_CHANGER_CLIENT_EXCEPTION];
 

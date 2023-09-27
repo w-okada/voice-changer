@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 
 import { WorkletNodeSetting } from "../const";
 import { VoiceChangerClient } from "../VoiceChangerClient";
+import { InternalCallback } from "../client/VoiceChangerWorkletNode";
 
 export type UseWorkletNodeSettingProps = {
     voiceChangerClient: VoiceChangerClient | null;
@@ -12,6 +13,7 @@ export type WorkletNodeSettingState = {
     startOutputRecording: () => void;
     stopOutputRecording: () => Promise<Float32Array>;
     trancateBuffer: () => Promise<void>;
+    setInternalAudioProcessCallback: (internalCallback: InternalCallback) => Promise<void>;
 };
 
 export const useWorkletNodeSetting = (props: UseWorkletNodeSettingProps): WorkletNodeSettingState => {
@@ -55,9 +57,17 @@ export const useWorkletNodeSetting = (props: UseWorkletNodeSettingProps): Workle
         };
     }, [props.voiceChangerClient]);
 
+    const setInternalAudioProcessCallback = useMemo(() => {
+        return async (internalCallback: InternalCallback) => {
+            if (!props.voiceChangerClient) return;
+            props.voiceChangerClient.setInternalAudioProcessCallback(internalCallback);
+        };
+    }, [props.voiceChangerClient]);
+
     return {
         startOutputRecording,
         stopOutputRecording,
         trancateBuffer,
+        setInternalAudioProcessCallback,
     };
 };
