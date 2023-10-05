@@ -1,7 +1,6 @@
 name: Issue or Bug Report
 description: Please provide as much detail as possible to convey the history of your problem.
 title: "[ISSUE]: "
-placeholder: "[ISSUE]: Please provide title"
 body:
   - type: markdown
     attributes:
