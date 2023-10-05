@@ -1,6 +1,7 @@
 name: Issue or Bug Report
 description: Please provide as much detail as possible to convey the history of your problem.
 title: "[ISSUE]: "
+placeholder: "[ISSUE]: Please provide title"
 body:
   - type: markdown
     attributes:
@@ -34,7 +35,7 @@ body:
       label: Read carefully and check the options
       options:
         - label: I've tried to Clear Settings
-        - label: Sample/Default Models are working 
+        - label: Sample/Default Models are working
         - label: I've tried to change the Chunk Size
         - label: GUI was successfully launched
         - label: I've read the [tutorial](https://github.com/w-okada/voice-changer/blob/master/tutorials/tutorial_rvc_en_latest.md)
