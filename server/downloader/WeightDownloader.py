@@ -105,7 +105,7 @@ def downloadWeight(voiceChangerParams: VoiceChangerParams):
     if os.path.exists(rmvpe) is False:
         downloadParams.append(
             {
-                "url": "https://huggingface.co/wok000/weights/resolve/main/rmvpe/rmvpe.pt",
+                "url": "https://huggingface.co/wok000/weights/resolve/main/rmvpe/rmvpe_20231006.pt",
                 "saveTo": rmvpe,
                 "position": 8,
             }
@@ -113,7 +113,7 @@ def downloadWeight(voiceChangerParams: VoiceChangerParams):
     if os.path.exists(rmvpe_onnx) is False:
         downloadParams.append(
             {
-                "url": "https://huggingface.co/wok000/weights_gpl/resolve/main/rmvpe/rmvpe_s.onnx",
+                "url": "https://huggingface.co/wok000/weights_gpl/resolve/main/rmvpe/rmvpe_20231006.onnx",
                 "saveTo": rmvpe_onnx,
                 "position": 9,
             }

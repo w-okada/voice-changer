@@ -52,7 +52,7 @@ class RMVPEOnnxPitchExtractor(PitchExtractor):
             audio = np.expand_dims(audio, axis=0)
 
             output = self.onnx_session.run(
-                ["f0", "uv"],
+                ["pitchf"],
                 {
                     "waveform": audio.astype(np.float32),
                     "threshold": np.array([0.3]).astype(np.float32),
