@@ -1,6 +1,6 @@
 {
     "name": "@dannadori/voice-changer-client-js",
-    "version": "1.0.172",
+    "version": "1.0.173",
     "description": "",
     "main": "dist/index.js",
     "directories": {
