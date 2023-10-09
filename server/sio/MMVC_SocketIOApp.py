@@ -40,6 +40,10 @@ class MMVC_SocketIOApp:
                         "filename": f"{getFrontendPath()}/assets/buymeacoffee.png",
                         "content_type": "image/png",
                     },
+                    "/ort-wasm-simd.wasm": {
+                        "filename": f"{getFrontendPath()}/ort-wasm-simd.wasm",
+                        "content_type": "application/wasm",
+                    },
                     "": f"{getFrontendPath()}",
                     "/": f"{getFrontendPath()}/index.html",
                 },

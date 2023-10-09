@@ -12,7 +12,7 @@ export type VoiceChangerWorkletListener = {
 };
 
 export type InternalCallback = {
-    processAudio: (data: Uint8Array) => Uint8Array;
+    processAudio: (data: Uint8Array) => Promise<Uint8Array>;
 };
 
 export class VoiceChangerWorkletNode extends AudioWorkletNode {
@@ -224,17 +224,22 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
                 downsampledBuffer = this._averageDownsampleBuffer(inputData, 48000, this.setting.sendingSampleRate);
             }
 
-            // Float to Int16
-            const arrayBuffer = new ArrayBuffer(downsampledBuffer.length * 2);
-            const dataView = new DataView(arrayBuffer);
-            for (let i = 0; i < downsampledBuffer.length; i++) {
-                let s = Math.max(-1, Math.min(1, downsampledBuffer[i]));
-                s = s < 0 ? s * 0x8000 : s * 0x7fff;
-                dataView.setInt16(i * 2, s, true);
+            // Float to Int16 (internalの場合はfloatのまま行く。)
+            if (this.setting.protocol != "internal") {
+                const arrayBuffer = new ArrayBuffer(downsampledBuffer.length * 2);
+                const dataView = new DataView(arrayBuffer);
+                for (let i = 0; i < downsampledBuffer.length; i++) {
+                    let s = Math.max(-1, Math.min(1, downsampledBuffer[i]));
+                    s = s < 0 ? s * 0x8000 : s * 0x7fff;
+                    dataView.setInt16(i * 2, s, true);
+                }
+                // バッファリング
+                this.requestChunks.push(arrayBuffer);
+            } else {
+                // internal
+                // console.log("downsampledBuffer.buffer", downsampledBuffer.buffer);
+                this.requestChunks.push(downsampledBuffer.buffer);
             }
-
-            // バッファリング
-            this.requestChunks.push(arrayBuffer);
 
             //// リクエストバッファの中身が、リクエスト送信数と違う場合は処理終了。
             if (this.requestChunks.length < this.setting.inputChunkNum) {
@@ -290,7 +295,10 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
                 this.listener.notifyException(VOICE_CHANGER_CLIENT_EXCEPTION.ERR_INTERNAL_AUDIO_PROCESS_CALLBACK_IS_NOT_INITIALIZED, `[AudioWorkletNode] internal audio process callback is not initialized`);
                 return;
             }
-            const res = this.internalCallback.processAudio(newBuffer);
+            const res = await this.internalCallback.processAudio(newBuffer);
+            if (res.length == 0) {
+                return;
+            }
             if (this.outputNode != null) {
                 this.outputNode.postReceivedVoice(res.buffer);
             } else {

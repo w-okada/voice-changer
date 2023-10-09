@@ -93,9 +93,9 @@ class Pipeline(object):
                 pitch = None
                 pitchf = None
         except IndexError as e:  # NOQA
-            # print(e)
-            # import traceback
-            # traceback.print_exc()
+            print(e)
+            import traceback
+            traceback.print_exc()
             raise NotEnoughDataExtimateF0()
         return pitch, pitchf
 

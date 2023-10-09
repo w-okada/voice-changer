@@ -21,7 +21,6 @@ class CrepeOnnxPitchExtractor(PitchExtractor):
         )
 
     def extract(self, audio, pitchf, f0_up_key, sr, window, silence_front=0):
-        n_frames = int(len(audio) // window) + 1
         start_frame = int(silence_front * sr / window)
         real_silence_front = start_frame * window / sr
 

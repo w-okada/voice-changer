@@ -42,6 +42,7 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
     private isRecording = false;
 
     playBuffer: Float32Array[] = [];
+    unpushedF32Data: Float32Array = new Float32Array(0);
     /**
      * @constructor
      */
@@ -105,11 +106,16 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
         }
 
         const f32Data = request.voice;
-        const chunkNum = f32Data.length / this.BLOCK_SIZE;
+        const concatedF32Data = new Float32Array(this.unpushedF32Data.length + f32Data.length);
+        concatedF32Data.set(this.unpushedF32Data);
+        concatedF32Data.set(f32Data, this.unpushedF32Data.length);
+
+        const chunkNum = Math.floor(concatedF32Data.length / this.BLOCK_SIZE);
         for (let i = 0; i < chunkNum; i++) {
-            const block = f32Data.slice(i * this.BLOCK_SIZE, (i + 1) * this.BLOCK_SIZE);
+            const block = concatedF32Data.slice(i * this.BLOCK_SIZE, (i + 1) * this.BLOCK_SIZE);
             this.playBuffer.push(block);
         }
+        this.unpushedF32Data = concatedF32Data.slice(chunkNum * this.BLOCK_SIZE);
     }
 
     pushData = (inputData: Float32Array) => {
@@ -133,10 +139,10 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
         }
 
         if (this.playBuffer.length === 0) {
-            // console.log("[worklet] no play buffer")
+            // console.log("[worklet] no play buffer");
             return true;
         }
-
+        // console.log("[worklet] play buffer");
         //// 一定期間無音状態が続いている場合はスキップ。
         // let voice: Float32Array | undefined
         // while (true) {
