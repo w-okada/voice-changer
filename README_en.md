@@ -3,6 +3,11 @@
 [Japanese](/README_ja.md)
 
 ## What's New!
+- v.1.5.3.15
+  - Improve:
+    - new rmvpe checkpoint for rvc (torch, onnx)
+    - Mac: upgrad torch version 2.1.0
+
 - v.1.5.3.14
   - Improve:
     - onnx performance (need to be converted)
@@ -12,20 +17,6 @@
   - Experimental
     - Add 16k RVC Sample (experimental) 
   
-- v.1.5.3.13
-
-  - Improve:
-    - overwrite models when upload new model
-    - Skip pass through confirm dialog
-  - some bugfixes:
-
-- v.1.5.3.12a
-
-  - Improve:
-    - Pass through confirm dialog
-  - bugfix:
-    - server mode: change chunk size causes tune change
-    - show blank icon
 
 # What is VC Client
 
@@ -82,12 +73,12 @@ It can be used in two main ways, in order of difficulty:
 
 | Version    | OS  | フレームワーク                        | link                                                                                                                                                            | サポート VC                                                               | サイズ |
 | ---------- | --- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------ |
+| v.1.5.3.15 | mac | ONNX(cpu), PyTorch(cpu,mps)           | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main)                                                                                             | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                          | 797MB  |
+|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main)                                                                                             | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC | 3240MB |
+|            | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main)                                                                                             | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC | 3125MB |
 | v.1.5.3.14 | mac | ONNX(cpu), PyTorch(cpu,mps)           | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main)                                                                                             | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                          | 797MB  |
 |            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main)                                                                                             | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC | 3240MB |
 |            | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main)                                                                                             | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC | 3125MB |
-| v.1.5.3.13 | mac | ONNX(cpu), PyTorch(cpu,mps)           | [google](https://drive.google.com/uc?id=1nD1jsDhqKtRt1m6LYZW9Xx02guVTYECi&export=download), [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                          | 797MB  |
-|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [google](https://drive.google.com/uc?id=1MCqHpJEzqo17QmaTRsvg74KVh-4g8S1o&export=download), [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC | 3240MB |
-|            | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [google](https://drive.google.com/uc?id=18p5O_DBTE7296Eh-j8oi-8R5tBKxcDVB&export=download), [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC | 3125MB |
 
 (\*1) You can also download from [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)
 (\*2) The developer does not have an AMD graphics card, so it has not been tested. This package only includes onnxruntime-directml.
