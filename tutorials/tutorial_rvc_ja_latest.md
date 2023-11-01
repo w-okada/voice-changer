@@ -1,6 +1,6 @@
 # Realtime Voice Changer Client for RVC チュートリアル(v.1.5.3.13)
 
-[English](/tutorials/tutorial_rvc_en_latest.md)
+[English](/tutorials/tutorial_rvc_en_latest.md) [Korean/한국어](/tutorials/tutorial_rvc_ko_latest.md)
 
 # はじめに
 
@@ -126,7 +126,7 @@ A7. フォルダのパスに unicode が含まれるとエラーが出るよう�
 | <img src="https://github.com/w-okada/rvc-trainer-docker/assets/48346627/7bc188db-3aae-43eb-98a1-34aacc16173d" width="32"> スパナ             | 各種便利ツールへのリンク         |
 | <img src="https://github.com/w-okada/rvc-trainer-docker/assets/48346627/5db16acc-e901-40d2-8fc2-1fb9fd67f59c" width="32"> コーヒー           | 開発者へ**寄付**するためのリンク |
 
-### claer setting
+### clear setting
 
 設定を初期化します。
 
@@ -271,10 +271,10 @@ gpu0 - gpu3 は GPU が検出されなくても表示されます。存在しな
 
 #### AUDIO
 
-使用するオーディオデバイスのタイプを選びます。詳細は[こちらの文書](./tutorial_device_mode.md)をご確認ください。
+使用するオーディオデバイスのタイプを選びます。詳細は[こちらの文書](./tutorial_device_mode_ja.md)をご確認ください。
 
 - client: ノイズ抑制機能など GUI(chrome)の機能を活用してマイク入力、スピーカー出力を行うことができます。
-- server: VCClient が直接マイクとスピーカーを操作します。遅延を抑えることができます。
+- server: VC Client が直接マイクとスピーカーを操作します。遅延を抑えることができます。
 
 #### input
 

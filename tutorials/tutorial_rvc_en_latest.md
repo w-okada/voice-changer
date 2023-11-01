@@ -1,6 +1,6 @@
 # Realtime Voice Changer Client for RVC Tutorial (v.1.5.3.13)
 
-[Japanese/日本語](/tutorials/tutorial_rvc_ja_latest.md)
+[Japanese/日本語](/tutorials/tutorial_rvc_ja_latest.md) [Korean/한국어](/tutorials/tutorial_rvc_ko_latest.md)
 
 # Introduction
 
@@ -125,7 +125,7 @@ Icons are links.
 | <img src="https://github.com/w-okada/rvc-trainer-docker/assets/48346627/7bc188db-3aae-43eb-98a1-34aacc16173d" width="32"> spanner  | tools             |
 | <img src="https://github.com/w-okada/rvc-trainer-docker/assets/48346627/5db16acc-e901-40d2-8fc2-1fb9fd67f59c" width="32"> coffee   | donation          |
 
-### claer setting
+### clear setting
 
 Initialize configuration.
 
@@ -267,10 +267,10 @@ Even if a GPU is not detected, gpu0 - gpu3 will still be displayed. If you speci
 
 #### AUDIO
 
-Choose the type of audio device you want to use. For more information, please refer to the [document](./tutorial_device_mode.md).
+Choose the type of audio device you want to use. For more information, please refer to the [document](./tutorial_device_mode_ja.md).
 
 - Client: You can make use of the microphone input and speaker output with the GUI functions such as noise cancellation.
-- Server: VCClient can directly control the microphone and speaker to minimize latency.
+- Server: VC Client can directly control the microphone and speaker to minimize latency.
 
 #### input
 
