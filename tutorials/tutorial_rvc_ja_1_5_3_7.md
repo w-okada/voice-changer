@@ -244,10 +244,10 @@ onnxdirectML 版では GPU の ON/OFF を切り替えることができます。
 
 #### AUDIO
 
-使用するオーディオデバイスのタイプを選びます。詳細は[こちらの文書](./tutorial_device_mode.md)をご確認ください。
+使用するオーディオデバイスのタイプを選びます。詳細は[こちらの文書](./tutorial_device_mode_ja.md)をご確認ください。
 
 - client: ノイズ抑制機能など GUI(chrome)の機能を活用してマイク入力、スピーカー出力を行うことができます。
-- server: VCClient が直接マイクとスピーカーを操作します。遅延を抑えることができます。
+- server: VC Client が直接マイクとスピーカーを操作します。遅延を抑えることができます。
 
 #### input
 

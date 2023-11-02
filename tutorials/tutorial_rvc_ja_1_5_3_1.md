@@ -251,7 +251,7 @@ GPU を 2 枚以上持っている場合、ここで GPU を選べます。
 
 client device mode と server device mode のどちらを使用するか選択します。音声変換が停止している時のみ変更できます。
 
-それぞれのモードの詳細は[こちら](./tutorial_device_mode.md)をご覧ください。
+それぞれのモードの詳細は[こちら](./tutorial_device_mode_ja.md)をご覧ください。
 
 ### AudioInput
 

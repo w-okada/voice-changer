@@ -238,10 +238,10 @@ In the onnxdirectML version, you can switch the GPU ON/OFF.
 
 #### AUDIO
 
-Choose the type of audio device you want to use. For more information, please refer to the [document](./tutorial_device_mode.md).
+Choose the type of audio device you want to use. For more information, please refer to the [document](./tutorial_device_mode_ja.md).
 
 - Client: You can make use of the microphone input and speaker output with the GUI functions such as noise cancellation.
-- Server: VCClient can directly control the microphone and speaker to minimize latency.
+- Server: VC Client can directly control the microphone and speaker to minimize latency.
 
 #### input
 
