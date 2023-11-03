@@ -13,7 +13,7 @@
 -   모델 학습은 별도로 진행해야 합니다.
     -   개인적으로 학습을 진행할 경우에는 [원본 RVC](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI) 또는 [ddPn08RVC](https://github.com/ddPn08/rvc-webui)로 진행하세요.
     -   브라우저에서 학습용 음성을 사용할 때는 [녹음 앱 on Github Pages](https://w-okada.github.io/voice-changer/)를 사용하는 것이 편리합니다.
-        -   [해설 영상](https://youtu.be/s_GirFEGvaA)
+        -   [설명 영상](https://youtu.be/s_GirFEGvaA)
     -   [학습 팁](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI/blob/main/docs/jp/training_tips_ja.md)가 공개되어 있으니 참조해 주세요.
 
 # 시작하기까지
@@ -22,7 +22,7 @@
 
 ### Windows 버전
 
-다운로드 받은 zip 파일을 풀고 `start_http.bat`을 실행하세요.
+다운로드 받은 zip 파일의 압축을 풀고 `start_http.bat`을 실행하세요.
 
 이미 구버전을 갖고 있다면 반드시 서로 다른 폴더에 압축을 푸세요.
 
@@ -32,9 +32,9 @@
 
 1. 다운로드한 파일의 압축을 풉니다.
 
-1. 다음으로 control 키를 누른 상태로 MMVCServerSIO를 클릭해 실행하세요(or 오른쪽 클릭으로 실행하세요). 확인되지 않은 개발자 메시지가 나타나면 다시 control 키를 누르고 클릭해 실행하세요(or 오른쪽 클릭으로 실행하세요). 터미널이 열리고 몇 초가 지나면 처리가 완료됩니다.
+1. 다음으로 control 키를 누른 상태로 MMVCServerSIO를 클릭해 실행하세요(or 오른쪽 클릭으로 실행하세요). 확인되지 않은 개발자 메시지가 나오면 다시 control 키를 누르고 클릭해 실행하세요(or 오른쪽 클릭으로 실행하세요). 터미널이 열리고 몇 초가 지나면 처리가 완료됩니다.
 
-1. 다음으로 control 키를 누른 상태로 startHTTP.command를 클릭해 실행하세요(or 오른쪽 클릭으로 실행하세요). 확인되지 않은 개발자 메시지가 나타나면 다시 control 키를 누르고 클릭해 실행하세요(or 오른쪽 클릭으로 실행하세요). 터미널이 열리고 몇 초가 지나면 처리가 완료됩니다.
+1. 다음으로 control 키를 누른 상태로 startHTTP.command를 클릭해 실행하세요(or 오른쪽 클릭으로 실행하세요). 확인되지 않은 개발자 메시지가 나오면 다시 control 키를 누르고 클릭해 실행하세요(or 오른쪽 클릭으로 실행하세요). 터미널이 열리고 몇 초가 지나면 처리가 완료됩니다.
 
 ※ 다시 말해, MMVCServerSIO와 startHTTP.command 둘 다 실행하는 것이 포인트입니다. 그리고 MMVCServerSIO 를 먼저 실행해야 합니다.
 
@@ -44,7 +44,7 @@
 
 원격으로 접속할 때는 http 대신 https `.bat` 파일(win)、`.command` 파일(mac)을 실행하세요.
 
-브라우저(Chrome만 지원)에서 접속하면 화면이 나옵니다.
+브라우저(Chrome에서만 지원)에서 접속하면 화면이 나옵니다.
 
 ### 컨트롤 표시
 
@@ -97,7 +97,7 @@ A3. 빠른 시작에서는 설명하지 않았는데 Pitch 조정이 가능한 �
 
 Q4. 윈도우 창이 나오지 않습니다. 또는 창은 나오지만 내용이 나오지 않습니다. 콘솔에 `electron: Failed to load URL: http://localhost:18888/ with error: ERR_CONNECTION_REFUSED` 같은 오류가 나옵니다.
 
-A4. 바이러스 검사가 진행 중일 가능성이 있습니다. 잠시 기다리거나 본인 책임하에 폴더를 제외 지정하세요.
+A4. 바이러스 검사가 진행 중일 가능성이 있습니다. 잠시 기다리거나 폴더를 검사 제외 지정하세요(이에 개발자는 책임이 없습니다).
 
 Q5. `[4716:0429/213736.103:ERROR:gpu_init.cc(523)] Passthrough is not supported, GL is disabled, ANGLE is`라는 메시지 창이 나옵니다.
 

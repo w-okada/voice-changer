@@ -1,12 +1,12 @@
 ## VC Client
 
-[Japanese](/README_ja.md)
+[Japanese](/README_ja.md) [Korean](/README_ko.md)
 
 ## What's New!
 - v.1.5.3.15
   - Improve:
     - new rmvpe checkpoint for rvc (torch, onnx)
-    - Mac: upgrad torch version 2.1.0
+    - Mac: upgrade torch version 2.1.0
 
 - v.1.5.3.14
   - Improve:
