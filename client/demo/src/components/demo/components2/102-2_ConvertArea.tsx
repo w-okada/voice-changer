@@ -13,7 +13,7 @@ export const ConvertArea = (props: ConvertProps) => {
     const convertArea = useMemo(() => {
         let nums: number[];
         if (!props.inputChunkNums) {
-            nums = [8, 16, 24, 32, 40, 48, 64, 80, 96, 112, 128, 192, 256, 320, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960, 1024, 2048];
+            nums = [8, 16, 24, 32, 40, 48, 64, 80, 96, 112, 128, 192, 256, 320, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960, 1024, 2048, 4096, 8192, 16384];
         } else {
             nums = props.inputChunkNums;
         }

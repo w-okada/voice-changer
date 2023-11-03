@@ -69,7 +69,7 @@ class OnnxRVCInferencer(Inferencer):
                 },
             )
 
-        if self.inferencerTypeVersion == "v2.1" or self.inferencerTypeVersion == "v1.1":
+        if self.inferencerTypeVersion == "v2.1" or self.inferencerTypeVersion == "v2.2" or self.inferencerTypeVersion == "v1.1":
             res = audio1[0]
         else:
             res = np.array(audio1)[0][0, 0]

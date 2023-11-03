@@ -54,5 +54,18 @@ module.exports = {
         new CopyPlugin({
             patterns: [{ from: "public/favicon.ico", to: "favicon.ico" }],
         }),
+
+        new CopyPlugin({
+            patterns: [{ from: "./node_modules/@dannadori/voice-changer-js/dist/ort-wasm-simd.wasm", to: "ort-wasm-simd.wasm" }],
+        }),
+        new CopyPlugin({
+            patterns: [{ from: "./node_modules/@dannadori/voice-changer-js/dist/process.js", to: "process.js" }],
+        }),
+        new CopyPlugin({
+            patterns: [{ from: "public/models/emb_pit_24000.bin", to: "models/emb_pit_24000.bin" }],
+        }),
+        new CopyPlugin({
+            patterns: [{ from: "public/models/rvc2v_24000.bin", to: "models/rvc2v_24000.bin" }],
+        }),
     ],
 };

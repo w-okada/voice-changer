@@ -8,8 +8,8 @@ export type UseWorkletSettingProps = {
 };
 
 export type WorkletSettingState = {
-    // setting: WorkletSetting;
-    // setSetting: (setting: WorkletSetting) => void;
+    setting: WorkletSetting;
+    _setSetting: (setting: WorkletSetting) => void;
 };
 
 export const useWorkletSetting = (props: UseWorkletSettingProps): WorkletSettingState => {
@@ -29,7 +29,7 @@ export const useWorkletSetting = (props: UseWorkletSettingProps): WorkletSetting
     // }, [props.voiceChangerClient])
 
     return {
-        // setting,
-        // setSetting,
+        setting,
+        _setSetting,
     };
 };

@@ -163,7 +163,8 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
                 slot.version = "v2"
             elif metadata["version"] == "2.1":  # 2.1はclipをonnx内部で実施. realtimeをdisable
                 slot.version = "v2.1"
-
+            elif metadata["version"] == "2.2":  # 2.1と同じ
+                slot.version = "v2.2"
         except Exception as e:
             slot.modelType = EnumInferenceTypes.onnxRVC.value
             slot.embChannels = 256

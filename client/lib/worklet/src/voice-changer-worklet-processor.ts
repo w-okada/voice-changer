@@ -34,7 +34,7 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
     private BLOCK_SIZE = 128;
     private initialized = false;
     private volume = 0;
-    private numTrancateTreshold = 150;
+    private numTrancateTreshold = 100;
     // private volTrancateThreshold = 0.0005
     // private volTrancateLength = 32
     // private volTrancateCount = 0
@@ -102,6 +102,7 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
         }
 
         if (this.playBuffer.length > this.numTrancateTreshold) {
+            console.log(`[worklet] Truncate ${this.playBuffer.length} > ${this.numTrancateTreshold}`);
             this.trancateBuffer();
         }
 
