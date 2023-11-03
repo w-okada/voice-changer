@@ -64,8 +64,11 @@ module.exports = {
         new CopyPlugin({
             patterns: [{ from: "public/models/emb_pit_24000.bin", to: "models/emb_pit_24000.bin" }],
         }),
-        new CopyPlugin({
-            patterns: [{ from: "public/models/rvc2v_24000.bin", to: "models/rvc2v_24000.bin" }],
-        }),
+        // new CopyPlugin({
+        //     patterns: [{ from: "public/models/rvc2v_24000.bin", to: "models/rvc2v_24000.bin" }],
+        // }),
+        // new CopyPlugin({
+        //     patterns: [{ from: "public/models/rvc2vnof0_24000.bin", to: "models/rvc2vnof0_24000.bin" }],
+        // }),
     ],
 };

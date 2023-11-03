@@ -34,7 +34,7 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
     private BLOCK_SIZE = 128;
     private initialized = false;
     private volume = 0;
-    private numTrancateTreshold = 100;
+    // private numTrancateTreshold = 100;
     // private volTrancateThreshold = 0.0005
     // private volTrancateLength = 32
     // private volTrancateCount = 0
@@ -69,7 +69,7 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
     handleMessage(event: any) {
         const request = event.data as VoiceChangerWorkletProcessorRequest;
         if (request.requestType === "config") {
-            this.numTrancateTreshold = request.numTrancateTreshold;
+            // this.numTrancateTreshold = request.numTrancateTreshold;
             // this.volTrancateLength = request.volTrancateLength
             // this.volTrancateThreshold = request.volTrancateThreshold
             console.log("[worklet] worklet configured", request);
@@ -101,12 +101,16 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
             return;
         }
 
-        if (this.playBuffer.length > this.numTrancateTreshold) {
-            console.log(`[worklet] Truncate ${this.playBuffer.length} > ${this.numTrancateTreshold}`);
+        const f32Data = request.voice;
+        // if (this.playBuffer.length > this.numTrancateTreshold) {
+        //     console.log(`[worklet] Truncate ${this.playBuffer.length} > ${this.numTrancateTreshold}`);
+        //     this.trancateBuffer();
+        // }
+        if (this.playBuffer.length > f32Data.length / this.BLOCK_SIZE) {
+            console.log(`[worklet] Truncate ${this.playBuffer.length} > ${f32Data.length / this.BLOCK_SIZE}`);
             this.trancateBuffer();
         }
 
-        const f32Data = request.voice;
         const concatedF32Data = new Float32Array(this.unpushedF32Data.length + f32Data.length);
         concatedF32Data.set(this.unpushedF32Data);
         concatedF32Data.set(f32Data, this.unpushedF32Data.length);

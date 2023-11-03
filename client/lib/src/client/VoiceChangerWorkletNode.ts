@@ -296,7 +296,7 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
                 return;
             }
             const res = await this.internalCallback.processAudio(newBuffer);
-            if (res.length == 0) {
+            if (res.length < 128 * 2) {
                 return;
             }
             if (this.outputNode != null) {

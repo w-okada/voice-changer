@@ -493,7 +493,8 @@ export type ClientSetting = {
 };
 export const DefaultClientSettng: ClientSetting = {
     workletSetting: {
-        numTrancateTreshold: 512 * 2,
+        // numTrancateTreshold: 512 * 2,
+        numTrancateTreshold: 100,
         volTrancateThreshold: 0.0005,
         volTrancateLength: 32,
     },
