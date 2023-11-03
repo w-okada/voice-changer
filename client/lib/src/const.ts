@@ -14,6 +14,11 @@ export const VoiceChangerType = {
 } as const;
 export type VoiceChangerType = (typeof VoiceChangerType)[keyof typeof VoiceChangerType];
 
+export const StaticModel = {
+    BeatriceJVS: "Beatrice-JVS",
+} as const;
+export type StaticModel = (typeof StaticModel)[keyof typeof StaticModel];
+
 ///////////////////////
 // サーバセッティング
 ///////////////////////
@@ -174,7 +179,7 @@ export type VoiceChangerServerSetting = {
     rvcQuality: number; // 0:low, 1:high
     silenceFront: number; // 0:off, 1:on
     modelSamplingRate: ModelSamplingRate; // 32000,40000,48000
-    modelSlotIndex: number;
+    modelSlotIndex: number | StaticModel;
 
     useEnhancer: number; // DDSP-SVC
     useDiff: number; // DDSP-SVC
@@ -194,7 +199,7 @@ export type VoiceChangerServerSetting = {
 };
 
 type ModelSlot = {
-    slotIndex: number;
+    slotIndex: number | StaticModel;
     voiceChangerType: VoiceChangerType;
     name: string;
     description: string;

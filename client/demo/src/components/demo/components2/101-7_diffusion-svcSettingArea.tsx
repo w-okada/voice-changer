@@ -10,8 +10,12 @@ export const DiffusionSVCSettingArea = (_props: DiffusionSVCSettingAreaProps) =>
     const selected = useMemo(() => {
         if (serverSetting.serverSetting.modelSlotIndex == undefined) {
             return;
+        } else if (serverSetting.serverSetting.modelSlotIndex == "Beatrice-JVS") {
+            const beatriceJVS = serverSetting.serverSetting.modelSlots.find((v) => v.slotIndex == "Beatrice-JVS");
+            return beatriceJVS;
+        } else {
+            return serverSetting.serverSetting.modelSlots[serverSetting.serverSetting.modelSlotIndex];
         }
-        return serverSetting.serverSetting.modelSlots[serverSetting.serverSetting.modelSlotIndex];
     }, [serverSetting.serverSetting.modelSlotIndex, serverSetting.serverSetting.modelSlots]);
 
     const settingArea = useMemo(() => {

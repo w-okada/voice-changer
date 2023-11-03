@@ -55,6 +55,7 @@ export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
                     );
 
                 const clickAction = async () => {
+                    // @ts-ignore
                     const dummyModelSlotIndex = Math.floor(Date.now() / 1000) * 1000 + x.slotIndex;
                     await serverSetting.updateServerSettings({ ...serverSetting.serverSetting, modelSlotIndex: dummyModelSlotIndex });
                     setTimeout(() => {

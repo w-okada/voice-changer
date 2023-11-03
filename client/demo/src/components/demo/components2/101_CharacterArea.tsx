@@ -28,8 +28,12 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
     const selected = useMemo(() => {
         if (serverSetting.serverSetting.modelSlotIndex == undefined) {
             return;
+        } else if (serverSetting.serverSetting.modelSlotIndex == "Beatrice-JVS") {
+            const beatriceJVS = serverSetting.serverSetting.modelSlots.find((v) => v.slotIndex == "Beatrice-JVS");
+            return beatriceJVS;
+        } else {
+            return serverSetting.serverSetting.modelSlots[serverSetting.serverSetting.modelSlotIndex];
         }
-        return serverSetting.serverSetting.modelSlots[serverSetting.serverSetting.modelSlotIndex];
     }, [serverSetting.serverSetting.modelSlotIndex, serverSetting.serverSetting.modelSlots]);
 
     useEffect(() => {
@@ -49,7 +53,8 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
             return <></>;
         }
 
-        const icon = selected.iconFile.length > 0 ? serverSetting.serverSetting.voiceChangerParams.model_dir + "/" + selected.slotIndex + "/" + selected.iconFile.split(/[\/\\]/).pop() : "./assets/icons/human.png";
+        const modelDir = serverSetting.serverSetting.modelSlotIndex == "Beatrice-JVS" ? "model_dir_static" : serverSetting.serverSetting.voiceChangerParams.model_dir;
+        const icon = selected.iconFile.length > 0 ? modelDir + "/" + selected.slotIndex + "/" + selected.iconFile.split(/[\/\\]/).pop() : "./assets/icons/human.png";
         const selectedTermOfUseUrlLink = selected.termsOfUseUrl ? (
             <a href={selected.termsOfUseUrl} target="_blank" rel="noopener noreferrer" className="portrait-area-terms-of-use-link">
                 [{messageBuilderState.getMessage(__filename, "terms_of_use")}]

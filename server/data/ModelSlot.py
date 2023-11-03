@@ -142,7 +142,7 @@ def loadSlotInfo(model_dir: str, slotIndex: int | StaticSlot) -> ModelSlots:
     jsonFile = os.path.join(slotDir, "params.json")
     if not os.path.exists(jsonFile):
         return ModelSlot()
-    jsonDict = json.load(open(os.path.join(slotDir, "params.json")))
+    jsonDict = json.load(open(jsonFile, encoding="utf-8"))
     slotInfoKey = list(ModelSlot.__annotations__.keys())
     slotInfo = ModelSlot(**{k: v for k, v in jsonDict.items() if k in slotInfoKey})
     if slotInfo.voiceChangerType == "RVC":
