@@ -1,17 +1,13 @@
 {
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "flake8.args": ["--max-line-length=1024", "--ignore=E402,E203,E722"],
   "workbench.colorCustomizations": {
     "tab.activeBackground": "#65952acc"
   },
-  "python.formatting.provider": "black",
-  "python.linting.mypyEnabled": false,
-  "[python]": {
-    "editor.defaultFormatter": null, // Prettier を使わないようにする
-    "editor.formatOnSave": true // ファイル保存時に自動フォーマット
-  },
-  "python.formatting.blackArgs": ["--line-length", "550"],
-  "python.linting.flake8Enabled": true,
-  "python.linting.flake8Args": [
-    "--max-line-length=99999"
-  ],
-  "python.linting.enabled": true
+  "black-formatter.args": ["--line-length", "550"],
+  "python.testing.pytestArgs": ["test"],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
 }

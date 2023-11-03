@@ -5,3 +5,9 @@
    Diffusion SVC and DDSP SVC uses DiffSinger Community Vocoders. Please check the license from the following link.
    Please place it on pretrain\\nsf_hifigan if you are using a different model.
    https://openvpi.github.io/vocoders/
+
+2. Beatrice JVS Corpus Edition のライセンスについてはこちらを確認してください。
+  [readme](https://github.com/w-okada/voice-changer/blob/master/server/voice_changer/Beatrice/)
+
+  Please check here for the license of the Beatrice JVS Corpus Edition.
+  [readme](https://github.com/w-okada/voice-changer/blob/master/server/voice_changer/Beatrice/)

@@ -26,8 +26,9 @@
 - [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc)
 - [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI)
 - [DDSP-SVC](https://github.com/yxlllc/DDSP-SVC)
+- [Beatrice JVS Corpus Edition](https://prj-beatrice.com/) * experimental,  (***NOT MIT Licnsence*** see [readme](https://github.com/w-okada/voice-changer/blob/master/server/voice_changer/Beatrice/))
 
-2. Distribute the load by running Voice Changer on a different PC
+1. Distribute the load by running Voice Changer on a different PC
    The real-time voice changer of this application works on a server-client configuration. By running the MMVC server on a separate PC, you can run it while minimizing the impact on other resource-intensive processes such as gaming commentary.
 
 ![image](https://user-images.githubusercontent.com/48346627/206640768-53f6052d-0a96-403b-a06c-6714a0b7471d.png)

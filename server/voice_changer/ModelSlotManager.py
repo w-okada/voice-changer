@@ -1,4 +1,4 @@
-from const import UPLOAD_DIR
+from const import UPLOAD_DIR, StaticSlot
 from data.ModelSlot import ModelSlots, loadAllSlotInfo, saveSlotInfo
 import json
 import os
@@ -30,13 +30,23 @@ class ModelSlotManager:
     def _load_model_slot(self, slotIndex: int):
         return self.modelSlots[slotIndex]
 
+    def _search_model_slot(self, slotIndex: StaticSlot):
+        target = [x for x in self.modelSlots if x.slotIndex == slotIndex]
+        if len(target) > 0:
+            return target[0]
+        else:
+            return None
+
     def getAllSlotInfo(self, reload: bool = False):
         if reload:
             self.modelSlots = loadAllSlotInfo(self.model_dir)
         return self.modelSlots
 
-    def get_slot_info(self, slotIndex: int):
-        return self._load_model_slot(slotIndex)
+    def get_slot_info(self, slotIndex: int | StaticSlot):
+        if slotIndex == "Beatrice-JVS":
+            return self._search_model_slot(slotIndex)
+        else:
+            return self._load_model_slot(slotIndex)
 
     def save_model_slot(self, slotIndex: int, slotInfo: ModelSlots):
         self._save_model_slot(slotIndex, slotInfo)
