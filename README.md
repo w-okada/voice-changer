@@ -3,6 +3,10 @@
 [English](/README_en.md)
 
 ## What's New!
+- v.1.5.3.16 (Only for Windows)
+  - New Feature:
+    - Beatrice is supported(experimental) 
+
 - v.1.5.3.15
   - Improve:
     - new rmvpe checkpoint for rvc (torch, onnx)
