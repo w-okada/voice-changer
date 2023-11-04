@@ -291,6 +291,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
                 self.voiceChangerModel = Beatrice(self.params, slotInfo)
             self.voiceChanger = VoiceChangerV2(self.params)
             self.voiceChanger.setModel(self.voiceChangerModel)
+
         else:
             logger.info(f"[Voice Changer] unknown voice changer model: {slotInfo.voiceChangerType}")
             if hasattr(self, "voiceChangerModel"):
