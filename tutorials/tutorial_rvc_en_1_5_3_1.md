@@ -233,7 +233,7 @@ If you have 2 or more GPUs, you can choose your GPU here.
 
 Choose between client device mode and server device mode. You can only change it when the voice conversion is stopped.
 
-For more details on each mode, please see [here](./tutorial_device_mode.md).
+For more details on each mode, please see [here](./tutorial_device_mode_ja.md).
 
 ### Audio Input
 

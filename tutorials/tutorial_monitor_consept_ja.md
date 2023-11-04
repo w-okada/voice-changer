@@ -10,7 +10,7 @@ v.1.5.3.7 から追加された server device mode における monitor output �
 
 ## v.1.5.3.7 以降の構成
 
-v.1.5.3.7 では、VCClient の server device mode でもう一つ出力先デバイスを設定できるようになりました(赤線)。これにより、モニター用には Voicemeeter を経由せずに直接 wasapi デバイスや asio デバイスに出力できるようになり、遅延が少ないモニタリングが可能になります。
+v.1.5.3.7 では、VC Client の server device mode でもう一つ出力先デバイスを設定できるようになりました(赤線)。これにより、モニター用には Voicemeeter を経由せずに直接 wasapi デバイスや asio デバイスに出力できるようになり、遅延が少ないモニタリングが可能になります。
 
 ![image](https://github.com/w-okada/voice-changer/assets/48346627/1d5065eb-b042-4521-ade3-66828c87a712)
 
