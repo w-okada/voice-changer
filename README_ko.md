@@ -5,8 +5,8 @@
 ## 새로운 기능!
 
 - v.1.5.3.16a
-  - New Feature:
-    - Beatrice is supported(experimental) 
+  - Bug fix:
+    - Lazy load Beatrice.
 
 
 - v.1.5.3.16 (Only for Windows, CPU dependent)
