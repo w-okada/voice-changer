@@ -55,20 +55,44 @@ module.exports = {
             patterns: [{ from: "public/favicon.ico", to: "favicon.ico" }],
         }),
 
+        new CopyPlugin({
+            patterns: [{ from: "./node_modules/@dannadori/voice-changer-js/dist/ort-wasm-simd.wasm", to: "ort-wasm-simd.wasm" }],
+        }),
         // new CopyPlugin({
-        //     patterns: [{ from: "./node_modules/@dannadori/voice-changer-js/dist/ort-wasm-simd.wasm", to: "ort-wasm-simd.wasm" }],
+        //     patterns: [{ from: "./node_modules/@dannadori/voice-changer-js/dist/tfjs-backend-wasm-simd.wasm", to: "tfjs-backend-wasm-simd.wasm" }],
         // }),
         // new CopyPlugin({
         //     patterns: [{ from: "./node_modules/@dannadori/voice-changer-js/dist/process.js", to: "process.js" }],
         // }),
         // new CopyPlugin({
-        //     patterns: [{ from: "public/models/emb_pit_24000.bin", to: "models/emb_pit_24000.bin" }],
+        //     patterns: [{ from: "public/models/rvcv2_emb_pit_24000.bin", to: "models/rvcv2_emb_pit_24000.bin" }],
         // }),
         // new CopyPlugin({
-        //     patterns: [{ from: "public/models/rvc2v_24000.bin", to: "models/rvc2v_24000.bin" }],
+        //     patterns: [{ from: "public/models/rvcv2_amitaro_v2_32k_f0_24000.bin", to: "models/rvcv2_amitaro_v2_32k_f0_24000.bin" }],
         // }),
         // new CopyPlugin({
-        //     patterns: [{ from: "public/models/rvc2vnof0_24000.bin", to: "models/rvc2vnof0_24000.bin" }],
+        //     patterns: [{ from: "public/models/rvcv2_amitaro_v2_32k_nof0_24000.bin", to: "models/rvcv2_amitaro_v2_32k_nof0_24000.bin" }],
+        // }),
+        // new CopyPlugin({
+        //     patterns: [{ from: "public/models/rvcv2_amitaro_v2_40k_f0_24000.bin", to: "models/rvcv2_amitaro_v2_40k_f0_24000.bin" }],
+        // }),
+        // new CopyPlugin({
+        //     patterns: [{ from: "public/models/rvcv2_amitaro_v2_40k_nof0_24000.bin", to: "models/rvcv2_amitaro_v2_40k_nof0_24000.bin" }],
+        // }),
+        // new CopyPlugin({
+        //     patterns: [{ from: "public/models/rvcv1_emb_pit_24000.bin", to: "models/rvcv1_emb_pit_24000.bin" }],
+        // }),
+        // new CopyPlugin({
+        //     patterns: [{ from: "public/models/rvcv1_amitaro_v1_32k_f0_24000.bin", to: "models/rvcv1_amitaro_v1_32k_f0_24000.bin" }],
+        // }),
+        // new CopyPlugin({
+        //     patterns: [{ from: "public/models/rvcv1_amitaro_v1_32k_nof0_24000.bin", to: "models/rvcv1_amitaro_v1_32k_nof0_24000.bin" }],
+        // }),
+        // new CopyPlugin({
+        //     patterns: [{ from: "public/models/rvcv1_amitaro_v1_40k_f0_24000.bin", to: "models/rvcv1_amitaro_v1_40k_f0_24000.bin" }],
+        // }),
+        // new CopyPlugin({
+        //     patterns: [{ from: "public/models/rvcv1_amitaro_v1_40k_nof0_24000.bin", to: "models/rvcv1_amitaro_v1_40k_nof0_24000.bin" }],
         // }),
     ],
 };

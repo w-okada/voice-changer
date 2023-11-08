@@ -1,5 +1,6 @@
 from typing import Any, Protocol, TypeAlias
 import numpy as np
+from const import VoiceChangerType
 
 from voice_changer.utils.LoadModelParams import LoadModelParams
 
@@ -10,6 +11,8 @@ FeatureInOut: TypeAlias = np.ndarray[Any, np.dtype[np.int16]]
 
 
 class VoiceChangerModel(Protocol):
+    voiceChangerType: VoiceChangerType = "RVC"
+
     # loadModel: Callable[..., dict[str, Any]]
     def loadModel(self, params: LoadModelParams):
         ...
@@ -23,7 +26,13 @@ class VoiceChangerModel(Protocol):
     def inference(self, data: tuple[Any, ...]) -> Any:
         ...
 
-    def generate_input(self, newData: AudioInOut, inputSize: int, crossfadeSize: int, solaSearchFrame: int) -> tuple[Any, ...]:
+    def generate_input(
+        self,
+        newData: AudioInOut,
+        inputSize: int,
+        crossfadeSize: int,
+        solaSearchFrame: int,
+    ) -> tuple[Any, ...]:
         ...
 
     def update_settings(self, key: str, val: int | float | str) -> bool:

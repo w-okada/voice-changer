@@ -20,7 +20,7 @@ else:
 
 from .models.diffusion.infer_gt_mel import DiffGtMel
 
-from voice_changer.utils.VoiceChangerModel import AudioInOut
+from voice_changer.utils.VoiceChangerModel import AudioInOut, VoiceChangerModel
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from voice_changer.DDSP_SVC.DDSP_SVCSetting import DDSP_SVCSettings
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
@@ -44,15 +44,20 @@ def phase_vocoder(a, b, fade_out, fade_in):
     deltaphase = deltaphase - 2 * np.pi * torch.floor(deltaphase / 2 / np.pi + 0.5)
     w = 2 * np.pi * torch.arange(n // 2 + 1).to(a) + deltaphase
     t = torch.arange(n).unsqueeze(-1).to(a) / n
-    result = a * (fade_out**2) + b * (fade_in**2) + torch.sum(absab * torch.cos(w * t + phia), -1) * fade_out * fade_in / n
+    result = (
+        a * (fade_out**2)
+        + b * (fade_in**2)
+        + torch.sum(absab * torch.cos(w * t + phia), -1) * fade_out * fade_in / n
+    )
     return result
 
 
-class DDSP_SVC:
+class DDSP_SVC(VoiceChangerModel):
     initialLoad: bool = True
 
     def __init__(self, params: VoiceChangerParams, slotInfo: DDSPSVCModelSlot):
         print("[Voice Changer] [DDSP-SVC] Creating instance ")
+        self.voiceChangerType = "DDSP-SVC"
         self.deviceManager = DeviceManager.get_instance()
         self.gpu_num = torch.cuda.device_count()
         self.params = params
@@ -71,8 +76,18 @@ class DDSP_SVC:
     def initialize(self):
         self.device = self.deviceManager.getDevice(self.settings.gpu)
         vcparams = VoiceChangerParamsManager.get_instance().params
-        modelPath = os.path.join(vcparams.model_dir, str(self.slotInfo.slotIndex), "model",  self.slotInfo.modelFile)
-        diffPath = os.path.join(vcparams.model_dir, str(self.slotInfo.slotIndex), "diff", self.slotInfo.diffModelFile)
+        modelPath = os.path.join(
+            vcparams.model_dir,
+            str(self.slotInfo.slotIndex),
+            "model",
+            self.slotInfo.modelFile,
+        )
+        diffPath = os.path.join(
+            vcparams.model_dir,
+            str(self.slotInfo.slotIndex),
+            "diff",
+            self.slotInfo.diffModelFile,
+        )
 
         self.svc_model = SvcDDSP()
         self.svc_model.setVCParams(self.params)
@@ -112,11 +127,15 @@ class DDSP_SVC:
         # newData = newData.astype(np.float32)
 
         if self.audio_buffer is not None:
-            self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)  # 過去のデータに連結
+            self.audio_buffer = np.concatenate(
+                [self.audio_buffer, newData], 0
+            )  # 過去のデータに連結
         else:
             self.audio_buffer = newData
 
-        convertSize = inputSize + crossfadeSize + solaSearchFrame + self.settings.extraConvertSize
+        convertSize = (
+            inputSize + crossfadeSize + solaSearchFrame + self.settings.extraConvertSize
+        )
 
         # if convertSize % self.hop_size != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
         #     convertSize = convertSize + (self.hop_size - (convertSize % self.hop_size))
@@ -147,7 +166,8 @@ class DDSP_SVC:
             f0_min=50,
             f0_max=1100,
             # safe_prefix_pad_length=0,  # TBD なにこれ？
-            safe_prefix_pad_length=self.settings.extraConvertSize / self.svc_model.args.data.sampling_rate,
+            safe_prefix_pad_length=self.settings.extraConvertSize
+            / self.svc_model.args.data.sampling_rate,
             diff_model=self.diff_model,
             diff_acc=self.settings.diffAcc,  # TBD なにこれ？
             diff_spk_id=self.settings.diffSpkId,
@@ -155,7 +175,9 @@ class DDSP_SVC:
             # diff_use_dpm=True if self.settings.useDiffDpm == 1 else False,  # TBD なにこれ？
             method=self.settings.diffMethod,
             k_step=self.settings.kStep,  # TBD なにこれ？
-            diff_silence=True if self.settings.useDiffSilence == 1 else False,  # TBD なにこれ？
+            diff_silence=True
+            if self.settings.useDiffSilence == 1
+            else False,  # TBD なにこれ？
         )
 
         return _audio.cpu().numpy() * 32768.0
@@ -182,5 +204,4 @@ class DDSP_SVC:
                 pass
 
     def get_model_current(self):
-        return [
-        ]
+        return []

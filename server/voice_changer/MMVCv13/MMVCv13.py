@@ -3,7 +3,7 @@ import os
 from data.ModelSlot import MMVCv13ModelSlot
 from voice_changer.VoiceChangerParamsManager import VoiceChangerParamsManager
 
-from voice_changer.utils.VoiceChangerModel import AudioInOut
+from voice_changer.utils.VoiceChangerModel import AudioInOut, VoiceChangerModel
 
 if sys.platform.startswith("darwin"):
     baseDir = [x for x in sys.path if x.endswith("Contents/MacOS")]
@@ -48,9 +48,10 @@ class MMVCv13Settings:
     strData: list[str] = field(default_factory=lambda: [])
 
 
-class MMVCv13:
+class MMVCv13(VoiceChangerModel):
     def __init__(self, slotInfo: MMVCv13ModelSlot):
         print("[Voice Changer] [MMVCv13] Creating instance ")
+        self.voiceChangerType = "MMVCv13"
         self.settings = MMVCv13Settings()
         self.net_g = None
         self.onnx_session = None
@@ -65,8 +66,12 @@ class MMVCv13:
     def initialize(self):
         print("[Voice Changer] [MMVCv13] Initializing... ")
         vcparams = VoiceChangerParamsManager.get_instance().params
-        configPath = os.path.join(vcparams.model_dir, str(self.slotInfo.slotIndex), self.slotInfo.configFile)
-        modelPath = os.path.join(vcparams.model_dir, str(self.slotInfo.slotIndex), self.slotInfo.modelFile)
+        configPath = os.path.join(
+            vcparams.model_dir, str(self.slotInfo.slotIndex), self.slotInfo.configFile
+        )
+        modelPath = os.path.join(
+            vcparams.model_dir, str(self.slotInfo.slotIndex), self.slotInfo.modelFile
+        )
 
         self.hps = get_hparams_from_file(configPath)
         if self.slotInfo.isONNX:
@@ -77,7 +82,13 @@ class MMVCv13:
                 provider_options=options,
             )
         else:
-            self.net_g = SynthesizerTrn(len(symbols), self.hps.data.filter_length // 2 + 1, self.hps.train.segment_size // self.hps.data.hop_length, n_speakers=self.hps.data.n_speakers, **self.hps.model)
+            self.net_g = SynthesizerTrn(
+                len(symbols),
+                self.hps.data.filter_length // 2 + 1,
+                self.hps.train.segment_size // self.hps.data.hop_length,
+                n_speakers=self.hps.data.n_speakers,
+                **self.hps.model
+            )
             self.net_g.eval()
             load_checkpoint(modelPath, self.net_g, None)
 
@@ -89,7 +100,11 @@ class MMVCv13:
     def getOnnxExecutionProvider(self):
         availableProviders = onnxruntime.get_available_providers()
         devNum = torch.cuda.device_count()
-        if self.settings.gpu >= 0 and "CUDAExecutionProvider" in availableProviders and devNum > 0:
+        if (
+            self.settings.gpu >= 0
+            and "CUDAExecutionProvider" in availableProviders
+            and devNum > 0
+        ):
             return ["CUDAExecutionProvider"], [{"device_id": self.settings.gpu}]
         elif self.settings.gpu >= 0 and "DmlExecutionProvider" in availableProviders:
             return ["DmlExecutionProvider"], [{}]
@@ -110,7 +125,11 @@ class MMVCv13:
             if key == "gpu" and self.slotInfo.isONNX:
                 providers, options = self.getOnnxExecutionProvider()
                 vcparams = VoiceChangerParamsManager.get_instance().params
-                modelPath = os.path.join(vcparams.model_dir, str(self.slotInfo.slotIndex), self.slotInfo.modelFile)
+                modelPath = os.path.join(
+                    vcparams.model_dir,
+                    str(self.slotInfo.slotIndex),
+                    self.slotInfo.modelFile,
+                )
                 self.onnx_session = onnxruntime.InferenceSession(
                     modelPath,
                     providers=providers,
@@ -136,7 +155,9 @@ class MMVCv13:
     def get_info(self):
         data = asdict(self.settings)
 
-        data["onnxExecutionProviders"] = self.onnx_session.get_providers() if self.onnx_session is not None else []
+        data["onnxExecutionProviders"] = (
+            self.onnx_session.get_providers() if self.onnx_session is not None else []
+        )
         return data
 
     def get_processing_sampling_rate(self):
@@ -166,7 +187,9 @@ class MMVCv13:
         newData = newData.astype(np.float32) / self.hps.data.max_wav_value
 
         if self.audio_buffer is not None:
-            self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)  # 過去のデータに連結
+            self.audio_buffer = np.concatenate(
+                [self.audio_buffer, newData], 0
+            )  # 過去のデータに連結
         else:
             self.audio_buffer = newData
 
@@ -175,7 +198,9 @@ class MMVCv13:
         # if convertSize < 8192:
         #     convertSize = 8192
         if convertSize % self.hps.data.hop_length != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
-            convertSize = convertSize + (self.hps.data.hop_length - (convertSize % self.hps.data.hop_length))
+            convertSize = convertSize + (
+                self.hps.data.hop_length - (convertSize % self.hps.data.hop_length)
+            )
 
         convertOffset = -1 * convertSize
         self.audio_buffer = self.audio_buffer[convertOffset:]  # 変換対象の部分だけ抽出
@@ -207,9 +232,7 @@ class MMVCv13:
                     "sid_src": sid_src.numpy(),
                     "sid_tgt": sid_tgt1.numpy(),
                 },
-            )[
-                0
-            ][0, 0]
+            )[0][0, 0]
             * self.hps.data.max_wav_value
         )
         return audio1
@@ -225,10 +248,19 @@ class MMVCv13:
             dev = torch.device("cuda", index=self.settings.gpu)
 
         with torch.no_grad():
-            x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [x.to(dev) for x in data]
+            x, x_lengths, spec, spec_lengths, y, y_lengths, sid_src = [
+                x.to(dev) for x in data
+            ]
             sid_target = torch.LongTensor([self.settings.dstId]).to(dev)
 
-            audio1 = self.net_g.to(dev).voice_conversion(spec, spec_lengths, sid_src=sid_src, sid_tgt=sid_target)[0, 0].data * self.hps.data.max_wav_value
+            audio1 = (
+                self.net_g.to(dev)
+                .voice_conversion(
+                    spec, spec_lengths, sid_src=sid_src, sid_tgt=sid_target
+                )[0, 0]
+                .data
+                * self.hps.data.max_wav_value
+            )
             result = audio1.float().cpu().numpy()
 
         return result
@@ -265,5 +297,5 @@ class MMVCv13:
             {
                 "key": "dstId",
                 "val": self.settings.dstId,
-            }
+            },
         ]

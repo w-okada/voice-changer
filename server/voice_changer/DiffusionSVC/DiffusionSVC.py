@@ -6,16 +6,28 @@ from voice_changer.DiffusionSVC.DiffusionSVCSettings import DiffusionSVCSettings
 from voice_changer.DiffusionSVC.inferencer.InferencerManager import InferencerManager
 from voice_changer.DiffusionSVC.pipeline.Pipeline import Pipeline
 from voice_changer.DiffusionSVC.pipeline.PipelineGenerator import createPipeline
-from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
+from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractorManager import (
+    PitchExtractorManager,
+)
 from voice_changer.ModelSlotManager import ModelSlotManager
 
-from voice_changer.utils.VoiceChangerModel import AudioInOut, PitchfInOut, FeatureInOut, VoiceChangerModel
+from voice_changer.utils.VoiceChangerModel import (
+    AudioInOut,
+    PitchfInOut,
+    FeatureInOut,
+    VoiceChangerModel,
+)
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
+
 # from voice_changer.RVC.onnxExporter.export2onnx import export2onnx
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 
-from Exceptions import DeviceCannotSupportHalfPrecisionException, PipelineCreateException, PipelineNotInitializedException
+from Exceptions import (
+    DeviceCannotSupportHalfPrecisionException,
+    PipelineCreateException,
+    PipelineNotInitializedException,
+)
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
 
@@ -23,6 +35,7 @@ logger = VoiceChangaerLogger.get_instance().getLogger()
 class DiffusionSVC(VoiceChangerModel):
     def __init__(self, params: VoiceChangerParams, slotInfo: DiffusionSVCModelSlot):
         logger.info("[Voice Changer] [DiffusionSVC] Creating instance ")
+        self.voiceChangerType = "Diffusion-SVC"
         self.deviceManager = DeviceManager.get_instance()
         EmbedderManager.initialize(params)
         PitchExtractorManager.initialize(params)
@@ -46,9 +59,17 @@ class DiffusionSVC(VoiceChangerModel):
 
         # pipelineの生成
         try:
-            self.pipeline = createPipeline(self.slotInfo, self.settings.gpu, self.settings.f0Detector, self.inputSampleRate, self.outputSampleRate)
+            self.pipeline = createPipeline(
+                self.slotInfo,
+                self.settings.gpu,
+                self.settings.f0Detector,
+                self.inputSampleRate,
+                self.outputSampleRate,
+            )
         except PipelineCreateException as e:  # NOQA
-            logger.error("[Voice Changer] pipeline create failed. check your model is valid.")
+            logger.error(
+                "[Voice Changer] pipeline create failed. check your model is valid."
+            )
             return
 
         # その他の設定
@@ -76,7 +97,9 @@ class DiffusionSVC(VoiceChangerModel):
         elif key in self.settings.strData:
             setattr(self.settings, key, str(val))
             if key == "f0Detector" and self.pipeline is not None:
-                pitchExtractor = PitchExtractorManager.getPitchExtractor(self.settings.f0Detector, self.settings.gpu)
+                pitchExtractor = PitchExtractorManager.getPitchExtractor(
+                    self.settings.f0Detector, self.settings.gpu
+                )
                 self.pipeline.setPitchExtractor(pitchExtractor)
         else:
             return False
@@ -100,30 +123,65 @@ class DiffusionSVC(VoiceChangerModel):
         crossfadeSize: int,
         solaSearchFrame: int = 0,
     ):
-        newData = newData.astype(np.float32) / 32768.0  # DiffusionSVCのモデルのサンプリングレートで入ってきている。（extraDataLength, Crossfade等も同じSRで処理）(★１)
-        new_feature_length = int(((newData.shape[0] / self.inputSampleRate) * self.slotInfo.samplingRate) / 512)  # 100 は hubertのhosizeから (16000 / 160).
+        newData = (
+            newData.astype(np.float32) / 32768.0
+        )  # DiffusionSVCのモデルのサンプリングレートで入ってきている。（extraDataLength, Crossfade等も同じSRで処理）(★１)
+        new_feature_length = int(
+            ((newData.shape[0] / self.inputSampleRate) * self.slotInfo.samplingRate)
+            / 512
+        )  # 100 は hubertのhosizeから (16000 / 160).
         # ↑newData.shape[0]//sampleRate でデータ秒数。これに16000かけてhubertの世界でのデータ長。これにhop数(160)でわるとfeatsのデータサイズになる。
         if self.audio_buffer is not None:
             # 過去のデータに連結
             self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)
-            self.pitchf_buffer = np.concatenate([self.pitchf_buffer, np.zeros(new_feature_length)], 0)
-            self.feature_buffer = np.concatenate([self.feature_buffer, np.zeros([new_feature_length, self.slotInfo.embChannels])], 0)
+            self.pitchf_buffer = np.concatenate(
+                [self.pitchf_buffer, np.zeros(new_feature_length)], 0
+            )
+            self.feature_buffer = np.concatenate(
+                [
+                    self.feature_buffer,
+                    np.zeros([new_feature_length, self.slotInfo.embChannels]),
+                ],
+                0,
+            )
         else:
             self.audio_buffer = newData
             self.pitchf_buffer = np.zeros(new_feature_length)
-            self.feature_buffer = np.zeros([new_feature_length, self.slotInfo.embChannels])
+            self.feature_buffer = np.zeros(
+                [new_feature_length, self.slotInfo.embChannels]
+            )
 
-        convertSize = newData.shape[0] + crossfadeSize + solaSearchFrame + self.settings.extraConvertSize
+        convertSize = (
+            newData.shape[0]
+            + crossfadeSize
+            + solaSearchFrame
+            + self.settings.extraConvertSize
+        )
 
         if convertSize % 128 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
             convertSize = convertSize + (128 - (convertSize % 128))
 
         # バッファがたまっていない場合はzeroで補う
-        generateFeatureLength = int(((convertSize / self.inputSampleRate) * self.slotInfo.samplingRate) / 512) + 1
+        generateFeatureLength = (
+            int(
+                ((convertSize / self.inputSampleRate) * self.slotInfo.samplingRate)
+                / 512
+            )
+            + 1
+        )
         if self.audio_buffer.shape[0] < convertSize:
-            self.audio_buffer = np.concatenate([np.zeros([convertSize]), self.audio_buffer])
-            self.pitchf_buffer = np.concatenate([np.zeros(generateFeatureLength), self.pitchf_buffer])
-            self.feature_buffer = np.concatenate([np.zeros([generateFeatureLength, self.slotInfo.embChannels]), self.feature_buffer])
+            self.audio_buffer = np.concatenate(
+                [np.zeros([convertSize]), self.audio_buffer]
+            )
+            self.pitchf_buffer = np.concatenate(
+                [np.zeros(generateFeatureLength), self.pitchf_buffer]
+            )
+            self.feature_buffer = np.concatenate(
+                [
+                    np.zeros([generateFeatureLength, self.slotInfo.embChannels]),
+                    self.feature_buffer,
+                ]
+            )
 
         convertOffset = -1 * convertSize
         featureOffset = -1 * generateFeatureLength
@@ -139,9 +197,17 @@ class DiffusionSVC(VoiceChangerModel):
         vol = float(max(vol, self.prevVol * 0.0))
         self.prevVol = vol
 
-        return (self.audio_buffer, self.pitchf_buffer, self.feature_buffer, convertSize, vol)
+        return (
+            self.audio_buffer,
+            self.pitchf_buffer,
+            self.feature_buffer,
+            convertSize,
+            vol,
+        )
 
-    def inference(self, receivedData: AudioInOut, crossfade_frame: int, sola_search_frame: int):
+    def inference(
+        self, receivedData: AudioInOut, crossfade_frame: int, sola_search_frame: int
+    ):
         if self.pipeline is None:
             logger.info("[Voice Changer] Pipeline is not initialized.")
             raise PipelineNotInitializedException()
@@ -169,7 +235,11 @@ class DiffusionSVC(VoiceChangerModel):
         speedUp = self.settings.speedUp
         embOutputLayer = 12
         useFinalProj = False
-        silenceFrontSec = self.settings.extraConvertSize / self.inputSampleRate if self.settings.silenceFront else 0.  # extaraConvertSize(既にモデルのサンプリングレートにリサンプリング済み)の秒数。モデルのサンプリングレートで処理(★１)。
+        silenceFrontSec = (
+            self.settings.extraConvertSize / self.inputSampleRate
+            if self.settings.silenceFront
+            else 0.0
+        )  # extaraConvertSize(既にモデルのサンプリングレートにリサンプリング済み)の秒数。モデルのサンプリングレートで処理(★１)。
 
         try:
             audio_out, self.pitchf_buffer, self.feature_buffer = self.pipeline.exec(
@@ -190,7 +260,9 @@ class DiffusionSVC(VoiceChangerModel):
             result = audio_out.detach().cpu().numpy()
             return result
         except DeviceCannotSupportHalfPrecisionException as e:  # NOQA
-            logger.warn("[Device Manager] Device cannot support half precision. Fallback to float....")
+            logger.warn(
+                "[Device Manager] Device cannot support half precision. Fallback to float...."
+            )
             self.deviceManager.setForceTensor(True)
             self.initialize()
             # raise e
