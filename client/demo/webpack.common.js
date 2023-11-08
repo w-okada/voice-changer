@@ -55,9 +55,9 @@ module.exports = {
             patterns: [{ from: "public/favicon.ico", to: "favicon.ico" }],
         }),
 
-        new CopyPlugin({
-            patterns: [{ from: "./node_modules/@dannadori/voice-changer-js/dist/ort-wasm-simd.wasm", to: "ort-wasm-simd.wasm" }],
-        }),
+        // new CopyPlugin({
+        //     patterns: [{ from: "./node_modules/@dannadori/voice-changer-js/dist/ort-wasm-simd.wasm", to: "ort-wasm-simd.wasm" }],
+        // }),
         // new CopyPlugin({
         //     patterns: [{ from: "./node_modules/@dannadori/voice-changer-js/dist/tfjs-backend-wasm-simd.wasm", to: "tfjs-backend-wasm-simd.wasm" }],
         // }),
