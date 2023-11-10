@@ -389,8 +389,12 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                         // Server Audio を使う場合はElementから音は出さない。
                         audio.volume = 0;
                     } else if (audioOutputForGUI == "none") {
-                        // @ts-ignore
-                        audio.setSinkId("");
+                        try {
+                            // @ts-ignore
+                            audio.setSinkId("");
+                        } catch (e) {
+                            console.error("catch:" + e);
+                        }
                         if (x == AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK) {
                             audio.volume = 0;
                         } else {
@@ -404,8 +408,12 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                             return x.deviceId == audioOutputForGUI;
                         });
                         if (found) {
-                            // @ts-ignore // 例外キャッチできないので事前にIDチェックが必要らしい。！？
-                            audio.setSinkId(audioOutputForGUI);
+                            try {
+                                // @ts-ignore // 例外キャッチできないので事前にIDチェックが必要らしい。！？
+                                audio.setSinkId(audioOutputForGUI);
+                            } catch (e) {
+                                console.error("catch:" + e);
+                            }
                         } else {
                             console.warn("No audio output device. use default");
                         }
@@ -620,9 +628,13 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                         // Server Audio を使う場合はElementから音は出さない。
                         audio.volume = 0;
                     } else if (audioMonitorForGUI == "none") {
-                        // @ts-ignore
-                        audio.setSinkId("");
-                        audio.volume = 0;
+                        try {
+                            // @ts-ignore
+                            audio.setSinkId("");
+                            audio.volume = 0;
+                        } catch (e) {
+                            console.error("catch:" + e);
+                        }
                     } else {
                         const audioOutputs = mediaDeviceInfos.filter((x) => {
                             return x.kind == "audiooutput";
@@ -631,9 +643,13 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                             return x.deviceId == audioMonitorForGUI;
                         });
                         if (found) {
-                            // @ts-ignore // 例外キャッチできないので事前にIDチェックが必要らしい。！？
-                            audio.setSinkId(audioMonitorForGUI);
-                            audio.volume = 1;
+                            try {
+                                // @ts-ignore // 例外キャッチできないので事前にIDチェックが必要らしい。！？
+                                audio.setSinkId(audioMonitorForGUI);
+                                audio.volume = 1;
+                            } catch (e) {
+                                console.error("catch:" + e);
+                            }
                         } else {
                             console.warn("No audio output device. use default");
                         }
