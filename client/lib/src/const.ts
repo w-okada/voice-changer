@@ -11,6 +11,7 @@ export const VoiceChangerType = {
     RVC: "RVC",
     "Diffusion-SVC": "Diffusion-SVC",
     Beatrice: "Beatrice",
+    LLVC: "LLVC",
 } as const;
 export type VoiceChangerType = (typeof VoiceChangerType)[keyof typeof VoiceChangerType];
 
@@ -37,6 +38,9 @@ export const ModelSamplingRate = {
 export type ModelSamplingRate = (typeof InputSampleRate)[keyof typeof InputSampleRate];
 
 export const CrossFadeOverlapSize = {
+    "128": 128,
+    "256": 256,
+    "512": 512,
     "1024": 1024,
     "2048": 2048,
     "4096": 4096,
@@ -296,7 +300,14 @@ export type BeatriceModelSlot = ModelSlot & {
     speakers: { [key: number]: string };
 };
 
-export type ModelSlotUnion = RVCModelSlot | MMVCv13ModelSlot | MMVCv15ModelSlot | SoVitsSvc40ModelSlot | DDSPSVCModelSlot | DiffusionSVCModelSlot | BeatriceModelSlot;
+export type LLVCModelSlot = ModelSlot & {
+    modelFile: string;
+    configFile: string;
+
+    speakers: { [key: number]: string };
+};
+
+export type ModelSlotUnion = RVCModelSlot | MMVCv13ModelSlot | MMVCv15ModelSlot | SoVitsSvc40ModelSlot | DDSPSVCModelSlot | DiffusionSVCModelSlot | BeatriceModelSlot | LLVCModelSlot;
 
 type ServerAudioDevice = {
     kind: "audioinput" | "audiooutput";

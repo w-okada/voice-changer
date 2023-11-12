@@ -29,6 +29,9 @@ export const ModelFileKind = {
     diffusionSVCModel: "diffusionSVCModel",
 
     beatriceModel: "beatriceModel",
+
+    llvcModel: "llvcModel",
+    llvcConfig: "llvcConfig",
 } as const;
 export type ModelFileKind = (typeof ModelFileKind)[keyof typeof ModelFileKind];
 

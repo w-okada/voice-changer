@@ -13,6 +13,7 @@ VoiceChangerType: TypeAlias = Literal[
     "RVC",
     "Diffusion-SVC",
     "Beatrice",
+    "LLVC",
 ]
 
 StaticSlot: TypeAlias = Literal["Beatrice-JVS",]

@@ -58,6 +58,7 @@ export class VoiceChangerClient {
 
             // const ctx44k = new AudioContext({ sampleRate: 44100 }) // これでもプチプチが残る
             const ctx44k = new AudioContext({ sampleRate: 48000 }); // 結局これが一番まし。
+            // const ctx44k = new AudioContext({ sampleRate: 16000 }); // LLVCテスト⇒16K出力でプチプチなしで行ける。
             console.log("audio out:", ctx44k);
             try {
                 this.vcOutNode = new VoiceChangerWorkletNode(ctx44k, voiceChangerWorkletListener); // vc node

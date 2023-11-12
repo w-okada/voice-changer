@@ -20,6 +20,8 @@ LoadModelParamFileKind: TypeAlias = Literal[
     "ddspSvcDiffusionConfig",
     "diffusionSVCModel",
     "beatriceModel",
+    "llvcModel",
+    "llvcConfig",
 ]
 
 

@@ -134,7 +134,24 @@ class BeatriceModelSlot(ModelSlot):
     speakers: dict = field(default_factory=lambda: {1: "user1", 2: "user2"})
 
 
-ModelSlots: TypeAlias = Union[ModelSlot, RVCModelSlot, MMVCv13ModelSlot, MMVCv15ModelSlot, SoVitsSvc40ModelSlot, DDSPSVCModelSlot, DiffusionSVCModelSlot, BeatriceModelSlot]
+@dataclass
+class LLVCModelSlot(ModelSlot):
+    voiceChangerType: VoiceChangerType = "LLVC"
+    modelFile: str = ""
+    configFile: str = ""
+
+
+ModelSlots: TypeAlias = Union[
+    ModelSlot,
+    RVCModelSlot,
+    MMVCv13ModelSlot,
+    MMVCv15ModelSlot,
+    SoVitsSvc40ModelSlot,
+    DDSPSVCModelSlot,
+    DiffusionSVCModelSlot,
+    BeatriceModelSlot,
+    LLVCModelSlot,
+]
 
 
 def loadSlotInfo(model_dir: str, slotIndex: int | StaticSlot) -> ModelSlots:
@@ -165,10 +182,12 @@ def loadSlotInfo(model_dir: str, slotIndex: int | StaticSlot) -> ModelSlots:
         return DiffusionSVCModelSlot(**{k: v for k, v in jsonDict.items() if k in slotInfoKey})
     elif slotInfo.voiceChangerType == "Beatrice":
         slotInfoKey.extend(list(BeatriceModelSlot.__annotations__.keys()))
-        if slotIndex == "Beatrice-JVS":
+        if slotIndex == "Beatrice-JVS":  # STATIC Model
             return BeatriceModelSlot(**{k: v for k, v in jsonDict.items() if k in slotInfoKey})
-
         return BeatriceModelSlot(**{k: v for k, v in jsonDict.items() if k in slotInfoKey})
+    elif slotInfo.voiceChangerType == "LLVC":
+        slotInfoKey.extend(list(LLVCModelSlot.__annotations__.keys()))
+        return LLVCModelSlot(**{k: v for k, v in jsonDict.items() if k in slotInfoKey})
     else:
         return ModelSlot()
 

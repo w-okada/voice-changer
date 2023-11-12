@@ -90,22 +90,16 @@ class VoiceChangerV2(VoiceChangerIF):
         self.params = params
         self.gpu_num = torch.cuda.device_count()
         self.prev_audio = np.zeros(4096)
-        self.mps_enabled: bool = (
-            getattr(torch.backends, "mps", None) is not None
-            and torch.backends.mps.is_available()
-        )
+        self.mps_enabled: bool = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
         self.onnx_device = onnxruntime.get_device()
         self.noCrossFade = False
 
-        logger.info(
-            f"VoiceChangerV2 Initialized (GPU_NUM(cuda):{self.gpu_num}, mps_enabled:{self.mps_enabled}, onnx_device:{self.onnx_device})"
-        )
+        logger.info(f"VoiceChangerV2 Initialized (GPU_NUM(cuda):{self.gpu_num}, mps_enabled:{self.mps_enabled}, onnx_device:{self.onnx_device})")
 
     def setModel(self, model: VoiceChangerModel):
         self.voiceChanger = model
-        self.voiceChanger.setSamplingRate(
-            self.settings.inputSampleRate, self.settings.outputSampleRate
-        )
+        self.voiceChanger.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
+        # if model.voiceChangerType == "Beatrice" or model.voiceChangerType == "LLVC":
         if model.voiceChangerType == "Beatrice":
             self.noCrossFade = True
         else:
@@ -113,15 +107,11 @@ class VoiceChangerV2(VoiceChangerIF):
 
     def setInputSampleRate(self, sr: int):
         self.settings.inputSampleRate = sr
-        self.voiceChanger.setSamplingRate(
-            self.settings.inputSampleRate, self.settings.outputSampleRate
-        )
+        self.voiceChanger.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
 
     def setOutputSampleRate(self, sr: int):
         self.settings.outputSampleRate = sr
-        self.voiceChanger.setSamplingRate(
-            self.settings.inputSampleRate, self.settings.outputSampleRate
-        )
+        self.voiceChanger.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
 
     def get_info(self):
         data = asdict(self.settings)
@@ -140,9 +130,7 @@ class VoiceChangerV2(VoiceChangerIF):
         if key == "serverAudioStated" and val == 0:
             self.settings.inputSampleRate = 48000
             self.settings.outputSampleRate = 48000
-            self.voiceChanger.setSamplingRate(
-                self.settings.inputSampleRate, self.settings.outputSampleRate
-            )
+            self.voiceChanger.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
 
         if key in self.settings.intData:
             setattr(self.settings, key, int(val))
@@ -156,6 +144,7 @@ class VoiceChangerV2(VoiceChangerIF):
                     STREAM_OUTPUT_FILE,
                     self.settings.inputSampleRate,
                     self.settings.outputSampleRate,
+                    # 16000,
                 )
             if key == "recordIO" and val == 0:
                 if hasattr(self, "ioRecorder"):
@@ -165,9 +154,7 @@ class VoiceChangerV2(VoiceChangerIF):
                 if hasattr(self, "ioRecorder"):
                     self.ioRecorder.close()
             if key == "inputSampleRate" or key == "outputSampleRate":
-                self.voiceChanger.setSamplingRate(
-                    self.settings.inputSampleRate, self.settings.outputSampleRate
-                )
+                self.voiceChanger.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
@@ -180,12 +167,7 @@ class VoiceChangerV2(VoiceChangerIF):
         return self.get_info()
 
     def _generate_strength(self, crossfadeSize: int):
-        if (
-            self.crossfadeSize != crossfadeSize
-            or self.currentCrossFadeOffsetRate != self.settings.crossFadeOffsetRate
-            or self.currentCrossFadeEndRate != self.settings.crossFadeEndRate
-            or self.currentCrossFadeOverlapSize != self.settings.crossFadeOverlapSize
-        ):
+        if self.crossfadeSize != crossfadeSize or self.currentCrossFadeOffsetRate != self.settings.crossFadeOffsetRate or self.currentCrossFadeEndRate != self.settings.crossFadeEndRate or self.currentCrossFadeOverlapSize != self.settings.crossFadeOverlapSize:
             self.crossfadeSize = crossfadeSize
             self.currentCrossFadeOffsetRate = self.settings.crossFadeOffsetRate
             self.currentCrossFadeEndRate = self.settings.crossFadeEndRate
@@ -214,9 +196,7 @@ class VoiceChangerV2(VoiceChangerIF):
                 ]
             )
 
-            logger.info(
-                f"Generated Strengths: for prev:{self.np_prev_strength.shape}, for cur:{self.np_cur_strength.shape}"
-            )
+            logger.info(f"Generated Strengths: for prev:{self.np_prev_strength.shape}, for cur:{self.np_cur_strength.shape}")
 
             # ひとつ前の結果とサイズが変わるため、記録は消去する。
             if hasattr(self, "np_prev_audio1") is True:
@@ -231,21 +211,15 @@ class VoiceChangerV2(VoiceChangerIF):
             return self.voiceChanger.get_processing_sampling_rate()
 
     #  receivedData: tuple of short
-    def on_request(
-        self, receivedData: AudioInOut
-    ) -> tuple[AudioInOut, list[Union[int, float]]]:
+    def on_request(self, receivedData: AudioInOut) -> tuple[AudioInOut, list[Union[int, float]]]:
         try:
             if self.voiceChanger is None:
-                raise VoiceChangerIsNotSelectedException(
-                    "Voice Changer is not selected."
-                )
+                raise VoiceChangerIsNotSelectedException("Voice Changer is not selected.")
 
             with Timer("main-process") as t:
-                processing_sampling_rate = (
-                    self.voiceChanger.get_processing_sampling_rate()
-                )
+                processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
 
-                if self.noCrossFade:  # Beatrice
+                if self.noCrossFade:  # Beatrice, LLVC
                     audio = self.voiceChanger.inference(
                         receivedData,
                         crossfade_frame=0,
@@ -257,9 +231,7 @@ class VoiceChangerV2(VoiceChangerIF):
                 else:
                     sola_search_frame = int(0.012 * processing_sampling_rate)
                     block_frame = receivedData.shape[0]
-                    crossfade_frame = min(
-                        self.settings.crossFadeOverlapSize, block_frame
-                    )
+                    crossfade_frame = min(self.settings.crossFadeOverlapSize, block_frame)
                     self._generate_strength(crossfade_frame)
 
                     audio = self.voiceChanger.inference(
@@ -270,9 +242,7 @@ class VoiceChangerV2(VoiceChangerIF):
 
                     if hasattr(self, "sola_buffer") is True:
                         np.set_printoptions(threshold=10000)
-                        audio_offset = -1 * (
-                            sola_search_frame + crossfade_frame + block_frame
-                        )
+                        audio_offset = -1 * (sola_search_frame + crossfade_frame + block_frame)
                         audio = audio[audio_offset:]
 
                         # SOLA algorithm from https://github.com/yxlllc/DDSP-SVC, https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI
@@ -297,25 +267,16 @@ class VoiceChangerV2(VoiceChangerIF):
 
                         result = output_wav
                     else:
-                        logger.info(
-                            "[Voice Changer] warming up... generating sola buffer."
-                        )
+                        logger.info("[Voice Changer] warming up... generating sola buffer.")
                         result = np.zeros(4096).astype(np.int16)
 
-                    if (
-                        hasattr(self, "sola_buffer") is True
-                        and sola_offset < sola_search_frame
-                    ):
-                        offset = -1 * (
-                            sola_search_frame + crossfade_frame - sola_offset
-                        )
+                    if hasattr(self, "sola_buffer") is True and sola_offset < sola_search_frame:
+                        offset = -1 * (sola_search_frame + crossfade_frame - sola_offset)
                         end = -1 * (sola_search_frame - sola_offset)
                         sola_buf_org = audio[offset:end]
                         self.sola_buffer = sola_buf_org * self.np_prev_strength
                     else:
-                        self.sola_buffer = (
-                            audio[-crossfade_frame:] * self.np_prev_strength
-                        )
+                        self.sola_buffer = audio[-crossfade_frame:] * self.np_prev_strength
                         # self.sola_buffer = audio[- crossfade_frame:]
 
             mainprocess_time = t.secs
@@ -324,12 +285,15 @@ class VoiceChangerV2(VoiceChangerIF):
             with Timer("post-process") as t:
                 result = result.astype(np.int16)
 
-                print_convert_processing(
-                    f" Output data size of {result.shape[0]}/{processing_sampling_rate}hz {result .shape[0]}/{self.settings.outputSampleRate}hz"
-                )
+                print_convert_processing(f" Output data size of {result.shape[0]}/{processing_sampling_rate}hz {result .shape[0]}/{self.settings.outputSampleRate}hz")
 
                 if receivedData.shape[0] != result.shape[0]:
-                    outputData = pad_array(result, receivedData.shape[0])
+                    # print("TODO FIX:::::PADDING", receivedData.shape[0], result.shape[0])
+                    if self.voiceChanger.voiceChangerType == "LLVC":
+                        outputData = result
+                    else:
+                        outputData = pad_array(result, receivedData.shape[0])
+
                     pass
                 else:
                     outputData = result
@@ -340,9 +304,7 @@ class VoiceChangerV2(VoiceChangerIF):
 
             postprocess_time = t.secs
 
-            print_convert_processing(
-                f" [fin] Input/Output size:{receivedData.shape[0]},{outputData.shape[0]}"
-            )
+            print_convert_processing(f" [fin] Input/Output size:{receivedData.shape[0]},{outputData.shape[0]}")
             perf = [0, mainprocess_time, postprocess_time]
 
             return outputData, perf
@@ -351,9 +313,7 @@ class VoiceChangerV2(VoiceChangerIF):
             logger.warn(f"[Voice Changer] [Exception], {e}")
             return np.zeros(1).astype(np.int16), [0, 0, 0]
         except ONNXInputArgumentException as e:
-            logger.warn(
-                f"[Voice Changer] [Exception] onnx are waiting valid input., {e}"
-            )
+            logger.warn(f"[Voice Changer] [Exception] onnx are waiting valid input., {e}")
             return np.zeros(1).astype(np.int16), [0, 0, 0]
         except HalfPrecisionChangingException:
             logger.warn("[Voice Changer] Switching model configuration....")
@@ -365,9 +325,7 @@ class VoiceChangerV2(VoiceChangerIF):
             logger.warn(f"[Voice Changer] embedder: {e}")
             return np.zeros(1).astype(np.int16), [0, 0, 0]
         except VoiceChangerIsNotSelectedException:
-            logger.warn(
-                "[Voice Changer] Voice Changer is not selected. Wait a bit and if there is no improvement, please re-select vc."
-            )
+            logger.warn("[Voice Changer] Voice Changer is not selected. Wait a bit and if there is no improvement, please re-select vc.")
             return np.zeros(1).astype(np.int16), [0, 0, 0]
         except DeviceCannotSupportHalfPrecisionException:
             # RVC.pyでfallback処理をするので、ここはダミーデータ返すだけ。

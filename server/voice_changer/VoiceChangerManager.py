@@ -199,6 +199,13 @@ class VoiceChangerManager(ServerDeviceCallbacks):
 
                 slotInfo = BeatriceModelSlotGenerator.loadModel(params)
                 self.modelSlotManager.save_model_slot(params.slot, slotInfo)
+
+            elif params.voiceChangerType == "LLVC":
+                from voice_changer.LLVC.LLVCModelSlotGenerator import LLVCModelSlotGenerator
+
+                slotInfo = LLVCModelSlotGenerator.loadModel(params)
+                self.modelSlotManager.save_model_slot(params.slot, slotInfo)
+
             logger.info(f"params, {params}")
 
     def get_info(self):
@@ -291,6 +298,14 @@ class VoiceChangerManager(ServerDeviceCallbacks):
                 self.voiceChangerModel = Beatrice(self.params, slotInfo)
             self.voiceChanger = VoiceChangerV2(self.params)
             self.voiceChanger.setModel(self.voiceChangerModel)
+        elif slotInfo.voiceChangerType == "LLVC":
+            logger.info("................LLVC")
+            from voice_changer.LLVC.LLVC import LLVC
+
+            self.voiceChangerModel = LLVC(self.params, slotInfo)
+            self.voiceChanger = VoiceChangerV2(self.params)
+            self.voiceChanger.setModel(self.voiceChangerModel)
+            pass
 
         else:
             logger.info(f"[Voice Changer] unknown voice changer model: {slotInfo.voiceChangerType}")
