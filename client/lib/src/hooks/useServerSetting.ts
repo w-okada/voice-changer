@@ -85,7 +85,14 @@ export type ServerSettingState = {
 };
 
 export const useServerSetting = (props: UseServerSettingProps): ServerSettingState => {
-    const [serverSetting, setServerSetting] = useState<ServerInfo>(DefaultServerSetting);
+    const [serverSetting, _setServerSetting] = useState<ServerInfo>(DefaultServerSetting);
+    const setServerSetting = (info: ServerInfo) => {
+        if (!info.modelSlots) {
+            // サーバが情報を空で返したとき。Web版対策
+            return;
+        }
+        _setServerSetting(info);
+    };
 
     //////////////
     // 設定
