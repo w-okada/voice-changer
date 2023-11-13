@@ -23,7 +23,7 @@ from mods.log_control import VoiceChangaerLogger
 
 from voice_changer.IORecorder import IORecorder
 
-from voice_changer.utils.Timer import Timer
+from voice_changer.utils.Timer import Timer2
 from voice_changer.utils.VoiceChangerIF import VoiceChangerIF
 from voice_changer.utils.VoiceChangerModel import AudioInOut, VoiceChangerModel
 from Exceptions import (
@@ -146,6 +146,7 @@ class VoiceChangerV2(VoiceChangerIF):
                     self.settings.outputSampleRate,
                     # 16000,
                 )
+                print(f"-------------------------- - - - {self.settings.inputSampleRate}, {self.settings.outputSampleRate}")
             if key == "recordIO" and val == 0:
                 if hasattr(self, "ioRecorder"):
                     self.ioRecorder.close()
@@ -216,7 +217,7 @@ class VoiceChangerV2(VoiceChangerIF):
             if self.voiceChanger is None:
                 raise VoiceChangerIsNotSelectedException("Voice Changer is not selected.")
 
-            with Timer("main-process") as t:
+            with Timer2("main-process", False) as t:
                 processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
 
                 if self.noCrossFade:  # Beatrice, LLVC
@@ -282,7 +283,7 @@ class VoiceChangerV2(VoiceChangerIF):
             mainprocess_time = t.secs
 
             # 後処理
-            with Timer("post-process") as t:
+            with Timer2("post-process", False) as t:
                 result = result.astype(np.int16)
 
                 print_convert_processing(f" Output data size of {result.shape[0]}/{processing_sampling_rate}hz {result .shape[0]}/{self.settings.outputSampleRate}hz")
@@ -299,6 +300,9 @@ class VoiceChangerV2(VoiceChangerIF):
                     outputData = result
 
                 if self.settings.recordIO == 1:
+                    print(f"-------------------------- - - -shapes::: {receivedData.shape}, {outputData.shape}")
+                    print(f"-------------------------- - - -shapes::: {receivedData.dtype}, {outputData.dtype}")
+                    print(f"-------------------------- - - -shapes::: {receivedData[0:10]}, {outputData[0:10]}")
                     self.ioRecorder.writeInput(receivedData)
                     self.ioRecorder.writeOutput(outputData.tobytes())
 

@@ -1,9 +1,10 @@
 import time
 import inspect
+from typing import Dict, List
 
 
 class Timer(object):
-    storedSecs = {}  # Class variable
+    storedSecs: Dict[str, Dict[str, List[float]]] = {}  # Class variable
 
     def __init__(self, title: str, enalbe: bool = True):
         self.title = title
@@ -24,7 +25,7 @@ class Timer(object):
         line_number = frame.lineno
         self.key = f"{title}_{filename}_{line_number}"
         if self.key not in self.storedSecs:
-            self.storedSecs[self.key] = []
+            self.storedSecs[self.key] = {}
 
     def __enter__(self):
         if self.enable is False:
@@ -39,12 +40,12 @@ class Timer(object):
         self.secs = self.end - self.start
         self.msecs = self.secs * 1000  # millisecs
         self.storedSecs[self.key].append(self.secs)
-        self.storedSecs[self.key] = self.storedSecs[self.key][-self.maxStores:]
+        self.storedSecs[self.key] = self.storedSecs[self.key][-self.maxStores :]
         self.avrSecs = sum(self.storedSecs[self.key]) / len(self.storedSecs[self.key])
 
 
 class Timer2(object):
-    storedSecs = {}  # Class variable
+    storedSecs: Dict[str, Dict[str, List[float]]] = {}  # Class variable
 
     def __init__(self, title: str, enalbe: bool = True):
         self.title = title
@@ -82,7 +83,7 @@ class Timer2(object):
         if self.lapkey not in self.storedSecs[self.key]:
             self.storedSecs[self.key][self.lapkey] = []
         self.storedSecs[self.key][self.lapkey].append(self.current - prev)
-        self.storedSecs[self.key][self.lapkey] = self.storedSecs[self.key][self.lapkey][-self.maxStores:]
+        self.storedSecs[self.key][self.lapkey] = self.storedSecs[self.key][self.lapkey][-self.maxStores :]
 
     def __exit__(self, *_):
         if self.enable is False:
@@ -93,4 +94,3 @@ class Timer2(object):
             section = key.split("_")[-1]
             milisecAvr = sum(val) / len(val) * 1000
             print(f"{section}: {milisecAvr} msec")
-

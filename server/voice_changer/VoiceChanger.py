@@ -11,7 +11,7 @@ from mods.log_control import VoiceChangaerLogger
 
 from voice_changer.IORecorder import IORecorder
 
-from voice_changer.utils.Timer import Timer
+from voice_changer.utils.Timer import Timer2
 from voice_changer.utils.VoiceChangerIF import VoiceChangerIF
 from voice_changer.utils.VoiceChangerModel import AudioInOut, VoiceChangerModel
 from Exceptions import (
@@ -191,7 +191,7 @@ class VoiceChanger(VoiceChangerIF):
 
             processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
             # 前処理
-            with Timer("pre-process") as t:
+            with Timer2("pre-process", False) as t:
                 if self.settings.inputSampleRate != processing_sampling_rate:
                     newData = cast(
                         AudioInOut,
@@ -211,10 +211,11 @@ class VoiceChanger(VoiceChangerIF):
                 self._generate_strength(crossfade_frame)
 
                 data = self.voiceChanger.generate_input(newData, block_frame, crossfade_frame, sola_search_frame)
+                t.record("fin")
             preprocess_time = t.secs
 
             # 変換処理
-            with Timer("main-process") as t:
+            with Timer2("main-process", False) as t:
                 # Inference
                 audio = self.voiceChanger.inference(data)
 
@@ -256,10 +257,11 @@ class VoiceChanger(VoiceChangerIF):
                 else:
                     self.sola_buffer = audio[-crossfade_frame:] * self.np_prev_strength
                     # self.sola_buffer = audio[- crossfade_frame:]
+                t.record("fin")
             mainprocess_time = t.secs
 
             # 後処理
-            with Timer("post-process") as t:
+            with Timer2("post-process", False) as t:
                 result = result.astype(np.int16)
 
                 if self.settings.outputSampleRate != processing_sampling_rate:
@@ -293,6 +295,7 @@ class VoiceChanger(VoiceChangerIF):
                 if self.settings.recordIO == 1:
                     self.ioRecorder.writeInput(receivedData)
                     self.ioRecorder.writeOutput(outputData.tobytes())
+                t.record("fin")
 
             postprocess_time = t.secs
 
