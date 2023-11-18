@@ -113,7 +113,7 @@ To run docker, see [start docker](docker_vcclient/README_en.md).
 
 To run on Anaconda venv, see [server developer's guide](README_dev_en.md)
 
-To run on Linux using an AMD GPU, see [setup guide linux](tutorials/tutorial_anaconda_amd_rocm.md).
+To run on Linux using an AMD GPU, see [setup guide linux](tutorials/tutorial_anaconda_amd_rocm.md)
 
 # Real-time performance
 
