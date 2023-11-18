@@ -92,6 +92,7 @@ python3 MMVCServerSIO.py
 
 The server will download all the required models and run. Now you can use the voice changer through the WebUI by opening http://127.0.0.1:18888/. You can select your GPU from the menu.
 
+![image](images/amd_gpu_select.png)
 
 ## Configure Audio Loopback
 In the last step, create a virtual audio device that redirects the web UI's output to an input, which can be used as a microphone in applications.
@@ -103,3 +104,5 @@ The default names of the audio devices are:
 - Output: Null Output
 
 In most applications, you can select the audio device as input. If you use Wine or Lutris and want to use the microphone within those environments, you need to add the device to your Wine configuration.
+
+![image](images/wine_device.png)
