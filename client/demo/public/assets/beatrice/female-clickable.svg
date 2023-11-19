@@ -1,0 +1,919 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="100%" viewBox="100 60 420 450" version="1.1">
+    <metadata>
+        <rdf:RDF>
+            <ns2:Work>
+                <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+                <dc:date>2023-11-19T01:03:39.602692</dc:date>
+                <dc:format>image/svg+xml</dc:format>
+                <dc:creator>
+                    <ns2:Agent>
+                        <dc:title>Matplotlib v3.7.1, https://matplotlib.org/</dc:title>
+                    </ns2:Agent>
+                </dc:creator>
+            </ns2:Work>
+        </rdf:RDF>
+    </metadata>
+    <defs>
+        <style type="text/css">
+            * {
+                stroke-linejoin: round;
+                stroke-linecap: butt
+            }
+        </style>
+        <style type="text/css">
+            .beatrice-node-pointer {
+                cursor: pointer;
+            }
+
+            .beatrice-node-pointer:hover {
+                stroke: gray;
+            }
+
+            .beatrice-node-pointer-selected {
+                stroke: #ef6767c2;
+                stroke-width: 3
+            }
+
+            .beatrice-text-pointer {
+                cursor: pointer;
+                pointer-events: none
+            }
+
+            .beatrice-text-pointer:hover {
+                /* ホバー時のスタイルは既に設定されたスタイルと異なる特定の属性を変更することができます。 */
+            }
+        </style>
+    </defs>
+    <g id="figure_1">
+        <g id="patch_1">
+            <path d="M 0 576  L 576 576  L 576 0  L 0 0  z " style="fill: #ffffff" />
+        </g>
+        <g id="axes_1">
+            <g id="LineCollection_1">
+                <path d="M 403.96157 149.258085  L 366.630583 148.159991  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 396.547407 371.476481  L 372.120414 365.421971  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 396.547407 371.476481  L 416.760989 346.999139  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 396.547407 371.476481  L 404.238335 402.754731  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 258.035169 326.134244  L 298.859694 332.465911  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 167.453327 366.897955  L 203.987537 347.931194  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 436.352807 416.173738  L 404.238335 402.754731  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 391.514336 242.048236  L 417.560846 259.464346  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 391.514336 242.048236  L 355.734145 235.68791  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 391.514336 242.048236  L 424.070309 219.021704  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 205.541044 459.711101  L 230.303076 436.148139  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 160.44225 292.540336  L 167.396334 325.961848  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 345.679012 107.607273  L 366.630583 148.159991  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 325.345004 219.195921  L 355.734145 235.68791  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 325.345004 219.195921  L 297.530501 194.55124  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 363.075301 201.701937  L 355.734145 235.68791  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 363.075301 201.701937  L 341.462109 170.414842  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 366.630583 148.159991  L 341.462109 170.414842  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 167.396334 325.961848  L 203.987537 347.931194  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 262.111309 181.887977  L 297.530501 194.55124  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 189.293496 262.735141  L 222.122563 261.416721  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 277.95603 462.622539  L 293.230217 421.393405  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 333.932593 269.342364  L 301.9174 258.124913  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 333.932593 269.342364  L 355.734145 235.68791  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 334.666605 338.097578  L 320.07566 368.578481  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 203.987537 347.931194  L 242.811958 354.082183  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 288.059985 363.924972  L 320.07566 368.578481  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 288.059985 363.924972  L 276.198518 388.99868  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 288.059985 363.924972  L 298.859694 332.465911  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 288.059985 363.924972  L 242.811958 354.082183  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 276.198518 388.99868  L 293.230217 421.393405  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 293.230217 421.393405  L 309.530924 454.827332  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 293.230217 421.393405  L 260.004712 426.426278  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 423.853712 378.321354  L 404.238335 402.754731  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 205.214352 217.066163  L 222.122563 261.416721  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 154.047193 423.153273  L 193.933786 408.004355  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 298.859694 332.465911  L 277.79477 306.980241  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 277.79477 306.980241  L 282.261978 282.779534  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 260.004712 426.426278  L 230.303076 436.148139  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 260.004712 426.426278  L 228.689744 409.959215  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 260.004712 426.426278  L 261.506403 474.152727  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 301.9174 258.124913  L 282.261978 282.779534  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 254.897329 263.033159  L 282.261978 282.779534  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 254.897329 263.033159  L 222.122563 261.416721  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 321.267463 403.021207  L 320.07566 368.578481  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 345.750267 380.131711  L 320.07566 368.578481  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 345.750267 380.131711  L 372.120414 365.421971  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 345.750267 380.131711  L 351.226176 419.342667  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 404.238335 402.754731  L 400.607869 434.730447  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+                <path d="M 193.933786 408.004355  L 230.303076 436.148139  " clip-path="url(#p0d66167a93)"
+                    style="fill: none; stroke: #808080" />
+            </g>
+            <g id="PathCollection_1">
+                <defs>
+                    <path id="C0_0_2922fe8094"
+                        d="M 0 11.18034  C 2.965061 11.18034 5.80908 10.002309 7.905694 7.905694  C 10.002309 5.80908 11.18034 2.965061 11.18034 -0  C 11.18034 -2.965061 10.002309 -5.80908 7.905694 -7.905694  C 5.80908 -10.002309 2.965061 -11.18034 0 -11.18034  C -2.965061 -11.18034 -5.80908 -10.002309 -7.905694 -7.905694  C -10.002309 -5.80908 -11.18034 -2.965061 -11.18034 0  C -11.18034 2.965061 -10.002309 5.80908 -7.905694 7.905694  C -5.80908 10.002309 -2.965061 11.18034 0 11.18034  z " />
+                </defs>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-1" onclick="(()=&gt;{console.log('node 1')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="403.96157" y="149.258085" style="fill: #e7f5d2" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-2" onclick="(()=&gt;{console.log('node 2')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="396.547407" y="371.476481" style="fill: #fbe8f2" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-3" onclick="(()=&gt;{console.log('node 3')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="258.035169" y="326.134244" style="fill: #cfebaa" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-4" onclick="(()=&gt;{console.log('node 4')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="167.453327" y="366.897955" style="fill: #f1f6e8" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-5" onclick="(()=&gt;{console.log('node 5')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="436.352807" y="416.173738" style="fill: #e89ac6" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-6" onclick="(()=&gt;{console.log('node 6')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="391.514336" y="242.048236" style="fill: #f3bcdd" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-7" onclick="(()=&gt;{console.log('node 7')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="205.541044" y="459.711101" style="fill: #fbd9ec" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-8" onclick="(()=&gt;{console.log('node 8')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="160.44225" y="292.540336" style="fill: #9ed067" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-9" onclick="(()=&gt;{console.log('node 9')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="424.070309" y="219.021704" style="fill: #e1f3c7" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-10" onclick="(()=&gt;{console.log('node 10')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="345.679012" y="107.607273" style="fill: #d0ecad" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-11" onclick="(()=&gt;{console.log('node 11')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="325.345004" y="219.195921" style="fill: #eff6e4" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-12" onclick="(()=&gt;{console.log('node 12')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="363.075301" y="201.701937" style="fill: #f9f0f5" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-13" onclick="(()=&gt;{console.log('node 13')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="366.630583" y="148.159991" style="fill: #ebf6dc" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-14" onclick="(()=&gt;{console.log('node 14')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="341.462109" y="170.414842" style="fill: #fad6ea" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-15" onclick="(()=&gt;{console.log('node 15')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="167.396334" y="325.961848" style="fill: #f5f7f3" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-16" onclick="(()=&gt;{console.log('node 16')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="262.111309" y="181.887977" style="fill: #e9f5d6" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-17" onclick="(()=&gt;{console.log('node 17')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="189.293496" y="262.735141" style="fill: #fce5f1" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-18" onclick="(()=&gt;{console.log('node 18')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="277.95603" y="462.622539" style="fill: #c4e699" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-19" onclick="(()=&gt;{console.log('node 19')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="333.932593" y="269.342364" style="fill: #f8f4f6" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-20" onclick="(()=&gt;{console.log('node 20')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="416.760989" y="346.999139" style="fill: #eef6e2" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-21" onclick="(()=&gt;{console.log('node 21')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="334.666605" y="338.097578" style="fill: #f5f7f3" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-22" onclick="(()=&gt;{console.log('node 22')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="203.987537" y="347.931194" style="fill: #edf6df" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-23" onclick="(()=&gt;{console.log('node 23')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="288.059985" y="363.924972" style="fill: #ddf1c1" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-24" onclick="(()=&gt;{console.log('node 24')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="276.198518" y="388.99868" style="fill: #f5f7f3" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-25" onclick="(()=&gt;{console.log('node 25')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="293.230217" y="421.393405" style="fill: #f3f7ef" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-26" onclick="(()=&gt;{console.log('node 26')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="423.853712" y="378.321354" style="fill: #edf6df" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-27" onclick="(()=&gt;{console.log('node 27')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="205.214352" y="217.066163" style="fill: #e7f5d2" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-28" onclick="(()=&gt;{console.log('node 28')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="242.811958" y="354.082183" style="fill: #d2ecb0" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-29" onclick="(()=&gt;{console.log('node 29')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="154.047193" y="423.153273" style="fill: #e6f5d0" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-30" onclick="(()=&gt;{console.log('node 30')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="298.859694" y="332.465911" style="fill: #ecf6de" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-31" onclick="(()=&gt;{console.log('node 31')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="277.79477" y="306.980241" style="fill: #eaf5d9" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-32" onclick="(()=&gt;{console.log('node 32')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="260.004712" y="426.426278" style="fill: #f9f1f5" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-33" onclick="(()=&gt;{console.log('node 33')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="301.9174" y="258.124913" style="fill: #dbf0bf" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-34" onclick="(()=&gt;{console.log('node 34')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="254.897329" y="263.033159" style="fill: #eff6e4" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-35" onclick="(()=&gt;{console.log('node 35')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="321.267463" y="403.021207" style="fill: #d0ecad" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-36" onclick="(()=&gt;{console.log('node 36')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="345.750267" y="380.131711" style="fill: #f9eef4" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-37" onclick="(()=&gt;{console.log('node 37')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="404.238335" y="402.754731" style="fill: #f9eef4" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-38" onclick="(()=&gt;{console.log('node 38')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="355.734145" y="235.68791" style="fill: #f9eef4" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-39" onclick="(()=&gt;{console.log('node 39')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="193.933786" y="408.004355" style="fill: #f0f6e7" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-40" onclick="(()=&gt;{console.log('node 40')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="297.530501" y="194.55124" style="fill: #f3f6ed" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-41" onclick="(()=&gt;{console.log('node 41')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="320.07566" y="368.578481" style="fill: #dbf0bf" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-42" onclick="(()=&gt;{console.log('node 42')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="228.689744" y="409.959215" style="fill: #f9eff4" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-43" onclick="(()=&gt;{console.log('node 43')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="351.226176" y="419.342667" style="fill: #cfebaa" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-44" onclick="(()=&gt;{console.log('node 44')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="372.120414" y="365.421971" style="fill: #f7f6f7" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-45" onclick="(()=&gt;{console.log('node 45')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="230.303076" y="436.148139" style="fill: #f8cee6" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-46" onclick="(()=&gt;{console.log('node 46')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="261.506403" y="474.152727" style="fill: #e6f5d0" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-47" onclick="(()=&gt;{console.log('node 47')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="417.560846" y="259.464346" style="fill: #b7e085" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-48" onclick="(()=&gt;{console.log('node 48')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="400.607869" y="434.730447" style="fill: #f8cee6" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-49" onclick="(()=&gt;{console.log('node 49')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="282.261978" y="282.779534" style="fill: #d6eeb6" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-50" onclick="(()=&gt;{console.log('node 50')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="222.122563" y="261.416721" style="fill: #edf6df" />
+                </g>
+                <g clip-path="url(#p0d66167a93)" id="beatrice-node-51" onclick="(()=&gt;{console.log('node 51')})()"
+                    class="beatrice-node-pointer">
+                    <use xlink:href="#C0_0_2922fe8094" x="309.530924" y="454.827332" style="fill: #f9eef4" />
+                </g>
+            </g>
+            <g id="beatrice-text-1" onclick="(()=&gt;{console.log('text 1 clicked')})()" class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(399.786883 152.569335) scale(0.12 -0.12)">
+                        <defs>
+                            <path id="DejaVuSans-Bold-32"
+                                d="M 1844 884  L 3897 884  L 3897 0  L 506 0  L 506 884  L 2209 2388  Q 2438 2594 2547 2791  Q 2656 2988 2656 3200  Q 2656 3528 2436 3728  Q 2216 3928 1850 3928  Q 1569 3928 1234 3808  Q 900 3688 519 3450  L 519 4475  Q 925 4609 1322 4679  Q 1719 4750 2100 4750  Q 2938 4750 3402 4381  Q 3866 4013 3866 3353  Q 3866 2972 3669 2642  Q 3472 2313 2841 1759  L 1844 884  z "
+                                transform="scale(0.015625)" />
+                        </defs>
+                        <use xlink:href="#DejaVuSans-Bold-32" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-2" onclick="(()=&gt;{console.log('text 2 clicked')})()" class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(392.37272 374.787731) scale(0.12 -0.12)">
+                        <defs>
+                            <path id="DejaVuSans-Bold-34"
+                                d="M 2356 3675  L 1038 1722  L 2356 1722  L 2356 3675  z M 2156 4666  L 3494 4666  L 3494 1722  L 4159 1722  L 4159 850  L 3494 850  L 3494 0  L 2356 0  L 2356 850  L 288 850  L 288 1881  L 2156 4666  z "
+                                transform="scale(0.015625)" />
+                        </defs>
+                        <use xlink:href="#DejaVuSans-Bold-34" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-3" onclick="(()=&gt;{console.log('text 3 clicked')})()" class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(253.860482 329.445494) scale(0.12 -0.12)">
+                        <defs>
+                            <path id="DejaVuSans-Bold-37"
+                                d="M 428 4666  L 3944 4666  L 3944 3988  L 2125 0  L 953 0  L 2675 3781  L 428 3781  L 428 4666  z "
+                                transform="scale(0.015625)" />
+                        </defs>
+                        <use xlink:href="#DejaVuSans-Bold-37" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-4" onclick="(()=&gt;{console.log('text 4 clicked')})()" class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(163.27864 370.209205) scale(0.12 -0.12)">
+                        <defs>
+                            <path id="DejaVuSans-Bold-38"
+                                d="M 2228 2088  Q 1891 2088 1709 1903  Q 1528 1719 1528 1375  Q 1528 1031 1709 848  Q 1891 666 2228 666  Q 2563 666 2741 848  Q 2919 1031 2919 1375  Q 2919 1722 2741 1905  Q 2563 2088 2228 2088  z M 1350 2484  Q 925 2613 709 2878  Q 494 3144 494 3541  Q 494 4131 934 4440  Q 1375 4750 2228 4750  Q 3075 4750 3515 4442  Q 3956 4134 3956 3541  Q 3956 3144 3739 2878  Q 3522 2613 3097 2484  Q 3572 2353 3814 2058  Q 4056 1763 4056 1313  Q 4056 619 3595 264  Q 3134 -91 2228 -91  Q 1319 -91 855 264  Q 391 619 391 1313  Q 391 1763 633 2058  Q 875 2353 1350 2484  z M 1631 3419  Q 1631 3141 1786 2991  Q 1941 2841 2228 2841  Q 2509 2841 2662 2991  Q 2816 3141 2816 3419  Q 2816 3697 2662 3845  Q 2509 3994 2228 3994  Q 1941 3994 1786 3844  Q 1631 3694 1631 3419  z "
+                                transform="scale(0.015625)" />
+                        </defs>
+                        <use xlink:href="#DejaVuSans-Bold-38" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-5" onclick="(()=&gt;{console.log('text 5 clicked')})()" class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(428.003432 419.484988) scale(0.12 -0.12)">
+                        <defs>
+                            <path id="DejaVuSans-Bold-31"
+                                d="M 750 831  L 1813 831  L 1813 3847  L 722 3622  L 722 4441  L 1806 4666  L 2950 4666  L 2950 831  L 4013 831  L 4013 0  L 750 0  L 750 831  z "
+                                transform="scale(0.015625)" />
+                            <path id="DejaVuSans-Bold-30"
+                                d="M 2944 2338  Q 2944 3213 2780 3570  Q 2616 3928 2228 3928  Q 1841 3928 1675 3570  Q 1509 3213 1509 2338  Q 1509 1453 1675 1090  Q 1841 728 2228 728  Q 2613 728 2778 1090  Q 2944 1453 2944 2338  z M 4147 2328  Q 4147 1169 3647 539  Q 3147 -91 2228 -91  Q 1306 -91 806 539  Q 306 1169 306 2328  Q 306 3491 806 4120  Q 1306 4750 2228 4750  Q 3147 4750 3647 4120  Q 4147 3491 4147 2328  z "
+                                transform="scale(0.015625)" />
+                        </defs>
+                        <use xlink:href="#DejaVuSans-Bold-31" />
+                        <use xlink:href="#DejaVuSans-Bold-30" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-6" onclick="(()=&gt;{console.log('text 6 clicked')})()" class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(383.164961 245.359486) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-31" />
+                        <use xlink:href="#DejaVuSans-Bold-34" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-7" onclick="(()=&gt;{console.log('text 7 clicked')})()" class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(197.191669 463.022351) scale(0.12 -0.12)">
+                        <defs>
+                            <path id="DejaVuSans-Bold-35"
+                                d="M 678 4666  L 3669 4666  L 3669 3781  L 1638 3781  L 1638 3059  Q 1775 3097 1914 3117  Q 2053 3138 2203 3138  Q 3056 3138 3531 2711  Q 4006 2284 4006 1522  Q 4006 766 3489 337  Q 2972 -91 2053 -91  Q 1656 -91 1267 -14  Q 878 63 494 219  L 494 1166  Q 875 947 1217 837  Q 1559 728 1863 728  Q 2300 728 2551 942  Q 2803 1156 2803 1522  Q 2803 1891 2551 2103  Q 2300 2316 1863 2316  Q 1603 2316 1309 2248  Q 1016 2181 678 2041  L 678 4666  z "
+                                transform="scale(0.015625)" />
+                        </defs>
+                        <use xlink:href="#DejaVuSans-Bold-31" />
+                        <use xlink:href="#DejaVuSans-Bold-35" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-8" onclick="(()=&gt;{console.log('text 8 clicked')})()" class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(152.092875 295.851586) scale(0.12 -0.12)">
+                        <defs>
+                            <path id="DejaVuSans-Bold-36"
+                                d="M 2316 2303  Q 2000 2303 1842 2098  Q 1684 1894 1684 1484  Q 1684 1075 1842 870  Q 2000 666 2316 666  Q 2634 666 2792 870  Q 2950 1075 2950 1484  Q 2950 1894 2792 2098  Q 2634 2303 2316 2303  z M 3803 4544  L 3803 3681  Q 3506 3822 3243 3889  Q 2981 3956 2731 3956  Q 2194 3956 1894 3657  Q 1594 3359 1544 2772  Q 1750 2925 1990 3001  Q 2231 3078 2516 3078  Q 3231 3078 3670 2659  Q 4109 2241 4109 1563  Q 4109 813 3618 361  Q 3128 -91 2303 -91  Q 1394 -91 895 523  Q 397 1138 397 2266  Q 397 3422 980 4083  Q 1563 4744 2578 4744  Q 2900 4744 3203 4694  Q 3506 4644 3803 4544  z "
+                                transform="scale(0.015625)" />
+                        </defs>
+                        <use xlink:href="#DejaVuSans-Bold-31" />
+                        <use xlink:href="#DejaVuSans-Bold-36" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-9" onclick="(()=&gt;{console.log('text 9 clicked')})()" class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(415.720934 222.332954) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-31" />
+                        <use xlink:href="#DejaVuSans-Bold-37" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-10" onclick="(()=&gt;{console.log('text 10 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(337.329637 110.918523) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-31" />
+                        <use xlink:href="#DejaVuSans-Bold-38" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-11" onclick="(()=&gt;{console.log('text 11 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(316.995629 222.507171) scale(0.12 -0.12)">
+                        <defs>
+                            <path id="DejaVuSans-Bold-39"
+                                d="M 641 103  L 641 966  Q 928 831 1190 764  Q 1453 697 1709 697  Q 2247 697 2547 995  Q 2847 1294 2900 1881  Q 2688 1725 2447 1647  Q 2206 1569 1925 1569  Q 1209 1569 770 1986  Q 331 2403 331 3084  Q 331 3838 820 4291  Q 1309 4744 2131 4744  Q 3044 4744 3544 4128  Q 4044 3513 4044 2388  Q 4044 1231 3459 570  Q 2875 -91 1856 -91  Q 1528 -91 1228 -42  Q 928 6 641 103  z M 2125 2350  Q 2441 2350 2600 2554  Q 2759 2759 2759 3169  Q 2759 3575 2600 3781  Q 2441 3988 2125 3988  Q 1809 3988 1650 3781  Q 1491 3575 1491 3169  Q 1491 2759 1650 2554  Q 1809 2350 2125 2350  z "
+                                transform="scale(0.015625)" />
+                        </defs>
+                        <use xlink:href="#DejaVuSans-Bold-31" />
+                        <use xlink:href="#DejaVuSans-Bold-39" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-12" onclick="(()=&gt;{console.log('text 12 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(354.725926 205.013187) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-32" />
+                        <use xlink:href="#DejaVuSans-Bold-34" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-13" onclick="(()=&gt;{console.log('text 13 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(358.281208 151.471241) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-32" />
+                        <use xlink:href="#DejaVuSans-Bold-35" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-14" onclick="(()=&gt;{console.log('text 14 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(333.112734 173.726092) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-32" />
+                        <use xlink:href="#DejaVuSans-Bold-36" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-15" onclick="(()=&gt;{console.log('text 15 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(159.046959 329.273098) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-32" />
+                        <use xlink:href="#DejaVuSans-Bold-37" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-16" onclick="(()=&gt;{console.log('text 16 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(253.761934 185.199227) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-32" />
+                        <use xlink:href="#DejaVuSans-Bold-39" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-17" onclick="(()=&gt;{console.log('text 17 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(180.944121 266.046391) scale(0.12 -0.12)">
+                        <defs>
+                            <path id="DejaVuSans-Bold-33"
+                                d="M 2981 2516  Q 3453 2394 3698 2092  Q 3944 1791 3944 1325  Q 3944 631 3412 270  Q 2881 -91 1863 -91  Q 1503 -91 1142 -33  Q 781 25 428 141  L 428 1069  Q 766 900 1098 814  Q 1431 728 1753 728  Q 2231 728 2486 893  Q 2741 1059 2741 1369  Q 2741 1688 2480 1852  Q 2219 2016 1709 2016  L 1228 2016  L 1228 2791  L 1734 2791  Q 2188 2791 2409 2933  Q 2631 3075 2631 3366  Q 2631 3634 2415 3781  Q 2200 3928 1806 3928  Q 1516 3928 1219 3862  Q 922 3797 628 3669  L 628 4550  Q 984 4650 1334 4700  Q 1684 4750 2022 4750  Q 2931 4750 3382 4451  Q 3834 4153 3834 3553  Q 3834 3144 3618 2883  Q 3403 2622 2981 2516  z "
+                                transform="scale(0.015625)" />
+                        </defs>
+                        <use xlink:href="#DejaVuSans-Bold-33" />
+                        <use xlink:href="#DejaVuSans-Bold-30" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-18" onclick="(()=&gt;{console.log('text 18 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(269.606655 465.933789) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-33" />
+                        <use xlink:href="#DejaVuSans-Bold-35" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-19" onclick="(()=&gt;{console.log('text 19 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(325.583218 272.653614) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-33" />
+                        <use xlink:href="#DejaVuSans-Bold-36" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-20" onclick="(()=&gt;{console.log('text 20 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(408.411614 350.310389) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-33" />
+                        <use xlink:href="#DejaVuSans-Bold-38" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-21" onclick="(()=&gt;{console.log('text 21 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(326.31723 341.408828) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-33" />
+                        <use xlink:href="#DejaVuSans-Bold-39" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-22" onclick="(()=&gt;{console.log('text 22 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(195.638162 351.242444) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-34" />
+                        <use xlink:href="#DejaVuSans-Bold-30" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-23" onclick="(()=&gt;{console.log('text 23 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(279.71061 367.236222) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-34" />
+                        <use xlink:href="#DejaVuSans-Bold-33" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-24" onclick="(()=&gt;{console.log('text 24 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(267.849143 392.30993) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-35" />
+                        <use xlink:href="#DejaVuSans-Bold-31" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-25" onclick="(()=&gt;{console.log('text 25 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(284.880842 424.704655) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-35" />
+                        <use xlink:href="#DejaVuSans-Bold-33" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-26" onclick="(()=&gt;{console.log('text 26 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(415.504337 381.632604) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-35" />
+                        <use xlink:href="#DejaVuSans-Bold-35" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-27" onclick="(()=&gt;{console.log('text 27 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(196.864977 220.377413) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-35" />
+                        <use xlink:href="#DejaVuSans-Bold-36" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-28" onclick="(()=&gt;{console.log('text 28 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(234.462583 357.393433) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-35" />
+                        <use xlink:href="#DejaVuSans-Bold-37" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-29" onclick="(()=&gt;{console.log('text 29 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(145.697818 426.464523) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-35" />
+                        <use xlink:href="#DejaVuSans-Bold-38" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-30" onclick="(()=&gt;{console.log('text 30 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(290.510319 335.777161) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-35" />
+                        <use xlink:href="#DejaVuSans-Bold-39" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-31" onclick="(()=&gt;{console.log('text 31 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(269.445395 310.291491) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-36" />
+                        <use xlink:href="#DejaVuSans-Bold-30" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-32" onclick="(()=&gt;{console.log('text 32 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(251.655337 429.737528) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-36" />
+                        <use xlink:href="#DejaVuSans-Bold-31" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-33" onclick="(()=&gt;{console.log('text 33 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(293.568025 261.436163) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-36" />
+                        <use xlink:href="#DejaVuSans-Bold-32" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-34" onclick="(()=&gt;{console.log('text 34 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(246.547954 266.344409) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-36" />
+                        <use xlink:href="#DejaVuSans-Bold-33" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-35" onclick="(()=&gt;{console.log('text 35 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(312.918088 406.332457) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-36" />
+                        <use xlink:href="#DejaVuSans-Bold-34" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-36" onclick="(()=&gt;{console.log('text 36 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(337.400892 383.442961) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-36" />
+                        <use xlink:href="#DejaVuSans-Bold-35" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-37" onclick="(()=&gt;{console.log('text 37 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(395.88896 406.065981) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-36" />
+                        <use xlink:href="#DejaVuSans-Bold-36" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-38" onclick="(()=&gt;{console.log('text 38 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(347.38477 238.99916) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-36" />
+                        <use xlink:href="#DejaVuSans-Bold-37" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-39" onclick="(()=&gt;{console.log('text 39 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(185.584411 411.315605) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-36" />
+                        <use xlink:href="#DejaVuSans-Bold-39" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-40" onclick="(()=&gt;{console.log('text 40 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(289.181126 197.86249) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-37" />
+                        <use xlink:href="#DejaVuSans-Bold-32" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-41" onclick="(()=&gt;{console.log('text 41 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(311.726285 371.889731) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-38" />
+                        <use xlink:href="#DejaVuSans-Bold-32" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-42" onclick="(()=&gt;{console.log('text 42 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(220.340369 413.270465) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-38" />
+                        <use xlink:href="#DejaVuSans-Bold-33" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-43" onclick="(()=&gt;{console.log('text 43 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(342.876801 422.653917) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-38" />
+                        <use xlink:href="#DejaVuSans-Bold-34" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-44" onclick="(()=&gt;{console.log('text 44 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(363.771039 368.733221) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-38" />
+                        <use xlink:href="#DejaVuSans-Bold-35" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-45" onclick="(()=&gt;{console.log('text 45 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(221.953701 439.459389) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-39" />
+                        <use xlink:href="#DejaVuSans-Bold-30" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-46" onclick="(()=&gt;{console.log('text 46 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(253.157028 477.463977) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-39" />
+                        <use xlink:href="#DejaVuSans-Bold-31" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-47" onclick="(()=&gt;{console.log('text 47 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(409.211471 262.775596) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-39" />
+                        <use xlink:href="#DejaVuSans-Bold-32" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-48" onclick="(()=&gt;{console.log('text 48 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(392.258494 438.041697) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-39" />
+                        <use xlink:href="#DejaVuSans-Bold-33" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-49" onclick="(()=&gt;{console.log('text 49 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(273.912603 286.090784) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-39" />
+                        <use xlink:href="#DejaVuSans-Bold-34" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-50" onclick="(()=&gt;{console.log('text 50 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(213.773188 264.727971) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-39" />
+                        <use xlink:href="#DejaVuSans-Bold-35" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+            <g id="beatrice-text-51" onclick="(()=&gt;{console.log('text 51 clicked')})()"
+                class="beatrice-text-pointer">
+                <g clip-path="url(#p0d66167a93)">
+
+                    <g transform="translate(301.181549 458.138582) scale(0.12 -0.12)">
+                        <use xlink:href="#DejaVuSans-Bold-39" />
+                        <use xlink:href="#DejaVuSans-Bold-36" x="69.580078" />
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+    <defs>
+        <clipPath id="p0d66167a93">
+            <rect x="124.405104" y="69.12" width="341.589792" height="443.52" />
+        </clipPath>
+    </defs>
+</svg>
