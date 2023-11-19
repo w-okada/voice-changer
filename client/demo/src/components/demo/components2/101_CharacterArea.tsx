@@ -10,22 +10,28 @@ import { F0FactorArea } from "./101-4_F0FactorArea";
 import { SoVitsSVC40SettingArea } from "./101-5_so-vits-svc40SettingArea";
 import { DDSPSVC30SettingArea } from "./101-6_ddsp-svc30SettingArea";
 import { DiffusionSVCSettingArea } from "./101-7_diffusion-svcSettingArea";
+import { Portrait } from "./101-0_Portrait";
+import { useAppRoot } from "../../../001_provider/001_AppRootProvider";
 
 export type CharacterAreaProps = {};
 
 export const CharacterArea = (_props: CharacterAreaProps) => {
-    const { serverSetting, initializedRef, volume, bufferingTime, performance, setting, setVoiceChangerClientSetting, start, stop } = useAppState();
+    const { appGuiSettingState } = useAppRoot();
+    const { serverSetting, initializedRef, volume, bufferingTime, performance, setting, setVoiceChangerClientSetting, start, stop, webInfoState } = useAppState();
     const guiState = useGuiState();
     const messageBuilderState = useMessageBuilder();
-
+    const webEdition = appGuiSettingState.edition.indexOf("web") >= 0;
+    const { beatriceJVSSpeakerId } = useGuiState();
     useMemo(() => {
-        messageBuilderState.setMessage(__filename, "terms_of_use", { ja: "利用規約", en: "terms of use" });
         messageBuilderState.setMessage(__filename, "export_to_onnx", { ja: "onnx出力", en: "export to onnx" });
         messageBuilderState.setMessage(__filename, "save_default", { ja: "設定保存", en: "save setting" });
         messageBuilderState.setMessage(__filename, "alert_onnx", { ja: "ボイチェン中はonnx出力できません", en: "cannot export onnx when voice conversion is enabled" });
     }, []);
 
     const selected = useMemo(() => {
+        if (webEdition) {
+            return webInfoState.webModelslot;
+        }
         if (serverSetting.serverSetting.modelSlotIndex == undefined) {
             return;
         } else if (serverSetting.serverSetting.modelSlotIndex == "Beatrice-JVS") {
@@ -34,58 +40,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
         } else {
             return serverSetting.serverSetting.modelSlots[serverSetting.serverSetting.modelSlotIndex];
         }
-    }, [serverSetting.serverSetting.modelSlotIndex, serverSetting.serverSetting.modelSlots]);
-
-    useEffect(() => {
-        const vol = document.getElementById("status-vol") as HTMLSpanElement;
-        const buf = document.getElementById("status-buf") as HTMLSpanElement;
-        const res = document.getElementById("status-res") as HTMLSpanElement;
-        if (!vol || !buf || !res) {
-            return;
-        }
-        vol.innerText = volume.toFixed(4);
-        buf.innerText = bufferingTime.toString();
-        res.innerText = performance.responseTime.toString();
-    }, [volume, bufferingTime, performance]);
-
-    const portrait = useMemo(() => {
-        if (!selected) {
-            return <></>;
-        }
-
-        const modelDir = serverSetting.serverSetting.modelSlotIndex == "Beatrice-JVS" ? "model_dir_static" : serverSetting.serverSetting.voiceChangerParams.model_dir;
-        const icon = selected.iconFile.length > 0 ? modelDir + "/" + selected.slotIndex + "/" + selected.iconFile.split(/[\/\\]/).pop() : "./assets/icons/human.png";
-        const selectedTermOfUseUrlLink = selected.termsOfUseUrl ? (
-            <a href={selected.termsOfUseUrl} target="_blank" rel="noopener noreferrer" className="portrait-area-terms-of-use-link">
-                [{messageBuilderState.getMessage(__filename, "terms_of_use")}]
-            </a>
-        ) : (
-            <></>
-        );
-
-        return (
-            <div className="portrait-area">
-                <div className="portrait-container">
-                    <img className="portrait" src={icon} alt={selected.name} />
-                    <div className="portrait-area-status">
-                        <p>
-                            <span className="portrait-area-status-vctype">{selected.voiceChangerType}</span>
-                        </p>
-                        <p>
-                            vol: <span id="status-vol">0</span>
-                        </p>
-                        <p>
-                            buf: <span id="status-buf">0</span> ms
-                        </p>
-                        <p>
-                            res: <span id="status-res">0</span> ms
-                        </p>
-                    </div>
-                    <div className="portrait-area-terms-of-use">{selectedTermOfUseUrlLink}</div>
-                </div>
-            </div>
-        );
-    }, [selected]);
+    }, [serverSetting.serverSetting.modelSlotIndex, serverSetting.serverSetting.modelSlots, webEdition]);
 
     const [startWithAudioContextCreate, setStartWithAudioContextCreate] = useState<boolean>(false);
     useEffect(() => {
@@ -95,6 +50,22 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
         guiState.setIsConverting(true);
         start();
     }, [startWithAudioContextCreate]);
+
+    const nameArea = useMemo(() => {
+        if (!selected) {
+            return <></>;
+        }
+        return (
+            <div className="character-area-control">
+                <div className="character-area-control-title">Name:</div>
+                <div className="character-area-control-field">
+                    <div className="character-area-text">
+                        {selected.name} {selected.slotIndex == "Beatrice-JVS" ? `speaker:${beatriceJVSSpeakerId}` : ""}
+                    </div>
+                </div>
+            </div>
+        );
+    }, [selected, beatriceJVSSpeakerId]);
 
     const startControl = useMemo(() => {
         const onStartClicked = async () => {
@@ -143,22 +114,37 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
         const stopClassName = guiState.isConverting ? "character-area-control-button-stanby" : "character-area-control-button-active";
         const passThruClassName = serverSetting.serverSetting.passThrough == false ? "character-area-control-passthru-button-stanby" : "character-area-control-passthru-button-active blinking";
         console.log("serverSetting.serverSetting.passThrough", passThruClassName, serverSetting.serverSetting.passThrough);
-        return (
-            <div className="character-area-control">
-                <div className="character-area-control-buttons">
-                    <div onClick={onStartClicked} className={startClassName}>
-                        start
-                    </div>
-                    <div onClick={onStopClicked} className={stopClassName}>
-                        stop
-                    </div>
-                    <div onClick={onPassThroughClicked} className={passThruClassName}>
-                        passthru
+
+        if (webEdition && webInfoState.webModelLoadingState != "ready") {
+            return (
+                <div className="character-area-control">
+                    <div className="character-area-control-title">wait...</div>
+                    <div className="character-area-control-field">
+                        <div className="character-area-text blink">{webInfoState.webModelLoadingState}..</div>
+                        <div className="character-area-text">
+                            pre:{Math.floor(webInfoState.progressLoadPreprocess * 100)}%, model: {Math.floor(webInfoState.progressLoadVCModel * 100)}%
+                        </div>
                     </div>
                 </div>
-            </div>
-        );
-    }, [guiState.isConverting, start, stop, serverSetting.serverSetting, serverSetting.updateServerSettings]);
+            );
+        } else {
+            return (
+                <div className="character-area-control">
+                    <div className="character-area-control-buttons">
+                        <div onClick={onStartClicked} className={startClassName}>
+                            start
+                        </div>
+                        <div onClick={onStopClicked} className={stopClassName}>
+                            stop
+                        </div>
+                        <div onClick={onPassThroughClicked} className={passThruClassName}>
+                            passthru
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+    }, [guiState.isConverting, start, stop, serverSetting.serverSetting, serverSetting.updateServerSettings, webInfoState.progressLoadPreprocess, webInfoState.progressLoadVCModel, webInfoState.webModelLoadingState]);
 
     const gainControl = useMemo(() => {
         const currentInputGain = serverSetting.serverSetting.enableServerAudio == 0 ? setting.voiceChangerClientSetting.inputGain : serverSetting.serverSetting.serverInputAudioGain;
@@ -275,8 +261,9 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
     const characterArea = useMemo(() => {
         return (
             <div className="character-area">
-                {portrait}
+                <Portrait></Portrait>
                 <div className="character-area-control-area">
+                    {nameArea}
                     {startControl}
                     {gainControl}
                     <TuningArea />
@@ -290,7 +277,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
                 </div>
             </div>
         );
-    }, [portrait, startControl, gainControl, modelSlotControl]);
+    }, [startControl, gainControl, modelSlotControl]);
 
     return characterArea;
 };

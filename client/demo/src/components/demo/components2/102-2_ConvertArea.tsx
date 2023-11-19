@@ -10,6 +10,8 @@ export const ConvertArea = (props: ConvertProps) => {
     const { setting, serverSetting, setWorkletNodeSetting, trancateBuffer } = useAppState();
     const { appGuiSettingState } = useAppRoot();
     const edition = appGuiSettingState.edition;
+    const webEdition = appGuiSettingState.edition.indexOf("web") >= 0;
+
     const convertArea = useMemo(() => {
         let nums: number[];
         if (!props.inputChunkNums) {
@@ -110,6 +112,8 @@ export const ConvertArea = (props: ConvertProps) => {
                         </div>
                     </div>
                 </>
+            ) : webEdition ? (
+                <></>
             ) : (
                 <div className="config-sub-area-control">
                     <div className="config-sub-area-control-title">GPU:</div>
@@ -133,6 +137,32 @@ export const ConvertArea = (props: ConvertProps) => {
                     </div>
                 </div>
             );
+
+        const extraArea = webEdition ? (
+            <></>
+        ) : (
+            <div className="config-sub-area-control">
+                <div className="config-sub-area-control-title">EXTRA:</div>
+                <div className="config-sub-area-control-field">
+                    <select
+                        className="body-select"
+                        value={serverSetting.serverSetting.extraConvertSize}
+                        onChange={(e) => {
+                            serverSetting.updateServerSettings({ ...serverSetting.serverSetting, extraConvertSize: Number(e.target.value) });
+                            trancateBuffer();
+                        }}
+                    >
+                        {[1024 * 4, 1024 * 8, 1024 * 16, 1024 * 32, 1024 * 64, 1024 * 128].map((x) => {
+                            return (
+                                <option key={x} value={x}>
+                                    {x}
+                                </option>
+                            );
+                        })}
+                    </select>
+                </div>
+            </div>
+        );
         return (
             <div className="config-sub-area">
                 <div className="config-sub-area-control">
@@ -157,27 +187,7 @@ export const ConvertArea = (props: ConvertProps) => {
                         </select>
                     </div>
                 </div>
-                <div className="config-sub-area-control">
-                    <div className="config-sub-area-control-title">EXTRA:</div>
-                    <div className="config-sub-area-control-field">
-                        <select
-                            className="body-select"
-                            value={serverSetting.serverSetting.extraConvertSize}
-                            onChange={(e) => {
-                                serverSetting.updateServerSettings({ ...serverSetting.serverSetting, extraConvertSize: Number(e.target.value) });
-                                trancateBuffer();
-                            }}
-                        >
-                            {[1024 * 4, 1024 * 8, 1024 * 16, 1024 * 32, 1024 * 64, 1024 * 128].map((x) => {
-                                return (
-                                    <option key={x} value={x}>
-                                        {x}
-                                    </option>
-                                );
-                            })}
-                        </select>
-                    </div>
-                </div>
+                {extraArea}
                 {gpuSelect}
             </div>
         );

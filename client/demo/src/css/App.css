@@ -1321,7 +1321,7 @@ body {
                 background: rgba(100, 100, 100, 0.5);
                 color: white;
                 position: absolute;
-                paddig: 2px;
+                padding: 2px;
                 font-size: 0.7rem;
                 right: 5px;
                 bottom: 5px;
@@ -1402,6 +1402,9 @@ body {
                 display: flex;
                 flex-direction: column;
 
+                .character-area-text {
+                    font-size: 0.9rem;
+                }
                 .character-area-slider-control {
                     display: flex;
                     flex-direction: row;
@@ -1830,4 +1833,63 @@ audio::-webkit-media-controls-overlay-enclosure{
     50% {
         opacity: 0.5;
     }
+}
+
+.blink {
+    animation: blinking 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes blinking {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.beatrice-portrait-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #333;
+    text-shadow: 0 0 2px #333;
+    text-align: center;
+    .edition {
+        font-size: 0.6rem;
+    }
+}
+.beatrice-portrait-select {
+    display: flex;
+    justify-content: center;
+    .button {
+        /* border: solid 2px #999; */
+        color: #615454;
+        font-weight: 700;
+        font-size: 0.8rem;
+        border-radius: 2px;
+        background: #adafad;
+        cursor: pointer;
+        padding: 0px 5px 0px 5px;
+        margin: 0px 5px 0px 5px;
+        line-height: 140%;
+        height: 1.1rem;
+    }
+    .button-selected {
+        /* border: solid 2px #999; */
+        color: #615454;
+        font-weight: 700;
+        font-size: 0.8rem;
+        border-radius: 2px;
+        background: #62b574;
+        cursor: pointer;
+        padding: 0px 5px 0px 5px;
+        margin: 0px 5px 0px 5px;
+        line-height: 140%;
+        height: 1.1rem;
+    }
+}
+.beatrice-speaker-graph-container {
+    width: 20rem;
+    height: 19rem;
+    border: none;
 }

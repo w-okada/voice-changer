@@ -37,7 +37,9 @@ server/memo.md
 client/lib/dist
 client/lib/worklet/dist
 client/demo/public/models
+client/demo/public/models_
 client/demo/dist/models
+client/demo/dist_web
 client/demo/src/001_provider/backup
 # client/demo/dist/ # demo用に残す
 

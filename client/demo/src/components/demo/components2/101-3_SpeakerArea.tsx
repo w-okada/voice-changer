@@ -64,6 +64,9 @@ export const SpeakerArea = (_props: SpeakerAreaProps) => {
         if (!selected) {
             return <></>;
         }
+        if (selected.slotIndex == "Beatrice-JVS") {
+            return; // beatrice JVS は変換先話者をグラフから選択するので、ここでは表示しない
+        }
 
         const options = Object.keys(selected.speakers).map((key) => {
             const val = selected.speakers[Number(key)];
@@ -80,7 +83,7 @@ export const SpeakerArea = (_props: SpeakerAreaProps) => {
 
         return (
             <div className="character-area-control">
-                <div className="character-area-control-title">{selected.voiceChangerType == "DDSP-SVC" || selected.voiceChangerType == "so-vits-svc-40" || selected.voiceChangerType == "RVC" || selected.voiceChangerType == "Beatrice" ? "Voice:" : ""}</div>
+                <div className="character-area-control-title">{selected.voiceChangerType == "DDSP-SVC" || selected.voiceChangerType == "so-vits-svc-40" || selected.voiceChangerType == "RVC" ? "Voice:" : ""}</div>
                 <div className="character-area-control-field">
                     <div className="character-area-slider-control">
                         <span className="character-area-slider-control-kind">{selected.voiceChangerType == "MMVCv13" || selected.voiceChangerType == "MMVCv15" ? "dst" : ""}</span>

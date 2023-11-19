@@ -34,6 +34,7 @@ module.exports = {
                 use: ["style-loader", { loader: "css-loader", options: { importLoaders: 1 } }, "postcss-loader"],
             },
             { test: /\.json$/, type: "asset/inline" },
+            { test: /\.svg$/, type: "asset/resource" },
         ],
     },
     output: {
@@ -56,9 +57,9 @@ module.exports = {
         }),
 
         // ダミーファイルコピー
-        new CopyPlugin({
-            patterns: [{ from: "public/assets/gui_settings/edition_web.txt", to: "assets/gui_settings/edition.txt" }],
-        }),
+        // new CopyPlugin({ //コピーの順番で上のassetのコピーで上書きされることがあるようだ。⇒npmスクリプトで対処。
+        //     patterns: [{ from: "public/assets/gui_settings/edition_web.txt", to: "assets/gui_settings/edition.txt" }],
+        // }),
         // new CopyPlugin({ // 拡張子なしのファイルコピーはできないようだ。⇒npmスクリプトで対処。
         //     patterns: [{ from: "public/info_web.txt", to: "info" }],
         // }),
@@ -102,6 +103,9 @@ module.exports = {
         }),
         new CopyPlugin({
             patterns: [{ from: "public/models/rvcv1_amitaro_v1_40k_nof0_24000.bin", to: "models/rvcv1_amitaro_v1_40k_nof0_24000.bin" }],
+        }),
+        new CopyPlugin({
+            patterns: [{ from: "public/models/amitaro.png", to: "models/amitaro.png" }],
         }),
     ],
 };

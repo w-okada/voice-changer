@@ -11,6 +11,7 @@ export const QualityArea = (props: QualityAreaProps) => {
     const { setVoiceChangerClientSetting, serverSetting, setting } = useAppState();
     const { appGuiSettingState } = useAppRoot();
     const edition = appGuiSettingState.edition;
+    const webEdition = appGuiSettingState.edition.indexOf("web") >= 0;
 
     const qualityArea = useMemo(() => {
         if (!serverSetting.updateServerSettings || !setVoiceChangerClientSetting || !serverSetting.serverSetting || !setting) {
@@ -46,6 +47,52 @@ export const QualityArea = (props: QualityAreaProps) => {
             }
         };
         const f0DetOptions = generateF0DetOptions();
+
+        const f0Det = webEdition ? (
+            <></>
+        ) : (
+            <div className="config-sub-area-control">
+                <div className="config-sub-area-control-title">F0 Det.:</div>
+                <div className="config-sub-area-control-field">
+                    <select
+                        className="body-select"
+                        value={serverSetting.serverSetting.f0Detector}
+                        onChange={(e) => {
+                            serverSetting.updateServerSettings({ ...serverSetting.serverSetting, f0Detector: e.target.value as F0Detector });
+                        }}
+                    >
+                        {f0DetOptions}
+                    </select>
+                </div>
+            </div>
+        );
+
+        const threshold = webEdition ? (
+            <></>
+        ) : (
+            <div className="config-sub-area-control">
+                <div className="config-sub-area-control-title">S.Thresh.:</div>
+                <div className="config-sub-area-control-field">
+                    <div className="config-sub-area-slider-control">
+                        <span className="config-sub-area-slider-control-kind"></span>
+                        <span className="config-sub-area-slider-control-slider">
+                            <input
+                                type="range"
+                                className="config-sub-area-slider-control-slider"
+                                min="0.00000"
+                                max="0.001"
+                                step="0.00001"
+                                value={serverSetting.serverSetting.silentThreshold || 0}
+                                onChange={(e) => {
+                                    serverSetting.updateServerSettings({ ...serverSetting.serverSetting, silentThreshold: Number(e.target.value) });
+                                }}
+                            ></input>
+                        </span>
+                        <span className="config-sub-area-slider-control-val">{serverSetting.serverSetting.silentThreshold}</span>
+                    </div>
+                </div>
+            </div>
+        );
 
         return (
             <div className="config-sub-area">
@@ -101,42 +148,8 @@ export const QualityArea = (props: QualityAreaProps) => {
                         </div>
                     </div>
                 </div>
-                <div className="config-sub-area-control">
-                    <div className="config-sub-area-control-title">F0 Det.:</div>
-                    <div className="config-sub-area-control-field">
-                        <select
-                            className="body-select"
-                            value={serverSetting.serverSetting.f0Detector}
-                            onChange={(e) => {
-                                serverSetting.updateServerSettings({ ...serverSetting.serverSetting, f0Detector: e.target.value as F0Detector });
-                            }}
-                        >
-                            {f0DetOptions}
-                        </select>
-                    </div>
-                </div>
-                <div className="config-sub-area-control">
-                    <div className="config-sub-area-control-title">S.Thresh.:</div>
-                    <div className="config-sub-area-control-field">
-                        <div className="config-sub-area-slider-control">
-                            <span className="config-sub-area-slider-control-kind"></span>
-                            <span className="config-sub-area-slider-control-slider">
-                                <input
-                                    type="range"
-                                    className="config-sub-area-slider-control-slider"
-                                    min="0.00000"
-                                    max="0.001"
-                                    step="0.00001"
-                                    value={serverSetting.serverSetting.silentThreshold || 0}
-                                    onChange={(e) => {
-                                        serverSetting.updateServerSettings({ ...serverSetting.serverSetting, silentThreshold: Number(e.target.value) });
-                                    }}
-                                ></input>
-                            </span>
-                            <span className="config-sub-area-slider-control-val">{serverSetting.serverSetting.silentThreshold}</span>
-                        </div>
-                    </div>
-                </div>
+                {f0Det}
+                {threshold}
             </div>
         );
     }, [serverSetting.serverSetting, setting, serverSetting.updateServerSettings, setVoiceChangerClientSetting]);

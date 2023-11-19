@@ -44,6 +44,14 @@ class MMVC_SocketIOApp:
                         "filename": f"{getFrontendPath()}/ort-wasm-simd.wasm",
                         "content_type": "application/wasm",
                     },
+                    "/assets/beatrice/female-clickable.svg": {
+                        "filename": f"{getFrontendPath()}/assets/beatrice/female-clickable.svg",
+                        "content_type": "image/svg+xml",
+                    },
+                    "/assets/beatrice/male-clickable.svg": {
+                        "filename": f"{getFrontendPath()}/assets/beatrice/male-clickable.svg",
+                        "content_type": "image/svg+xml",
+                    },
                     "": f"{getFrontendPath()}",
                     "/": f"{getFrontendPath()}/index.html",
                 },

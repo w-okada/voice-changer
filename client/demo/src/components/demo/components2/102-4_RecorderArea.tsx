@@ -2,16 +2,21 @@ import React, { useMemo, useState } from "react";
 import { useAppState } from "../../../001_provider/001_AppStateProvider";
 import { useGuiState } from "../001_GuiStateProvider";
 import { AUDIO_ELEMENT_FOR_SAMPLING_INPUT, AUDIO_ELEMENT_FOR_SAMPLING_OUTPUT } from "../../../const";
+import { useAppRoot } from "../../../001_provider/001_AppRootProvider";
 
 export type RecorderAreaProps = {};
 
 export const RecorderArea = (_props: RecorderAreaProps) => {
     const { serverSetting } = useAppState();
     const { audioOutputForAnalyzer, setAudioOutputForAnalyzer, outputAudioDeviceInfo } = useGuiState();
-
     const [serverIORecording, setServerIORecording] = useState<boolean>(false);
+    const { appGuiSettingState } = useAppRoot();
+    const webEdition = appGuiSettingState.edition.indexOf("web") >= 0;
 
     const serverIORecorderRow = useMemo(() => {
+        if (webEdition) {
+            return <> </>;
+        }
         const onServerIORecordStartClicked = async () => {
             setServerIORecording(true);
             await serverSetting.updateServerSettings({ ...serverSetting.serverSetting, recordIO: 1 });

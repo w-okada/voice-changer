@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { ReactNode } from "react";
 import { useAppRoot } from "../../001_provider/001_AppRootProvider";
 import { StateControlCheckbox, useStateControlCheckbox } from "../../hooks/useStateControlCheckbox";
+import { useAppState } from "../../001_provider/001_AppStateProvider";
 
 export const OpenServerControlCheckbox = "open-server-control-checkbox";
 export const OpenModelSettingCheckbox = "open-model-setting-checkbox";
@@ -83,6 +84,12 @@ type GuiStateAndMethod = {
 
     textInputResolve: TextInputResolveType | null;
     setTextInputResolve: (val: TextInputResolveType | null) => void;
+
+    // for Beatrice
+    beatriceJVSSpeakerId: number;
+    beatriceJVSSpeakerPitch: number;
+    setBeatriceJVSSpeakerId: (id: number) => void;
+    setBeatriceJVSSpeakerPitch: (pitch: number) => void;
 };
 
 const GuiStateContext = React.createContext<GuiStateAndMethod | null>(null);
@@ -100,6 +107,7 @@ type TextInputResolveType = {
 
 export const GuiStateProvider = ({ children }: Props) => {
     const { appGuiSettingState } = useAppRoot();
+    const { serverSetting } = useAppState();
     const [isConverting, setIsConverting] = useState<boolean>(false);
     const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
     const [modelSlotNum, setModelSlotNum] = useState<number>(0);
@@ -116,6 +124,9 @@ export const GuiStateProvider = ({ children }: Props) => {
     const [audioOutputForAnalyzer, setAudioOutputForAnalyzer] = useState<string>("default");
 
     const [textInputResolve, setTextInputResolve] = useState<TextInputResolveType | null>(null);
+
+    const [beatriceJVSSpeakerId, setBeatriceJVSSpeakerId] = useState<number>(1);
+    const [beatriceJVSSpeakerPitch, setBeatriceJVSSpeakerPitch] = useState<number>(0);
 
     const reloadDeviceInfo = async () => {
         try {
@@ -242,6 +253,24 @@ export const GuiStateProvider = ({ children }: Props) => {
         setTimeout(show);
     }, [appGuiSettingState.edition]);
 
+    useEffect(() => {
+        let dstId;
+        if (beatriceJVSSpeakerPitch == 0) {
+            dstId = (beatriceJVSSpeakerId - 1) * 5;
+        } else if (beatriceJVSSpeakerPitch == 1) {
+            dstId = (beatriceJVSSpeakerId - 1) * 5 + 1;
+        } else if (beatriceJVSSpeakerPitch == 2) {
+            dstId = (beatriceJVSSpeakerId - 1) * 5 + 2;
+        } else if (beatriceJVSSpeakerPitch == -1) {
+            dstId = (beatriceJVSSpeakerId - 1) * 5 + 3;
+        } else if (beatriceJVSSpeakerPitch == -2) {
+            dstId = (beatriceJVSSpeakerId - 1) * 5 + 4;
+        } else {
+            throw new Error(`invalid beatriceJVSSpeakerPitch speaker:${beatriceJVSSpeakerId} pitch:${beatriceJVSSpeakerPitch}`);
+        }
+        serverSetting.updateServerSettings({ ...serverSetting.serverSetting, dstId: dstId });
+    }, [beatriceJVSSpeakerId, beatriceJVSSpeakerPitch]);
+
     const providerValue = {
         stateControls: {
             openServerControlCheckbox,
@@ -296,6 +325,12 @@ export const GuiStateProvider = ({ children }: Props) => {
 
         textInputResolve,
         setTextInputResolve,
+
+        // For Beatrice
+        beatriceJVSSpeakerId,
+        beatriceJVSSpeakerPitch,
+        setBeatriceJVSSpeakerId,
+        setBeatriceJVSSpeakerPitch,
     };
     return <GuiStateContext.Provider value={providerValue}>{children}</GuiStateContext.Provider>;
 };

@@ -12,6 +12,7 @@ export const VoiceChangerType = {
     "Diffusion-SVC": "Diffusion-SVC",
     Beatrice: "Beatrice",
     LLVC: "LLVC",
+    WebModel: "WebModel",
 } as const;
 export type VoiceChangerType = (typeof VoiceChangerType)[keyof typeof VoiceChangerType];
 
@@ -307,7 +308,15 @@ export type LLVCModelSlot = ModelSlot & {
     speakers: { [key: number]: string };
 };
 
-export type ModelSlotUnion = RVCModelSlot | MMVCv13ModelSlot | MMVCv15ModelSlot | SoVitsSvc40ModelSlot | DDSPSVCModelSlot | DiffusionSVCModelSlot | BeatriceModelSlot | LLVCModelSlot;
+export type WebModelSlot = ModelSlot & {
+    modelFile: string;
+    defaultTune: number;
+    modelType: RVCModelType;
+    f0: boolean;
+    samplingRate: number;
+};
+
+export type ModelSlotUnion = RVCModelSlot | MMVCv13ModelSlot | MMVCv15ModelSlot | SoVitsSvc40ModelSlot | DDSPSVCModelSlot | DiffusionSVCModelSlot | BeatriceModelSlot | LLVCModelSlot | WebModelSlot;
 
 type ServerAudioDevice = {
     kind: "audioinput" | "audiooutput";

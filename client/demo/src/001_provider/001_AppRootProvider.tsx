@@ -8,10 +8,10 @@ type Props = {
 };
 
 type AppRootValue = {
-    audioContextState: AudioConfigState
-    appGuiSettingState: AppGuiSettingStateAndMethod
-    getGUISetting: () => Promise<void>
-}
+    audioContextState: AudioConfigState;
+    appGuiSettingState: AppGuiSettingStateAndMethod;
+    getGUISetting: () => Promise<void>;
+};
 
 const AppRootContext = React.createContext<AppRootValue | null>(null);
 export const useAppRoot = (): AppRootValue => {
@@ -23,17 +23,16 @@ export const useAppRoot = (): AppRootValue => {
 };
 
 export const AppRootProvider = ({ children }: Props) => {
-    const audioContextState = useAudioConfig()
-    const appGuiSettingState = useAppGuiSetting()
-
+    const audioContextState = useAudioConfig();
+    const appGuiSettingState = useAppGuiSetting();
 
     const getGUISetting = async () => {
-        await appGuiSettingState.getAppGuiSetting(`/assets/gui_settings/GUI.json`)
-    }
+        await appGuiSettingState.getAppGuiSetting(`/assets/gui_settings/GUI.json`);
+    };
     const providerValue: AppRootValue = {
         audioContextState,
         appGuiSettingState,
-        getGUISetting
+        getGUISetting,
     };
     return <AppRootContext.Provider value={providerValue}>{children}</AppRootContext.Provider>;
 };
