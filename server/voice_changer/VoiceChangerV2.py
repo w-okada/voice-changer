@@ -300,9 +300,6 @@ class VoiceChangerV2(VoiceChangerIF):
                     outputData = result
 
                 if self.settings.recordIO == 1:
-                    print(f"-------------------------- - - -shapes::: {receivedData.shape}, {outputData.shape}")
-                    print(f"-------------------------- - - -shapes::: {receivedData.dtype}, {outputData.dtype}")
-                    print(f"-------------------------- - - -shapes::: {receivedData[0:10]}, {outputData[0:10]}")
                     self.ioRecorder.writeInput(receivedData)
                     self.ioRecorder.writeOutput(outputData.tobytes())
 

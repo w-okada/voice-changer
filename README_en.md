@@ -4,6 +4,12 @@
 
 ## What's New!
 
+- v.1.5.3.17
+  - New Features:
+    - Added similarity graph for Beatrice speaker selection 
+  - Bug Fixes:
+    - Fixed crossfade issue with Beatrice speaker
+
 - v.1.5.3.16a
   - Bug fix:
     - Lazy load Beatrice.
@@ -18,15 +24,6 @@
     - new rmvpe checkpoint for rvc (torch, onnx)
     - Mac: upgrade torch version 2.1.0
 
-- v.1.5.3.14
-  - Improve:
-    - onnx performance (need to be converted)
-  - Some fixes:
-    - change default f0 det to onnx_rmvpe
-    - disable unrecommnded f0 det on direct ml
-  - Experimental
-    - Add 16k RVC Sample (experimental) 
-  
 
 # What is VC Client
 
@@ -84,6 +81,9 @@ It can be used in two main ways, in order of difficulty:
 
 | Version     | OS  | フレームワーク                        | link                                                                | サポート VC                                                                         | サイズ |
 | ----------- | --- | ------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------ |
+| v.1.5.3.17  | mac | ONNX(cpu), PyTorch(cpu,mps)           | N/A                                                                 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                                    | 797MB  |
+|             | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3240MB |
+|             | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3125MB |
 | v.1.5.3.16a | mac | ONNX(cpu), PyTorch(cpu,mps)           | N/A                                                                 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                                    | 797MB  |
 |             | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3240MB |
 |             | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3125MB |
@@ -91,9 +91,6 @@ It can be used in two main ways, in order of difficulty:
 |             | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3240MB |
 |             | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3125MB |
 | v.1.5.3.15  | mac | ONNX(cpu), PyTorch(cpu,mps)           | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                                    | 797MB  |
-|             | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC           | 3240MB |
-|             | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC           | 3125MB |
-| v.1.5.3.14  | mac | ONNX(cpu), PyTorch(cpu,mps)           | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                                    | 797MB  |
 |             | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC           | 3240MB |
 |             | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC           | 3125MB |
 
