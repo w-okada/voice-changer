@@ -52,6 +52,7 @@ class LLVCInferencer:
                 inputTensor = torch.cat([self.front_ctx, inputTensor])
             self.front_ctx = inputTensor[-L * 2 :]
 
+            # すさまじい勢いでメモリリークしていく。。。？要調査
             audio1, self.enc_buf, self.dec_buf, self.out_buf, self.convnet_pre_ctx = self.model(
                 inputTensor.unsqueeze(0).unsqueeze(0),
                 self.enc_buf,
