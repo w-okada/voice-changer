@@ -12,6 +12,7 @@ import { DDSPSVC30SettingArea } from "./101-6_ddsp-svc30SettingArea";
 import { DiffusionSVCSettingArea } from "./101-7_diffusion-svcSettingArea";
 import { Portrait } from "./101-0_Portrait";
 import { useAppRoot } from "../../../001_provider/001_AppRootProvider";
+import { WebEditionSettingArea } from "./101-8_web-editionSettingArea";
 
 export type CharacterAreaProps = {};
 
@@ -226,6 +227,9 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
         if (!selected) {
             return <></>;
         }
+        if (webEdition) {
+            return <></>;
+        }
         const onUpdateDefaultClicked = async () => {
             await serverSetting.updateModelDefault();
         };
@@ -286,6 +290,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
                     <SoVitsSVC40SettingArea />
                     <DDSPSVC30SettingArea />
                     <DiffusionSVCSettingArea />
+                    <WebEditionSettingArea />
                     {modelSlotControl}
                 </div>
             </div>

@@ -61,7 +61,7 @@ export const AppStateProvider = ({ children }: Props) => {
     useEffect(() => {
         if (appRoot.appGuiSettingState.edition.indexOf("web") >= 0 && clientState.clientState.initialized) {
             clientState.clientState.setWorkletNodeSetting({ ...clientState.clientState.setting.workletNodeSetting, protocol: "internal" });
-            webInfoState.loadVoiceChanagerModel();
+            // webInfoState.loadVoiceChanagerModel(); // hook内でuseEffectでinvoke
         }
     }, [clientState.clientState.initialized]);
 
