@@ -1,5 +1,5 @@
 import { ClientState, WebModelSlot } from "@dannadori/voice-changer-client-js";
-import { VoiceChangerJSClientConfig, VoiceChangerJSClient } from "@dannadori/voice-changer-js";
+import { VoiceChangerJSClientConfig, VoiceChangerJSClient, ProgressUpdateType, ProgreeeUpdateCallbcckInfo } from "@dannadori/voice-changer-js";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 export type UseWebInfoProps = {
@@ -28,23 +28,52 @@ export type WebInfoState = {
     webModelLoadingState: WebModelLoadingState;
     progressLoadPreprocess: number;
     progressLoadVCModel: number;
+    progressWarmup: number;
     webModelslot: WebModelSlot;
 };
 export type WebInfoStateAndMethod = WebInfoState & {
     loadVoiceChanagerModel: () => Promise<void>;
 };
-// const modelUrl = `${baseUrl}/models/rvc2v_40k_f0_24000.bin`;
-// const modelUrl = `${baseUrl}/models/rvc2v_40k_nof0_24000.bin`;
-// const modelUrl = `${baseUrl}/models/rvc2v_16k_f0_24000.bin`;
-// const modelUrl = `${baseUrl}/models/rvcv2_amitaro_v2_40k_f0_24000.bin`;
-// const modelUrl = `${baseUrl}/models/rvcv2_amitaro_v2_40k_nof0_24000.bin`;
-// const modelUrl = `${baseUrl}/models/rvcv2_amitaro_v2_32k_f0_24000.bin`;
-// const modelUrl = `${baseUrl}/models/rvcv2_amitaro_v2_32k_nof0_24000.bin`;
 
-// const modelUrl = `${baseUrl}/models/rvcv1_amitaro_v1_32k_f0_24000.bin`;
-// const modelUrl = `${baseUrl}/models/rvcv1_amitaro_v1_32k_nof0_24000.bin`;
-// const modelUrl = `${baseUrl}/models/rvcv1_amitaro_v1_40k_f0_24000.bin`;
-// const modelUrl = `${baseUrl}/models/rvcv1_amitaro_v1_40k_nof0_24000.bin`;
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv1_amitaro_v1_32k_f0_8000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv1_amitaro_v1_32k_f0_12000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv1_amitaro_v1_32k_f0_16000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv1_amitaro_v1_32k_f0_24000.bin
+
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv1_amitaro_v1_32k_nof0_8000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv1_amitaro_v1_32k_nof0_12000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv1_amitaro_v1_32k_nof0_16000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv1_amitaro_v1_32k_nof0_24000.bin
+
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv1_amitaro_v1_40k_f0_8000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv1_amitaro_v1_40k_f0_12000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv1_amitaro_v1_40k_f0_16000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv1_amitaro_v1_40k_f0_24000.bin
+
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv1_amitaro_v1_40k_nof0_8000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv1_amitaro_v1_40k_nof0_12000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv1_amitaro_v1_40k_nof0_16000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv1_amitaro_v1_40k_nof0_24000.bin
+
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_32k_f0_8000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_32k_f0_12000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_32k_f0_16000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_32k_f0_24000.bin
+
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_32k_nof0_8000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_32k_nof0_12000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_32k_nof0_16000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_32k_nof0_24000.bin
+
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_40k_f0_8000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_40k_f0_12000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_40k_f0_16000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_40k_f0_24000.bin
+
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_40k_nof0_8000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_40k_nof0_12000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_40k_nof0_16000.bin
+// https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_40k_nof0_24000.bin
 
 const InitialVoiceChangerConfig: VoiceChangerConfig = {
     config: {
@@ -68,6 +97,7 @@ export const useWebInfo = (props: UseWebInfoProps): WebInfoStateAndMethod => {
     const [webModelLoadingState, setWebModelLoadingState] = useState<WebModelLoadingState>(WebModelLoadingState.none);
     const [progressLoadPreprocess, setProgressLoadPreprocess] = useState<number>(0);
     const [progressLoadVCModel, setProgressLoadVCModel] = useState<number>(0);
+    const [progressWarmup, setProgressWarmup] = useState<number>(0);
     const voiceChangerJSClient = useRef<VoiceChangerJSClient>();
 
     const webModelslot: WebModelSlot = useMemo(() => {
@@ -89,11 +119,13 @@ export const useWebInfo = (props: UseWebInfoProps): WebInfoStateAndMethod => {
     }, []);
 
     useEffect(() => {
-        const progressCallback = (data: any) => {
-            if (data.progressUpdateType === "loadPreprocessModel") {
+        const progressCallback = (data: ProgreeeUpdateCallbcckInfo) => {
+            if (data.progressUpdateType === ProgressUpdateType.loadPreprocessModel) {
                 setProgressLoadPreprocess(data.progress);
-            } else if (data.progressUpdateType === "loadVCModel") {
+            } else if (data.progressUpdateType === ProgressUpdateType.loadVCModel) {
                 setProgressLoadVCModel(data.progress);
+            } else if (data.progressUpdateType === ProgressUpdateType.checkResponseTime) {
+                setProgressWarmup(data.progress);
             }
         };
         setVoiceChangerConfig({ ...voiceChangerConfig, progressCallback });
@@ -113,7 +145,9 @@ export const useWebInfo = (props: UseWebInfoProps): WebInfoStateAndMethod => {
 
         // worm up
         setWebModelLoadingState("warmup");
-        const warmupResult = await voiceChangerJSClient.current.checkResponseTime();
+        const warmupResult = await voiceChangerJSClient.current.checkResponseTime((progress: number) => {
+            console.log(`Recieve Progress: ${progress}`);
+        });
         console.log("warmup result", warmupResult);
 
         // check time
@@ -137,6 +171,7 @@ export const useWebInfo = (props: UseWebInfoProps): WebInfoStateAndMethod => {
         webModelLoadingState,
         progressLoadPreprocess,
         progressLoadVCModel,
+        progressWarmup,
         webModelslot,
         loadVoiceChanagerModel,
     };

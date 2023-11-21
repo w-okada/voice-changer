@@ -17,7 +17,7 @@ export type CharacterAreaProps = {};
 
 export const CharacterArea = (_props: CharacterAreaProps) => {
     const { appGuiSettingState } = useAppRoot();
-    const { serverSetting, initializedRef, volume, bufferingTime, performance, setting, setVoiceChangerClientSetting, start, stop, webInfoState } = useAppState();
+    const { serverSetting, initializedRef, setting, setVoiceChangerClientSetting, start, stop, webInfoState } = useAppState();
     const guiState = useGuiState();
     const messageBuilderState = useMessageBuilder();
     const webEdition = appGuiSettingState.edition.indexOf("web") >= 0;
@@ -113,20 +113,31 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
         const startClassName = guiState.isConverting ? "character-area-control-button-active" : "character-area-control-button-stanby";
         const stopClassName = guiState.isConverting ? "character-area-control-button-stanby" : "character-area-control-button-active";
         const passThruClassName = serverSetting.serverSetting.passThrough == false ? "character-area-control-passthru-button-stanby" : "character-area-control-passthru-button-active blinking";
-        console.log("serverSetting.serverSetting.passThrough", passThruClassName, serverSetting.serverSetting.passThrough);
 
         if (webEdition && webInfoState.webModelLoadingState != "ready") {
-            return (
-                <div className="character-area-control">
-                    <div className="character-area-control-title">wait...</div>
-                    <div className="character-area-control-field">
-                        <div className="character-area-text blink">{webInfoState.webModelLoadingState}..</div>
-                        <div className="character-area-text">
-                            pre:{Math.floor(webInfoState.progressLoadPreprocess * 100)}%, model: {Math.floor(webInfoState.progressLoadVCModel * 100)}%
+            if (webInfoState.webModelLoadingState == "none" || webInfoState.webModelLoadingState == "loading") {
+                return (
+                    <div className="character-area-control">
+                        <div className="character-area-control-title">wait...</div>
+                        <div className="character-area-control-field">
+                            <div className="character-area-text blink">{webInfoState.webModelLoadingState}..</div>
+                            <div className="character-area-text">
+                                pre:{Math.floor(webInfoState.progressLoadPreprocess * 100)}%, model: {Math.floor(webInfoState.progressLoadVCModel * 100)}%
+                            </div>
                         </div>
                     </div>
-                </div>
-            );
+                );
+            } else if (webInfoState.webModelLoadingState == "warmup") {
+                return (
+                    <div className="character-area-control">
+                        <div className="character-area-control-title">wait...</div>
+                        <div className="character-area-control-field">
+                            <div className="character-area-text blink">{webInfoState.webModelLoadingState}..</div>
+                            <div className="character-area-text">warm up:{Math.floor(webInfoState.progressWarmup * 100)}%</div>
+                        </div>
+                    </div>
+                );
+            }
         } else {
             return (
                 <div className="character-area-control">
@@ -144,7 +155,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
                 </div>
             );
         }
-    }, [guiState.isConverting, start, stop, serverSetting.serverSetting, serverSetting.updateServerSettings, webInfoState.progressLoadPreprocess, webInfoState.progressLoadVCModel, webInfoState.webModelLoadingState]);
+    }, [guiState.isConverting, start, stop, serverSetting.serverSetting, serverSetting.updateServerSettings, webInfoState.progressLoadPreprocess, webInfoState.progressLoadVCModel, webInfoState.progressWarmup, webInfoState.webModelLoadingState]);
 
     const gainControl = useMemo(() => {
         const currentInputGain = serverSetting.serverSetting.enableServerAudio == 0 ? setting.voiceChangerClientSetting.inputGain : serverSetting.serverSetting.serverInputAudioGain;
