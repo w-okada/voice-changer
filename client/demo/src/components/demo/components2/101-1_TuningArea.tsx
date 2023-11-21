@@ -1,14 +1,20 @@
 import React, { useMemo } from "react";
 import { useAppState } from "../../../001_provider/001_AppStateProvider";
 import { useGuiState } from "../001_GuiStateProvider";
+import { useAppRoot } from "../../../001_provider/001_AppRootProvider";
 
 export type TuningAreaProps = {};
 
 export const TuningArea = (_props: TuningAreaProps) => {
-    const { serverSetting } = useAppState();
-    const { beatriceJVSSpeakerId, setBeatriceJVSSpeakerPitch, beatriceJVSSpeakerPitch } = useGuiState();
+    const { appGuiSettingState } = useAppRoot();
+    const { serverSetting, webInfoState } = useAppState();
+    const { setBeatriceJVSSpeakerPitch, beatriceJVSSpeakerPitch } = useGuiState();
+    const webEdition = appGuiSettingState.edition.indexOf("web") >= 0;
 
     const selected = useMemo(() => {
+        if (webEdition) {
+            return webInfoState.webModelslot;
+        }
         if (serverSetting.serverSetting.modelSlotIndex == undefined) {
             return;
         } else if (serverSetting.serverSetting.modelSlotIndex == "Beatrice-JVS") {
@@ -17,7 +23,7 @@ export const TuningArea = (_props: TuningAreaProps) => {
         } else {
             return serverSetting.serverSetting.modelSlots[serverSetting.serverSetting.modelSlotIndex];
         }
-    }, [serverSetting.serverSetting.modelSlotIndex, serverSetting.serverSetting.modelSlots]);
+    }, [serverSetting.serverSetting.modelSlotIndex, serverSetting.serverSetting.modelSlots, webEdition]);
 
     const tuningArea = useMemo(() => {
         if (!selected) {
@@ -57,9 +63,18 @@ export const TuningArea = (_props: TuningAreaProps) => {
             );
         }
 
-        const currentTuning = serverSetting.serverSetting.tran;
+        let currentTuning;
+        if (webEdition) {
+            currentTuning = webInfoState.upkey;
+        } else {
+            currentTuning = serverSetting.serverSetting.tran;
+        }
         const tranValueUpdatedAction = async (val: number) => {
-            await serverSetting.updateServerSettings({ ...serverSetting.serverSetting, tran: val });
+            if (webEdition) {
+                webInfoState.setUpkey(val);
+            } else {
+                await serverSetting.updateServerSettings({ ...serverSetting.serverSetting, tran: val });
+            }
         };
 
         return (
@@ -85,7 +100,7 @@ export const TuningArea = (_props: TuningAreaProps) => {
                 </div>
             </div>
         );
-    }, [serverSetting.serverSetting, serverSetting.updateServerSettings, selected]);
+    }, [serverSetting.serverSetting, serverSetting.updateServerSettings, selected, webEdition, webInfoState.upkey]);
 
     return tuningArea;
 };

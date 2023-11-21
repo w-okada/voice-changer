@@ -137,6 +137,8 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
                         </div>
                     </div>
                 );
+            } else {
+                throw new Error("invalid webModelLoadingState");
             }
         } else {
             return (

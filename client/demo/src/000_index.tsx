@@ -13,6 +13,7 @@ import { AppRootProvider, useAppRoot } from "./001_provider/001_AppRootProvider"
 import { useIndexedDB } from "@dannadori/voice-changer-client-js";
 import { Demo } from "./components/demo/010_Demo";
 import { useMessageBuilder } from "./hooks/useMessageBuilder";
+import { removeDB as webDBRemove } from "@dannadori/voice-changer-js";
 
 library.add(fas, far, fab);
 
@@ -57,6 +58,7 @@ const AppStateWrapper = () => {
 
         const onClearCacheClicked = async () => {
             await removeDB();
+            await webDBRemove();
             location.reload();
         };
         const onReloadClicked = () => {

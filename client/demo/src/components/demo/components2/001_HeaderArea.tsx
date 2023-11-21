@@ -4,6 +4,7 @@ import { useAppRoot } from "../../../001_provider/001_AppRootProvider";
 import { useAppState } from "../../../001_provider/001_AppStateProvider";
 import { useIndexedDB } from "@dannadori/voice-changer-client-js";
 import { useMessageBuilder } from "../../../hooks/useMessageBuilder";
+import { removeDB as webDBRemove } from "@dannadori/voice-changer-js";
 
 export type HeaderAreaProps = {
     mainTitle: string;
@@ -119,6 +120,7 @@ export const HeaderArea = (props: HeaderAreaProps) => {
         const onClearSettingClicked = async () => {
             await clearSetting();
             await removeItem(INDEXEDDB_KEY_AUDIO_OUTPUT);
+            await webDBRemove();
             location.reload();
         };
 
