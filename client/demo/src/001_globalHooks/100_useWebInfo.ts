@@ -1,5 +1,5 @@
 import { ClientState, WebModelSlot } from "@dannadori/voice-changer-client-js";
-import { VoiceChangerJSClientConfig, VoiceChangerJSClient, ProgressUpdateType, ProgreeeUpdateCallbcckInfo, VoiceChangerType, InputLengthKey } from "@dannadori/voice-changer-js";
+import { VoiceChangerJSClientConfig, VoiceChangerJSClient, ProgressUpdateType, ProgreeeUpdateCallbcckInfo, VoiceChangerType, InputLengthKey, ResponseTimeInfo } from "@dannadori/voice-changer-js";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 export type UseWebInfoProps = {
@@ -33,6 +33,7 @@ export type WebInfoState = {
     progressWarmup: number;
     webModelslot: WebModelSlot;
     upkey: number;
+    responseTimeInfo: ResponseTimeInfo;
 };
 export type WebInfoStateAndMethod = WebInfoState & {
     loadVoiceChanagerModel: () => Promise<void>;
@@ -160,7 +161,7 @@ export const useWebInfo = (props: UseWebInfoProps): WebInfoStateAndMethod => {
             name: "あみたろ",
             termOfUse: "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/amitaro_contentvec_256/term_of_use.txt",
             sampleRate: sampleRate,
-            useF0: false,
+            useF0: useF0,
             inputLength: inputLength,
             progressCallback,
         };
@@ -173,6 +174,11 @@ export const useWebInfo = (props: UseWebInfoProps): WebInfoStateAndMethod => {
     const [progressLoadVCModel, setProgressLoadVCModel] = useState<number>(0);
     const [progressWarmup, setProgressWarmup] = useState<number>(0);
     const [upkey, setUpkey] = useState<number>(0);
+    const [responseTimeInfo, setResponseTimeInfo] = useState<ResponseTimeInfo>({
+        responseTime: 0,
+        realDuration: 0,
+        rtf: 0,
+    });
     const voiceChangerJSClient = useRef<VoiceChangerJSClient>();
 
     const webModelslot: WebModelSlot = useMemo(() => {
@@ -223,6 +229,7 @@ export const useWebInfo = (props: UseWebInfoProps): WebInfoStateAndMethod => {
         // check time
         const responseTimeInfo = await voiceChangerJSClient.current.checkResponseTime();
         console.log("responseTimeInfo", responseTimeInfo);
+        setResponseTimeInfo(responseTimeInfo);
 
         props.clientState?.setInternalAudioProcessCallback({
             processAudio: async (data: Uint8Array) => {
@@ -231,6 +238,7 @@ export const useWebInfo = (props: UseWebInfoProps): WebInfoStateAndMethod => {
                 const audio = new Uint8Array(res[0].buffer);
                 if (res[1]) {
                     console.log("RESPONSE!", res[1]);
+                    setResponseTimeInfo(res[1]);
                 }
                 return audio;
             },
@@ -263,6 +271,7 @@ export const useWebInfo = (props: UseWebInfoProps): WebInfoStateAndMethod => {
         progressWarmup,
         webModelslot,
         upkey,
+        responseTimeInfo,
         loadVoiceChanagerModel,
         setUpkey,
         setVoiceChangerConfig,

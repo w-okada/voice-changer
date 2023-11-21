@@ -48,13 +48,20 @@ export const Portrait = (_props: PortraitProps) => {
         const vol = document.getElementById("status-vol") as HTMLSpanElement;
         const buf = document.getElementById("status-buf") as HTMLSpanElement;
         const res = document.getElementById("status-res") as HTMLSpanElement;
+        const rtf = document.getElementById("status-rtf") as HTMLSpanElement;
         if (!vol || !buf || !res) {
             return;
         }
         vol.innerText = volume.toFixed(4);
-        buf.innerText = bufferingTime.toString();
-        res.innerText = performance.responseTime.toString();
-    }, [volume, bufferingTime, performance]);
+        if (webEdition) {
+            buf.innerText = webInfoState.responseTimeInfo.realDuration.toString() ?? "0";
+            res.innerText = webInfoState.responseTimeInfo.responseTime.toString() ?? "0";
+            rtf.innerText = webInfoState.responseTimeInfo.rtf.toString() ?? "0";
+        } else {
+            buf.innerText = bufferingTime.toString();
+            res.innerText = performance.responseTime.toString();
+        }
+    }, [volume, bufferingTime, performance, webInfoState.responseTimeInfo]);
 
     const setSelectedClass = () => {
         const iframe = document.querySelector(".beatrice-speaker-graph-container");
@@ -193,6 +200,9 @@ export const Portrait = (_props: PortraitProps) => {
                         </p>
                         <p>
                             res: <span id="status-res">0</span> ms
+                        </p>
+                        <p>
+                            rtf: <span id="status-rtf">0</span>
                         </p>
                     </div>
                     <div className="portrait-area-terms-of-use">{selectedTermOfUseUrlLink}</div>

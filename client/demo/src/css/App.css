@@ -1364,6 +1364,15 @@ body {
                         border: solid 1px #000;
                     }
                 }
+                .character-area-control-button-disable {
+                    width: 5rem;
+                    border: solid 1px #333;
+                    border-radius: 2px;
+                    background: #d3d7d3;
+                    font-weight: 700;
+                    text-align: center;
+                    color: grey;
+                }
                 .character-area-control-passthru-button-stanby {
                     width: 5rem;
                     border: solid 1px #999;
