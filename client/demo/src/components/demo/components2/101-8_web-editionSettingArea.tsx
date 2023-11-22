@@ -91,7 +91,6 @@ export const WebEditionSettingArea = (_props: WebEditionSettingAreaProps) => {
             </div>
         );
 
-        console.log("webInfoState.voiceChangerConfig.useF0 ", webInfoState.voiceChangerConfig.useF0);
         const pitchEnableClassName = "character-area-control-button" + (webInfoState.voiceChangerConfig.useF0 == true ? " character-area-control-button-active" : " character-area-control-button-stanby");
         const pitchDisableClassName = "character-area-control-button" + (webInfoState.voiceChangerConfig.useF0 == false ? " character-area-control-button-active" : " character-area-control-button-stanby");
         const pitch = (

@@ -157,7 +157,7 @@ export const useWebInfo = (props: UseWebInfoProps): WebInfoStateAndMethod => {
                 outputSamplingRate: 48000,
             },
             modelUrl: modelUrl,
-            portrait: `${window.location.origin}/models/amitaro.png`,
+            portrait: "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/amitaro.png",
             name: "あみたろ",
             termOfUse: "https://huggingface.co/wok000/vcclient_model/raw/main/rvc/amitaro_contentvec_256/term_of_use.txt",
             sampleRate: sampleRate,
