@@ -4,6 +4,7 @@ import { fileSelectorAsDataURL, useIndexedDB } from "@dannadori/voice-changer-cl
 import { useGuiState } from "../001_GuiStateProvider";
 import { AUDIO_ELEMENT_FOR_PLAY_MONITOR, AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_CONVERTED, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK, AUDIO_ELEMENT_FOR_TEST_ORIGINAL, INDEXEDDB_KEY_AUDIO_MONITR, INDEXEDDB_KEY_AUDIO_OUTPUT } from "../../../const";
 import { isDesktopApp } from "../../../const";
+import { useAppRoot } from "../../../001_provider/001_AppRootProvider";
 
 export type DeviceAreaProps = {};
 
@@ -19,8 +20,19 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
     const { getItem, setItem } = useIndexedDB({ clientType: null });
     const [outputRecordingStarted, setOutputRecordingStarted] = useState<boolean>(false);
 
+    const { appGuiSettingState } = useAppRoot();
+    const webEdition = appGuiSettingState.edition.indexOf("web") >= 0;
+
     // (1) Audio Mode
     const deviceModeRow = useMemo(() => {
+        if (webEdition) {
+            return (
+                <div className="config-sub-area-control">
+                    <div className="config-sub-area-control-title">AUDIO:</div>
+                    <div className="config-sub-area-control-field"></div>
+                </div>
+            );
+        }
         const enableServerAudio = serverSetting.serverSetting.enableServerAudio;
         const clientChecked = enableServerAudio == 1 ? false : true;
         const serverChecked = enableServerAudio == 1 ? true : false;

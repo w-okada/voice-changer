@@ -142,21 +142,37 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
                 throw new Error("invalid webModelLoadingState");
             }
         } else {
-            return (
-                <div className="character-area-control">
-                    <div className="character-area-control-buttons">
-                        <div onClick={onStartClicked} className={startClassName}>
-                            start
-                        </div>
-                        <div onClick={onStopClicked} className={stopClassName}>
-                            stop
-                        </div>
-                        <div onClick={onPassThroughClicked} className={passThruClassName}>
-                            passthru
+            if (webEdition) {
+                return (
+                    <div className="character-area-control">
+                        <div className="character-area-control-buttons">
+                            <div onClick={onStartClicked} className={startClassName}>
+                                start
+                            </div>
+                            <div onClick={onStopClicked} className={stopClassName}>
+                                stop
+                            </div>
                         </div>
                     </div>
-                </div>
-            );
+                );
+            } else {
+                return (
+                    <div className="character-area-control">
+                        <div className="character-area-control-buttons">
+                            <div onClick={onStartClicked} className={startClassName}>
+                                start
+                            </div>
+                            <div onClick={onStopClicked} className={stopClassName}>
+                                stop
+                            </div>
+
+                            <div onClick={onPassThroughClicked} className={passThruClassName}>
+                                passthru
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
         }
     }, [guiState.isConverting, start, stop, serverSetting.serverSetting, serverSetting.updateServerSettings, webInfoState.progressLoadPreprocess, webInfoState.progressLoadVCModel, webInfoState.progressWarmup, webInfoState.webModelLoadingState]);
 

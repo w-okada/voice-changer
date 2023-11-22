@@ -125,10 +125,10 @@ const f0ModelUrl: { [modelType in VoiceChangerType]: { [inputLength in InputLeng
 };
 
 export const useWebInfo = (props: UseWebInfoProps): WebInfoStateAndMethod => {
-    const initVoiceChangerType: VoiceChangerType = "rvcv1";
+    const initVoiceChangerType: VoiceChangerType = "rvcv2";
     const initInputLength: InputLengthKey = "24000";
     const initUseF0 = false;
-    const initSampleRate: ModelSampleRateStr = "40k";
+    const initSampleRate: ModelSampleRateStr = "32k";
 
     const progressCallback = (data: ProgreeeUpdateCallbcckInfo) => {
         if (data.progressUpdateType === ProgressUpdateType.loadPreprocessModel) {
