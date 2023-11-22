@@ -15,6 +15,7 @@ type AppStateValue = ClientState & {
     audioContext: AudioContext;
     initializedRef: React.MutableRefObject<boolean>;
     webInfoState: WebInfoStateAndMethod;
+    webEdition: boolean;
 };
 
 const AppStateContext = React.createContext<AppStateValue | null>(null);
@@ -28,9 +29,10 @@ export const useAppState = (): AppStateValue => {
 
 export const AppStateProvider = ({ children }: Props) => {
     const appRoot = useAppRoot();
+    const webEdition = appRoot.appGuiSettingState.edition.indexOf("web") >= 0;
     const clientState = useVCClient({ audioContext: appRoot.audioContextState.audioContext });
     const messageBuilderState = useMessageBuilder();
-    const webInfoState = useWebInfo(clientState);
+    const webInfoState = useWebInfo({ clientState: clientState.clientState, webEdition: webEdition });
     // const voiceChangerJSClient = useRef<VoiceChangerJSClient>();
 
     useEffect(() => {
@@ -70,6 +72,7 @@ export const AppStateProvider = ({ children }: Props) => {
         ...clientState.clientState,
         initializedRef,
         webInfoState,
+        webEdition,
     };
 
     return <AppStateContext.Provider value={providerValue}>{children}</AppStateContext.Provider>;

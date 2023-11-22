@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 export type UseWebInfoProps = {
     clientState: ClientState | null;
+    webEdition: boolean;
 };
 
 export const WebModelLoadingState = {
@@ -213,6 +214,10 @@ export const useWebInfo = (props: UseWebInfoProps): WebInfoStateAndMethod => {
         }
         if (!props.clientState.initialized) {
             console.warn("[useWebInfo] clientState is not initialized yet");
+            return;
+        }
+        if (!props.webEdition) {
+            console.warn("[useWebInfo] this is not web edition");
             return;
         }
         console.log("loadVoiceChanagerModel1", voiceChangerConfig);
