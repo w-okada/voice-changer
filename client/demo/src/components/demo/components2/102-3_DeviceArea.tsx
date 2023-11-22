@@ -10,7 +10,7 @@ export type DeviceAreaProps = {};
 
 export const DeviceArea = (_props: DeviceAreaProps) => {
     const { setting, serverSetting, audioContext, setAudioOutputElementId, setAudioMonitorElementId, initializedRef, setVoiceChangerClientSetting, startOutputRecording, stopOutputRecording } = useAppState();
-    const { isConverting, audioInputForGUI, inputAudioDeviceInfo, setAudioInputForGUI, fileInputEchoback, setFileInputEchoback, setAudioOutputForGUI, setAudioMonitorForGUI, audioOutputForGUI, audioMonitorForGUI, outputAudioDeviceInfo, shareScreenEnabled, setShareScreenEnabled } = useGuiState();
+    const { isConverting, audioInputForGUI, inputAudioDeviceInfo, setAudioInputForGUI, fileInputEchoback, setFileInputEchoback, setAudioOutputForGUI, setAudioMonitorForGUI, audioOutputForGUI, audioMonitorForGUI, outputAudioDeviceInfo, shareScreenEnabled, setShareScreenEnabled, reloadDeviceInfo } = useGuiState();
     const [inputHostApi, setInputHostApi] = useState<string>("ALL");
     const [outputHostApi, setOutputHostApi] = useState<string>("ALL");
     const [monitorHostApi, setMonitorHostApi] = useState<string>("ALL");
@@ -29,7 +29,13 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
             return (
                 <div className="config-sub-area-control">
                     <div className="config-sub-area-control-title">AUDIO:</div>
-                    <div className="config-sub-area-control-field"></div>
+                    <div className="config-sub-area-control-field">
+                        <div className="config-sub-area-buttons">
+                            <div onClick={reloadDeviceInfo} className="config-sub-area-button">
+                                reload
+                            </div>
+                        </div>
+                    </div>
                 </div>
             );
         }
@@ -74,6 +80,12 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                                 }}
                             />
                             <label htmlFor="server-device">server</label>
+                        </div>
+
+                        <div className="config-sub-area-buttons">
+                            <div onClick={reloadDeviceInfo} className="config-sub-area-button">
+                                reload
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -16,6 +16,7 @@ from voice_changer.utils.VoiceChangerModel import AudioInOut
 from typing import Protocol
 from typing import Union
 from typing import Literal, TypeAlias
+
 AudioDeviceKind: TypeAlias = Literal["input", "output"]
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
@@ -69,9 +70,7 @@ EditableServerDeviceSettings = {
         "serverOutputAudioGain",
         "serverMonitorAudioGain",
     ],
-    "boolData": [
-        "exclusiveMode"
-    ]
+    "boolData": ["exclusiveMode"],
 }
 
 
@@ -233,24 +232,8 @@ class ServerDevice:
             return False
 
     def runNoMonitorSeparate(self, block_frame: int, inputMaxChannel: int, outputMaxChannel: int, inputExtraSetting, outputExtraSetting):
-        with sd.InputStream(
-            callback=self.audioInput_callback_outQueue,
-            dtype="float32",
-            device=self.settings.serverInputDeviceId,
-            blocksize=block_frame,
-            samplerate=self.settings.serverInputAudioSampleRate,
-            channels=inputMaxChannel,
-            extra_settings=inputExtraSetting
-        ):
-            with sd.OutputStream(
-                callback=self.audioOutput_callback,
-                dtype="float32",
-                device=self.settings.serverOutputDeviceId,
-                blocksize=block_frame,
-                samplerate=self.settings.serverOutputAudioSampleRate,
-                channels=outputMaxChannel,
-                extra_settings=outputExtraSetting
-            ):
+        with sd.InputStream(callback=self.audioInput_callback_outQueue, dtype="float32", device=self.settings.serverInputDeviceId, blocksize=block_frame, samplerate=self.settings.serverInputAudioSampleRate, channels=inputMaxChannel, extra_settings=inputExtraSetting):
+            with sd.OutputStream(callback=self.audioOutput_callback, dtype="float32", device=self.settings.serverOutputDeviceId, blocksize=block_frame, samplerate=self.settings.serverOutputAudioSampleRate, channels=outputMaxChannel, extra_settings=outputExtraSetting):
                 while True:
                     changed = self.checkSettingChanged()
                     if changed:
@@ -263,24 +246,8 @@ class ServerDevice:
                     # print(f"                monitor: id:{self.settings.serverMonitorDeviceId}, sr:{self.settings.serverMonitorAudioSampleRate}, ch:{self.serverMonitorAudioDevice.maxOutputChannels}")
 
     def runWithMonitorStandard(self, block_frame: int, inputMaxChannel: int, outputMaxChannel: int, monitorMaxChannel: int, inputExtraSetting, outputExtraSetting, monitorExtraSetting):
-        with sd.Stream(
-            callback=self.audio_callback_outQueue,
-            dtype="float32",
-            device=(self.settings.serverInputDeviceId, self.settings.serverMonitorDeviceId),
-            blocksize=block_frame,
-            samplerate=self.settings.serverInputAudioSampleRate,
-            channels=(inputMaxChannel, monitorMaxChannel),
-            extra_settings=[inputExtraSetting, monitorExtraSetting]
-        ):
-            with sd.OutputStream(
-                callback=self.audioOutput_callback,
-                dtype="float32",
-                device=self.settings.serverOutputDeviceId,
-                blocksize=block_frame,
-                samplerate=self.settings.serverOutputAudioSampleRate,
-                channels=outputMaxChannel,
-                extra_settings=outputExtraSetting
-            ):
+        with sd.Stream(callback=self.audio_callback_outQueue, dtype="float32", device=(self.settings.serverInputDeviceId, self.settings.serverMonitorDeviceId), blocksize=block_frame, samplerate=self.settings.serverInputAudioSampleRate, channels=(inputMaxChannel, monitorMaxChannel), extra_settings=[inputExtraSetting, monitorExtraSetting]):
+            with sd.OutputStream(callback=self.audioOutput_callback, dtype="float32", device=self.settings.serverOutputDeviceId, blocksize=block_frame, samplerate=self.settings.serverOutputAudioSampleRate, channels=outputMaxChannel, extra_settings=outputExtraSetting):
                 while True:
                     changed = self.checkSettingChanged()
                     if changed:
@@ -293,33 +260,9 @@ class ServerDevice:
                     print(f"                monitor: id:{self.settings.serverMonitorDeviceId}, sr:{self.settings.serverMonitorAudioSampleRate}, ch:{monitorMaxChannel}")
 
     def runWithMonitorAllSeparate(self, block_frame: int, inputMaxChannel: int, outputMaxChannel: int, monitorMaxChannel: int, inputExtraSetting, outputExtraSetting, monitorExtraSetting):
-        with sd.InputStream(
-            callback=self.audioInput_callback_outQueue_monQueue,
-            dtype="float32",
-            device=self.settings.serverInputDeviceId,
-            blocksize=block_frame,
-            samplerate=self.settings.serverInputAudioSampleRate,
-            channels=inputMaxChannel,
-            extra_settings=inputExtraSetting
-        ):
-            with sd.OutputStream(
-                callback=self.audioOutput_callback,
-                dtype="float32",
-                device=self.settings.serverOutputDeviceId,
-                blocksize=block_frame,
-                samplerate=self.settings.serverOutputAudioSampleRate,
-                channels=outputMaxChannel,
-                extra_settings=outputExtraSetting
-            ):
-                with sd.OutputStream(
-                    callback=self.audioMonitor_callback,
-                    dtype="float32",
-                    device=self.settings.serverMonitorDeviceId,
-                    blocksize=block_frame,
-                    samplerate=self.settings.serverMonitorAudioSampleRate,
-                    channels=monitorMaxChannel,
-                    extra_settings=monitorExtraSetting
-                ):
+        with sd.InputStream(callback=self.audioInput_callback_outQueue_monQueue, dtype="float32", device=self.settings.serverInputDeviceId, blocksize=block_frame, samplerate=self.settings.serverInputAudioSampleRate, channels=inputMaxChannel, extra_settings=inputExtraSetting):
+            with sd.OutputStream(callback=self.audioOutput_callback, dtype="float32", device=self.settings.serverOutputDeviceId, blocksize=block_frame, samplerate=self.settings.serverOutputAudioSampleRate, channels=outputMaxChannel, extra_settings=outputExtraSetting):
+                with sd.OutputStream(callback=self.audioMonitor_callback, dtype="float32", device=self.settings.serverMonitorDeviceId, blocksize=block_frame, samplerate=self.settings.serverMonitorAudioSampleRate, channels=monitorMaxChannel, extra_settings=monitorExtraSetting):
                     while True:
                         changed = self.checkSettingChanged()
                         if changed:
@@ -338,6 +281,8 @@ class ServerDevice:
         self.currentModelSamplingRate = -1
         while True:
             if self.settings.serverAudioStated == 0 or self.settings.serverInputDeviceId == -1:
+                sd._terminate()
+                sd._initialize()
                 time.sleep(2)
             else:
                 sd._terminate()
@@ -474,6 +419,7 @@ class ServerDevice:
                 except Exception as e:
                     print("[Voice Changer] processing, ex:", e)
                     import traceback
+
                     traceback.print_exc()
                     time.sleep(2)
 

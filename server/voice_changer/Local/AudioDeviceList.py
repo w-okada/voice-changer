@@ -5,6 +5,7 @@ import numpy as np
 
 from const import ServerAudioDeviceType
 from mods.log_control import VoiceChangaerLogger
+
 # from const import SERVER_DEVICE_SAMPLE_RATES
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
@@ -26,18 +27,20 @@ def dummy_callback(data: np.ndarray, frames, times, status):
     pass
 
 
-def checkSamplingRate(deviceId: int, desiredSamplingRate: int, type: ServerAudioDeviceType):
+def checkSamplingRate(
+    deviceId: int, desiredSamplingRate: int, type: ServerAudioDeviceType
+):
     if type == "input":
         try:
             with sd.InputStream(
                 device=deviceId,
                 callback=dummy_callback,
                 dtype="float32",
-                samplerate=desiredSamplingRate
+                samplerate=desiredSamplingRate,
             ):
                 pass
             return True
-        except Exception as e: # NOQA
+        except Exception as e:  # NOQA
             # print("[checkSamplingRate]", e)
             return False
     else:
@@ -46,11 +49,11 @@ def checkSamplingRate(deviceId: int, desiredSamplingRate: int, type: ServerAudio
                 device=deviceId,
                 callback=dummy_callback,
                 dtype="float32",
-                samplerate=desiredSamplingRate
+                samplerate=desiredSamplingRate,
             ):
                 pass
             return True
-        except Exception as e: # NOQA
+        except Exception as e:  # NOQA
             # print("[checkSamplingRate]", e)
             return False
 
