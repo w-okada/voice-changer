@@ -3,7 +3,6 @@ import { useAppState } from "../../../001_provider/001_AppStateProvider";
 import { useGuiState } from "../001_GuiStateProvider";
 import { useMessageBuilder } from "../../../hooks/useMessageBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useAppRoot } from "../../../001_provider/001_AppRootProvider";
 
 export type ModelSlotAreaProps = {};
 
@@ -14,8 +13,7 @@ const SortTypes = {
 export type SortTypes = (typeof SortTypes)[keyof typeof SortTypes];
 
 export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
-    const { serverSetting, getInfo } = useAppState();
-    const { appGuiSettingState } = useAppRoot();
+    const { serverSetting, getInfo, webEdition } = useAppState();
     const guiState = useGuiState();
     const messageBuilderState = useMessageBuilder();
     const [sortType, setSortType] = useState<SortTypes>("slot");
@@ -118,7 +116,7 @@ export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
         );
     }, [modelTiles, sortType]);
 
-    if (appGuiSettingState.edition.indexOf("web") >= 0) {
+    if (webEdition) {
         return <></>;
     }
 

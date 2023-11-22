@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useAppState } from "../../../001_provider/001_AppStateProvider";
 import { useMessageBuilder } from "../../../hooks/useMessageBuilder";
-import { useAppRoot } from "../../../001_provider/001_AppRootProvider";
 export type PortraitProps = {};
 const BeatriceSpeakerType = {
     male: "male",
@@ -13,8 +12,7 @@ type BeatriceSpeakerType = (typeof BeatriceSpeakerType)[keyof typeof BeatriceSpe
 import MyIcon from "./female-clickable.svg";
 import { useGuiState } from "../001_GuiStateProvider";
 export const Portrait = (_props: PortraitProps) => {
-    const { appGuiSettingState } = useAppRoot();
-    const { serverSetting, volume, bufferingTime, performance, webInfoState } = useAppState();
+    const { serverSetting, volume, bufferingTime, performance, webInfoState, webEdition } = useAppState();
     const messageBuilderState = useMessageBuilder();
     const [beatriceSpeakerType, setBeatriceSpeakerType] = useState<BeatriceSpeakerType>(BeatriceSpeakerType.male);
     const [beatriceSpeakerIndexInGender, setBeatriceSpeakerIndexInGender] = useState<string>("");
@@ -22,8 +20,6 @@ export const Portrait = (_props: PortraitProps) => {
 
     const beatriceMaleSpeakersList = [1, 3, 5, 6, 9, 11, 12, 13, 20, 21, 22, 23, 28, 31, 32, 33, 34, 37, 41, 42, 44, 45, 46, 47, 48, 49, 50, 52, 54, 68, 70, 71, 73, 74, 75, 76, 77, 78, 79, 80, 81, 86, 87, 88, 89, 97, 98, 99, 100];
     const beatriceFemaleSpeakersList = [2, 4, 7, 8, 10, 14, 15, 16, 17, 18, 19, 24, 25, 26, 27, 29, 30, 35, 36, 38, 39, 40, 43, 51, 53, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 69, 72, 82, 83, 84, 85, 90, 91, 92, 93, 94, 95, 96];
-
-    const webEdition = appGuiSettingState.edition.indexOf("web") >= 0;
 
     useMemo(() => {
         messageBuilderState.setMessage(__filename, "terms_of_use", { ja: "利用規約", en: "terms of use" });

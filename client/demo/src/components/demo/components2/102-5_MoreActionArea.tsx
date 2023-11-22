@@ -1,13 +1,12 @@
 import React, { useMemo } from "react";
 import { useGuiState } from "../001_GuiStateProvider";
-import { useAppRoot } from "../../../001_provider/001_AppRootProvider";
+import { useAppState } from "../../../001_provider/001_AppStateProvider";
 
 export type MoreActionAreaProps = {};
 
 export const MoreActionArea = (_props: MoreActionAreaProps) => {
     const { stateControls } = useGuiState();
-    const { appGuiSettingState } = useAppRoot();
-    const webEdition = appGuiSettingState.edition.indexOf("web") >= 0;
+    const { webEdition } = useAppState();
 
     const serverIORecorderRow = useMemo(() => {
         const onOpenMergeLabClicked = () => {

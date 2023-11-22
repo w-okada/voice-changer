@@ -1,14 +1,11 @@
 import React, { useMemo } from "react";
 import { useAppState } from "../../../001_provider/001_AppStateProvider";
-import { useAppRoot } from "../../../001_provider/001_AppRootProvider";
 import { useGuiState } from "../001_GuiStateProvider";
 
 export type WebEditionSettingAreaProps = {};
 
 export const WebEditionSettingArea = (_props: WebEditionSettingAreaProps) => {
-    const { serverSetting, webInfoState } = useAppState();
-    const { appGuiSettingState } = useAppRoot();
-    const webEdition = appGuiSettingState.edition.indexOf("web") >= 0;
+    const { serverSetting, webInfoState, webEdition } = useAppState();
     const guiState = useGuiState();
 
     const selected = useMemo(() => {

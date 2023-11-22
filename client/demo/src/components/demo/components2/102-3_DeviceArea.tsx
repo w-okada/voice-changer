@@ -4,12 +4,11 @@ import { fileSelectorAsDataURL, useIndexedDB } from "@dannadori/voice-changer-cl
 import { useGuiState } from "../001_GuiStateProvider";
 import { AUDIO_ELEMENT_FOR_PLAY_MONITOR, AUDIO_ELEMENT_FOR_PLAY_RESULT, AUDIO_ELEMENT_FOR_TEST_CONVERTED, AUDIO_ELEMENT_FOR_TEST_CONVERTED_ECHOBACK, INDEXEDDB_KEY_AUDIO_MONITR, INDEXEDDB_KEY_AUDIO_OUTPUT } from "../../../const";
 import { isDesktopApp } from "../../../const";
-import { useAppRoot } from "../../../001_provider/001_AppRootProvider";
 
 export type DeviceAreaProps = {};
 
 export const DeviceArea = (_props: DeviceAreaProps) => {
-    const { setting, serverSetting, audioContext, setAudioOutputElementId, setAudioMonitorElementId, initializedRef, setVoiceChangerClientSetting, startOutputRecording, stopOutputRecording } = useAppState();
+    const { setting, serverSetting, audioContext, setAudioOutputElementId, setAudioMonitorElementId, initializedRef, setVoiceChangerClientSetting, startOutputRecording, stopOutputRecording, webEdition } = useAppState();
     const { isConverting, audioInputForGUI, inputAudioDeviceInfo, setAudioInputForGUI, fileInputEchoback, setFileInputEchoback, setAudioOutputForGUI, setAudioMonitorForGUI, audioOutputForGUI, audioMonitorForGUI, outputAudioDeviceInfo, shareScreenEnabled, setShareScreenEnabled, reloadDeviceInfo } = useGuiState();
     const [inputHostApi, setInputHostApi] = useState<string>("ALL");
     const [outputHostApi, setOutputHostApi] = useState<string>("ALL");
@@ -19,9 +18,6 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
 
     const { getItem, setItem } = useIndexedDB({ clientType: null });
     const [outputRecordingStarted, setOutputRecordingStarted] = useState<boolean>(false);
-
-    const { appGuiSettingState } = useAppRoot();
-    const webEdition = appGuiSettingState.edition.indexOf("web") >= 0;
 
     // (1) Audio Mode
     const deviceModeRow = useMemo(() => {

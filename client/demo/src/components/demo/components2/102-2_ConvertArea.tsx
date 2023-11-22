@@ -7,10 +7,9 @@ export type ConvertProps = {
 };
 
 export const ConvertArea = (props: ConvertProps) => {
-    const { setting, serverSetting, setWorkletNodeSetting, trancateBuffer } = useAppState();
+    const { setting, serverSetting, setWorkletNodeSetting, trancateBuffer, webEdition } = useAppState();
     const { appGuiSettingState } = useAppRoot();
     const edition = appGuiSettingState.edition;
-    const webEdition = appGuiSettingState.edition.indexOf("web") >= 0;
 
     const convertArea = useMemo(() => {
         let nums: number[];

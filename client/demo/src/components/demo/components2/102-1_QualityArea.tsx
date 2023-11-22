@@ -8,10 +8,9 @@ export type QualityAreaProps = {
 };
 
 export const QualityArea = (props: QualityAreaProps) => {
-    const { setVoiceChangerClientSetting, serverSetting, setting } = useAppState();
+    const { setVoiceChangerClientSetting, serverSetting, setting, webEdition } = useAppState();
     const { appGuiSettingState } = useAppRoot();
     const edition = appGuiSettingState.edition;
-    const webEdition = appGuiSettingState.edition.indexOf("web") >= 0;
 
     const qualityArea = useMemo(() => {
         if (!serverSetting.updateServerSettings || !setVoiceChangerClientSetting || !serverSetting.serverSetting || !setting) {

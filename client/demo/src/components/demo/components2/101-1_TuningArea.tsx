@@ -1,15 +1,12 @@
 import React, { useMemo } from "react";
 import { useAppState } from "../../../001_provider/001_AppStateProvider";
 import { useGuiState } from "../001_GuiStateProvider";
-import { useAppRoot } from "../../../001_provider/001_AppRootProvider";
 
 export type TuningAreaProps = {};
 
 export const TuningArea = (_props: TuningAreaProps) => {
-    const { appGuiSettingState } = useAppRoot();
-    const { serverSetting, webInfoState } = useAppState();
+    const { serverSetting, webInfoState, webEdition } = useAppState();
     const { setBeatriceJVSSpeakerPitch, beatriceJVSSpeakerPitch } = useGuiState();
-    const webEdition = appGuiSettingState.edition.indexOf("web") >= 0;
 
     const selected = useMemo(() => {
         if (webEdition) {
