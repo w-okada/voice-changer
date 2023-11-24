@@ -9,6 +9,8 @@ from local_attention import LocalAttention
 import torch.nn.functional as F
 #import fast_transformers.causal_product.causal_product_cuda
 
+FLAG_PCMER_NORM = False
+
 def softmax_kernel(data, *, projection_matrix, is_query, normalize_data=True, eps=1e-4, device = None):
     b, h, *_ = data.shape
     # (batch size, head, length, model_dim)
@@ -77,7 +79,8 @@ class PCmer(nn.Module):
                 dim_keys,
                 dim_values,
                 residual_dropout,
-                attention_dropout):
+                attention_dropout,
+                pcmer_norm=False):
         super().__init__()
         self.num_layers = num_layers
         self.num_heads = num_heads
@@ -86,6 +89,9 @@ class PCmer(nn.Module):
         self.dim_keys = dim_keys
         self.residual_dropout = residual_dropout
         self.attention_dropout = attention_dropout
+        global FLAG_PCMER_NORM
+        if pcmer_norm:
+            FLAG_PCMER_NORM = True
 
         self._layers = nn.ModuleList([_EncoderLayer(self) for _ in range(num_layers)])
         
@@ -290,6 +296,11 @@ class FastAttention(nn.Module):
 
     def forward(self, q, k, v):
         device = q.device
+
+        global FLAG_PCMER_NORM
+        if FLAG_PCMER_NORM:
+            q = q / (q.norm(dim=-1, keepdim=True) + 1e-8)
+            k = k / (k.norm(dim=-1, keepdim=True) + 1e-8)
 
         if self.no_projection:
             q = q.softmax(dim = -1)

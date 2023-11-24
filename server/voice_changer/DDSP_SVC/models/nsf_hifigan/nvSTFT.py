@@ -84,12 +84,7 @@ class STFT():
         n_fft_new = int(np.round(n_fft * factor))
         win_size_new = int(np.round(win_size * factor))
         hop_length_new = int(np.round(hop_length * speed))
-        
-        if torch.min(y) < -1.:
-            print('min value is ', torch.min(y))
-        if torch.max(y) > 1.:
-            print('max value is ', torch.max(y))
-        
+                
         mel_basis_key = str(fmax)+'_'+str(y.device)
         if mel_basis_key not in self.mel_basis:
             mel = librosa_mel_fn(sr=sampling_rate, n_fft=n_fft, n_mels=n_mels, fmin=fmin, fmax=fmax)

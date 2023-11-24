@@ -13,7 +13,8 @@ def test(args, model, vocoder, loader_test, saver):
     model.eval()
 
     # losses
-    test_loss = 0.
+    test_ddsp_loss = 0.
+    test_diff_loss = 0.
     
     # intialization
     num_batches = len(loader_test)
@@ -39,10 +40,12 @@ def test(args, model, vocoder, loader_test, saver):
                     data['f0'], 
                     data['volume'], 
                     data['spk_id'],
-                    gt_spec=None,
-                    infer=True, 
+                    vocoder=vocoder,
+                    infer=True,
+                    return_wav=False,
                     infer_speedup=args.infer.speedup, 
-                    method=args.infer.method)
+                    method=args.infer.method,
+                    k_step=args.model.k_step_max)
             signal = vocoder.infer(mel, data['f0'])
             ed_time = time.time()
                         
@@ -54,15 +57,17 @@ def test(args, model, vocoder, loader_test, saver):
             rtf_all.append(rtf)
            
             # loss
-            for i in range(args.train.batch_size):
-                loss = model(
-                    data['units'], 
-                    data['f0'], 
-                    data['volume'], 
-                    data['spk_id'], 
-                    gt_spec=data['mel'],
-                    infer=False)
-                test_loss += loss.item()
+            ddsp_loss, diff_loss = model(
+                data['units'], 
+                data['f0'], 
+                data['volume'], 
+                data['spk_id'],
+                vocoder=vocoder,
+                gt_spec=data['mel'],
+                infer=False,
+                k_step=args.model.k_step_max)
+            test_ddsp_loss += ddsp_loss.item()
+            test_diff_loss += diff_loss.item()
             
             # log mel
             saver.log_spec(data['name'][0], data['mel'], mel)
@@ -76,13 +81,14 @@ def test(args, model, vocoder, loader_test, saver):
             saver.log_audio({fn+'/gt.wav': audio, fn+'/pred.wav': signal})
             
     # report
-    test_loss /= args.train.batch_size
-    test_loss /= num_batches 
+    test_ddsp_loss /= num_batches
+    test_diff_loss /= num_batches 
     
     # check
-    print(' [test_loss] test_loss:', test_loss)
+    print(' [test_ddsp_loss] test_ddsp_loss:', test_ddsp_loss)
+    print(' [test_diff_loss] test_diff_loss:', test_diff_loss)
     print(' Real Time Factor', np.mean(rtf_all))
-    return test_loss
+    return test_ddsp_loss, test_diff_loss
 
 
 def train(args, initial_global_step, model, optimizer, scheduler, vocoder, loader_train, loader_test):
@@ -120,17 +126,20 @@ def train(args, initial_global_step, model, optimizer, scheduler, vocoder, loade
             
             # forward
             if dtype == torch.float32:
-                loss = model(data['units'].float(), data['f0'], data['volume'], data['spk_id'], 
-                                aug_shift = data['aug_shift'], gt_spec=data['mel'].float(), infer=False)
+                ddsp_loss, diff_loss = model(data['units'].float(), data['f0'], data['volume'], data['spk_id'], 
+                                aug_shift=data['aug_shift'], vocoder=vocoder, gt_spec=data['mel'].float(), infer=False, k_step=args.model.k_step_max)
             else:
                 with autocast(device_type=args.device, dtype=dtype):
-                    loss = model(data['units'], data['f0'], data['volume'], data['spk_id'], 
-                                    aug_shift = data['aug_shift'], gt_spec=data['mel'], infer=False)
+                    ddsp_loss, diff_loss=model(data['units'], data['f0'], data['volume'], data['spk_id'], 
+                                    aug_shift=data['aug_shift'], vocoder=vocoder, gt_spec=data['mel'].float(), infer=False, k_step=args.model.k_step_max)
             
             # handle nan loss
-            if torch.isnan(loss):
-                raise ValueError(' [x] nan loss ')
+            if torch.isnan(ddsp_loss):
+                raise ValueError(' [x] nan ddsp_loss ')
+            elif torch.isnan(diff_loss):
+                raise ValueError(' [x] nan diff_loss ')
             else:
+                loss = args.train.lambda_ddsp * ddsp_loss + diff_loss
                 # backpropagate
                 if dtype == torch.float32:
                     loss.backward()
@@ -159,10 +168,9 @@ def train(args, initial_global_step, model, optimizer, scheduler, vocoder, loade
                 )
                 
                 saver.log_value({
-                    'train/loss': loss.item()
-                })
-                
-                saver.log_value({
+                    'train/loss': loss.item(),
+                    'train/ddsp_loss': ddsp_loss.item(),
+                    'train/diff_loss': diff_loss.item(),
                     'train/lr': current_lr
                 })
             
@@ -177,7 +185,8 @@ def train(args, initial_global_step, model, optimizer, scheduler, vocoder, loade
                     saver.delete_model(postfix=f'{last_val_step}')
                 
                 # run testing set
-                test_loss = test(args, model, vocoder, loader_test, saver)
+                test_ddsp_loss, test_diff_loss = test(args, model, vocoder, loader_test, saver)
+                test_loss = args.train.lambda_ddsp * test_ddsp_loss + test_diff_loss
                 
                 # log loss
                 saver.log_info(
@@ -187,7 +196,9 @@ def train(args, initial_global_step, model, optimizer, scheduler, vocoder, loade
                 )
                 
                 saver.log_value({
-                    'validation/loss': test_loss
+                    'validation/loss': test_loss,
+                    'validation/ddsp_loss': test_ddsp_loss,
+                    'validation/diff_loss': test_diff_loss
                 })
                 
                 model.train()

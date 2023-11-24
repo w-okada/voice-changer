@@ -94,12 +94,6 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
             } else if (setting.voiceChangerType == "DDSP-SVC") {
                 const enough =
                     !!setting.files.find((x) => {
-                        return x.kind == "ddspSvcModel";
-                    }) &&
-                    !!setting.files.find((x) => {
-                        return x.kind == "ddspSvcModelConfig";
-                    }) &&
-                    !!setting.files.find((x) => {
                         return x.kind == "ddspSvcDiffusion";
                     }) &&
                     !!setting.files.find((x) => {
