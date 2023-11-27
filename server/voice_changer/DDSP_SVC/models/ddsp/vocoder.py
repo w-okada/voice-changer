@@ -4,7 +4,7 @@ import yaml
 import torch
 import torch.nn.functional as F
 import pyworld as pw
-import parselmouth
+# import parselmouth
 import torchcrepe
 import resampy
 from transformers import HubertModel, Wav2Vec2FeatureExtractor
@@ -46,22 +46,22 @@ class F0_Extractor:
         audio = audio[int(np.round(real_silence_front * self.sample_rate)) : ]
         
         # extract f0 using parselmouth
-        if self.f0_extractor == 'parselmouth':
-            l_pad = int(np.ceil(1.5 / self.f0_min * self.sample_rate))
-            r_pad = int(self.hop_size * ((len(audio) - 1) // self.hop_size + 1) - len(audio) + l_pad + 1)
-            s = parselmouth.Sound(np.pad(audio, (l_pad, r_pad)), self.sample_rate).to_pitch_ac(
-                time_step = self.hop_size / self.sample_rate, 
-                voicing_threshold = 0.6,
-                pitch_floor = self.f0_min, 
-                pitch_ceiling = self.f0_max)
-            assert np.abs(s.t1 - 1.5 / self.f0_min) < 0.001
-            f0 = np.pad(s.selected_array['frequency'], (start_frame, 0))
-            if len(f0) < n_frames:
-                f0 = np.pad(f0, (0, n_frames - len(f0)))
-            f0 = f0[: n_frames]
+        # if self.f0_extractor == 'parselmouth':
+        #     l_pad = int(np.ceil(1.5 / self.f0_min * self.sample_rate))
+        #     r_pad = int(self.hop_size * ((len(audio) - 1) // self.hop_size + 1) - len(audio) + l_pad + 1)
+        #     s = parselmouth.Sound(np.pad(audio, (l_pad, r_pad)), self.sample_rate).to_pitch_ac(
+        #         time_step = self.hop_size / self.sample_rate, 
+        #         voicing_threshold = 0.6,
+        #         pitch_floor = self.f0_min, 
+        #         pitch_ceiling = self.f0_max)
+        #     assert np.abs(s.t1 - 1.5 / self.f0_min) < 0.001
+        #     f0 = np.pad(s.selected_array['frequency'], (start_frame, 0))
+        #     if len(f0) < n_frames:
+        #         f0 = np.pad(f0, (0, n_frames - len(f0)))
+        #     f0 = f0[: n_frames]
             
         # extract f0 using dio
-        elif self.f0_extractor == 'dio':
+        if self.f0_extractor == 'dio':
             _f0, t = pw.dio(
                 audio.astype('double'), 
                 self.sample_rate, 

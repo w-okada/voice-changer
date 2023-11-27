@@ -157,23 +157,23 @@ def interpolate_f0(f0):
     return ip_data[:, 0], vuv_vector[:, 0]
 
 
-def compute_f0_parselmouth(wav_numpy, p_len=None, sampling_rate=44100, hop_length=512):
-    import parselmouth
+# def compute_f0_parselmouth(wav_numpy, p_len=None, sampling_rate=44100, hop_length=512):
+#     import parselmouth
 
-    x = wav_numpy
-    if p_len is None:
-        p_len = x.shape[0] // hop_length
-    else:
-        assert abs(p_len - x.shape[0] // hop_length) < 4, "pad length error"
-    time_step = hop_length / sampling_rate * 1000
-    f0_min = 50
-    f0_max = 1100
-    f0 = parselmouth.Sound(x, sampling_rate).to_pitch_ac(time_step=time_step / 1000, voicing_threshold=0.6, pitch_floor=f0_min, pitch_ceiling=f0_max).selected_array["frequency"]
+#     x = wav_numpy
+#     if p_len is None:
+#         p_len = x.shape[0] // hop_length
+#     else:
+#         assert abs(p_len - x.shape[0] // hop_length) < 4, "pad length error"
+#     time_step = hop_length / sampling_rate * 1000
+#     f0_min = 50
+#     f0_max = 1100
+#     f0 = parselmouth.Sound(x, sampling_rate).to_pitch_ac(time_step=time_step / 1000, voicing_threshold=0.6, pitch_floor=f0_min, pitch_ceiling=f0_max).selected_array["frequency"]
 
-    pad_size = (p_len - len(f0) + 1) // 2
-    if pad_size > 0 or p_len - len(f0) - pad_size > 0:
-        f0 = np.pad(f0, [[pad_size, p_len - len(f0) - pad_size]], mode="constant")
-    return f0
+#     pad_size = (p_len - len(f0) + 1) // 2
+#     if pad_size > 0 or p_len - len(f0) - pad_size > 0:
+#         f0 = np.pad(f0, [[pad_size, p_len - len(f0) - pad_size]], mode="constant")
+#     return f0
 
 
 def resize_f0(x, target_len):
