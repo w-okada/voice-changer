@@ -27,3 +27,6 @@ websockets==11.0.2
 sounddevice==0.4.6
 dataclasses_json==0.5.7
 onnxsim==0.4.28
+diffusion==6.10.1
+transformers==4.35.2
+# praat-parselmouth==0.4.3

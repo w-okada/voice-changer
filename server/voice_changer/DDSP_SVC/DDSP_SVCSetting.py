@@ -11,13 +11,13 @@ class DDSP_SVCSettings:
     silentThreshold: float = 0.00001
     extraConvertSize: int = 1024 * 32
 
-    useEnhancer: int = 0
-    useDiff: int = 1
+    # useEnhancer: int = 0
+    # useDiff: int = 1
     # useDiffDpm: int = 0
     diffMethod: str = "dpm-solver"  # "pndm", "dpm-solver"
     useDiffSilence: int = 0
     diffAcc: int = 20
-    diffSpkId: int = 1
+    # diffSpkId: int = 1
     kStep: int = 120
     threshold: int = -45
 
@@ -28,12 +28,12 @@ class DDSP_SVCSettings:
         "dstId",
         "tran",
         "extraConvertSize",
-        "useEnhancer",
-        "useDiff",
+        # "useEnhancer",
+        # "useDiff",
         # "useDiffDpm",
         "useDiffSilence",
         "diffAcc",
-        "diffSpkId",
+        # "diffSpkId",
         "kStep",
     ]
     floatData = ["silentThreshold"]

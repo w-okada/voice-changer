@@ -4,6 +4,7 @@ import { useGuiState } from "../001_GuiStateProvider";
 import { useMessageBuilder } from "../../../hooks/useMessageBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppRoot } from "../../../001_provider/001_AppRootProvider";
+import { DDSPSVCModelSlot } from "@dannadori/voice-changer-client-js";
 
 export type ModelSlotAreaProps = {};
 
@@ -32,8 +33,8 @@ export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
             sortType == "slot"
                 ? serverSetting.serverSetting.modelSlots
                 : serverSetting.serverSetting.modelSlots.slice().sort((a, b) => {
-                      return a.name.localeCompare(b.name);
-                  });
+                    return a.name.localeCompare(b.name);
+                });
 
         return modelSlots
             .map((x, index) => {

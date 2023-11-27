@@ -62,6 +62,7 @@
     },
     "dependencies": {
         "@alexanderolsen/libsamplerate-js": "^2.1.0",
+        "@babel/runtime": "^7.23.4",
         "@dannadori/voice-changer-client-js": "^1.0.177",
         "@dannadori/voice-changer-js": "^1.0.2",
         "@dannadori/worker-manager": "^1.0.20",

@@ -17,6 +17,10 @@ class DDSP_SVCModelSlotGenerator(ModelSlotGenerator):
                 slotInfo.diffConfigFile = file.name
             elif file.kind == "ddspSvcDiffusion":
                 slotInfo.diffModelFile = file.name
+        if slotInfo.configFile == '':
+            slotInfo.configFile = 'builtin'
+        if slotInfo.modelFile == '':
+            slotInfo.modelFile = 'builtin'
         slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
-        slotInfo.name = os.path.splitext(os.path.basename(slotInfo.modelFile))[0]
+        slotInfo.name = os.path.splitext(os.path.basename(slotInfo.diffModelFile))[0]
         return slotInfo

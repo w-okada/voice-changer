@@ -63,7 +63,7 @@ class DDSP_SVC(VoiceChangerModel):
         self.params = params
         self.settings = DDSP_SVCSettings()
         self.svc_model: SvcDDSP = SvcDDSP()
-        self.diff_model: DiffGtMel = DiffGtMel()
+        # self.diff_model: DiffGtMel = DiffGtMel()
 
         self.svc_model.setVCParams(params)
         EmbedderManager.initialize(params)
@@ -81,19 +81,19 @@ class DDSP_SVC(VoiceChangerModel):
             str(self.slotInfo.slotIndex),
             "model",
             self.slotInfo.modelFile,
-        )
+        ) if self.slotInfo.modelFile != 'builtin' else self.slotInfo.modelFile
         diffPath = os.path.join(
             vcparams.model_dir,
             str(self.slotInfo.slotIndex),
             "diff",
             self.slotInfo.diffModelFile,
         )
-
+        
         self.svc_model = SvcDDSP()
         self.svc_model.setVCParams(self.params)
-        self.svc_model.update_model(modelPath, self.device)
-        self.diff_model = DiffGtMel(device=self.device)
-        self.diff_model.flush_model(diffPath, ddsp_config=self.svc_model.args)
+        self.svc_model.update_model(modelPath, diffPath , self.device)
+        # self.diff_model = DiffGtMel(device=self.device)
+        # self.diff_model.flush_model(diffPath, ddsp_config=self.svc_model.args)
 
     def update_settings(self, key: str, val: int | float | str):
         if key in self.settings.intData:
@@ -161,19 +161,19 @@ class DDSP_SVC(VoiceChangerModel):
             pitch_adjust=self.settings.tran,
             use_spk_mix=False,
             spk_mix_dict=None,
-            use_enhancer=True if self.settings.useEnhancer == 1 else False,
+            # use_enhancer=True if self.settings.useEnhancer == 1 else False,
             pitch_extractor_type=self.settings.f0Detector,
             f0_min=50,
             f0_max=1100,
             # safe_prefix_pad_length=0,  # TBD なにこれ？
             safe_prefix_pad_length=self.settings.extraConvertSize
             / self.svc_model.args.data.sampling_rate,
-            diff_model=self.diff_model,
+            # diff_model=self.diff_model,
             diff_acc=self.settings.diffAcc,  # TBD なにこれ？
-            diff_spk_id=self.settings.diffSpkId,
-            diff_use=True if self.settings.useDiff == 1 else False,
+            # diff_spk_id=self.settings.diffSpkId,
+            # diff_use=True if self.settings.useDiff == 1 else False,
             # diff_use_dpm=True if self.settings.useDiffDpm == 1 else False,  # TBD なにこれ？
-            method=self.settings.diffMethod,
+            diff_method=self.settings.diffMethod,
             k_step=self.settings.kStep,  # TBD なにこれ？
             diff_silence=True
             if self.settings.useDiffSilence == 1
