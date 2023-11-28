@@ -17,7 +17,7 @@ from voice_changer.RVC.embedder.Embedder import Embedder
 from voice_changer.common.VolumeExtractor import VolumeExtractor
 from torchaudio.transforms import Resample
 
-from voice_changer.utils.Timer import Timer
+from voice_changer.utils.Timer import Timer2
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
 
@@ -45,7 +45,7 @@ class Pipeline(object):
         device,
         isHalf,
         resamplerIn: Resample,
-        resamplerOut: Resample
+        resamplerOut: Resample,
     ):
         self.inferencer = inferencer
         inferencer_block_size, inferencer_sampling_rate = inferencer.getConfig()
@@ -64,7 +64,7 @@ class Pipeline(object):
         logger.info("GENERATE INFERENCER" + str(self.inferencer))
         logger.info("GENERATE EMBEDDER" + str(self.embedder))
         logger.info("GENERATE PITCH EXTRACTOR" + str(self.pitchExtractor))
-        
+
         self.targetSR = targetSR
         self.device = device
         self.isHalf = False
@@ -103,7 +103,7 @@ class Pipeline(object):
         skip_diffusion=True,
     ):
         # print("---------- pipe line --------------------")
-        with Timer("pre-process", False) as t:
+        with Timer2("pre-process", False) as t:
             audio_t = torch.from_numpy(audio).float().unsqueeze(0).to(self.device)
             audio16k = self.resamplerIn(audio_t)
             volume, mask = self.extract_volume_and_mask(audio16k, threshold=-60.0)
@@ -111,7 +111,7 @@ class Pipeline(object):
             n_frames = int(audio16k.size(-1) // self.hop_size + 1)
         # print("[Timer::1: ]", t.secs)
 
-        with Timer("pre-process", False) as t:
+        with Timer2("pre-process", False) as t:
             # ピッチ検出
             try:
                 # pitch = self.pitchExtractor.extract(
@@ -141,8 +141,7 @@ class Pipeline(object):
             feats = feats.view(1, -1)
         # print("[Timer::2: ]", t.secs)
 
-        with Timer("pre-process", False) as t:
-
+        with Timer2("pre-process", False) as t:
             # embedding
             with autocast(enabled=self.isHalf):
                 try:
@@ -156,28 +155,17 @@ class Pipeline(object):
                         raise DeviceChangingException()
                     else:
                         raise e
-            feats = F.interpolate(feats.permute(0, 2, 1), size=int(n_frames), mode='nearest').permute(0, 2, 1)
+            feats = F.interpolate(feats.permute(0, 2, 1), size=int(n_frames), mode="nearest").permute(0, 2, 1)
         # print("[Timer::3: ]", t.secs)
 
-        with Timer("pre-process", False) as t:
+        with Timer2("pre-process", False) as t:
             # 推論実行
             try:
                 with torch.no_grad():
                     with autocast(enabled=self.isHalf):
                         audio1 = (
                             torch.clip(
-                                self.inferencer.infer(
-                                    audio16k,
-                                    feats,
-                                    pitch.unsqueeze(-1),
-                                    volume,
-                                    mask,
-                                    sid,
-                                    k_step,
-                                    infer_speedup,
-                                    silence_front=silence_front,
-                                    skip_diffusion=skip_diffusion
-                                    ).to(dtype=torch.float32),
+                                self.inferencer.infer(audio16k, feats, pitch.unsqueeze(-1), volume, mask, sid, k_step, infer_speedup, silence_front=silence_front, skip_diffusion=skip_diffusion).to(dtype=torch.float32),
                                 -1.0,
                                 1.0,
                             )
@@ -191,7 +179,7 @@ class Pipeline(object):
                     raise e
         # print("[Timer::4: ]", t.secs)
 
-        with Timer("pre-process", False) as t:  # NOQA
+        with Timer2("pre-process", False) as t:  # NOQA
             feats_buffer = feats.squeeze(0).detach().cpu()
             if pitch is not None:
                 pitch_buffer = pitch.squeeze(0).detach().cpu()

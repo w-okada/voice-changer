@@ -9,7 +9,7 @@ from mods.log_control import VoiceChangaerLogger
 from voice_changer.Local.AudioDeviceList import checkSamplingRate, list_audio_device
 import time
 import sounddevice as sd
-from voice_changer.utils.Timer import Timer
+from voice_changer.utils.Timer import Timer2
 import librosa
 
 from voice_changer.utils.VoiceChangerModel import AudioInOut
@@ -139,7 +139,7 @@ class ServerDevice:
         return out_wav, times
 
     def _processDataWithTime(self, indata: np.ndarray):
-        with Timer("all_inference_time") as t:
+        with Timer2("all_inference_time", False) as t:
             out_wav, times = self._processData(indata)
         all_inference_time = t.secs
         self.performance = [all_inference_time] + times

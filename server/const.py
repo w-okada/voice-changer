@@ -98,11 +98,9 @@ RVCSampleMode: TypeAlias = Literal[
 def getSampleJsonAndModelIds(mode: RVCSampleMode):
     if mode == "production":
         return [
-            # "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0001.json",
-            # "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0002.json",
-            "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0003_t2.json",
-            "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0003_o2.json",
-            "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0003_d2.json",
+            "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0004_t.json",
+            "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0004_o.json",
+            "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0004_d.json",
         ], [
             ("Tsukuyomi-chan_o", {"useIndex": False}),
             ("Amitaro_o", {"useIndex": False}),

@@ -55,6 +55,7 @@ export const WebEditionSettingArea = (_props: WebEditionSettingAreaProps) => {
             </div>
         );
 
+        const sr16KClassName = "character-area-control-button" + (webInfoState.voiceChangerConfig.sampleRate == "16k" ? " character-area-control-button-active" : " character-area-control-button-stanby");
         const sr32KClassName = "character-area-control-button" + (webInfoState.voiceChangerConfig.sampleRate == "32k" ? " character-area-control-button-active" : " character-area-control-button-stanby");
         const sr40KClassName = "character-area-control-button" + (webInfoState.voiceChangerConfig.sampleRate == "40k" ? " character-area-control-button-active" : " character-area-control-button-stanby");
         const sampleRate = (
@@ -64,6 +65,15 @@ export const WebEditionSettingArea = (_props: WebEditionSettingAreaProps) => {
                     <div className="character-area-slider-control">
                         <span className="character-area-slider-control-kind"></span>
                         <span className="character-area-control-buttons">
+                            <span
+                                className={!readyForConfig ? "character-area-control-button-disable" : sr16KClassName}
+                                onClick={() => {
+                                    if (webInfoState.voiceChangerConfig.sampleRate == "16k" || !readyForConfig) return;
+                                    webInfoState.setVoiceChangerConfig("rvcv2", "16k", webInfoState.voiceChangerConfig.useF0, webInfoState.voiceChangerConfig.inputLength);
+                                }}
+                            >
+                                16k
+                            </span>
                             <span
                                 className={!readyForConfig ? "character-area-control-button-disable" : sr32KClassName}
                                 onClick={() => {

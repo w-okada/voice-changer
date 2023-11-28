@@ -50,7 +50,7 @@ export const Portrait = (_props: PortraitProps) => {
         }
         vol.innerText = volume.toFixed(4);
         if (webEdition) {
-            buf.innerText = webInfoState.responseTimeInfo.realDuration.toString() ?? "0";
+            buf.innerText = bufferingTime.toString();
             res.innerText = webInfoState.responseTimeInfo.responseTime.toString() ?? "0";
             rtf.innerText = webInfoState.responseTimeInfo.rtf.toString() ?? "0";
         } else {

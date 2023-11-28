@@ -7,7 +7,7 @@ from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.diffusion.vocoder
 from voice_changer.DiffusionSVC.inferencer.onnx.VocoderOnnx import VocoderOnnx
 
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
-from voice_changer.utils.Timer import Timer
+from voice_changer.utils.Timer import Timer2
 
 
 class DiffusionSVCInferencer(Inferencer):
@@ -49,18 +49,14 @@ class DiffusionSVCInferencer(Inferencer):
         return model_block_size, model_sampling_rate
 
     @torch.no_grad()  # 最基本推理代码,将输入标准化为tensor,只与mel打交道
-    def __call__(self, units, f0, volume, spk_id=1, spk_mix_dict=None, aug_shift=0,
-                 gt_spec=None, infer_speedup=10, method='dpm-solver', k_step=None, use_tqdm=True,
-                 spk_emb=None):
-
+    def __call__(self, units, f0, volume, spk_id=1, spk_mix_dict=None, aug_shift=0, gt_spec=None, infer_speedup=10, method="dpm-solver", k_step=None, use_tqdm=True, spk_emb=None):
         if self.diff_args.model.k_step_max is not None:
             if k_step is None:
                 raise ValueError("k_step must not None when Shallow Diffusion Model inferring")
             if k_step > int(self.diff_args.model.k_step_max):
                 raise ValueError("k_step must <= k_step_max of Shallow Diffusion Model")
             if gt_spec is None:
-                raise ValueError("gt_spec must not None when Shallow Diffusion Model inferring, gt_spec can from "
-                                 "input mel or output of naive model")
+                raise ValueError("gt_spec must not None when Shallow Diffusion Model inferring, gt_spec can from " "input mel or output of naive model")
 
         aug_shift = torch.from_numpy(np.array([[float(aug_shift)]])).float().to(self.dev)
 
@@ -75,8 +71,7 @@ class DiffusionSVCInferencer(Inferencer):
         return self.diff_model(units, f0, volume, spk_id=spk_id, spk_mix_dict=spk_mix_dict, aug_shift=aug_shift, gt_spec=gt_spec, infer=True, infer_speedup=infer_speedup, method=method, k_step=k_step, use_tqdm=use_tqdm, spk_emb=spk_emb, spk_emb_dict=spk_emb_dict)
 
     @torch.no_grad()
-    def naive_model_call(self, units, f0, volume, spk_id=1, spk_mix_dict=None,
-                         aug_shift=0, spk_emb=None):
+    def naive_model_call(self, units, f0, volume, spk_id=1, spk_mix_dict=None, aug_shift=0, spk_emb=None):
         # spk_id
         spk_emb_dict = None
         if self.diff_args.model.use_speaker_encoder:  # with speaker encoder
@@ -85,9 +80,7 @@ class DiffusionSVCInferencer(Inferencer):
         else:
             spk_id = torch.LongTensor(np.array([[int(spk_id)]])).to(self.dev)
         aug_shift = torch.from_numpy(np.array([[float(aug_shift)]])).float().to(self.dev)
-        out_spec = self.naive_model(units, f0, volume, spk_id=spk_id, spk_mix_dict=spk_mix_dict,
-                                    aug_shift=aug_shift, infer=True,
-                                    spk_emb=spk_emb, spk_emb_dict=spk_emb_dict)
+        out_spec = self.naive_model(units, f0, volume, spk_id=spk_id, spk_mix_dict=spk_mix_dict, aug_shift=aug_shift, infer=True, spk_emb=spk_emb, spk_emb_dict=spk_emb_dict)
         return out_spec
 
     @torch.no_grad()
@@ -114,19 +107,18 @@ class DiffusionSVCInferencer(Inferencer):
         silence_front: float,
         skip_diffusion: bool = True,
     ) -> torch.Tensor:
-        with Timer("pre-process", False) as t:
+        with Timer2("pre-process", False) as t:
             gt_spec = self.naive_model_call(feats, pitch, volume, spk_id=sid, spk_mix_dict=None, aug_shift=0, spk_emb=None)
 
         # print("[    ----Timer::1: ]", t.secs)
 
-        with Timer("pre-process", False) as t:
+        with Timer2("pre-process", False) as t:
             if skip_diffusion == 0:
-                out_mel = self.__call__(feats, pitch, volume, spk_id=sid, spk_mix_dict=None, aug_shift=0, gt_spec=gt_spec, infer_speedup=infer_speedup, method='dpm-solver', k_step=k_step, use_tqdm=False, spk_emb=None)
+                out_mel = self.__call__(feats, pitch, volume, spk_id=sid, spk_mix_dict=None, aug_shift=0, gt_spec=gt_spec, infer_speedup=infer_speedup, method="dpm-solver", k_step=k_step, use_tqdm=False, spk_emb=None)
                 gt_spec = out_mel
         # print("[    ----Timer::2: ]", t.secs)
 
-
-        with Timer("pre-process", False) as t:  # NOQA
+        with Timer2("pre-process", False) as t:  # NOQA
             if self.vocoder_onnx is None:
                 start_frame = int(silence_front * self.vocoder.vocoder_sample_rate / self.vocoder.vocoder_hop_size)
                 out_wav = self.mel2wav(gt_spec, pitch, start_frame=start_frame)
