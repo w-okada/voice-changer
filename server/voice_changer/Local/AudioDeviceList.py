@@ -27,9 +27,7 @@ def dummy_callback(data: np.ndarray, frames, times, status):
     pass
 
 
-def checkSamplingRate(
-    deviceId: int, desiredSamplingRate: int, type: ServerAudioDeviceType
-):
+def checkSamplingRate(deviceId: int, desiredSamplingRate: int, type: ServerAudioDeviceType):
     if type == "input":
         try:
             with sd.InputStream(
@@ -41,7 +39,7 @@ def checkSamplingRate(
                 pass
             return True
         except Exception as e:  # NOQA
-            # print("[checkSamplingRate]", e)
+            print("[checkSamplingRate]", e)
             return False
     else:
         try:
@@ -54,7 +52,7 @@ def checkSamplingRate(
                 pass
             return True
         except Exception as e:  # NOQA
-            # print("[checkSamplingRate]", e)
+            print("[checkSamplingRate]", e)
             return False
 
 

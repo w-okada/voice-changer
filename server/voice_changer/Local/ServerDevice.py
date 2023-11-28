@@ -281,8 +281,8 @@ class ServerDevice:
         self.currentModelSamplingRate = -1
         while True:
             if self.settings.serverAudioStated == 0 or self.settings.serverInputDeviceId == -1:
-                sd._terminate()
-                sd._initialize()
+                # sd._terminate()
+                # sd._initialize()
                 time.sleep(2)
             else:
                 sd._terminate()

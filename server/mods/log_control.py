@@ -1,4 +1,5 @@
 import logging
+import traceback
 
 
 class UvicornSuppressFilter(logging.Filter):
@@ -9,6 +10,24 @@ class UvicornSuppressFilter(logging.Filter):
 class NullHandler(logging.Handler):
     def emit(self, record):
         pass
+
+
+class DebugStreamHandler(logging.StreamHandler):
+    def emit(self, record):
+        try:
+            super().emit(record)
+        except Exception as e:
+            print(f"Error logging message: {e}", file=sys.stderr)
+            traceback.print_exc()
+
+
+class DebugFileHandler(logging.FileHandler):
+    def emit(self, record):
+        try:
+            super().emit(record)
+        except Exception as e:
+            print(f"Error writing log message to file: {e}", file=sys.stderr)
+            traceback.print_exc()
 
 
 class VoiceChangaerLogger:
@@ -60,16 +79,19 @@ class VoiceChangaerLogger:
     def initialize(self, initialize: bool):
         if not self.logger.handlers:
             if initialize:
-                file_handler = logging.FileHandler('vcclient.log', encoding='utf-8', mode='w')
+                # file_handler = logging.FileHandler("vcclient.log", encoding="utf-8", mode="w")
+                file_handler = DebugFileHandler("vcclient.log", encoding="utf-8", mode="w")
             else:
-                file_handler = logging.FileHandler('vcclient.log', encoding='utf-8')
-            file_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(process)d - %(message)s')
+                # file_handler = logging.FileHandler("vcclient.log", encoding="utf-8")
+                file_handler = DebugFileHandler("vcclient.log", encoding="utf-8")
+            file_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(process)d - %(message)s")
             file_handler.setFormatter(file_formatter)
             file_handler.setLevel(logging.DEBUG)
             self.logger.addHandler(file_handler)
 
-            stream_formatter = logging.Formatter('%(message)s')
-            stream_handler = logging.StreamHandler()
+            stream_formatter = logging.Formatter("%(message)s")
+            # stream_handler = logging.StreamHandler()
+            stream_handler = DebugStreamHandler()
             stream_handler.setFormatter(stream_formatter)
             stream_handler.setLevel(logging.INFO)
             self.logger.addHandler(stream_handler)
