@@ -127,7 +127,7 @@ export const useClient = (props: UseClientProps): ClientState => {
     };
 
     // 設定データ管理
-    const { setItem, getItem } = useIndexedDB({ clientType: null });
+    const { setItem, getItem, removeItem } = useIndexedDB({ clientType: null });
     // 設定データの更新と保存
     const _setSetting = (_setting: ClientSetting) => {
         const storeData = { ..._setting };
@@ -231,7 +231,7 @@ export const useClient = (props: UseClientProps): ClientState => {
     }, [voiceChangerClientSetting.reloadClientSetting, serverSetting.reloadServerInfo]);
 
     const clearSetting = async () => {
-        // TBD
+        await removeItem("clientSetting");
     };
 
     // 設定変更

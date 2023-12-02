@@ -527,7 +527,7 @@ export const DefaultClientSettng: ClientSetting = {
         serverUrl: "",
         protocol: "sio",
         sendingSampleRate: 48000,
-        inputChunkNum: 48,
+        inputChunkNum: 192,
         downSamplingMode: "average",
     },
     voiceChangerClientSetting: {

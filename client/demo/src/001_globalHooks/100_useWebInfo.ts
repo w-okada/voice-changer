@@ -113,23 +113,29 @@ const f0ModelUrl: { [modelType in VoiceChangerType]: { [inputLength in InputLeng
     rvcv2: {
         "24000": {
             "40k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_40k_f0_24000.bin",
-            "32k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_32k_f0_24000.bin",
-            "16k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_16k_f0_24000.bin",
+            // "32k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_32k_f0_24000.bin",
+            "32k": "https://192.168.0.247:8080/models/rvcv2_exp_v2_32k_f0_24000.bin",
+            // "16k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_16k_f0_24000.bin",
+            // "16k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/vctk/rvcv2_vctk_v2_16k_f0_24000.bin",
+            "16k": "https://192.168.0.247:8080/models/rvcv2_vctk_v2_16k_f0_24000.bin",
         },
         "16000": {
             "40k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_40k_f0_16000.bin",
             "32k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_32k_f0_16000.bin",
-            "16k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_16k_f0_16000.bin",
+            // "16k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_16k_f0_16000.bin",
+            "16k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/vctk/rvcv2_vctk_v2_16k_f0_16000.bin",
         },
         "12000": {
             "40k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_40k_f0_12000.bin",
             "32k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_32k_f0_12000.bin",
-            "16k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_16k_f0_12000.bin",
+            // "16k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_16k_f0_12000.bin",
+            "16k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/vctk/rvcv2_vctk_v2_16k_f0_16000.bin",
         },
         "8000": {
             "40k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_40k_f0_8000.bin",
             "32k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_32k_f0_8000.bin",
-            "16k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_16k_f0_8000.bin",
+            // "16k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/amitaro/rvcv2_amitaro_v2_16k_f0_8000.bin",
+            "16k": "https://huggingface.co/wok000/vcclient_model/resolve/main/web_model/v_01_alpha/vctk/rvcv2_vctk_v2_16k_f0_8000.bin",
         },
     },
 };
@@ -137,7 +143,7 @@ const f0ModelUrl: { [modelType in VoiceChangerType]: { [inputLength in InputLeng
 export const useWebInfo = (props: UseWebInfoProps): WebInfoStateAndMethod => {
     const initVoiceChangerType: VoiceChangerType = "rvcv2";
     const initInputLength: InputLengthKey = "24000";
-    const initUseF0 = false;
+    const initUseF0 = true;
     const initSampleRate: ModelSampleRateStr = "32k";
 
     const progressCallback = (data: ProgreeeUpdateCallbcckInfo) => {

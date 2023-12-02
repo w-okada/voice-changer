@@ -98,12 +98,12 @@ module.exports = {
         // new CopyPlugin({
         //     patterns: [{ from: "public/models/rvcv1_amitaro_v1_32k_nof0_24000.bin", to: "models/rvcv1_amitaro_v1_32k_nof0_24000.bin" }],
         // }),
-        // new CopyPlugin({
-        //     patterns: [{ from: "public/models/rvcv1_amitaro_v1_40k_f0_24000.bin", to: "models/rvcv1_amitaro_v1_40k_f0_24000.bin" }],
-        // }),
-        // new CopyPlugin({
-        //     patterns: [{ from: "public/models/rvcv1_amitaro_v1_40k_nof0_24000.bin", to: "models/rvcv1_amitaro_v1_40k_nof0_24000.bin" }],
-        // }),
+        new CopyPlugin({
+            patterns: [{ from: "public/models/rvcv2_exp_v2_32k_f0_24000.bin", to: "models/rvcv2_exp_v2_32k_f0_24000.bin" }],
+        }),
+        new CopyPlugin({
+            patterns: [{ from: "public/models/rvcv2_vctk_v2_16k_f0_24000.bin", to: "models/rvcv2_vctk_v2_16k_f0_24000.bin" }],
+        }),
         // new CopyPlugin({
         //     patterns: [{ from: "public/models/amitaro.png", to: "models/amitaro.png" }],
         // }),
