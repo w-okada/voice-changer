@@ -75,7 +75,10 @@ class MMVC_Rest:
             )
             app_fastapi.mount("/tmp", StaticFiles(directory=f"{TMP_DIR}"), name="static")
             app_fastapi.mount("/upload_dir", StaticFiles(directory=f"{UPLOAD_DIR}"), name="static")
-            app_fastapi.mount("/model_dir_static", StaticFiles(directory=f"{MODEL_DIR_STATIC}"), name="static")
+            try:
+                app_fastapi.mount("/model_dir_static", StaticFiles(directory=f"{MODEL_DIR_STATIC}"), name="static")
+            except Exception as e:
+                print("Locating model_dir_static failed", e)
 
             if sys.platform.startswith("darwin"):
                 p1 = os.path.dirname(sys._MEIPASS)
