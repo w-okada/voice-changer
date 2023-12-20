@@ -72,6 +72,7 @@ class Timer2(object):
         if self.enable is False:
             return self
         self.current = time.time()
+        self.start = time.time()
         return self
 
     def record(self, lapname: str):
@@ -88,9 +89,11 @@ class Timer2(object):
     def __exit__(self, *_):
         if self.enable is False:
             return
+        self.end = time.time()
+        self.elapsed = (self.end - self.start) * 1000
         title = self.key.split("_")[-1]
-        print(f"---- {title} ----")
+        print(f"---- {title}(elapsed:{round(self.elapsed,1)}ms) ----")
         for key, val in self.storedSecs[self.key].items():
             section = key.split("_")[-1]
             milisecAvr = sum(val) / len(val) * 1000
-            print(f"{section}: {milisecAvr} msec")
+            print(f"{section}: {round(milisecAvr,1)} msec, {val[-1]}")

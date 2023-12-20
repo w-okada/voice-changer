@@ -102,8 +102,9 @@ class Pipeline(object):
         protect=0.5,
         skip_diffusion=True,
     ):
+        use_timer = False
         # print("---------- pipe line --------------------")
-        with Timer2("pre-process", False) as t:
+        with Timer2("pre-process", use_timer) as t:
             audio_t = torch.from_numpy(audio).float().unsqueeze(0).to(self.device)
             audio16k = self.resamplerIn(audio_t)
             volume, mask = self.extract_volume_and_mask(audio16k, threshold=-60.0)
@@ -111,7 +112,7 @@ class Pipeline(object):
             n_frames = int(audio16k.size(-1) // self.hop_size + 1)
         # print("[Timer::1: ]", t.secs)
 
-        with Timer2("pre-process", False) as t:
+        with Timer2("extract pitch", use_timer) as t:
             # ピッチ検出
             try:
                 # pitch = self.pitchExtractor.extract(
@@ -141,7 +142,7 @@ class Pipeline(object):
             feats = feats.view(1, -1)
         # print("[Timer::2: ]", t.secs)
 
-        with Timer2("pre-process", False) as t:
+        with Timer2("extract feature", use_timer) as t:
             # embedding
             with autocast(enabled=self.isHalf):
                 try:
@@ -158,7 +159,7 @@ class Pipeline(object):
             feats = F.interpolate(feats.permute(0, 2, 1), size=int(n_frames), mode="nearest").permute(0, 2, 1)
         # print("[Timer::3: ]", t.secs)
 
-        with Timer2("pre-process", False) as t:
+        with Timer2("infer", use_timer) as t:
             # 推論実行
             try:
                 with torch.no_grad():
@@ -179,7 +180,7 @@ class Pipeline(object):
                     raise e
         # print("[Timer::4: ]", t.secs)
 
-        with Timer2("pre-process", False) as t:  # NOQA
+        with Timer2("post-process", use_timer) as t:  # NOQA
             feats_buffer = feats.squeeze(0).detach().cpu()
             if pitch is not None:
                 pitch_buffer = pitch.squeeze(0).detach().cpu()

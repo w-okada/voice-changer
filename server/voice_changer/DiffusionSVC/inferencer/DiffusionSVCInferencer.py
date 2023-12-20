@@ -107,18 +107,19 @@ class DiffusionSVCInferencer(Inferencer):
         silence_front: float,
         skip_diffusion: bool = True,
     ) -> torch.Tensor:
-        with Timer2("pre-process", False) as t:
+        use_timer = False
+        with Timer2("    Naive", use_timer) as t:
             gt_spec = self.naive_model_call(feats, pitch, volume, spk_id=sid, spk_mix_dict=None, aug_shift=0, spk_emb=None)
 
         # print("[    ----Timer::1: ]", t.secs)
 
-        with Timer2("pre-process", False) as t:
+        with Timer2("    Diffuser", use_timer) as t:
             if skip_diffusion == 0:
                 out_mel = self.__call__(feats, pitch, volume, spk_id=sid, spk_mix_dict=None, aug_shift=0, gt_spec=gt_spec, infer_speedup=infer_speedup, method="dpm-solver", k_step=k_step, use_tqdm=False, spk_emb=None)
                 gt_spec = out_mel
         # print("[    ----Timer::2: ]", t.secs)
 
-        with Timer2("pre-process", False) as t:  # NOQA
+        with Timer2("    Vocoder", use_timer) as t:  # NOQA
             if self.vocoder_onnx is None:
                 start_frame = int(silence_front * self.vocoder.vocoder_sample_rate / self.vocoder.vocoder_hop_size)
                 out_wav = self.mel2wav(gt_spec, pitch, start_frame=start_frame)
