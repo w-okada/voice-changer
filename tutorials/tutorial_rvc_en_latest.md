@@ -22,7 +22,7 @@ From the following, the original [Retrieval-based-Voice-Conversion-WebUI](https:
 
 ### Windows version,
 
-Unzip the downloaded zip file and run `start_http.bat`.
+Unzip the downloaded zip file from [huggingface](https://huggingface.co/wok000/vcclient000/tree/main) and run `start_http.bat`.
 
 If you have the old version, be sure to unzip it into a separate folder.
 
@@ -30,7 +30,7 @@ If you have the old version, be sure to unzip it into a separate folder.
 
 It is launched as follows.
 
-1. Unzip the downloaded file.
+1. Unzip the downloaded file from [huggingface](https://huggingface.co/wok000/vcclient000/tree/main).
 
 1. Next, run MMVCServerSIO by hold down the control key and clicking it (or right-click to run it). If a message appears stating that the developer cannot be verified, run it again by holding down the control key and clicking it (or right-click to run it). The terminal will open and the process will finish within a few seconds.
 
