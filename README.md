@@ -5,7 +5,7 @@
 ## What's New!
 - v.1.5.3.17c
   - implement fcpe in RVC
-  warning: not stable 
+  warning: not stable, see https://github.com/w-okada/voice-changer/issues/1066
 
 - v.1.5.3.17b
   - bugfix:
