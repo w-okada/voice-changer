@@ -4,7 +4,7 @@
 
 ## What's New!
 - v.1.5.3.17c
-  implement fcpe in RVC
+  - implement fcpe in RVC
   warning: not stable 
 
 - v.1.5.3.17b
