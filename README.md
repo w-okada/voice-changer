@@ -3,10 +3,6 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## What's New!
-- v.1.5.3.17c
-  - implement fcpe in RVC
-  - warning: not stable, see https://github.com/w-okada/voice-changer/issues/1066
-
 - v.1.5.3.17b
   - bugfix:
     - clear setting
