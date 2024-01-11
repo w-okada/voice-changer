@@ -26,7 +26,7 @@ class FcpePitchExtractor(PitchExtractor):
         f0_mel_max = 1127 * np.log(1 + f0_max / 700)
 
         f0 = self.fcpe.infer(
-            audio.to(self.device_fcpe).unsqueeze(0).float(),
+            audio.to(self.device).unsqueeze(0).float(),
             sr=16000,
             decoder_mode="local_argmax",
             threshold=0.006,
