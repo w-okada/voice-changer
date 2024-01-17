@@ -43,6 +43,9 @@ class PitchExtractorManager(Protocol):
             return RMVPEPitchExtractor(cls.params.rmvpe, gpu)
         elif pitchExtractorType == "rmvpe_onnx":
             return RMVPEOnnxPitchExtractor(cls.params.rmvpe_onnx, gpu)
+        elif pitchExtractorType == "fcpe":
+            # add the FcpePitchExtractor
+            return FcpePitchExtractor(gpu)
         else:
             # return hubert as default
             print("[Voice Changer] PitchExctractor not found", pitchExtractorType)
