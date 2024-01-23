@@ -1,0 +1,23 @@
+name: Package exe with PyInstaller - Windows
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: PyInstaller Windows
+      uses: deiteris/pyinstaller-action-windows@python3-10-pyinstaller-5-3
+      with:
+        requirements: requirements-dml.txt
+        path: server
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: my-exe
+        path: src/dist/windows # or path/to/artifact
