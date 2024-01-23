@@ -13,22 +13,19 @@ jobs:
       matrix:
         include:
         # - os: windows-latest
-        #   asset_name: ${{ github.event.repository.name }}-windows-amd64
+        #   os_suffix: windows-amd64
         #   backend: cuda
         - os: windows-latest
-          asset_name: ${{ github.event.repository.name }}-windows-amd64
+          os_suffix: windows-amd64
           backend: dml
         # - os: macos-latest
-        #   asset_name: ${{ github.event.repository.name }}-macos-amd64
+        #   os_suffix: macos-amd64
         #   backend: cpu
-        # - os: macos-latest
-        #   asset_name: ${{ github.event.repository.name }}-macos-amd64
-        #   backend: cuda
         - os: ubuntu-latest
-          asset_name: ${{ github.event.repository.name }}-linux-amd64
+          os_suffix: linux-amd64
           backend: cpu
         # - os: ubuntu-latest
-        #   asset_name: ${{ github.event.repository.name }}-linux-amd64
+        #   os_suffix: linux-amd64
         #   backend: cuda
     runs-on: ${{ matrix.os }}
     env:
@@ -52,5 +49,5 @@ jobs:
     - name: Uploading artifact
       uses: actions/upload-artifact@v4
       with:
-        name: voice-changer-${{ matrix.asset_name }}-${{ matrix.backend }}
+        name: voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}
         path: ./server/dist
