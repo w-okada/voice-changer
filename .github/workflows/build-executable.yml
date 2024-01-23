@@ -30,8 +30,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: voice-changer
-        path: ./dist
-        working-directory: ./server
+        path: ./server/dist
 
   # linux-cpu:
     # runs-on: ubuntu-latest
