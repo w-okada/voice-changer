@@ -12,9 +12,9 @@ jobs:
     strategy:
       matrix:
         include:
-        # - os: windows-latest
-        #   os_suffix: windows-amd64
-        #   backend: cuda
+        - os: windows-latest
+          os_suffix: windows-amd64
+          backend: cuda
         - os: windows-latest
           os_suffix: windows-amd64
           backend: dml
@@ -27,6 +27,9 @@ jobs:
         # - os: ubuntu-latest
         #   os_suffix: linux-amd64
         #   backend: cuda
+        # - os: ubuntu-latest
+        #   os_suffix: linux-amd64
+        #   backend: rocm
     runs-on: ${{ matrix.os }}
     env:
       BACKEND: ${{ matrix.backend }}
