@@ -8,7 +8,7 @@ on:
 
 
 jobs:
-  windows-cpu+dml:
+  windows-dml:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
