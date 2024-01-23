@@ -9,28 +9,27 @@ on:
 
 jobs:
   build-all:
-    build:
-      strategy:
-        matrix:
-          include:
-          # - os: windows-latest
-          #   asset_name: ${{ github.event.repository.name }}-windows-amd64
-          #   backend: cuda
-          - os: windows-latest
-            asset_name: ${{ github.event.repository.name }}-windows-amd64
-            backend: dml
-          # - os: macos-latest
-          #   asset_name: ${{ github.event.repository.name }}-macos-amd64
-          #   backend: cpu
-          # - os: macos-latest
-          #   asset_name: ${{ github.event.repository.name }}-macos-amd64
-          #   backend: cuda
-          - os: ubuntu-latest
-            asset_name: ${{ github.event.repository.name }}-linux-amd64
-            backend: cpu
-          # - os: ubuntu-latest
-          #   asset_name: ${{ github.event.repository.name }}-linux-amd64
-          #   backend: cuda
+    strategy:
+      matrix:
+        include:
+        # - os: windows-latest
+        #   asset_name: ${{ github.event.repository.name }}-windows-amd64
+        #   backend: cuda
+        - os: windows-latest
+          asset_name: ${{ github.event.repository.name }}-windows-amd64
+          backend: dml
+        # - os: macos-latest
+        #   asset_name: ${{ github.event.repository.name }}-macos-amd64
+        #   backend: cpu
+        # - os: macos-latest
+        #   asset_name: ${{ github.event.repository.name }}-macos-amd64
+        #   backend: cuda
+        - os: ubuntu-latest
+          asset_name: ${{ github.event.repository.name }}-linux-amd64
+          backend: cpu
+        # - os: ubuntu-latest
+        #   asset_name: ${{ github.event.repository.name }}-linux-amd64
+        #   backend: cuda
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
