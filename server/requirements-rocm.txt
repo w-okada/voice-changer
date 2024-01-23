@@ -1,0 +1,21 @@
+# # apt-get update
+# # apt-get install -y emacs mlocate wget git curl gcc g++ make unzip
+# # wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh
+# # bash Anaconda3-2022.10-Linux-x86_64.sh
+
+--extra-index-url https://download.pytorch.org/whl/rocm5.6
+torch
+torchaudio
+faiss-cpu
+
+tensorboard
+tensorboardx
+
+onnxscript
+onnxsim
+onnxruntime-gpu
+onnxconverter-common
+torchcrepe
+local_attention
+pyworld
+transformers
