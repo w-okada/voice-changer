@@ -3,10 +3,9 @@
 # # wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh
 # # bash Anaconda3-2022.10-Linux-x86_64.sh
 
-# ONNX is compiled with CUDA 11.x
---extra-index-url https://download.pytorch.org/whl/cu118
-torch
-torchaudio
+--extra-index-url https://download.pytorch.org/whl/rocm5.4.2
+torch==2.0.1
+torchaudio==2.0.2
 faiss-cpu
 
 tensorboard

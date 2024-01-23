@@ -18,18 +18,18 @@ jobs:
         - os: windows-latest
           os_suffix: windows-amd64
           backend: dml
-        # - os: macos-latest
-        #   os_suffix: macos-amd64
-        #   backend: cpu
+        - os: macos-latest
+          os_suffix: macos-amd64
+          backend: cpu
         - os: ubuntu-latest
           os_suffix: linux-amd64
           backend: cpu
-        # - os: ubuntu-latest
-        #   os_suffix: linux-amd64
-        #   backend: cuda
-        # - os: ubuntu-latest
-        #   os_suffix: linux-amd64
-        #   backend: rocm
+        - os: ubuntu-latest
+          os_suffix: linux-amd64
+          backend: cuda
+        - os: ubuntu-latest
+          os_suffix: linux-amd64
+          backend: rocm
     runs-on: ${{ matrix.os }}
     env:
       BACKEND: ${{ matrix.backend }}

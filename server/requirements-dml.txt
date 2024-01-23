@@ -14,7 +14,6 @@ tensorboardx
 onnxscript
 onnxsim
 onnxruntime-directml
-onnxconverter-common
 torchcrepe
 local_attention
 pyworld
