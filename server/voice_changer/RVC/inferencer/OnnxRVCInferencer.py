@@ -14,18 +14,18 @@ class OnnxRVCInferencer(Inferencer):
             onnxProviderOptions,
         ) = DeviceManager.get_instance().getOnnxExecutionProvider(gpu)
 
+        so = onnxruntime.SessionOptions()
+        # so.log_severity_level = 3
+        # so.enable_profiling = True
         onnx_session = onnxruntime.InferenceSession(
-            file, providers=onnxProviders, provider_options=onnxProviderOptions
+            file, sess_options=so, providers=onnxProviders, provider_options=onnxProviderOptions
         )
 
-        # check half-precision
-        first_input_type = onnx_session.get_inputs()[0].type
-        if first_input_type == "tensor(float)":
-            self.isHalf = False
-        else:
-            self.isHalf = True
-
+        # check half-precision of "feats" input
+        self.input_feats_half = onnx_session.get_inputs()[0].type == "tensor(float16)"
         self.model = onnx_session
+
+        # self.output_half = onnx_session.get_outputs()[0].type == "tensor(float16)"
 
         self.inferencerTypeVersion = inferencerTypeVersion
 
@@ -46,37 +46,42 @@ class OnnxRVCInferencer(Inferencer):
         # print("INFER1", self.model.get_providers())
         # print("INFER2", self.model.get_provider_options())
         # print("INFER3", self.model.get_session_options())
-        if self.isHalf:
-            audio1 = self.model.run(
-                ["audio"],
-                {
-                    "feats": feats.cpu().numpy().astype(np.float16),
-                    "p_len": pitch_length.cpu().numpy().astype(np.int64),
-                    "pitch": pitch.cpu().numpy().astype(np.int64),
-                    "pitchf": pitchf.cpu().numpy().astype(np.float32),
-                    "sid": sid.cpu().numpy().astype(np.int64)
-                },
-            )
+        if feats.device.type == 'cuda':
+            binding = self.model.io_binding()
+
+            if self.input_feats_half:
+                feats = feats.to(torch.float16)
+                binding.bind_input('feats', device_type='cuda', device_id=feats.device.index, element_type=np.float16, shape=tuple(feats.shape), buffer_ptr=feats.data_ptr())
+            else:
+                binding.bind_input('feats', device_type='cuda', device_id=feats.device.index, element_type=np.float32, shape=tuple(feats.shape), buffer_ptr=feats.data_ptr())
+            binding.bind_input('p_len', device_type='cuda', device_id=feats.device.index, element_type=np.int64, shape=tuple(pitch_length.shape), buffer_ptr=pitch_length.data_ptr())
+            binding.bind_input('pitch', device_type='cuda', device_id=feats.device.index, element_type=np.int64, shape=tuple(pitch.shape), buffer_ptr=pitch.data_ptr())
+            binding.bind_input('pitchf', device_type='cuda', device_id=feats.device.index, element_type=np.float32, shape=tuple(pitchf.shape), buffer_ptr=pitchf.data_ptr())
+            binding.bind_input('sid', device_type='cuda', device_id=feats.device.index, element_type=np.int64, shape=tuple(sid.shape), buffer_ptr=sid.data_ptr())
+
+            binding.bind_output('audio', device_type='cuda', device_id=feats.device.index)
+
+            self.model.run_with_iobinding(binding)
+
+            output = [output.numpy() for output in binding.get_outputs()]
         else:
-            audio1 = self.model.run(
+            output = self.model.run(
                 ["audio"],
                 {
-                    "feats": feats.cpu().numpy().astype(np.float32),
-                    "p_len": pitch_length.cpu().numpy().astype(np.int64),
-                    "pitch": pitch.cpu().numpy().astype(np.int64),
-                    "pitchf": pitchf.cpu().numpy().astype(np.float32),
-                    "sid": sid.cpu().numpy().astype(np.int64)
+                    "feats": feats.detach().cpu().numpy().astype(np.float16 if self.input_feats_half else np.float32, copy=False),
+                    "p_len": pitch_length.detach().cpu().numpy(),
+                    "pitch": pitch.detach().cpu().numpy(),
+                    "pitchf": pitchf.detach().cpu().numpy(),
+                    "sid": sid.detach().cpu().numpy()
                 },
             )
+        # self.model.end_profiling()
+
+        res = torch.as_tensor(output[0], dtype=torch.float32, device=sid.device)
 
         if self.inferencerTypeVersion == "v2.1" or self.inferencerTypeVersion == "v2.2" or self.inferencerTypeVersion == "v1.1":
-            res = audio1[0]
-        else:
-            res = np.array(audio1)[0][0, 0]
-            res = np.clip(res, -1.0, 1.0)
-        return torch.tensor(res)
-
-        # return torch.tensor(np.array(audio1))
+            return res
+        return torch.clip(res[0, 0], -1.0, 1.0)
 
     def getInferencerInfo(self):
         inferencer = super().getInferencerInfo()

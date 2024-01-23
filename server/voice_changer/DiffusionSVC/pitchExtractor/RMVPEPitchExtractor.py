@@ -36,7 +36,7 @@ class RMVPEPitchExtractor(PitchExtractor):
         real_silence_front = start_frame * hop_size / 16000  # 秒
         audio_t = audio_t[:, int(np.round(real_silence_front * 16000)):]
 
-        f0 = self.rmvpe.infer_from_audio_t(audio_t.squeeze(), thred=0.03)
+        f0 = self.rmvpe.infer_from_audio_t(audio_t.squeeze(), threshold=0.03)
 
         desired_hop_size = block_size * 16000 / model_sr
         desired_f0_length = int(audio_t.shape[1] // desired_hop_size) + 1

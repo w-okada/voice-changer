@@ -4,15 +4,14 @@ VoiceChangerV2向け
 from dataclasses import asdict
 import numpy as np
 import torch
+import torch.nn.functional as F
 from data.ModelSlot import RVCModelSlot
 from mods.log_control import VoiceChangaerLogger
 
 from voice_changer.RVC.RVCSettings import RVCSettings
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 from voice_changer.utils.VoiceChangerModel import (
-    AudioInOut,
-    PitchfInOut,
-    FeatureInOut,
+    AudioInOutFloat,
     VoiceChangerModel,
 )
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
@@ -27,7 +26,7 @@ from Exceptions import (
     PipelineCreateException,
     PipelineNotInitializedException,
 )
-import resampy
+import soxr
 from typing import cast
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
@@ -47,11 +46,14 @@ class RVCr2(VoiceChangerModel):
 
         self.pipeline: Pipeline | None = None
 
-        self.audio_buffer: AudioInOut | None = None
-        self.pitchf_buffer: PitchfInOut | None = None
-        self.feature_buffer: FeatureInOut | None = None
+        self.audio_buffer: torch.Tensor | None = None
+        self.pitchf_buffer: torch.Tensor | None = None
+        self.feature_buffer: torch.Tensor | None = None
         self.prevVol = 0.0
         self.slotInfo = slotInfo
+
+        self.sr = 16000
+        self.window = 160
         # self.initialize()
 
     def initialize(self):
@@ -72,15 +74,21 @@ class RVCr2(VoiceChangerModel):
         self.settings.tran = self.slotInfo.defaultTune
         self.settings.indexRatio = self.slotInfo.defaultIndexRatio
         self.settings.protect = self.slotInfo.defaultProtect
-        logger.info("[Voice Changer] [RVC] Initializing... done")
 
-    def setSamplingRate(self, inputSampleRate, outputSampleRate):
-        self.inputSampleRate = inputSampleRate
+        self.audio_buffer = torch.zeros((0,), dtype=torch.float32, device=self.pipeline.device)
+        self.pitchf_buffer = torch.zeros((0,), dtype=torch.float32, device=self.pipeline.device)
+        self.feature_buffer = torch.zeros((0, self.slotInfo.embChannels), dtype=torch.float32, device=self.pipeline.device)
+
+        logger.info("[Voice Changer] [RVCr2] Initializing... done")
+
+    def setSamplingRate(self, input_sample_rate, outputSampleRate):
+        self.input_sample_rate = input_sample_rate
         self.outputSampleRate = outputSampleRate
         # self.initialize()
 
     def update_settings(self, key: str, val: int | float | str):
-        logger.info(f"[Voice Changer][RVC]: update_settings {key}:{val}")
+        logger.info(f"[Voice Changer] [RVCr2]: update_settings {key}:{val}")
+
         if key in self.settings.intData:
             setattr(self.settings, key, int(val))
             if key == "gpu":
@@ -111,141 +119,127 @@ class RVCr2(VoiceChangerModel):
     def get_processing_sampling_rate(self):
         return self.slotInfo.samplingRate
 
-    def generate_input(
+    def alloc(
         self,
-        newData: AudioInOut,
-        crossfadeSize: int,
-        solaSearchFrame: int,
-        extra_frame: int,
+        convert_size: int,
+        convert_feature_size: int,
     ):
-        # 16k で入ってくる。
-        inputSize = newData.shape[0]
-        newData = newData.astype(np.float32) / 32768.0
-        newFeatureLength = inputSize // 160  # hopsize:=160
+        # 過去のデータに連結
+        if self.audio_buffer.shape[0] < convert_size:
+            print('Reallocating audio buffer. Old size:', self.audio_buffer.shape[0])
+            self.audio_buffer = torch.zeros(convert_size, dtype=torch.float32, device=self.pipeline.device)
+        # Align audio buffer size with the latest convert size. Will be realloc'ed later if necessary,
+        self.audio_buffer = self.audio_buffer[:convert_size]
 
-        if self.audio_buffer is not None:
-            # 過去のデータに連結
-            self.audio_buffer = np.concatenate([self.audio_buffer, newData], 0)
-            if self.slotInfo.f0:
-                self.pitchf_buffer = np.concatenate(
-                    [self.pitchf_buffer, np.zeros(newFeatureLength)], 0
-                )
-            self.feature_buffer = np.concatenate(
-                [
-                    self.feature_buffer,
-                    np.zeros([newFeatureLength, self.slotInfo.embChannels]),
-                ],
-                0,
-            )
-        else:
-            self.audio_buffer = newData
-            if self.slotInfo.f0:
-                self.pitchf_buffer = np.zeros(newFeatureLength)
-            self.feature_buffer = np.zeros(
-                [newFeatureLength, self.slotInfo.embChannels]
-            )
-
-        convertSize = inputSize + crossfadeSize + solaSearchFrame + extra_frame
-
-        if convertSize % 160 != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
-            convertSize = convertSize + (160 - (convertSize % 160))
-        outSize = int(
-            ((convertSize - extra_frame) / 16000) * self.slotInfo.samplingRate
-        )
-
-        # バッファがたまっていない場合はzeroで補う
-        if self.audio_buffer.shape[0] < convertSize:
-            self.audio_buffer = np.concatenate(
-                [np.zeros([convertSize]), self.audio_buffer]
-            )
-            if self.slotInfo.f0:
-                self.pitchf_buffer = np.concatenate(
-                    [np.zeros([convertSize // 160]), self.pitchf_buffer]
-                )
-            self.feature_buffer = np.concatenate(
-                [
-                    np.zeros([convertSize // 160, self.slotInfo.embChannels]),
-                    self.feature_buffer,
-                ]
-            )
-
-        # 不要部分をトリミング
-        convertOffset = -1 * convertSize
-        featureOffset = convertOffset // 160
-        self.audio_buffer = self.audio_buffer[convertOffset:]  # 変換対象の部分だけ抽出
         if self.slotInfo.f0:
-            self.pitchf_buffer = self.pitchf_buffer[featureOffset:]
-        self.feature_buffer = self.feature_buffer[featureOffset:]
+            if self.pitchf_buffer.shape[0] < convert_feature_size:
+                print('Reallocating pitchf buffer. Old size:', self.pitchf_buffer.shape[0])
+                self.pitchf_buffer = torch.zeros(convert_feature_size, dtype=torch.float32, device=self.pipeline.device)
+            self.pitchf_buffer = self.pitchf_buffer[:convert_feature_size]
 
-        # 出力部分だけ切り出して音量を確認。(TODO:段階的消音にする)
-        cropOffset = -1 * (inputSize + crossfadeSize)
-        cropEnd = -1 * (crossfadeSize)
-        crop = self.audio_buffer[cropOffset:cropEnd]
-        vol = np.sqrt(np.square(crop).mean())
-        vol = max(vol, self.prevVol * 0.0)
-        self.prevVol = vol
+        if self.feature_buffer.shape[0] < convert_feature_size:
+            print('Reallocating feature buffer. Old size:', self.feature_buffer.shape[0])
+            self.feature_buffer = torch.zeros((convert_feature_size, self.slotInfo.embChannels), dtype=torch.float32, device=self.pipeline.device)
+        self.feature_buffer = self.feature_buffer[:convert_feature_size]
 
         return (
             self.audio_buffer,
             self.pitchf_buffer,
             self.feature_buffer,
-            convertSize,
-            vol,
-            outSize,
         )
 
+    def write_input(
+        self,
+        new_data: torch.Tensor,
+        target: torch.Tensor,
+    ):
+        input_size = new_data.shape[0]
+        old_data = target[input_size:].detach().clone() # Pytorch doesn't allow to move memory chunk to the same shared memory
+        offset = target.shape[0] - input_size
+        target[:offset] = old_data
+        target[offset:] = new_data
+        return target
+
     def inference(
-        self, receivedData: AudioInOut, crossfade_frame: int, sola_search_frame: int
+        self, received_data: AudioInOutFloat, crossfade_frame: int, sola_search_frame: int
     ):
         if self.pipeline is None:
             logger.info("[Voice Changer] Pipeline is not initialized.")
             raise PipelineNotInitializedException()
 
         # 処理は16Kで実施(Pitch, embed, (infer))
-        receivedData = cast(
-            AudioInOut,
-            resampy.resample(
-                receivedData,
-                self.inputSampleRate,
-                16000,
-            ),
-        )
-        crossfade_frame = int((crossfade_frame / self.inputSampleRate) * 16000)
-        sola_search_frame = int((sola_search_frame / self.inputSampleRate) * 16000)
-        extra_frame = int(
-            (self.settings.extraConvertSize / self.inputSampleRate) * 16000
+        received_data: AudioInOutFloat = soxr.resample(
+            received_data,
+            self.input_sample_rate,
+            self.sr,
         )
 
-        # 入力データ生成
-        data = self.generate_input(
-            receivedData, crossfade_frame, sola_search_frame, extra_frame
-        )
+        received_data = torch.as_tensor(received_data, dtype=torch.float32, device=self.pipeline.device)
 
-        audio = data[0]
-        pitchf = data[1]
-        feature = data[2]
-        convertSize = data[3]
-        vol = data[4]
-        outSize = data[5]
+        # 16k で入ってくる。
+        input_size = received_data.shape[0]
+
+        crossfade_frame = int((crossfade_frame / self.input_sample_rate) * self.sr)
+        sola_search_frame = int((sola_search_frame / self.input_sample_rate) * self.sr)
+        extra_frame = int((self.settings.extraConvertSize / self.input_sample_rate) * self.sr)
+
+        convert_size = input_size + crossfade_frame + sola_search_frame + extra_frame
+        if (modulo := convert_size % self.window) != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
+            convert_size = convert_size + (self.window - modulo)
+
+        # 16k で入ってくる。
+        convert_feature_size = convert_size // self.window
+
+         # 入力データ生成
+        audio, pitchf, feature = self.alloc(convert_size, convert_feature_size)
+
+        self.audio_buffer = self.write_input(received_data, audio)
+
+        # 出力部分だけ切り出して音量を確認。(TODO:段階的消音にする)
+        cropOffset = -(input_size + crossfade_frame)
+        cropEnd = -crossfade_frame
+        crop = audio[cropOffset:cropEnd]
+        vol_t = torch.sqrt(
+            torch.square(crop).mean()
+        )
+        vol = max(vol_t.item(), 0)
+        self.prevVol = vol
 
         if vol < self.settings.silentThreshold:
-            return np.zeros(convertSize).astype(np.int16) * np.sqrt(vol)
+            return np.zeros(convert_size, dtype=np.float32)
 
-        device = self.pipeline.device
+        repeat = self.settings.rvcQuality
 
-        audio = torch.from_numpy(audio).to(device=device, dtype=torch.float32)
-        repeat = 1 if self.settings.rvcQuality else 0
+        if repeat:
+            audio = audio.unsqueeze(0)
+
+            quality_padding_sec = (audio.shape[1] - 1) / self.sr  # padding(reflect)のサイズは元のサイズより小さい必要がある。
+
+            t_pad = round(self.sr * quality_padding_sec)  # 前後に音声を追加
+            silence_front = 0
+            out_size = None
+
+            t_pad_tgt = round(self.slotInfo.samplingRate * quality_padding_sec)  # 前後に音声を追加　出力時のトリミング(モデルのサンプリングで出力される)
+            audio = F.pad(audio, (t_pad, t_pad), mode="reflect").squeeze(0)
+            convert_feature_size = audio.shape[0] // self.window
+        else:
+            t_pad_tgt = None
+            out_size = int(((convert_size - extra_frame) / self.sr) * self.slotInfo.samplingRate)
+            silence_front = self.settings.extraConvertSize / self.input_sample_rate \
+                if self.settings.silenceFront \
+                else 0.0
+
         sid = self.settings.dstId
         f0_up_key = self.settings.tran
         index_rate = self.settings.indexRatio
         protect = self.settings.protect
 
-        if_f0 = 1 if self.slotInfo.f0 else 0
+        if_f0 = self.slotInfo.f0
         embOutputLayer = self.slotInfo.embOutputLayer
         useFinalProj = self.slotInfo.useFinalProj
 
         try:
-            audio_out, self.pitchf_buffer, self.feature_buffer = self.pipeline.exec(
+            audio_out, pitchf, feature = self.pipeline.exec(
                 sid,
                 audio,
                 pitchf,
@@ -254,28 +248,13 @@ class RVCr2(VoiceChangerModel):
                 index_rate,
                 if_f0,
                 # 0,
-                self.settings.extraConvertSize / self.inputSampleRate
-                if self.settings.silenceFront
-                else 0.0,  # extaraDataSizeの秒数。入力のサンプリングレートで算出
+                silence_front,  # extaraDataSizeの秒数。入力のサンプリングレートで算出
                 embOutputLayer,
                 useFinalProj,
                 repeat,
                 protect,
-                outSize,
+                out_size,
             )
-            # result = audio_out.detach().cpu().numpy() * np.sqrt(vol)
-            result = audio_out[-outSize:].detach().cpu().numpy() * np.sqrt(vol)
-
-            result = cast(
-                AudioInOut,
-                resampy.resample(
-                    result,
-                    self.slotInfo.samplingRate,
-                    self.outputSampleRate,
-                ),
-            )
-
-            return result
         except DeviceCannotSupportHalfPrecisionException as e:  # NOQA
             logger.warn(
                 "[Device Manager] Device cannot support half precision. Fallback to float...."
@@ -283,8 +262,28 @@ class RVCr2(VoiceChangerModel):
             self.deviceManager.setForceTensor(True)
             self.initialize()
             # raise e
+            return np.zeros(convert_size, dtype=np.float32)
 
-        return
+        if pitchf is not None:
+            self.pitchf_buffer = self.write_input(pitchf, self.pitchf_buffer)
+
+        self.feature_buffer = self.write_input(feature, self.feature_buffer)
+
+        # inferで出力されるサンプリングレートはモデルのサンプリングレートになる。
+        # pipelineに（入力されるときはhubertように16k）
+        if t_pad_tgt is not None:
+            audio_out = audio_out[t_pad_tgt:-t_pad_tgt]
+
+        # FIXME: Why the heck does it require another sqrt to amplify the volume?
+        result = (audio_out * torch.sqrt(vol_t)).detach().cpu().numpy()
+
+        result: AudioInOutFloat = soxr.resample(
+            result,
+            self.slotInfo.samplingRate,
+            self.outputSampleRate
+        )
+
+        return result
 
     def __del__(self):
         del self.pipeline

@@ -12,8 +12,8 @@ class MMVC_Namespace(socketio.AsyncNamespace):
 
     async def emitTo(self, data):
         timestamp = 0
-        audio1 = np.zeros(1).astype(np.int16)
-        bin = struct.pack("<%sh" % len(audio1), *audio1)
+        audio1 = np.zeros(1, dtype=np.float32)
+        bin = struct.pack("<%sf" % len(audio1), *audio1)
         perf = data
 
         await self.emit("response", [timestamp, bin, perf], to=self.sid)
@@ -47,12 +47,12 @@ class MMVC_Namespace(socketio.AsyncNamespace):
             print(data)
             await self.emit("response", [timestamp, 0], to=sid)
         else:
-            unpackedData = np.array(struct.unpack("<%sh" % (len(data) // struct.calcsize("<h")), data)).astype(np.int16)
+            unpackedData = np.array(struct.unpack("<%sf" % (len(data) // struct.calcsize("<f")), data), dtype=np.float32, copy=False)
 
             res = self.voiceChangerManager.changeVoice(unpackedData)
             audio1 = res[0]
             perf = res[1] if len(res) == 2 else [0, 0, 0]
-            bin = struct.pack("<%sh" % len(audio1), *audio1)
+            bin = struct.pack("<%sf" % len(audio1), *audio1)
             await self.emit("response", [timestamp, bin, perf], to=sid)
 
     def on_disconnect(self, sid):

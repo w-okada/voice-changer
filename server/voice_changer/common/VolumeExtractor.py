@@ -14,13 +14,15 @@ class VolumeExtractor:
         }
 
     def extract(self, audio: torch.Tensor):
-        audio = audio.squeeze().cpu()
+        audio = audio.squeeze().detach().cpu().numpy()
         n_frames = int(len(audio) // self.hop_size) + 1
         audio2 = audio ** 2
         audio2 = np.pad(audio2, (int(self.hop_size // 2), int((self.hop_size + 1) // 2)), mode='reflect')
         volume = np.array(
-            [np.mean(audio2[int(n * self.hop_size): int((n + 1) * self.hop_size)]) for n in range(n_frames)])
-        volume = np.sqrt(volume)
+            [np.mean(audio2[int(n * self.hop_size): int((n + 1) * self.hop_size)]) for n in range(n_frames)],
+            copy=False,
+        )
+        volume = np.sqrt(volume, out=volume)
         return volume
 
     def extract_t(self, audio: torch.Tensor):
@@ -31,18 +33,18 @@ class VolumeExtractor:
 
             audio2_frames = audio2.unfold(0, int(self.hop_size), int(self.hop_size)).contiguous()
 
-            volume = torch.mean(audio2_frames, dim=-1)
-            volume = torch.sqrt(volume)
+            volume = torch.mean(audio2_frames, dim=-1, out=volume)
+            volume = torch.sqrt(volume, out=volume)
             if volume.size(0) < n_frames:
                 volume = torch.nn.functional.pad(volume, (0, n_frames - volume.size(0)), 'constant', volume[-1])
             return volume
 
-    def get_mask_from_volume(self, volume, block_size: int, threshold=-60.0, device='cpu') -> torch.Tensor:
-        volume = volume.cpu().numpy()
+    def get_mask_from_volume(self, volume: torch.Tensor, block_size: int, threshold=-60.0, device='cpu') -> torch.Tensor:
+        volume = volume.detach().cpu().numpy()
         mask = (volume > 10 ** (float(threshold) / 20)).astype('float')
         mask = np.pad(mask, (4, 4), constant_values=(mask[0], mask[-1]))
         mask = np.array([np.max(mask[n: n + 9]) for n in range(len(mask) - 8)])
-        mask = torch.from_numpy(mask).float().to(device).unsqueeze(-1).unsqueeze(0)
+        mask = torch.as_tensor(mask, device=device, dtype=torch.float).unsqueeze(-1).unsqueeze(0)
         mask = upsample(mask, block_size).squeeze(-1)
         return mask
 

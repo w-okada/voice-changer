@@ -96,7 +96,7 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
                 slot.useFinalProj = False
 
             # DDPNモデルの情報を表示
-            if slot.embChannels == 256 and slot.embOutputLayer == 9 and slot.useFinalProj is True:
+            if slot.embChannels == 256 and slot.embOutputLayer == 9 and slot.useFinalProj:
                 print("[Voice Changer] DDPN Model(pyTorch) : Official v1 like")
             elif slot.embChannels == 768 and slot.embOutputLayer == 12 and slot.useFinalProj is False:
                 print("[Voice Changer] DDPN Model(pyTorch): Official v2 like")
@@ -137,7 +137,7 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
                 slot.useFinalProj = False
 
             # ONNXモデルの情報を表示
-            if slot.embChannels == 256 and slot.embOutputLayer == 9 and slot.useFinalProj is True:
+            if slot.embChannels == 256 and slot.embOutputLayer == 9 and slot.useFinalProj:
                 print("[Voice Changer] ONNX Model: Official v1 like")
             elif slot.embChannels == 768 and slot.embOutputLayer == 12 and slot.useFinalProj is False:
                 print("[Voice Changer] ONNX Model: Official v2 like")

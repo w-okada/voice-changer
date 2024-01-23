@@ -3,6 +3,7 @@ from const import PitchExtractorType
 from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractor import PitchExtractor
 from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
 import onnxruntime
+import torch
 
 
 class RMVPEOnnxPitchExtractor(PitchExtractor):
@@ -20,57 +21,54 @@ class RMVPEOnnxPitchExtractor(PitchExtractor):
             onnxProviders,
             onnxProviderOptions,
         ) = DeviceManager.get_instance().getOnnxExecutionProvider(gpu)
-        self.onnxProviders = onnxProviders
-        self.onnxProviderOptions = onnxProviderOptions
+
+        self.device = DeviceManager.get_instance().getDevice(gpu)
+        self.threshold = torch.tensor((0.3,), dtype=torch.float32, device=self.device)
 
         so = onnxruntime.SessionOptions()
-        so.log_severity_level = 3
+        # so.log_severity_level = 3
+        # so.enable_profiling = True
         self.onnx_session = onnxruntime.InferenceSession(self.file, sess_options=so, providers=onnxProviders, provider_options=onnxProviderOptions)
 
-    def extract(self, audio, pitchf, f0_up_key, sr, window, silence_front=0):
-        try:
-            # データ変換
-            if isinstance(audio, np.ndarray) is False:
-                audio = audio = audio.cpu().numpy()
+    def extract(self, audio: torch.Tensor, pitchf: torch.Tensor, f0_up_key: int, sr: int, window: int, silence_front: int = 0) -> tuple[torch.Tensor, torch.Tensor]:
+        # 処理
+        silenceFrontFrame = silence_front * sr
+        startWindow = int(silenceFrontFrame / window)  # 小数点以下切り捨て
+        slienceFrontFrameOffset = startWindow * window
+        targetFrameLength = len(audio) - slienceFrontFrameOffset
+        minimumFrames = 0.01 * sr
+        targetFrameLength = max(minimumFrames, targetFrameLength)
+        audio = audio[-targetFrameLength:].unsqueeze(0)
 
-            if isinstance(pitchf, np.ndarray) is False:
-                pitchf = pitchf.cpu().numpy().astype(np.float32)
+        if audio.device.type == 'cuda':
+            binding = self.onnx_session.io_binding()
 
-            if audio.ndim != 1:
-                raise RuntimeError(f"Exeption in {self.__class__.__name__} audio.ndim is not 1 (size :{audio.ndim}, {audio.shape})")
-            if pitchf.ndim != 1:
-                raise RuntimeError(f"Exeption in {self.__class__.__name__} pitchf.ndim is not 1 (size :{pitchf.ndim}, {pitchf.shape})")
+            binding.bind_input('waveform', device_type='cuda', device_id=self.device.index, element_type=np.float32, shape=tuple(audio.shape), buffer_ptr=audio.data_ptr())
+            binding.bind_input('threshold', device_type='cuda', device_id=self.device.index, element_type=np.float32, shape=tuple(self.threshold.shape), buffer_ptr=self.threshold.data_ptr())
 
-            # 処理
-            silenceFrontFrame = silence_front * sr
-            startWindow = int(silenceFrontFrame / window)  # 小数点以下切り捨て
-            slienceFrontFrameOffset = startWindow * window
-            targetFrameLength = len(audio) - slienceFrontFrameOffset
-            minimumFrames = 0.01 * sr
-            targetFrameLength = max(minimumFrames, targetFrameLength)
-            audio = audio[-targetFrameLength:]
-            audio = np.expand_dims(audio, axis=0)
+            binding.bind_output('pitchf', device_type='cuda', device_id=self.device.index)
 
-            output = self.onnx_session.run(
+            self.onnx_session.run_with_iobinding(binding)
+
+            output = [output.numpy() for output in binding.get_outputs()]
+        else:
+            output: list[np.ndarray] = self.onnx_session.run(
                 ["pitchf"],
                 {
-                    "waveform": audio.astype(np.float32),
-                    "threshold": np.array([0.3]).astype(np.float32),
+                    "waveform": audio.detach().cpu().numpy(),
+                    "threshold": self.threshold.detach().cpu().numpy(),
                 },
             )
+        # self.onnx_session.end_profiling()
 
-            f0 = output[0].squeeze()
+        f0 = torch.as_tensor(output[0], dtype=torch.float32, device=audio.device).squeeze()
 
-            f0 *= pow(2, f0_up_key / 12)
-            pitchf[-f0.shape[0]:] = f0[: pitchf.shape[0]]
+        f0 *= (f0_up_key / 12) ** 2
+        pitchf[-f0.shape[0]:] = f0[:pitchf.shape[0]]
+        f0_mel = 1127.0 * torch.log(1.0 + pitchf / 700.0)
+        f0_mel[f0_mel > 0] = (f0_mel[f0_mel > 0] - self.f0_mel_min) * 254 / (self.f0_mel_max - self.f0_mel_min) + 1
+        f0_mel[f0_mel <= 1] = 1
+        f0_mel[f0_mel > 255] = 255
+        f0_coarse = torch.round(f0_mel, out=f0_mel).to(dtype=torch.int64)
 
-            f0_mel = 1127.0 * np.log(1.0 + pitchf / 700.0)
-            f0_mel[f0_mel > 0] = (f0_mel[f0_mel > 0] - self.f0_mel_min) * 254 / (self.f0_mel_max - self.f0_mel_min) + 1
-            f0_mel[f0_mel <= 1] = 1
-            f0_mel[f0_mel > 255] = 255
-            f0_coarse = np.rint(f0_mel).astype(int)
-
-        except Exception as e:
-            raise RuntimeError(f"Exeption in {self.__class__.__name__}", e)
-
-        return f0_coarse, pitchf
+        return f0_coarse.unsqueeze(0), pitchf.unsqueeze(0)

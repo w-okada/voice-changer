@@ -12,6 +12,9 @@ class VoiceChangerParamsManager:
         if cls._instance is None:
             cls._instance = cls()
         return cls._instance
-    
+
     def setParams(self, params: VoiceChangerParams):
         self.params = params
+
+    def getParams(self):
+        return self.params

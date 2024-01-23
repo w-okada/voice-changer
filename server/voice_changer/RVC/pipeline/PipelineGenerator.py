@@ -58,7 +58,7 @@ def createPipeline(params: VoiceChangerParams, modelSlot: RVCModelSlot, gpu: int
     return pipeline
 
 
-def _loadIndex(indexPath: str):
+def _loadIndex(indexPath: str) -> faiss.Index | None:
     # Indexのロード
     print("[Voice Changer] Loading index...")
     # ファイル指定があってもファイルがない場合はNone

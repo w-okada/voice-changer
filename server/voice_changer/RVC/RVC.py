@@ -40,7 +40,7 @@ class RVC(VoiceChangerModel):
         # self.initialize()
 
     def initialize(self):
-        logger.info("[Voice Changer][RVC] Initializing... ")
+        logger.info("[Voice Changer] [RVC] Initializing... ")
 
         # pipelineの生成
         try:
@@ -141,21 +141,17 @@ class RVC(VoiceChangerModel):
         if self.pipeline is None:
             logger.info("[Voice Changer] Pipeline is not initialized.111")
             raise PipelineNotInitializedException()
-        audio = data[0]
-        pitchf = data[1]
-        feature = data[2]
-        convertSize = data[3]
-        vol = data[4]
-        outSize = data[5]
+
+        audio, pitchf, feature, convertSize, vol, outSize = data
 
         if vol < self.settings.silentThreshold:
-            return np.zeros(convertSize).astype(np.int16) * np.sqrt(vol)
+            return np.zeros(convertSize, dtype=np.int16) * np.sqrt(vol)
 
         if self.pipeline is not None:
             device = self.pipeline.device
         else:
             device = torch.device("cpu")
-        audio = torch.from_numpy(audio).to(device=device, dtype=torch.float32)
+        audio = torch.as_tensor(audio, device=device, dtype=torch.float32)
         audio = torchaudio.functional.resample(audio, self.slotInfo.samplingRate, 16000, rolloff=0.99)
         repeat = 1 if self.settings.rvcQuality else 0
         sid = self.settings.dstId
@@ -163,7 +159,6 @@ class RVC(VoiceChangerModel):
         index_rate = self.settings.indexRatio
         protect = self.settings.protect
 
-        if_f0 = 1 if self.slotInfo.f0 else 0
         embOutputLayer = self.slotInfo.embOutputLayer
         useFinalProj = self.slotInfo.useFinalProj
 
@@ -175,7 +170,7 @@ class RVC(VoiceChangerModel):
                 feature,
                 f0_up_key,
                 index_rate,
-                if_f0,
+                self.slotInfo.f0,
                 self.settings.extraConvertSize / self.slotInfo.samplingRate if self.settings.silenceFront else 0.,  # extaraDataSizeの秒数。RVCのモデルのサンプリングレートで処理(★１)。
                 embOutputLayer,
                 useFinalProj,

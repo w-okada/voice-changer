@@ -5,7 +5,7 @@ import torch
 import os
 import numpy as np
 from dataclasses import dataclass, asdict, field
-import resampy
+import soxr
 import onnxruntime
 from mods.log_control import VoiceChangaerLogger
 
@@ -77,7 +77,6 @@ class VoiceChanger(VoiceChangerIF):
         self.voiceChanger: VoiceChangerModel | None = None
         self.params = params
         self.gpu_num = torch.cuda.device_count()
-        self.prev_audio = np.zeros(4096)
         self.mps_enabled: bool = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
         self.onnx_device = onnxruntime.get_device()
 
@@ -169,9 +168,7 @@ class VoiceChanger(VoiceChangerIF):
 
             logger.info(f"Generated Strengths: for prev:{self.np_prev_strength.shape}, for cur:{self.np_cur_strength.shape}")
             # ひとつ前の結果とサイズが変わるため、記録は消去する。
-            if hasattr(self, "np_prev_audio1") is True:
-                delattr(self, "np_prev_audio1")
-            if hasattr(self, "sola_buffer") is True:
+            if hasattr(self, "sola_buffer"):
                 del self.sola_buffer
 
     def get_processing_sampling_rate(self):
@@ -195,10 +192,10 @@ class VoiceChanger(VoiceChangerIF):
                 if self.settings.inputSampleRate != processing_sampling_rate:
                     newData = cast(
                         AudioInOut,
-                        resampy.resample(
+                        soxr.resample(
                             receivedData,
                             self.settings.inputSampleRate,
-                            processing_sampling_rate,
+                            processing_sampling_rate
                         ),
                     )
                 else:
@@ -219,7 +216,7 @@ class VoiceChanger(VoiceChangerIF):
                 # Inference
                 audio = self.voiceChanger.inference(data)
 
-                if hasattr(self, "sola_buffer") is True:
+                if hasattr(self, "sola_buffer"):
                     np.set_printoptions(threshold=10000)
                     audio_offset = -1 * (sola_search_frame + crossfade_frame + block_frame)
                     audio = audio[audio_offset:]
@@ -236,7 +233,7 @@ class VoiceChanger(VoiceChangerIF):
                             np.ones(crossfade_frame),
                             "valid",
                         )
-                        + 1e-3
+                        + 0.001
                     )
                     sola_offset = int(np.argmax(cor_nom / cor_den))
                     sola_end = sola_offset + block_frame
@@ -244,12 +241,12 @@ class VoiceChanger(VoiceChangerIF):
                     output_wav[:crossfade_frame] *= self.np_cur_strength
                     output_wav[:crossfade_frame] += self.sola_buffer[:]
 
-                    result = output_wav
+                    result = output_wav.astype(np.int16, copy=False)
                 else:
                     logger.info("[Voice Changer] warming up... generating sola buffer.")
-                    result = np.zeros(4096).astype(np.int16)
+                    result = np.zeros(4096, dtype=np.int16)
 
-                if hasattr(self, "sola_buffer") is True and sola_offset < sola_search_frame:
+                if hasattr(self, "sola_buffer") and sola_offset < sola_search_frame:
                     offset = -1 * (sola_search_frame + crossfade_frame - sola_offset)
                     end = -1 * (sola_search_frame - sola_offset)
                     sola_buf_org = audio[offset:end]
@@ -262,8 +259,6 @@ class VoiceChanger(VoiceChangerIF):
 
             # 後処理
             with Timer2("post-process", False) as t:
-                result = result.astype(np.int16)
-
                 if self.settings.outputSampleRate != processing_sampling_rate:
                     # print(
                     #     "output samplingrate",
@@ -272,11 +267,11 @@ class VoiceChanger(VoiceChangerIF):
                     # )
                     outputData = cast(
                         AudioInOut,
-                        resampy.resample(
+                        soxr.resample(
                             result,
                             processing_sampling_rate,
-                            self.settings.outputSampleRate,
-                        ).astype(np.int16),
+                            self.settings.outputSampleRate
+                        ),
                     )
                 else:
                     outputData = result
@@ -306,31 +301,31 @@ class VoiceChanger(VoiceChangerIF):
 
         except NoModeLoadedException as e:
             logger.warn(f"[Voice Changer] [Exception], {e}")
-            return np.zeros(1).astype(np.int16), [0, 0, 0]
+            return np.zeros(1, dtype=np.int16), [0, 0, 0]
         except ONNXInputArgumentException as e:
             logger.warn(f"[Voice Changer] [Exception] onnx are waiting valid input., {e}")
-            return np.zeros(1).astype(np.int16), [0, 0, 0]
+            return np.zeros(1, dtype=np.int16), [0, 0, 0]
         except HalfPrecisionChangingException:
             logger.warn("[Voice Changer] Switching model configuration....")
-            return np.zeros(1).astype(np.int16), [0, 0, 0]
+            return np.zeros(1, dtype=np.int16), [0, 0, 0]
         except NotEnoughDataExtimateF0:
             logger.warn("[Voice Changer] warming up... waiting more data.")
-            return np.zeros(1).astype(np.int16), [0, 0, 0]
+            return np.zeros(1, dtype=np.int16), [0, 0, 0]
         except DeviceChangingException as e:
             logger.warn(f"[Voice Changer] embedder: {e}")
-            return np.zeros(1).astype(np.int16), [0, 0, 0]
+            return np.zeros(1, dtype=np.int16), [0, 0, 0]
         except VoiceChangerIsNotSelectedException:
             logger.warn("[Voice Changer] Voice Changer is not selected. Wait a bit and if there is no improvement, please re-select vc.")
-            return np.zeros(1).astype(np.int16), [0, 0, 0]
+            return np.zeros(1, dtype=np.int16), [0, 0, 0]
         except DeviceCannotSupportHalfPrecisionException:
             # RVC.pyでfallback処理をするので、ここはダミーデータ返すだけ。
-            return np.zeros(1).astype(np.int16), [0, 0, 0]
+            return np.zeros(1, dtype=np.int16), [0, 0, 0]
         except PipelineNotInitializedException:
-            return np.zeros(1).astype(np.int16), [0, 0, 0]
+            return np.zeros(1, dtype=np.int16), [0, 0, 0]
         except Exception as e:
             logger.warn(f"[Voice Changer] VC PROCESSING EXCEPTION!!! {e}")
             logger.exception(e)
-            return np.zeros(1).astype(np.int16), [0, 0, 0]
+            return np.zeros(1, dtype=np.int16), [0, 0, 0]
 
     def export2onnx(self):
         return self.voiceChanger.export2onnx()
@@ -350,7 +345,7 @@ PRINT_CONVERT_PROCESSING: bool = False
 
 
 def print_convert_processing(mess: str):
-    if PRINT_CONVERT_PROCESSING is True:
+    if PRINT_CONVERT_PROCESSING:
         logger.info(mess)
 
 

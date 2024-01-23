@@ -18,6 +18,10 @@ from voice_changer.utils.VoiceChangerModel import AudioInOut
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from dataclasses import dataclass, asdict, field
 import torch
+try:
+    import torch_directml
+except ImportError:
+    import voice_changer.RVC.deviceManager.DummyDML as torch_directml
 
 # import threading
 from typing import Callable
@@ -121,7 +125,12 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         for id in range(devCount):
             name = torch.cuda.get_device_name(id)
             memory = torch.cuda.get_device_properties(id).total_memory
-            gpu = {"id": id, "name": name, "memory": memory}
+            gpu = {"id": id, "name": f"{name} (CUDA) ", "memory": memory}
+            gpus.append(gpu)
+        devCount = torch_directml.device_count()
+        for id in range(devCount):
+            name = torch_directml.device_name(id)
+            gpu = {"id": id, "name": f"{name} (DirectML) ", "memory": 0}
             gpus.append(gpu)
         return gpus
 
@@ -228,7 +237,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         return data
 
     def get_performance(self):
-        if hasattr(self, "voiceChanger"):
+        if self.voiceChanger is not None:
             info = self.voiceChanger.get_performance()
             return info
         else:
@@ -347,14 +356,14 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         return self.get_info()
 
     def changeVoice(self, receivedData: AudioInOut):
-        if self.settings.passThrough is True:  # パススルー
+        if self.settings.passThrough:  # パススルー
             return receivedData, []
 
-        if hasattr(self, "voiceChanger") is True:
+        if self.voiceChanger is not None:
             return self.voiceChanger.on_request(receivedData)
         else:
             logger.info("Voice Change is not loaded. Did you load a correct model?")
-            return np.zeros(1).astype(np.int16), []
+            return np.zeros(1, dtype=np.float32), []
 
     def export2onnx(self):
         return self.voiceChanger.export2onnx()

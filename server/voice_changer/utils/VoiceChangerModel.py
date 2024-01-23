@@ -25,7 +25,7 @@ class VoiceChangerModel(Protocol):
     def get_info(self) -> dict[str, Any]:
         ...
 
-    def inference(self, data: tuple[Any, ...]) -> Any:
+    def inference(self, data: tuple[Any, ...]) -> np.ndarray:
         ...
 
     def generate_input(
@@ -38,4 +38,7 @@ class VoiceChangerModel(Protocol):
         ...
 
     def update_settings(self, key: str, val: int | float | str) -> bool:
+        ...
+
+    def setSamplingRate(self, inputSampleRate: int, outputSampleRate: int):
         ...

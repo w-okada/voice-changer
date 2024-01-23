@@ -13,7 +13,7 @@ from typing import Dict, List
 #         self.msecs = 0
 #         self.avrSecs = 0
 
-#         if self.enable is False:
+#         if not self.enable:
 #             return
 
 #         self.maxStores = 10
@@ -28,13 +28,13 @@ from typing import Dict, List
 #             self.storedSecs[self.key] = {}
 
 #     def __enter__(self):
-#         if self.enable is False:
+#         if not self.enable:
 #             return
 #         self.start = time.time()
 #         return self
 
 #     def __exit__(self, *_):
-#         if self.enable is False:
+#         if not self.enable:
 #             return
 #         self.end = time.time()
 #         self.secs = self.end - self.start
@@ -47,14 +47,14 @@ from typing import Dict, List
 class Timer2(object):
     storedSecs: Dict[str, Dict[str, List[float]]] = {}  # Class variable
 
-    def __init__(self, title: str, enalbe: bool = True):
+    def __init__(self, title: str, enable: bool = True):
         self.title = title
-        self.enable = enalbe
+        self.enable = enable
         self.secs = 0
         self.msecs = 0
         self.avrSecs = 0
 
-        if self.enable is False:
+        if not self.enable:
             return
 
         self.maxStores = 10
@@ -69,13 +69,13 @@ class Timer2(object):
             self.storedSecs[self.key] = {}
 
     def __enter__(self):
-        if self.enable is False:
+        if not self.enable:
             return self
         self.current = time.time()
         return self
 
     def record(self, lapname: str):
-        if self.enable is False:
+        if not self.enable:
             return
         self.lapkey = f"{self.key}_{lapname}"
         prev = self.current
@@ -86,7 +86,7 @@ class Timer2(object):
         self.storedSecs[self.key][self.lapkey] = self.storedSecs[self.key][self.lapkey][-self.maxStores :]
 
     def __exit__(self, *_):
-        if self.enable is False:
+        if not self.enable:
             return
         title = self.key.split("_")[-1]
         print(f"---- {title} ----")

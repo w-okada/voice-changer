@@ -7,10 +7,10 @@ from .rvc_models.infer_pack.models import SynthesizerTrnMs768NSFsid
 
 class RVCInferencerv2(Inferencer):
     def loadModel(self, file: str, gpu: int):
-        self.setProps(EnumInferenceTypes.pyTorchRVCv2, file, True, gpu)
-
         dev = DeviceManager.get_instance().getDevice(gpu)
-        isHalf = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
+        # isHalf = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
+        isHalf = False
+        self.setProps(EnumInferenceTypes.pyTorchRVCv2, file, isHalf, gpu)
 
         cpt = torch.load(file, map_location="cpu")
         model = SynthesizerTrnMs768NSFsid(*cpt["config"], is_half=isHalf)
@@ -34,8 +34,9 @@ class RVCInferencerv2(Inferencer):
         sid: torch.Tensor,
         convert_length: int | None,
     ) -> torch.Tensor:
+        if pitch is None or pitchf is None:
+            raise RuntimeError("[Voice Changer] Pitch or Pitchf is not found.")
+
         res = self.model.infer(feats, pitch_length, pitch, pitchf, sid, convert_length=convert_length)
         res = res[0][0, 0].to(dtype=torch.float32)
-        res = torch.clip(res, -1.0, 1.0)
-        return res        
-
+        return torch.clip(res, -1.0, 1.0, out=res)

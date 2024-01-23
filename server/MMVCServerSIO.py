@@ -115,13 +115,15 @@ printMessage(f"Booting PHASE :{__name__}", level=2)
 PORT = args.p
 
 
-def localServer(logLevel: str = "critical"):
+def localServer(logLevel: str = 'critical', key_path: str | None = None, cert_path: str | None = None):
     try:
         uvicorn.run(
             f"{os.path.basename(__file__)[:-3]}:app_socketio",
             host="0.0.0.0",
             port=int(PORT),
             reload=False if hasattr(sys, "_MEIPASS") else True,
+            ssl_keyfile=key_path,
+            ssl_certfile=cert_path,
             log_level=logLevel,
         )
     except Exception as e:

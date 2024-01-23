@@ -24,7 +24,7 @@ def weighted_argmax(logits: np.ndarray):
     return bins, _apply_weights(logits, bins)
 
 
-def viterbi(logits):
+def viterbi(logits: np.ndarray):
     """Sample observations using viterbi decoding"""
     # Create viterbi transition matrix
     if not hasattr(viterbi, 'transition'):
@@ -40,8 +40,8 @@ def viterbi(logits):
 
     # Perform viterbi decoding
     bins = np.array([
-        librosa.sequence.viterbi(sequence, viterbi.transition).astype(np.int64)
-        for sequence in probs])
+        librosa.sequence.viterbi(sequence, viterbi.transition)
+        for sequence in probs], dtype=np.int64)
 
     # Convert to frequency in Hz
     return bins, onnxcrepe.convert.bins_to_frequency(bins)

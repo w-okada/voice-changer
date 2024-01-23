@@ -75,11 +75,12 @@ DiffusionSVCInferenceType: TypeAlias = Literal["combo",]
 
 
 PitchExtractorType: TypeAlias = Literal[
-    "harvest",
     "dio",
-    "crepe",
+    "harvest",
     "crepe_full",
     "crepe_tiny",
+    "crepe_full_onnx",
+    "crepe_tiny_onnx",
     "rmvpe",
     "rmvpe_onnx",
 ]

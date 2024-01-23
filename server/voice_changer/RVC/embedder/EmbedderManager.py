@@ -2,9 +2,6 @@ from torch import device
 
 from const import EmbedderType
 from voice_changer.RVC.embedder.Embedder import Embedder
-from voice_changer.RVC.embedder.FairseqContentvec import FairseqContentvec
-from voice_changer.RVC.embedder.FairseqHubert import FairseqHubert
-from voice_changer.RVC.embedder.FairseqHubertJp import FairseqHubertJp
 from voice_changer.RVC.embedder.OnnxContentvec import OnnxContentvec
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 
@@ -39,28 +36,7 @@ class EmbedderManager:
     def loadEmbedder(
         cls, embederType: EmbedderType, isHalf: bool, dev: device
     ) -> Embedder:
-        if embederType == "hubert_base":
-            try:
-                if cls.params.content_vec_500_onnx_on is False:
-                    raise Exception("[Voice Changer][Embedder] onnx is off")
-                file = cls.params.content_vec_500_onnx
-                return OnnxContentvec().loadModel(file, dev)
-            except Exception as e:  # noqa
-                print("[Voice Changer] use torch contentvec", e)
-                file = cls.params.hubert_base
-                return FairseqHubert().loadModel(file, dev, isHalf)
-        elif embederType == "hubert-base-japanese":
-            file = cls.params.hubert_base_jp
-            return FairseqHubertJp().loadModel(file, dev, isHalf)
-        elif embederType == "contentvec":
-            try:
-                if cls.params.content_vec_500_onnx_on is False:
-                    raise Exception("[Voice Changer][Embedder] onnx is off")
-                file = cls.params.content_vec_500_onnx
-                return OnnxContentvec().loadModel(file, dev)
-            except Exception as e:
-                print(e)
-                file = cls.params.hubert_base
-                return FairseqContentvec().loadModel(file, dev, isHalf)
-        else:
-            return FairseqHubert().loadModel(file, dev, isHalf)
+        if embederType not in ["hubert_base", "contentvec"]:
+            raise RuntimeError(f'Unsupported embedder type: {embederType}')
+        file = cls.params.content_vec_500_onnx
+        return OnnxContentvec().loadModel(file, dev)

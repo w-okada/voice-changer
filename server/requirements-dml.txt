@@ -1,0 +1,21 @@
+# # apt-get update
+# # apt-get install -y emacs mlocate wget git curl gcc g++ make unzip
+# # wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh
+# # bash Anaconda3-2022.10-Linux-x86_64.sh
+
+torch==2.0.0 # torch-directml is built with pytorch 2.0.0
+torchaudio
+torch-directml
+faiss-cpu
+
+tensorboard
+tensorboardx
+
+onnxscript
+onnxsim
+onnxruntime-directml
+onnxconverter-common
+torchcrepe
+local_attention
+pyworld
+transformers

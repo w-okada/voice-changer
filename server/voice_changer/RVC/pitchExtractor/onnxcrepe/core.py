@@ -1,4 +1,4 @@
-import librosa
+import soxr
 import numpy as np
 
 from voice_changer.RVC.pitchExtractor import onnxcrepe
@@ -34,15 +34,15 @@ UNVOICED = np.nan
 
 
 def predict(session,
-            audio,
-            sample_rate,
+            audio: np.ndarray,
+            sample_rate: int,
             precision=None,
             fmin=50.,
             fmax=MAX_FMAX,
             decoder=onnxcrepe.decode.weighted_viterbi,
             return_periodicity=False,
             batch_size=None,
-            pad=True):
+            pad=True) -> np.ndarray | tuple[np.ndarray, np.ndarray]:
     """Performs pitch estimation
 
     Arguments
@@ -110,8 +110,8 @@ def predict(session,
     return np.concatenate(results, axis=1)
 
 
-def preprocess(audio,
-               sample_rate,
+def preprocess(audio: np.ndarray,
+               sample_rate: int,
                precision=None,
                batch_size=None,
                pad=True):
@@ -134,7 +134,7 @@ def preprocess(audio,
     """
     # Resample
     if sample_rate != SAMPLE_RATE:
-        audio = librosa.resample(audio, orig_sr=sample_rate, target_sr=SAMPLE_RATE)
+        audio = soxr.resample(audio, sample_rate, SAMPLE_RATE)
 
     # Default hop length of 10 ms
     hop_length = SAMPLE_RATE / 100 if precision is None else SAMPLE_RATE * precision / 1000
@@ -175,7 +175,7 @@ def preprocess(audio,
         yield frames
 
 
-def infer(session, frames):
+def infer(session, frames) -> np.ndarray:
     """Forward pass through the model
 
     Arguments
@@ -237,12 +237,12 @@ def postprocess(probabilities,
 ###############################################################################
 
 
-def periodicity(probabilities, bins):
+def periodicity(probabilities: np.ndarray, bins: np.ndarray):
     """Computes the periodicity from the network output and pitch bins"""
     # shape=(time / precision, 360)
     probs_stacked = probabilities.transpose(0, 2, 1).reshape(-1, PITCH_BINS)
     # shape=(time / precision, 1)
-    bins_stacked = bins.reshape(-1, 1).astype(np.int64)
+    bins_stacked = bins.reshape(-1, 1).astype(np.int64, copy=False)
 
     # Use maximum logit over pitch bins as periodicity
     periodicity = np.take_along_axis(probs_stacked, bins_stacked, axis=1)
@@ -251,6 +251,6 @@ def periodicity(probabilities, bins):
     return periodicity.reshape(probabilities.shape[0], probabilities.shape[2])
 
 
-def resample(audio, sample_rate):
+def resample(audio: np.ndarray, sample_rate: int):
     """Resample audio"""
-    return librosa.resample(audio, orig_sr=sample_rate, target_sr=onnxcrepe.SAMPLE_RATE)
+    return soxr.resample(audio, sample_rate, onnxcrepe.SAMPLE_RATE)

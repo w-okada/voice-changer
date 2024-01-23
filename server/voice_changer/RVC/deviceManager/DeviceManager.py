@@ -1,6 +1,11 @@
 import torch
 import onnxruntime
 
+try:
+    import torch_directml
+except ImportError:
+    import voice_changer.RVC.deviceManager.DummyDML as torch_directml
+
 
 class DeviceManager(object):
     _instance = None
@@ -18,46 +23,35 @@ class DeviceManager(object):
             getattr(torch.backends, "mps", None) is not None
             and torch.backends.mps.is_available()
         )
+        self.dml_enabled: bool = torch_directml.is_available()
 
     def getDevice(self, id: int):
-        if id < 0 or self.gpu_num == 0:
-            if self.mps_enabled is False:
-                dev = torch.device("cpu")
-            else:
-                dev = torch.device("mps")
+        if id == -1:
+            return torch.device("cpu")
+
+        if self.gpu_num > 0 and id < self.gpu_num:
+            return torch.device("cuda", index=id)
+        elif self.mps_enabled:
+            return torch.device("mps")
+        elif self.dml_enabled:
+            return torch.device(torch_directml.device(id))
         else:
-            if id < self.gpu_num:
-                dev = torch.device("cuda", index=id)
-            else:
-                print("[Voice Changer] device detection error, fallback to cpu")
-                dev = torch.device("cpu")
-        return dev
+            print("[Voice Changer] Device detection error, fallback to cpu")
+            return torch.device("cpu")
 
     def getOnnxExecutionProvider(self, gpu: int):
+        cpu_settings = {
+            "intra_op_num_threads": 8,
+            "execution_mode": onnxruntime.ExecutionMode.ORT_PARALLEL,
+            "inter_op_num_threads": 8,
+        }
         availableProviders = onnxruntime.get_available_providers()
-        devNum = torch.cuda.device_count()
-        if gpu >= 0 and "CUDAExecutionProvider" in availableProviders and devNum > 0:
-            if gpu < devNum:  # ひとつ前のif文で弾いてもよいが、エラーの解像度を上げるため一段下げ。
-                return ["CUDAExecutionProvider"], [{"device_id": gpu}]
-            else:
-                print("[Voice Changer] device detection error, fallback to cpu")
-                return ["CPUExecutionProvider"], [
-                    {
-                        "intra_op_num_threads": 8,
-                        "execution_mode": onnxruntime.ExecutionMode.ORT_PARALLEL,
-                        "inter_op_num_threads": 8,
-                    }
-                ]
+        if gpu >= 0 and "CUDAExecutionProvider" in availableProviders and self.gpu_num > 0:
+            return ["CUDAExecutionProvider", "CPUExecutionProvider"], [{"device_id": gpu}, cpu_settings]
         elif gpu >= 0 and "DmlExecutionProvider" in availableProviders:
-            return ["DmlExecutionProvider"], [{"device_id": gpu}]
+            return ["DmlExecutionProvider", "CPUExecutionProvider"], [{"device_id": gpu}, cpu_settings]
         else:
-            return ["CPUExecutionProvider"], [
-                {
-                    "intra_op_num_threads": 8,
-                    "execution_mode": onnxruntime.ExecutionMode.ORT_PARALLEL,
-                    "inter_op_num_threads": 8,
-                }
-            ]
+            return ["CPUExecutionProvider"], [cpu_settings]
 
     def setForceTensor(self, forceTensor: bool):
         self.forceTensor = forceTensor

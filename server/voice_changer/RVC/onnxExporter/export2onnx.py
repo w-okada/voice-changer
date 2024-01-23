@@ -26,7 +26,6 @@ from voice_changer.RVC.onnxExporter.SynthesizerTrnMsNSFsid_webui_ONNX import (
 )
 from voice_changer.VoiceChangerParamsManager import VoiceChangerParamsManager
 
-
 def export2onnx(gpu: int, modelSlot: RVCModelSlot):
     vcparams = VoiceChangerParamsManager.get_instance().params
     modelFile = os.path.join(vcparams.model_dir, str(modelSlot.slotIndex), os.path.basename(modelSlot.modelFile))
@@ -46,23 +45,24 @@ def export2onnx(gpu: int, modelSlot: RVCModelSlot):
         "embOutputLayer": modelSlot.embOutputLayer,
         "useFinalProj": modelSlot.useFinalProj,
     }
-    gpuMomory = DeviceManager.get_instance().getDeviceMemory(gpu)
-    print(f"[Voice Changer] exporting onnx... gpu_id:{gpu} gpu_mem:{gpuMomory}")
 
-    if gpuMomory > 0:
-        _export2onnx(modelFile, output_path, output_path_simple, True, metadata)
-    else:
-        print("[Voice Changer] Warning!!! onnx export with float32. maybe size is doubled.")
-        _export2onnx(modelFile, output_path, output_path_simple, False, metadata)
+    print("[Voice Changer] Exporting onnx...")
+    _export2onnx(modelFile, output_path, output_path_simple, gpu, metadata)
+
     return output_file_simple
 
 
-def _export2onnx(input_model, output_model, output_model_simple, is_half, metadata):
-    cpt = torch.load(input_model, map_location="cpu")
+def _export2onnx(input_model, output_model, output_model_simple, gpu, metadata):
+    dev = DeviceManager.get_instance().getDevice(gpu)
+    if dev.type == 'privateuseone':
+        dev = torch.device('cpu')
+    is_half = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
+
+    cpt = torch.load(input_model, map_location=dev)
     if is_half:
-        dev = torch.device("cuda", index=0)
+        print(f'[Voice Changer] Exporting to float16 on GPU')
     else:
-        dev = torch.device("cpu")
+        print(f'[Voice Changer] Exporting to float32 on CPU')
 
     # EnumInferenceTypesのままだとシリアライズできないのでテキスト化
     if metadata["modelType"] == EnumInferenceTypes.pyTorchRVC.value:
@@ -83,24 +83,25 @@ def _export2onnx(input_model, output_model, output_model_simple, is_half, metada
             metadata["modelType"],
             EnumInferenceTypes.pyTorchRVCv2.value,
         )
+        return
 
     net_g_onnx.eval().to(dev)
     net_g_onnx.load_state_dict(cpt["weight"], strict=False)
     if is_half:
         net_g_onnx = net_g_onnx.half()
-    
+
     featsLength = 64
 
     if is_half:
-        feats = torch.HalfTensor(1, featsLength, metadata["embChannels"]).to(dev)
+        feats = torch.zeros((1, featsLength, metadata["embChannels"]), dtype=torch.float16, device=dev)
     else:
-        feats = torch.FloatTensor(1, featsLength, metadata["embChannels"]).to(dev)
-    p_len = torch.LongTensor([featsLength]).to(dev)
-    sid = torch.LongTensor([0]).to(dev)
+        feats = torch.zeros((1, featsLength, metadata["embChannels"]), dtype=torch.float32, device=dev)
+    p_len = torch.tensor([featsLength], dtype=torch.int64, device=dev)
+    sid = torch.tensor([0], dtype=torch.int64, device=dev)
 
-    if metadata["f0"] is True:
-        pitch = torch.zeros(1, featsLength, dtype=torch.int64).to(dev)
-        pitchf = torch.FloatTensor(1, featsLength).to(dev)
+    if metadata["f0"]:
+        pitch = torch.zeros((1, featsLength), dtype=torch.int64, device=dev)
+        pitchf = torch.zeros((1, featsLength), dtype=torch.float32, device=dev)
         input_names = ["feats", "p_len", "pitch", "pitchf", "sid"]
         inputs = (
             feats,
@@ -138,9 +139,8 @@ def _export2onnx(input_model, output_model, output_model_simple, is_half, metada
         output_names=output_names,
     )
 
-    model_onnx2 = onnx.load(output_model)
-    model_simp, check = simplify(model_onnx2)
-    meta = model_simp.metadata_props.add()
+    onnx_model, _ = simplify(onnx.load(output_model))
+    meta = onnx_model.metadata_props.add()
     meta.key = "metadata"
     meta.value = json.dumps(metadata)
-    onnx.save(model_simp, output_model_simple)
+    onnx.save(onnx_model, output_model_simple)

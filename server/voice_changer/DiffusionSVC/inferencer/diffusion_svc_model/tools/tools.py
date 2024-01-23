@@ -3,7 +3,6 @@ import torch
 import torch.nn.functional as F
 
 import pyworld as pw
-import parselmouth
 import torchcrepe
 import librosa
 import fsspec
@@ -233,18 +232,8 @@ class F0_Extractor:
         real_silence_front = start_frame * self.hop_size / self.sample_rate
         audio = audio[int(np.round(real_silence_front * self.sample_rate)):]
 
-        # extract f0 using parselmouth
-        if self.f0_extractor == 'parselmouth':
-            f0 = parselmouth.Sound(audio, self.sample_rate).to_pitch_ac(
-                time_step=self.hop_size / self.sample_rate,
-                voicing_threshold=0.6,
-                pitch_floor=self.f0_min,
-                pitch_ceiling=self.f0_max).selected_array['frequency']
-            pad_size = start_frame + (int(len(audio) // self.hop_size) - len(f0) + 1) // 2
-            f0 = np.pad(f0, (pad_size, n_frames - len(f0) - pad_size))
-
         # extract f0 using dio
-        elif self.f0_extractor == 'dio':
+        if self.f0_extractor == 'dio':
             _f0, t = pw.dio(
                 audio.astype('double'),
                 self.sample_rate,

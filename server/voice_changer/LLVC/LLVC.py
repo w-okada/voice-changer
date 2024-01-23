@@ -3,7 +3,7 @@ from typing import Any, cast
 from scipy import signal
 import os
 from dataclasses import dataclass, asdict, field
-import resampy
+import soxr
 from data.ModelSlot import LLVCModelSlot
 from mods.log_control import VoiceChangaerLogger
 import numpy as np
@@ -118,7 +118,7 @@ class LLVC(VoiceChangerModel):
         """
         if waveform.ndim == 2:  # double channels
             waveform = waveform.mean(axis=-1)
-        waveform16K = resampy.resample(waveform, srcSampleRate, self.processingSampleRate)
+        waveform16K = soxr.resample(waveform, srcSampleRate, self.processingSampleRate)
         # waveform16K = self.downsampler(torch.from_numpy(waveform)).numpy()
         waveform16K = signal.filtfilt(self.bh, self.ah, waveform16K)
         return waveform16K.copy()
@@ -159,7 +159,7 @@ class LLVC(VoiceChangerModel):
                 self.prev_audio1 = new_audio[-crossfade_audio_length:]  # 次回のクロスフェード用に保存
                 # (2) リサンプル
                 if self.outputSampleRate != self.processingSampleRate:
-                    new_audio = resampy.resample(new_audio, self.processingSampleRate, self.outputSampleRate)
+                    new_audio = soxr.resample(new_audio, self.processingSampleRate, self.outputSampleRate)
                     # new_audio = self.upsampler(torch.from_numpy(new_audio)).numpy()
                     # new_audio = np.repeat(new_audio, 3)
 

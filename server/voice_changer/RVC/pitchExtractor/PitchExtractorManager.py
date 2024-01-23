@@ -22,7 +22,7 @@ class PitchExtractorManager(Protocol):
     def getPitchExtractor(
         cls, pitchExtractorType: PitchExtractorType, gpu: int
     ) -> PitchExtractor:
-        cls.currentPitchExtractor = cls.loadPitchExtractor(pitchExtractorType,  gpu)
+        cls.currentPitchExtractor = cls.loadPitchExtractor(pitchExtractorType, gpu)
         return cls.currentPitchExtractor
 
     @classmethod
@@ -33,11 +33,13 @@ class PitchExtractorManager(Protocol):
             return HarvestPitchExtractor()
         elif pitchExtractorType == "dio":
             return DioPitchExtractor()
-        elif pitchExtractorType == "crepe":
-            return CrepePitchExtractor(gpu)
         elif pitchExtractorType == "crepe_tiny":
-            return CrepeOnnxPitchExtractor(pitchExtractorType, cls.params.crepe_onnx_tiny, gpu)
+            return CrepePitchExtractor(gpu, 'tiny')
         elif pitchExtractorType == "crepe_full":
+            return CrepePitchExtractor(gpu, 'full')
+        elif pitchExtractorType == "crepe_tiny_onnx":
+            return CrepeOnnxPitchExtractor(pitchExtractorType, cls.params.crepe_onnx_tiny, gpu)
+        elif pitchExtractorType == "crepe_full_onnx":
             return CrepeOnnxPitchExtractor(pitchExtractorType, cls.params.crepe_onnx_full, gpu)
         elif pitchExtractorType == "rmvpe":
             return RMVPEPitchExtractor(cls.params.rmvpe, gpu)

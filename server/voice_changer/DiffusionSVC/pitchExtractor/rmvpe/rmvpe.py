@@ -326,35 +326,36 @@ class MelSpectrogram(torch.nn.Module):
             logger.warn(f"[RMVPE] Device is not same. mel_basis:{self.mel_basis.device}, magnitude:{magnitude.device}")
             self.mel_basis.to(magnitude.device)
         mel_output = torch.matmul(self.mel_basis, magnitude)
-        if self.is_half is True:
+        if self.is_half:
             mel_output = mel_output.half()
         log_mel_spec = torch.log(torch.clamp(mel_output, min=self.clamp))
         return log_mel_spec
 
 
 class RMVPE:
-    def __init__(self, model_path, is_half, device=None):
-        self.resample_kernel = {}
+    def __init__(self, model_path: str, is_half: bool, device: torch.device | str = None):
+        # self.resample_kernel = {}
         model = E2E(4, 1, (2, 2))
+        if device is None:
+            device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
         ckpt = torch.load(model_path, map_location="cpu")
         model.load_state_dict(ckpt)
-        model.eval()
-        if is_half is True:
+
+        model.eval().to(device)
+        if is_half:
             model = model.half()
         self.model = model
-        self.resample_kernel = {}
         self.is_half = is_half
-        if device is None:
-            device = "cuda" if torch.cuda.is_available() else "cpu"
+
         self.device = device
         self.mel_extractor = MelSpectrogram(
             is_half, 128, 16000, 1024, 160, None, 30, 8000
         ).to(device)
-        self.model = self.model.to(device)
-        cents_mapping = 20 * np.arange(360) + 1997.3794084376191
-        self.cents_mapping = np.pad(cents_mapping, (4, 4))  # 368
+        cents_mapping = 20 * torch.arange(360, device=device) + 1997.3794084376191
+        self.cents_mapping = F.pad(cents_mapping, (4, 4))
 
-    def mel2hidden(self, mel):
+    def mel2hidden(self, mel: torch.Tensor) -> torch.Tensor:
         with torch.no_grad():
             n_frames = mel.shape[-1]
             mel = F.pad(
@@ -363,64 +364,41 @@ class RMVPE:
             hidden = self.model(mel)
             return hidden[:, :n_frames]
 
-    def decode(self, hidden, thred=0.03):
-        cents_pred = self.to_local_average_cents(hidden, thred=thred)
+    def decode(self, hidden: torch.Tensor, threshold=0.03):
+        cents_pred = self.to_local_average_cents(hidden, threshold=threshold)
         f0 = 10 * (2 ** (cents_pred / 1200))
         f0[f0 == 10] = 0
         # f0 = np.array([10 * (2 ** (cent_pred / 1200)) if cent_pred else 0 for cent_pred in cents_pred])
         return f0
 
-    def infer_from_audio(self, audio, thred=0.03):
-        audio = torch.from_numpy(audio).float().to(self.device).unsqueeze(0)
-        # torch.cuda.synchronize()
-        # t0=ttime()
-        mel = self.mel_extractor(audio, center=True)
-        # torch.cuda.synchronize()
-        # t1=ttime()
+    def infer_from_audio_t(self, audio: torch.Tensor, threshold=0.03) -> torch.Tensor:
+        mel: torch.Tensor = self.mel_extractor(audio.unsqueeze(0), center=True)
         hidden = self.mel2hidden(mel)
-        # torch.cuda.synchronize()
-        # t2=ttime()
-        hidden = hidden.squeeze(0).cpu().numpy()
-        if self.is_half is True:
-            hidden = hidden.astype("float32")
-        f0 = self.decode(hidden, thred=thred)
-        # torch.cuda.synchronize()
-        # t3=ttime()
-        # print("hmvpe:%s\t%s\t%s\t%s"%(t1-t0,t2-t1,t3-t2,t3-t0))
+        hidden = hidden.squeeze(0)
+        if self.is_half:
+            hidden = hidden.to(torch.float32)
+        f0 = self.decode(hidden, threshold=threshold)
         return f0
 
-    def infer_from_audio_t(self, audio, thred=0.03):
-        # audio = torch.from_numpy(audio).float().to(self.device).unsqueeze(0)
-        mel = self.mel_extractor(audio.unsqueeze(0), center=True)
-        hidden = self.mel2hidden(mel)
-        hidden = hidden.squeeze(0).cpu().numpy()
-        if self.is_half is True:
-            hidden = hidden.astype("float32")
-        f0 = self.decode(hidden, thred=thred)
-        return f0
-
-    def to_local_average_cents(self, salience, thred=0.05):
+    def to_local_average_cents(self, hidden: torch.Tensor, threshold=0.05):
         # t0 = ttime()
-        center = np.argmax(salience, axis=1)  # 帧长#index
-        salience = np.pad(salience, ((0, 0), (4, 4)))  # 帧长,368
+        starts = torch.argmax(hidden, dim=1)  # 帧长#index
+        hidden = F.pad(hidden, (8, 0))  # 帧长,368
         # t1 = ttime()
-        center += 4
-        todo_salience = []
-        todo_cents_mapping = []
-        starts = center - 4
+        hidden_avgs: list[torch.Tensor] = []
+        cents_mapping_avgs: list[torch.Tensor] = []
+        center = starts + 4
         ends = center + 5
-        for idx in range(salience.shape[0]):
-            todo_salience.append(salience[:, starts[idx] : ends[idx]][idx])  # NOQA
-            todo_cents_mapping.append(self.cents_mapping[starts[idx] : ends[idx]])  # NOQA
+        for idx in range(hidden.shape[0]):
+            hidden_avgs.append(hidden[:, starts[idx] : ends[idx]][idx])  # NOQA
+            cents_mapping_avgs.append(self.cents_mapping[starts[idx] : ends[idx]])  # NOQA
         # t2 = ttime()
-        todo_salience = np.array(todo_salience)  # 帧长，9
-        todo_cents_mapping = np.array(todo_cents_mapping)  # 帧长，9
-        product_sum = np.sum(todo_salience * todo_cents_mapping, 1)
-        weight_sum = np.sum(todo_salience, 1)  # 帧长
-        devided = product_sum / weight_sum  # 帧长
+        hidden_avgs = torch.stack(hidden_avgs)  # 帧长，9
+        cents_mapping_avgs = torch.stack(cents_mapping_avgs)  # 帧长，9
+        division = torch.sum(hidden_avgs * cents_mapping_avgs, 1) / torch.sum(hidden_avgs, 1)  # 帧长
         # t3 = ttime()
-        maxx = np.max(salience, axis=1)  # 帧长
-        devided[maxx <= thred] = 0
+        maxx = torch.max(hidden, dim=1)  # 帧长
+        division[maxx.values <= threshold] = 0
         # t4 = ttime()
         # print("decode:%s\t%s\t%s\t%s" % (t1 - t0, t2 - t1, t3 - t2, t4 - t3))
-        return devided
+        return division

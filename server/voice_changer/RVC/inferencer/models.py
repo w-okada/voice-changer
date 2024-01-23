@@ -33,7 +33,7 @@ class TextEncoder(nn.Module):
         self.p_dropout = p_dropout
         self.emb_phone = nn.Linear(emb_channels, hidden_channels)
         self.lrelu = nn.LeakyReLU(0.1, inplace=True)
-        if f0 is True:
+        if f0:
             self.emb_pitch = nn.Embedding(256, hidden_channels)  # pitch 256
         self.encoder = Encoder(hidden_channels, filter_channels, n_heads, n_layers, kernel_size, p_dropout)
         self.proj = nn.Conv1d(hidden_channels, out_channels * 2, 1)

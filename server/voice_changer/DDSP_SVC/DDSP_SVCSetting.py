@@ -6,7 +6,7 @@ class DDSP_SVCSettings:
     gpu: int = -9999
     dstId: int = 1
 
-    f0Detector: str = "dio"  # dio or harvest or crepe # parselmouth
+    f0Detector: str = "dio"  # dio or harvest or crepe
     tran: int = 20
     silentThreshold: float = 0.00001
     extraConvertSize: int = 1024 * 32
