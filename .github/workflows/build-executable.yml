@@ -14,7 +14,7 @@ jobs:
     - name: PyInstaller Windows
       uses: JackMcKew/pyinstaller-action-windows@python3-10-pyinstaller-5-3
       with:
-        requirements: requirements-common.txt -r requirements-dml.txt
+        requirements: requirements-dml.txt
         path: server
 
     - uses: actions/upload-artifact@v2
