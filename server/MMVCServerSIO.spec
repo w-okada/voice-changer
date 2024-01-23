@@ -1,17 +1,23 @@
 # -*- mode: python ; coding: utf-8 -*-
 # from PyInstaller.utils.hooks import collect_all
 import sys
+import os.path
 import site
+import logging
 
 sys.setrecursionlimit(sys.getrecursionlimit() * 5)
 
-site_packages = site.getsitepackages()[0].replace('\\', '/')
+backend = 'cpu' if 'BACKEND' not in os.environ else os.environ['BACKEND']
+python_folder = next(folder for folder in site.getsitepackages() if 'site-packages' in folder).replace('\\', '/')
+logging.info(python_folder)
 
 datas = [('../client/demo/dist', './dist'), ('./model_dir_static', './model_dir_static')]
+
 if sys.platform == 'win32':
-    binaries = [(site_packages + '/Lib/site-packages/torch_directml/DirectML.dll', 'torch_directml'), (site_packages + '/Lib/site-packages/onnxruntime/capi/onnxruntime_providers_shared.dll', 'onnxruntime/capi')]
+    binaries = [(python_folder + '/onnxruntime/capi/*.dll', 'onnxruntime/capi')]
 else:
-    binaries = [(site_packages + '/Lib/site-packages/onnxruntime/capi/onnxruntime_providers_shared.so', 'onnxruntime/capi')]
+    binaries = [(python_folder + '/onnxruntime/capi/*.so', 'onnxruntime/capi')]
+
 hiddenimports = ['MMVCServerSIO']
 # tmp_ret = collect_all('fairseq')
 # datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
