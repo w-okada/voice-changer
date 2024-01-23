@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: PyInstaller Windows
       uses: deiteris/pyinstaller-action-windows@python3-10-pyinstaller-5-3
       with:
