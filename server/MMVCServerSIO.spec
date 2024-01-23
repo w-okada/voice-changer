@@ -2,29 +2,32 @@
 # from PyInstaller.utils.hooks import collect_all
 import sys
 import os.path
+import site
+import logging
 
 sys.setrecursionlimit(sys.getrecursionlimit() * 5)
 
 backend = 'cpu' if 'BACKEND' not in os.environ else os.environ['BACKEND']
-python_folder = os.path.dirname(sys.executable.replace('\\', '/'))
+python_folder = next(folder for folder in site.getsitepackages() if 'site-packages' in folder).replace('\\', '/')
+logging.info(python_folder)
 
 datas = [('../client/demo/dist', './dist'), ('./model_dir_static', './model_dir_static')]
 
 if backend == 'dml':
     if sys.platform == 'win32':
-        binaries = [(python_folder + '/Lib/site-packages/torch_directml/DirectML.dll', 'torch_directml'), (python_folder + '/Lib/site-packages/onnxruntime/capi/onnxruntime_providers_shared.dll', 'onnxruntime/capi')]
+        binaries = [(python_folder + '/torch_directml/DirectML.dll', 'torch_directml'), (python_folder + '/onnxruntime/capi/onnxruntime_providers_shared.dll', 'onnxruntime/capi')]
     else:
         raise Exception('DML is not available for other platforms.')
 elif backend == 'cpu':
     if sys.platform == 'win32':
-        binaries = [(python_folder + '/Lib/site-packages/onnxruntime/capi/onnxruntime_providers_shared.dll', 'onnxruntime/capi')]
+        binaries = [(python_folder + '/onnxruntime/capi/onnxruntime_providers_shared.dll', 'onnxruntime/capi')]
     else:
-        binaries = [(python_folder + '/Lib/site-packages/onnxruntime/capi/onnxruntime_providers_shared.so', 'onnxruntime/capi')]
+        binaries = [(python_folder + '/onnxruntime/capi/onnxruntime_providers_shared.so', 'onnxruntime/capi')]
 elif backend == 'cuda':
     if sys.platform == 'win32':
-        binaries = [(python_folder + '/Lib/site-packages/onnxruntime/capi/onnxruntime_providers_shared.dll', 'onnxruntime/capi'), (python_folder + '/Lib/site-packages/onnxruntime/capi/onnxruntime_providers_cuda.dll', 'onnxruntime/capi')]
+        binaries = [(python_folder + '/onnxruntime/capi/onnxruntime_providers_shared.dll', 'onnxruntime/capi'), (python_folder + '/onnxruntime/capi/onnxruntime_providers_cuda.dll', 'onnxruntime/capi')]
     else:
-        binaries = [(python_folder + '/Lib/site-packages/onnxruntime/capi/onnxruntime_providers_shared.so', 'onnxruntime/capi'), (python_folder + '/Lib/site-packages/onnxruntime/capi/onnxruntime_providers_cuda.so', 'onnxruntime/capi')]
+        binaries = [(python_folder + '/onnxruntime/capi/onnxruntime_providers_shared.so', 'onnxruntime/capi'), (python_folder + '/onnxruntime/capi/onnxruntime_providers_cuda.so', 'onnxruntime/capi')]
 
 hiddenimports = ['MMVCServerSIO']
 # tmp_ret = collect_all('fairseq')
