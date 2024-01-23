@@ -8,8 +8,10 @@ sys.setrecursionlimit(sys.getrecursionlimit() * 5)
 site_packages = site.getsitepackages()[0].replace('\\', '/')
 
 datas = [('../client/demo/dist', './dist'), ('./model_dir_static', './model_dir_static')]
-print(datas)
-binaries = [(site_packages + '/Lib/site-packages/torch_directml/DirectML.dll', 'torch_directml'), (site_packages + '/Lib/site-packages/onnxruntime/capi/onnxruntime_providers_shared.dll', 'onnxruntime/capi')]
+if sys.platform == 'win32':
+    binaries = [(site_packages + '/Lib/site-packages/torch_directml/DirectML.dll', 'torch_directml'), (site_packages + '/Lib/site-packages/onnxruntime/capi/onnxruntime_providers_shared.dll', 'onnxruntime/capi')]
+else:
+    binaries = [(site_packages + '/Lib/site-packages/onnxruntime/capi/onnxruntime_providers_shared.so', 'onnxruntime/capi')]
 hiddenimports = ['MMVCServerSIO']
 # tmp_ret = collect_all('fairseq')
 # datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
