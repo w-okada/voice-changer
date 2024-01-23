@@ -1,6 +1,8 @@
 # -*- mode: python ; coding: utf-8 -*-
 # from PyInstaller.utils.hooks import collect_all
 
+import sys ; sys.setrecursionlimit(sys.getrecursionlimit() * 5)
+
 datas = [('../client/demo/dist', './dist'), ('./model_dir_static', './model_dir_static')]
 binaries = [('C:/Users/Snek/AppData/Local/Programs/Python/Python310/Lib/site-packages/torch_directml/DirectML.dll', 'torch_directml'), ('C:/Users/Snek/AppData/Local/Programs/Python/Python310/Lib/site-packages/onnxruntime/capi/onnxruntime_providers_shared.dll', 'onnxruntime/capi')]
 hiddenimports = ['MMVCServerSIO']

@@ -3,6 +3,21 @@
 # # wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh
 # # bash Anaconda3-2022.10-Linux-x86_64.sh
 
+uvicorn
+pyOpenSSL
+numpy
+soxr
+python-socketio
+fastapi
+python-multipart
+scipy
+matplotlib
+librosa
+gin
+einops
+websockets
+sounddevice
+
 torch==2.0.0 # torch-directml is built with pytorch 2.0.0
 torchaudio
 torch-directml
