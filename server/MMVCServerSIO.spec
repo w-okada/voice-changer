@@ -8,6 +8,7 @@ sys.setrecursionlimit(sys.getrecursionlimit() * 5)
 site_packages = site.getsitepackages()[0].replace('\\', '/')
 
 datas = [('../client/demo/dist', './dist'), ('./model_dir_static', './model_dir_static')]
+print(datas)
 binaries = [(site_packages + '/Lib/site-packages/torch_directml/DirectML.dll', 'torch_directml'), (site_packages + '/Lib/site-packages/onnxruntime/capi/onnxruntime_providers_shared.dll', 'onnxruntime/capi')]
 hiddenimports = ['MMVCServerSIO']
 # tmp_ret = collect_all('fairseq')
