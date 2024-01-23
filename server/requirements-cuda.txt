@@ -15,7 +15,6 @@ tensorboardx
 onnxscript
 onnxsim
 onnxruntime-gpu
-onnxconverter-common
 torchcrepe
 local_attention
 pyworld
