@@ -16,6 +16,7 @@ jobs:
       with:
         requirements: requirements-dml.txt
         path: server
+        spec: MMVCServerSIO.spec
 
     - uses: actions/upload-artifact@v4
       with:
