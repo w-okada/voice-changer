@@ -7,18 +7,48 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  windows-cpu:
+    runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: PyInstaller Windows
-      uses: deiteris/pyinstaller-action-windows@python3-10-pyinstaller-5-3
+    - name: Set up Python
+      uses: actions/setup-python@v4
       with:
-        requirements: requirements-dml.txt
-        path: server
-        spec: MMVCServerSIO.spec
+        python-version: '3.10'
+        architecture: x64
+        cache: pip
+    - name: Installing build dependencies
+      run: python -m pip install --upgrade pip wheel setuptools pyinstaller
+    - name: Installing project dependencies
+      run: |
+        cd server
+        python -m pip install -r requirements-common.txt -r requirements-dml.txt
+    - name: Building executable
+      run: pyinstaller --clean -y --dist ./dist --workpath /tmp MMVCServerSIO.spec
+    - name: Uploading artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: voice-changer
+        path: server/dist
 
-    - uses: actions/upload-artifact@v4
-      with:
-        name: my-exe
-        path: server/dist/windows # or path/to/artifact
+  # linux-cpu:
+    # runs-on: ubuntu-latest
+    # steps:
+    # - name: Set up Python
+    #   uses: actions/setup-python@v4
+    #   with:
+    #     python-version: '3.10'
+    #     architecture: 'x64'
+    #     cache: 'pip'
+    # - name: Installing build dependencies
+    #   run: python -m pip install --upgrade pip wheel setuptools pyinstaller
+    # - name: Installing project dependencies
+    #   run: |
+    #     cd server
+    #     python -m pip install -r requirements-common.txt -r requirements-dml.txt
+    # - name: Building executable
+    #   run: pyinstaller --clean -y --dist ./dist --workpath /tmp MMVCServerSIO.spec
+    # - name: Uploading artifact
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: voice-changer
+    #     path: server/dist
