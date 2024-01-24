@@ -7,7 +7,8 @@
 --extra-index-url https://download.pytorch.org/whl/cu118
 torch
 torchaudio
-faiss-cpu
+faiss-cpu; sys_platform!='linux'
+faiss-gpu; sys_platform=='linux'
 
 tensorboard
 tensorboardx
