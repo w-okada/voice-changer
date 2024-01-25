@@ -45,6 +45,7 @@ export const Portrait = (_props: PortraitProps) => {
         const buf = document.getElementById("status-buf") as HTMLSpanElement;
         const res = document.getElementById("status-res") as HTMLSpanElement;
         const rtf = document.getElementById("status-rtf") as HTMLSpanElement;
+        const perf = document.getElementById("status-perf") as HTMLSpanElement;
         if (!vol || !buf || !res) {
             return;
         }
@@ -53,9 +54,11 @@ export const Portrait = (_props: PortraitProps) => {
             buf.innerText = bufferingTime.toString();
             res.innerText = webInfoState.responseTimeInfo.responseTime.toString() ?? "0";
             rtf.innerText = webInfoState.responseTimeInfo.rtf.toString() ?? "0";
+            perf.innerText = performance.mainprocessTime.toString() ?? "0";
         } else {
             buf.innerText = bufferingTime.toString();
             res.innerText = performance.responseTime.toString();
+            perf.innerText = performance.mainprocessTime.toString() ?? "0";
         }
     }, [volume, bufferingTime, performance, webInfoState.responseTimeInfo]);
 
@@ -196,6 +199,9 @@ export const Portrait = (_props: PortraitProps) => {
                         </p>
                         <p>
                             res: <span id="status-res">0</span> ms
+                        </p>
+                        <p>
+                            perf: <span id="status-perf">0</span> ms
                         </p>
                         <p>
                             rtf: <span id="status-rtf">0</span>

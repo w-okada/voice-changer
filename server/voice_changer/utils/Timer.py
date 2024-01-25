@@ -1,6 +1,6 @@
-import time
 import inspect
 from typing import Dict, List
+from time import perf_counter
 
 
 # class Timer(object):
@@ -51,8 +51,6 @@ class Timer2(object):
         self.title = title
         self.enable = enable
         self.secs = 0
-        self.msecs = 0
-        self.avrSecs = 0
 
         if not self.enable:
             return
@@ -71,26 +69,27 @@ class Timer2(object):
     def __enter__(self):
         if not self.enable:
             return self
-        self.current = time.time()
+        self.now = perf_counter()
         return self
 
     def record(self, lapname: str):
         if not self.enable:
             return
         self.lapkey = f"{self.key}_{lapname}"
-        prev = self.current
-        self.current = time.time()
+        prev = self.now
+        self.now = perf_counter()
         if self.lapkey not in self.storedSecs[self.key]:
             self.storedSecs[self.key][self.lapkey] = []
-        self.storedSecs[self.key][self.lapkey].append(self.current - prev)
+        self.storedSecs[self.key][self.lapkey].append(self.now - prev)
         self.storedSecs[self.key][self.lapkey] = self.storedSecs[self.key][self.lapkey][-self.maxStores :]
 
     def __exit__(self, *_):
         if not self.enable:
             return
-        title = self.key.split("_")[-1]
-        print(f"---- {title} ----")
-        for key, val in self.storedSecs[self.key].items():
-            section = key.split("_")[-1]
-            milisecAvr = sum(val) / len(val) * 1000
-            print(f"{section}: {milisecAvr} msec")
+        self.secs = perf_counter() - self.now
+        # title = self.key.split("_")[-1]
+        # print(f"---- {title} ----")
+        # for key, val in self.storedSecs[self.key].items():
+        #     section = key.split("_")[-1]
+        #     milisecAvr = sum(val) / len(val) * 1000
+        #     print(f"{section}: {milisecAvr} msec")

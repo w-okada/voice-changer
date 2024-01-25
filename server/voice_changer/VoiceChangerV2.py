@@ -215,7 +215,7 @@ class VoiceChangerV2(VoiceChangerIF):
             if self.voiceChanger is None:
                 raise VoiceChangerIsNotSelectedException("Voice Changer is not selected.")
 
-            with Timer2("main-process", False) as t:
+            with Timer2("main-process", True) as t:
                 processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
 
                 if self.noCrossFade:  # Beatrice, LLVC
@@ -280,7 +280,7 @@ class VoiceChangerV2(VoiceChangerIF):
             mainprocess_time = t.secs
 
             # 後処理
-            with Timer2("post-process", False) as t:
+            with Timer2("post-process", True) as t:
                 print_convert_processing(f" Output data size of {result.shape[0]}/{processing_sampling_rate}hz {result .shape[0]}/{self.settings.outputSampleRate}hz")
 
                 # if receivedData.shape[0] != result.shape[0]:
