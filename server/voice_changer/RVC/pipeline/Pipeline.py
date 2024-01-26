@@ -28,7 +28,7 @@ class Pipeline:
     pitchExtractor: PitchExtractor
 
     index: Index | None
-    big_npy: Index | None
+    index_reconstruct: Index | None
     # feature: Any | None
 
     targetSR: int
@@ -54,7 +54,7 @@ class Pipeline:
         logger.info("GENERATE PITCH EXTRACTOR" + str(self.pitchExtractor))
 
         self.index = index
-        self.index_reconstruct: Index | None = index.reconstruct_n(0, index.ntotal) if index is not None else None
+        self.index_reconstruct: torch.Tensor | None = torch.as_tensor(index.reconstruct_n(0, index.ntotal), dtype=torch.float32, device=device) if index is not None else None
         # self.feature = feature
 
         self.targetSR = targetSR
@@ -138,7 +138,6 @@ class Pipeline:
 
         with Timer2("Pipeline-Exec", False) as t:  # NOQA
             # 16000のサンプリングレートで入ってきている。以降この世界は16000で処理。
-            search_index = self.index is not None and self.index_reconstruct is not None and index_rate != 0
 
             # tensor型調整
             # if audio.dim() == 2:  # double channels
@@ -158,39 +157,37 @@ class Pipeline:
             t.record("extract-feats")
 
             # Index - feature抽出
-            # if search_index:
-            #     audio_front = feats[0]
-            #     # apply silent front for indexsearch
-            #     silence_offset = math.floor(silence_front * self.sr) // 360
-            #     audio_front = audio_front[silence_offset:]
+            if self.index is not None and self.index_reconstruct is not None and index_rate != 0:
+                silence_offset = math.floor(silence_front * self.sr) // 360
+                audio_full = feats[0]
+                audio_front = audio_full[silence_offset:]
 
-            #     if self.isHalf:
-            #         audio_front = audio_front.to(dtype=torch.float32)
+                if self.isHalf:
+                    audio_front = audio_front.to(dtype=torch.float32, copy=False)
 
-            #     # TODO: kは調整できるようにする
-            #     k = 1
-            #     if k == 1:
-            #         _, ix: tuple[torch.Tensor, torch.Tensor] = self.index.search(audio_front, 1)
-            #         audio_front = self.index_reconstruct[ix.squeeze()]
-            #     else:
-            #         score, ix: tuple[torch.Tensor, torch.Tensor] = self.index.search(audio_front, k=8)
-            #         weight = torch.square(1 / score)
-            #         weight /= weight.sum(dim=1, keepdim=True)
-            #         audio_front = torch.sum(self.index_reconstruct[ix] * weight.unsqueeze(2), dim=1, out=audio_front)
+                # TODO: kは調整できるようにする
+                k = 1
+                if k == 1:
+                    _, ix = self.index.search(audio_front, 1)
+                    audio_front[:] = self.index_reconstruct[ix.squeeze()]
+                else:
+                    score, ix = self.index.search(audio_front, k=8)
+                    weight = torch.square(1 / score)
+                    weight /= weight.sum(dim=1, keepdim=True)
+                    audio_front[:] = torch.sum(self.index_reconstruct[ix] * weight.unsqueeze(2), dim=1)
 
-            #     # Recover silent font
-            #     audio_front = torch.cat([torch.zeros([silence_offset, audio_front.shape[1]], dtype=torch.float32), feature[:silence_offset:2], audio_front])[-feats.shape[1]:]
-            #     feats = torch.as_tensor(audio_front, device=self.device).unsqueeze(0) * index_rate + (1 - index_rate) * feats
+                # Recover silent front
+                feats = audio_full.unsqueeze(0) * index_rate + (1 - index_rate) * feats
 
-            #     # pitchの推定が上手くいかない(pitchf=0)場合、検索前の特徴を混ぜる
-            #     # pitchffの作り方の疑問はあるが、本家通りなので、このまま使うことにする。
-            #     # https://github.com/w-okada/voice-changer/pull/276#issuecomment-1571336929
-            #     if protect < 0.5:
-            #         pitchff = pitchf.detach().clone()
-            #         pitchff[pitchf > 0] = 1
-            #         pitchff[pitchf < 1] = protect
-            #         pitchff = pitchff.unsqueeze(-1)
-            #         feats = feats * pitchff + feats * (1 - pitchff)
+                # pitchの推定が上手くいかない(pitchf=0)場合、検索前の特徴を混ぜる
+                # pitchffの作り方の疑問はあるが、本家通りなので、このまま使うことにする。
+                # https://github.com/w-okada/voice-changer/pull/276#issuecomment-1571336929
+                if protect < 0.5:
+                    pitchff = pitchf.detach().clone()
+                    pitchff[pitchf > 0] = 1
+                    pitchff[pitchf < 1] = protect
+                    pitchff = pitchff.unsqueeze(-1)
+                    feats = feats * pitchff + feats * (1 - pitchff)
 
             feats: torch.Tensor = F.interpolate(feats.permute(0, 2, 1), scale_factor=2).permute(0, 2, 1).contiguous()
 
