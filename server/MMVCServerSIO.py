@@ -220,20 +220,20 @@ if __name__ == "__main__":
     printMessage("In many cases, it will launch when you access any of the following URLs.", level=2)
     if "EX_PORT" in locals() and "EX_IP" in locals():  # シェルスクリプト経由起動(docker)
         if args.https == 1:
-            printMessage(f"https://127.0.0.1:{EX_PORT}/", level=1)
+            printMessage(f"https://localhost:{EX_PORT}/", level=1)
             for ip in EX_IP.strip().split(" "):
                 printMessage(f"https://{ip}:{EX_PORT}/", level=1)
         else:
-            printMessage(f"http://127.0.0.1:{EX_PORT}/", level=1)
+            printMessage(f"http://localhost:{EX_PORT}/", level=1)
     else:  # 直接python起動
         if args.https == 1:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.connect((args.test_connect, 80))
             hostname = s.getsockname()[0]
-            printMessage(f"https://127.0.0.1:{PORT}/", level=1)
+            printMessage(f"https://localhost:{PORT}/", level=1)
             printMessage(f"https://{hostname}:{PORT}/", level=1)
         else:
-            printMessage(f"http://127.0.0.1:{PORT}/", level=1)
+            printMessage(f"http://localhost:{PORT}/", level=1)
 
     # サーバ起動
     if args.https:
@@ -256,12 +256,12 @@ if __name__ == "__main__":
         p.start()
         try:
             if sys.platform.startswith("win"):
-                process = subprocess.Popen([NATIVE_CLIENT_FILE_WIN, "--disable-gpu", "-u", f"http://127.0.0.1:{PORT}/"])
+                process = subprocess.Popen([NATIVE_CLIENT_FILE_WIN, "--disable-gpu", "-u", f"http://localhost:{PORT}/"])
                 return_code = process.wait()
                 logger.info("client closed.")
                 p.terminate()
             elif sys.platform.startswith("darwin"):
-                process = subprocess.Popen([NATIVE_CLIENT_FILE_MAC, "--disable-gpu", "-u", f"http://127.0.0.1:{PORT}/"])
+                process = subprocess.Popen([NATIVE_CLIENT_FILE_MAC, "--disable-gpu", "-u", f"http://localhost:{PORT}/"])
                 return_code = process.wait()
                 logger.info("client closed.")
                 p.terminate()
