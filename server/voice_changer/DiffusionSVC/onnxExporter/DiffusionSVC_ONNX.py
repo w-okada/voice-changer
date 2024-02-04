@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.diffusion.unit2mel import load_model_vocoder_from_combo
-from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
+from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 
 
 class DiffusionSVC_ONNX:
@@ -74,7 +74,7 @@ class DiffusionSVC_ONNX:
         infer_speedup: int,
         silence_front: float,
     ) -> torch.Tensor:
-        
+
         aug_shift = torch.LongTensor([0]).to(feats.device)
         out_spec = self.naive_model(feats, pitch, volume, sid, spk_mix_dict=None,
                                     aug_shift=aug_shift, infer=True,

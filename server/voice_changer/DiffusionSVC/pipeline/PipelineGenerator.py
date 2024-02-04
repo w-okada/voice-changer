@@ -5,7 +5,7 @@ from voice_changer.DiffusionSVC.inferencer.InferencerManager import InferencerMa
 from voice_changer.DiffusionSVC.pipeline.Pipeline import Pipeline
 from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
 
-from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
+from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 import os
 import torch
@@ -21,7 +21,7 @@ def createPipeline(modelSlot: DiffusionSVCModelSlot, gpu: int, f0Detector: str, 
     half = False
 
     # Inferencer 生成
-    try:        
+    try:
         modelPath = os.path.join(vcparams.model_dir, str(modelSlot.slotIndex), os.path.basename(modelSlot.modelFile))
         inferencer = InferencerManager.getInferencer(modelSlot.modelType, modelPath, gpu)
     except Exception as e:
@@ -60,4 +60,3 @@ def createPipeline(modelSlot: DiffusionSVCModelSlot, gpu: int, f0Detector: str, 
     )
 
     return pipeline
-

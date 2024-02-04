@@ -164,7 +164,7 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
         const generateFileRowsByVCType = (vcType: VoiceChangerType) => {
             const rows: JSX.Element[] = [];
             if (vcType == "RVC") {
-                rows.push(generateFileRow(uploadSetting!, "Model", "rvcModel", ["pth", "onnx"]));
+                rows.push(generateFileRow(uploadSetting!, "Model", "rvcModel", ["pth", "onnx", 'safetensors']));
                 rows.push(generateFileRow(uploadSetting!, "Index", "rvcIndex", ["index", "bin"]));
             } else if (vcType == "MMVCv13") {
                 rows.push(generateFileRow(uploadSetting!, "Config", "mmvcv13Config", ["json"]));

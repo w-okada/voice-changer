@@ -204,7 +204,6 @@ class Pipeline:
             sid = torch.as_tensor(sid, device=self.device, dtype=torch.int64).unsqueeze(0)
             t.record("mid-precess")
             # 推論実行
-            # with autocast(enabled=self.isHalf):
             out_audio = self.infer(feats, p_len, pitch, pitchf, sid, out_size)
             t.record("infer")
 
@@ -218,9 +217,3 @@ class Pipeline:
             # torch.cuda.empty_cache()
         # print("EXEC AVERAGE:", t.avrSecs)
         return out_audio, pitchf_buffer, feats_buffer
-
-    def __del__(self):
-        del self.embedder
-        del self.inferencer
-        del self.pitchExtractor
-        print('Pipeline has been deleted')

@@ -3,9 +3,11 @@ import json
 import torch
 from onnxsim import simplify
 import onnx
+import safetensors
 from const import TMP_DIR, EnumInferenceTypes
 from data.ModelSlot import RVCModelSlot
-from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
+from voice_changer.common.SafetensorsUtils import load_model
+from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.onnxExporter.SynthesizerTrnMs256NSFsid_ONNX import (
     SynthesizerTrnMs256NSFsid_ONNX,
 )
@@ -57,8 +59,22 @@ def _export2onnx(input_model, output_model, output_model_simple, gpu, metadata):
     if dev.type == 'privateuseone':
         dev = torch.device('cpu')
     is_half = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
+    is_safetensors = '.safetensors' in input_model
 
-    cpt = torch.load(input_model, map_location=dev)
+    if is_safetensors:
+        cpt = safetensors.safe_open(input_model, 'pt', device=str(dev))
+        m = cpt.metadata()
+        data = {
+            'config': json.loads(m.get('config', '{}')),
+            'params': json.loads(m.get('params', '{}'))
+        }
+    else:
+        cpt = torch.load(input_model, map_location=dev)
+        data = {
+            'config': cpt['config'],
+            'params': cpt['params']
+        }
+
     if is_half:
         print(f'[Voice Changer] Exporting to float16 on GPU')
     else:
@@ -66,17 +82,17 @@ def _export2onnx(input_model, output_model, output_model_simple, gpu, metadata):
 
     # EnumInferenceTypesのままだとシリアライズできないのでテキスト化
     if metadata["modelType"] == EnumInferenceTypes.pyTorchRVC.value:
-        net_g_onnx = SynthesizerTrnMs256NSFsid_ONNX(*cpt["config"], is_half=is_half)
+        net_g_onnx = SynthesizerTrnMs256NSFsid_ONNX(*data["config"], is_half=is_half)
     elif metadata["modelType"] == EnumInferenceTypes.pyTorchWebUI.value:
-        net_g_onnx = SynthesizerTrnMsNSFsid_webui_ONNX(**cpt["params"], is_half=is_half)
+        net_g_onnx = SynthesizerTrnMsNSFsid_webui_ONNX(**data["params"], is_half=is_half)
     elif metadata["modelType"] == EnumInferenceTypes.pyTorchRVCNono.value:
-        net_g_onnx = SynthesizerTrnMs256NSFsid_nono_ONNX(*cpt["config"])
+        net_g_onnx = SynthesizerTrnMs256NSFsid_nono_ONNX(*data["config"])
     elif metadata["modelType"] == EnumInferenceTypes.pyTorchWebUINono.value:
-        net_g_onnx = SynthesizerTrnMsNSFsidNono_webui_ONNX(**cpt["params"])
+        net_g_onnx = SynthesizerTrnMsNSFsidNono_webui_ONNX(**data["params"])
     elif metadata["modelType"] == EnumInferenceTypes.pyTorchRVCv2.value:
-        net_g_onnx = SynthesizerTrnMs768NSFsid_ONNX(*cpt["config"], is_half=is_half)
+        net_g_onnx = SynthesizerTrnMs768NSFsid_ONNX(*data["config"], is_half=is_half)
     elif metadata["modelType"] == EnumInferenceTypes.pyTorchRVCv2Nono.value:
-        net_g_onnx = SynthesizerTrnMs768NSFsid_nono_ONNX(*cpt["config"])
+        net_g_onnx = SynthesizerTrnMs768NSFsid_nono_ONNX(*data["config"])
     else:
         print(
             "unknwon::::: ",
@@ -86,7 +102,10 @@ def _export2onnx(input_model, output_model, output_model_simple, gpu, metadata):
         return
 
     net_g_onnx.eval().to(dev)
-    net_g_onnx.load_state_dict(cpt["weight"], strict=False)
+    if is_safetensors:
+        load_model(net_g_onnx, cpt, strict=False)
+    else:
+        net_g_onnx.load_state_dict(cpt["weight"], strict=False)
     if is_half:
         net_g_onnx = net_g_onnx.half()
 

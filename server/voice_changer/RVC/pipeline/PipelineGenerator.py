@@ -4,7 +4,7 @@ import faiss
 from Exceptions import PipelineCreateException
 from data.ModelSlot import RVCModelSlot
 
-from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
+from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 from voice_changer.RVC.inferencer.InferencerManager import InferencerManager
 from voice_changer.RVC.pipeline.Pipeline import Pipeline

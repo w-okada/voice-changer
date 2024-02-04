@@ -17,11 +17,7 @@ from voice_changer.utils.ModelMerger import MergeElement, ModelMergerRequest
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from dataclasses import dataclass, asdict, field
-import torch
-try:
-    import torch_directml
-except ImportError:
-    import voice_changer.RVC.deviceManager.DummyDML as torch_directml
+from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 
 # import threading
 from typing import Callable
@@ -79,6 +75,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         logger.info("[Voice Changer] VoiceChangerManager initializing...")
         self.params = params
         self.voiceChanger: VoiceChanger = None
+        self.voiceChangerModel = None
         self.settings: VoiceChangerManagerSettings = VoiceChangerManagerSettings()
 
         self.modelSlotManager = ModelSlotManager.get_instance(self.params.model_dir)
@@ -91,15 +88,18 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         thread.start()
 
         # 設定保存用情報
+        self.current_model_index = -1
         self.stored_setting: dict[str, str | int | float] = {}
         if os.path.exists(STORED_SETTING_FILE):
             self.stored_setting = json.load(open(STORED_SETTING_FILE, "r", encoding="utf-8"))
         if "modelSlotIndex" in self.stored_setting:
             self.update_settings("modelSlotIndex", self.stored_setting["modelSlotIndex"])
+        # キャッシュ設定の反映
+        for k, v in self.stored_setting.items():
+            if k != "modelSlotIndex":
+                self.update_settings(k, v)
         if "gpu" not in self.stored_setting:
-            self.update_settings("gpu", 0)
-        # for key, val in self.stored_setting.items():
-        #     self.update_settings(key, val)
+            self.update_settings("gpu", -1)
         logger.info("[Voice Changer] VoiceChangerManager initializing... done.")
 
     def store_setting(self, key: str, val: str | int | float):
@@ -120,19 +120,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             json.dump(self.stored_setting, open(STORED_SETTING_FILE, "w"))
 
     def _get_gpuInfos(self):
-        devCount = torch.cuda.device_count()
-        gpus = []
-        for id in range(devCount):
-            name = torch.cuda.get_device_name(id)
-            memory = torch.cuda.get_device_properties(id).total_memory
-            gpu = {"id": id, "name": f"{name} (CUDA) ", "memory": memory}
-            gpus.append(gpu)
-        devCount = torch_directml.device_count()
-        for id in range(devCount):
-            name = torch_directml.device_name(id)
-            gpu = {"id": id, "name": f"{name} (DirectML) ", "memory": 0}
-            gpus.append(gpu)
-        return gpus
+        return DeviceManager.listDevices()
 
     @classmethod
     def get_instance(cls, params: VoiceChangerParams):
@@ -244,11 +232,22 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             return {"status": "ERROR", "msg": "no model loaded"}
 
     def generateVoiceChanger(self, val: int | StaticSlot):
+        if self.current_model_index == val:
+            return
+
+        self.current_model_index = val
         slotInfo = self.modelSlotManager.get_slot_info(val)
         if slotInfo is None:
             logger.info(f"[Voice Changer] model slot is not found {val}")
             return
-        elif slotInfo.voiceChangerType == "RVC":
+
+        if self.voiceChangerModel is not None and slotInfo.voiceChangerType == self.voiceChangerModel.voiceChangerType:
+            self.voiceChangerModel.set_slot_info(slotInfo)
+            self.voiceChanger.setModel(self.voiceChangerModel)
+            self.voiceChangerModel.initialize()
+            return
+
+        if slotInfo.voiceChangerType == "RVC":
             logger.info("................RVC")
             # from voice_changer.RVC.RVC import RVC
 
@@ -314,38 +313,21 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             self.voiceChangerModel = LLVC(self.params, slotInfo)
             self.voiceChanger = VoiceChangerV2(self.params)
             self.voiceChanger.setModel(self.voiceChangerModel)
-            pass
 
         else:
             logger.info(f"[Voice Changer] unknown voice changer model: {slotInfo.voiceChangerType}")
-            if hasattr(self, "voiceChangerModel"):
-                del self.voiceChangerModel
-            return
 
     def update_settings(self, key: str, val: str | int | float | bool):
         self.store_setting(key, val)
 
         if key in self.settings.boolData:
-            if val == "true":
-                newVal = True
-            elif val == "false":
-                newVal = False
+            newVal = val == 'true'
             setattr(self.settings, key, newVal)
         elif key in self.settings.intData:
+            newVal = int(val)
             if key == "modelSlotIndex":
-                try:
-                    newVal = int(val)
-                    newVal = newVal % 1000
-                except:
-                    newVal = re.sub("^\d+", "", val)  # 先頭の数字を取り除く。
                 logger.info(f"[Voice Changer] model slot is changed {self.settings.modelSlotIndex} -> {newVal}")
                 self.generateVoiceChanger(newVal)
-                # キャッシュ設定の反映
-                for k, v in self.stored_setting.items():
-                    if k != "modelSlotIndex":
-                        self.update_settings(k, v)
-            else:
-                newVal = int(val)
 
             setattr(self.settings, key, newVal)
 

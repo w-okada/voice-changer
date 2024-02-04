@@ -12,7 +12,7 @@ from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from voice_changer.RVC.onnxExporter.export2onnx import export2onnx
 from voice_changer.RVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
 from voice_changer.RVC.pipeline.PipelineGenerator import createPipeline
-from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
+from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.pipeline.Pipeline import Pipeline
 
 from Exceptions import DeviceCannotSupportHalfPrecisionException, PipelineCreateException, PipelineNotInitializedException

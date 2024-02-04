@@ -2,6 +2,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch
 import numpy as np
+from safetensors import safe_open
+from voice_changer.common.SafetensorsUtils import load_model
 from librosa.filters import mel
 
 from mods.log_control import VoiceChangaerLogger
@@ -265,7 +267,6 @@ class E2E(nn.Module):
 class MelSpectrogram(torch.nn.Module):
     def __init__(
         self,
-        is_half,
         n_mel_channels,
         sampling_rate,
         win_length,
@@ -286,7 +287,7 @@ class MelSpectrogram(torch.nn.Module):
             fmax=mel_fmax,
             htk=True,
         )
-        mel_basis = torch.from_numpy(mel_basis).float()
+        mel_basis = torch.from_numpy(mel_basis)
         self.register_buffer("mel_basis", mel_basis)
         self.n_fft = win_length if n_fft is None else n_fft
         self.hop_length = hop_length
@@ -294,7 +295,6 @@ class MelSpectrogram(torch.nn.Module):
         self.sampling_rate = sampling_rate
         self.n_mel_channels = n_mel_channels
         self.clamp = clamp
-        self.is_half = is_half
 
     def forward(self, audio, keyshift=0, speed=1, center=True):
         factor = 2 ** (keyshift / 12)
@@ -326,31 +326,29 @@ class MelSpectrogram(torch.nn.Module):
             logger.warn(f"[RMVPE] Device is not same. mel_basis:{self.mel_basis.device}, magnitude:{magnitude.device}")
             self.mel_basis.to(magnitude.device)
         mel_output = torch.matmul(self.mel_basis, magnitude)
-        if self.is_half:
-            mel_output = mel_output.half()
         log_mel_spec = torch.log(torch.clamp(mel_output, min=self.clamp))
         return log_mel_spec
 
 
 class RMVPE:
     def __init__(self, model_path: str, is_half: bool, device: torch.device | str = None):
-        # self.resample_kernel = {}
-        model = E2E(4, 1, (2, 2))
         if device is None:
             device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-        ckpt = torch.load(model_path, map_location="cpu")
-        model.load_state_dict(ckpt)
-
+        model = E2E(4, 1, (2, 2))
+        if '.safetensors' in model_path:
+            with safe_open(model_path, 'pt') as cpt:
+                load_model(model, cpt, strict=False)
+        else:
+            cpt = torch.load(model_path, map_location=device)
+            model.load_state_dict(cpt, strict=False)
         model.eval().to(device)
-        if is_half:
-            model = model.half()
+
         self.model = model
-        self.is_half = is_half
 
         self.device = device
         self.mel_extractor = MelSpectrogram(
-            is_half, 128, 16000, 1024, 160, None, 30, 8000
+            128, 16000, 1024, 160, None, 30, 8000
         ).to(device)
         cents_mapping = 20 * torch.arange(360, device=device) + 1997.3794084376191
         self.cents_mapping = F.pad(cents_mapping, (4, 4))
@@ -373,10 +371,7 @@ class RMVPE:
 
     def infer_from_audio_t(self, audio: torch.Tensor, threshold=0.03) -> torch.Tensor:
         mel: torch.Tensor = self.mel_extractor(audio.unsqueeze(0), center=True)
-        hidden = self.mel2hidden(mel)
-        hidden = hidden.squeeze(0)
-        if self.is_half:
-            hidden = hidden.to(torch.float32)
+        hidden = self.mel2hidden(mel).squeeze(0)
         f0 = self.decode(hidden, threshold=threshold)
         return f0
 
