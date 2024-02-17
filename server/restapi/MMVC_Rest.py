@@ -3,7 +3,7 @@ import sys
 
 from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.routing import APIRoute
-from fastapi.middleware.cors import CORSMiddleware
+# from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
 from typing import Callable
@@ -48,13 +48,13 @@ class MMVC_Rest:
             logger.info("[Voice Changer] MMVC_Rest initializing...")
             app_fastapi = FastAPI()
             app_fastapi.router.route_class = ValidationErrorLoggingRoute
-            app_fastapi.add_middleware(
-                CORSMiddleware,
-                allow_origins=["*"],
-                allow_credentials=True,
-                allow_methods=["*"],
-                allow_headers=["*"],
-            )
+            # app_fastapi.add_middleware(
+            #     CORSMiddleware,
+            #     allow_origins=["*"],
+            #     allow_credentials=True,
+            #     allow_methods=["*"],
+            #     allow_headers=["*"],
+            # )
 
             app_fastapi.mount(
                 "/front",
