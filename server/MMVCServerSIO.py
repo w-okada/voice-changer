@@ -42,6 +42,7 @@ logger.debug(f"---------------- Booting PHASE :{__name__} -----------------")
 def setupArgParser():
     parser = argparse.ArgumentParser()
     parser.add_argument("--logLevel", type=str, default="error", help="Log level info|critical|error. (default: error)")
+    parser.add_argument("--host", type=str, default='127.0.0.1', help="Specify the IP address for HTTP. Specify 0.0.0.0 to listen on all interfaces.")
     parser.add_argument("-p", type=int, default=18888, help="port")
     parser.add_argument("--https", type=strtobool, default=False, help="use https")
     parser.add_argument("--test_connect", type=str, default="8.8.8.8", help="test connect to detect ip in https mode. default 8.8.8.8")
@@ -112,6 +113,7 @@ vcparams.setParams(voiceChangerParams)
 
 printMessage(f"Booting PHASE :{__name__}", level=2)
 
+HOST = args.host
 PORT = args.p
 
 
@@ -119,7 +121,7 @@ def localServer(logLevel: str = 'critical', key_path: str | None = None, cert_pa
     try:
         uvicorn.run(
             f"{os.path.basename(__file__)[:-3]}:app_socketio",
-            host="0.0.0.0",
+            host=HOST,
             port=int(PORT),
             reload=False,
             ssl_keyfile=key_path,
@@ -239,15 +241,7 @@ if __name__ == "__main__":
     if args.https:
         # HTTPS サーバ起動
         try:
-            uvicorn.run(
-                f"{os.path.basename(__file__)[:-3]}:app_socketio",
-                host="0.0.0.0",
-                port=int(PORT),
-                reload=False,
-                ssl_keyfile=key_path,
-                ssl_certfile=cert_path,
-                log_level=args.logLevel,
-            )
+            localServer(args.logLevel, key_path, cert_path)
         except Exception as e:
             logger.error(f"[Voice Changer] Web Server(https) Launch Exception, {e}")
 
