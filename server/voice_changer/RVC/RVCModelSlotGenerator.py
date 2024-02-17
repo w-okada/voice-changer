@@ -4,8 +4,10 @@ from dataclasses import asdict
 import torch
 import onnxruntime
 import json
+import safetensors
 
 from data.ModelSlot import RVCModelSlot
+from voice_changer.common.SafetensorsUtils import convert_single
 from voice_changer.VoiceChangerParamsManager import VoiceChangerParamsManager
 from voice_changer.utils.LoadModelParams import LoadModelParams
 from voice_changer.utils.ModelSlotGenerator import ModelSlotGenerator
@@ -35,15 +37,26 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
             slotInfo = cls._setInfoByONNX(modelPath, slotInfo)
         else:
             slotInfo = cls._setInfoByPytorch(modelPath, slotInfo)
+            if not modelPath.endswith(".safetensors"):
+                convert_single(modelPath, True)
+                filename, _ = os.path.splitext(os.path.basename(modelPath))
+                slotInfo.modelFile = f'{filename}.safetensors'
         return slotInfo
 
     @classmethod
     def _setInfoByPytorch(cls, modelPath: str, slot: RVCModelSlot):
-        cpt = torch.load(modelPath, map_location="cpu")
+        if modelPath.endswith(".safetensors"):
+            with safetensors.safe_open(modelPath, 'pt') as data:
+                cpt = data.metadata()
+                cpt['f0'] = int(cpt['f0'])
+                cpt['config'] = json.loads(cpt['config'])
+        else:
+            cpt = torch.load(modelPath, map_location="cpu")
         config_len = len(cpt["config"])
         version = cpt.get("version", "v1")
 
         slot = RVCModelSlot(**asdict(slot))
+        slot.f0 = True if cpt["f0"] == 1 else False
 
         if version == "voras_beta":
             slot.f0 = True if cpt["f0"] == 1 else False
@@ -67,9 +80,7 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
 
         elif config_len == 18:
             # Original RVC
-            slot.f0 = True if cpt["f0"] == 1 else False
-            version = cpt.get("version", "v1")
-            if version is None or version == "v1":
+            if version == "v1":
                 slot.modelType = EnumInferenceTypes.pyTorchRVC.value if slot.f0 else EnumInferenceTypes.pyTorchRVCNono.value
                 slot.embChannels = 256
                 slot.embOutputLayer = 9

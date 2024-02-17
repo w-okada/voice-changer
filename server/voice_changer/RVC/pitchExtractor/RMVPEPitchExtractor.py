@@ -1,8 +1,8 @@
 import numpy as np
 from const import PitchExtractorType
-from voice_changer.DiffusionSVC.pitchExtractor.PitchExtractor import PitchExtractor
-from voice_changer.DiffusionSVC.pitchExtractor.rmvpe.rmvpe import RMVPE
-from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
+from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
+from voice_changer.common.rmvpe.rmvpe import RMVPE
+from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 import torch
 
 

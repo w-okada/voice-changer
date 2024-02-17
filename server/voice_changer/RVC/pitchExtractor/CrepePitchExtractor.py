@@ -3,7 +3,7 @@ import numpy as np
 import torch
 from typing import Any
 from const import PitchExtractorType
-from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
+from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 

@@ -83,7 +83,7 @@ class VoiceChangerV2(VoiceChangerIF):
         self.currentCrossFadeOverlapSize = 0  # setting
         self.crossfadeSize = 0  # calculated
 
-        self.voiceChanger: VoiceChangerModel | None = None
+        self.voiceChangerModel: VoiceChangerModel | None = None
         self.params = params
         self.gpu_num = torch.cuda.device_count()
         self.mps_enabled: bool = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
@@ -97,8 +97,8 @@ class VoiceChangerV2(VoiceChangerIF):
 
 
     def setModel(self, model: VoiceChangerModel):
-        self.voiceChanger = model
-        self.voiceChanger.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
+        self.voiceChangerModel = model
+        self.voiceChangerModel.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
         # if model.voiceChangerType == "Beatrice" or model.voiceChangerType == "LLVC":
         if model.voiceChangerType == "Beatrice":
             self.noCrossFade = True
@@ -107,30 +107,30 @@ class VoiceChangerV2(VoiceChangerIF):
 
     def setInputSampleRate(self, sr: int):
         self.settings.inputSampleRate = sr
-        self.voiceChanger.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
+        self.voiceChangerModel.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
 
     def setOutputSampleRate(self, sr: int):
         self.settings.outputSampleRate = sr
-        self.voiceChanger.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
+        self.voiceChangerModel.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
 
     def get_info(self):
         data = asdict(self.settings)
-        if self.voiceChanger is not None:
-            data.update(self.voiceChanger.get_info())
+        if self.voiceChangerModel is not None:
+            data.update(self.voiceChangerModel.get_info())
         return data
 
     def get_performance(self):
         return self.settings.performance
 
     def update_settings(self, key: str, val: Any):
-        if self.voiceChanger is None:
+        if self.voiceChangerModel is None:
             logger.warn("[Voice Changer] Voice Changer is not selected.")
             return self.get_info()
 
         if key == "serverAudioStated" and val == 0:
             self.settings.inputSampleRate = 48000
             self.settings.outputSampleRate = 48000
-            self.voiceChanger.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
+            self.voiceChangerModel.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
 
         if key in self.settings.intData:
             setattr(self.settings, key, int(val))
@@ -155,13 +155,13 @@ class VoiceChangerV2(VoiceChangerIF):
                 if self.ioRecorder is not None:
                     self.ioRecorder.close()
             if key == "inputSampleRate" or key == "outputSampleRate":
-                self.voiceChanger.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
+                self.voiceChangerModel.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
             setattr(self.settings, key, str(val))
         else:
-            ret = self.voiceChanger.update_settings(key, val)
+            ret = self.voiceChangerModel.update_settings(key, val)
             if ret is False:
                 pass
                 # print(f"({key} is not mutable variable or unknown variable)")
@@ -204,23 +204,23 @@ class VoiceChangerV2(VoiceChangerIF):
                 del self.sola_buffer
 
     def get_processing_sampling_rate(self):
-        if self.voiceChanger is None:
+        if self.voiceChangerModel is None:
             return 0
         else:
-            return self.voiceChanger.get_processing_sampling_rate()
+            return self.voiceChangerModel.get_processing_sampling_rate()
 
     #  receivedData: tuple of short
     def on_request(self, receivedData: AudioInOutFloat) -> tuple[AudioInOutFloat, list[Union[int, float]]]:
         try:
-            if self.voiceChanger is None:
+            if self.voiceChangerModel is None:
                 raise VoiceChangerIsNotSelectedException("Voice Changer is not selected.")
 
             with Timer2("main-process", True) as t:
-                processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
+                processing_sampling_rate = self.voiceChangerModel.get_processing_sampling_rate()
 
                 if self.noCrossFade:  # Beatrice, LLVC
                     with torch.no_grad():
-                        audio = self.voiceChanger.inference(
+                        audio = self.voiceChangerModel.inference(
                             receivedData,
                             crossfade_frame=0,
                             sola_search_frame=0,
@@ -236,7 +236,7 @@ class VoiceChangerV2(VoiceChangerIF):
 
                     with torch.no_grad():
                         # TODO: Maybe audio and sola buffer should be tensors here.
-                        audio = self.voiceChanger.inference(
+                        audio = self.voiceChangerModel.inference(
                             receivedData,
                             crossfade_frame=crossfade_frame,
                             sola_search_frame=sola_search_frame,
@@ -285,7 +285,7 @@ class VoiceChangerV2(VoiceChangerIF):
 
                 # if receivedData.shape[0] != result.shape[0]:
                 # print("TODO FIX:::::PADDING", receivedData.shape[0], result.shape[0])
-                if self.voiceChanger.voiceChangerType == "LLVC":
+                if self.voiceChangerModel.voiceChangerType == "LLVC":
                     outputData = result
                 else:
                     outputData = pad_array(result, receivedData.shape[0])
@@ -333,15 +333,15 @@ class VoiceChangerV2(VoiceChangerIF):
             return np.zeros(1, dtype=np.float32), [0, 0, 0]
 
     def export2onnx(self):
-        return self.voiceChanger.export2onnx()
+        return self.voiceChangerModel.export2onnx()
 
         ##############
 
     def merge_models(self, request: str):
-        if self.voiceChanger is None:
+        if self.voiceChangerModel is None:
             logger.info("[Voice Changer] Voice Changer is not selected.")
             return
-        self.voiceChanger.merge_models(request)
+        self.voiceChangerModel.merge_models(request)
         return self.get_info()
 
 

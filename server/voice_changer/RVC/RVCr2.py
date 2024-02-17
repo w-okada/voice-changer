@@ -18,7 +18,7 @@ from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from voice_changer.RVC.onnxExporter.export2onnx import export2onnx
 from voice_changer.RVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
 from voice_changer.RVC.pipeline.PipelineGenerator import createPipeline
-from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
+from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.pipeline.Pipeline import Pipeline
 
 from Exceptions import (
@@ -57,7 +57,7 @@ class RVCr2(VoiceChangerModel):
         # self.initialize()
 
     def initialize(self):
-        logger.info("[Voice Changer][RVCr2] Initializing... ")
+        logger.info("[Voice Changer] [RVCr2] Initializing... ")
 
         # pipelineの生成
         try:
@@ -106,6 +106,9 @@ class RVCr2(VoiceChangerModel):
         else:
             return False
         return True
+
+    def set_slot_info(self, slotInfo: RVCModelSlot):
+        self.slotInfo = slotInfo
 
     def get_info(self):
         data = asdict(self.settings)

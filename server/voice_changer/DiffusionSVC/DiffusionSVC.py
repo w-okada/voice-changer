@@ -21,7 +21,7 @@ from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 
 # from voice_changer.RVC.onnxExporter.export2onnx import export2onnx
-from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
+from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 
 from Exceptions import (
     DeviceCannotSupportHalfPrecisionException,

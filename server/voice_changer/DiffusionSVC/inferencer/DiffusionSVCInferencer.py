@@ -6,7 +6,7 @@ from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.diffusion.unit2me
 from voice_changer.DiffusionSVC.inferencer.diffusion_svc_model.diffusion.vocoder import Vocoder
 from voice_changer.DiffusionSVC.inferencer.onnx.VocoderOnnx import VocoderOnnx
 
-from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
+from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from voice_changer.utils.Timer import Timer2
 
 

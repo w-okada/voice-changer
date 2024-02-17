@@ -269,7 +269,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
         };
 
         const exportOnnx =
-            selected.voiceChangerType == "RVC" && selected.modelFile.endsWith("pth") ? (
+            selected.voiceChangerType == "RVC" && (selected.modelFile.endsWith("pth") || selected.modelFile.endsWith("safetensors")) ? (
                 <div className="character-area-button" onClick={onnxExportButtonAction}>
                     {messageBuilderState.getMessage(__filename, "export_to_onnx")}
                 </div>

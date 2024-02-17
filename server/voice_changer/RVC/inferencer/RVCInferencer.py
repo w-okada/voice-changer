@@ -1,7 +1,7 @@
 import torch
 from const import EnumInferenceTypes
 
-from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
+from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
 from .rvc_models.infer_pack.models import SynthesizerTrnMs256NSFsid
 
@@ -38,5 +38,4 @@ class RVCInferencer(Inferencer):
         res = self.model.infer(feats, pitch_length, pitch, pitchf, sid, convert_length=convert_length)
         res = res[0][0, 0].to(dtype=torch.float32)
         res = torch.clip(res, -1.0, 1.0)
-        return res        
-
+        return res

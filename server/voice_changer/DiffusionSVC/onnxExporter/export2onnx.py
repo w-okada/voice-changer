@@ -5,7 +5,7 @@ from onnxsim import simplify
 import onnx
 from const import TMP_DIR, EnumInferenceTypes
 from data.ModelSlot import DiffusionSVCModelSlot
-from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
+from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 
 
 def export2onnx(gpu: int, modelSlot: DiffusionSVCModelSlot):

@@ -27,16 +27,16 @@ jobs:
         - os: ubuntu-latest
           os_suffix: linux-amd64
           backend: cuda
-        - os: ubuntu-latest
-          os_suffix: linux-amd64
-          backend: rocm
+        # - os: ubuntu-latest
+        #   os_suffix: linux-amd64
+        #   backend: rocm
     runs-on: ${{ matrix.os }}
     env:
       BACKEND: ${{ matrix.backend }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.10'
         architecture: x64

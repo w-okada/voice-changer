@@ -20,3 +20,4 @@ torchcrepe
 local_attention
 pyworld
 transformers
+safetensors

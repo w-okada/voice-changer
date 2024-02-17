@@ -1,7 +1,7 @@
 import torch
 from const import EnumInferenceTypes
 
-from voice_changer.RVC.deviceManager.DeviceManager import DeviceManager
+from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
 from .models import SynthesizerTrnMsNSFsidNono
 

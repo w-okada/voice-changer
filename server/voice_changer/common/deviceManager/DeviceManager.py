@@ -4,8 +4,7 @@ import onnxruntime
 try:
     import torch_directml
 except ImportError:
-    import voice_changer.RVC.deviceManager.DummyDML as torch_directml
-
+    import voice_changer.common.deviceManager.DummyDML as torch_directml
 
 class DeviceManager(object):
     _instance = None
@@ -38,6 +37,22 @@ class DeviceManager(object):
         else:
             print("[Voice Changer] Device detection error, fallback to cpu")
             return torch.device("cpu")
+
+    @staticmethod
+    def listDevices():
+        devCount = torch.cuda.device_count()
+        gpus = []
+        for id in range(devCount):
+            name = torch.cuda.get_device_name(id)
+            memory = torch.cuda.get_device_properties(id).total_memory
+            gpu = {"id": id, "name": f"{name} (CUDA) ", "memory": memory}
+            gpus.append(gpu)
+        devCount = torch_directml.device_count()
+        for id in range(devCount):
+            name = torch_directml.device_name(id)
+            gpu = {"id": id, "name": f"{name} (DirectML) ", "memory": 0}
+            gpus.append(gpu)
+        return gpus
 
     def getOnnxExecutionProvider(self, gpu: int):
         cpu_settings = {

@@ -24,12 +24,11 @@ class EmbedderManager:
         elif cls.currentEmbedder.matchCondition(embederType) is False:
             print("[Voice Changer] generate new embedder. (not match)")
             cls.currentEmbedder = cls.loadEmbedder(embederType, isHalf, dev)
-        else:
-            print("[Voice Changer] generate new embedder. (anyway)")
+        elif cls.currentEmbedder.dev != dev:
+            print(f"[Voice Changer] generate new embedder. (moving to {dev})")
             cls.currentEmbedder = cls.loadEmbedder(embederType, isHalf, dev)
-
-            # cls.currentEmbedder.setDevice(dev)
-            # cls.currentEmbedder.setHalf(isHalf)
+        else:
+            print('[Voice Changer] Reusing embedder.')
         return cls.currentEmbedder
 
     @classmethod
