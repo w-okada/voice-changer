@@ -82,6 +82,7 @@ PitchExtractorType: TypeAlias = Literal[
     "crepe_tiny",
     "rmvpe",
     "rmvpe_onnx",
+    "fcpe",
 ]
 
 ServerAudioDeviceType: TypeAlias = Literal["audioinput", "audiooutput"]
