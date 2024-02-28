@@ -206,6 +206,12 @@ class VoiceChangerManager(ServerDeviceCallbacks):
                 slotInfo = LLVCModelSlotGenerator.loadModel(params)
                 self.modelSlotManager.save_model_slot(params.slot, slotInfo)
 
+            elif params.voiceChangerType == "EasyVC":
+                from voice_changer.EasyVC.EasyVCModelSlotGenerator import EasyVCModelSlotGenerator
+
+                slotInfo = EasyVCModelSlotGenerator.loadModel(params)
+                self.modelSlotManager.save_model_slot(params.slot, slotInfo)
+
             logger.info(f"params, {params}")
 
     def get_info(self):
@@ -303,6 +309,15 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             from voice_changer.LLVC.LLVC import LLVC
 
             self.voiceChangerModel = LLVC(self.params, slotInfo)
+            self.voiceChanger = VoiceChangerV2(self.params)
+            self.voiceChanger.setModel(self.voiceChangerModel)
+            pass
+
+        elif slotInfo.voiceChangerType == "EasyVC":
+            logger.info("................EasyVC")
+            from voice_changer.EasyVC.EasyVC import EasyVC
+
+            self.voiceChangerModel = EasyVC(self.params, slotInfo)
             self.voiceChanger = VoiceChangerV2(self.params)
             self.voiceChanger.setModel(self.voiceChangerModel)
             pass

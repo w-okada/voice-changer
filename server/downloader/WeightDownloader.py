@@ -19,9 +19,19 @@ def downloadWeight(voiceChangerParams: VoiceChangerParams):
     crepe_onnx_tiny = voiceChangerParams.crepe_onnx_tiny
     rmvpe = voiceChangerParams.rmvpe
     rmvpe_onnx = voiceChangerParams.rmvpe_onnx
+    whisper_tiny = voiceChangerParams.whisper_tiny
 
-    weight_files = [content_vec_500_onnx, hubert_base, hubert_base_jp, hubert_soft,
-                    nsf_hifigan, crepe_onnx_full, crepe_onnx_tiny, rmvpe]
+    weight_files = [
+        content_vec_500_onnx,
+        hubert_base,
+        hubert_base_jp,
+        hubert_soft,
+        nsf_hifigan,
+        crepe_onnx_full,
+        crepe_onnx_tiny,
+        rmvpe,
+        whisper_tiny,
+    ]
 
     # file exists check (currently only for rvc)
     downloadParams = []
@@ -116,6 +126,15 @@ def downloadWeight(voiceChangerParams: VoiceChangerParams):
                 "url": "https://huggingface.co/wok000/weights_gpl/resolve/main/rmvpe/rmvpe_20231006.onnx",
                 "saveTo": rmvpe_onnx,
                 "position": 9,
+            }
+        )
+
+    if os.path.exists(whisper_tiny) is False:
+        downloadParams.append(
+            {
+                "url": "https://openaipublic.azureedge.net/main/whisper/models/65147644a518d12f04e32d6f3b26facc3f8dd46e5390956a9424a650c0ce22b9/tiny.pt",
+                "saveTo": whisper_tiny,
+                "position": 10,
             }
         )
 

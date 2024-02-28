@@ -58,6 +58,7 @@ def setupArgParser():
     parser.add_argument("--hubert_base", type=str, default="pretrain/hubert_base.pt", help="path to hubert_base model(pytorch)")
     parser.add_argument("--hubert_base_jp", type=str, default="pretrain/rinna_hubert_base_jp.pt", help="path to hubert_base_jp model(pytorch)")
     parser.add_argument("--hubert_soft", type=str, default="pretrain/hubert/hubert-soft-0d54a1f4.pt", help="path to hubert_soft model(pytorch)")
+    parser.add_argument("--whisper_tiny", type=str, default="pretrain/whisper_tiny.pt", help="path to hubert_soft model(pytorch)")
     parser.add_argument("--nsf_hifigan", type=str, default="pretrain/nsf_hifigan/model", help="path to nsf_hifigan model(pytorch)")
     parser.add_argument("--crepe_onnx_full", type=str, default="pretrain/crepe_onnx_full.onnx", help="path to crepe_onnx_full")
     parser.add_argument("--crepe_onnx_tiny", type=str, default="pretrain/crepe_onnx_tiny.onnx", help="path to crepe_onnx_tiny")
@@ -106,6 +107,7 @@ voiceChangerParams = VoiceChangerParams(
     rmvpe=args.rmvpe,
     rmvpe_onnx=args.rmvpe_onnx,
     sample_mode=args.sample_mode,
+    whisper_tiny=args.whisper_tiny,
 )
 vcparams = VoiceChangerParamsManager.get_instance()
 vcparams.setParams(voiceChangerParams)

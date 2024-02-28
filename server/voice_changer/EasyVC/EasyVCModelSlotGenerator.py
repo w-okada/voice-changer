@@ -1,19 +1,17 @@
 import os
 
-from data.ModelSlot import LLVCModelSlot
+from data.ModelSlot import EasyVCModelSlot
 from voice_changer.utils.LoadModelParams import LoadModelParams
 from voice_changer.utils.ModelSlotGenerator import ModelSlotGenerator
 
 
-class LLVCModelSlotGenerator(ModelSlotGenerator):
+class EasyVCModelSlotGenerator(ModelSlotGenerator):
     @classmethod
     def loadModel(cls, props: LoadModelParams):
-        slotInfo: LLVCModelSlot = LLVCModelSlot()
+        slotInfo: EasyVCModelSlot = EasyVCModelSlot()
         for file in props.files:
-            if file.kind == "llvcModel":
+            if file.kind == "easyVCModel":
                 slotInfo.modelFile = file.name
-            if file.kind == "llvcConfig":
-                slotInfo.configFile = file.name
         slotInfo.name = os.path.splitext(os.path.basename(slotInfo.modelFile))[0]
         slotInfo.slotIndex = props.slot
         return slotInfo

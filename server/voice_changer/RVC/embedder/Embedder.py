@@ -15,14 +15,6 @@ class Embedder(EmbedderProtocol):
 
         self.model: Any | None = None
 
-    def loadModel(self, file: str, dev: device, isHalf: bool = True):
-        ...
-
-    def extractFeatures(
-        self, feats: torch.Tensor, embOutputLayer=9, useFinalProj=True
-    ) -> torch.Tensor:
-        ...
-
     def getEmbedderInfo(self):
         return {
             "embedderType": self.embedderType,

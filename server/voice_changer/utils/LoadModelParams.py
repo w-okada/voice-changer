@@ -22,6 +22,7 @@ LoadModelParamFileKind: TypeAlias = Literal[
     "beatriceModel",
     "llvcModel",
     "llvcConfig",
+    "easyVCModel",
 ]
 
 

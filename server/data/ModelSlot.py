@@ -141,6 +141,14 @@ class LLVCModelSlot(ModelSlot):
     configFile: str = ""
 
 
+@dataclass
+class EasyVCModelSlot(ModelSlot):
+    voiceChangerType: VoiceChangerType = "EasyVC"
+    modelFile: str = ""
+    version: str = ""
+    samplingRate: int = -1
+
+
 ModelSlots: TypeAlias = Union[
     ModelSlot,
     RVCModelSlot,
@@ -151,6 +159,7 @@ ModelSlots: TypeAlias = Union[
     DiffusionSVCModelSlot,
     BeatriceModelSlot,
     LLVCModelSlot,
+    EasyVCModelSlot,
 ]
 
 
@@ -188,6 +197,9 @@ def loadSlotInfo(model_dir: str, slotIndex: int | StaticSlot) -> ModelSlots:
     elif slotInfo.voiceChangerType == "LLVC":
         slotInfoKey.extend(list(LLVCModelSlot.__annotations__.keys()))
         return LLVCModelSlot(**{k: v for k, v in jsonDict.items() if k in slotInfoKey})
+    elif slotInfo.voiceChangerType == "EasyVC":
+        slotInfoKey.extend(list(EasyVCModelSlot.__annotations__.keys()))
+        return EasyVCModelSlot(**{k: v for k, v in jsonDict.items() if k in slotInfoKey})
     else:
         return ModelSlot()
 

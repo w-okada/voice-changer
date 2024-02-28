@@ -1,4 +1,5 @@
 from const import EnumInferenceTypes
+from voice_changer.RVC.inferencer.EasyVCInferencerONNX import EasyVCInferencerONNX
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
 from voice_changer.RVC.inferencer.OnnxRVCInferencer import OnnxRVCInferencer
 from voice_changer.RVC.inferencer.OnnxRVCInferencerNono import OnnxRVCInferencerNono
@@ -42,6 +43,7 @@ class InferencerManager:
         elif inferencerType == EnumInferenceTypes.pyTorchVoRASbeta or inferencerType == EnumInferenceTypes.pyTorchVoRASbeta.value:
             if sys.platform.startswith("darwin") is False:
                 from voice_changer.RVC.inferencer.VorasInferencebeta import VoRASInferencer
+
                 return VoRASInferencer().loadModel(file, gpu)
             else:
                 raise RuntimeError("[Voice Changer] VoRAS is not supported on macOS")
@@ -55,5 +57,8 @@ class InferencerManager:
             return OnnxRVCInferencer().loadModel(file, gpu, inferencerTypeVersion)
         elif inferencerType == EnumInferenceTypes.onnxRVCNono or inferencerType == EnumInferenceTypes.onnxRVCNono.value:
             return OnnxRVCInferencerNono().loadModel(file, gpu, inferencerTypeVersion)
+        elif inferencerType == EnumInferenceTypes.easyVC or inferencerType == EnumInferenceTypes.easyVC.value:
+            return EasyVCInferencerONNX().loadModel(file, gpu)
+
         else:
             raise RuntimeError("[Voice Changer] Inferencer not found", inferencerType)

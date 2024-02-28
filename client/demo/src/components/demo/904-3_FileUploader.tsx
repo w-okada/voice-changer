@@ -125,6 +125,11 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
                         return x.kind == "llvcConfig";
                     });
                 return enough;
+            } else if (setting.voiceChangerType == "EasyVC") {
+                const enough = !!setting.files.find((x) => {
+                    return x.kind == "easyVCModel";
+                });
+                return enough;
             }
             return false;
         };
@@ -189,6 +194,8 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
             } else if (vcType == "LLVC") {
                 rows.push(generateFileRow(uploadSetting!, "Model", "llvcModel", ["pth"]));
                 rows.push(generateFileRow(uploadSetting!, "Config", "llvcConfig", ["json"]));
+            } else if (vcType == "EasyVC") {
+                rows.push(generateFileRow(uploadSetting!, "Model", "easyVCModel", ["onnx"]));
             }
             return rows;
         };

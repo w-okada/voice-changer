@@ -216,8 +216,8 @@ class VoiceChangerV2(VoiceChangerIF):
         try:
             if self.voiceChanger is None:
                 raise VoiceChangerIsNotSelectedException("Voice Changer is not selected.")
-
-            with Timer2("main-process", False) as t:
+            enableMainprocessTimer = False
+            with Timer2("main-process", enableMainprocessTimer) as t:
                 processing_sampling_rate = self.voiceChanger.get_processing_sampling_rate()
 
                 if self.noCrossFade:  # Beatrice, LLVC
@@ -234,12 +234,14 @@ class VoiceChangerV2(VoiceChangerIF):
                     block_frame = receivedData.shape[0]
                     crossfade_frame = min(self.settings.crossFadeOverlapSize, block_frame)
                     self._generate_strength(crossfade_frame)
+                    t.record("generate_strength")
 
                     audio = self.voiceChanger.inference(
                         receivedData,
                         crossfade_frame=crossfade_frame,
                         sola_search_frame=sola_search_frame,
                     )
+                    t.record("inference")
 
                     if hasattr(self, "sola_buffer") is True:
                         np.set_printoptions(threshold=10000)
@@ -271,6 +273,8 @@ class VoiceChangerV2(VoiceChangerIF):
                         logger.info("[Voice Changer] warming up... generating sola buffer.")
                         result = np.zeros(4096).astype(np.int16)
 
+                    t.record("sora")
+
                     if hasattr(self, "sola_buffer") is True and sola_offset < sola_search_frame:
                         offset = -1 * (sola_search_frame + crossfade_frame - sola_offset)
                         end = -1 * (sola_search_frame - sola_offset)
@@ -279,6 +283,8 @@ class VoiceChangerV2(VoiceChangerIF):
                     else:
                         self.sola_buffer = audio[-crossfade_frame:] * self.np_prev_strength
                         # self.sola_buffer = audio[- crossfade_frame:]
+
+                    t.record("post")
 
             mainprocess_time = t.secs
 

@@ -16,3 +16,4 @@ class VoiceChangerParams:
     crepe_onnx_tiny: str
     rmvpe: str
     rmvpe_onnx: str
+    whisper_tiny: str

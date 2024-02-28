@@ -57,7 +57,7 @@ class Timer2(object):
         if self.enable is False:
             return
 
-        self.maxStores = 10
+        self.maxStores = 1
 
         current_frame = inspect.currentframe()
         caller_frame = inspect.getouterframes(current_frame, 2)
