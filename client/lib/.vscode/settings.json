@@ -1,8 +1,11 @@
 {
-    "workbench.colorCustomizations": {
-        "tab.activeBackground": "#65952acc"
-    },
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "prettier.printWidth": 1024,
-    "prettier.tabWidth": 4
+  "workbench.colorCustomizations": {
+    "tab.activeBackground": "#65952acc"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.printWidth": 1024,
+  "prettier.tabWidth": 4,
+  "files.associations": {
+    "*.css": "postcss"
+  }
 }

@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 import { GuiStateProvider } from "./001_GuiStateProvider";
 import { Dialogs } from "./900_Dialogs";
 import { ModelSlotControl } from "./b00_ModelSlotControl";
@@ -13,5 +13,5 @@ export const Demo = () => {
                 <ModelSlotControl></ModelSlotControl>
             </div>
         </GuiStateProvider>
-    )
-}
+    );
+};

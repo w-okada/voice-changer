@@ -138,7 +138,7 @@ class Pipeline(object):
         # print(f"pipeline exec input, audio:{audio.shape}, pitchf:{pitchf.shape}, feature:{feature.shape}")
         # print(f"pipeline exec input, silence_front:{silence_front}, out_size:{out_size}")
 
-        enablePipelineTimer = True
+        enablePipelineTimer = False
         with Timer2("Pipeline-Exec", enablePipelineTimer) as t:  # NOQA
             # 16000のサンプリングレートで入ってきている。以降この世界は16000で処理。
             # self.t_pad = self.sr * repeat  # 1秒

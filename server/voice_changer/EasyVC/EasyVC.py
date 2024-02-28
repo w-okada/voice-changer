@@ -184,8 +184,8 @@ class EasyVC(VoiceChangerModel):
             logger.info("[Voice Changer] Pipeline is not initialized.")
             raise PipelineNotInitializedException()
 
-        enableTimer = True
-        with Timer2("infer_easyvc", enableTimer) as t:
+        enableTimer = False
+        with Timer2("infer-easyvc", enableTimer) as t:
 
             # 処理は16Kで実施(Pitch, embed, (infer))
             receivedData = cast(
@@ -203,7 +203,7 @@ class EasyVC(VoiceChangerModel):
 
             # 入力データ生成
             data = self.generate_input(receivedData, crossfade_frame, sola_search_frame, extra_frame)
-            t.record("generate_input")
+            t.record("generate-input")
 
             audio = data[0]
             pitchf = data[1]
