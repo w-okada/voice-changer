@@ -4,11 +4,11 @@
 
 ## What's New!
 - v.1.5.3.17b
-  - bugfix:
+  - Bug fix:
     - clear setting
-  - improve
+  - Improve
     - file sanitizer
-  - chage:
+  - Change:
     - default input chunk size: 192.
       - decided by this chart.(https://rentry.co/VoiceChangerGuide#gpu-chart-for-known-working-chunkextra)
 
@@ -48,7 +48,7 @@
 - [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc)
 - [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI)
 - [DDSP-SVC](https://github.com/yxlllc/DDSP-SVC)
-- [Beatrice JVS Corpus Edition](https://prj-beatrice.com/) * experimental,  (***NOT MIT Licnsence*** see [readme](https://github.com/w-okada/voice-changer/blob/master/server/voice_changer/Beatrice/)) *  Only for Windows, CPU dependent
+- [Beatrice JVS Corpus Edition](https://prj-beatrice.com/) * experimental,  (***NOT MIT License*** see [readme](https://github.com/w-okada/voice-changer/blob/master/server/voice_changer/Beatrice/)) *  Only for Windows, CPU dependent
 
 1. Distribute the load by running Voice Changer on a different PC
    The real-time voice changer of this application works on a server-client configuration. By running the MMVC server on a separate PC, you can run it while minimizing the impact on other resource-intensive processes such as gaming commentary.
@@ -58,7 +58,7 @@
 3. Cross-platform compatibility
    Supports Windows, Mac (including Apple Silicon M1), Linux, and Google Colaboratory.
 
-# usage
+# Usage
 
 This is an app for performing voice changes with MMVC and so-vits-svc.
 
@@ -71,7 +71,7 @@ It can be used in two main ways, in order of difficulty:
 
 - You can download and run executable binaries.
 
-- Please see [here](tutorials/tutorial_rvc_en_latest.md) for the tutorial. ([troubule shoot](https://github.com/w-okada/voice-changer/blob/master/tutorials/trouble_shoot_communication_ja.md))
+- Please see [here](tutorials/tutorial_rvc_en_latest.md) for the tutorial. ([troubuleshoot](https://github.com/w-okada/voice-changer/blob/master/tutorials/trouble_shoot_communication_ja.md))
 
 - It's now easy to try it out on [Google Colaboratory](https://github.com/w-okada/voice-changer/blob/master/Realtime_Voice_Changer_on_Colab.ipynb) (requires a ngrok account). You can launch it from the 'Open in Colab' button in the top left corner.
 
@@ -124,7 +124,7 @@ To run on Anaconda venv, see [server developer's guide](README_dev_en.md)
 
 To run on Linux using an AMD GPU, see [setup guide linux](tutorials/tutorial_anaconda_amd_rocm.md)
 
-# Real-time performance
+# Real-time Performance
 
 Conversion is almost instantaneous when using GPU.
 
@@ -174,9 +174,9 @@ In accordance with the Tsukuyomi-chan Corpus Terms of Use for the Tsukuyomi-chan
 - Publicly disclosing secondary use (use as materials) for others.
   (Distributing or selling as a work for viewing is not a problem.)
 
-Regarding the Real-time Voice Changer Amitaro, we prohibit the following uses in accordance with the terms of use of the Amitaro's koe-sozai kobo.[detail](https://amitaro.net/voice/faq/#index_id6)
+Regarding the Real-time Voice Changer Amitaro, we prohibit the following uses in accordance with the terms of use of the Amitaro's koe-sozai kobo. [details](https://amitaro.net/voice/faq/#index_id6)
 
-Regarding the Real-time Voice Changer Kikoto Mahiro, we prohibit the following uses in accordance with the terms of use of Replica doll.[detail](https://kikyohiroto1227.wixsite.com/kikoto-utau/ter%EF%BD%8Ds-of-service)
+Regarding the Real-time Voice Changer Kikoto Mahiro, we prohibit the following uses in accordance with the terms of use of Replica doll. [details](https://kikyohiroto1227.wixsite.com/kikoto-utau/ter%EF%BD%8Ds-of-service)
 
 # Disclaimer
 
