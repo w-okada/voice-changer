@@ -1,0 +1,3 @@
+[submodule "recorder/public/assets/Cognitive-Speech-TTS"]
+	path = recorder/public/assets/Cognitive-Speech-TTS
+	url = https://github.com/brandonkovacs/Cognitive-Speech-TTS.git
