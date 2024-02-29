@@ -71,7 +71,7 @@ It can be used in two main ways, in order of difficulty:
 
 - You can download and run executable binaries.
 
-- Please see [here](tutorials/tutorial_rvc_en_latest.md) for the tutorial. ([troubule shoot](https://github.com/w-okada/voice-changer/blob/master/tutorials/trouble_shoot_communication_ja.md))
+- Please see [here](tutorials/tutorial_rvc_en_latest.md) for the tutorial. ([trouble shoot](https://github.com/w-okada/voice-changer/blob/master/tutorials/trouble_shoot_communication_ja.md))
 
 - It's now easy to try it out on [Google Colaboratory](https://github.com/w-okada/voice-changer/blob/master/Realtime_Voice_Changer_on_Colab.ipynb) (requires a ngrok account). You can launch it from the 'Open in Colab' button in the top left corner.
 
