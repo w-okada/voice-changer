@@ -15,13 +15,13 @@ export const CorpusTextArea = () => {
 
     return (
         <div className="card">
-            <div className="title">{applicationSetting.applicationSetting.current_text_index + 1}番目</div>
+            <div className="title">#{applicationSetting.applicationSetting.current_text_index + 1}</div>
 
             <div className="text">
-                <div className="tag">テキスト</div>
+                <div className="tag">Text</div>
                 <div>{text}</div></div>
             <div className="text">
-                <div className="tag">読み</div>
+                <div className="tag">Text</div>
                 <div>{text_hira}</div></div>
         </div >
     );
