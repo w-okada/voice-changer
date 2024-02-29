@@ -6,11 +6,10 @@ import { useAppState } from "../../003_provider/AppStateProvider";
 export const CorpusTextArea = () => {
     const { applicationSetting } = useAppSetting()
     const { corpusDataState } = useAppState();
-    const { text, text_hira } = useMemo(() => {
+    const { text } = useMemo(() => {
         const corpus = corpusDataState.corpusTextData[applicationSetting.applicationSetting.current_text];
         const text = corpus?.text[applicationSetting.applicationSetting.current_text_index] || "";
-        const text_hira = corpus?.text_hira[applicationSetting.applicationSetting.current_text_index] || "";
-        return { text, text_hira };
+        return { text };
     }, [corpusDataState.corpusTextData, applicationSetting.applicationSetting.current_text, applicationSetting.applicationSetting.current_text_index]);
 
     return (
@@ -20,9 +19,7 @@ export const CorpusTextArea = () => {
             <div className="text">
                 <div className="tag">Text</div>
                 <div>{text}</div></div>
-            <div className="text">
-                <div className="tag">Text</div>
-                <div>{text_hira}</div></div>
+
         </div >
     );
 };

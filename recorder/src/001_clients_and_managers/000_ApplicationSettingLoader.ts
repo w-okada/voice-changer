@@ -20,7 +20,6 @@ export type CorpusTextSetting = {
     "title": string,
     "wavPrefix": string,
     "file": string,
-    "file_hira": string
 }
 
 export const InitialApplicationSetting = require("../../public/assets/setting.json")

@@ -43,7 +43,6 @@ export const ExportController = () => {
                 const fileName = generateWavFileName(prefix, j);
                 const textFileName = generateTextFileName(prefix, j)
                 const textData = targetCorpus.text[j]
-                const textHiraData = targetCorpus.text_hira[j]
                 // 生データ
                 zip.file(`00_myvoice/raw/${fileName}`, userData.micWavBlob);
 
@@ -73,7 +72,6 @@ export const ExportController = () => {
                 zip.file(`00_myvoice/wav/${fileName}`, vfWav24KhzTrim);
 
                 // TXT
-                zip.file(`00_myvoice/text/${textFileName}`, textHiraData);
                 zip.file(`00_myvoice/readable_text/${textFileName}`, textData);
             }
 

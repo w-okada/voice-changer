@@ -6,9 +6,7 @@ export type CorpusTextData = {
     "title": string,
     "wavPrefix": string,
     "file": string,
-    "file_hira": string,
     "text": string[]
-    "text_hira": string[]
 }
 
 export type CorpusDataState = {
@@ -32,17 +30,16 @@ export const useCorpusData = (): CorpusDataStateAndMethod => {
             const newCorpusTextData: { [title: string]: CorpusTextData } = {}
             for (const x of textSettings) {
                 const text = await fetchTextResource(x.file)
-                const textHira = await fetchTextResource(x.file_hira)
-                const splitText = text.split("\n").filter(x => { return x.length > 0 })
-                const splitTextHira = textHira.split("\n").filter(x => { return x.length > 0 })
+                const splitText = text.split("\n").map(function (x) {
+                    return x.trim()
+                  })
+
 
                 const data: CorpusTextData = {
                     title: x.title,
                     wavPrefix: x.wavPrefix,
                     file: x.file,
-                    file_hira: x.file_hira,
                     text: splitText,
-                    text_hira: splitTextHira,
                 }
                 newCorpusTextData[data.title] = data
             }
