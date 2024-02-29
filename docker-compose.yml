@@ -1,0 +1,59 @@
+version: "3.8"
+services:
+
+  vcclient:
+    image: voice-changer/vcclient:latest
+    container_name: vcclient
+    build:
+      context: ./docker_vcclient
+      dockerfile: ../docker_vcclient/Dockerfile
+      args:
+          DOCKER_BUILDKIT: 1
+      shm_size: "2gb"
+    restart: always
+    shm_size: "2gb"
+    volumes:
+      - type: bind
+        source: ./docker_folder/model_dir
+        target: /voice-changer/server/model_dir
+      - type: bind
+        source: ./docker_folder/pretrain
+        target: /voice-changer/server/pretrain
+    ports:
+      - 10010:18888
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    command:
+      - --https false
+      - --content_vec_500 pretrain/checkpoint_best_legacy_500.pt
+      - --content_vec_500_onnx pretrain/content_vec_500.onnx
+      - --content_vec_500_onnx_on true
+      - --hubert_base pretrain/hubert_base.pt
+      - --hubert_base_jp pretrain/rinna_hubert_base_jp.pt
+      - --hubert_soft pretrain/hubert/hubert-soft-0d54a1f4.pt
+      - --nsf_hifigan pretrain/nsf_hifigan/model
+      - --crepe_onnx_full pretrain/crepe_onnx_full.onnx
+      - --crepe_onnx_tiny pretrain/crepe_onnx_tiny.onnx
+      - --rmvpe pretrain/rmvpe.pt
+      - --model_dir model_dir
+      - --samples samples.json
+    environment:
+      - EX_IP=vcclient
+      - EX_PORT=18888
+      - LOCAL_UID=1000
+      - LOCAL_GID=1000
+
+  recorder:
+    image: voice-changer/recorder:latest
+    container_name: recorder
+    build:
+      context: ./recorder
+      dockerfile: ../recorder/Dockerfile
+    ports:
+      - 10015:8080
+    restart: always
