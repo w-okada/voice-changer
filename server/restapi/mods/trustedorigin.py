@@ -20,15 +20,17 @@ class TrustedOriginMiddleware:
         if port is not None:
             local_origins = [f'{origin}:{port}' for origin in local_origins]
 
-        if not allowed_origins:
-            allowed_origins = local_origins
-        else:
+        self.allowed_origins: set[str] = set()
+        if allowed_origins is not None:
             for origin in allowed_origins:
-                assert urlparse(origin).scheme, ENFORCE_URL_ORIGIN_FORMAT
-            allowed_origins = local_origins + allowed_origins
-
+                url = urlparse(origin)
+                assert url.scheme, ENFORCE_URL_ORIGIN_FORMAT
+                valid_origin = f'{url.scheme}://{url.hostname}'
+                if url.port:
+                    valid_origin += f':{url.port}'
+                self.allowed_origins.add(valid_origin)
+        self.allowed_origins.update(local_origins)
         self.app = app
-        self.allowed_origins = list(allowed_origins)
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] not in (
