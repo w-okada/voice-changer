@@ -6,7 +6,7 @@ from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.routing import APIRoute
 from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
-from typing import Callable
+from typing import Callable, Optional, Sequence, Literal
 from mods.log_control import VoiceChangaerLogger
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 
@@ -43,8 +43,8 @@ class MMVC_Rest:
         cls,
         voiceChangerManager: VoiceChangerManager,
         voiceChangerParams: VoiceChangerParams,
-        port: int,
-        allowedOrigins: list[str],
+        allowedOrigins: Optional[Sequence[str]] = None,
+        port: Optional[int] = None,
     ):
         if cls._instance is None:
             logger.info("[Voice Changer] MMVC_Rest initializing...")
