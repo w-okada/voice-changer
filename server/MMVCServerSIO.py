@@ -42,7 +42,6 @@ logger.debug(f"---------------- Booting PHASE :{__name__} -----------------")
 def setupArgParser():
     parser = argparse.ArgumentParser()
     parser.add_argument("--logLevel", type=str, default="error", help="Log level info|critical|error. (default: error)")
-    parser.add_argument("--host", type=str, default='127.0.0.1', help="Specify the IP address for HTTP. Specify 0.0.0.0 to listen on all interfaces.")
     parser.add_argument("-p", type=int, default=18888, help="port")
     parser.add_argument("--https", type=strtobool, default=False, help="use https")
     parser.add_argument("--test_connect", type=str, default="8.8.8.8", help="test connect to detect ip in https mode. default 8.8.8.8")
@@ -64,6 +63,9 @@ def setupArgParser():
     parser.add_argument("--crepe_onnx_tiny", type=str, default="pretrain/crepe_onnx_tiny.onnx", help="path to crepe_onnx_tiny")
     parser.add_argument("--rmvpe", type=str, default="pretrain/rmvpe.pt", help="path to rmvpe")
     parser.add_argument("--rmvpe_onnx", type=str, default="pretrain/rmvpe.onnx", help="path to rmvpe onnx")
+
+    parser.add_argument("--host", type=str, default='127.0.0.1', help="IP address of the network interface to listen for HTTP connections. Specify 0.0.0.0 to listen on all interfaces.")
+    parser.add_argument("--allowed-origins", action='append', default=[], help="List of URLs to allow connection from, i.e. https://example.com. Allows http(s)://127.0.0.1:{port} and http(s)://localhost:{port} by default.")
 
     return parser
 
@@ -136,8 +138,8 @@ if __name__ == "MMVCServerSIO":
     mp.freeze_support()
 
     voiceChangerManager = VoiceChangerManager.get_instance(voiceChangerParams)
-    app_fastapi = MMVC_Rest.get_instance(voiceChangerManager, voiceChangerParams)
-    app_socketio = MMVC_SocketIOApp.get_instance(app_fastapi, voiceChangerManager)
+    app_fastapi = MMVC_Rest.get_instance(voiceChangerManager, voiceChangerParams, args.allowed_origins, PORT)
+    app_socketio = MMVC_SocketIOApp.get_instance(app_fastapi, voiceChangerManager, args.allowed_origins, PORT)
 
 
 if __name__ == "__mp_main__":

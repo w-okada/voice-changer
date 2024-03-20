@@ -2,9 +2,9 @@ name: Package exe with PyInstaller
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master-custom ]
   pull_request:
-    branches: [ master ]
+    branches: [ master-custom ]
 
 
 jobs:
