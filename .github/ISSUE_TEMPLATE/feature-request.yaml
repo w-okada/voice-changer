@@ -4,7 +4,7 @@ title: "[REQUEST]: "
 body:
   - type: markdown
     attributes:
-      value: When creating a feature request, please be aware that **we do not guarantee that your idea will be implemented**. We are always working to make our software better, so please be pacient and do not put pressure on our devs.
+      value: When creating a feature request, please be aware that **we do not guarantee that your idea will be implemented**. We are always working to make our software better, so please be patient and do not put pressure on our devs.
   - type: input
     id: few-words
     attributes:

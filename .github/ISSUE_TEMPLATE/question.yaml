@@ -5,7 +5,7 @@ description: Do you any question? Use this template
 body:
   - type: markdown
     attributes:
-      value: We are always working to make our software better, so please be pacient and wait for a response
+      value: We are always working to make our software better, so please be patient and wait for a response
   - type: textarea
     id: question  
     attributes:
