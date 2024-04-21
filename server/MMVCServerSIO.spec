@@ -12,9 +12,15 @@ python_folder = next(folder for folder in site.getsitepackages() if 'site-packag
 logging.info(python_folder)
 
 datas = [('../client/demo/dist', './dist'), ('./model_dir_static', './model_dir_static')]
+if backend == 'dml':
+    datas += [('./editions/dml/edition.txt', '.')]
+else:
+    datas += [('./editions/edition.txt', '.')]
 
 if sys.platform == 'win32':
     binaries = [(python_folder + '/onnxruntime/capi/*.dll', 'onnxruntime/capi')]
+    if backend == 'dml':
+        binaries += [(python_folder + '/torch_directml/DirectML.dll', 'torch_directml')]
 else:
     binaries = [(python_folder + '/onnxruntime/capi/*.so', 'onnxruntime/capi')]
 
