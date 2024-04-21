@@ -22,6 +22,7 @@ from const import (
     NATIVE_CLIENT_FILE_MAC,
     NATIVE_CLIENT_FILE_WIN,
     SSL_KEY_DIR,
+    EDITION_FILE
 )
 import subprocess
 import multiprocessing as mp
@@ -109,6 +110,7 @@ voiceChangerParams = VoiceChangerParams(
     rmvpe=args.rmvpe,
     rmvpe_onnx=args.rmvpe_onnx,
     sample_mode=args.sample_mode,
+    edition=open(EDITION_FILE, 'r').read()
 )
 vcparams = VoiceChangerParamsManager.get_instance()
 vcparams.setParams(voiceChangerParams)

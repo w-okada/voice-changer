@@ -19,7 +19,7 @@ export const QualityArea = (props: QualityAreaProps) => {
 
         const generateF0DetOptions = () => {
             if (edition.indexOf("onnxdirectML-cuda") >= 0) {
-                const recommended = ["crepe_tiny", "rmvpe_onnx"];
+                const recommended = ["crepe_full_onnx", "crepe_tiny_onnx", "rmvpe_onnx"];
                 return Object.values(props.detectors).map((x) => {
                     if (recommended.includes(x)) {
                         return (

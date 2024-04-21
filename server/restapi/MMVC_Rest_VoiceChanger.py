@@ -5,7 +5,7 @@ import traceback
 
 from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 from pydantic import BaseModel
@@ -22,8 +22,12 @@ class MMVC_Rest_VoiceChanger:
         self.voiceChangerManager = voiceChangerManager
         self.router = APIRouter()
         self.router.add_api_route("/test", self.test, methods=["POST"])
+        self.router.add_api_route("/edition", self.edition, methods=["GET"])
 
         self.tlock = threading.Lock()
+
+    def edition(self):
+        return PlainTextResponse(self.voiceChangerManager.params.edition)
 
     def test(self, voice: VoiceModel):
         try:
