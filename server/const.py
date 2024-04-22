@@ -40,7 +40,7 @@ NATIVE_CLIENT_FILE_MAC = (
     if hasattr(sys, "_MEIPASS")
     else "voice-changer-native-client"
 )
-EDITION_FILE = os.path.join(sys._MEIPASS, "edition.txt") if hasattr(sys, "_MEIPASS") else 'edition.txt'
+EDITION_FILE = os.path.join(sys._MEIPASS, "edition.txt") if hasattr(sys, "_MEIPASS") else 'editions/edition.txt'
 
 MODEL_DIR_STATIC = os.path.join(sys._MEIPASS, "model_dir_static") if hasattr(sys, "_MEIPASS") else "model_dir_static"
 
