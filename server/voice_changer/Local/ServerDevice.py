@@ -133,8 +133,7 @@ class ServerDevice:
 
     def _processData(self, indata: np.ndarray):
         indata = indata * self.settings.serverInputAudioGain
-        unpackedData = librosa.to_mono(indata.T) * 32768.0
-        unpackedData = unpackedData.astype(np.int16)
+        unpackedData = librosa.to_mono(indata.T)
         out_wav, times = self.serverDeviceCallbacks.on_request(unpackedData)
         return out_wav, times
 
@@ -153,7 +152,7 @@ class ServerDevice:
 
             self.outQueue.put(out_wav)
             outputChannels = outdata.shape[1]  # Monitorへのアウトプット
-            outdata[:] = np.repeat(out_wav, outputChannels).reshape(-1, outputChannels) / 32768.0
+            outdata[:] = np.repeat(out_wav, outputChannels).reshape(-1, outputChannels)
             outdata[:] = outdata * self.settings.serverMonitorAudioGain
         except Exception as e:
             print("[Voice Changer] ex:", e)
@@ -183,7 +182,7 @@ class ServerDevice:
             while self.outQueue.qsize() > 0:
                 self.outQueue.get()
             outputChannels = outdata.shape[1]
-            outdata[:] = np.repeat(out_wav, outputChannels).reshape(-1, outputChannels) / 32768.0
+            outdata[:] = np.repeat(out_wav, outputChannels).reshape(-1, outputChannels)
             outdata[:] = outdata * self.settings.serverOutputAudioGain
         except Exception as e:
             print("[Voice Changer][ServerDevice][audioOutput_callback]  ex:", e)
@@ -196,7 +195,7 @@ class ServerDevice:
             while self.monQueue.qsize() > 0:
                 self.monQueue.get()
             outputChannels = outdata.shape[1]
-            outdata[:] = np.repeat(mon_wav, outputChannels).reshape(-1, outputChannels) / 32768.0
+            outdata[:] = np.repeat(mon_wav, outputChannels).reshape(-1, outputChannels)
             outdata[:] = outdata * self.settings.serverMonitorAudioGain
         except Exception as e:
             print("[Voice Changer][ServerDevice][audioMonitor_callback]  ex:", e)
