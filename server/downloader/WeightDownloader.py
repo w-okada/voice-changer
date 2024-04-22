@@ -4,12 +4,13 @@ from concurrent.futures import ThreadPoolExecutor
 from downloader.Downloader import download
 from mods.log_control import VoiceChangaerLogger
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
+from settings import ServerSettings
 from Exceptions import WeightDownladException
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
-def downloadWeight(voiceChangerParams: VoiceChangerParams):
+def downloadWeight(voiceChangerParams: VoiceChangerParams | ServerSettings):
     content_vec_500_onnx = voiceChangerParams.content_vec_500_onnx
     hubert_base = voiceChangerParams.hubert_base
     hubert_base_jp = voiceChangerParams.hubert_base_jp

@@ -42,7 +42,7 @@ class MMVC_Rest:
     def get_instance(
         cls,
         voiceChangerManager: VoiceChangerManager,
-        voiceChangerParams: VoiceChangerParams,
+        model_dir: str,
         allowedOrigins: Optional[Sequence[str]] = None,
         port: Optional[int] = None,
     ):
@@ -84,17 +84,17 @@ class MMVC_Rest:
                 p1 = os.path.dirname(sys._MEIPASS)
                 p2 = os.path.dirname(p1)
                 p3 = os.path.dirname(p2)
-                model_dir = os.path.join(p3, voiceChangerParams.model_dir)
+                model_dir = os.path.join(p3, model_dir)
                 print("mac model_dir:", model_dir)
                 app_fastapi.mount(
-                    f"/{voiceChangerParams.model_dir}",
+                    f"/{model_dir}",
                     StaticFiles(directory=model_dir),
                     name="static",
                 )
             else:
                 app_fastapi.mount(
-                    f"/{voiceChangerParams.model_dir}",
-                    StaticFiles(directory=voiceChangerParams.model_dir),
+                    f"/{model_dir}",
+                    StaticFiles(directory=model_dir),
                     name="static",
                 )
 
