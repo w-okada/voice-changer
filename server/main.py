@@ -77,7 +77,10 @@ async def main(args):
 
     downloadWeight(settings)
 
-    downloadInitialSamples(settings.sample_mode, settings.model_dir)
+    try:
+        downloadInitialSamples(settings.sample_mode, settings.model_dir)
+    except:
+        printMessage("Failed to download samples. Skipping.", level=2)
 
     # HTTPS key/cert作成
     if args.https and args.httpsSelfSigned:
