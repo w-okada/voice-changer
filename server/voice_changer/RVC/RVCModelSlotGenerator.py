@@ -8,15 +8,15 @@ import safetensors
 
 from data.ModelSlot import RVCModelSlot
 from voice_changer.common.SafetensorsUtils import convert_single
-from voice_changer.VoiceChangerParamsManager import VoiceChangerParamsManager
 from voice_changer.utils.LoadModelParams import LoadModelParams
 from voice_changer.utils.ModelSlotGenerator import ModelSlotGenerator
-
+from settings import ServerSettings
 
 class RVCModelSlotGenerator(ModelSlotGenerator):
     @classmethod
     def loadModel(cls, props: LoadModelParams):
-        vcparams = VoiceChangerParamsManager.get_instance().params
+        model_dir = ServerSettings().model_dir
+
         slotInfo: RVCModelSlot = RVCModelSlot()
         for file in props.files:
             if file.kind == "rvcModel":
@@ -32,7 +32,7 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
 
         # slotInfo.iconFile = "/assets/icons/noimage.png"
 
-        modelPath = os.path.join(vcparams.model_dir, str(props.slot), os.path.basename(slotInfo.modelFile))
+        modelPath = os.path.join(model_dir, str(props.slot), os.path.basename(slotInfo.modelFile))
         if slotInfo.isONNX:
             slotInfo = cls._setInfoByONNX(modelPath, slotInfo)
         else:
