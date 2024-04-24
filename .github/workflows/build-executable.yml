@@ -1,6 +1,12 @@
 name: Package exe with PyInstaller
 
 on:
+  workflow_dispatch: # allows manual triggering
+    inputs:
+      create_release:
+        description: 'Create new release'
+        required: true
+        type: boolean
   push:
     branches: [ master-custom ]
   pull_request:
@@ -56,7 +62,7 @@ jobs:
         path: ./server/dist
 
   release:
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master-custom' }}
+    if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/master-custom' ) || github.event.inputs.create_release == 'true' }}
 
     runs-on: ubuntu-latest
 
