@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class DiffusionSVCSettings:
-    gpu: int = -9999
+    gpu: int = -1
     dstId: int = 0
 
     f0Detector: str = "harvest"  # dio or harvest

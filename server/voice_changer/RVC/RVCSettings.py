@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class RVCSettings:
-    gpu: int = -9999
+    gpu: int = -1
     dstId: int = 0
 
     f0Detector: str = "rmvpe_onnx"  # dio or harvest

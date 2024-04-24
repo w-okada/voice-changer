@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class DDSP_SVCSettings:
-    gpu: int = -9999
+    gpu: int = -1
     dstId: int = 1
 
     f0Detector: str = "dio"  # dio or harvest or crepe

@@ -54,7 +54,7 @@ class RVCr2(VoiceChangerModel):
 
         self.sr = 16000
         self.window = 160
-        # self.initialize()
+        self.initialize()
 
     def initialize(self):
         logger.info("[Voice Changer] [RVCr2] Initializing... ")

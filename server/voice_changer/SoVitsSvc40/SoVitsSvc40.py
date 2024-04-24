@@ -51,7 +51,7 @@ providers = [
 
 @dataclass
 class SoVitsSvc40Settings:
-    gpu: int = -9999
+    gpu: int = -1
     dstId: int = 0
 
     f0Detector: str = "harvest"  # dio or harvest
