@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class BeatriceSettings:
-    # gpu: int = -9999
+    # gpu: int = -1
     dstId: int = 0
     modelSamplingRate: int = 48000
     silentThreshold: float = 0.00001

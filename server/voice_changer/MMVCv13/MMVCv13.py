@@ -38,7 +38,7 @@ from Exceptions import NoModeLoadedException
 
 @dataclass
 class MMVCv13Settings:
-    gpu: int = -9999
+    gpu: int = -1
     srcId: int = 0
     dstId: int = 101
 

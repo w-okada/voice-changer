@@ -27,10 +27,11 @@ from voice_changer.RVC.onnxExporter.SynthesizerTrnMsNSFsid_webui_ONNX import (
     SynthesizerTrnMsNSFsid_webui_ONNX,
 )
 from voice_changer.VoiceChangerParamsManager import VoiceChangerParamsManager
+from settings import ServerSettings
 
 def export2onnx(gpu: int, modelSlot: RVCModelSlot):
-    vcparams = VoiceChangerParamsManager.get_instance().params
-    modelFile = os.path.join(vcparams.model_dir, str(modelSlot.slotIndex), os.path.basename(modelSlot.modelFile))
+    model_dir = ServerSettings().model_dir
+    modelFile = os.path.join(model_dir, str(modelSlot.slotIndex), os.path.basename(modelSlot.modelFile))
 
     output_file = os.path.splitext(os.path.basename(modelFile))[0] + ".onnx"
     output_file_simple = os.path.splitext(os.path.basename(modelFile))[0] + "_simple.onnx"

@@ -35,7 +35,7 @@ class DioPitchExtractor(PitchExtractor):
         )
         f0 = pyworld.stonemask(audio.astype(np.double), _f0, t, sr)
 
-        f0 *= pow(2, f0_up_key / 12)
+        f0 *= 2 ** (f0_up_key / 12)
         pitchf[-f0.shape[0]:] = f0[:pitchf.shape[0]]
         f0bak = pitchf.copy()
         f0_mel = 1127 * np.log(1 + f0bak / 700)

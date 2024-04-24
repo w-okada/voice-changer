@@ -17,3 +17,5 @@ gin
 einops
 websockets
 sounddevice
+python-dotenv
+pydantic-settings

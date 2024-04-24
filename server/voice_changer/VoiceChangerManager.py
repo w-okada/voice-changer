@@ -99,7 +99,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             if k != "modelSlotIndex":
                 self.update_settings(k, v)
         if "gpu" not in self.stored_setting:
-            self.update_settings("gpu", 0)
+            self.update_settings("gpu", -1)
         logger.info("[Voice Changer] VoiceChangerManager initializing... done.")
 
     def store_setting(self, key: str, val: str | int | float):
@@ -209,7 +209,10 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         data = asdict(self.settings)
         data["gpus"] = self.gpus
         data["modelSlots"] = self.modelSlotManager.getAllSlotInfo(reload=True)
-        data["sampleModels"] = getSampleInfos(self.params.sample_mode)
+        try:
+            data["sampleModels"] = getSampleInfos(self.params.sample_mode)
+        except:
+            data["sampleModels"] = []
         data["python"] = sys.version
         data["voiceChangerParams"] = self.params
 
