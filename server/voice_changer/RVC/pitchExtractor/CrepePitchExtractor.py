@@ -47,7 +47,7 @@ class CrepePitchExtractor(PitchExtractor):
         f0[pd < 0.1] = 0
         f0 = f0.squeeze()
 
-        f0 *= (f0_up_key / 12) ** 2
+        f0 *= 2 ** (f0_up_key / 12)
         pitchf[-f0.shape[0]:] = f0[:pitchf.shape[0]]
         f0_mel = 1127.0 * torch.log(1.0 + pitchf / 700.0)
         f0_mel[f0_mel > 0] = (f0_mel[f0_mel > 0] - self.f0_mel_min) * 254 / (self.f0_mel_max - self.f0_mel_min) + 1
