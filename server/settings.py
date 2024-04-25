@@ -6,7 +6,7 @@ class ServerSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8', protected_namespaces=('model_config',))
 
     model_dir: str = 'model_dir'
-    content_vec_500: str = ''
+    content_vec_500: str = 'pretrain/checkpoint_best_legacy_500.pt'
     content_vec_500_onnx: str = 'pretrain/content_vec_500.onnx'
     content_vec_500_onnx_on: bool = True
     hubert_base: str = 'pretrain/hubert_base.pt'
