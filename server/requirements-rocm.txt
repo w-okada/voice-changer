@@ -3,9 +3,8 @@
 # # wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh
 # # bash Anaconda3-2022.10-Linux-x86_64.sh
 
---extra-index-url https://download.pytorch.org/whl/rocm5.4.2
-torch==2.0.1
-torchaudio==2.0.2
+https://repo.radeon.com/rocm/manylinux/rocm-rel-6.0.2/torch-2.1.2+rocm6.0-cp310-cp310-linux_x86_64.whl
+torchaudio
 faiss-cpu
 
 tensorboard
@@ -13,7 +12,7 @@ tensorboardx
 
 onnxscript
 onnxsim
-onnxruntime-gpu
+https://repo.radeon.com/rocm/manylinux/rocm-rel-6.0.2/onnxruntime_rocm-inference-1.17.0-cp310-cp310-linux_x86_64.whl
 torchcrepe
 local_attention
 pyworld

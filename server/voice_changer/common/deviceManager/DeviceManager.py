@@ -61,7 +61,9 @@ class DeviceManager(object):
             "inter_op_num_threads": 8,
         }
         availableProviders = onnxruntime.get_available_providers()
-        if gpu >= 0 and "CUDAExecutionProvider" in availableProviders and self.gpu_num > 0:
+        if gpu >= 0 and "ROCMExecutionProvider" in availableProviders and self.gpu_num > 0:
+            return ["ROCMExecutionProvider", "CPUExecutionProvider"], [{"device_id": gpu}, cpu_settings]
+        elif gpu >= 0 and "CUDAExecutionProvider" in availableProviders and self.gpu_num > 0:
             return ["CUDAExecutionProvider", "CPUExecutionProvider"], [{"device_id": gpu}, cpu_settings]
         elif gpu >= 0 and "DmlExecutionProvider" in availableProviders:
             return ["DmlExecutionProvider", "CPUExecutionProvider"], [{"device_id": gpu}, cpu_settings]

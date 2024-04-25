@@ -35,9 +35,9 @@ jobs:
         - os: ubuntu-latest
           os_suffix: linux-amd64
           backend: cuda
-        # - os: ubuntu-latest
-        #   os_suffix: linux-amd64
-        #   backend: rocm
+        - os: ubuntu-latest
+          os_suffix: linux-amd64
+          backend: rocm
     runs-on: ${{ matrix.os }}
     env:
       BACKEND: ${{ matrix.backend }}
