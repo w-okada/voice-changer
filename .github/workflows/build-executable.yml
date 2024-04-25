@@ -8,7 +8,7 @@ on:
         required: true
         type: boolean
   push:
-    branches: [ master-custom, fix-release ]
+    branches: [ master-custom ]
   pull_request:
     branches: [ master-custom ]
 
@@ -64,7 +64,7 @@ jobs:
         path: ./server/dist
 
   release:
-    if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/fix-release' ) || github.event.inputs.create_release == 'true' }}
+    if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/master-custom' ) || github.event.inputs.create_release == 'true' }}
 
     runs-on: ubuntu-latest
 
