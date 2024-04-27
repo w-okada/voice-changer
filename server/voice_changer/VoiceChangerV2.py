@@ -16,7 +16,6 @@ import torch
 import os
 import numpy as np
 from dataclasses import dataclass, asdict, field
-import onnxruntime
 from mods.log_control import VoiceChangaerLogger
 
 # from voice_changer.Beatrice.Beatrice import Beatrice
@@ -37,6 +36,7 @@ from Exceptions import (
     VoiceChangerIsNotSelectedException,
 )
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
+from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 
 STREAM_INPUT_FILE = os.path.join(TMP_DIR, "in.wav")
 STREAM_OUTPUT_FILE = os.path.join(TMP_DIR, "out.wav")
@@ -51,6 +51,8 @@ class VoiceChangerV2Settings:
     crossFadeOffsetRate: float = 0.1
     crossFadeEndRate: float = 0.9
     crossFadeOverlapSize: int = 4096
+    serverReadChunkSize: int = 128
+    gpu: int = -1
 
     recordIO: int = 0  # 0:off, 1:on
 
@@ -63,6 +65,8 @@ class VoiceChangerV2Settings:
             "outputSampleRate",
             "crossFadeOverlapSize",
             "recordIO",
+            "serverReadChunkSize",
+            "gpu"
         ]
     )
     floatData: list[str] = field(
@@ -78,21 +82,17 @@ class VoiceChangerV2(VoiceChangerIF):
     def __init__(self, params: VoiceChangerParams):
         # 初期化
         self.settings = VoiceChangerV2Settings()
-        self.currentCrossFadeOffsetRate = 0.0
-        self.currentCrossFadeEndRate = 0.0
-        self.currentCrossFadeOverlapSize = 0  # setting
-        self.crossfadeSize = 0  # calculated
+        self.block_frame = self.settings.serverReadChunkSize * 128
+        self.crossfade_frame = min(self.settings.crossFadeOverlapSize, self.block_frame)  # calculated
 
         self.voiceChangerModel: VoiceChangerModel | None = None
         self.params = params
-        self.gpu_num = torch.cuda.device_count()
-        self.mps_enabled: bool = getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
-        self.onnx_device = onnxruntime.get_device()
+        self.device_manager = DeviceManager.get_instance()
         self.noCrossFade = False
-        self.sola_buffer: AudioInOutFloat | None = None
+        self.sola_buffer: torch.Tensor | None = None
         self.ioRecorder: IORecorder | None = None
 
-        logger.info(f"VoiceChangerV2 Initialized (GPU_NUM(cuda):{self.gpu_num}, mps_enabled:{self.mps_enabled}, onnx_device:{self.onnx_device})")
+        logger.info(f"VoiceChangerV2 Initialized")
         np.set_printoptions(threshold=10000)
 
 
@@ -134,8 +134,15 @@ class VoiceChangerV2(VoiceChangerIF):
 
         if key in self.settings.intData:
             setattr(self.settings, key, int(val))
-            if key == "crossFadeOffsetRate" or key == "crossFadeEndRate":
-                self.crossfadeSize = 0
+            if key == "serverReadChunkSize":
+                self.block_frame = self.settings.serverReadChunkSize * 128
+                self.crossfade_frame = min(self.settings.crossFadeOverlapSize, self.block_frame)
+                self._generate_strength()
+            if key == 'gpu':
+                # When changing GPU, need to re-allocate fade-in/fade-out buffers on different device
+                self._generate_strength()
+            if key == 'crossFadeOverlapSize':
+                self._generate_strength()
             if key == "recordIO" and val == 1:
                 if self.ioRecorder is not None:
                     self.ioRecorder.close()
@@ -158,50 +165,43 @@ class VoiceChangerV2(VoiceChangerIF):
                 self.voiceChangerModel.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
+            if key == "crossFadeOffsetRate" or key == "crossFadeEndRate":
+                self._generate_strength()
         elif key in self.settings.strData:
             setattr(self.settings, key, str(val))
-        else:
-            ret = self.voiceChangerModel.update_settings(key, val)
-            if ret is False:
-                pass
-                # print(f"({key} is not mutable variable or unknown variable)")
+
+        self.voiceChangerModel.update_settings(key, val)
+
         return self.get_info()
 
-    def _generate_strength(self, crossfadeSize: int):
-        if self.crossfadeSize != crossfadeSize or self.currentCrossFadeOffsetRate != self.settings.crossFadeOffsetRate or self.currentCrossFadeEndRate != self.settings.crossFadeEndRate or self.currentCrossFadeOverlapSize != self.settings.crossFadeOverlapSize:
-            self.crossfadeSize = crossfadeSize
-            self.currentCrossFadeOffsetRate = self.settings.crossFadeOffsetRate
-            self.currentCrossFadeEndRate = self.settings.crossFadeEndRate
-            self.currentCrossFadeOverlapSize = self.settings.crossFadeOverlapSize
+    def _generate_strength(self):
+        cf_offset = int(self.crossfade_frame * self.settings.crossFadeOffsetRate)
+        cf_end = int(self.crossfade_frame * self.settings.crossFadeEndRate)
+        cf_range = cf_end - cf_offset
+        percent = np.arange(cf_range, dtype=np.float32) / cf_range
 
-            cf_offset = int(crossfadeSize * self.settings.crossFadeOffsetRate)
-            cf_end = int(crossfadeSize * self.settings.crossFadeEndRate)
-            cf_range = cf_end - cf_offset
-            percent = np.arange(cf_range, dtype=np.float32) / cf_range
+        np_prev_strength = np.cos(percent * 0.5 * np.pi) ** 2
+        np_cur_strength = np.cos((1 - percent) * 0.5 * np.pi) ** 2
 
-            np_prev_strength = np.cos(percent * 0.5 * np.pi) ** 2
-            np_cur_strength = np.cos((1 - percent) * 0.5 * np.pi) ** 2
+        self.np_prev_strength = np.concatenate(
+            [
+                np.ones(cf_offset, dtype=np.float32),
+                np_prev_strength,
+                np.zeros(self.crossfade_frame - cf_offset - len(np_prev_strength), dtype=np.float32),
+            ]
+        )
+        self.np_cur_strength = np.concatenate(
+            [
+                np.zeros(cf_offset, dtype=np.float32),
+                np_cur_strength,
+                np.ones(self.crossfade_frame - cf_offset - len(np_cur_strength), dtype=np.float32),
+            ]
+        )
 
-            self.np_prev_strength = np.concatenate(
-                [
-                    np.ones(cf_offset, dtype=np.float32),
-                    np_prev_strength,
-                    np.zeros(crossfadeSize - cf_offset - len(np_prev_strength), dtype=np.float32),
-                ]
-            )
-            self.np_cur_strength = np.concatenate(
-                [
-                    np.zeros(cf_offset, dtype=np.float32),
-                    np_cur_strength,
-                    np.ones(crossfadeSize - cf_offset - len(np_cur_strength), dtype=np.float32),
-                ]
-            )
+        logger.info(f"Generated Strengths: for prev:{self.np_prev_strength.shape}, for cur:{self.np_cur_strength.shape}")
 
-            logger.info(f"Generated Strengths: for prev:{self.np_prev_strength.shape}, for cur:{self.np_cur_strength.shape}")
-
-            # ひとつ前の結果とサイズが変わるため、記録は消去する。
-            if self.sola_buffer is not None:
-                del self.sola_buffer
+        # ひとつ前の結果とサイズが変わるため、記録は消去する。
+        self.sola_buffer = None
 
     def get_processing_sampling_rate(self):
         if self.voiceChangerModel is None:
@@ -227,24 +227,23 @@ class VoiceChangerV2(VoiceChangerIF):
                         )
                     # block_frame = receivedData.shape[0]
                     # result = audio[:block_frame]
-                    result = audio
+                    result = audio.detach().cpu().numpy()
                 else:
                     sola_search_frame = int(0.012 * processing_sampling_rate)
                     block_frame = receivedData.shape[0]
-                    crossfade_frame = min(self.settings.crossFadeOverlapSize, block_frame)
-                    self._generate_strength(crossfade_frame)
+                    assert block_frame == self.block_frame, f"Received audio block frame of unexpected size! Expected {self.block_frame}, got: {block_frame}"
 
                     with torch.no_grad():
                         # TODO: Maybe audio and sola buffer should be tensors here.
                         audio = self.voiceChangerModel.inference(
                             receivedData,
-                            crossfade_frame=crossfade_frame,
+                            crossfade_frame=self.crossfade_frame,
                             sola_search_frame=sola_search_frame,
-                        )
+                        ).detach().cpu().numpy()
 
                     if self.sola_buffer is not None:
-                        sola_crossfade_frame = sola_search_frame + crossfade_frame
-                        audio_offset = -(sola_crossfade_frame + block_frame)
+                        sola_crossfade_frame = sola_search_frame + self.crossfade_frame
+                        audio_offset = -(sola_crossfade_frame + self.block_frame)
                         audio = audio[audio_offset:]
 
                         # SOLA algorithm from https://github.com/yxlllc/DDSP-SVC, https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI
@@ -256,16 +255,16 @@ class VoiceChangerV2(VoiceChangerIF):
                         cor_den = np.sqrt(
                             np.convolve(
                                 audio[: sola_crossfade_frame] ** 2,
-                                np.ones(crossfade_frame, dtype=np.float32),
+                                np.ones(self.crossfade_frame, dtype=np.float32),
                                 "valid",
                             )
                             + 0.001
                         )
                         sola_offset = int(np.argmax(cor_nom / cor_den))
-                        sola_end = sola_offset + block_frame
+                        sola_end = sola_offset + self.block_frame
                         result = audio[sola_offset:sola_end]
-                        result[:crossfade_frame] *= self.np_cur_strength
-                        result[:crossfade_frame] += self.sola_buffer[:]
+                        result[:self.crossfade_frame] *= self.np_cur_strength
+                        result[:self.crossfade_frame] += self.sola_buffer[:]
 
                         if sola_offset < sola_search_frame:
                             offset = -(sola_crossfade_frame - sola_offset)
@@ -273,8 +272,8 @@ class VoiceChangerV2(VoiceChangerIF):
                             self.sola_buffer = audio[offset:end] * self.np_prev_strength
                     else:
                         logger.info("[Voice Changer] warming up... generating sola buffer.")
-                        self.sola_buffer = audio[-crossfade_frame:] * self.np_prev_strength
-                        # self.sola_buffer = audio[- crossfade_frame:]
+                        self.sola_buffer = audio[-self.crossfade_frame:] * self.np_prev_strength
+                        # self.sola_buffer = audio[- self.crossfade_frame:]
                         result = np.zeros(4096, dtype=np.float32)
 
             mainprocess_time = t.secs

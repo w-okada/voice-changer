@@ -17,12 +17,16 @@ class DeviceManager(object):
         return cls._instance
 
     def __init__(self):
+        self.device = torch.device('cpu')
         self.gpu_num = torch.cuda.device_count()
         self.mps_enabled: bool = (
             getattr(torch.backends, "mps", None) is not None
             and torch.backends.mps.is_available()
         )
         self.dml_enabled: bool = torch_directml.is_available()
+
+    def setDevice(self, id: int):
+        self.device = self.getDevice(id)
 
     def getDevice(self, id: int):
         if id == -1:

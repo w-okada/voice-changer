@@ -20,6 +20,7 @@ from voice_changer.RVC.pitchExtractor.PitchExtractorManager import PitchExtracto
 from voice_changer.RVC.pipeline.PipelineGenerator import createPipeline
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.pipeline.Pipeline import Pipeline
+from torchaudio import transforms as tat
 
 from Exceptions import (
     DeviceCannotSupportHalfPrecisionException,
@@ -37,7 +38,7 @@ class RVCr2(VoiceChangerModel):
         logger.info("[Voice Changer] [RVCr2] Creating instance ")
         self.voiceChangerType = "RVC"
 
-        self.deviceManager = DeviceManager.get_instance()
+        self.device_manager = DeviceManager.get_instance()
         EmbedderManager.initialize(params)
         PitchExtractorManager.initialize(params)
         self.settings = RVCSettings()
@@ -54,6 +55,13 @@ class RVCr2(VoiceChangerModel):
 
         self.sr = 16000
         self.window = 160
+
+        self.resampler_in: tat.Resample | None = None
+        self.resampler_out: tat.Resample | None = None
+
+        self.input_sample_rate = 44100
+        self.outputSampleRate = 44100
+
         self.initialize()
 
     def initialize(self):
@@ -75,11 +83,23 @@ class RVCr2(VoiceChangerModel):
         self.settings.indexRatio = self.slotInfo.defaultIndexRatio
         self.settings.protect = self.slotInfo.defaultProtect
 
-        self.audio_buffer = torch.zeros((0,), dtype=torch.float32, device=self.pipeline.device)
-        self.pitchf_buffer = torch.zeros((0,), dtype=torch.float32, device=self.pipeline.device)
-        self.feature_buffer = torch.zeros((0, self.slotInfo.embChannels), dtype=torch.float32, device=self.pipeline.device)
+        self.audio_buffer = torch.zeros((0,), dtype=torch.float32, device=self.device_manager.device)
+        self.pitchf_buffer = torch.zeros((0,), dtype=torch.float32, device=self.device_manager.device)
+        self.feature_buffer = torch.zeros((0, self.slotInfo.embChannels), dtype=torch.float32, device=self.device_manager.device)
 
-        logger.info("[Voice Changer] [RVCr2] Initializing... done")
+        self.resampler_in = tat.Resample(
+            orig_freq=self.input_sample_rate,
+            new_freq=self.sr,
+            dtype=torch.float32
+        ).to(self.device_manager.device)
+
+        self.resampler_out = tat.Resample(
+            orig_freq=self.slotInfo.samplingRate,
+            new_freq=self.outputSampleRate,
+            dtype=torch.float32
+        ).to(self.device_manager.device)
+
+        logger.info(f"[Voice Changer] [RVCr2] Initializing on {self.device_manager.device}... done")
 
     def setSamplingRate(self, input_sample_rate, outputSampleRate):
         self.input_sample_rate = input_sample_rate
@@ -92,7 +112,7 @@ class RVCr2(VoiceChangerModel):
         if key in self.settings.intData:
             setattr(self.settings, key, int(val))
             if key == "gpu":
-                self.deviceManager.setForceTensor(False)
+                self.device_manager.setForceTensor(False)
                 self.initialize()
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
@@ -130,19 +150,19 @@ class RVCr2(VoiceChangerModel):
         # 過去のデータに連結
         if self.audio_buffer.shape[0] < convert_size:
             print('Reallocating audio buffer. Old size:', self.audio_buffer.shape[0])
-            self.audio_buffer = torch.zeros(convert_size, dtype=torch.float32, device=self.pipeline.device)
+            self.audio_buffer = torch.zeros(convert_size, dtype=torch.float32, device=self.device_manager.device)
         # Align audio buffer size with the latest convert size. Will be realloc'ed later if necessary,
         self.audio_buffer = self.audio_buffer[:convert_size]
 
         if self.slotInfo.f0:
             if self.pitchf_buffer.shape[0] < convert_feature_size:
                 print('Reallocating pitchf buffer. Old size:', self.pitchf_buffer.shape[0])
-                self.pitchf_buffer = torch.zeros(convert_feature_size, dtype=torch.float32, device=self.pipeline.device)
+                self.pitchf_buffer = torch.zeros(convert_feature_size, dtype=torch.float32, device=self.device_manager.device)
             self.pitchf_buffer = self.pitchf_buffer[:convert_feature_size]
 
         if self.feature_buffer.shape[0] < convert_feature_size:
             print('Reallocating feature buffer. Old size:', self.feature_buffer.shape[0])
-            self.feature_buffer = torch.zeros((convert_feature_size, self.slotInfo.embChannels), dtype=torch.float32, device=self.pipeline.device)
+            self.feature_buffer = torch.zeros((convert_feature_size, self.slotInfo.embChannels), dtype=torch.float32, device=self.device_manager.device)
         self.feature_buffer = self.feature_buffer[:convert_feature_size]
 
         return (
@@ -170,14 +190,17 @@ class RVCr2(VoiceChangerModel):
             logger.info("[Voice Changer] Pipeline is not initialized.")
             raise PipelineNotInitializedException()
 
-        # 処理は16Kで実施(Pitch, embed, (infer))
-        received_data: AudioInOutFloat = soxr.resample(
-            received_data,
-            self.input_sample_rate,
-            self.sr,
-        )
+        received_data = torch.as_tensor(received_data, dtype=torch.float32, device=self.device_manager.device)
 
-        received_data = torch.as_tensor(received_data, dtype=torch.float32, device=self.pipeline.device)
+        received_data: torch.Tensor = self.resampler_in(received_data)
+        # 処理は16Kで実施(Pitch, embed, (infer))
+        # received_data: AudioInOutFloat = soxr.resample(
+        #     received_data,
+        #     self.input_sample_rate,
+        #     self.sr,
+        # )
+
+        # received_data = torch.as_tensor(received_data, dtype=torch.float32, device=self.device_manager.device)
 
         # 16k で入ってくる。
         input_size = received_data.shape[0]
@@ -209,7 +232,7 @@ class RVCr2(VoiceChangerModel):
         self.prevVol = vol
 
         if vol < self.settings.silentThreshold:
-            return np.zeros(convert_size, dtype=np.float32)
+            return torch.zeros(convert_size, device=self.device_manager.device, dtype=torch.float32)
 
         repeat = self.settings.rvcQuality
 
@@ -262,10 +285,10 @@ class RVCr2(VoiceChangerModel):
             logger.warn(
                 "[Device Manager] Device cannot support half precision. Fallback to float...."
             )
-            self.deviceManager.setForceTensor(True)
+            self.device_manager.setForceTensor(True)
             self.initialize()
             # raise e
-            return np.zeros(convert_size, dtype=np.float32)
+            return torch.zeros(convert_size, device=self.device_manager.device, dtype=torch.float32)
 
         if pitchf is not None:
             self.pitchf_buffer = self.write_input(pitchf, self.pitchf_buffer)
@@ -278,13 +301,15 @@ class RVCr2(VoiceChangerModel):
             audio_out = audio_out[t_pad_tgt:-t_pad_tgt]
 
         # FIXME: Why the heck does it require another sqrt to amplify the volume?
-        result = (audio_out * torch.sqrt(vol_t)).detach().cpu().numpy()
+        # result = (audio_out * torch.sqrt(vol_t)).detach().cpu().numpy()
 
-        result: AudioInOutFloat = soxr.resample(
-            result,
-            self.slotInfo.samplingRate,
-            self.outputSampleRate
-        )
+        # result: AudioInOutFloat = soxr.resample(
+        #     result,
+        #     self.slotInfo.samplingRate,
+        #     self.outputSampleRate
+        # )
+
+        result: torch.Tensor = self.resampler_out(audio_out * torch.sqrt(vol_t))
 
         return result
 
