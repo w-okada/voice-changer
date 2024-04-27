@@ -232,7 +232,7 @@ class RVCr2(VoiceChangerModel):
         self.prevVol = vol
 
         if vol < self.settings.silentThreshold:
-            return torch.zeros(convert_size, device=self.device_manager.device, dtype=torch.float32)
+            return torch.zeros(convert_size * 2, device=self.device_manager.device, dtype=torch.float32)
 
         repeat = self.settings.rvcQuality
 
@@ -288,7 +288,7 @@ class RVCr2(VoiceChangerModel):
             self.device_manager.setForceTensor(True)
             self.initialize()
             # raise e
-            return torch.zeros(convert_size, device=self.device_manager.device, dtype=torch.float32)
+            return torch.zeros(convert_size * 2, device=self.device_manager.device, dtype=torch.float32)
 
         if pitchf is not None:
             self.pitchf_buffer = self.write_input(pitchf, self.pitchf_buffer)
