@@ -218,6 +218,9 @@ class VoiceChangerV2(VoiceChangerIF):
             with Timer2("main-process", True) as t:
                 processing_sampling_rate = self.voiceChangerModel.get_processing_sampling_rate()
 
+                receivedData = receivedData[-self.block_frame:]
+                receivedData = np.pad(receivedData, (0, self.block_frame - receivedData.shape[0]), mode='constant')
+
                 if self.noCrossFade:  # Beatrice, LLVC
                     with torch.no_grad():
                         audio = self.voiceChangerModel.inference(
@@ -230,8 +233,6 @@ class VoiceChangerV2(VoiceChangerIF):
                     result = audio.detach().cpu().numpy()
                 else:
                     sola_search_frame = int(0.012 * processing_sampling_rate)
-                    block_frame = receivedData.shape[0]
-                    assert block_frame == self.block_frame, f"Received audio block frame of unexpected size! Expected {self.block_frame}, got: {block_frame}"
 
                     with torch.no_grad():
                         # TODO: Maybe audio and sola buffer should be tensors here.
