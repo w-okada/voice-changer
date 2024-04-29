@@ -356,9 +356,8 @@ class RMVPE:
     def mel2hidden(self, mel: torch.Tensor) -> torch.Tensor:
         with torch.no_grad():
             n_frames = mel.shape[-1]
-            mel = F.pad(
-                mel, (0, 32 * ((n_frames - 1) // 32 + 1) - n_frames), mode="reflect"
-            )
+            n_pad = 32 * ((n_frames - 1) // 32 + 1) - n_frames
+            mel = F.pad(mel, (0, n_pad), mode="constant")
             hidden = self.model(mel)
             return hidden[:, :n_frames]
 

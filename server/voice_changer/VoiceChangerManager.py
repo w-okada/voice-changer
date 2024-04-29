@@ -43,6 +43,7 @@ class VoiceChangerManagerSettings:
     intData: list[str] = field(
         default_factory=lambda: [
             "modelSlotIndex",
+            "gpu"
         ]
     )
 
@@ -331,6 +332,9 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             if key == "modelSlotIndex":
                 logger.info(f"[Voice Changer] model slot is changed {self.settings.modelSlotIndex} -> {newVal}")
                 self.generateVoiceChanger(newVal)
+            elif key == 'gpu':
+                device_manager = DeviceManager.get_instance()
+                device_manager.setDevice(newVal)
 
             setattr(self.settings, key, newVal)
 
