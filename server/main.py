@@ -1,6 +1,7 @@
 import sys
 import uvicorn
 import asyncio
+import traceback
 
 from dotenv import set_key
 from distutils.util import strtobool
@@ -140,4 +141,8 @@ if __name__ == "__main__":
 
     printMessage(f"Booting PHASE :{__name__}", level=2)
 
-    asyncio.run(main(args))
+    try:
+        asyncio.run(main(args))
+    except Exception as e:
+        print(traceback.format_exc())
+        input('Press Enter to continue...')
