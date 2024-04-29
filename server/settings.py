@@ -12,7 +12,7 @@ class ServerSettings(BaseSettings):
     # hubert_base: str = 'pretrain/hubert_base.pt'
     # hubert_base_jp: str = 'pretrain/rinna_hubert_base_jp.pt'
     # hubert_soft: str = 'pretrain/hubert/hubert-soft-0d54a1f4.pt'
-    sample_mode: Literal[RVCSampleMode] = ''
+    sample_mode: RVCSampleMode = ''
     crepe_onnx_full: str = 'pretrain/crepe_onnx_full.onnx'
     crepe_onnx_tiny: str = 'pretrain/crepe_onnx_tiny.onnx'
     rmvpe: str = 'pretrain/rmvpe.pt'
