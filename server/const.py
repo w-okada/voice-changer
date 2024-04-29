@@ -90,10 +90,12 @@ ServerAudioDeviceType: TypeAlias = Literal["audioinput", "audiooutput"]
 
 RVCSampleMode: TypeAlias = Literal[
     "production",
+    "testAll",
     "testOfficial",
     "testDDPNTorch",
     "testDDPNONNX",
     "testONNXFull",
+    "",
 ]
 
 

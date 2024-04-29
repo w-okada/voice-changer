@@ -19,3 +19,4 @@ websockets
 sounddevice
 python-dotenv
 pydantic-settings
+xxhash

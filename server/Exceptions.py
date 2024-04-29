@@ -36,10 +36,13 @@ class VoiceChangerIsNotSelectedException(Exception):
         return repr("Voice Changer is not selected.")
 
 
-class WeightDownladException(Exception):
+class WeightDownloadException(Exception):
     def __str__(self):
         return repr("Failed to download weight.")
 
+class WeightsVerificationException(Exception):
+    def __str__(self):
+        return repr("Weight failed to pass verification check.")
 
 class PipelineCreateException(Exception):
     def __str__(self):

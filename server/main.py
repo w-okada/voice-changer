@@ -2,6 +2,7 @@ import sys
 import uvicorn
 import asyncio
 
+from dotenv import set_key
 from distutils.util import strtobool
 from datetime import datetime
 import platform
@@ -69,6 +70,9 @@ async def main(args):
     logger.debug(args)
 
     settings = ServerSettings()
+    if not os.path.exists('.env'):
+        for key, value in settings.model_dump().items():
+            set_key('.env', key.upper(), str(value))
 
     printMessage(f"PYTHON: {sys.version}", level=2)
     # printMessage("Voice Changerを起動しています。", level=2)

@@ -6,7 +6,7 @@ import socket
 import platform
 import os
 import argparse
-from Exceptions import WeightDownladException
+from Exceptions import WeightDownloadException
 from downloader.SampleDownloader import downloadInitialSamples
 from downloader.WeightDownloader import downloadWeight
 from voice_changer.VoiceChangerParamsManager import VoiceChangerParamsManager
@@ -159,7 +159,7 @@ if __name__ == "__main__":
     # ダウンロード(Weight)
     try:
         downloadWeight(voiceChangerParams)
-    except WeightDownladException:
+    except WeightDownloadException as e:
         # printMessage("RVC用のモデルファイルのダウンロードに失敗しました。", level=2)
         printMessage("failed to download weight for rvc", level=2)
 

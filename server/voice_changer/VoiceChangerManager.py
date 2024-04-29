@@ -210,10 +210,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         data = asdict(self.settings)
         data["gpus"] = self.gpus
         data["modelSlots"] = self.modelSlotManager.getAllSlotInfo(reload=True)
-        try:
-            data["sampleModels"] = getSampleInfos(self.params.sample_mode)
-        except:
-            data["sampleModels"] = []
+        data["sampleModels"] = getSampleInfos(self.params.sample_mode)
         data["python"] = sys.version
         data["voiceChangerParams"] = self.params
 
