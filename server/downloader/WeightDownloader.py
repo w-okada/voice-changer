@@ -1,6 +1,6 @@
 import os
+import asyncio
 
-from concurrent.futures import ThreadPoolExecutor
 from downloader.Downloader import download
 from mods.log_control import VoiceChangaerLogger
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
@@ -11,7 +11,7 @@ from xxhash import xxh128
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
 
-def downloadWeight(voiceChangerParams: VoiceChangerParams | ServerSettings):
+async def downloadWeight(voiceChangerParams: VoiceChangerParams | ServerSettings):
     content_vec_500_onnx = voiceChangerParams.content_vec_500_onnx
     # hubert_base = voiceChangerParams.hubert_base
     # hubert_base_jp = voiceChangerParams.hubert_base_jp
@@ -77,8 +77,10 @@ def downloadWeight(voiceChangerParams: VoiceChangerParams | ServerSettings):
         })
         pos += 1
 
-    with ThreadPoolExecutor() as pool:
-        pool.map(download, files_to_download)
+    tasks: list[asyncio.Task] = []
+    for file in files_to_download:
+        tasks.append(asyncio.ensure_future(download(file)))
+    await asyncio.gather(*tasks)
 
     # ファイルサイズをログに書き込む。（デバッグ用）
     logger.info('[Voice Changer] Verifying files...')

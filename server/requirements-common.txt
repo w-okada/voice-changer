@@ -20,3 +20,4 @@ sounddevice
 python-dotenv
 pydantic-settings
 xxhash
+aiohttp

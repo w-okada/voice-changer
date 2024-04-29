@@ -1,13 +1,14 @@
-import requests
+import aiohttp
 
 class HttpClient:
     _instance = None
 
     def __init__(self):
-        self.session = requests.Session()
+        self.session: aiohttp.ClientSession = None
 
     @classmethod
-    def get_client(cls) -> requests.Session:
+    async def get_client(cls) -> aiohttp.ClientSession:
         if cls._instance is None:
             cls._instance = cls()
+            cls._instance.session = aiohttp.ClientSession()
         return cls._instance.session

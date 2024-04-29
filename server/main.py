@@ -80,10 +80,10 @@ async def main(args):
     printMessage("Activating the Voice Changer.", level=2)
     # ダウンロード(Weight)
 
-    downloadWeight(settings)
+    await downloadWeight(settings)
 
     try:
-        downloadInitialSamples(settings.sample_mode, settings.model_dir)
+        await downloadInitialSamples(settings.sample_mode, settings.model_dir)
     except:
         printMessage("Failed to download samples. Skipping.", level=2)
 
