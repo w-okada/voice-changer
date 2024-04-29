@@ -232,6 +232,7 @@ class RVCr2(VoiceChangerModel):
         self.prevVol = vol
 
         if vol < self.settings.silentThreshold:
+            # FIXME: Convert size is multiplied by 2 to make sure it's more than SOLA buffer
             return torch.zeros(convert_size * 2, device=self.device_manager.device, dtype=torch.float32)
 
         repeat = self.settings.rvcQuality
