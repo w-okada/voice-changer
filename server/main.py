@@ -87,6 +87,9 @@ async def main(args):
     except:
         printMessage("Failed to download samples. Skipping.", level=2)
 
+    # FIXME: Need to refactor samples download logic
+    os.makedirs(settings.model_dir, exist_ok=True)
+
     # HTTPS key/cert作成
     if args.https and args.httpsSelfSigned:
         # HTTPS(おれおれ証明書生成)
