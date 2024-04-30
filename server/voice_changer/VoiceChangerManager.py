@@ -129,91 +129,88 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             cls._instance = cls(params)
         return cls._instance
 
-    def loadModel(self, params: LoadModelParams):
+    async def loadModel(self, params: LoadModelParams):
         if params.isSampleMode:
             # サンプルダウンロード
             logger.info(f"[Voice Changer] sample download...., {params}")
-            downloadSample(self.params.sample_mode, params.sampleId, self.params.model_dir, params.slot, params.params)
+            await downloadSample(self.params.sample_mode, params.sampleId, self.params.model_dir, params.slot, params.params)
             self.modelSlotManager.getAllSlotInfo(reload=True)
             info = {"status": "OK"}
             return info
-        else:
-            # アップローダ
-            # ファイルをslotにコピー
-            slotDir = os.path.join(
+
+        # アップローダ
+        # ファイルをslotにコピー
+        slotDir = os.path.join(
+            self.params.model_dir,
+            str(params.slot),
+        )
+        if os.path.isdir(slotDir):
+            shutil.rmtree(slotDir)
+
+        for file in params.files:
+            logger.info(f"FILE: {file}")
+            srcPath = os.path.join(UPLOAD_DIR, file.dir, file.name)
+            dstDir = os.path.join(
                 self.params.model_dir,
                 str(params.slot),
+                file.dir,
             )
-            if os.path.isdir(slotDir):
-                shutil.rmtree(slotDir)
+            dstPath = os.path.join(dstDir, file.name)
+            os.makedirs(dstDir, exist_ok=True)
+            logger.info(f"move to {srcPath} -> {dstPath}")
+            shutil.move(srcPath, dstPath)
+            file.name = os.path.basename(dstPath)
 
-            for file in params.files:
-                logger.info(f"FILE: {file}")
-                srcPath = os.path.join(UPLOAD_DIR, file.dir, file.name)
-                dstDir = os.path.join(
-                    self.params.model_dir,
-                    str(params.slot),
-                    file.dir,
-                )
-                dstPath = os.path.join(dstDir, file.name)
-                os.makedirs(dstDir, exist_ok=True)
-                logger.info(f"move to {srcPath} -> {dstPath}")
-                shutil.move(srcPath, dstPath)
-                file.name = os.path.basename(dstPath)
+        # メタデータ作成(各VCで定義)
+        if params.voiceChangerType == "RVC":
+            from voice_changer.RVC.RVCModelSlotGenerator import RVCModelSlotGenerator  # 起動時にインポートするとパラメータが取れない。
 
-            # メタデータ作成(各VCで定義)
-            if params.voiceChangerType == "RVC":
-                from voice_changer.RVC.RVCModelSlotGenerator import RVCModelSlotGenerator  # 起動時にインポートするとパラメータが取れない。
+            slotInfo = RVCModelSlotGenerator.loadModel(params)
+            self.modelSlotManager.save_model_slot(params.slot, slotInfo)
+        elif params.voiceChangerType == "MMVCv13":
+            from voice_changer.MMVCv13.MMVCv13ModelSlotGenerator import MMVCv13ModelSlotGenerator
 
-                slotInfo = RVCModelSlotGenerator.loadModel(params)
-                self.modelSlotManager.save_model_slot(params.slot, slotInfo)
-            elif params.voiceChangerType == "MMVCv13":
-                from voice_changer.MMVCv13.MMVCv13ModelSlotGenerator import MMVCv13ModelSlotGenerator
+            slotInfo = MMVCv13ModelSlotGenerator.loadModel(params)
+            self.modelSlotManager.save_model_slot(params.slot, slotInfo)
+        elif params.voiceChangerType == "MMVCv15":
+            from voice_changer.MMVCv15.MMVCv15ModelSlotGenerator import MMVCv15ModelSlotGenerator
 
-                slotInfo = MMVCv13ModelSlotGenerator.loadModel(params)
-                self.modelSlotManager.save_model_slot(params.slot, slotInfo)
-            elif params.voiceChangerType == "MMVCv15":
-                from voice_changer.MMVCv15.MMVCv15ModelSlotGenerator import MMVCv15ModelSlotGenerator
+            slotInfo = MMVCv15ModelSlotGenerator.loadModel(params)
+            self.modelSlotManager.save_model_slot(params.slot, slotInfo)
+        elif params.voiceChangerType == "so-vits-svc-40":
+            from voice_changer.SoVitsSvc40.SoVitsSvc40ModelSlotGenerator import SoVitsSvc40ModelSlotGenerator
 
-                slotInfo = MMVCv15ModelSlotGenerator.loadModel(params)
-                self.modelSlotManager.save_model_slot(params.slot, slotInfo)
-            elif params.voiceChangerType == "so-vits-svc-40":
-                from voice_changer.SoVitsSvc40.SoVitsSvc40ModelSlotGenerator import SoVitsSvc40ModelSlotGenerator
+            slotInfo = SoVitsSvc40ModelSlotGenerator.loadModel(params)
+            self.modelSlotManager.save_model_slot(params.slot, slotInfo)
+        elif params.voiceChangerType == "DDSP-SVC":
+            from voice_changer.DDSP_SVC.DDSP_SVCModelSlotGenerator import DDSP_SVCModelSlotGenerator
 
-                slotInfo = SoVitsSvc40ModelSlotGenerator.loadModel(params)
-                self.modelSlotManager.save_model_slot(params.slot, slotInfo)
-            elif params.voiceChangerType == "DDSP-SVC":
-                from voice_changer.DDSP_SVC.DDSP_SVCModelSlotGenerator import DDSP_SVCModelSlotGenerator
+            slotInfo = DDSP_SVCModelSlotGenerator.loadModel(params)
+            self.modelSlotManager.save_model_slot(params.slot, slotInfo)
+        elif params.voiceChangerType == "Diffusion-SVC":
+            from voice_changer.DiffusionSVC.DiffusionSVCModelSlotGenerator import DiffusionSVCModelSlotGenerator
 
-                slotInfo = DDSP_SVCModelSlotGenerator.loadModel(params)
-                self.modelSlotManager.save_model_slot(params.slot, slotInfo)
-            elif params.voiceChangerType == "Diffusion-SVC":
-                from voice_changer.DiffusionSVC.DiffusionSVCModelSlotGenerator import DiffusionSVCModelSlotGenerator
+            slotInfo = DiffusionSVCModelSlotGenerator.loadModel(params)
+            self.modelSlotManager.save_model_slot(params.slot, slotInfo)
+        elif params.voiceChangerType == "Beatrice":
+            from voice_changer.Beatrice.BeatriceModelSlotGenerator import BeatriceModelSlotGenerator
 
-                slotInfo = DiffusionSVCModelSlotGenerator.loadModel(params)
-                self.modelSlotManager.save_model_slot(params.slot, slotInfo)
-            elif params.voiceChangerType == "Beatrice":
-                from voice_changer.Beatrice.BeatriceModelSlotGenerator import BeatriceModelSlotGenerator
+            slotInfo = BeatriceModelSlotGenerator.loadModel(params)
+            self.modelSlotManager.save_model_slot(params.slot, slotInfo)
 
-                slotInfo = BeatriceModelSlotGenerator.loadModel(params)
-                self.modelSlotManager.save_model_slot(params.slot, slotInfo)
+        elif params.voiceChangerType == "LLVC":
+            from voice_changer.LLVC.LLVCModelSlotGenerator import LLVCModelSlotGenerator
 
-            elif params.voiceChangerType == "LLVC":
-                from voice_changer.LLVC.LLVCModelSlotGenerator import LLVCModelSlotGenerator
+            slotInfo = LLVCModelSlotGenerator.loadModel(params)
+            self.modelSlotManager.save_model_slot(params.slot, slotInfo)
 
-                slotInfo = LLVCModelSlotGenerator.loadModel(params)
-                self.modelSlotManager.save_model_slot(params.slot, slotInfo)
-
-            logger.info(f"params, {params}")
+        logger.info(f"params, {params}")
 
     def get_info(self):
         data = asdict(self.settings)
         data["gpus"] = self.gpus
         data["modelSlots"] = self.modelSlotManager.getAllSlotInfo(reload=True)
-        try:
-            data["sampleModels"] = getSampleInfos(self.params.sample_mode)
-        except:
-            data["sampleModels"] = []
+        data["sampleModels"] = getSampleInfos(self.params.sample_mode)
         data["python"] = sys.version
         data["voiceChangerParams"] = self.params
 

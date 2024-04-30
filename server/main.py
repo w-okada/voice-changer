@@ -1,7 +1,9 @@
 import sys
 import uvicorn
 import asyncio
+import traceback
 
+from dotenv import set_key
 from distutils.util import strtobool
 from datetime import datetime
 import platform
@@ -69,18 +71,25 @@ async def main(args):
     logger.debug(args)
 
     settings = ServerSettings()
+    if not os.path.exists('.env'):
+        for key, value in settings.model_dump().items():
+            set_key('.env', key.upper(), str(value))
 
     printMessage(f"PYTHON: {sys.version}", level=2)
     # printMessage("Voice Changerを起動しています。", level=2)
     printMessage("Activating the Voice Changer.", level=2)
     # ダウンロード(Weight)
 
-    downloadWeight(settings)
+    await downloadWeight(settings)
 
     try:
-        downloadInitialSamples(settings.sample_mode, settings.model_dir)
-    except:
-        printMessage("Failed to download samples. Skipping.", level=2)
+        await downloadInitialSamples(settings.sample_mode, settings.model_dir)
+    except Exception as e:
+        print(traceback.format_exc())
+        printMessage(f"Failed to download samples. Reason: {e}", level=2)
+
+    # FIXME: Need to refactor samples download logic
+    os.makedirs(settings.model_dir, exist_ok=True)
 
     # HTTPS key/cert作成
     if args.https and args.httpsSelfSigned:
@@ -136,4 +145,8 @@ if __name__ == "__main__":
 
     printMessage(f"Booting PHASE :{__name__}", level=2)
 
-    asyncio.run(main(args))
+    try:
+        asyncio.run(main(args))
+    except Exception as e:
+        print(traceback.format_exc())
+        input('Press Enter to continue...')

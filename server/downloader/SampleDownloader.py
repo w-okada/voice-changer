@@ -1,7 +1,7 @@
 import json
 import os
 import sys
-from concurrent.futures import ThreadPoolExecutor
+import asyncio
 from typing import Any, Tuple
 
 from const import RVCSampleMode, getSampleJsonAndModelIds
@@ -15,24 +15,22 @@ from downloader.Downloader import download, download_no_tqdm
 logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
-def downloadInitialSamples(mode: RVCSampleMode, model_dir: str):
+async def downloadInitialSamples(mode: RVCSampleMode, model_dir: str):
     sampleJsonUrls, sampleModels = getSampleJsonAndModelIds(mode)
-    sampleJsons = _downloadSampleJsons(sampleJsonUrls)
+    sampleJsons = await _downloadSampleJsons(sampleJsonUrls)
     if os.path.exists(model_dir):
         logger.info("[Voice Changer] model_dir is already exists. skip download samples.")
         return
     samples = _generateSampleList(sampleJsons)
     slotIndex = list(range(len(sampleModels)))
-    _downloadSamples(samples, sampleModels, model_dir, slotIndex)
-    pass
+    await _downloadSamples(samples, sampleModels, model_dir, slotIndex)
 
 
-def downloadSample(mode: RVCSampleMode, modelId: str, model_dir: str, slotIndex: int, params: Any):
+async def downloadSample(mode: RVCSampleMode, modelId: str, model_dir: str, slotIndex: int, params: Any):
     sampleJsonUrls, _sampleModels = getSampleJsonAndModelIds(mode)
     sampleJsons = _generateSampleJsons(sampleJsonUrls)
     samples = _generateSampleList(sampleJsons)
-    _downloadSamples(samples, [(modelId, params)], model_dir, [slotIndex], withoutTqdm=True)
-    pass
+    await _downloadSamples(samples, [(modelId, params)], model_dir, [slotIndex], withoutTqdm=True)
 
 
 def getSampleInfos(mode: RVCSampleMode):
@@ -42,12 +40,14 @@ def getSampleInfos(mode: RVCSampleMode):
     return samples
 
 
-def _downloadSampleJsons(sampleJsonUrls: list[str]):
-    sampleJsons = []
+async def _downloadSampleJsons(sampleJsonUrls: list[str]):
+    sampleJsons: list[str] = []
+    tasks: list[asyncio.Task] = []
     for url in sampleJsonUrls:
         filename = os.path.basename(url)
-        download_no_tqdm({"url": url, "saveTo": filename, "position": 0})
+        tasks.append(asyncio.ensure_future(download_no_tqdm({"url": url, "saveTo": filename, "position": 0})))
         sampleJsons.append(filename)
+    await asyncio.gather(*tasks)
     return sampleJsons
 
 
@@ -71,7 +71,7 @@ def _generateSampleList(sampleJsons: list[str]):
     return samples
 
 
-def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str, Any]], model_dir: str, slotIndex: list[int], withoutTqdm=False):
+async def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str, Any]], model_dir: str, slotIndex: list[int], withoutTqdm=False):
     downloadParams = []
     line_num = 0
     modelSlotManager = ModelSlotManager.get_instance(model_dir)
@@ -203,12 +203,14 @@ def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str
 
     # ダウンロード
     logger.info("[Voice Changer] Downloading model files...")
+    tasks: list[asyncio.Task] = []
     if withoutTqdm:
-        with ThreadPoolExecutor() as pool:
-            pool.map(download_no_tqdm, downloadParams)
+        for file in downloadParams:
+            tasks.append(asyncio.ensure_future(download_no_tqdm(file)))
     else:
-        with ThreadPoolExecutor() as pool:
-            pool.map(download, downloadParams)
+        for file in downloadParams:
+            tasks.append(asyncio.ensure_future(download(file)))
+    await asyncio.gather(*tasks)
 
     # メタデータ作成
     logger.info("[Voice Changer] Generating metadata...")

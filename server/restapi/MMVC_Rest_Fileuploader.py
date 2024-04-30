@@ -76,7 +76,7 @@ class MMVC_Rest_Fileuploader:
             import traceback
             traceback.print_exc()
 
-    def post_load_model(
+    async def post_load_model(
         self,
         slot: int = Form(...),
         isHalf: bool = Form(...),
@@ -89,14 +89,14 @@ class MMVC_Rest_Fileuploader:
             loadModelparams.files = [LoadModelParamFile(**x) for x in paramDict["files"]]
             # print("paramDict", loadModelparams)
 
-            info = self.voiceChangerManager.loadModel(loadModelparams)
+            info = await self.voiceChangerManager.loadModel(loadModelparams)
             json_compatible_item_data = jsonable_encoder(info)
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:
             print("[Voice Changer] post_load_model ex:", e)
             import traceback
             traceback.print_exc()
-            
+
     def get_onnx(self):
         try:
             info = self.voiceChangerManager.export2onnx()
