@@ -49,7 +49,6 @@ class RVCr2(VoiceChangerModel):
 
         self.audio_buffer: torch.Tensor | None = None
         self.pitchf_buffer: torch.Tensor | None = None
-        self.feature_buffer: torch.Tensor | None = None
         self.prevVol = 0.0
         self.slotInfo = slotInfo
 
@@ -85,7 +84,6 @@ class RVCr2(VoiceChangerModel):
 
         self.audio_buffer = torch.zeros((0,), dtype=torch.float32, device=self.device_manager.device)
         self.pitchf_buffer = torch.zeros((0,), dtype=torch.float32, device=self.device_manager.device)
-        self.feature_buffer = torch.zeros((0, self.slotInfo.embChannels), dtype=torch.float32, device=self.device_manager.device)
 
         self.resampler_in = tat.Resample(
             orig_freq=self.input_sample_rate,
@@ -160,15 +158,9 @@ class RVCr2(VoiceChangerModel):
                 self.pitchf_buffer = torch.zeros(convert_feature_size, dtype=torch.float32, device=self.device_manager.device)
             self.pitchf_buffer = self.pitchf_buffer[:convert_feature_size]
 
-        if self.feature_buffer.shape[0] < convert_feature_size:
-            print('Reallocating feature buffer. Old size:', self.feature_buffer.shape[0])
-            self.feature_buffer = torch.zeros((convert_feature_size, self.slotInfo.embChannels), dtype=torch.float32, device=self.device_manager.device)
-        self.feature_buffer = self.feature_buffer[:convert_feature_size]
-
         return (
             self.audio_buffer,
             self.pitchf_buffer,
-            self.feature_buffer,
         )
 
     def write_input(
@@ -226,7 +218,7 @@ class RVCr2(VoiceChangerModel):
         convert_feature_size = convert_size // self.window
 
          # 入力データ生成
-        audio, pitchf, feature = self.alloc(convert_size, convert_feature_size)
+        audio, pitchf = self.alloc(convert_size, convert_feature_size)
 
         self.audio_buffer = self.write_input(received_data, audio)
 
@@ -261,11 +253,10 @@ class RVCr2(VoiceChangerModel):
         useFinalProj = self.slotInfo.useFinalProj
 
         try:
-            audio_out, pitchf, feature = self.pipeline.exec(
+            audio_out, pitchf = self.pipeline.exec(
                 sid,
                 audio,
                 pitchf,
-                feature,
                 f0_up_key,
                 index_rate,
                 if_f0,
@@ -288,8 +279,6 @@ class RVCr2(VoiceChangerModel):
 
         if pitchf is not None:
             self.pitchf_buffer = self.write_input(pitchf, self.pitchf_buffer)
-
-        self.feature_buffer = self.write_input(feature, self.feature_buffer)
 
         # inferで出力されるサンプリングレートはモデルのサンプリングレートになる。
         # pipelineに（入力されるときはhubertように16k）
