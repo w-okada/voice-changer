@@ -45,16 +45,16 @@ class DeviceManager(object):
     @staticmethod
     def listDevices():
         devCount = torch.cuda.device_count()
-        gpus = []
+        gpus = [{ "id": -1, "name": "CPU" }]
         for id in range(devCount):
             name = torch.cuda.get_device_name(id)
             memory = torch.cuda.get_device_properties(id).total_memory
-            gpu = {"id": id, "name": f"{name} (CUDA) ", "memory": memory}
+            gpu = {"id": id, "name": f"{id}: {name} (CUDA) ", "memory": memory}
             gpus.append(gpu)
         devCount = torch_directml.device_count()
         for id in range(devCount):
             name = torch_directml.device_name(id)
-            gpu = {"id": id, "name": f"{name} (DirectML) ", "memory": 0}
+            gpu = {"id": id, "name": f"{id}: {name} (DirectML) ", "memory": 0}
             gpus.append(gpu)
         return gpus
 

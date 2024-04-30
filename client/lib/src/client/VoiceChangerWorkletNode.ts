@@ -52,7 +52,6 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
     super(context, "voice-changer-worklet-processor");
     this.port.onmessage = this.handleMessage.bind(this);
     this.listener = listener;
-    this.createSocketIO();
     console.log(`[worklet_node][voice-changer-worklet-processor] created.`);
   }
 
@@ -93,7 +92,7 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
   };
 
   // 処理
-  private createSocketIO = () => {
+  createSocketIO = () => {
     if (this.socket) {
       this.socket.close();
     }
