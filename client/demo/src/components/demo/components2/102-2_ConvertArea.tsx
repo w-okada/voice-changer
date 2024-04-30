@@ -24,7 +24,7 @@ export const ConvertArea = (props: ConvertProps) => {
             });
         }
 
-        const gpusEntry = [...serverSetting.serverSetting.gpus, { id: -1, name: "CPU" }];
+        const gpusEntry = serverSetting.serverSetting.gpus;
 
         const gpuSelect = webEdition ? (
                 <></>
