@@ -150,28 +150,13 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
 
   postReceivedVoice = (data: ArrayBuffer) => {
     // Int16 to Float
-    //const i16Data = new Int16Array(data);
-    // const f32Data = new Float32Array(i16Data.length);
+    const i16Data = new Int16Array(data);
+    const f32Data = new Float32Array(i16Data.length);
     // console.log(`[worklet] f32DataLength${f32Data.length} i16DataLength${i16Data.length}`)
-    // i16Data.forEach((x, i) => {
-    //   const float = x >= 0x8000 ? -(0x10000 - x) / 0x8000 : x / 0x7fff;
-    //   f32Data[i] = float;
-    // });
-    const f32Data = new Float32Array(data);
-
-    // アップサンプリング
-    // let upSampledBuffer: Float32Array | null = null;
-    // if (this.setting.sendingSampleRate == 48000) {
-    //   upSampledBuffer = f32Data;
-    // } else {
-    //   upSampledBuffer = new Float32Array(f32Data.length * 2);
-    //   for (let i = 0; i < f32Data.length; i++) {
-    //     const currentFrame = f32Data[i];
-    //     const nextFrame = i + 1 < f32Data.length ? f32Data[i + 1] : f32Data[i];
-    //     upSampledBuffer[i * 2] = currentFrame;
-    //     upSampledBuffer[i * 2 + 1] = (currentFrame + nextFrame) / 2;
-    //   }
-    // }
+    for (let i = 0; i < i16Data.length; i++) {
+      const x = i16Data[i];
+      f32Data[i] = x >= 0x8000 ? -(0x10000 - x) / 0x8000 : x / 0x7fff;
+    }
 
     const req: VoiceChangerWorkletProcessorRequest = {
       requestType: "voice",
@@ -187,43 +172,6 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
     }
   };
 
-  // private _averageDownsampleBuffer(
-  //   buffer: Float32Array,
-  //   originalSampleRate: number,
-  //   destinationSamplerate: number
-  // ) {
-  //   if (originalSampleRate == destinationSamplerate) {
-  //     return buffer;
-  //   }
-  //   if (destinationSamplerate > originalSampleRate) {
-  //     throw "downsampling rate show be smaller than original sample rate";
-  //   }
-  //   const sampleRateRatio = originalSampleRate / destinationSamplerate;
-  //   const newLength = Math.round(buffer.length / sampleRateRatio);
-  //   const result = new Float32Array(newLength);
-  //   let offsetResult = 0;
-  //   let offsetBuffer = 0;
-  //   while (offsetResult < result.length) {
-  //     var nextOffsetBuffer = Math.round((offsetResult + 1) * sampleRateRatio);
-  //     // Use average value of skipped samples
-  //     var accum = 0,
-  //       count = 0;
-  //     for (
-  //       var i = offsetBuffer;
-  //       i < nextOffsetBuffer && i < buffer.length;
-  //       i++
-  //     ) {
-  //       accum += buffer[i];
-  //       count++;
-  //     }
-  //     result[offsetResult] = accum / count;
-  //     // Or you can simply get rid of the skipped samples:
-  //     // result[offsetResult] = buffer[nextOffsetBuffer];
-  //     offsetResult++;
-  //     offsetBuffer = nextOffsetBuffer;
-  //   }
-  //   return result;
-  // }
   handleMessage(event: any) {
     // console.log(`[Node:handleMessage_] `, event.data.volume);
     if (event.data.responseType === "start_ok") {
@@ -242,47 +190,22 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
       const inputData = event.data.inputData as Float32Array;
       // console.log("receive input data", inputData);
 
-      // ダウンサンプリング
-      // let downsampledBuffer: Float32Array | null = null;
-      // if (this.setting.sendingSampleRate == 48000) {
-      //   downsampledBuffer = inputData;
-      // } else if (this.setting.downSamplingMode == DownSamplingMode.decimate) {
-      //   //////// (Kind 1) 間引き //////////
-      //   //// 48000Hz で入ってくるので間引いて24000Hzに変換する。
-      //   downsampledBuffer = new Float32Array(inputData.length / 2);
-      //   for (let i = 0; i < inputData.length; i++) {
-      //     if (i % 2 == 0) {
-      //       downsampledBuffer[i / 2] = inputData[i];
-      //     }
-      //   }
-      // } else {
-      //   //////// (Kind 2) 平均 //////////
-      //   // downsampledBuffer = this._averageDownsampleBuffer(buffer, 48000, 24000)
-      //   downsampledBuffer = this._averageDownsampleBuffer(
-      //     inputData,
-      //     48000,
-      //     this.setting.sendingSampleRate
-      //   );
-      // }
-
       // Float to Int16 (internalの場合はfloatのまま行く。)
-      // if (this.setting.protocol != "internal") {
-      //   const arrayBuffer = new ArrayBuffer(downsampledBuffer.length * 2);
-      //   const dataView = new DataView(arrayBuffer);
-      //   for (let i = 0; i < downsampledBuffer.length; i++) {
-      //     let s = Math.max(-1, Math.min(1, downsampledBuffer[i]));
-      //     s = s < 0 ? s * 0x8000 : s * 0x7fff;
-      //     dataView.setInt16(i * 2, s, true);
-      //   }
-      //   // バッファリング
-      //   this.requestChunks.push(arrayBuffer);
-      // } else {
-      //   // internal
-      //   // console.log("downsampledBuffer.buffer", downsampledBuffer.buffer);
-      //   this.requestChunks.push(downsampledBuffer.buffer);
-      // }
-
-      this.requestChunks.push(inputData.buffer);
+      if (this.setting.protocol != "internal") {
+        const arrayBuffer = new ArrayBuffer(inputData.length * 2);
+        const dataView = new DataView(arrayBuffer);
+        for (let i = 0; i < inputData.length; i++) {
+          let s = Math.max(-1, Math.min(1, inputData[i]));
+          s = s < 0 ? s * 0x8000 : s * 0x7fff;
+          dataView.setInt16(i * 2, s, true);
+        }
+        // バッファリング
+        this.requestChunks.push(arrayBuffer);
+      } else {
+        // internal
+        // console.log("inputData.buffer", inputData.buffer);
+        this.requestChunks.push(inputData.buffer);
+      }
 
       //// リクエストバッファの中身が、リクエスト送信数と違う場合は処理終了。
       if (this.requestChunks.length < this.setting.inputChunkNum) {
