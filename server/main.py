@@ -84,8 +84,9 @@ async def main(args):
 
     try:
         await downloadInitialSamples(settings.sample_mode, settings.model_dir)
-    except:
-        printMessage("Failed to download samples. Skipping.", level=2)
+    except Exception as e:
+        print(traceback.format_exc())
+        printMessage(f"Failed to download samples. Reason: {e}", level=2)
 
     # FIXME: Need to refactor samples download logic
     os.makedirs(settings.model_dir, exist_ok=True)

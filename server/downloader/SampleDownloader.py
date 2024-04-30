@@ -41,11 +41,13 @@ def getSampleInfos(mode: RVCSampleMode):
 
 
 async def _downloadSampleJsons(sampleJsonUrls: list[str]):
-    sampleJsons = []
+    sampleJsons: list[str] = []
+    tasks: list[asyncio.Task] = []
     for url in sampleJsonUrls:
         filename = os.path.basename(url)
-        await download_no_tqdm({"url": url, "saveTo": filename, "position": 0})
+        tasks.append(asyncio.ensure_future(download_no_tqdm({"url": url, "saveTo": filename, "position": 0})))
         sampleJsons.append(filename)
+    await asyncio.gather(*tasks)
     return sampleJsons
 
 
