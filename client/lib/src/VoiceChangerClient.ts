@@ -55,6 +55,7 @@ export class VoiceChangerClient {
                 await this.ctx.audioWorklet.addModule(scriptUrl);
                 this.vcInNode = new VoiceChangerWorkletNode(this.ctx, voiceChangerWorkletListener); // vc node
             }
+            this.vcInNode.createSocketIO()
 
             // const ctx44k = new AudioContext({ sampleRate: 44100 }) // これでもプチプチが残る
             const ctx44k = new AudioContext({ sampleRate: 48000 }); // 結局これが一番まし。
