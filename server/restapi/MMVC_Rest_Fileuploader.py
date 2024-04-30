@@ -4,9 +4,9 @@ from typing import Union
 from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from fastapi import UploadFile, File, Form
+from fastapi import UploadFile, Form
 
-from restapi.mods.FileUploader import upload_file, concat_file_chunks
+from restapi.mods.FileUploader import upload_file
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 
 from const import MODEL_DIR, UPLOAD_DIR
@@ -24,7 +24,6 @@ class MMVC_Rest_Fileuploader:
         self.router.add_api_route("/info", self.get_info, methods=["GET"])
         self.router.add_api_route("/performance", self.get_performance, methods=["GET"])
         self.router.add_api_route("/upload_file", self.post_upload_file, methods=["POST"])
-        self.router.add_api_route("/concat_uploaded_file", self.post_concat_uploaded_file, methods=["POST"])
         self.router.add_api_route("/update_settings", self.post_update_settings, methods=["POST"])
         self.router.add_api_route("/load_model", self.post_load_model, methods=["POST"])
         self.router.add_api_route("/onnx", self.get_onnx, methods=["GET"])
@@ -33,21 +32,13 @@ class MMVC_Rest_Fileuploader:
         self.router.add_api_route("/update_model_info", self.post_update_model_info, methods=["POST"])
         self.router.add_api_route("/upload_model_assets", self.post_upload_model_assets, methods=["POST"])
 
-    def post_upload_file(self, file: UploadFile = File(...), filename: str = Form(...)):
+    def post_upload_file(self, file: UploadFile, filename: str = Form(...)):
         try:
             res = upload_file(UPLOAD_DIR, file, filename)
             json_compatible_item_data = jsonable_encoder(res)
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:
             print("[Voice Changer] post_upload_file ex:", e)
-
-    def post_concat_uploaded_file(self, filename: str = Form(...), filenameChunkNum: int = Form(...)):
-        try:
-            res = concat_file_chunks(UPLOAD_DIR, filename, filenameChunkNum, UPLOAD_DIR)
-            json_compatible_item_data = jsonable_encoder(res)
-            return JSONResponse(content=json_compatible_item_data)
-        except Exception as e:
-            print("[Voice Changer] post_concat_uploaded_file ex:", e)
 
     def get_info(self):
         try:
