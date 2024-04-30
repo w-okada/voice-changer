@@ -192,6 +192,18 @@ class RVCr2(VoiceChangerModel):
 
         received_data = torch.as_tensor(received_data, dtype=torch.float32, device=self.device_manager.device)
 
+        input_size = received_data.shape[0]
+
+        vol_t = torch.sqrt(
+            torch.square(received_data).mean()
+        )
+        vol = max(vol_t.item(), 0)
+        self.prevVol = vol
+
+        if vol < self.settings.silentThreshold:
+            # FIXME: Input size is multiplied by 2 to make sure it's more than SOLA buffer
+            return torch.zeros(input_size * 2, device=self.device_manager.device, dtype=torch.float32)
+
         received_data: torch.Tensor = self.resampler_in(received_data)
         # 処理は16Kで実施(Pitch, embed, (infer))
         # received_data: AudioInOutFloat = soxr.resample(
@@ -201,9 +213,6 @@ class RVCr2(VoiceChangerModel):
         # )
 
         # received_data = torch.as_tensor(received_data, dtype=torch.float32, device=self.device_manager.device)
-
-        # 16k で入ってくる。
-        input_size = received_data.shape[0]
 
         crossfade_frame = int((crossfade_frame / self.input_sample_rate) * self.sr)
         sola_search_frame = int((sola_search_frame / self.input_sample_rate) * self.sr)
@@ -220,20 +229,6 @@ class RVCr2(VoiceChangerModel):
         audio, pitchf, feature = self.alloc(convert_size, convert_feature_size)
 
         self.audio_buffer = self.write_input(received_data, audio)
-
-        # 出力部分だけ切り出して音量を確認。(TODO:段階的消音にする)
-        cropOffset = -(input_size + crossfade_frame)
-        cropEnd = -crossfade_frame
-        crop = audio[cropOffset:cropEnd]
-        vol_t = torch.sqrt(
-            torch.square(crop).mean()
-        )
-        vol = max(vol_t.item(), 0)
-        self.prevVol = vol
-
-        if vol < self.settings.silentThreshold:
-            # FIXME: Convert size is multiplied by 2 to make sure it's more than SOLA buffer
-            return torch.zeros(convert_size * 2, device=self.device_manager.device, dtype=torch.float32)
 
         repeat = self.settings.rvcQuality
 
@@ -289,7 +284,7 @@ class RVCr2(VoiceChangerModel):
             self.device_manager.setForceTensor(True)
             self.initialize()
             # raise e
-            return torch.zeros(convert_size * 2, device=self.device_manager.device, dtype=torch.float32)
+            return torch.zeros(input_size * 2, device=self.device_manager.device, dtype=torch.float32)
 
         if pitchf is not None:
             self.pitchf_buffer = self.write_input(pitchf, self.pitchf_buffer)
