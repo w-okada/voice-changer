@@ -47,12 +47,13 @@ class MMVC_Namespace(socketio.AsyncNamespace):
             print(data)
             await self.emit("response", [timestamp, 0], to=sid)
         else:
-            unpackedData = np.array(struct.unpack("<%sf" % (len(data) // struct.calcsize("<f")), data), dtype=np.float32, copy=False)
+            # Receive and send int16 instead of float32 to reduce bandwidth requirement over websocket
+            unpackedData = np.array(struct.unpack("<%sh" % (len(data) // struct.calcsize("<h")), data), dtype=np.float32, copy=False) / 32768.0
 
             res = self.voiceChangerManager.changeVoice(unpackedData)
-            audio1 = res[0]
+            audio1 = (res[0] * 32767.5).astype(np.int16)
             perf = res[1] if len(res) == 2 else [0, 0, 0]
-            bin = struct.pack("<%sf" % len(audio1), *audio1)
+            bin = struct.pack("<%sh" % len(audio1), *audio1)
             await self.emit("response", [timestamp, bin, perf], to=sid)
 
     def on_disconnect(self, sid):
