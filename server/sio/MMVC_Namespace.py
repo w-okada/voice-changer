@@ -40,21 +40,13 @@ class MMVC_Namespace(socketio.AsyncNamespace):
 
     async def on_request_message(self, sid, msg):
         self.sid = sid
-        timestamp = int(msg[0])
-        data = msg[1]
-        if isinstance(data, str):
-            print(type(data))
-            print(data)
-            await self.emit("response", [timestamp, 0], to=sid)
-        else:
-            # Receive and send int16 instead of float32 to reduce bandwidth requirement over websocket
-            unpackedData = np.array(struct.unpack("<%sh" % (len(data) // struct.calcsize("<h")), data), dtype=np.float32, copy=False) / 32768.0
+        timestamp, data = msg
+        # Receive and send int16 instead of float32 to reduce bandwidth requirement over websocket
+        input_audio = np.frombuffer(data, dtype=np.int16).astype(np.float32) / 32768
 
-            res = self.voiceChangerManager.changeVoice(unpackedData)
-            audio1 = (res[0] * 32767.5).astype(np.int16)
-            perf = res[1] if len(res) == 2 else [0, 0, 0]
-            bin = struct.pack("<%sh" % len(audio1), *audio1)
-            await self.emit("response", [timestamp, bin, perf], to=sid)
+        out_audio, perf = self.voiceChangerManager.changeVoice(input_audio)
+        out_audio = (out_audio * 32767).astype(np.int16).tobytes()
+        await self.emit("response", [timestamp, out_audio, perf], to=sid)
 
     def on_disconnect(self, sid):
         # print('[{}] disconnect'.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
