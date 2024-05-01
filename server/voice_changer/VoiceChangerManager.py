@@ -343,13 +343,13 @@ class VoiceChangerManager(ServerDeviceCallbacks):
 
     def changeVoice(self, receivedData: AudioInOut):
         if self.settings.passThrough:  # パススルー
-            return receivedData, []
+            return receivedData, [0, 0, 0]
 
         if self.voiceChanger is not None:
             return self.voiceChanger.on_request(receivedData)
         else:
             logger.info("Voice Change is not loaded. Did you load a correct model?")
-            return np.zeros(1, dtype=np.float32), []
+            return np.zeros(1, dtype=np.float32), [0, 0, 0]
 
     def export2onnx(self):
         return self.voiceChanger.export2onnx()
