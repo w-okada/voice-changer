@@ -133,7 +133,8 @@ class VoiceChangerV2(VoiceChangerIF):
             self.voiceChangerModel.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
 
         if key in self.settings.intData:
-            setattr(self.settings, key, int(val))
+            val = int(val)
+            setattr(self.settings, key, val)
             if key == "serverReadChunkSize":
                 self.block_frame = self.settings.serverReadChunkSize * 128
                 self.crossfade_frame = min(self.settings.crossFadeOverlapSize, self.block_frame)
@@ -293,8 +294,8 @@ class VoiceChangerV2(VoiceChangerIF):
                 #     outputData = result
 
                 if self.settings.recordIO == 1:
-                    self.ioRecorder.writeInput(receivedData)
-                    self.ioRecorder.writeOutput(outputData.tobytes())
+                    self.ioRecorder.writeInput((receivedData * 32767).astype(np.int16))
+                    self.ioRecorder.writeOutput((outputData * 32767).astype(np.int16).tobytes())
 
             postprocess_time = t.secs
 
