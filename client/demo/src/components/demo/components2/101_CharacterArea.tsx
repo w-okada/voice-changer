@@ -70,6 +70,9 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
 
     const startControl = useMemo(() => {
         const onStartClicked = async () => {
+            if (serverSetting.serverSetting.modelSlotIndex === -1) {
+                return
+            }
             if (serverSetting.serverSetting.enableServerAudio == 0) {
                 if (!initializedRef.current) {
                     while (true) {

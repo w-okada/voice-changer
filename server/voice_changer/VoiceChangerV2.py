@@ -51,7 +51,7 @@ class VoiceChangerV2Settings:
     crossFadeOffsetRate: float = 0.1
     crossFadeEndRate: float = 0.9
     crossFadeOverlapSize: int = 4096
-    serverReadChunkSize: int = 128
+    serverReadChunkSize: int = 192
     gpu: int = -1
 
     recordIO: int = 0  # 0:off, 1:on
@@ -92,6 +92,7 @@ class VoiceChangerV2(VoiceChangerIF):
         self.sola_buffer: torch.Tensor | None = None
         self.ioRecorder: IORecorder | None = None
 
+        self._generate_strength()
         logger.info(f"VoiceChangerV2 Initialized")
         np.set_printoptions(threshold=10000)
 

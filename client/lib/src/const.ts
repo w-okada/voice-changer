@@ -393,7 +393,7 @@ export const DefaultServerSetting: ServerInfo = {
     serverInputDeviceId: -1,
     serverOutputDeviceId: -1,
     serverMonitorDeviceId: -1,
-    serverReadChunkSize: 256,
+    serverReadChunkSize: 192,
     serverInputAudioGain: 1.0,
     serverOutputAudioGain: 1.0,
     serverMonitorAudioGain: 1.0,

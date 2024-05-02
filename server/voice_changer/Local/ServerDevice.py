@@ -44,7 +44,7 @@ class ServerDeviceSettings:
     serverInputDeviceId: int = -1
     serverOutputDeviceId: int = -1
     serverMonitorDeviceId: int = -1  # -1 でモニター無効
-    serverReadChunkSize: int = 256
+    serverReadChunkSize: int = 192
     serverInputAudioGain: float = 1.0
     serverOutputAudioGain: float = 1.0
     serverMonitorAudioGain: float = 1.0
