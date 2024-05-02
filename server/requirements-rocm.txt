@@ -3,7 +3,8 @@
 # # wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh
 # # bash Anaconda3-2022.10-Linux-x86_64.sh
 
-https://repo.radeon.com/rocm/manylinux/rocm-rel-6.0.2/torch-2.1.2+rocm6.0-cp310-cp310-linux_x86_64.whl
+--extra-index-url https://download.pytorch.org/whl/rocm6.0
+torch
 torchaudio
 faiss-cpu
 
