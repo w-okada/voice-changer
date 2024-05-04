@@ -150,8 +150,6 @@ class Pipeline:
             # embedding
             # with autocast(enabled=self.isHalf):
             feats = self.extractFeatures(feats, embOutputLayer, useFinalProj)
-            # FIXME(chunk crossfade): This somehow helps to fix transitions between chunks
-            feats = torch.cat((feats, feats[:, -1:, :]), 1)
             t.record("extract-feats")
 
             # Index - feature抽出

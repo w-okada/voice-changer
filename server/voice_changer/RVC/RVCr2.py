@@ -152,7 +152,8 @@ class RVCr2(VoiceChangerModel):
         sola_search_frame_16k = int(sola_search_frame_sec * self.sr)
         extra_frame_16k = int(extra_frame_sec * self.sr)
 
-        convert_size_16k = block_frame_16k + sola_buffer_frame_16k + sola_search_frame_16k + extra_frame_16k
+        # FIXME: Not sure if crossfade_frame is required, but it fixes chunk transitions
+        convert_size_16k = block_frame_16k + sola_buffer_frame_16k + sola_search_frame_16k + extra_frame_16k + crossfade_frame_16k
         if (modulo := convert_size_16k % self.window) != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
             convert_size_16k = convert_size_16k + (self.window - modulo)
         convert_feature_size_16k = convert_size_16k // self.window
