@@ -148,12 +148,10 @@ class RVCr2(VoiceChangerModel):
         # Calculate frame sizes for 16000Hz
         block_frame_16k = int(block_frame_sec * self.sr)
         crossfade_frame_16k = int(crossfade_frame_sec * self.sr)
-        sola_buffer_frame_16k = int(sola_buffer_frame_sec * self.sr)
         sola_search_frame_16k = int(sola_search_frame_sec * self.sr)
         extra_frame_16k = int(extra_frame_sec * self.sr)
 
-        # FIXME: Not sure if crossfade_frame is required, but it fixes chunk transitions
-        convert_size_16k = block_frame_16k + sola_buffer_frame_16k + sola_search_frame_16k + extra_frame_16k + crossfade_frame_16k
+        convert_size_16k = block_frame_16k + sola_search_frame_16k + extra_frame_16k + crossfade_frame_16k
         if (modulo := convert_size_16k % self.window) != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
             convert_size_16k = convert_size_16k + (self.window - modulo)
         convert_feature_size_16k = convert_size_16k // self.window
@@ -167,8 +165,7 @@ class RVCr2(VoiceChangerModel):
 
         # Calculate offsets for inferencer
         self.skip_head = extra_frame_model // model_window
-        # FIXME(chunk crossfade): Looks like return length must be rounded up to the next frame
-        # while skip head should not. Not sure why exactly, but seems to work reliably though.
+        # FIXME: Not sure if it's still necessary to round up the return length
         self.return_length = block_frame_model + sola_buffer_frame_model + sola_search_frame_model
         if (modulo := self.return_length % model_window) != 0:
             self.return_length += model_window - modulo
