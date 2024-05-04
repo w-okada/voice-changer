@@ -13,12 +13,6 @@ class DioPitchExtractor(PitchExtractor):
 
     def extract(self, audio, pitchf, f0_up_key, sr, window, silence_front=0):
         audio = audio.detach().cpu().numpy()
-        n_frames = int(len(audio) // window) + 1  # NOQA
-        start_frame = int(silence_front * sr / window)
-        real_silence_front = start_frame * window / sr
-
-        silence_front_offset = max(min(int(np.round(real_silence_front * sr)), len(audio) - 3000), 0)
-        audio = audio[silence_front_offset:]
 
         f0_min = 50
         f0_max = 1100

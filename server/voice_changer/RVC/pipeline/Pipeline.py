@@ -144,7 +144,7 @@ class Pipeline:
 
             # ピッチ検出
             # with autocast(enabled=self.isHalf):
-            pitch, pitchf = self.extractPitch(audio, if_f0, pitchf, f0_up_key, silence_front)
+            pitch, pitchf = self.extractPitch(audio[silence_front:], if_f0, pitchf, f0_up_key, silence_front)
             t.record("extract-pitch")
 
             # embedding

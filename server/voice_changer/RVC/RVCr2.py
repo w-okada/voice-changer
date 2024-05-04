@@ -174,7 +174,7 @@ class RVCr2(VoiceChangerModel):
             self.return_length += model_window - modulo
         self.return_length //= model_window
 
-        self.silence_front = extra_frame_sec if self.settings.silenceFront else 0.0
+        self.silence_front = extra_frame_16k if self.settings.silenceFront else 0
 
         self.crop_start = -(block_frame_16k + crossfade_frame_16k)
         self.crop_end = -crossfade_frame_16k
@@ -221,7 +221,7 @@ class RVCr2(VoiceChangerModel):
                 self.settings.tran,
                 self.settings.indexRatio,
                 self.slotInfo.f0,
-                self.silence_front,  # extaraDataSizeの秒数。入力のサンプリングレートで算出
+                self.silence_front,
                 self.slotInfo.embOutputLayer,
                 self.slotInfo.useFinalProj,
                 self.settings.protect,

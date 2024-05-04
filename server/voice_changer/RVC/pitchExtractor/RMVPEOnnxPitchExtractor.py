@@ -31,11 +31,7 @@ class RMVPEOnnxPitchExtractor(PitchExtractor):
         self.onnx_session = onnxruntime.InferenceSession(self.file, sess_options=so, providers=onnxProviders, provider_options=onnxProviderOptions)
 
     def extract(self, audio: torch.Tensor, pitchf: torch.Tensor, f0_up_key: int, sr: int, window: int, silence_front: int = 0) -> tuple[torch.Tensor, torch.Tensor]:
-        # 処理
-        offset_frame_number = silence_front * sr
-        start_frame = int(offset_frame_number / window)  # frame
-        real_silence_front = start_frame * window / sr  # 秒
-        audio = audio[int(np.round(real_silence_front * sr)):].unsqueeze(0)
+        audio = audio.unsqueeze(0)
 
         if audio.device.type == 'cuda':
             binding = self.onnx_session.io_binding()
