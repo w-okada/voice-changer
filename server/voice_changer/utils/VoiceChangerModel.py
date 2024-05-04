@@ -42,3 +42,6 @@ class VoiceChangerModel(Protocol):
 
     def setSamplingRate(self, inputSampleRate: int, outputSampleRate: int):
         ...
+
+    def realloc(self, block_frame: int, extra_frame: int, crossfade_frame: int, sola_buffer_frame: int, sola_search_frame: int):
+        ...

@@ -2,11 +2,11 @@ import math
 import torch
 from torch import nn
 
-from .rvc_models.infer_pack.models import GeneratorNSF, PosteriorEncoder, ResidualCouplingBlock, Generator
+from .infer_pack_old.models import GeneratorNSF, PosteriorEncoder, ResidualCouplingBlock, Generator
 
 # from infer_pack import commons, attentions
-from .rvc_models.infer_pack.commons import sequence_mask, rand_slice_segments, slice_segments2
-from .rvc_models.infer_pack.attentions import Encoder
+from .infer_pack_old.commons import sequence_mask, rand_slice_segments, slice_segments2
+from .infer_pack_old.attentions import Encoder
 
 
 class TextEncoder(nn.Module):

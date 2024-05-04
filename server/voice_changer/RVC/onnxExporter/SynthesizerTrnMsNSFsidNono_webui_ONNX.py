@@ -1,7 +1,7 @@
 from torch import nn
-from ..inferencer.rvc_models.infer_pack.models import PosteriorEncoder, ResidualCouplingBlock, Generator  # type: ignore
+from ..inferencer.rvc_models.infer_pack_old.models import PosteriorEncoder, ResidualCouplingBlock, Generator  # type: ignore
 import torch
-from ..inferencer.models import TextEncoder  # type: ignore
+from ..inferencer.rvc_models.models import TextEncoder  # type: ignore
 
 
 class SynthesizerTrnMsNSFsidNono_webui_ONNX(nn.Module):
@@ -68,4 +68,3 @@ class SynthesizerTrnMsNSFsidNono_webui_ONNX(nn.Module):
         o = self.dec((z * x_mask)[:, :, :max_len], g=g)
         o = torch.clip(o[0, 0], -1.0, 1.0)
         return o
-    

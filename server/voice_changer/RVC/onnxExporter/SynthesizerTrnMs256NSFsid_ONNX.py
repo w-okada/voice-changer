@@ -1,5 +1,5 @@
 from torch import nn
-from ..inferencer.rvc_models.infer_pack.models import TextEncoder256, PosteriorEncoder, ResidualCouplingBlock, GeneratorNSF  # type: ignore
+from ..inferencer.rvc_models.infer_pack_old.models import TextEncoder256, PosteriorEncoder, ResidualCouplingBlock, GeneratorNSF  # type: ignore
 import torch
 
 
