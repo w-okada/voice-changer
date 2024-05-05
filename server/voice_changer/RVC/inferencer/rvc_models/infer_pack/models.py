@@ -784,17 +784,15 @@ class SynthesizerTrnMs256NSFsid(nn.Module):
         pitch: torch.Tensor,
         nsff0: torch.Tensor,
         sid: torch.Tensor,
-        skip_head: Optional[torch.Tensor] = None,
-        return_length: Optional[torch.Tensor] = None,
+        skip_head: Optional[int] = None,
+        return_length: Optional[int] = None,
     ):
         g = self.emb_g(sid).unsqueeze(-1)
         m_p, logs_p, x_mask = self.enc_p(phone, pitch, phone_lengths)
         z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p) * 0.66666) * x_mask
         if skip_head is not None and return_length is not None:
-            assert isinstance(skip_head, torch.Tensor)
-            assert isinstance(return_length, torch.Tensor)
-            head = int(skip_head.item())
-            length = int(return_length.item())
+            head = skip_head
+            length = return_length
             z_p = z_p[:, :, head: head + length]
             x_mask = x_mask[:, :, head: head + length]
             nsff0 = nsff0[:, head: head + length]
@@ -946,17 +944,15 @@ class SynthesizerTrnMs768NSFsid(nn.Module):
         pitch: torch.Tensor,
         nsff0: torch.Tensor,
         sid: torch.Tensor,
-        skip_head: Optional[torch.Tensor] = None,
-        return_length: Optional[torch.Tensor] = None,
+        skip_head: Optional[int] = None,
+        return_length: Optional[int] = None,
     ):
         g = self.emb_g(sid).unsqueeze(-1)
         m_p, logs_p, x_mask = self.enc_p(phone, pitch, phone_lengths)
         z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p) * 0.66666) * x_mask
         if skip_head is not None and return_length is not None:
-            assert isinstance(skip_head, torch.Tensor)
-            assert isinstance(return_length, torch.Tensor)
-            head = int(skip_head.item())
-            length = int(return_length.item())
+            head = skip_head
+            length = return_length
             z_p = z_p[:, :, head: head + length]
             x_mask = x_mask[:, :, head: head + length]
             nsff0 = nsff0[:, head: head + length]
@@ -1097,17 +1093,15 @@ class SynthesizerTrnMs256NSFsid_nono(nn.Module):
         phone: torch.Tensor,
         phone_lengths: torch.Tensor,
         sid: torch.Tensor,
-        skip_head: Optional[torch.Tensor] = None,
-        return_length: Optional[torch.Tensor] = None,
+        skip_head: Optional[int] = None,
+        return_length: Optional[int] = None,
     ):
         g = self.emb_g(sid).unsqueeze(-1)
         m_p, logs_p, x_mask = self.enc_p(phone, None, phone_lengths)
         z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p) * 0.66666) * x_mask
         if skip_head is not None and return_length is not None:
-            assert isinstance(skip_head, torch.Tensor)
-            assert isinstance(return_length, torch.Tensor)
-            head = int(skip_head.item())
-            length = int(return_length.item())
+            head = skip_head
+            length = return_length
             z_p = z_p[:, :, head: head + length]
             x_mask = x_mask[:, :, head: head + length]
         z = self.flow(z_p, x_mask, g=g, reverse=True)
@@ -1247,17 +1241,15 @@ class SynthesizerTrnMs768NSFsid_nono(nn.Module):
         phone: torch.Tensor,
         phone_lengths: torch.Tensor,
         sid: torch.Tensor,
-        skip_head: Optional[torch.Tensor] = None,
-        return_length: Optional[torch.Tensor] = None,
+        skip_head: Optional[int] = None,
+        return_length: Optional[int] = None,
     ):
         g = self.emb_g(sid).unsqueeze(-1)
         m_p, logs_p, x_mask = self.enc_p(phone, None, phone_lengths)
         z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p) * 0.66666) * x_mask
         if skip_head is not None and return_length is not None:
-            assert isinstance(skip_head, torch.Tensor)
-            assert isinstance(return_length, torch.Tensor)
-            head = int(skip_head.item())
-            length = int(return_length.item())
+            head = skip_head
+            length = return_length
             z_p = z_p[:, :, head: head + length]
             x_mask = x_mask[:, :, head: head + length]
         z = self.flow(z_p, x_mask, g=g, reverse=True)
