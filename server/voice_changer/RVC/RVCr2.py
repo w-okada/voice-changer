@@ -202,7 +202,7 @@ class RVCr2(VoiceChangerModel):
         self.audio_buffer = self.write_input(audio_in_16k, self.audio_buffer)
 
         vol_t = torch.sqrt(
-            torch.square(audio_in_16k).mean()
+            torch.square(self.audio_buffer[self.crop_start:self.crop_end]).mean()
         )
         vol = max(vol_t.item(), 0)
         self.prev_vol = vol
