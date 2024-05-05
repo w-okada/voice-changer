@@ -106,7 +106,7 @@ class Pipeline:
             else:
                 raise e
 
-    def infer(self, feats: torch.Tensor, p_len: torch.Tensor, pitch: torch.Tensor, pitchf: torch.Tensor, sid: torch.Tensor, skip_head: torch.Tensor, return_length: torch.Tensor) -> torch.Tensor:
+    def infer(self, feats: torch.Tensor, p_len: torch.Tensor, pitch: torch.Tensor, pitchf: torch.Tensor, sid: torch.Tensor, skip_head: int | None, return_length: int | None) -> torch.Tensor:
         try:
             return self.inferencer.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length)
         except RuntimeError as e:
@@ -193,10 +193,6 @@ class Pipeline:
             p_len = torch.as_tensor([feats_len], device=self.device, dtype=torch.int64)
 
             sid = torch.as_tensor(sid, device=self.device, dtype=torch.int64).unsqueeze(0)
-            if return_length is not None:
-                return_length = torch.as_tensor([return_length], device=self.device, dtype=torch.int64)
-            if skip_head is not None:
-                skip_head = torch.as_tensor([skip_head], device=self.device, dtype=torch.int64)
             t.record("mid-precess")
             # 推論実行
             out_audio = self.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length)
