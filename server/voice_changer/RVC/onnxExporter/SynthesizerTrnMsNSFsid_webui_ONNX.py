@@ -1,7 +1,7 @@
 from torch import nn
-from ..inferencer.rvc_models.infer_pack.models import PosteriorEncoder, ResidualCouplingBlock, GeneratorNSF  # type: ignore
+from ..inferencer.rvc_models.infer_pack_old.models import PosteriorEncoder, ResidualCouplingBlock, GeneratorNSF  # type: ignore
 import torch
-from ..inferencer.models import TextEncoder  # type: ignore
+from ..inferencer.rvc_models.models import TextEncoder  # type: ignore
 
 
 class SynthesizerTrnMsNSFsid_webui_ONNX(nn.Module):

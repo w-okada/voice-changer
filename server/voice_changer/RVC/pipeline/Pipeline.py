@@ -73,7 +73,7 @@ class Pipeline:
     def setPitchExtractor(self, pitchExtractor: PitchExtractor):
         self.pitchExtractor = pitchExtractor
 
-    def extractPitch(self, audio: torch.Tensor, if_f0: bool, pitchf: torch.Tensor, f0_up_key: int, silence_front: int) -> tuple[torch.Tensor | None, torch.Tensor | None]:
+    def extractPitch(self, audio: torch.Tensor, if_f0: bool, pitchf: torch.Tensor, f0_up_key: int) -> tuple[torch.Tensor | None, torch.Tensor | None]:
         if not if_f0:
             return None, None
 
@@ -84,7 +84,6 @@ class Pipeline:
                 f0_up_key,
                 self.sr,
                 self.window,
-                silence_front,
             )
         except IndexError as e:  # NOQA
             print(e)
@@ -107,9 +106,9 @@ class Pipeline:
             else:
                 raise e
 
-    def infer(self, feats: torch.Tensor, p_len: torch.Tensor, pitch: torch.Tensor, pitchf: torch.Tensor, sid: torch.Tensor, out_size: int) -> torch.Tensor:
+    def infer(self, feats: torch.Tensor, p_len: torch.Tensor, pitch: torch.Tensor, pitchf: torch.Tensor, sid: torch.Tensor, skip_head: torch.Tensor, return_length: torch.Tensor) -> torch.Tensor:
         try:
-            return self.inferencer.infer(feats, p_len, pitch, pitchf, sid, out_size)
+            return self.inferencer.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length)
         except RuntimeError as e:
             print("Failed to infer:", e)
             if "HALF" in e.__str__().upper():
@@ -128,13 +127,10 @@ class Pipeline:
         silence_front: int,
         embOutputLayer: int,
         useFinalProj: bool,
-        repeat: int,
         protect: float = 0.5,
-        out_size: int | None = None,
+        skip_head: int | None = None,
+        return_length: int | None = None,
     ) -> tuple[torch.Tensor, torch.Tensor | None, torch.Tensor]:
-        # print(f"pipeline exec input, audio:{audio.shape}, pitchf:{pitchf.shape}, feature:{feature.shape}")
-        # print(f"pipeline exec input, silence_front:{silence_front}, out_size:{out_size}")
-
         with Timer2("Pipeline-Exec", False) as t:  # NOQA
             # 16000のサンプリングレートで入ってきている。以降この世界は16000で処理。
 
@@ -147,7 +143,7 @@ class Pipeline:
 
             # ピッチ検出
             # with autocast(enabled=self.isHalf):
-            pitch, pitchf = self.extractPitch(audio, if_f0, pitchf, f0_up_key, silence_front)
+            pitch, pitchf = self.extractPitch(audio[silence_front:], if_f0, pitchf, f0_up_key)
             t.record("extract-pitch")
 
             # embedding
@@ -190,10 +186,6 @@ class Pipeline:
 
             feats: torch.Tensor = F.interpolate(feats.permute(0, 2, 1), scale_factor=2).permute(0, 2, 1).contiguous()
 
-            # apply silent front for inference
-            if type(self.inferencer) in [OnnxRVCInferencer, OnnxRVCInferencerNono]:
-                feats = feats[:, math.floor(silence_front * self.sr) // 360 * 2 :, :]  # NOQA
-
             feats_len = feats.shape[1]
             if pitch is not None and pitchf is not None:
                 pitch = pitch[:, -feats_len:]
@@ -201,9 +193,13 @@ class Pipeline:
             p_len = torch.as_tensor([feats_len], device=self.device, dtype=torch.int64)
 
             sid = torch.as_tensor(sid, device=self.device, dtype=torch.int64).unsqueeze(0)
+            if return_length is not None:
+                return_length = torch.as_tensor([return_length], device=self.device, dtype=torch.int64)
+            if skip_head is not None:
+                skip_head = torch.as_tensor([skip_head], device=self.device, dtype=torch.int64)
             t.record("mid-precess")
             # 推論実行
-            out_audio = self.infer(feats, p_len, pitch, pitchf, sid, out_size)
+            out_audio = self.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length)
             t.record("infer")
 
             pitchf_buffer = pitchf.squeeze(0) if pitchf is not None else None

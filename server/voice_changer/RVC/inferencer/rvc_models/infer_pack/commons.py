@@ -1,5 +1,9 @@
+from typing import List, Optional
 import math
+
+import numpy as np
 import torch
+from torch import nn
 from torch.nn import functional as F
 
 
@@ -13,16 +17,18 @@ def get_padding(kernel_size, dilation=1):
     return int((kernel_size * dilation - dilation) / 2)
 
 
-def convert_pad_shape(pad_shape):
-    l = pad_shape[::-1]
-    pad_shape = [item for sublist in l for item in sublist]
-    return pad_shape
+# def convert_pad_shape(pad_shape):
+#     l = pad_shape[::-1]
+#     pad_shape = [item for sublist in l for item in sublist]
+#     return pad_shape
 
 
 def kl_divergence(m_p, logs_p, m_q, logs_q):
     """KL(P||Q)"""
     kl = (logs_q - logs_p) - 0.5
-    kl += 0.5 * (torch.exp(2.0 * logs_p) + ((m_p - m_q) ** 2)) * torch.exp(-2.0 * logs_q)
+    kl += (
+        0.5 * (torch.exp(2.0 * logs_p) + ((m_p - m_q) ** 2)) * torch.exp(-2.0 * logs_q)
+    )
     return kl
 
 
@@ -68,8 +74,12 @@ def rand_slice_segments(x, x_lengths=None, segment_size=4):
 def get_timing_signal_1d(length, channels, min_timescale=1.0, max_timescale=1.0e4):
     position = torch.arange(length, dtype=torch.float)
     num_timescales = channels // 2
-    log_timescale_increment = math.log(float(max_timescale) / float(min_timescale)) / (num_timescales - 1)
-    inv_timescales = min_timescale * torch.exp(torch.arange(num_timescales, dtype=torch.float) * -log_timescale_increment)
+    log_timescale_increment = math.log(float(max_timescale) / float(min_timescale)) / (
+        num_timescales - 1
+    )
+    inv_timescales = min_timescale * torch.exp(
+        torch.arange(num_timescales, dtype=torch.float) * -log_timescale_increment
+    )
     scaled_time = position.unsqueeze(0) * inv_timescales.unsqueeze(1)
     signal = torch.cat([torch.sin(scaled_time), torch.cos(scaled_time)], 0)
     signal = F.pad(signal, [0, 0, 0, channels % 2])
@@ -94,8 +104,7 @@ def subsequent_mask(length):
     return mask
 
 
-# @torch.jit.script
-# @torch.jit._script_if_tracing
+@torch.jit.script
 def fused_add_tanh_sigmoid_multiply(input_a, input_b, n_channels):
     n_channels_int = n_channels[0]
     in_act = input_a + input_b
@@ -105,12 +114,22 @@ def fused_add_tanh_sigmoid_multiply(input_a, input_b, n_channels):
     return acts
 
 
+# def convert_pad_shape(pad_shape):
+#     l = pad_shape[::-1]
+#     pad_shape = [item for sublist in l for item in sublist]
+#     return pad_shape
+
+
+def convert_pad_shape(pad_shape: List[List[int]]) -> List[int]:
+    return torch.tensor(pad_shape).flip(0).reshape(-1).int().tolist()
+
+
 def shift_1d(x):
     x = F.pad(x, convert_pad_shape([[0, 0], [0, 0], [1, 0]]))[:, :, :-1]
     return x
 
 
-def sequence_mask(length, max_length=None):
+def sequence_mask(length: torch.Tensor, max_length: Optional[int] = None):
     if max_length is None:
         max_length = length.max()
     x = torch.arange(max_length, dtype=length.dtype, device=length.device)
@@ -122,6 +141,7 @@ def generate_path(duration, mask):
     duration: [b, 1, t_x]
     mask: [b, 1, t_y, t_x]
     """
+    device = duration.device
 
     b, _, t_y, t_x = mask.shape
     cum_duration = torch.cumsum(duration, -1)

@@ -38,14 +38,12 @@ class OnnxRVCInferencer(Inferencer):
         pitch: torch.Tensor,
         pitchf: torch.Tensor,
         sid: torch.Tensor,
-        convert_length: int | None,
+        skip_head: torch.Tensor | None,
+        return_length: torch.Tensor | None,
     ) -> torch.Tensor:
         if pitch is None or pitchf is None:
             raise RuntimeError("[Voice Changer] Pitch or Pitchf is not found.")
 
-        # print("INFER1", self.model.get_providers())
-        # print("INFER2", self.model.get_provider_options())
-        # print("INFER3", self.model.get_session_options())
         if feats.device.type == 'cuda':
             binding = self.model.io_binding()
 

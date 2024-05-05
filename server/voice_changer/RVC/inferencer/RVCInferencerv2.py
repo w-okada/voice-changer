@@ -17,20 +17,16 @@ class RVCInferencerv2(Inferencer):
 
         # Keep torch.load for backward compatibility, but discourage the use of this loading method
         if '.safetensors' in file:
-            with safe_open(file, 'pt', device=str(dev)) as cpt:
+            with safe_open(file, 'pt', device=str(dev) if dev.type == 'cuda' else 'cpu') as cpt:
                 config = json.loads(cpt.metadata()['config'])
                 model = SynthesizerTrnMs768NSFsid(*config, is_half=False).to(dev)
                 load_model(model, cpt, strict=False)
         else:
-            cpt = torch.load(file, map_location=dev)
+            cpt = torch.load(file, map_location=dev if dev.type == 'cuda' else 'cpu')
             model = SynthesizerTrnMs768NSFsid(*cpt["config"], is_half=False).to(dev)
             model.load_state_dict(cpt["weight"], strict=False)
 
-        model.eval()
-
-        model = model.to(dev)
-        if isHalf:
-            model = model.half()
+        model.eval().remove_weight_norm()
 
         self.model = model
         return self
@@ -42,11 +38,12 @@ class RVCInferencerv2(Inferencer):
         pitch: torch.Tensor,
         pitchf: torch.Tensor,
         sid: torch.Tensor,
-        convert_length: int | None,
+        skip_head: torch.Tensor | None,
+        return_length: torch.Tensor | None,
     ) -> torch.Tensor:
         if pitch is None or pitchf is None:
             raise RuntimeError("[Voice Changer] Pitch or Pitchf is not found.")
 
-        res = self.model.infer(feats, pitch_length, pitch, pitchf, sid, convert_length=convert_length)
+        res = self.model.infer(feats, pitch_length, pitch, pitchf, sid, skip_head=skip_head, return_length=return_length)
         res = res[0][0, 0].to(dtype=torch.float32)
         return torch.clip(res, -1.0, 1.0, out=res)

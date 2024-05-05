@@ -21,13 +21,7 @@ class CrepePitchExtractor(PitchExtractor):
         self.f0_mel_max = 1127 * np.log(1 + self.f0_max / 700)
 
 
-    def extract(self, audio: torch.Tensor | np.ndarray[Any, np.float32], pitchf: torch.Tensor | np.ndarray[Any, np.float32], f0_up_key: int, sr: int, window: int, silence_front: int = 0):
-        start_frame = int(silence_front * sr / window)
-        real_silence_front = start_frame * window / sr
-
-        silence_front_offset = int(np.round(real_silence_front * sr))
-        audio = audio[silence_front_offset:]
-
+    def extract(self, audio: torch.Tensor | np.ndarray[Any, np.float32], pitchf: torch.Tensor | np.ndarray[Any, np.float32], f0_up_key: int, sr: int, window: int):
         f0, pd = torchcrepe.predict(
             audio.unsqueeze(0),
             sr,

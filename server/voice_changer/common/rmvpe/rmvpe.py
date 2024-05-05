@@ -337,10 +337,10 @@ class RMVPE:
 
         model = E2E(4, 1, (2, 2))
         if '.safetensors' in model_path:
-            with safe_open(model_path, 'pt') as cpt:
+            with safe_open(model_path, 'pt', device=str(device) if device.type == 'cuda' else 'cpu') as cpt:
                 load_model(model, cpt, strict=False)
         else:
-            cpt = torch.load(model_path, map_location=device)
+            cpt = torch.load(model_path, map_location=device if device.type == 'cuda' else 'cpu')
             model.load_state_dict(cpt, strict=False)
         model.eval().to(device)
 
