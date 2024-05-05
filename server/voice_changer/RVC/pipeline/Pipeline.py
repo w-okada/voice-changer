@@ -73,7 +73,7 @@ class Pipeline:
     def setPitchExtractor(self, pitchExtractor: PitchExtractor):
         self.pitchExtractor = pitchExtractor
 
-    def extractPitch(self, audio: torch.Tensor, if_f0: bool, pitchf: torch.Tensor, f0_up_key: int, silence_front: int) -> tuple[torch.Tensor | None, torch.Tensor | None]:
+    def extractPitch(self, audio: torch.Tensor, if_f0: bool, pitchf: torch.Tensor, f0_up_key: int) -> tuple[torch.Tensor | None, torch.Tensor | None]:
         if not if_f0:
             return None, None
 
@@ -84,7 +84,6 @@ class Pipeline:
                 f0_up_key,
                 self.sr,
                 self.window,
-                silence_front,
             )
         except IndexError as e:  # NOQA
             print(e)
@@ -144,7 +143,7 @@ class Pipeline:
 
             # ピッチ検出
             # with autocast(enabled=self.isHalf):
-            pitch, pitchf = self.extractPitch(audio[silence_front:], if_f0, pitchf, f0_up_key, silence_front)
+            pitch, pitchf = self.extractPitch(audio[silence_front:], if_f0, pitchf, f0_up_key)
             t.record("extract-pitch")
 
             # embedding

@@ -12,7 +12,7 @@ class HarvestPitchExtractor(PitchExtractor):
         super().__init__()
         self.pitchExtractorType: PitchExtractorType = "harvest"
 
-    def extract(self, audio, pitchf, f0_up_key, sr, window, silence_front=0):
+    def extract(self, audio, pitchf, f0_up_key, sr, window):
         audio = audio.detach().cpu().numpy()
 
         f0_min = 50

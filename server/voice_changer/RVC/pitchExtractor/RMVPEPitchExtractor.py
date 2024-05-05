@@ -23,7 +23,7 @@ class RMVPEPitchExtractor(PitchExtractor):
         isHalf = False
         self.rmvpe = RMVPE(model_path=file, is_half=isHalf, device=self.device)
 
-    def extract(self, audio: torch.Tensor, pitchf: torch.Tensor, f0_up_key: int, sr: int, window: int, silence_front: int = 0) -> tuple[torch.Tensor, torch.Tensor]:
+    def extract(self, audio: torch.Tensor, pitchf: torch.Tensor, f0_up_key: int, sr: int, window: int) -> tuple[torch.Tensor, torch.Tensor]:
         f0: torch.Tensor = self.rmvpe.infer_from_audio_t(audio, threshold=0.03)
 
         f0 *= 2 ** (f0_up_key / 12)
