@@ -51,6 +51,7 @@ class RVCr2(VoiceChangerModel):
         self.silence_front = 0.0
         self.slotInfo = slotInfo
 
+        # 処理は16Kで実施(Pitch, embed, (infer))
         self.sr = 16000
         self.window = 160
 
@@ -97,9 +98,20 @@ class RVCr2(VoiceChangerModel):
         logger.info(f"[Voice Changer] [RVCr2] Initializing on {self.device_manager.device}... done")
 
     def setSamplingRate(self, input_sample_rate, outputSampleRate):
-        self.input_sample_rate = input_sample_rate
-        self.outputSampleRate = outputSampleRate
-        # self.initialize()
+        if self.input_sample_rate != input_sample_rate:
+            self.input_sample_rate = input_sample_rate
+            self.resampler_in = tat.Resample(
+                orig_freq=self.input_sample_rate,
+                new_freq=self.sr,
+                dtype=torch.float32
+            ).to(self.device_manager.device)
+        if self.outputSampleRate != outputSampleRate:
+            self.outputSampleRate = outputSampleRate
+            self.resampler_out = tat.Resample(
+                orig_freq=self.slotInfo.samplingRate,
+                new_freq=self.outputSampleRate,
+                dtype=torch.float32
+            ).to(self.device_manager.device)
 
     def update_settings(self, key: str, val: int | float | str):
         logger.info(f"[Voice Changer] [RVCr2]: update_settings {key}:{val}")
