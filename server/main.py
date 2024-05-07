@@ -13,12 +13,13 @@ from downloader.WeightDownloader import downloadWeight
 from downloader.SampleDownloader import downloadInitialSamples
 from mods.ssl import create_self_signed_cert
 from const import SSL_KEY_DIR
-
+from webbrowser import open_new_tab
 from settings import ServerSettings
 from mods.log_control import VoiceChangaerLogger
 
 VoiceChangaerLogger.get_instance().initialize(initialize=True)
 logger = VoiceChangaerLogger.get_instance().getLogger()
+settings = ServerSettings()
 
 def setupArgParser():
     parser = argparse.ArgumentParser()
@@ -53,9 +54,9 @@ def printMessage(message, level=0):
     logger.info(message)
 
 
-async def runServer(host: str, port: int, logLevel: str = 'critical', key_path: str | None = None, cert_path: str | None = None):
+async def runServer(host: str, port: int, launch_browser: bool = False, logLevel: str = 'critical', key_path: str | None = None, cert_path: str | None = None):
     config = uvicorn.Config(
-        "server:app_socketio",
+        "app:socketio",
         host=host,
         port=port,
         reload=False,
@@ -64,13 +65,22 @@ async def runServer(host: str, port: int, logLevel: str = 'critical', key_path: 
         log_level=logLevel
     )
     server = uvicorn.Server(config)
-    await server.serve()
 
+    asyncio.create_task(server.serve())
+
+    while not server.started:
+        await asyncio.sleep(1)
+
+    if launch_browser:
+        proto = 'https' if key_path and cert_path else 'http'
+        open_new_tab(f'{proto}://127.0.0.1:{settings.port}')
+
+    while True:
+        await asyncio.sleep(1)
 
 async def main(args):
     logger.debug(args)
 
-    settings = ServerSettings()
     if not os.path.exists('.env'):
         for key, value in settings.model_dump().items():
             set_key('.env', key.upper(), str(value))
@@ -134,14 +144,15 @@ async def main(args):
     # サーバ起動
     if args.https:
         # HTTPS サーバ起動
-        await runServer(settings.host, settings.port, args.logLevel, key_path, cert_path)
+        await runServer(settings.host, settings.port, args.launch_browser, args.logLevel, key_path, cert_path)
     else:
-        await runServer(settings.host, settings.port, args.logLevel)
+        await runServer(settings.host, settings.port, args.launch_browser, args.logLevel)
 
 
 if __name__ == "__main__":
     parser = setupArgParser()
     args, _ = parser.parse_known_args()
+    args.launch_browser = False
 
     printMessage(f"Booting PHASE :{__name__}", level=2)
 
