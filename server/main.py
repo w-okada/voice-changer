@@ -3,6 +3,9 @@ import uvicorn
 import asyncio
 import traceback
 
+import threading
+import socket
+import time
 from dotenv import set_key
 from distutils.util import strtobool
 from datetime import datetime
@@ -53,6 +56,19 @@ def printMessage(message, level=0):
             message = f"\033[47m    {message}\033[0m"
     logger.info(message)
 
+def wait_for_server(proto: str, launch_browser: bool):
+    while True:
+        time.sleep(1)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        result = sock.connect_ex(('127.0.0.1', settings.port))
+        if result == 0:
+            break
+        sock.close()
+    print('-' * 8)
+    print(f"The server is listening on {proto}://{settings.host}:{settings.port}/")
+    print('-' * 8)
+    if launch_browser:
+        open_new_tab(f'{proto}://127.0.0.1:{settings.port}')
 
 async def runServer(host: str, port: int, launch_browser: bool = False, logLevel: str = 'critical', key_path: str | None = None, cert_path: str | None = None):
     config = uvicorn.Config(
@@ -66,17 +82,10 @@ async def runServer(host: str, port: int, launch_browser: bool = False, logLevel
     )
     server = uvicorn.Server(config)
 
-    asyncio.create_task(server.serve())
+    proto = 'https' if key_path and cert_path else 'http'
+    threading.Thread(target=wait_for_server, daemon=True, args=(proto, launch_browser)).start()
 
-    while not server.started:
-        await asyncio.sleep(1)
-
-    if launch_browser:
-        proto = 'https' if key_path and cert_path else 'http'
-        open_new_tab(f'{proto}://127.0.0.1:{settings.port}')
-
-    while True:
-        await asyncio.sleep(1)
+    await server.serve()
 
 async def main(args):
     logger.debug(args)
@@ -133,13 +142,6 @@ async def main(args):
         # HTTP
         printMessage("protocol: HTTP", level=1)
     printMessage("-- ---- -- ", level=1)
-
-    # アドレス表示
-    # printMessage("ブラウザで次のURLを開いてください.", level=2)
-    if args.https == 1:
-        printMessage(f"The server is listening on https://{settings.host}:{settings.port}/", level=1)
-    else:
-        printMessage(f"The server is listening on http://{settings.host}:{settings.port}/", level=1)
 
     # サーバ起動
     if args.https:
