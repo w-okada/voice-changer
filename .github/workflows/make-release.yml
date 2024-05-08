@@ -115,13 +115,17 @@ jobs:
           const path = require('path');
           const fs = require('fs');
           const release_id = '${{ needs.create-tag.outputs.release_id }}';
-          for (const file of fs.readdirSync('./server')) {
-            console.log('uploadReleaseAsset', file);
-            await github.repos.uploadReleaseAsset({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              release_id: release_id,
-              name: file,
-              data: await fs.readFileSync(`./server/${file}`)
-            });
+          const files = fs.readdirSync('./server');
+          console.log('Target directory files', files);
+          for (const file of files) {
+            if (file.match(/[.](?:z\d+)|(?:zip(?:[.]\d+)?)$/)) {
+              console.log('uploadReleaseAsset', file);
+              await github.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: release_id,
+                name: file,
+                data: await fs.readFileSync(`./server/${file}`)
+              });
+            }
           }
