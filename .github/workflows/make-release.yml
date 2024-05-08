@@ -48,6 +48,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
+        draft: true
         tag_name: ${{ steps.tag.outputs.name }}
 
   build-all:
@@ -111,11 +112,12 @@ jobs:
           const path = require('path');
           const fs = require('fs');
           const release_id = '${{ needs.create-tag.outputs.release_id }}';
-          const artifact_name = './server/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip'
+          const artifact_name = 'voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip';
+          const artifact_path = `./server/${artifact_name}`;
           await github.repos.uploadReleaseAsset({
             owner: context.repo.owner,
             repo: context.repo.repo,
             release_id: release_id,
-            name: file,
-            data: await fs.readFileSync(artifact_name)
+            name: artifact_name,
+            data: await fs.readFileSync(artifact_path)
           });
