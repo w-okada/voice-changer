@@ -15,7 +15,7 @@ env:
 
 jobs:
   create-tag:
-    if: ${{ github.event.inputs.create_release == 'true' }}
+    # if: ${{ github.event.inputs.create_release == 'true' }}
 
     runs-on: ubuntu-latest
 
