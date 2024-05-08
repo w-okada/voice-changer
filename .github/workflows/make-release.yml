@@ -111,10 +111,11 @@ jobs:
           const path = require('path');
           const fs = require('fs');
           const release_id = '${{ needs.create-tag.outputs.release_id }}';
+          const artifact_name = './server/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip'
           await github.repos.uploadReleaseAsset({
             owner: context.repo.owner,
             repo: context.repo.repo,
             release_id: release_id,
             name: file,
-            data: await fs.readFileSync('${{ ./server/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip }}')
+            data: await fs.readFileSync(artifact_name)
           });
