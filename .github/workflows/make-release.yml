@@ -102,9 +102,9 @@ jobs:
       shell: bash
       run: |
         if [ "$RUNNER_OS" = "Windows" ]; then
-          7z a -v2g -tzip ./server/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip ./server/dist > /dev/null 2>&1
+          7z a -v2000m -tzip ./server/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip ./server/dist > /dev/null 2>&1
         else
-          zip -r -s 2g ./server/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip ./server/dist > /dev/null 2>&1
+          zip -r -s 2000m ./server/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip ./server/dist > /dev/null 2>&1
         fi
     - name: Upload release
       id: upload_release
@@ -116,7 +116,6 @@ jobs:
           const fs = require('fs');
           const release_id = '${{ needs.create-tag.outputs.release_id }}';
           const files = fs.readdirSync('./server');
-          console.log('Target directory files', files);
           for (const file of files) {
             if (file.match(/[.](?:z\d+)|(?:zip(?:[.]\d+)?)$/)) {
               console.log('uploadReleaseAsset', file);
