@@ -257,7 +257,6 @@ export class ServerRestClient {
             timestamp,
             buffer: Buffer.from(buffer).toString("base64"),
         };
-        const body = JSON.stringify(obj);
 
         const res = await fetch(`${url}`, {
             method: "POST",
@@ -265,22 +264,10 @@ export class ServerRestClient {
                 Accept: "application/json",
                 "Content-Type": "application/json",
             },
-            body: body,
+            body: JSON.stringify(obj),
         });
 
-        try {
-            const receivedJson = await res.json();
-            const changedVoiceBase64 = receivedJson["changedVoiceBase64"];
-            const buf = Buffer.from(changedVoiceBase64, "base64");
-            const ab = new ArrayBuffer(buf.length);
-            const view = new Uint8Array(ab);
-            for (let i = 0; i < buf.length; ++i) {
-                view[i] = buf[i];
-            }
-            return ab;
-        } catch (e) {
-            console.log("Exception:", e);
-            return new ArrayBuffer(10);
-        }
+        const { changedVoiceBase64, perf } = await res.json();
+        return { changedVoiceBuffer: Buffer.from(changedVoiceBase64, "base64").buffer, perf };
     };
 }
