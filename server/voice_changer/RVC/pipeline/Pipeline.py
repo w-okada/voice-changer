@@ -153,7 +153,7 @@ class Pipeline:
 
             # Index - feature抽出
             if self.index is not None and self.index_reconstruct is not None and index_rate != 0:
-                silence_offset = math.floor(silence_front * self.sr) // 360
+                silence_offset = silence_front // 360
                 audio_full = feats[0]
                 audio_front = audio_full[silence_offset:]
 
