@@ -12,6 +12,7 @@
 from typing import Any, Union
 
 from const import TMP_DIR
+from torch.functional import F
 import torch
 import os
 import numpy as np
@@ -48,9 +49,7 @@ class VoiceChangerV2Settings:
     inputSampleRate: int = 48000  # 48000 or 24000
     outputSampleRate: int = 48000  # 48000 or 24000
 
-    crossFadeOffsetRate: float = 0.1
-    crossFadeEndRate: float = 0.9
-    crossFadeOverlapSize: int = 4096
+    crossFadeOverlapSize: int = 8192
     serverReadChunkSize: int = 192
     extraConvertSize: int = 1024 * 4
     gpu: int = -1
@@ -71,12 +70,6 @@ class VoiceChangerV2Settings:
             "gpu"
         ]
     )
-    floatData: list[str] = field(
-        default_factory=lambda: [
-            "crossFadeOffsetRate",
-            "crossFadeEndRate",
-        ]
-    )
     strData: list[str] = field(default_factory=lambda: [])
 
 
@@ -89,7 +82,7 @@ class VoiceChangerV2(VoiceChangerIF):
         self.crossfade_frame = self.settings.crossFadeOverlapSize
         self.input_sample_sec = self.settings.inputSampleRate // 100
         self.sola_search_frame = self.input_sample_sec
-        self.sola_buffer_frame = min(self.crossfade_frame, self.input_sample_sec * 4)
+        self.sola_buffer_frame = int(self.crossfade_frame * 0.75) # 2/3 of crossfade frame size. Seems to work better?
         self.extra_frame = self.settings.extraConvertSize
 
         self.processing_sampling_rate = 0
@@ -108,7 +101,7 @@ class VoiceChangerV2(VoiceChangerIF):
     def setModel(self, model: VoiceChangerModel):
         self.voiceChangerModel = model
         self.processing_sampling_rate = self.voiceChangerModel.get_processing_sampling_rate()
-        self.sola_buffer_frame = min(self.crossfade_frame, self.input_sample_sec * 4)
+        self.sola_buffer_frame = int(self.crossfade_frame * 0.75)
         self.voiceChangerModel.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
         self.voiceChangerModel.realloc(self.block_frame, self.extra_frame, self.crossfade_frame, self.sola_buffer_frame, self.sola_search_frame)
         self._generate_strength()
@@ -123,7 +116,7 @@ class VoiceChangerV2(VoiceChangerIF):
 
         self.input_sample_sec = self.settings.inputSampleRate // 100
         self.sola_search_frame = self.input_sample_sec
-        self.sola_buffer_frame = min(self.crossfade_frame, self.input_sample_sec * 4)
+        self.sola_buffer_frame = int(self.crossfade_frame * 0.75)
 
         self.voiceChangerModel.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
         self.voiceChangerModel.realloc(self.block_frame, self.extra_frame, self.crossfade_frame, self.sola_buffer_frame, self.sola_search_frame)
@@ -164,7 +157,7 @@ class VoiceChangerV2(VoiceChangerIF):
                 self._generate_strength()
             elif key == 'crossFadeOverlapSize':
                 self.crossfade_frame = self.settings.crossFadeOverlapSize
-                self.sola_buffer_frame = min(self.crossfade_frame, self.input_sample_sec * 4)
+                self.sola_buffer_frame = int(self.crossfade_frame * 0.75)
                 self._generate_strength()
             elif key == "recordIO" and val == 1:
                 if self.ioRecorder is not None:
@@ -186,14 +179,10 @@ class VoiceChangerV2(VoiceChangerIF):
                     self.ioRecorder.close()
             elif key in {"inputSampleRate", "outputSampleRate"}:
                 self.voiceChangerModel.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
-        elif key in self.settings.floatData:
-            setattr(self.settings, key, float(val))
-            if key in {"crossFadeOffsetRate", "crossFadeEndRate"}:
-                self._generate_strength()
         elif key in self.settings.strData:
             setattr(self.settings, key, str(val))
 
-        if key in {'gpu', 'serverReadChunkSize', 'extraConvertSize', 'crossFadeOffsetRate', 'crossFadeEndRate', 'crossFadeOverlapSize'}:
+        if key in {'gpu', 'serverReadChunkSize', 'extraConvertSize', 'crossFadeOverlapSize', 'rvcQuality', 'silenceFront'}:
             if self.voiceChangerModel is not None:
                 self.voiceChangerModel.realloc(self.block_frame, self.extra_frame, self.crossfade_frame, self.sola_buffer_frame, self.sola_search_frame)
 
@@ -202,33 +191,25 @@ class VoiceChangerV2(VoiceChangerIF):
         return self.get_info()
 
     def _generate_strength(self):
-        cf_offset = int(self.sola_buffer_frame * self.settings.crossFadeOffsetRate)
-        cf_end = int(self.sola_buffer_frame * self.settings.crossFadeEndRate)
-        cf_range = cf_end - cf_offset
-        percent = np.arange(cf_range, dtype=np.float32) / cf_range
-
-        np_prev_strength = np.cos(percent * 0.5 * np.pi) ** 2
-        np_cur_strength = np.cos((1 - percent) * 0.5 * np.pi) ** 2
-
-        self.np_prev_strength = np.concatenate(
-            [
-                np.ones(cf_offset, dtype=np.float32),
-                np_prev_strength,
-                np.zeros(self.sola_buffer_frame - cf_offset - len(np_prev_strength), dtype=np.float32),
-            ]
+        self.fade_in_window: torch.Tensor = (
+            torch.sin(
+                0.5
+                * np.pi
+                * torch.linspace(
+                    0.0,
+                    1.0,
+                    steps=self.sola_buffer_frame,
+                    device=self.device_manager.device,
+                    dtype=torch.float32,
+                )
+            )
+            ** 2
         )
-        self.np_cur_strength = np.concatenate(
-            [
-                np.zeros(cf_offset, dtype=np.float32),
-                np_cur_strength,
-                np.ones(self.sola_buffer_frame - cf_offset - len(np_cur_strength), dtype=np.float32),
-            ]
-        )
-
-        logger.info(f"Generated Strengths: for prev:{self.np_prev_strength.shape}, for cur:{self.np_cur_strength.shape}")
+        self.fade_out_window: torch.Tensor = 1 - self.fade_in_window
 
         # ひとつ前の結果とサイズが変わるため、記録は消去する。
-        self.sola_buffer = np.zeros(self.sola_buffer_frame, dtype=np.float32)
+        self.sola_buffer = torch.zeros(self.sola_buffer_frame, device=self.device_manager.device, dtype=torch.float32)
+        logger.info(f'Allocated sola buffer size: {self.sola_buffer.shape}')
 
     def get_processing_sampling_rate(self):
         if self.voiceChangerModel is None:
@@ -250,55 +231,38 @@ class VoiceChangerV2(VoiceChangerIF):
                 # Copy into fixed-size buffer
                 audio_in_fixed[:audio_in.shape[0]] = audio_in
 
-                if self.noCrossFade:  # Beatrice, LLVC
-                    with torch.no_grad():
-                        audio = self.voiceChangerModel.inference(
-                            audio_in_fixed,
-                            crossfade_frame=0,
-                            sola_search_frame=0,
-                        )
-                    # block_frame = audio_in_fixed.shape[0]
-                    # result = audio[:block_frame]
-                    if audio is None:
-                        return np.zeros(self.block_frame, dtype=np.float32), [0, 0, 0]
-                    result = audio.detach().cpu().numpy()
-                else:
-                    with torch.no_grad():
-                        # TODO: Maybe audio and sola buffer should be tensors here.
-                        audio = self.voiceChangerModel.inference(audio_in_fixed)
-                    if audio is None:
-                        return np.zeros(self.block_frame, dtype=np.float32), [0, 0, 0]
+                with torch.no_grad():
+                    audio = self.voiceChangerModel.inference(audio_in_fixed)
 
-                    audio = audio.detach().cpu().numpy()
+                if audio is None:
+                    return np.zeros(self.block_frame, dtype=np.float32), [0, 0, 0]
 
-                    sola_buffer_frame = self.sola_search_frame + self.sola_buffer_frame
-                    audio_offset = -(sola_buffer_frame + self.block_frame)
-                    audio = audio[audio_offset:]
-
+                if not self.noCrossFade:
                     # SOLA algorithm from https://github.com/yxlllc/DDSP-SVC, https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI
-                    cor_nom = np.convolve(
-                        audio[: sola_buffer_frame],
-                        np.flip(self.sola_buffer),
-                        "valid",
-                    )
-                    cor_den = np.sqrt(
-                        np.convolve(
-                            audio[: sola_buffer_frame] ** 2,
-                            np.ones(self.sola_buffer_frame, dtype=np.float32),
-                            "valid",
+                    conv_input = audio[
+                        None, None, : self.sola_buffer_frame + self.sola_search_frame
+                    ]
+                    cor_nom = F.conv1d(conv_input, self.sola_buffer[None, None, :])
+                    cor_den = torch.sqrt(
+                        F.conv1d(
+                            conv_input ** 2,
+                            torch.ones(1, 1, self.sola_buffer_frame, device=self.device_manager.device),
                         )
-                        + 0.001
+                        + 1e-8
                     )
-                    sola_offset = int(np.argmax(cor_nom / cor_den))
-                    sola_end = sola_offset + self.block_frame
-                    result = audio[sola_offset:sola_end]
-                    result[:self.sola_buffer_frame] *= self.np_cur_strength
-                    result[:self.sola_buffer_frame] += self.sola_buffer[:]
+                    sola_offset = torch.argmax(cor_nom[0, 0] / cor_den[0, 0])
 
-                    if sola_offset < self.sola_search_frame:
-                        offset = -(sola_buffer_frame - sola_offset)
-                        end = -(self.sola_search_frame - sola_offset)
-                        self.sola_buffer = audio[offset:end] * self.np_prev_strength
+                    audio = audio[sola_offset:]
+                    audio[: self.sola_buffer_frame] *= self.fade_in_window
+                    audio[: self.sola_buffer_frame] += (
+                        self.sola_buffer * self.fade_out_window
+                    )
+
+                    self.sola_buffer[:] = audio[
+                        self.block_frame : self.block_frame + self.sola_buffer_frame
+                    ]
+
+                result: np.ndarray = audio[: self.block_frame].detach().cpu().numpy()
 
             mainprocess_time = t.secs
 
@@ -306,25 +270,16 @@ class VoiceChangerV2(VoiceChangerIF):
             with Timer2("post-process", True) as t:
                 print_convert_processing(f" Output data size of {result.shape[0]}/{self.processing_sampling_rate}hz {result.shape[0]}/{self.settings.outputSampleRate}hz")
 
-                # if audio_in_fixed.shape[0] != result.shape[0]:
-                # print("TODO FIX:::::PADDING", audio_in_fixed.shape[0], result.shape[0])
-                if self.voiceChangerModel.voiceChangerType == "LLVC":
-                    outputData = result
-                else:
-                    outputData = pad_array(result, audio_in_fixed.shape[0])
-                # else:
-                #     outputData = result
-
                 if self.settings.recordIO == 1:
                     self.ioRecorder.writeInput((audio_in_fixed * 32767).astype(np.int16))
-                    self.ioRecorder.writeOutput((outputData * 32767).astype(np.int16).tobytes())
+                    self.ioRecorder.writeOutput((result * 32767).astype(np.int16).tobytes())
 
             postprocess_time = t.secs
 
-            print_convert_processing(f" [fin] Input/Output size:{audio_in_fixed.shape[0]},{outputData.shape[0]}")
+            print_convert_processing(f" [fin] Input/Output size:{audio_in_fixed.shape[0]},{result.shape[0]}")
             perf = [0, mainprocess_time, postprocess_time]
 
-            return outputData, perf
+            return result, perf
 
         except NoModeLoadedException as e:
             logger.warn(f"[Voice Changer] [Exception], {e}")
@@ -375,18 +330,3 @@ PRINT_CONVERT_PROCESSING: bool = False
 def print_convert_processing(mess: str):
     if PRINT_CONVERT_PROCESSING:
         logger.info(mess)
-
-
-def pad_array(arr: AudioInOutFloat, target_length: int):
-    current_length = arr.shape[0]
-    if current_length >= target_length:
-        return arr
-
-    pad_width = target_length - current_length
-    pad_left = pad_width // 2
-    pad_right = pad_width - pad_left
-    # padded_arr = np.pad(
-    #     arr, (pad_left, pad_right), "constant", constant_values=(0, 0)
-    # )
-    padded_arr = np.pad(arr, (pad_left, pad_right), "edge")
-    return padded_arr

@@ -43,8 +43,16 @@ export const CrossFadeOverlapSize = {
     "256": 256,
     "512": 512,
     "1024": 1024,
+    "1536": 1536,
     "2048": 2048,
+    "3072": 3072,
     "4096": 4096,
+    "6144": 6144,
+    "8192": 8192,
+    "10240": 10240,
+    "12288": 12288,
+    "14336": 14336,
+    "16384": 16384,
 } as const;
 export type CrossFadeOverlapSize = (typeof CrossFadeOverlapSize)[keyof typeof CrossFadeOverlapSize];
 
@@ -84,8 +92,6 @@ export const ServerSettingKey = {
     dstId: "dstId",
     gpu: "gpu",
 
-    crossFadeOffsetRate: "crossFadeOffsetRate",
-    crossFadeEndRate: "crossFadeEndRate",
     crossFadeOverlapSize: "crossFadeOverlapSize",
 
     framework: "framework",
@@ -149,8 +155,6 @@ export type VoiceChangerServerSetting = {
     dstId: number;
     gpu: number;
 
-    crossFadeOffsetRate: number;
-    crossFadeEndRate: number;
     crossFadeOverlapSize: CrossFadeOverlapSize;
 
     f0Factor: number;
@@ -376,8 +380,6 @@ export const DefaultServerSetting: ServerInfo = {
     passThrough: false,
     inputSampleRate: 48000,
 
-    crossFadeOffsetRate: 0.0,
-    crossFadeEndRate: 1.0,
     crossFadeOverlapSize: CrossFadeOverlapSize[1024],
 
     recordIO: 0,

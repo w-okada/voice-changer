@@ -50,11 +50,10 @@ export const AdvancedSettingDialog = () => {
         );
         const crossfaceRow = (
             <div className="advanced-setting-container-row">
-                <div className="advanced-setting-container-row-title">Crossfade</div>
+                <div className="advanced-setting-container-row-title">Crossfade size</div>
                 <div className="advanced-setting-container-row-field">
                     <div className="advanced-setting-container-row-field-crossfade-container">
                         <div>
-                            <div>overlap:</div>
                             <div>
                                 <select
                                     className="body-select"
@@ -66,65 +65,14 @@ export const AdvancedSettingDialog = () => {
                                     {Object.values(CrossFadeOverlapSize).map((x) => {
                                         return (
                                             <option key={x} value={x}>
-                                                {x}
+                                                {x} ({(x / 48000 * 1000).toFixed(1)} ms)
                                             </option>
                                         );
                                     })}
                                 </select>
                             </div>
                         </div>
-                        <div>
-                            <div>start:</div>
-                            <div>
-                                <input
-                                    type="number"
-                                    min={0}
-                                    max={1}
-                                    step={0.1}
-                                    value={serverSetting.serverSetting.crossFadeOffsetRate}
-                                    onChange={(e) => {
-                                        serverSetting.updateServerSettings({ ...serverSetting.serverSetting, crossFadeOffsetRate: Number(e.target.value) });
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <div>end:</div>
-                            <div>
-                                <input
-                                    type="number"
-                                    min={0}
-                                    max={1}
-                                    step={0.1}
-                                    value={serverSetting.serverSetting.crossFadeEndRate}
-                                    onChange={(e) => {
-                                        serverSetting.updateServerSettings({ ...serverSetting.serverSetting, crossFadeEndRate: Number(e.target.value) });
-                                    }}
-                                />
-                            </div>
-                        </div>
                     </div>
-                </div>
-            </div>
-        );
-
-        const trancateRow = (
-            <div className="advanced-setting-container-row">
-                <div className="advanced-setting-container-row-title">Trancate</div>
-                <div className="advanced-setting-container-row-field">
-                    <input
-                        type="number"
-                        min={5}
-                        max={300}
-                        step={1}
-                        value={setting.workletSetting.numTrancateTreshold}
-                        onChange={(e) => {
-                            setWorkletSetting({
-                                ...setting.workletSetting,
-                                numTrancateTreshold: Number(e.target.value),
-                            });
-                        }}
-                    />
                 </div>
             </div>
         );
@@ -216,7 +164,6 @@ export const AdvancedSettingDialog = () => {
             <div className="advanced-setting-container">
                 {protocolRow}
                 {crossfaceRow}
-                {trancateRow}
                 {silenceFrontRow}
                 {protectRow}
                 {rvcQualityRow}
