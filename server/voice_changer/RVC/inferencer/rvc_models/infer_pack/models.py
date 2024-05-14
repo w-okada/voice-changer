@@ -791,11 +791,13 @@ class SynthesizerTrnMs256NSFsid(nn.Module):
         m_p, logs_p, x_mask = self.enc_p(phone, pitch, phone_lengths)
         z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p) * 0.66666) * x_mask
         if skip_head is not None and return_length is not None:
-            head = skip_head
-            length = return_length
-            z_p = z_p[:, :, head: head + length]
-            x_mask = x_mask[:, :, head: head + length]
-            nsff0 = nsff0[:, head: head + length]
+            z_p = z_p[:, :, skip_head: skip_head + return_length]
+            x_mask = x_mask[:, :, skip_head: skip_head + return_length]
+            nsff0 = nsff0[:, skip_head: skip_head + return_length]
+        elif skip_head is not None and return_length is None:
+            z_p = z_p[:, :, skip_head: -1]
+            x_mask = x_mask[:, :, skip_head: -1]
+            nsff0 = nsff0[:, skip_head: -1]
         z = self.flow(z_p, x_mask, g=g, reverse=True)
         o = self.dec(z * x_mask, nsff0, g=g)
         return o, x_mask, (z, z_p, m_p, logs_p)
@@ -951,11 +953,13 @@ class SynthesizerTrnMs768NSFsid(nn.Module):
         m_p, logs_p, x_mask = self.enc_p(phone, pitch, phone_lengths)
         z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p) * 0.66666) * x_mask
         if skip_head is not None and return_length is not None:
-            head = skip_head
-            length = return_length
-            z_p = z_p[:, :, head: head + length]
-            x_mask = x_mask[:, :, head: head + length]
-            nsff0 = nsff0[:, head: head + length]
+            z_p = z_p[:, :, skip_head: skip_head + return_length]
+            x_mask = x_mask[:, :, skip_head: skip_head + return_length]
+            nsff0 = nsff0[:, skip_head: skip_head + return_length]
+        elif skip_head is not None and return_length is None:
+            z_p = z_p[:, :, skip_head: -1]
+            x_mask = x_mask[:, :, skip_head: -1]
+            nsff0 = nsff0[:, skip_head: -1]
         z = self.flow(z_p, x_mask, g=g, reverse=True)
         o = self.dec(z * x_mask, nsff0, g=g)
         return o, x_mask, (z, z_p, m_p, logs_p)
@@ -1100,10 +1104,11 @@ class SynthesizerTrnMs256NSFsid_nono(nn.Module):
         m_p, logs_p, x_mask = self.enc_p(phone, None, phone_lengths)
         z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p) * 0.66666) * x_mask
         if skip_head is not None and return_length is not None:
-            head = skip_head
-            length = return_length
-            z_p = z_p[:, :, head: head + length]
-            x_mask = x_mask[:, :, head: head + length]
+            z_p = z_p[:, :, skip_head: skip_head + return_length]
+            x_mask = x_mask[:, :, skip_head: skip_head + return_length]
+        elif skip_head is not None and return_length is None:
+            z_p = z_p[:, :, skip_head: -1]
+            x_mask = x_mask[:, :, skip_head: -1]
         z = self.flow(z_p, x_mask, g=g, reverse=True)
         o = self.dec(z * x_mask, g=g)
         return o, x_mask, (z, z_p, m_p, logs_p)
@@ -1248,10 +1253,11 @@ class SynthesizerTrnMs768NSFsid_nono(nn.Module):
         m_p, logs_p, x_mask = self.enc_p(phone, None, phone_lengths)
         z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p) * 0.66666) * x_mask
         if skip_head is not None and return_length is not None:
-            head = skip_head
-            length = return_length
-            z_p = z_p[:, :, head: head + length]
-            x_mask = x_mask[:, :, head: head + length]
+            z_p = z_p[:, :, skip_head: skip_head + return_length]
+            x_mask = x_mask[:, :, skip_head: skip_head + return_length]
+        elif skip_head is not None and return_length is None:
+            z_p = z_p[:, :, skip_head: -1]
+            x_mask = x_mask[:, :, skip_head: -1]
         z = self.flow(z_p, x_mask, g=g, reverse=True)
         o = self.dec(z * x_mask, g=g)
         return o, x_mask, (z, z_p, m_p, logs_p)

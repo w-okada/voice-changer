@@ -177,11 +177,14 @@ class RVCr2(VoiceChangerModel):
 
         # Calculate offsets for inferencer
         self.skip_head = extra_frame_model // model_window
-        # FIXME: Not sure if it's still necessary to round up the return length
-        self.return_length = block_frame_model + sola_buffer_frame_model + sola_search_frame_model
-        if (modulo := self.return_length % model_window) != 0:
-            self.return_length += model_window - modulo
-        self.return_length //= model_window
+
+        if not self.settings.rvcQuality:
+            self.return_length = block_frame_model + sola_buffer_frame_model + sola_search_frame_model
+            if (modulo := self.return_length % model_window) != 0:
+                self.return_length += model_window - modulo
+            self.return_length //= model_window
+        else:
+            self.return_length = None
 
         self.silence_front = extra_frame_16k if self.settings.silenceFront else 0
 
