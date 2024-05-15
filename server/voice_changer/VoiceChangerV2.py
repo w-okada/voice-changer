@@ -49,7 +49,7 @@ class VoiceChangerV2Settings:
     inputSampleRate: int = 48000  # 48000 or 24000
     outputSampleRate: int = 48000  # 48000 or 24000
 
-    crossFadeOverlapSize: int = 8192
+    crossFadeOverlapSize: int = 4096
     serverReadChunkSize: int = 192
     extraConvertSize: int = 1024 * 4
     gpu: int = -1
@@ -80,9 +80,7 @@ class VoiceChangerV2(VoiceChangerIF):
 
         self.block_frame = self.settings.serverReadChunkSize * 128
         self.crossfade_frame = self.settings.crossFadeOverlapSize
-        self.input_sample_sec = self.settings.inputSampleRate // 100
-        self.sola_search_frame = self.input_sample_sec
-        self.sola_buffer_frame = int(self.crossfade_frame * 0.75) # 2/3 of crossfade frame size. Seems to work better?
+        self.sola_search_frame = int(0.012 * self.settings.inputSampleRate)
         self.extra_frame = self.settings.extraConvertSize
 
         self.processing_sampling_rate = 0
@@ -101,9 +99,8 @@ class VoiceChangerV2(VoiceChangerIF):
     def setModel(self, model: VoiceChangerModel):
         self.voiceChangerModel = model
         self.processing_sampling_rate = self.voiceChangerModel.get_processing_sampling_rate()
-        self.sola_buffer_frame = int(self.crossfade_frame * 0.75)
         self.voiceChangerModel.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
-        self.voiceChangerModel.realloc(self.block_frame, self.extra_frame, self.crossfade_frame, self.sola_buffer_frame, self.sola_search_frame)
+        self.voiceChangerModel.realloc(self.block_frame, self.extra_frame, self.crossfade_frame, self.sola_search_frame)
         self._generate_strength()
         # if model.voiceChangerType == "Beatrice" or model.voiceChangerType == "LLVC":
         if model.voiceChangerType == "Beatrice":
@@ -114,12 +111,10 @@ class VoiceChangerV2(VoiceChangerIF):
     def setInputSampleRate(self, sr: int):
         self.settings.inputSampleRate = sr
 
-        self.input_sample_sec = self.settings.inputSampleRate // 100
-        self.sola_search_frame = self.input_sample_sec
-        self.sola_buffer_frame = int(self.crossfade_frame * 0.75)
+        self.sola_search_frame = int(0.012 * self.settings.inputSampleRate)
 
         self.voiceChangerModel.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
-        self.voiceChangerModel.realloc(self.block_frame, self.extra_frame, self.crossfade_frame, self.sola_buffer_frame, self.sola_search_frame)
+        self.voiceChangerModel.realloc(self.block_frame, self.extra_frame, self.crossfade_frame, self.sola_search_frame)
 
     def setOutputSampleRate(self, sr: int):
         self.settings.outputSampleRate = sr
@@ -157,7 +152,6 @@ class VoiceChangerV2(VoiceChangerIF):
                 self._generate_strength()
             elif key == 'crossFadeOverlapSize':
                 self.crossfade_frame = self.settings.crossFadeOverlapSize
-                self.sola_buffer_frame = int(self.crossfade_frame * 0.75)
                 self._generate_strength()
             elif key == "recordIO" and val == 1:
                 if self.ioRecorder is not None:
@@ -184,7 +178,7 @@ class VoiceChangerV2(VoiceChangerIF):
 
         if key in {'gpu', 'serverReadChunkSize', 'extraConvertSize', 'crossFadeOverlapSize', 'rvcQuality', 'silenceFront'}:
             if self.voiceChangerModel is not None:
-                self.voiceChangerModel.realloc(self.block_frame, self.extra_frame, self.crossfade_frame, self.sola_buffer_frame, self.sola_search_frame)
+                self.voiceChangerModel.realloc(self.block_frame, self.extra_frame, self.crossfade_frame, self.sola_search_frame)
 
         self.voiceChangerModel.update_settings(key, val)
 
@@ -198,7 +192,7 @@ class VoiceChangerV2(VoiceChangerIF):
                 * torch.linspace(
                     0.0,
                     1.0,
-                    steps=self.sola_buffer_frame,
+                    steps=self.crossfade_frame,
                     device=self.device_manager.device,
                     dtype=torch.float32,
                 )
@@ -208,7 +202,7 @@ class VoiceChangerV2(VoiceChangerIF):
         self.fade_out_window: torch.Tensor = 1 - self.fade_in_window
 
         # ひとつ前の結果とサイズが変わるため、記録は消去する。
-        self.sola_buffer = torch.zeros(self.sola_buffer_frame, device=self.device_manager.device, dtype=torch.float32)
+        self.sola_buffer = torch.zeros(self.crossfade_frame, device=self.device_manager.device, dtype=torch.float32)
         logger.info(f'Allocated sola buffer size: {self.sola_buffer.shape}')
 
     def get_processing_sampling_rate(self):
@@ -223,60 +217,60 @@ class VoiceChangerV2(VoiceChangerIF):
                 raise VoiceChangerIsNotSelectedException("Voice Changer is not selected.")
 
             with Timer2("main-process", True) as t:
-                # FIXME: Normally, the client must communicate with exactly the same buffer size.
-                # Pre-alloc fixed-size buffer
-                audio_in_fixed = np.zeros(self.block_frame, dtype=np.float32)
-                # Clamp received data to block frame size
-                audio_in = audio_in[-self.block_frame:]
-                # Copy into fixed-size buffer
-                audio_in_fixed[:audio_in.shape[0]] = audio_in
+                block_size = audio_in.shape[0]
 
                 with torch.no_grad():
-                    audio = self.voiceChangerModel.inference(audio_in_fixed)
+                    audio = self.voiceChangerModel.inference(audio_in)
 
                 if audio is None:
-                    return np.zeros(self.block_frame, dtype=np.float32), [0, 0, 0]
+                    return np.zeros(block_size, dtype=np.float32), [0, 0, 0]
 
                 if not self.noCrossFade:
                     # SOLA algorithm from https://github.com/yxlllc/DDSP-SVC, https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI
                     conv_input = audio[
-                        None, None, : self.sola_buffer_frame + self.sola_search_frame
+                        None, None, : self.crossfade_frame + self.sola_search_frame
                     ]
                     cor_nom = F.conv1d(conv_input, self.sola_buffer[None, None, :])
                     cor_den = torch.sqrt(
                         F.conv1d(
                             conv_input ** 2,
-                            torch.ones(1, 1, self.sola_buffer_frame, device=self.device_manager.device),
+                            torch.ones(1, 1, self.crossfade_frame, device=self.device_manager.device),
                         )
                         + 1e-8
                     )
                     sola_offset = torch.argmax(cor_nom[0, 0] / cor_den[0, 0])
 
                     audio = audio[sola_offset:]
-                    audio[: self.sola_buffer_frame] *= self.fade_in_window
-                    audio[: self.sola_buffer_frame] += (
+                    audio[: self.crossfade_frame] *= self.fade_in_window
+                    audio[: self.crossfade_frame] += (
                         self.sola_buffer * self.fade_out_window
                     )
 
-                    self.sola_buffer[:] = audio[
-                        self.block_frame : self.block_frame + self.sola_buffer_frame
-                    ]
+                    end = block_size + self.crossfade_frame
+                    if audio.shape[0] >= end:
+                        self.sola_buffer[:] = audio[block_size : end]
+                    else:
+                        # No idea why but either new RVC code seems to produce smaller audio
+                        # or SOLA offset calculation is a bit off. This fixes audio "popping" when fading chunks.
+                        offset = end - audio.shape[0]
+                        self.sola_buffer[-offset :] = torch.zeros(offset, device=self.device_manager.device, dtype=torch.float32)
+                        self.sola_buffer[: -offset] = audio[block_size :]
 
-                result: np.ndarray = audio[: self.block_frame].detach().cpu().numpy()
+                result: np.ndarray = audio[: block_size].detach().cpu().numpy()
 
             mainprocess_time = t.secs
 
             # 後処理
             with Timer2("post-process", True) as t:
-                print_convert_processing(f" Output data size of {result.shape[0]}/{self.processing_sampling_rate}hz {result.shape[0]}/{self.settings.outputSampleRate}hz")
+                # print(f" Output data size of {result.shape[0]}/{self.processing_sampling_rate}hz {result.shape[0]}/{self.settings.outputSampleRate}hz")
 
                 if self.settings.recordIO == 1:
-                    self.ioRecorder.writeInput((audio_in_fixed * 32767).astype(np.int16))
+                    self.ioRecorder.writeInput((audio_in * 32767).astype(np.int16))
                     self.ioRecorder.writeOutput((result * 32767).astype(np.int16).tobytes())
 
             postprocess_time = t.secs
 
-            print_convert_processing(f" [fin] Input/Output size:{audio_in_fixed.shape[0]},{result.shape[0]}")
+            # print(f" [fin] Input/Output size:{audio_in.shape[0]},{result.shape[0]}")
             perf = [0, mainprocess_time, postprocess_time]
 
             return result, perf
@@ -321,12 +315,3 @@ class VoiceChangerV2(VoiceChangerIF):
             return
         self.voiceChangerModel.merge_models(request)
         return self.get_info()
-
-
-PRINT_CONVERT_PROCESSING: bool = False
-# PRINT_CONVERT_PROCESSING = True
-
-
-def print_convert_processing(mess: str):
-    if PRINT_CONVERT_PROCESSING:
-        logger.info(mess)

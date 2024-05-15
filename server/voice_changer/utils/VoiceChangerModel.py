@@ -1,4 +1,5 @@
 from typing import Any, Protocol, TypeAlias
+import torch
 import numpy as np
 from const import VoiceChangerType
 
@@ -25,7 +26,7 @@ class VoiceChangerModel(Protocol):
     def get_info(self) -> dict[str, Any]:
         ...
 
-    def inference(self, data: tuple[Any, ...]) -> np.ndarray:
+    def inference(self, data: tuple[Any, ...]) -> torch.Tensor:
         ...
 
     def generate_input(
@@ -43,5 +44,5 @@ class VoiceChangerModel(Protocol):
     def setSamplingRate(self, inputSampleRate: int, outputSampleRate: int):
         ...
 
-    def realloc(self, block_frame: int, extra_frame: int, crossfade_frame: int, sola_buffer_frame: int, sola_search_frame: int):
+    def realloc(self, block_frame: int, extra_frame: int, crossfade_frame: int, sola_search_frame: int):
         ...

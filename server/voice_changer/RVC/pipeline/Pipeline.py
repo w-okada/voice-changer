@@ -146,6 +146,7 @@ class Pipeline:
             # embedding
             # with autocast(enabled=self.isHalf):
             feats = self.extractFeatures(feats, embOutputLayer, useFinalProj)
+            feats = torch.cat((feats, feats[:, -1:, :]), 1)
             t.record("extract-feats")
 
             # Index - feature抽出
@@ -181,13 +182,14 @@ class Pipeline:
                     pitchff = pitchff.unsqueeze(-1)
                     feats = feats * pitchff + feats * (1 - pitchff)
 
+            audio_feats_len = audio.shape[0] // self.window
             feats: torch.Tensor = F.interpolate(feats.permute(0, 2, 1), scale_factor=2).permute(0, 2, 1).contiguous()
 
-            feats_len = feats.shape[1]
+            feats = feats[:, :audio_feats_len, :]
             if pitch is not None and pitchf is not None:
-                pitch = pitch[:, -feats_len:]
-                pitchf = pitchf[:, -feats_len:]
-            p_len = torch.as_tensor([feats_len], device=self.device, dtype=torch.int64)
+                pitch = pitch[:, -audio_feats_len:]
+                pitchf = pitchf[:, -audio_feats_len:]
+            p_len = torch.as_tensor([audio_feats_len], device=self.device, dtype=torch.int64)
 
             sid = torch.as_tensor(sid, device=self.device, dtype=torch.int64).unsqueeze(0)
             t.record("mid-precess")

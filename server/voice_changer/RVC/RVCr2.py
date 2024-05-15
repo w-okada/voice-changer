@@ -149,43 +149,20 @@ class RVCr2(VoiceChangerModel):
     def get_processing_sampling_rate(self):
         return self.slotInfo.samplingRate
 
-    def realloc(self, block_frame: int, extra_frame: int, crossfade_frame: int, sola_buffer_frame: int, sola_search_frame: int):
-        # Calculate frame sizes based on DEVICE sample rate (f.e., 48000Hz)
-        block_frame_sec = block_frame / self.input_sample_rate
-        crossfade_frame_sec = crossfade_frame / self.input_sample_rate
-        sola_buffer_frame_sec = sola_buffer_frame / self.input_sample_rate
-        sola_search_frame_sec = sola_search_frame / self.input_sample_rate
-        extra_frame_sec = extra_frame / self.input_sample_rate
-
-        # Calculate frame sizes for 16000Hz
-        block_frame_16k = int(block_frame_sec * self.sr)
-        crossfade_frame_16k = int(crossfade_frame_sec * self.sr)
-        sola_search_frame_16k = int(sola_search_frame_sec * self.sr)
-        extra_frame_16k = int(extra_frame_sec * self.sr)
+    def realloc(self, block_frame: int, extra_frame: int, crossfade_frame: int, sola_search_frame: int):
+        # Calculate frame sizes based on DEVICE sample rate (f.e., 48000Hz) and convert to 16000Hz
+        block_frame_16k = int(block_frame / self.input_sample_rate * self.sr)
+        crossfade_frame_16k = int(crossfade_frame / self.input_sample_rate * self.sr)
+        sola_search_frame_16k = int(sola_search_frame / self.input_sample_rate * self.sr)
+        extra_frame_16k = int(extra_frame / self.input_sample_rate * self.sr)
 
         convert_size_16k = block_frame_16k + sola_search_frame_16k + extra_frame_16k + crossfade_frame_16k
         if (modulo := convert_size_16k % self.window) != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
             convert_size_16k = convert_size_16k + (self.window - modulo)
         convert_feature_size_16k = convert_size_16k // self.window
 
-        # Calculate frame sizes for MODEL INFERENCE sample rate (f.e., 32000Hz)
-        model_window = self.slotInfo.samplingRate // 100
-        block_frame_model = int(block_frame_sec * self.slotInfo.samplingRate)
-        sola_buffer_frame_model = int(sola_buffer_frame_sec * self.slotInfo.samplingRate)
-        sola_search_frame_model = int(sola_search_frame_sec * self.slotInfo.samplingRate)
-        extra_frame_model = int(extra_frame_sec * self.slotInfo.samplingRate)
-
-        # Calculate offsets for inferencer
-        self.skip_head = extra_frame_model // model_window
-
-        if not self.settings.rvcQuality:
-            self.return_length = block_frame_model + sola_buffer_frame_model + sola_search_frame_model
-            if (modulo := self.return_length % model_window) != 0:
-                self.return_length += model_window - modulo
-            self.return_length //= model_window
-        else:
-            self.return_length = None
-
+        self.skip_head = extra_frame_16k // self.window
+        self.return_length = convert_feature_size_16k if not self.settings.rvcQuality else None
         self.silence_front = extra_frame_16k if self.settings.silenceFront else 0
 
         self.crop_start = -(block_frame_16k + crossfade_frame_16k)
@@ -223,6 +200,11 @@ class RVCr2(VoiceChangerModel):
         self.prev_vol = vol
 
         if vol < self.settings.silentThreshold:
+            if self.slotInfo.f0:
+                self.pitchf_buffer = self.write_input(
+                    torch.zeros(audio_in.shape[0] // self.window, device=self.device_manager.device, dtype=torch.float32),
+                    self.pitchf_buffer
+                )
             return None
 
         try:
