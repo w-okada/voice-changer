@@ -10,7 +10,7 @@ from voice_changer.Local.ServerDevice import ServerDevice, ServerDeviceCallbacks
 from voice_changer.ModelSlotManager import ModelSlotManager
 from voice_changer.RVC.RVCModelMerger import RVCModelMerger
 from voice_changer.VoiceChanger import VoiceChanger
-from const import STORED_SETTING_FILE, UPLOAD_DIR, StaticSlot
+from const import STORED_SETTING_FILE, STORED_SETTINGS, UPLOAD_DIR, StaticSlot
 from voice_changer.VoiceChangerV2 import VoiceChangerV2
 from voice_changer.utils.LoadModelParams import LoadModelParamFile, LoadModelParams
 from voice_changer.utils.ModelMerger import MergeElement, ModelMergerRequest
@@ -104,19 +104,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         logger.info("[Voice Changer] VoiceChangerManager initializing... done.")
 
     def store_setting(self, key: str, val: str | int | float):
-        saveItemForServerDevice = ["enableServerAudio", "serverAudioSampleRate", "serverInputDeviceId", "serverOutputDeviceId", "serverMonitorDeviceId", "serverReadChunkSize", "serverInputAudioGain", "serverOutputAudioGain"]
-        saveItemForVoiceChanger = ["crossFadeOffsetRate", "crossFadeEndRate", "crossFadeOverlapSize"]
-        saveItemForVoiceChangerManager = ["modelSlotIndex"]
-        saveItemForRVC = ["extraConvertSize", "gpu", "silentThreshold"]
-        saveItemForAllVoiceChanger = ["f0Detector"]  # 設定されたf0DetectorがVCに存在しない値の場合はデフォルトに落ちるように実装すること
-
-        saveItem = []
-        saveItem.extend(saveItemForServerDevice)
-        saveItem.extend(saveItemForVoiceChanger)
-        saveItem.extend(saveItemForVoiceChangerManager)
-        saveItem.extend(saveItemForRVC)
-        saveItem.extend(saveItemForAllVoiceChanger)
-        if key in saveItem:
+        if key in STORED_SETTINGS:
             self.stored_setting[key] = val
             json.dump(self.stored_setting, open(STORED_SETTING_FILE, "w"))
 

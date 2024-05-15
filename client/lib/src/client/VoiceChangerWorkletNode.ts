@@ -248,20 +248,20 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
       this.socket.emit("request_message", [timestamp, newBuffer.buffer]);
     } else if (this.setting.protocol === "rest") {
       const restClient = new ServerRestClient(this.setting.serverUrl);
-      const res = await restClient.postVoice(timestamp, newBuffer.buffer);
-      if (res.byteLength < 128 * 2) {
+      const { changedVoiceBuffer, perf } = await restClient.postVoice(timestamp, newBuffer.buffer);
+      if (changedVoiceBuffer.byteLength < 128 * 2) {
         this.listener.notifyException(
-          VOICE_CHANGER_CLIENT_EXCEPTION.ERR_REST_INVALID_RESPONSE,
-          `[REST] recevied data is too short ${res.byteLength}`
+          VOICE_CHANGER_CLIENT_EXCEPTION.ERR_SIO_INVALID_RESPONSE,
+          `[REST] recevied data is too short ${changedVoiceBuffer.byteLength}`
         );
       } else {
         if (this.outputNode != null) {
-          this.outputNode.postReceivedVoice(res);
+          this.outputNode.postReceivedVoice(changedVoiceBuffer);
         } else {
-          this.postReceivedVoice(res);
+          this.postReceivedVoice(changedVoiceBuffer);
         }
-        this.listener.notifyResponseTime(Date.now() - timestamp);
       }
+      this.listener.notifyResponseTime(Date.now() - timestamp, perf);
     } else if (this.setting.protocol == "internal") {
       if (!this.internalCallback) {
         this.listener.notifyException(

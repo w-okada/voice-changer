@@ -31,30 +31,20 @@ class MMVC_Rest_VoiceChanger:
 
     def test(self, voice: VoiceModel):
         try:
-            timestamp = voice.timestamp
-            buffer = voice.buffer
-            wav = base64.b64decode(buffer)
+            data = base64.b64decode(voice.buffer)
 
-            # if wav == 0:
-            #     samplerate, data = read("dummy.wav")
-            #     unpackedData = data
-            # else:
-            #     unpackedData = np.array(
-            #         struct.unpack("<%sh" % (len(wav) // struct.calcsize("<h")), wav)
-            #     )
-
-            unpackedData = np.array(struct.unpack("<%sh" % (len(wav) // struct.calcsize("<h")), wav), dtype=np.int16, copy=False)
-            # print(f"[REST] unpackedDataType {unpackedData.dtype}")
+            unpackedData = np.frombuffer(data, dtype=np.int16).astype(np.float32) / 32768
 
             self.tlock.acquire()
-            changedVoice = self.voiceChangerManager.changeVoice(unpackedData)
+            out_audio, perf = self.voiceChangerManager.changeVoice(unpackedData)
             self.tlock.release()
+            out_audio = (out_audio * 32767).astype(np.int16).tobytes()
 
-            changedVoiceBase64 = base64.b64encode(changedVoice[0]).decode("utf-8")
-            data = {"timestamp": timestamp, "changedVoiceBase64": changedVoiceBase64}
-
-            json_compatible_item_data = jsonable_encoder(data)
-            return JSONResponse(content=json_compatible_item_data)
+            return JSONResponse(content=jsonable_encoder({
+                "timestamp": voice.timestamp,
+                "changedVoiceBase64": base64.b64encode(out_audio).decode("utf-8"),
+                "perf": perf
+            }))
 
         except Exception as e:
             print("REQUEST PROCESSING!!!! EXCEPTION!!!", e)

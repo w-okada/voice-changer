@@ -73,10 +73,7 @@ class Pipeline:
     def setPitchExtractor(self, pitchExtractor: PitchExtractor):
         self.pitchExtractor = pitchExtractor
 
-    def extractPitch(self, audio: torch.Tensor, if_f0: bool, pitchf: torch.Tensor, f0_up_key: int) -> tuple[torch.Tensor | None, torch.Tensor | None]:
-        if not if_f0:
-            return None, None
-
+    def extractPitch(self, audio: torch.Tensor, pitchf: torch.Tensor, f0_up_key: int) -> tuple[torch.Tensor | None, torch.Tensor | None]:
         try:
             return self.pitchExtractor.extract(
                 audio,
@@ -143,17 +140,18 @@ class Pipeline:
 
             # ピッチ検出
             # with autocast(enabled=self.isHalf):
-            pitch, pitchf = self.extractPitch(audio[silence_front:], if_f0, pitchf, f0_up_key)
+            pitch, pitchf = self.extractPitch(audio[silence_front:], pitchf, f0_up_key) if if_f0 else (None, None)
             t.record("extract-pitch")
 
             # embedding
             # with autocast(enabled=self.isHalf):
             feats = self.extractFeatures(feats, embOutputLayer, useFinalProj)
+            feats = torch.cat((feats, feats[:, -1:, :]), 1)
             t.record("extract-feats")
 
             # Index - feature抽出
             if self.index is not None and self.index_reconstruct is not None and index_rate != 0:
-                silence_offset = math.floor(silence_front * self.sr) // 360
+                silence_offset = silence_front // 360
                 audio_full = feats[0]
                 audio_front = audio_full[silence_offset:]
 
@@ -184,13 +182,14 @@ class Pipeline:
                     pitchff = pitchff.unsqueeze(-1)
                     feats = feats * pitchff + feats * (1 - pitchff)
 
+            audio_feats_len = audio.shape[0] // self.window
             feats: torch.Tensor = F.interpolate(feats.permute(0, 2, 1), scale_factor=2).permute(0, 2, 1).contiguous()
 
-            feats_len = feats.shape[1]
+            feats = feats[:, :audio_feats_len, :]
             if pitch is not None and pitchf is not None:
-                pitch = pitch[:, -feats_len:]
-                pitchf = pitchf[:, -feats_len:]
-            p_len = torch.as_tensor([feats_len], device=self.device, dtype=torch.int64)
+                pitch = pitch[:, -audio_feats_len:]
+                pitchf = pitchf[:, -audio_feats_len:]
+            p_len = torch.as_tensor([audio_feats_len], device=self.device, dtype=torch.int64)
 
             sid = torch.as_tensor(sid, device=self.device, dtype=torch.int64).unsqueeze(0)
             t.record("mid-precess")
