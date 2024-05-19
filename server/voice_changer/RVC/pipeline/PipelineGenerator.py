@@ -2,6 +2,7 @@ import os
 import sys
 import traceback
 import faiss
+import faiss.contrib.torch_utils
 import torch
 from Exceptions import PipelineCreateException
 from data.ModelSlot import RVCModelSlot
@@ -77,7 +78,7 @@ def _loadIndex(indexPath: str, dev: torch.device) -> tuple[faiss.Index | None, t
             return (None, None)
         # BUG: faiss-gpu does not support reconstruct on GPU indices
         # https://github.com/facebookresearch/faiss/issues/2181
-        index_reconstruct = torch.as_tensor(index.reconstruct_n(0, index.ntotal), dtype=torch.float32, device=dev)
+        index_reconstruct = index.reconstruct_n(0, index.ntotal).to(dev)
         if sys.platform == 'linux' and dev.type == 'cuda':
             index: faiss.GpuIndexIVFFlat = faiss.index_cpu_to_gpus_list(index, gpus=[dev.index])
     except: # NOQA
