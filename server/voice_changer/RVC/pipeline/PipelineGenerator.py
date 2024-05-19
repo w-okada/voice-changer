@@ -1,6 +1,8 @@
 import os
+import sys
 import traceback
 import faiss
+import torch
 from Exceptions import PipelineCreateException
 from data.ModelSlot import RVCModelSlot
 
@@ -43,7 +45,7 @@ def createPipeline(params: VoiceChangerParams, modelSlot: RVCModelSlot, gpu: int
 
     # index, feature
     indexPath = os.path.join(params.model_dir, str(modelSlot.slotIndex), os.path.basename(modelSlot.indexFile))
-    index = _loadIndex(indexPath)
+    index = _loadIndex(indexPath, dev)
 
     pipeline = Pipeline(
         embedder,
@@ -58,7 +60,7 @@ def createPipeline(params: VoiceChangerParams, modelSlot: RVCModelSlot, gpu: int
     return pipeline
 
 
-def _loadIndex(indexPath: str) -> faiss.Index | None:
+def _loadIndex(indexPath: str, dev: torch.device) -> faiss.Index | None:
     # Indexのロード
     print("[Voice Changer] Loading index...")
     # ファイル指定があってもファイルがない場合はNone
@@ -68,9 +70,14 @@ def _loadIndex(indexPath: str) -> faiss.Index | None:
 
     try:
         print("Try loading...", indexPath)
-        index = faiss.read_index(indexPath)
+        index: faiss.IndexFlatL2 = faiss.read_index(indexPath)
+        if not index.is_trained:
+            print("[Voice Changer] Invalid index. You MUST use added_xxxx.index, not trained_xxxx.index. Index will not be used.")
+            return None
+        if sys.platform == 'linux' and dev.type == 'cuda':
+            index: faiss.GpuIndexFlatL2 = faiss.index_cpu_to_gpus_list(index, gpus=[dev.index])
     except: # NOQA
-        print("[Voice Changer] load index failed. Use no index.")
+        print("[Voice Changer] Load index failed. Use no index.")
         traceback.print_exc()
         return None
 
