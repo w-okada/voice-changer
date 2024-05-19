@@ -163,7 +163,7 @@ class RVCr2(VoiceChangerModel):
 
         self.skip_head = extra_frame_16k // self.window
         self.return_length = convert_feature_size_16k if not self.settings.rvcQuality else None
-        self.silence_front = extra_frame_16k if self.settings.silenceFront else 0
+        self.silence_front = extra_frame_16k - (self.window * 5) if self.settings.silenceFront else 0
 
         self.crop_start = -(block_frame_16k + crossfade_frame_16k)
         self.crop_end = -crossfade_frame_16k
