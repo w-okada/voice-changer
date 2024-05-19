@@ -56,7 +56,7 @@ class Pipeline:
 
         self.index = index
         self.index_reconstruct: torch.Tensor | None = index_reconstruct
-        self.use_gpu_index = sys.platform == 'linux' and device.type == 'cuda'
+        # self.use_gpu_index = sys.platform == 'linux' and device.type == 'cuda'
         # self.feature = feature
 
         self.targetSR = targetSR
@@ -117,11 +117,11 @@ class Pipeline:
 
     def _search_index(self, audio: torch.Tensor, top_k: int = 1):
         if top_k == 1:
-            _, ix = self.index.search(audio if self.use_gpu_index else audio.detach().cpu(), 1)
+            _, ix = self.index.search(audio.detach().cpu().numpy(), 1)
             ix = torch.as_tensor(ix, dtype=torch.int64, device=self.device)
             return self.index_reconstruct[ix.squeeze()]
 
-        score, ix = self.index.search(audio if self.use_gpu_index else audio.detach().cpu(), k=top_k)
+        score, ix = self.index.search(audio.detach().cpu().numpy(), k=top_k)
         score, ix = (
             torch.as_tensor(score, dtype=torch.float32, device=self.device),
             torch.as_tensor(ix, dtype=torch.int64, device=self.device)
