@@ -1,5 +1,6 @@
-from faiss import Index
-import math
+from faiss import IndexIVFFlat
+import faiss.contrib.torch_utils
+import sys
 import torch
 import torch.nn.functional as F
 from torch.cuda.amp import autocast
@@ -27,8 +28,8 @@ class Pipeline:
     inferencer: Inferencer
     pitchExtractor: PitchExtractor
 
-    index: Index | None
-    index_reconstruct: Index | None
+    index: IndexIVFFlat | None
+    index_reconstruct: torch.Tensor | None
     # feature: Any | None
 
     targetSR: int
@@ -40,11 +41,12 @@ class Pipeline:
         embedder: Embedder,
         inferencer: Inferencer,
         pitchExtractor: PitchExtractor,
-        index: Index | None,
+        index: IndexIVFFlat | None,
+        index_reconstruct: torch.Tensor | None,
         # feature: Any | None,
-        targetSR,
-        device,
-        isHalf,
+        targetSR: int,
+        device: torch.device,
+        isHalf: bool,
     ):
         self.embedder = embedder
         self.inferencer = inferencer
@@ -54,7 +56,8 @@ class Pipeline:
         logger.info("GENERATE PITCH EXTRACTOR" + str(self.pitchExtractor))
 
         self.index = index
-        self.index_reconstruct: torch.Tensor | None = torch.as_tensor(index.reconstruct_n(0, index.ntotal), dtype=torch.float32, device=device) if index is not None else None
+        self.index_reconstruct: torch.Tensor | None = index_reconstruct
+        self.use_gpu_index = sys.platform == 'linux' and device.type == 'cuda'
         # self.feature = feature
 
         self.targetSR = targetSR
@@ -91,8 +94,8 @@ class Pipeline:
     def extractFeatures(self, feats: torch.Tensor, embOutputLayer: int, useFinalProj: bool):
         try:
             feats = self.embedder.extractFeatures(feats, embOutputLayer, useFinalProj)
-            if torch.isnan(feats).all():
-                raise DeviceCannotSupportHalfPrecisionException()
+            # if torch.isnan(feats).all():
+            #     raise DeviceCannotSupportHalfPrecisionException()
             return feats
         except RuntimeError as e:
             print("Failed to extract features:", e)
@@ -112,6 +115,22 @@ class Pipeline:
                 raise HalfPrecisionChangingException()
             else:
                 raise e
+
+    def _search_index(self, audio: torch.Tensor, top_k: int = 1):
+        if top_k == 1:
+            _, ix = self.index.search(audio if self.use_gpu_index else audio.detach().cpu(), 1)
+            ix = ix.to(self.device)
+            return self.index_reconstruct[ix.squeeze()]
+
+        score, ix = self.index.search(audio if self.use_gpu_index else audio.detach().cpu(), k=top_k)
+        score, ix = (
+            score.to(self.device),
+            ix.to(self.device),
+        )
+        weight = torch.square(1 / score)
+        weight /= weight.sum(dim=1, keepdim=True)
+        return torch.sum(self.index_reconstruct[ix] * weight.unsqueeze(2), dim=1)
+
 
     def exec(
         self,
@@ -151,26 +170,17 @@ class Pipeline:
 
             # Index - feature抽出
             if self.index is not None and self.index_reconstruct is not None and index_rate != 0:
-                silence_offset = silence_front // 360
-                audio_full = feats[0]
-                audio_front = audio_full[silence_offset:]
+                skip_offset = skip_head // 2
+                index_audio = feats[0][skip_offset :]
 
                 if self.isHalf:
-                    audio_front = audio_front.to(dtype=torch.float32, copy=False)
+                    index_audio = index_audio.to(dtype=torch.float32, copy=False)
 
                 # TODO: kは調整できるようにする
-                k = 1
-                if k == 1:
-                    _, ix = self.index.search(audio_front, 1)
-                    audio_front[:] = self.index_reconstruct[ix.squeeze()]
-                else:
-                    score, ix = self.index.search(audio_front, k=8)
-                    weight = torch.square(1 / score)
-                    weight /= weight.sum(dim=1, keepdim=True)
-                    audio_front[:] = torch.sum(self.index_reconstruct[ix] * weight.unsqueeze(2), dim=1)
+                index_audio = self._search_index(index_audio, 8)
 
                 # Recover silent front
-                feats = audio_full.unsqueeze(0) * index_rate + (1 - index_rate) * feats
+                feats[0][skip_offset :] = index_audio.unsqueeze(0) * index_rate + (1 - index_rate) * feats[0][skip_offset :]
 
                 # pitchの推定が上手くいかない(pitchf=0)場合、検索前の特徴を混ぜる
                 # pitchffの作り方の疑問はあるが、本家通りなので、このまま使うことにする。
@@ -197,12 +207,10 @@ class Pipeline:
             out_audio = self.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length)
             t.record("infer")
 
-            pitchf_buffer = pitchf.squeeze(0) if pitchf is not None else None
-
             # del p_len, pitch, pitchf, feats, sid
             # torch.cuda.empty_cache()
 
             t.record("post-process")
             # torch.cuda.empty_cache()
         # print("EXEC AVERAGE:", t.avrSecs)
-        return out_audio, pitchf_buffer
+        return out_audio

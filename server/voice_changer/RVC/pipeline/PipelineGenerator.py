@@ -1,6 +1,9 @@
 import os
+import sys
 import traceback
 import faiss
+import faiss.contrib.torch_utils
+import torch
 from Exceptions import PipelineCreateException
 from data.ModelSlot import RVCModelSlot
 
@@ -43,13 +46,14 @@ def createPipeline(params: VoiceChangerParams, modelSlot: RVCModelSlot, gpu: int
 
     # index, feature
     indexPath = os.path.join(params.model_dir, str(modelSlot.slotIndex), os.path.basename(modelSlot.indexFile))
-    index = _loadIndex(indexPath)
+    index, index_reconstruct = _loadIndex(indexPath, dev)
 
     pipeline = Pipeline(
         embedder,
         inferencer,
         pitchExtractor,
         index,
+        index_reconstruct,
         modelSlot.samplingRate,
         dev,
         half,
@@ -58,20 +62,28 @@ def createPipeline(params: VoiceChangerParams, modelSlot: RVCModelSlot, gpu: int
     return pipeline
 
 
-def _loadIndex(indexPath: str) -> faiss.Index | None:
+def _loadIndex(indexPath: str, dev: torch.device) -> tuple[faiss.Index | None, torch.Tensor | None]:
     # Indexのロード
     print("[Voice Changer] Loading index...")
     # ファイル指定があってもファイルがない場合はNone
     if os.path.exists(indexPath) is not True or os.path.isfile(indexPath) is not True:
         print("[Voice Changer] Index file is not found")
-        return None
+        return (None, None)
 
     try:
         print("Try loading...", indexPath)
-        index = faiss.read_index(indexPath)
+        index: faiss.IndexIVFFlat = faiss.read_index(indexPath)
+        if not index.is_trained:
+            print("[Voice Changer] Invalid index. You MUST use added_xxxx.index, not trained_xxxx.index. Index will not be used.")
+            return (None, None)
+        # BUG: faiss-gpu does not support reconstruct on GPU indices
+        # https://github.com/facebookresearch/faiss/issues/2181
+        index_reconstruct = index.reconstruct_n(0, index.ntotal).to(dev)
+        if sys.platform == 'linux' and dev.type == 'cuda':
+            index: faiss.GpuIndexIVFFlat = faiss.index_cpu_to_gpus_list(index, gpus=[dev.index])
     except: # NOQA
-        print("[Voice Changer] load index failed. Use no index.")
+        print("[Voice Changer] Load index failed. Use no index.")
         traceback.print_exc()
-        return None
+        return (None, None)
 
-    return index
+    return index, index_reconstruct
