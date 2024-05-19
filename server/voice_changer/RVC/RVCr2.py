@@ -16,6 +16,7 @@ from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from voice_changer.RVC.onnxExporter.export2onnx import export2onnx
 from voice_changer.RVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
 from voice_changer.RVC.pipeline.PipelineGenerator import createPipeline
+from voice_changer.common.TorchUtils import circular_write
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.pipeline.Pipeline import Pipeline
 from torchaudio import transforms as tat
@@ -169,19 +170,11 @@ class RVCr2(VoiceChangerModel):
         self.crop_end = -crossfade_frame_16k
 
         self.audio_buffer = torch.zeros(convert_size_16k, dtype=torch.float32, device=self.device_manager.device)
-        self.pitchf_buffer = torch.zeros(convert_feature_size_16k, dtype=torch.float32, device=self.device_manager.device)
+        # Additional +1 is to compensate for pitch extraction algorithm
+        # that can output additional feature.
+        self.pitchf_buffer = torch.zeros(convert_feature_size_16k + 1, dtype=torch.float32, device=self.device_manager.device)
         print('Allocated audio buffer:', self.audio_buffer.shape[0])
         print('Allocated pitchf buffer:', self.pitchf_buffer.shape[0])
-
-    def write_input(
-        self,
-        new_data: torch.Tensor,
-        target: torch.Tensor,
-    ):
-        offset = new_data.shape[0]
-        target[: -offset] = target[offset :].detach().clone()
-        target[-offset :] = new_data
-        return target
 
     def inference(self, audio_in: AudioInOutFloat):
         if self.pipeline is None:
@@ -191,7 +184,7 @@ class RVCr2(VoiceChangerModel):
             torch.as_tensor(audio_in, dtype=torch.float32, device=self.device_manager.device)
         )
 
-        self.audio_buffer = self.write_input(audio_in_16k, self.audio_buffer)
+        self.audio_buffer = circular_write(audio_in_16k, self.audio_buffer)
 
         vol_t = torch.sqrt(
             torch.square(self.audio_buffer[self.crop_start:self.crop_end]).mean()
@@ -201,14 +194,14 @@ class RVCr2(VoiceChangerModel):
 
         if vol < self.settings.silentThreshold:
             if self.slotInfo.f0:
-                self.pitchf_buffer = self.write_input(
+                self.pitchf_buffer = circular_write(
                     torch.zeros(audio_in.shape[0] // self.window, device=self.device_manager.device, dtype=torch.float32),
                     self.pitchf_buffer
                 )
             return None
 
         try:
-            audio_model, pitchf = self.pipeline.exec(
+            audio_model = self.pipeline.exec(
                 self.settings.dstId,
                 self.audio_buffer,
                 self.pitchf_buffer,
@@ -230,9 +223,6 @@ class RVCr2(VoiceChangerModel):
             self.initialize()
             # raise e
             return None
-
-        if pitchf is not None:
-            self.pitchf_buffer = self.write_input(pitchf, self.pitchf_buffer)
 
         # FIXME: Why the heck does it require another sqrt to amplify the volume?
         audio_out: torch.Tensor = self.resampler_out(audio_model * torch.sqrt(vol_t))

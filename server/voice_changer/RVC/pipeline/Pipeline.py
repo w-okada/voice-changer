@@ -207,12 +207,10 @@ class Pipeline:
             out_audio = self.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length)
             t.record("infer")
 
-            pitchf_buffer = pitchf.squeeze(0) if pitchf is not None else None
-
             # del p_len, pitch, pitchf, feats, sid
             # torch.cuda.empty_cache()
 
             t.record("post-process")
             # torch.cuda.empty_cache()
         # print("EXEC AVERAGE:", t.avrSecs)
-        return out_audio, pitchf_buffer
+        return out_audio
