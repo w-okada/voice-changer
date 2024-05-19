@@ -94,8 +94,8 @@ class Pipeline:
     def extractFeatures(self, feats: torch.Tensor, embOutputLayer: int, useFinalProj: bool):
         try:
             feats = self.embedder.extractFeatures(feats, embOutputLayer, useFinalProj)
-            if torch.isnan(feats).all():
-                raise DeviceCannotSupportHalfPrecisionException()
+            # if torch.isnan(feats).all():
+            #     raise DeviceCannotSupportHalfPrecisionException()
             return feats
         except RuntimeError as e:
             print("Failed to extract features:", e)
