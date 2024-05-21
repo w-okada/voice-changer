@@ -195,7 +195,7 @@ class RVCr2(VoiceChangerModel):
         if vol < self.settings.silentThreshold:
             if self.slotInfo.f0:
                 self.pitchf_buffer = circular_write(
-                    torch.zeros(audio_in.shape[0] // self.window, device=self.device_manager.device, dtype=torch.float32),
+                    torch.zeros(audio_in_16k.shape[0] // self.window, device=self.device_manager.device, dtype=torch.float32),
                     self.pitchf_buffer
                 )
             return None
