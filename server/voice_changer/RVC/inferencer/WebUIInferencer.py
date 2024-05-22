@@ -3,7 +3,7 @@ from const import EnumInferenceTypes
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
-from .rvc_models.models import SynthesizerTrnMsNSFsid
+from voice_changer.RVC.inferencer.rvc_models.infer_pack.models_onnx import SynthesizerTrnMsNSFsidM
 
 
 class WebUIInferencer(Inferencer):
@@ -14,7 +14,7 @@ class WebUIInferencer(Inferencer):
         isHalf = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
 
         cpt = torch.load(file, map_location="cpu")
-        model = SynthesizerTrnMsNSFsid(**cpt["params"], is_half=isHalf)
+        model = SynthesizerTrnMsNSFsidM(**cpt["params"], is_half=isHalf)
 
         model.eval()
         model.load_state_dict(cpt["weight"], strict=False)
@@ -33,9 +33,10 @@ class WebUIInferencer(Inferencer):
         pitch: torch.Tensor,
         pitchf: torch.Tensor,
         sid: torch.Tensor,
-        convert_length: int | None,
+        skip_head: torch.Tensor | None,
+        return_length: torch.Tensor | None,
     ) -> torch.Tensor:
-        res = self.model.infer(feats, pitch_length, pitch, pitchf, sid, convert_length=convert_length)
+        res = self.model.infer(feats, pitch_length, pitch, pitchf, sid, skip_head=skip_head)
         res = res[0][0, 0].to(dtype=torch.float32)
         res = torch.clip(res, -1.0, 1.0)
         return res

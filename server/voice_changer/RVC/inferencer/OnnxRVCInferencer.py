@@ -56,6 +56,7 @@ class OnnxRVCInferencer(Inferencer):
             binding.bind_input('pitch', device_type='cuda', device_id=feats.device.index, element_type=np.int64, shape=tuple(pitch.shape), buffer_ptr=pitch.data_ptr())
             binding.bind_input('pitchf', device_type='cuda', device_id=feats.device.index, element_type=np.float32, shape=tuple(pitchf.shape), buffer_ptr=pitchf.data_ptr())
             binding.bind_input('sid', device_type='cuda', device_id=feats.device.index, element_type=np.int64, shape=tuple(sid.shape), buffer_ptr=sid.data_ptr())
+            binding.bind_cpu_input('skip_head', np.array(skip_head, dtype=np.int64))
 
             binding.bind_output('audio', device_type='cuda', device_id=feats.device.index)
 
@@ -70,7 +71,8 @@ class OnnxRVCInferencer(Inferencer):
                     "p_len": pitch_length.detach().cpu().numpy(),
                     "pitch": pitch.detach().cpu().numpy(),
                     "pitchf": pitchf.detach().cpu().numpy(),
-                    "sid": sid.detach().cpu().numpy()
+                    "sid": sid.detach().cpu().numpy(),
+                    "skip_head": np.array(skip_head, dtype=np.int64)
                 },
             )
         # self.model.end_profiling()

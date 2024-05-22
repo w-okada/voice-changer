@@ -8,25 +8,7 @@ from const import TMP_DIR, EnumInferenceTypes
 from data.ModelSlot import RVCModelSlot
 from voice_changer.common.SafetensorsUtils import load_model
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
-from voice_changer.RVC.onnxExporter.SynthesizerTrnMs256NSFsid_ONNX import (
-    SynthesizerTrnMs256NSFsid_ONNX,
-)
-from voice_changer.RVC.onnxExporter.SynthesizerTrnMs256NSFsid_nono_ONNX import (
-    SynthesizerTrnMs256NSFsid_nono_ONNX,
-)
-from voice_changer.RVC.onnxExporter.SynthesizerTrnMs768NSFsid_ONNX import (
-    SynthesizerTrnMs768NSFsid_ONNX,
-)
-from voice_changer.RVC.onnxExporter.SynthesizerTrnMs768NSFsid_nono_ONNX import (
-    SynthesizerTrnMs768NSFsid_nono_ONNX,
-)
-from voice_changer.RVC.onnxExporter.SynthesizerTrnMsNSFsidNono_webui_ONNX import (
-    SynthesizerTrnMsNSFsidNono_webui_ONNX,
-)
-from voice_changer.RVC.onnxExporter.SynthesizerTrnMsNSFsid_webui_ONNX import (
-    SynthesizerTrnMsNSFsid_webui_ONNX,
-)
-from voice_changer.VoiceChangerParamsManager import VoiceChangerParamsManager
+from ..inferencer.rvc_models.infer_pack.models_onnx import SynthesizerTrnMsNSFsidM  # type: ignore
 from settings import ServerSettings
 
 def export2onnx(gpu: int, modelSlot: RVCModelSlot):
@@ -83,17 +65,18 @@ def _export2onnx(input_model, output_model, output_model_simple, gpu, metadata):
 
     # EnumInferenceTypesのままだとシリアライズできないのでテキスト化
     if metadata["modelType"] == EnumInferenceTypes.pyTorchRVC.value:
-        net_g_onnx = SynthesizerTrnMs256NSFsid_ONNX(*data["config"], is_half=is_half)
-    elif metadata["modelType"] == EnumInferenceTypes.pyTorchWebUI.value:
-        net_g_onnx = SynthesizerTrnMsNSFsid_webui_ONNX(**data["params"], is_half=is_half)
+        net_g_onnx = SynthesizerTrnMsNSFsidM(*data["config"], 256, is_half=is_half)
     elif metadata["modelType"] == EnumInferenceTypes.pyTorchRVCNono.value:
-        net_g_onnx = SynthesizerTrnMs256NSFsid_nono_ONNX(*data["config"])
+        net_g_onnx = SynthesizerTrnMsNSFsidM(*data["config"], 256, is_half=is_half)
+    # pyTorchWebUI already includes number of text embeddings in the model config (?)
+    elif metadata["modelType"] == EnumInferenceTypes.pyTorchWebUI.value:
+        net_g_onnx = SynthesizerTrnMsNSFsidM(**data["params"], is_half=is_half)
     elif metadata["modelType"] == EnumInferenceTypes.pyTorchWebUINono.value:
-        net_g_onnx = SynthesizerTrnMsNSFsidNono_webui_ONNX(**data["params"])
+        net_g_onnx = SynthesizerTrnMsNSFsidM(**data["params"], is_half=is_half)
     elif metadata["modelType"] == EnumInferenceTypes.pyTorchRVCv2.value:
-        net_g_onnx = SynthesizerTrnMs768NSFsid_ONNX(*data["config"], is_half=is_half)
+        net_g_onnx = SynthesizerTrnMsNSFsidM(*data["config"], 768, is_half=is_half)
     elif metadata["modelType"] == EnumInferenceTypes.pyTorchRVCv2Nono.value:
-        net_g_onnx = SynthesizerTrnMs768NSFsid_nono_ONNX(*data["config"])
+        net_g_onnx = SynthesizerTrnMsNSFsidM(*data["config"], 768, is_half=is_half)
     else:
         print(
             "unknwon::::: ",
@@ -118,25 +101,28 @@ def _export2onnx(input_model, output_model, output_model_simple, gpu, metadata):
         feats = torch.zeros((1, featsLength, metadata["embChannels"]), dtype=torch.float32, device=dev)
     p_len = torch.tensor([featsLength], dtype=torch.int64, device=dev)
     sid = torch.tensor([0], dtype=torch.int64, device=dev)
+    skip_head = torch.tensor(32, dtype=torch.int64, device=dev)
 
     if metadata["f0"]:
         pitch = torch.zeros((1, featsLength), dtype=torch.int64, device=dev)
         pitchf = torch.zeros((1, featsLength), dtype=torch.float32, device=dev)
-        input_names = ["feats", "p_len", "pitch", "pitchf", "sid"]
+        input_names = ["feats", "p_len", "pitch", "pitchf", "sid", "skip_head"]
         inputs = (
             feats,
             p_len,
             pitch,
             pitchf,
             sid,
+            skip_head,
         )
 
     else:
-        input_names = ["feats", "p_len", "sid"]
+        input_names = ["feats", "p_len", "sid", "skip_head"]
         inputs = (
             feats,
             p_len,
             sid,
+            skip_head,
         )
 
     output_names = [
@@ -152,7 +138,7 @@ def _export2onnx(input_model, output_model, output_model_simple, gpu, metadata):
             "pitch": [1],
             "pitchf": [1],
         },
-        do_constant_folding=False,
+        do_constant_folding=True,
         opset_version=17,
         verbose=False,
         input_names=input_names,
