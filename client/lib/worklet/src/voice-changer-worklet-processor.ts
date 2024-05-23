@@ -102,7 +102,7 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
 
         const f32Data = request.voice;
         const chunkSize = Math.floor(f32Data.length / this.BLOCK_SIZE);
-        if (this.playBuffer.length > chunkSize) {
+        if (this.playBuffer.length > chunkSize * 1.25) {
             console.log(`[worklet] Truncate ${this.playBuffer.length} > ${chunkSize}`);
             this.trancateBuffer(this.playBuffer.length - chunkSize);
         }
