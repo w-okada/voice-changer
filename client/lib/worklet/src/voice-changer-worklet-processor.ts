@@ -57,7 +57,7 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
         for (let i = 0; i < data.length; i++) {
             sum += data[i]
         }
-        const rms = Math.sqrt((sum ** 2) / data.length);
+        const rms = Math.sqrt((sum * sum) / data.length);
         return Math.max(rms, prevVol * 0.95);
     };
 
