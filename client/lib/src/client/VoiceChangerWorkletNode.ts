@@ -28,7 +28,9 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
   private listener: VoiceChangerWorkletListener;
 
   private setting: WorkletNodeSetting = DefaultClientSettng.workletNodeSetting;
-  private requestChunks: ArrayBuffer[] = [];
+  private requestChunks: ArrayBuffer = new ArrayBuffer(128);
+  private requestChunksView: DataView = new DataView(this.requestChunks);
+  private chunkCounter: number = 0;
   private socket: Socket<DefaultEventsMap, DefaultEventsMap> | null = null;
   // performance monitor
   private bufferStart = 0;
@@ -73,6 +75,10 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
     ) {
       recreateSocketIoRequired = true;
     }
+    this.requestChunks = new ArrayBuffer(setting.inputChunkNum * 128 * 2);
+    this.requestChunksView = new DataView(this.requestChunks);
+    this.chunkCounter = 0;
+
     this.setting = setting;
     if (recreateSocketIoRequired) {
       this.createSocketIO();
@@ -192,40 +198,26 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
 
       // Float to Int16 (internalの場合はfloatのまま行く。)
       if (this.setting.protocol != "internal") {
-        const arrayBuffer = new ArrayBuffer(inputData.length * 2);
-        const dataView = new DataView(arrayBuffer);
+        const offset = inputData.length * this.chunkCounter * 2;
         for (let i = 0; i < inputData.length; i++) {
           let s = Math.max(-1, Math.min(1, inputData[i]));
           s = s < 0 ? s * 0x8000 : s * 0x7fff;
-          dataView.setInt16(i * 2, s, true);
+          this.requestChunksView.setInt16(offset + i * 2, s, true);
         }
-        // バッファリング
-        this.requestChunks.push(arrayBuffer);
       } else {
         // internal
         // console.log("inputData.buffer", inputData.buffer);
-        this.requestChunks.push(inputData.buffer);
+        // this.requestChunks.push(inputData.buffer);
       }
 
       //// リクエストバッファの中身が、リクエスト送信数と違う場合は処理終了。
-      if (this.requestChunks.length < this.setting.inputChunkNum) {
+      if (this.chunkCounter < this.setting.inputChunkNum - 1) {
+        this.chunkCounter++;
         return;
       }
 
-      // リクエスト用の入れ物を作成
-      const windowByteLength = this.requestChunks.reduce((prev, cur) => {
-        return prev + cur.byteLength;
-      }, 0);
-      const newBuffer = new Uint8Array(windowByteLength);
-
-      // リクエストのデータをセット
-      this.requestChunks.reduce((prev, cur) => {
-        newBuffer.set(new Uint8Array(cur), prev);
-        return prev + cur.byteLength;
-      }, 0);
-
-      this.sendBuffer(newBuffer);
-      this.requestChunks = [];
+      this.sendBuffer(new Uint8Array(this.requestChunks));
+      this.chunkCounter = 0;
 
       this.listener.notifySendBufferingTime(Date.now() - this.bufferStart);
       this.bufferStart = Date.now();
@@ -307,6 +299,10 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
   };
 
   start = async () => {
+    this.requestChunks = new ArrayBuffer(this.setting.inputChunkNum * 128 * 2);
+    this.requestChunksView = new DataView(this.requestChunks);
+    this.chunkCounter = 0;
+
     const p = new Promise<void>((resolve) => {
       this.startPromiseResolve = resolve;
     });

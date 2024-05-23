@@ -42,7 +42,6 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
     private isRecording = false;
 
     playBuffer: Float32Array[] = [];
-    unpushedF32Data: Float32Array = new Float32Array(0);
     /**
      * @constructor
      */
@@ -54,18 +53,17 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
     }
 
     calcVol = (data: Float32Array, prevVol: number) => {
-        const sum = data.reduce((prev, cur) => {
-            return prev + cur * cur;
-        }, 0);
-        const rms = Math.sqrt(sum / data.length);
+        let sum = 0;
+        for (let i = 0; i < data.length; i++) {
+            sum += data[i]
+        }
+        const rms = Math.sqrt((sum ** 2) / data.length);
         return Math.max(rms, prevVol * 0.95);
     };
 
-    trancateBuffer = () => {
+    trancateBuffer = (start: number, end?: number) => {
+        this.playBuffer = this.playBuffer.slice(start, end)
         console.log("[worklet] Buffer truncated");
-        while (this.playBuffer.length > 2) {
-            this.playBuffer.shift();
-        }
     };
     handleMessage(event: any) {
         const request = event.data as VoiceChangerWorkletProcessorRequest;
@@ -98,30 +96,21 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
             this.port.postMessage(stopResponse);
             return;
         } else if (request.requestType === "trancateBuffer") {
-            this.trancateBuffer();
+            this.trancateBuffer(0, 0);
             return;
         }
 
         const f32Data = request.voice;
-        // if (this.playBuffer.length > this.numTrancateTreshold) {
-        //     console.log(`[worklet] Truncate ${this.playBuffer.length} > ${this.numTrancateTreshold}`);
-        //     this.trancateBuffer();
-        // }
-        if (this.playBuffer.length > (f32Data.length / this.BLOCK_SIZE) * 1.5) {
-            console.log(`[worklet] Truncate ${this.playBuffer.length} > ${f32Data.length / this.BLOCK_SIZE}`);
-            this.trancateBuffer();
+        const chunkSize = Math.floor(f32Data.length / this.BLOCK_SIZE);
+        if (this.playBuffer.length > chunkSize) {
+            console.log(`[worklet] Truncate ${this.playBuffer.length} > ${chunkSize}`);
+            this.trancateBuffer(this.playBuffer.length - chunkSize);
         }
 
-        const concatedF32Data = new Float32Array(this.unpushedF32Data.length + f32Data.length);
-        concatedF32Data.set(this.unpushedF32Data);
-        concatedF32Data.set(f32Data, this.unpushedF32Data.length);
-
-        const chunkNum = Math.floor(concatedF32Data.length / this.BLOCK_SIZE);
-        for (let i = 0; i < chunkNum; i++) {
-            const block = concatedF32Data.slice(i * this.BLOCK_SIZE, (i + 1) * this.BLOCK_SIZE);
+        for (let i = 0; i < chunkSize; i++) {
+            const block = f32Data.subarray(i * this.BLOCK_SIZE, (i + 1) * this.BLOCK_SIZE);
             this.playBuffer.push(block);
         }
-        this.unpushedF32Data = concatedF32Data.slice(chunkNum * this.BLOCK_SIZE);
     }
 
     pushData = (inputData: Float32Array) => {
@@ -171,7 +160,7 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
         //         // console.log("silent...skip")
         //     }
         // }
-        let voice = this.playBuffer.shift();
+        const voice = this.playBuffer.shift();
         if (voice) {
             this.volume = this.calcVol(voice, this.volume);
             const volumeResponse: VoiceChangerWorkletProcessorResponse = {
