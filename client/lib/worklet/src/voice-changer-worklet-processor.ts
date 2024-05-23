@@ -133,10 +133,6 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
             }
         }
 
-        if (this.playBuffer.length === 0) {
-            // console.log("[worklet] no play buffer");
-            return true;
-        }
         // console.log("[worklet] play buffer");
         //// 一定期間無音状態が続いている場合はスキップ。
         // let voice: Float32Array | undefined
