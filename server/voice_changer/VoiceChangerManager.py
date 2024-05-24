@@ -4,6 +4,7 @@ import sys
 import shutil
 import threading
 import numpy as np
+import torch
 from downloader.SampleDownloader import downloadSample, getSampleInfos
 from mods.log_control import VoiceChangaerLogger
 from voice_changer.Local.ServerDevice import ServerDevice, ServerDeviceCallbacks
@@ -333,11 +334,12 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         if self.settings.passThrough:  # パススルー
             return receivedData, [0, 0, 0]
 
-        if self.voiceChanger is not None:
-            return self.voiceChanger.on_request(receivedData)
-        else:
+        if self.voiceChanger is None:
             logger.info("Voice Change is not loaded. Did you load a correct model?")
             return np.zeros(1, dtype=np.float32), [0, 0, 0]
+
+        with torch.no_grad():
+            return self.voiceChanger.on_request(receivedData)
 
     def export2onnx(self):
         return self.voiceChanger.export2onnx()
