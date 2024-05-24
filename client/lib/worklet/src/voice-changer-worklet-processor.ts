@@ -118,7 +118,7 @@ class VoiceChangerWorkletProcessor extends AudioWorkletProcessor {
             responseType: ResponseType.inputData,
             inputData: inputData,
         };
-        this.port.postMessage(volumeResponse);
+        this.port.postMessage(volumeResponse, [inputData.buffer]);
     };
 
     process(_inputs: Float32Array[][], outputs: Float32Array[][], _parameters: Record<string, Float32Array>) {

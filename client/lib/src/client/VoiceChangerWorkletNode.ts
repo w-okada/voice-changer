@@ -164,6 +164,10 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
       f32Data[i] = x >= 0x8000 ? -(0x10000 - x) / 0x8000 : x / 0x7fff;
     }
 
+    if (this.isOutputRecording) {
+      this.recordingOutputChunk.push(f32Data.slice());
+    }
+
     const req: VoiceChangerWorkletProcessorRequest = {
       requestType: "voice",
       voice: f32Data,
@@ -171,11 +175,7 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
       volTrancateThreshold: 0,
       volTrancateLength: 0,
     };
-    this.port.postMessage(req);
-
-    if (this.isOutputRecording) {
-      this.recordingOutputChunk.push(f32Data);
-    }
+    this.port.postMessage(req, [f32Data.buffer]);
   };
 
   handleMessage(event: any) {
