@@ -3,7 +3,9 @@ import faiss.contrib.torch_utils
 import sys
 import torch
 import torch.nn.functional as F
-from torch.cuda.amp import autocast
+import onnxruntime
+from voice_changer.common.deviceManager.DeviceManager import DeviceManager
+from io import BytesIO
 from Exceptions import (
     DeviceCannotSupportHalfPrecisionException,
     DeviceChangingException,
@@ -14,14 +16,37 @@ from mods.log_control import VoiceChangaerLogger
 
 from voice_changer.RVC.embedder.Embedder import Embedder
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
-from voice_changer.RVC.inferencer.OnnxRVCInferencer import OnnxRVCInferencer
-from voice_changer.RVC.inferencer.OnnxRVCInferencerNono import OnnxRVCInferencerNono
 
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 from voice_changer.utils.Timer import Timer2
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
 
+class OnnxUpscaler(torch.nn.Module):
+    def __init__(self):
+        super(OnnxUpscaler, self).__init__()
+
+    def forward(self, x: torch.Tensor):
+        x = F.interpolate(x, scale_factor=2, mode='nearest')
+        return x.permute(0, 2, 1)
+
+def make_onnx_upscaler(device: torch.device, dim_size: int):
+    (
+        providers,
+        provider_options,
+    ) = DeviceManager.get_instance().getOnnxExecutionProvider(device.index)
+
+    with BytesIO() as io:
+        torch.onnx.export(
+            OnnxUpscaler(),
+            torch.randn(1, dim_size, 100),
+            io,
+            dynamic_axes={'in': [2]},
+            opset_version=17,
+            input_names=['in'],
+            output_names=['out'],
+        )
+        return onnxruntime.InferenceSession(io.getvalue(), providers=providers, provider_options=provider_options)
 
 class Pipeline:
     embedder: Embedder
@@ -45,6 +70,7 @@ class Pipeline:
         index_reconstruct: torch.Tensor | None,
         # feature: Any | None,
         targetSR: int,
+        embChannels: int,
         device: torch.device,
         isHalf: bool,
     ):
@@ -59,6 +85,8 @@ class Pipeline:
         self.index_reconstruct: torch.Tensor | None = index_reconstruct
         self.use_gpu_index = sys.platform == 'linux' and device.type == 'cuda'
         # self.feature = feature
+
+        self.onnx_upscaler = make_onnx_upscaler(device, embChannels) if device.type == 'privateuseone' else None
 
         self.targetSR = targetSR
         self.device = device
@@ -193,7 +221,11 @@ class Pipeline:
                     feats = feats * pitchff + feats * (1 - pitchff)
 
             audio_feats_len = audio.shape[0] // self.window
-            feats: torch.Tensor = F.interpolate(feats.permute(0, 2, 1), scale_factor=2).permute(0, 2, 1).contiguous()
+            if self.onnx_upscaler is not None:
+                feats = self.onnx_upscaler.run(['out'], { 'in': feats.permute(0, 2, 1).detach().cpu().numpy() })
+                feats = torch.as_tensor(feats[0], dtype=torch.float32, device=self.device)
+            else:
+                feats: torch.Tensor = F.interpolate(feats.permute(0, 2, 1), scale_factor=2, mode='nearest').permute(0, 2, 1).contiguous()
 
             feats = feats[:, :audio_feats_len, :]
             if pitch is not None and pitchf is not None:
