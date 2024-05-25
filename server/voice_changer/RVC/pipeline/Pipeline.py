@@ -29,13 +29,6 @@ from voice_changer.utils.Timer import Timer2
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
 
-class OnnxUpscaler(torch.nn.Module):
-    def __init__(self):
-        super(OnnxUpscaler, self).__init__()
-
-    def forward(self, x: torch.Tensor):
-        x = F.interpolate(x, scale_factor=2, mode='nearest')
-        return x.permute(0, 2, 1)
 
 def make_onnx_upscaler(device: torch.device, dim_size: int):
     # Inputs
