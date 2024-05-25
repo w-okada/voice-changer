@@ -10,14 +10,13 @@ from voice_changer.common.SafetensorsUtils import load_model
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from ..inferencer.rvc_models.infer_pack.models_onnx import SynthesizerTrnMsNSFsidM  # type: ignore
 from settings import ServerSettings
+from io import BytesIO
 
 def export2onnx(gpu: int, modelSlot: RVCModelSlot):
     model_dir = ServerSettings().model_dir
     modelFile = os.path.join(model_dir, str(modelSlot.slotIndex), os.path.basename(modelSlot.modelFile))
 
-    output_file = os.path.splitext(os.path.basename(modelFile))[0] + ".onnx"
     output_file_simple = os.path.splitext(os.path.basename(modelFile))[0] + "_simple.onnx"
-    output_path = os.path.join(TMP_DIR, output_file)
     output_path_simple = os.path.join(TMP_DIR, output_file_simple)
     metadata = {
         "application": "VC_CLIENT",
@@ -32,12 +31,12 @@ def export2onnx(gpu: int, modelSlot: RVCModelSlot):
     }
 
     print("[Voice Changer] Exporting onnx...")
-    _export2onnx(modelFile, output_path, output_path_simple, gpu, metadata)
+    _export2onnx(modelFile, output_path_simple, gpu, metadata)
 
     return output_file_simple
 
 
-def _export2onnx(input_model, output_model, output_model_simple, gpu, metadata):
+def _export2onnx(input_model: str, output_model_simple: str, gpu: int, metadata: dict):
     dev = DeviceManager.get_instance().getDevice(gpu)
     if dev.type == 'privateuseone':
         dev = torch.device('cpu')
@@ -129,23 +128,24 @@ def _export2onnx(input_model, output_model, output_model_simple, gpu, metadata):
         "audio",
     ]
 
-    torch.onnx.export(
-        net_g_onnx,
-        inputs,
-        output_model,
-        dynamic_axes={
-            "feats": [1],
-            "pitch": [1],
-            "pitchf": [1],
-        },
-        do_constant_folding=True,
-        opset_version=17,
-        verbose=False,
-        input_names=input_names,
-        output_names=output_names,
-    )
+    with BytesIO() as io:
+        torch.onnx.export(
+            net_g_onnx,
+            inputs,
+            io,
+            dynamic_axes={
+                "feats": [1],
+                "pitch": [1],
+                "pitchf": [1],
+            },
+            do_constant_folding=True,
+            opset_version=17,
+            verbose=False,
+            input_names=input_names,
+            output_names=output_names,
+        )
+        onnx_model, _ = simplify(onnx.load_model_from_string(io.getvalue()))
 
-    onnx_model, _ = simplify(onnx.load(output_model))
     meta = onnx_model.metadata_props.add()
     meta.key = "metadata"
     meta.value = json.dumps(metadata)
