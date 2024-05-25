@@ -219,8 +219,7 @@ class VoiceChangerV2(VoiceChangerIF):
             with Timer2("main-process", True) as t:
                 block_size = audio_in.shape[0]
 
-                with torch.no_grad():
-                    audio = self.voiceChangerModel.inference(audio_in)
+                audio = self.voiceChangerModel.inference(audio_in)
 
                 if audio is None:
                     return np.zeros(block_size, dtype=np.float32), [0, 0, 0]
