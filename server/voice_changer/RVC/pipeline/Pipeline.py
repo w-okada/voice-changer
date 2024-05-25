@@ -1,11 +1,18 @@
 from faiss import IndexIVFFlat
 import faiss.contrib.torch_utils
+
+from onnx import TensorProto
+from onnx.helper import (
+    make_model, make_node, make_graph,
+    make_tensor_value_info
+)
+
+import numpy as np
 import sys
 import torch
 import torch.nn.functional as F
 import onnxruntime
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
-from io import BytesIO
 from Exceptions import (
     DeviceCannotSupportHalfPrecisionException,
     DeviceChangingException,
@@ -31,22 +38,29 @@ class OnnxUpscaler(torch.nn.Module):
         return x.permute(0, 2, 1)
 
 def make_onnx_upscaler(device: torch.device, dim_size: int):
+    # Inputs
+    input = make_tensor_value_info('in', TensorProto.FLOAT, [1, dim_size, None])
+    scales = make_tensor_value_info('scales', TensorProto.FLOAT, [None])
+    # Outputs
+    output = make_tensor_value_info('out', TensorProto.FLOAT, [1, dim_size, None])
+
+    resize_node = make_node(
+        "Resize",
+        inputs=["in", "", "scales"],
+        outputs=["out"],
+        mode="nearest",
+        axes=[2]
+    )
+
+    graph = make_graph([resize_node], 'upscaler', [input, scales], [output])
+
+    onnx_model = make_model(graph)
+
     (
         providers,
         provider_options,
     ) = DeviceManager.get_instance().getOnnxExecutionProvider(device.index)
-
-    with BytesIO() as io:
-        torch.onnx.export(
-            OnnxUpscaler(),
-            torch.randn(1, dim_size, 100),
-            io,
-            dynamic_axes={'in': [2]},
-            opset_version=17,
-            input_names=['in'],
-            output_names=['out'],
-        )
-        return onnxruntime.InferenceSession(io.getvalue(), providers=providers, provider_options=provider_options)
+    return onnxruntime.InferenceSession(onnx_model.SerializeToString(), providers=providers, provider_options=provider_options)
 
 class Pipeline:
     embedder: Embedder
@@ -222,8 +236,8 @@ class Pipeline:
 
             audio_feats_len = audio.shape[0] // self.window
             if self.onnx_upscaler is not None:
-                feats = self.onnx_upscaler.run(['out'], { 'in': feats.permute(0, 2, 1).detach().cpu().numpy() })
-                feats = torch.as_tensor(feats[0], dtype=torch.float32, device=self.device)
+                feats = self.onnx_upscaler.run(['out'], { 'in': feats.permute(0, 2, 1).detach().cpu().numpy(), 'scales': np.array([2], dtype=np.float32) })
+                feats = torch.as_tensor(feats[0], dtype=torch.float32, device=self.device).permute(0, 2, 1)
             else:
                 feats: torch.Tensor = F.interpolate(feats.permute(0, 2, 1), scale_factor=2, mode='nearest').permute(0, 2, 1).contiguous()
 
