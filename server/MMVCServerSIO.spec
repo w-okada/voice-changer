@@ -1,5 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 # from PyInstaller.utils.hooks import collect_all
+from PyInstaller.utils.hooks import collect_data_files
 import sys
 import os.path
 import site
@@ -25,6 +26,7 @@ else:
     binaries = [(python_folder + '/onnxruntime/capi/*.so', 'onnxruntime/capi')]
 
 hiddenimports = ['app']
+datas += collect_data_files('onnxscript', include_py_files=True)
 # tmp_ret = collect_all('fairseq')
 # datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 
@@ -38,7 +40,7 @@ a = Analysis(
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
-    noarchive=False,
+    noarchive=True,
 )
 pyz = PYZ(a.pure)
 
