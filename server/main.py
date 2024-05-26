@@ -56,14 +56,17 @@ def printMessage(message, level=0):
             message = f"\033[47m    {message}\033[0m"
     logger.info(message)
 
+def check_port(port) -> int:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind(("127.0.0.1", port))
+
 def wait_for_server(proto: str, launch_browser: bool):
     while True:
         time.sleep(1)
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        result = sock.connect_ex(('127.0.0.1', settings.port))
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            result = sock.connect_ex(('127.0.0.1', settings.port))
         if result == 0:
             break
-        sock.close()
     print('-' * 8)
     print(f"The server is listening on {proto}://{settings.host}:{settings.port}/")
     print('-' * 8)
@@ -71,6 +74,8 @@ def wait_for_server(proto: str, launch_browser: bool):
         open_new_tab(f'{proto}://127.0.0.1:{settings.port}')
 
 async def runServer(host: str, port: int, launch_browser: bool = False, logLevel: str = 'critical', key_path: str | None = None, cert_path: str | None = None):
+    check_port(port)
+
     config = uvicorn.Config(
         "app:socketio",
         host=host,
