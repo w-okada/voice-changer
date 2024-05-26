@@ -14,7 +14,7 @@ The following videos demonstrate how the voice changer works and performs with A
 
 [Amd iGPU.webm](https://github.com/deiteris/voice-changer/assets/6103913/af72e31a-cf66-447b-87c9-43f13355402f)
 
-[Amd dGPU Radeon RX 6600M.webm](https://github.com/deiteris/voice-changer/assets/6103913/74ea7b24-4a0c-42ac-889d-dd5e4353229d)
+[Amd Dgpu Rx6600m.webm](https://github.com/deiteris/voice-changer/assets/6103913/bc5180b8-3f67-478b-9ea8-c8ae5e59a4c2)
 
 ## Supported operated systems
 
