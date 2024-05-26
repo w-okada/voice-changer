@@ -1,218 +1,242 @@
-## VC Client
+# Voice Changer
 
-[English](/README_en.md) [Korean](/README_ko.md)
+## Overview
 
-## What's New!
-- v.1.5.3.17b
-  - bugfix:
-    - clear setting
-  - improve
-    - file sanitizer
-  - chage:
-    - default input chunk size: 192.
-      - decided by this chart.(https://rentry.co/VoiceChangerGuide#gpu-chart-for-known-working-chunkextra)
+This is a fork of [w-okada voice changer](https://github.com/w-okada/voice-changer) that performs real-time voice conversion
+using various voice conversion algorithms.
 
-- v.1.5.3.17a
-  - Bug Fixes:
-    - Server mode error
-    - RVC Model merger
-  - Misc
-    - Add RVC Sample Chihaya-Jinja (https://chihaya369.booth.pm/items/4701666)
+> **NOTE**: Currently, this version is only guaranteed to work with Retrieval-based Voice Conversion (RVC).
+> Other voice conversion algorithms are not guaranteed to work.
 
-- v.1.5.3.17
-  - New Features:
-    - Added similarity graph for Beatrice speaker selection 
-  - Bug Fixes:
-    - Fixed crossfade issue with Beatrice speaker
+The fork mostly preserves the same user interface and user experience, gradually improving the existing features and peformance.
 
-- v.1.5.3.16a
-  - Bug fix:
-    - Lazy load Beatrice.
+## Supported operated systems
 
-- v.1.5.3.16 (Only for Windows, CPU dependent)
-  - New Feature:
-    - Beatrice is supported(experimental) 
+> **NOTE**: macOS builds are not included yet. But you can run from source.
 
-- v.1.5.3.15
-  - Improve:
-    - new rmvpe checkpoint for rvc (torch, onnx)
-    - Mac: upgrade torch version 2.1.0
+* Windows 10 or later.
+* Linux.
+* macOS.
 
+## System requirements
 
+> **NOTE**: Minimum requirement means that you will be able to run **ONLY** the voice changer. Voice conversion and gaming at the same time will not provide satisfying experience.
 
+### CPU-only voice conversion
 
-# VC Client とは
+Minimum requirement: Intel Core i5-4690K or AMD FX-6300.
 
-1. 各種音声変換 AI(VC, Voice Conversion)を用いてリアルタイム音声変換を行うためのクライアントソフトウェアです。サポートしている音声変換 AI は次のものになります。
+Recommended requirement: Intel Core i5-10400F or AMD Ryzen 5 1600X.
 
-- サポートする音声変換 AI （サポート VC）
-  - [MMVC](https://github.com/isletennos/MMVC_Trainer)
-  - [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc)
-  - [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI)
-  - [DDSP-SVC](https://github.com/yxlllc/DDSP-SVC)
-  - [Beatrice JVS Corpus Edition](https://prj-beatrice.com/) * experimental,  (***NOT MIT Licnsence*** see [readme](https://github.com/w-okada/voice-changer/blob/master/server/voice_changer/Beatrice/)) *  Only for Windows, CPU dependent
-1. 本ソフトウェアは、ネットワークを介した利用も可能であり、ゲームなどの高負荷なアプリケーションと同時に使用する場合などに音声変換処理の負荷を外部にオフロードすることができます。
+### GPU voice conversion
 
-![image](https://user-images.githubusercontent.com/48346627/206640768-53f6052d-0a96-403b-a06c-6714a0b7471d.png)
+Minimum requirement:
 
-3. 複数のプラットフォームに対応しています。
+* An integrated graphics card: AMD Radeon Vega 7 (with AMD Ryzen 5 5600G) or later.
+* A dedicated graphics card: Nvidia GeForce GTX 900 Series or later or AMD Radeon RX 500 series or later.
 
-- Windows, Mac(M1), Linux, Google Colab (MMVC のみ)
+Recommended requirement:
 
-# 使用方法
+A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX 6000 series or later.
 
-大きく 2 つの方法でご利用できます。難易度順に次の通りです。
+## Known issues
 
-- 事前ビルド済みの Binary での利用
-- Docker や Anaconda など環境構築を行った上での利用
+### General
 
-本ソフトウェアや MMVC になじみの薄い方は上から徐々に慣れていくとよいと思います。
+* Mozilla Firefox ESR may not display audio devices.
 
-## (1) 事前ビルド済みの Binary での利用
+### DirectML (dml) version
 
-- 実行形式のバイナリをダウンロードして実行することができます。
+* When changing **Chunk**, **Extra** or **Crossfade size** settings, you must switch device to CPU then back to your GPU.
+  Otherwise, performance issues can be observed.
 
-- チュートリアルは[こちら](tutorials/tutorial_rvc_ja_latest.md)をご覧ください。([ネットワークのトラブルシュート](https://github.com/w-okada/voice-changer/blob/master/tutorials/trouble_shoot_communication_ja.md))
+* Only `rmvpe_onnx`, `crepe_tiny_onnx` and `crepe_full_onnx` are available in the list of **F0 Det.**.
 
-- [Google Colaboratory](https://github.com/w-okada/voice-changer/blob/master/Realtime_Voice_Changer_on_Colab.ipynb) で簡単にお試しいただけるようになりました。左上の Open in Colab のボタンから起動できます。
+### All versions
 
-<img src="https://github.com/w-okada/voice-changer/assets/48346627/3f092e2d-6834-42f6-bbfd-7d389111604e" width="400" height="150">
+* Export to ONNX does not work.
 
-- Windows 版と Mac 版を提供しています。
+## How to use
 
-  - Windows かつ Nvidia の GPU をご使用の方は、ONNX(cpu,cuda), PyTorch(cpu,cuda)をダウンロードしてください。
-  - Windows かつ AMD/Intel の GPU をご使用の方は、ONNX(cpu,DirectML), PyTorch(cpu,cuda)をダウンロードしてください。AMD/Intel の GPU は onnx のモデルを使用する場合のみ有効になります。
-  - いずれの GPU のサポート状況についても、PyTorch、Onnxruntime がサポートしている場合のみ有効になります。
-  - Windows で GPU をご使用にならない方は、ONNX(cpu,cuda), PyTorch(cpu,cuda)をダウンロードしてください。
+### Running locally
 
-- Windows 版は、ダウンロードした zip ファイルを解凍して、`start_http.bat`を実行してください。
+> **NOTE**: These instructions are for Windows only.
 
-- Mac 版はダウンロードファイルを解凍したのちに、`startHttp.command`を実行してください。開発元を検証できない旨が示される場合は、再度コントロールキーを押してクリックして実行してください(or 右クリックから実行してください)。
+#### Before you start
 
-- 初回起動時は各種データをダウンロードします。ダウンロードに時間がかかる可能性があります。ダウンロードが完了すると、ブラウザが立ち上がります。
+1. [If not installed] Download and install [7-Zip](https://www.7-zip.org/).
 
-- リモートから接続する場合は、`.bat`ファイル(win)、`.command`ファイル(mac)の http が https に置き換わっているものを使用してください。
+1. [If not installed] Download and install [VAC Lite by Muzychenko](https://software.muzychenko.net/freeware/vac470lite.zip).
 
-- DDPS-SVC の encoder は hubert-soft のみ対応です。
+1. Navigate to the [releases section](https://github.com/deiteris/voice-changer/releases).
 
-- ダウンロードはこちらから。
+#### Check your hardware
 
-| Version     | OS  | フレームワーク                        | link                                                                | サポート VC                                                                         | サイズ |
-| ----------- | --- | ------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------ |
-| v.1.5.3.17b | mac | ONNX(cpu), PyTorch(cpu,mps)           | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                                    | 797MB  |
-|             | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3240MB |
-|             | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3125MB |
-| v.1.5.3.16a | mac | ONNX(cpu), PyTorch(cpu,mps)           | N/A                                                                 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                                    | 797MB  |
-|             | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3240MB |
-|             | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3125MB |
-| v.1.5.3.15  | mac | ONNX(cpu), PyTorch(cpu,mps)           | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                                    | 797MB  |
-|             | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC           | 3240MB |
-|             | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC           | 3125MB |
+1. Open **Task Manager** > **Performance**.
 
-(\*1) Google Drive からダウンロードできない方は[hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)からダウンロードしてみてください
-(\*2) 開発者が AMD のグラフィックボードを持っていないので動作確認していません。onnxruntime-directml を同梱しただけのものです。
-(\*3) 解凍や起動が遅い場合、ウィルス対策ソフトのチェックが走っている可能性があります。ファイルやフォルダを対象外にして実行してみてください。（自己責任です）
+1. Click **CPU**, check and note the processor model on the right. An example: AMD Ryzen 7 5800H with Radeon Graphics.
 
-## (2) Docker や Anaconda など環境構築を行った上での利用
+1. Check and note graphics card models under **GPU**. An example:
 
-本リポジトリをクローンして利用します。Windows では WSL2 の環境構築が必須になります。また、WSL2 上で Docker もしくは Anaconda などの仮想環境の構築が必要となります。Mac では Anaconda などの Python の仮想環境の構築が必要となります。事前準備が必要となりますが、多くの環境においてこの方法が一番高速で動きます。**<font color="red"> GPU が無くてもそこそこ新しい CPU であれば十分動く可能性があります </font>（下記のリアルタイム性の節を参照）**。
+   * GPU 0: AMD Radeon RX 6600M.
 
-[WSL2 と Docker のインストールの解説動画](https://youtu.be/POo_Cg0eFMU)
+   * GPU 1: AMD Radeon(TM) Graphics.
 
-[WSL2 と Anaconda のインストールの解説動画](https://youtu.be/fba9Zhsukqw)
+#### For AMD/Intel/CPU users
 
-Docker での実行は、[Docker を使用する](docker_vcclient/README.md)を参考にサーバを起動してください。
+1. Download the `voice-changer-windows-amd64-dml.zip.001` ZIP file.
 
-Anaconda の仮想環境上での実行は、[サーバ開発者向けのページ](README_dev_ja.md)を参考にサーバを起動してください。
+1. Right-click the ZIP file. In the opened action menu select **7-Zip** > **Extract to "voice-changer-windows-amd64-dml\\"**
 
-# トラブルシュート
+#### For Nvidia users
 
-- [通信編](tutorials/trouble_shoot_communication_ja.md)
+1. Download the `voice-changer-windows-amd64-cuda.zip.001` and `voice-changer-windows-amd64-cuda.zip.002` ZIP files and place them in the same folder.
 
-# リアルタイム性（MMVC）
+1. Right-click either of ZIP files. In the opened action menu select **7-Zip** > **Extract to "voice-changer-windows-amd64-cuda\\"**
 
-GPU を使用するとほとんどタイムラグなく変換可能です。
+#### Running
 
-https://twitter.com/DannadoriYellow/status/1613483372579545088?s=20&t=7CLD79h1F3dfKiTb7M8RUQ
+1. Open the extracted folder (`voice-changer-windows-amd64-dml` or `voice-changer-windows-amd64-cuda`) > `dist` > `MMVCServerSIO`.
 
-CPU でも最近のであればそれなりの速度で変換可能。
+1. Run `MMVCServerSIO.exe`.
 
-https://twitter.com/DannadoriYellow/status/1613553862773997569?s=20&t=7CLD79h1F3dfKiTb7M8RUQ
+When running the voice changer for the first time, it will start downloading necessary files. Do not close the window until the download finishes.
 
-古い CPU( i7-4770)だと、1000msec くらいかかってしまう。
+Once the download is finished, the voice changer will open the user interface using your default web browser.
 
-# 開発者の署名について
+### Running on Colab/Kaggle
 
-本ソフトウェアは開発元の署名しておりません。下記のように警告が出ますが、コントロールキーを押しながらアイコンをクリックすると実行できるようになります。これは Apple のセキュリティポリシーによるものです。実行は自己責任となります。
+Refer to corresponding [Colab](https://github.com/deiteris/voice-changer/blob/master-custom/Colab_RealtimeVoiceChanger.ipynb) or [Kaggle](https://github.com/deiteris/voice-changer/blob/master-custom/Kaggle_RealtimeVoiceChanger.ipynb) notebooks in this repository and follow their instructions.
 
-![image](https://user-images.githubusercontent.com/48346627/212567711-c4a8d599-e24c-4fa3-8145-a5df7211f023.png)
+## Troubleshooting
 
-# Acknowledgments
+> **NOTE**: When any issue with the voice changer occurs, check the command line window (the one that opens during the start) for errors.
 
-- [立ちずんだもん素材](https://seiga.nicovideo.jp/seiga/im10792934)
-- [いらすとや](https://www.irasutoya.com/)
-- [つくよみちゃん](https://tyc.rei-yumesaki.net/)
+### Weight failed to pass verification check
+
+Either the download was incomplete during the first-time start or your files were corrupted. The error will show which files are affected above:
 
 ```
-  本ソフトウェアの音声合成には、フリー素材キャラクター「つくよみちゃん」が無料公開している音声データを使用しています。
-  ■つくよみちゃんコーパス（CV.夢前黎）
-  https://tyc.rei-yumesaki.net/material/corpus/
-  © Rei Yumesaki
+Corrupted file pretrain/crepe_onnx_full.onnx: calculated hash 67f6432087eec1887bfcfc6e4045dcae, expected hash e9bb11eb5d3557805715077b30aefebc
+Corrupted file pretrain/content_vec_500.onnx: calculated hash ef1f3a8da54c6c7d1ebc708b5824e155, expected hash ab288ca5b540a4a15909a40edf875d1e
+Corrupted file pretrain/rmvpe.pt: calculated hash a014255b0460e3cc20c576c01d5583ff, expected hash 7989809b6b54fb33653818e357bcb643
+Corrupted file pretrain/rmvpe.onnx: calculated hash 9737c9c9b5ce93bd797a643613ac87e1, expected hash b6979bf69503f8ec48c135000028a7b0
 ```
 
-- [あみたろの声素材工房](https://amitaro.net/)
-- [れぷりかどーる](https://kikyohiroto1227.wixsite.com/kikoto-utau)
+Delete the mentioned files and restart the voice changer. Deleted files will be re-downloaded.
 
-# 利用規約
+### Audio devices are not displayed
 
-- リアルタイムボイスチェンジャーつくよみちゃんについては、つくよみちゃんコーパスの利用規約に準じ、次の目的で変換後の音声を使用することを禁止します。
+1. Make sure that you have given the permission to access the microphone.
+
+1. If you are using Mozilla Firefox ESR, there may be an issue with audio devices. Use other web browser (preferably Chrome or Chromium-based).
+
+### No sound after start
+
+1. Make sure you have selected correct input and output audio devices.
+
+1. Make sure your input device is not muted. Check the microphone volume in the system settings or hardware switch on your headset (usually a button, if present).
+
+### Hearing non-converted voice
+
+In the voice changer, make sure **passthru** is not on (indicated by blinking red color). Click it to switch it off (indicated by solid green color).
+
+### Hearing audio crackles
+
+1. Make sure you are using **VAC by Muzychenko** (indicated by the **Line 1** audio device name).
+
+1. Make sure the **perf** time is smaller than **buf**. Increase **Chunk** or reduce **Extra** and **Crossfade size**.
+
+## Contribution
+
+At the moment, the fork does not accept any code contributions. However, feel free to report any issues
+you encounter during usage.
+
+## Working with the source
+
+### Prerequisites
+
+1. Open a command line.
+
+1. Download and install [Python 3.10](https://www.python.org/downloads/release/python-3108/).
+
+1. Verify your Python version by running the following command:
+
+   ```
+   python --version
+   Python 3.10.8
+   ```
+
+1. Navigate to the `server` folder.
+
+1. [If not set up] Set up virtual environment with the following command:
+
+   ```
+   python -m venv venv
+   ```
+
+1. Activate virtual environment using one of the following commands:
+
+   * For Windows:
+
+     ```
+     .\venv\Scripts\activate.ps1
+     ```
+
+   * For Linux/macOS:
+
+     ```
+     source ./venv/bin/activate
+     ```
+
+1. Install the requirements using one of the following commands:
+
+   * For AMD/Intel/CPU (Windows only):
+
+     ```
+     pip install -r requirements-common.txt -r requirements-dml.txt
+     ```
+
+   * For Nvidia (any OS):
+
+     ```
+     pip install -r requirements-common.txt -r requirements-cuda.txt
+     ```
+
+   * For AMD ROCm (Linux only):
+
+     ```
+     pip install -r requirements-common.txt -r requirements-rocm.txt
+     ```
+
+   * For CPU (Linux only):
+
+     ```
+     pip install -r requirements-common.txt -r requirements-cpu.txt
+     ```
+
+### Running the server
+
+Run the server by executing `main.py`.
 
 ```
-
-■人を批判・攻撃すること。（「批判・攻撃」の定義は、つくよみちゃんキャラクターライセンスに準じます）
-
-■特定の政治的立場・宗教・思想への賛同または反対を呼びかけること。
-
-■刺激の強い表現をゾーニングなしで公開すること。
-
-■他者に対して二次利用（素材としての利用）を許可する形で公開すること。
-※鑑賞用の作品として配布・販売していただくことは問題ございません。
+python ./main.py
 ```
 
-- リアルタイムボイスチェンジャーあみたろについては、あみたろの声素材工房様の次の利用規約に準じます。詳細は[こちら](https://amitaro.net/voice/faq/#index_id6)です。
+This will run the server with default settings. Note that it will not open the web browser by default, copy the address from command line.
 
-```
-あみたろの声素材やコーパス読み上げ音声を使って音声モデルを作ったり、ボイスチェンジャーや声質変換などを使用して、自分の声をあみたろの声に変換して使うのもOKです。
+### Building a package
 
-ただしその場合は絶対に、あみたろ（もしくは小春音アミ）の声に声質変換していることを明記し、あみたろ（および小春音アミ）が話しているわけではないことが誰でもわかるようにしてください。
-また、あみたろの声で話す内容は声素材の利用規約の範囲内のみとし、センシティブな発言などはしないでください。
-```
+1. [If not installed] Install `pyinstaller` with the following command:
 
-- リアルタイムボイスチェンジャー黄琴まひろについては、れぷりかどーるの利用規約に準じます。詳細は[こちら](https://kikyohiroto1227.wixsite.com/kikoto-utau/ter%EF%BD%8Ds-of-service)です。
+   ```
+   pip install --upgrade pip wheel setuptools pyinstaller
+   ```
 
-# 免責事項
+1. Run the following command to build an executable:
 
-本ソフトウェアの使用または使用不能により生じたいかなる直接損害・間接損害・波及的損害・結果的損害 または特別損害についても、一切責任を負いません。
+   ```
+   pyinstaller --clean -y --dist ./dist --workpath /tmp MMVCServerSIO.spec
+   ```
 
-# (1) レコーダー（トレーニング用音声録音アプリ）
-
-MMVC トレーニング用の音声を簡単に録音できるアプリです。
-Github Pages 上で実行できるため、ブラウザのみあれば様々なプラットフォームからご利用可能です。
-録音したデータは、ブラウザ上に保存されます。外部に漏れることはありません。
-
-[録音アプリ on Github Pages](https://w-okada.github.io/voice-changer/)
-
-[解説動画](https://youtu.be/s_GirFEGvaA)
-
-# 過去バージョン
-
-| Version    | OS  | フレームワーク                    | link                                                                                           | サポート VC                                                                   | サイズ |
-| ---------- | --- | --------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------ |
-| v.1.5.2.9e | mac | ONNX(cpu), PyTorch(cpu,mps)       | [normal](https://drive.google.com/uc?id=1W0d7I7619PcO7kjb1SPXp6MmH5Unvd78&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 796MB  |
-|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1tmTMJRRggS2Sb4goU-eHlRvUBR88RZDl&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2872MB |
-| v.1.5.3.1  | mac | ONNX(cpu), PyTorch(cpu,mps)       | [normal](https://drive.google.com/uc?id=1oswF72q_cQQeXhIn6W275qLnoBAmcrR_&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                              | 796MB  |
-|            | win | ONNX(cpu,cuda), PyTorch(cpu,cuda) | [normal](https://drive.google.com/uc?id=1AWjDhW4w2Uljp1-9P8YUJBZsIlnhkJX2&export=download) \*1 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, so-vits-svc 4.0v2, RVC, DDSP-SVC | 2872MB |
-
-# For Contributor
-
-このリポジトリは[CLA](https://raw.githubusercontent.com/w-okada/voice-changer/master/LICENSE-CLA)を設定しています。
+   This will output the resulting executable in the `dist` folder.
