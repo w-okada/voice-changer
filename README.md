@@ -162,9 +162,9 @@ you encounter during usage.
 
 ### Prerequisites
 
-1. Open a command line.
+1. [If not installed] Download and install [Python 3.10](https://www.python.org/downloads/release/python-3108/).
 
-1. Download and install [Python 3.10](https://www.python.org/downloads/release/python-3108/).
+1. Open a command line.
 
 1. Verify your Python version by running the following command:
 
@@ -215,7 +215,7 @@ you encounter during usage.
      pip install -r requirements-common.txt -r requirements-rocm.txt
      ```
 
-   * For CPU (Linux only):
+   * For CPU (Linux/macOS only):
 
      ```
      pip install -r requirements-common.txt -r requirements-cpu.txt
