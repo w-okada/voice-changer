@@ -62,6 +62,8 @@ A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX
 
 * Only `rmvpe_onnx`, `crepe_tiny_onnx` and `crepe_full_onnx` are available in the list of **F0 Det.**.
 
+* When using a laptop with integrated GPU and dedicated GPU, reduced performance can be observed when running the voice changer on built-in display.
+
 ### All versions
 
 * Export to ONNX does not work.
