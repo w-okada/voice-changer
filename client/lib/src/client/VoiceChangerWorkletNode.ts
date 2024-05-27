@@ -21,7 +21,7 @@ export type VoiceChangerWorkletListener = {
 };
 
 export type InternalCallback = {
-  processAudio: (data: Uint8Array) => Promise<Uint8Array>;
+  processAudio: (data: ArrayBuffer) => Promise<Uint8Array>;
 };
 
 export class VoiceChangerWorkletNode extends AudioWorkletNode {
@@ -216,7 +216,7 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
         return;
       }
 
-      this.sendBuffer(new Uint8Array(this.requestChunks));
+      this.sendBuffer(this.requestChunks);
       this.chunkCounter = 0;
 
       this.listener.notifySendBufferingTime(Date.now() - this.bufferStart);
@@ -229,7 +229,7 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
     }
   }
 
-  private sendBuffer = async (newBuffer: Uint8Array) => {
+  private sendBuffer = async (newBuffer: ArrayBuffer) => {
     const timestamp = Date.now();
     if (this.setting.protocol === "sio") {
       if (!this.socket) {
@@ -237,10 +237,10 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
         return;
       }
       // console.log("emit!")
-      this.socket.emit("request_message", [timestamp, newBuffer.buffer]);
+      this.socket.emit("request_message", [timestamp, newBuffer]);
     } else if (this.setting.protocol === "rest") {
       const restClient = new ServerRestClient(this.setting.serverUrl);
-      const { changedVoiceBuffer, perf } = await restClient.postVoice(timestamp, newBuffer.buffer);
+      const { changedVoiceBuffer, perf } = await restClient.postVoice(timestamp, newBuffer);
       if (changedVoiceBuffer.byteLength < 128 * 2) {
         this.listener.notifyException(
           VOICE_CHANGER_CLIENT_EXCEPTION.ERR_SIO_INVALID_RESPONSE,

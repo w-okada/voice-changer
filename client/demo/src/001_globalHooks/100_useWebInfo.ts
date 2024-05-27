@@ -252,8 +252,8 @@ export const useWebInfo = (props: UseWebInfoProps): WebInfoStateAndMethod => {
         setResponseTimeInfo(responseTimeInfo);
 
         props.clientState?.setInternalAudioProcessCallback({
-            processAudio: async (data: Uint8Array) => {
-                const audioF32 = new Float32Array(data.buffer);
+            processAudio: async (data: ArrayBuffer) => {
+                const audioF32 = new Float32Array(data);
                 const res = await voiceChangerJSClient.current!.convert(audioF32);
                 const audio = new Uint8Array(res[0].buffer);
                 if (res[1]) {
