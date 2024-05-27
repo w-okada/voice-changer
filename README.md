@@ -10,11 +10,15 @@ using various voice conversion algorithms.
 
 The fork mostly preserves the same user interface and user experience, gradually improving the existing features and peformance.
 
-The following videos demonstrate how the voice changer works and performs with AMD graphics cards:
+The following videos demonstrate how the voice changer works and performs with AMD graphics cards (including integrated GPU!):
 
 [Amd iGPU.webm](https://github.com/deiteris/voice-changer/assets/6103913/af72e31a-cf66-447b-87c9-43f13355402f)
 
 [Amd Dgpu Rx6600m.webm](https://github.com/deiteris/voice-changer/assets/6103913/bc5180b8-3f67-478b-9ea8-c8ae5e59a4c2)
+
+And this one demonstrates how the voice changer works and performs with Nvidia GeForce GTX 1650 laptop:
+
+[Nvidia Dgpu Gtx1650.webm](https://github.com/deiteris/voice-changer/assets/6103913/cb5b0a5b-a96c-460e-9f57-f82bed84559e)
 
 ## Supported operated systems
 
