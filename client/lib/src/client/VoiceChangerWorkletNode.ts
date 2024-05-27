@@ -21,15 +21,14 @@ export type VoiceChangerWorkletListener = {
 };
 
 export type InternalCallback = {
-  processAudio: (data: Uint8Array) => Promise<Uint8Array>;
+  processAudio: (data: ArrayBuffer) => Promise<Uint8Array>;
 };
 
 export class VoiceChangerWorkletNode extends AudioWorkletNode {
   private listener: VoiceChangerWorkletListener;
 
   private setting: WorkletNodeSetting = DefaultClientSettng.workletNodeSetting;
-  private requestChunks: ArrayBuffer = new ArrayBuffer(128);
-  private requestChunksView: DataView = new DataView(this.requestChunks);
+  private requestChunks: Int16Array = new Int16Array(this.setting.inputChunkNum * 128);
   private chunkCounter: number = 0;
   private socket: Socket<DefaultEventsMap, DefaultEventsMap> | null = null;
   // performance monitor
@@ -75,8 +74,7 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
     ) {
       recreateSocketIoRequired = true;
     }
-    this.requestChunks = new ArrayBuffer(setting.inputChunkNum * 128 * 2);
-    this.requestChunksView = new DataView(this.requestChunks);
+    this.requestChunks = new Int16Array(this.setting.inputChunkNum * 128);
     this.chunkCounter = 0;
 
     this.setting = setting;
@@ -198,11 +196,10 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
 
       // Float to Int16 (internalの場合はfloatのまま行く。)
       if (this.setting.protocol != "internal") {
-        const offset = inputData.length * this.chunkCounter * 2;
+        const offset = inputData.length * this.chunkCounter;
         for (let i = 0; i < inputData.length; i++) {
           let s = Math.max(-1, Math.min(1, inputData[i]));
-          s = s < 0 ? s * 0x8000 : s * 0x7fff;
-          this.requestChunksView.setInt16(offset + i * 2, s, true);
+          this.requestChunks[offset + i] = s < 0 ? s * 0x8000 : s * 0x7fff;
         }
       } else {
         // internal
@@ -216,7 +213,7 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
         return;
       }
 
-      this.sendBuffer(new Uint8Array(this.requestChunks));
+      this.sendBuffer(this.requestChunks.buffer);
       this.chunkCounter = 0;
 
       this.listener.notifySendBufferingTime(Date.now() - this.bufferStart);
@@ -229,7 +226,7 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
     }
   }
 
-  private sendBuffer = async (newBuffer: Uint8Array) => {
+  private sendBuffer = async (newBuffer: ArrayBuffer) => {
     const timestamp = Date.now();
     if (this.setting.protocol === "sio") {
       if (!this.socket) {
@@ -237,10 +234,10 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
         return;
       }
       // console.log("emit!")
-      this.socket.emit("request_message", [timestamp, newBuffer.buffer]);
+      this.socket.emit("request_message", [timestamp, newBuffer]);
     } else if (this.setting.protocol === "rest") {
       const restClient = new ServerRestClient(this.setting.serverUrl);
-      const { changedVoiceBuffer, perf } = await restClient.postVoice(timestamp, newBuffer.buffer);
+      const { changedVoiceBuffer, perf } = await restClient.postVoice(timestamp, newBuffer);
       if (changedVoiceBuffer.byteLength < 128 * 2) {
         this.listener.notifyException(
           VOICE_CHANGER_CLIENT_EXCEPTION.ERR_SIO_INVALID_RESPONSE,
@@ -271,16 +268,16 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
       // } else {
       //     this.postReceivedVoice(res.buffer);
       // }
-      this.internalCallback.processAudio(newBuffer).then((res) => {
-        if (res.length < 128 * 2) {
-          return;
-        }
-        if (this.outputNode != null) {
-          this.outputNode.postReceivedVoice(res.buffer);
-        } else {
-          this.postReceivedVoice(res.buffer);
-        }
-      });
+      // this.internalCallback.processAudio(newBuffer).then((res) => {
+      //   if (res.length < 128 * 2) {
+      //     return;
+      //   }
+      //   if (this.outputNode != null) {
+      //     this.outputNode.postReceivedVoice(res.buffer);
+      //   } else {
+      //     this.postReceivedVoice(res.buffer);
+      //   }
+      // });
     } else {
       throw "unknown protocol";
     }
@@ -299,8 +296,7 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
   };
 
   start = async () => {
-    this.requestChunks = new ArrayBuffer(this.setting.inputChunkNum * 128 * 2);
-    this.requestChunksView = new DataView(this.requestChunks);
+    this.requestChunks = new Int16Array(this.setting.inputChunkNum * 128);
     this.chunkCounter = 0;
 
     const p = new Promise<void>((resolve) => {
