@@ -32,13 +32,16 @@ And this one demonstrates how the voice changer works and performs with Nvidia G
 
 > **NOTE**: Minimum requirement means that you will be able to run **ONLY** the voice changer. Voice conversion and gaming at the same time will not provide satisfying experience.
 
-### CPU-only voice conversion
+RAM: at least 6GB.
+Disk space: at least 6GB of free disk space. For fast model loading, SSD is recommended.
+
+### For CPU-only voice conversion
 
 Minimum requirement: Intel Core i5-4690K or AMD FX-6300.
 
 Recommended requirement: Intel Core i5-10400F or AMD Ryzen 5 1600X.
 
-### GPU voice conversion
+### For GPU voice conversion
 
 Minimum requirement:
 
@@ -62,7 +65,9 @@ A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX
 
 * Only `rmvpe_onnx`, `crepe_tiny_onnx` and `crepe_full_onnx` are available in the list of **F0 Det.**.
 
-* When using a laptop with integrated GPU and dedicated GPU, reduced performance can be observed when running the voice changer on built-in display.
+* When using a laptop with integrated GPU and dedicated GPU, severely degraded performance (up to 50% reduction) can be observed when running the voice changer on built-in display.
+
+* Slightly degraded performance (up to 25% reduction) can be observed with multi-GPU setups.
 
 ### All versions
 
