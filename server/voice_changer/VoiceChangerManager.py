@@ -94,6 +94,12 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         self.stored_setting: dict[str, str | int | float] = {}
         if os.path.exists(STORED_SETTING_FILE):
             self.stored_setting = json.load(open(STORED_SETTING_FILE, "r", encoding="utf-8"))
+        if 'version' not in self.stored_setting:
+            if 'crossFadeOverlapSize' in self.stored_setting:
+                self.update_settings('crossFadeOverlapSize', "0.10")
+            if 'extraConvertSize' in self.stored_setting:
+                self.update_settings('extraConvertSize', "0.5")
+            self.update_settings("version", 1)
         if "modelSlotIndex" in self.stored_setting:
             self.update_settings("modelSlotIndex", self.stored_setting["modelSlotIndex"])
         # キャッシュ設定の反映
