@@ -30,7 +30,7 @@ UPLOAD_DIR = os.path.join(tmpdir.name, "upload_dir") if hasattr(sys, "_MEIPASS")
 
 STORED_SETTINGS = {
     "enableServerAudio", "serverAudioSampleRate", "serverInputDeviceId", "serverOutputDeviceId", "serverMonitorDeviceId", "serverInputAudioGain", "serverOutputAudioGain",
-    "crossFadeOverlapSize",
+    "crossFadeOverlapSize", "protect",
     "modelSlotIndex", "serverReadChunkSize", "extraConvertSize", "gpu",
     "f0Detector", "rvcQuality", "silenceFront", "silentThreshold",
 }

@@ -58,22 +58,19 @@ export const ConvertArea = (props: ConvertProps) => {
             <div className="config-sub-area-control">
                 <div className="config-sub-area-control-title">EXTRA:</div>
                 <div className="config-sub-area-control-field">
-                    <select
-                        className="body-select"
-                        value={serverSetting.serverSetting.extraConvertSize}
-                        onChange={(e) => {
-                            serverSetting.updateServerSettings({ ...serverSetting.serverSetting, extraConvertSize: Number(e.target.value) });
-                            trancateBuffer();
-                        }}
-                    >
-                        {[1024 * 4, 1024 * 8, 1024 * 16, 1024 * 32, 1024 * 64, 1024 * 128].map((x) => {
-                            return (
-                                <option key={x} value={x}>
-                                    {x}
-                                </option>
-                            );
-                        })}
-                    </select>
+                    <div className="config-sub-area-slider-control">
+                        <input
+                            className="config-sub-area-slider-control-slider"
+                            type="range"
+                            min={0.1}
+                            max={5}
+                            step={0.1}
+                            value={serverSetting.serverSetting.extraConvertSize}
+                            onChange={(e) => {
+                                serverSetting.updateServerSettings({ ...serverSetting.serverSetting, extraConvertSize: Number(e.target.value) });
+                            }} />
+                        <span className="config-sub-area-slider-control-val">{serverSetting.serverSetting.extraConvertSize} s</span>
+                    </div>
                 </div>
             </div>
         );
@@ -82,23 +79,21 @@ export const ConvertArea = (props: ConvertProps) => {
                 <div className="config-sub-area-control">
                     <div className="config-sub-area-control-title">CHUNK:</div>
                     <div className="config-sub-area-control-field">
-                        <select
-                            className="body-select"
-                            value={setting.workletNodeSetting.inputChunkNum}
-                            onChange={(e) => {
-                                setWorkletNodeSetting({ ...setting.workletNodeSetting, inputChunkNum: Number(e.target.value) });
-                                trancateBuffer();
-                                serverSetting.updateServerSettings({ ...serverSetting.serverSetting, serverReadChunkSize: Number(e.target.value) });
-                            }}
-                        >
-                            {nums.map((x) => {
-                                return (
-                                    <option key={x} value={x}>
-                                        {x} ({((x * 128 * 1000) / 48000).toFixed(1)} ms, {x * 128})
-                                    </option>
-                                );
-                            })}
-                        </select>
+                        <div className="config-sub-area-slider-control">
+                            <input
+                                className="config-sub-area-slider-control-slider"
+                                type="range"
+                                min={1}
+                                max={1024}
+                                step={1}
+                                value={serverSetting.serverSetting.serverReadChunkSize}
+                                onChange={(e) => {
+                                    setWorkletNodeSetting({ ...setting.workletNodeSetting, inputChunkNum: Number(e.target.value) });
+                                    trancateBuffer();
+                                    serverSetting.updateServerSettings({ ...serverSetting.serverSetting, serverReadChunkSize: Number(e.target.value) });
+                                }} />
+                            <span className="config-sub-area-slider-control-val">{((serverSetting.serverSetting.serverReadChunkSize * 128 * 1000) / 48000).toFixed(1)} ms</span>
+                        </div>
                     </div>
                 </div>
                 {extraArea}

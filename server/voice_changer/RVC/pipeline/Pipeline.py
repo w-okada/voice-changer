@@ -75,7 +75,7 @@ class Pipeline:
         pitchExtractor: PitchExtractor,
         index: IndexIVFFlat | None,
         index_reconstruct: torch.Tensor | None,
-        # feature: Any | None,
+        use_f0: bool,
         targetSR: int,
         embChannels: int,
         device: torch.device,
@@ -90,7 +90,9 @@ class Pipeline:
 
         self.index = index
         self.index_reconstruct: torch.Tensor | None = index_reconstruct
+        self.use_index = index is not None and self.index_reconstruct is not None
         self.use_gpu_index = sys.platform == 'linux' and device.type == 'cuda'
+        self.use_f0 = use_f0
         # self.feature = feature
 
         self.onnx_upscaler = make_onnx_upscaler(device, embChannels) if device.type == 'privateuseone' else None
@@ -166,6 +168,11 @@ class Pipeline:
         weight /= weight.sum(dim=1, keepdim=True)
         return torch.sum(self.index_reconstruct[ix] * weight.unsqueeze(2), dim=1)
 
+    def _upscale(self, feats: torch.Tensor) -> torch.Tensor:
+        if self.onnx_upscaler is not None:
+            feats = self.onnx_upscaler.run(['out'], { 'in': feats.permute(0, 2, 1).detach().cpu().numpy(), 'scales': np.array([2], dtype=np.float32) })
+            return torch.as_tensor(feats[0], dtype=torch.float32, device=self.device).permute(0, 2, 1).contiguous()
+        return F.interpolate(feats.permute(0, 2, 1), scale_factor=2, mode='nearest').permute(0, 2, 1).contiguous()
 
     def exec(
         self,
@@ -174,7 +181,7 @@ class Pipeline:
         pitchf: torch.Tensor,  # torch.tensor [m]
         f0_up_key: int,
         index_rate: float,
-        if_f0: bool,
+        audio_feats_len: int,
         silence_front: int,
         embOutputLayer: int,
         useFinalProj: bool,
@@ -189,55 +196,54 @@ class Pipeline:
             # if audio.dim() == 2:  # double channels
             #     audio = audio.mean(-1)
             assert audio.dim() == 1, audio.dim()
-            feats = audio.view(1, -1)
             t.record("pre-process")
 
             # ピッチ検出
             # with autocast(enabled=self.isHalf):
-            pitch, pitchf = self.extractPitch(audio[silence_front:], pitchf, f0_up_key) if if_f0 else (None, None)
+            pitch, pitchf = self.extractPitch(audio[silence_front:], pitchf, f0_up_key) if self.use_f0 else (None, None)
             t.record("extract-pitch")
 
             # embedding
             # with autocast(enabled=self.isHalf):
-            feats = self.extractFeatures(feats, embOutputLayer, useFinalProj)
+            feats = self.extractFeatures(audio.view(1, -1), embOutputLayer, useFinalProj)
             feats = torch.cat((feats, feats[:, -1:, :]), 1)
             t.record("extract-feats")
 
+            use_protect = protect < 0.5
+            if self.use_f0 and use_protect:
+                feats_orig = feats.detach().clone()
+
             # Index - feature抽出
-            if self.index is not None and self.index_reconstruct is not None and index_rate != 0:
+            is_active_index = self.use_index and index_rate > 0
+            if is_active_index:
                 skip_offset = skip_head // 2
                 index_audio = feats[0][skip_offset :]
 
-                if self.isHalf:
-                    index_audio = index_audio.to(dtype=torch.float32, copy=False)
+                # if self.isHalf:
+                #     index_audio = index_audio.to(dtype=torch.float32, copy=False)
 
                 # TODO: kは調整できるようにする
-                index_audio = self._search_index(index_audio, 8)
+                index_audio = self._search_index(index_audio, 8).unsqueeze(0)
 
                 # Recover silent front
-                feats[0][skip_offset :] = index_audio.unsqueeze(0) * index_rate + (1 - index_rate) * feats[0][skip_offset :]
+                feats[0][skip_offset :] = index_audio * index_rate + feats[0][skip_offset :] * (1 - index_rate)
 
+            feats = self._upscale(feats)[:, :audio_feats_len, :]
+            if self.use_f0:
+                pitch = pitch[:, -audio_feats_len:]
+                pitchf = pitchf[:, -audio_feats_len:]
                 # pitchの推定が上手くいかない(pitchf=0)場合、検索前の特徴を混ぜる
                 # pitchffの作り方の疑問はあるが、本家通りなので、このまま使うことにする。
                 # https://github.com/w-okada/voice-changer/pull/276#issuecomment-1571336929
-                if protect < 0.5:
+                if is_active_index and use_protect:
+                    # FIXME: Another interpolate on feats is a big performance hit.
+                    feats_orig = self._upscale(feats_orig)[:, :audio_feats_len, :]
                     pitchff = pitchf.detach().clone()
                     pitchff[pitchf > 0] = 1
                     pitchff[pitchf < 1] = protect
                     pitchff = pitchff.unsqueeze(-1)
-                    feats = feats * pitchff + feats * (1 - pitchff)
+                    feats = feats * pitchff + feats_orig * (1 - pitchff)
 
-            audio_feats_len = audio.shape[0] // self.window
-            if self.onnx_upscaler is not None:
-                feats = self.onnx_upscaler.run(['out'], { 'in': feats.permute(0, 2, 1).detach().cpu().numpy(), 'scales': np.array([2], dtype=np.float32) })
-                feats = torch.as_tensor(feats[0], dtype=torch.float32, device=self.device).permute(0, 2, 1)
-            else:
-                feats: torch.Tensor = F.interpolate(feats.permute(0, 2, 1), scale_factor=2, mode='nearest').permute(0, 2, 1).contiguous()
-
-            feats = feats[:, :audio_feats_len, :]
-            if pitch is not None and pitchf is not None:
-                pitch = pitch[:, -audio_feats_len:]
-                pitchf = pitchf[:, -audio_feats_len:]
             p_len = torch.as_tensor([audio_feats_len], device=self.device, dtype=torch.int64)
 
             sid = torch.as_tensor(sid, device=self.device, dtype=torch.int64).unsqueeze(0)

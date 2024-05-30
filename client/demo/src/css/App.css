@@ -1538,9 +1538,9 @@ audio::-webkit-media-controls-overlay-enclosure{
                     .config-sub-area-slider-control-slider {
                         width: 10rem;
                     }
-                    .config-sub-area-slider-control-val {
+                    /*.config-sub-area-slider-control-val {
                         width: 3rem;
-                    }
+                    }*/
                 }
                 .config-sub-area-buttons {
                     display: flex;

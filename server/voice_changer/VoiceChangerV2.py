@@ -49,9 +49,9 @@ class VoiceChangerV2Settings:
     inputSampleRate: int = 48000  # 48000 or 24000
     outputSampleRate: int = 48000  # 48000 or 24000
 
-    crossFadeOverlapSize: int = 4096
+    crossFadeOverlapSize: float = 0.10
     serverReadChunkSize: int = 192
-    extraConvertSize: int = 1024 * 4
+    extraConvertSize: float = 0.5
     gpu: int = -1
 
     recordIO: int = 0  # 0:off, 1:on
@@ -63,14 +63,19 @@ class VoiceChangerV2Settings:
         default_factory=lambda: [
             "inputSampleRate",
             "outputSampleRate",
-            "crossFadeOverlapSize",
             "recordIO",
             "serverReadChunkSize",
-            "extraConvertSize",
             "gpu"
         ]
     )
     strData: list[str] = field(default_factory=lambda: [])
+    floatData: list[str] = field(
+        default_factory=lambda: [
+            "extraConvertSize",
+            "protect",
+            "crossFadeOverlapSize",
+        ]
+    )
 
 
 class VoiceChangerV2(VoiceChangerIF):
@@ -79,9 +84,9 @@ class VoiceChangerV2(VoiceChangerIF):
         self.settings = VoiceChangerV2Settings()
 
         self.block_frame = self.settings.serverReadChunkSize * 128
-        self.crossfade_frame = self.settings.crossFadeOverlapSize
+        self.crossfade_frame = int(self.settings.crossFadeOverlapSize * self.settings.inputSampleRate)
+        self.extra_frame = int(self.settings.extraConvertSize * self.settings.inputSampleRate)
         self.sola_search_frame = int(0.012 * self.settings.inputSampleRate)
-        self.extra_frame = self.settings.extraConvertSize
 
         self.processing_sampling_rate = 0
 
@@ -111,7 +116,10 @@ class VoiceChangerV2(VoiceChangerIF):
     def setInputSampleRate(self, sr: int):
         self.settings.inputSampleRate = sr
 
-        self.sola_search_frame = int(0.012 * self.settings.inputSampleRate)
+        self.extra_frame = int(self.settings.extraConvertSize * sr)
+        self.crossfade_frame = int(self.settings.crossFadeOverlapSize * sr)
+        self.sola_search_frame = int(0.012 * sr)
+        self._generate_strength()
 
         self.voiceChangerModel.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
         self.voiceChangerModel.realloc(self.block_frame, self.extra_frame, self.crossfade_frame, self.sola_search_frame)
@@ -144,14 +152,8 @@ class VoiceChangerV2(VoiceChangerIF):
             setattr(self.settings, key, val)
             if key == "serverReadChunkSize":
                 self.block_frame = self.settings.serverReadChunkSize * 128
-                self._generate_strength()
-            elif key == 'extraConvertSize':
-                self.extra_frame = val
             elif key == 'gpu':
                 # When changing GPU, need to re-allocate fade-in/fade-out buffers on different device
-                self._generate_strength()
-            elif key == 'crossFadeOverlapSize':
-                self.crossfade_frame = self.settings.crossFadeOverlapSize
                 self._generate_strength()
             elif key == "recordIO" and val == 1:
                 if self.ioRecorder is not None:
@@ -175,9 +177,17 @@ class VoiceChangerV2(VoiceChangerIF):
                 self.voiceChangerModel.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
         elif key in self.settings.strData:
             setattr(self.settings, key, str(val))
+        elif key in self.settings.floatData:
+            val = float(val)
+            setattr(self.settings, key, val)
+            if key == 'extraConvertSize':
+                self.extra_frame = int(val * self.settings.inputSampleRate)
+            elif key == 'crossFadeOverlapSize':
+                self.crossfade_frame = int(val * self.settings.inputSampleRate)
+                self._generate_strength()
 
-        if key in {'gpu', 'serverReadChunkSize', 'extraConvertSize', 'crossFadeOverlapSize', 'rvcQuality', 'silenceFront'}:
-            if self.voiceChangerModel is not None:
+        if self.voiceChangerModel is not None:
+            if key in {'gpu', 'serverReadChunkSize', 'extraConvertSize', 'crossFadeOverlapSize', 'rvcQuality', 'silenceFront'}:
                 self.voiceChangerModel.realloc(self.block_frame, self.extra_frame, self.crossfade_frame, self.sola_search_frame)
 
         self.voiceChangerModel.update_settings(key, val)

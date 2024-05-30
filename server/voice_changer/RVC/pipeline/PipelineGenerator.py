@@ -54,6 +54,7 @@ def createPipeline(params: VoiceChangerParams, modelSlot: RVCModelSlot, gpu: int
         pitchExtractor,
         index,
         index_reconstruct,
+        modelSlot.f0,
         modelSlot.samplingRate,
         modelSlot.embChannels,
         dev,

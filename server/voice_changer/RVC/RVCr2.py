@@ -160,10 +160,10 @@ class RVCr2(VoiceChangerModel):
         convert_size_16k = block_frame_16k + sola_search_frame_16k + extra_frame_16k + crossfade_frame_16k
         if (modulo := convert_size_16k % self.window) != 0:  # モデルの出力のホップサイズで切り捨てが発生するので補う。
             convert_size_16k = convert_size_16k + (self.window - modulo)
-        convert_feature_size_16k = convert_size_16k // self.window
+        self.convert_feature_size_16k = convert_size_16k // self.window
 
         self.skip_head = extra_frame_16k // self.window
-        self.return_length = convert_feature_size_16k if not self.settings.rvcQuality else None
+        self.return_length = self.convert_feature_size_16k if not self.settings.rvcQuality else None
         self.silence_front = extra_frame_16k - (self.window * 5) if self.settings.silenceFront else 0
 
         self.crop_start = -(block_frame_16k + crossfade_frame_16k)
@@ -172,7 +172,7 @@ class RVCr2(VoiceChangerModel):
         self.audio_buffer = torch.zeros(convert_size_16k, dtype=torch.float32, device=self.device_manager.device)
         # Additional +1 is to compensate for pitch extraction algorithm
         # that can output additional feature.
-        self.pitchf_buffer = torch.zeros(convert_feature_size_16k + 1, dtype=torch.float32, device=self.device_manager.device)
+        self.pitchf_buffer = torch.zeros(self.convert_feature_size_16k + 1, dtype=torch.float32, device=self.device_manager.device)
         print('Allocated audio buffer:', self.audio_buffer.shape[0])
         print('Allocated pitchf buffer:', self.pitchf_buffer.shape[0])
 
@@ -195,7 +195,7 @@ class RVCr2(VoiceChangerModel):
         if vol < self.settings.silentThreshold:
             if self.slotInfo.f0:
                 self.pitchf_buffer = circular_write(
-                    torch.zeros(audio_in_16k.shape[0] // self.window, device=self.device_manager.device, dtype=torch.float32),
+                    torch.zeros(self.convert_feature_size_16k, device=self.device_manager.device, dtype=torch.float32),
                     self.pitchf_buffer
                 )
             return None
@@ -207,7 +207,7 @@ class RVCr2(VoiceChangerModel):
                 self.pitchf_buffer,
                 self.settings.tran,
                 self.settings.indexRatio,
-                self.slotInfo.f0,
+                self.convert_feature_size_16k,
                 self.silence_front,
                 self.slotInfo.embOutputLayer,
                 self.slotInfo.useFinalProj,
