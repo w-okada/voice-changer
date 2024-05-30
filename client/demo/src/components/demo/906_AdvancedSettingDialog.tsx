@@ -50,28 +50,21 @@ export const AdvancedSettingDialog = () => {
         );
         const crossfaceRow = (
             <div className="advanced-setting-container-row">
-                <div className="advanced-setting-container-row-title">Crossfade size</div>
+                <div className="advanced-setting-container-row-title">Crossfade length</div>
                 <div className="advanced-setting-container-row-field">
-                    <div className="advanced-setting-container-row-field-crossfade-container">
-                        <div>
-                            <div>
-                                <select
-                                    className="body-select"
-                                    value={serverSetting.serverSetting.crossFadeOverlapSize}
-                                    onChange={(e) => {
-                                        serverSetting.updateServerSettings({ ...serverSetting.serverSetting, crossFadeOverlapSize: Number(e.target.value) as CrossFadeOverlapSize });
-                                    }}
-                                >
-                                    {Object.values(CrossFadeOverlapSize).map((x) => {
-                                        return (
-                                            <option key={x} value={x}>
-                                                {x} ({(x / 48000 * 1000).toFixed(1)} ms)
-                                            </option>
-                                        );
-                                    })}
-                                </select>
-                            </div>
-                        </div>
+                    <div>
+                        <input
+                            type="range"
+                            className="body-item-input-slider"
+                            min="0.05"
+                            max="0.20"
+                            step="0.01"
+                            value={serverSetting.serverSetting.crossFadeOverlapSize}
+                            onChange={(e) => {
+                                serverSetting.updateServerSettings({ ...serverSetting.serverSetting, crossFadeOverlapSize: Number(e.target.value) });
+                            }}
+                        ></input>
+                        <span className="body-item-input-slider-val">{serverSetting.serverSetting.crossFadeOverlapSize} ms</span>
                     </div>
                 </div>
             </div>
@@ -110,7 +103,7 @@ export const AdvancedSettingDialog = () => {
                             className="body-item-input-slider"
                             min="0"
                             max="0.5"
-                            step="0.1"
+                            step="0.01"
                             value={serverSetting.serverSetting.protect || 0}
                             onChange={(e) => {
                                 serverSetting.updateServerSettings({ ...serverSetting.serverSetting, protect: Number(e.target.value) });

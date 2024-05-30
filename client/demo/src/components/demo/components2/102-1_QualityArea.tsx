@@ -73,7 +73,6 @@ export const QualityArea = (props: QualityAreaProps) => {
                 <div className="config-sub-area-control-title">S.Thresh.:</div>
                 <div className="config-sub-area-control-field">
                     <div className="config-sub-area-slider-control">
-                        <span className="config-sub-area-slider-control-kind"></span>
                         <span className="config-sub-area-slider-control-slider">
                             <input
                                 type="range"

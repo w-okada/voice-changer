@@ -38,24 +38,6 @@ export const ModelSamplingRate = {
 } as const;
 export type ModelSamplingRate = (typeof InputSampleRate)[keyof typeof InputSampleRate];
 
-export const CrossFadeOverlapSize = {
-    "128": 128,
-    "256": 256,
-    "512": 512,
-    "1024": 1024,
-    "1536": 1536,
-    "2048": 2048,
-    "3072": 3072,
-    "4096": 4096,
-    "6144": 6144,
-    "8192": 8192,
-    "10240": 10240,
-    "12288": 12288,
-    "14336": 14336,
-    "16384": 16384,
-} as const;
-export type CrossFadeOverlapSize = (typeof CrossFadeOverlapSize)[keyof typeof CrossFadeOverlapSize];
-
 export const F0Detector = {
     dio: "dio",
     harvest: "harvest",
@@ -155,7 +137,7 @@ export type VoiceChangerServerSetting = {
     dstId: number;
     gpu: number;
 
-    crossFadeOverlapSize: CrossFadeOverlapSize;
+    crossFadeOverlapSize: number;
 
     f0Factor: number;
     f0Detector: F0Detector; // dio or harvest
@@ -380,7 +362,7 @@ export const DefaultServerSetting: ServerInfo = {
     passThrough: false,
     inputSampleRate: 48000,
 
-    crossFadeOverlapSize: CrossFadeOverlapSize[1024],
+    crossFadeOverlapSize: 0.10,
 
     recordIO: 0,
 
