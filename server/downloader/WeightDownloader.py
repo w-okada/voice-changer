@@ -41,39 +41,50 @@ async def downloadWeight(voiceChangerParams: VoiceChangerParams | ServerSettings
             "url": "https://huggingface.co/wok000/weights/resolve/main/crepe/onnx/full.onnx",
             "saveTo": crepe_onnx_full,
             "hash": "e9bb11eb5d3557805715077b30aefebc",
+            "size": 88984790
         },
         {
             "url": "https://huggingface.co/wok000/weights/resolve/main/crepe/onnx/tiny.onnx",
             "saveTo": crepe_onnx_tiny,
             "hash": "b509427f6d223152e57ff2aeb1b48300",
+            "size": 1955762
         },
         {
             "url": "https://huggingface.co/wok000/weights_gpl/resolve/main/content-vec/contentvec-f.onnx",
             "saveTo": content_vec_500_onnx,
             "hash": "ab288ca5b540a4a15909a40edf875d1e",
+            "size": 378550151
         },
         {
             "url": "https://huggingface.co/wok000/weights/resolve/main/rmvpe/rmvpe_20231006.pt",
             "saveTo": rmvpe,
             "hash": "7989809b6b54fb33653818e357bcb643",
+            "size": 181184272
         },
         {
             "url": "https://huggingface.co/wok000/weights_gpl/resolve/main/rmvpe/rmvpe_20231006.onnx",
             "saveTo": rmvpe_onnx,
             "hash": "b6979bf69503f8ec48c135000028a7b0",
+            "size": 362003174
         }
     ]
 
     files_to_download = []
     pos = 0
     for param in file_params:
-        if os.path.exists(param["saveTo"]):
-            continue
+        saveTo = param['saveTo']
+        try:
+            offset = os.stat(saveTo).st_size
+            if offset == param['size']:
+                continue
+        except:
+            offset = None
         files_to_download.append({
             "url": param["url"],
-            "saveTo": param["saveTo"],
+            "saveTo": saveTo,
             "hash": param["hash"],
-            "position": pos
+            "position": pos,
+            "offset": offset
         })
         pos += 1
 
