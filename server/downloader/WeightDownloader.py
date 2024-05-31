@@ -75,7 +75,9 @@ async def downloadWeight(voiceChangerParams: VoiceChangerParams | ServerSettings
         saveTo = param['saveTo']
         try:
             offset = os.stat(saveTo).st_size
-            if offset == param['size']:
+            # Check whether the offset is greater than expected file size just
+            # to avoid potentially starting a download on incorrect offset
+            if offset >= param['size']:
                 continue
         except:
             offset = None
