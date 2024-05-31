@@ -33,6 +33,7 @@ And this one demonstrates how the voice changer works and performs with Nvidia G
 > **NOTE**: Minimum requirement means that you will be able to run **ONLY** the voice changer. Voice conversion and gaming at the same time will not provide satisfying experience.
 
 RAM: at least 6GB.
+
 Disk space: at least 6GB of free disk space. For fast model loading, SSD is recommended.
 
 ### For CPU-only voice conversion
