@@ -8,7 +8,7 @@ using various voice conversion algorithms.
 > **NOTE**: Currently, this version is only guaranteed to work with Retrieval-based Voice Conversion (RVC).
 > Other voice conversion algorithms are not guaranteed to work.
 
-The fork mostly preserves the same user interface and user experience, gradually improving the existing features and peformance.
+The fork mostly preserves the same user interface and user experience, gradually improving the existing features and performance.
 
 The following videos demonstrate how the voice changer works and performs with AMD graphics cards (including integrated GPU!):
 
