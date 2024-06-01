@@ -209,12 +209,12 @@ class Pipeline:
             feats = torch.cat((feats, feats[:, -1:, :]), 1)
             t.record("extract-feats")
 
-            use_protect = protect < 0.5
-            if self.use_f0 and use_protect:
-                feats_orig = feats.detach().clone()
-
             # Index - feature抽出
             is_active_index = self.use_index and index_rate > 0
+            use_protect = protect < 0.5
+            if self.use_f0 and is_active_index and use_protect:
+                feats_orig = feats.detach().clone()
+
             if is_active_index:
                 skip_offset = skip_head // 2
                 index_audio = feats[0][skip_offset :]
