@@ -143,6 +143,14 @@
       "created_at": "2024-04-04T10:53:14Z",
       "repoId": 527419347,
       "pullRequestNo": 1171
+    },
+    {
+      "name": "vitaliylag",
+      "id": 12641771,
+      "comment_id": 2143259823,
+      "created_at": "2024-06-01T03:13:56Z",
+      "repoId": 527419347,
+      "pullRequestNo": 1224
     }
   ]
 }
