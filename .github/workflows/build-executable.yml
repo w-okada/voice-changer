@@ -39,6 +39,9 @@ jobs:
     env:
       BACKEND: ${{ matrix.backend }}
     steps:
+    - name: Clean runner
+      shell: bash
+      run: rm -rf "$AGENT_TOOLSDIRECTORY"
     - uses: actions/checkout@v4
     - name: Set up Python
       uses: actions/setup-python@v5
