@@ -26,7 +26,7 @@ And this one demonstrates how the voice changer works and performs with Nvidia G
 
 * Windows 10 or later.
 * Linux.
-* macOS.
+* macOS 12 Monterey or later. With Apple Silicon or Intel CPU.
 
 ## System requirements
 
@@ -76,9 +76,7 @@ A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX
 
 ## How to use
 
-### Running locally
-
-> **NOTE**: These instructions are for Windows only.
+### Running locally on Windows
 
 #### Before you start
 
@@ -112,7 +110,7 @@ A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX
 
 1. Right-click either of ZIP files. In the opened action menu select **7-Zip** > **Extract to "voice-changer-windows-amd64-cuda\\"**. This will unpack **both** files, no need to unpack them separately.
 
-#### Running
+#### Running the voice changer
 
 1. Open the extracted folder (`voice-changer-windows-amd64-dml` or `voice-changer-windows-amd64-cuda`) > `dist` > `MMVCServerSIO`.
 
@@ -121,6 +119,28 @@ A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX
 When running the voice changer for the first time, it will start downloading necessary files. Do not close the window until the download finishes.
 
 Once the download is finished, the voice changer will open the user interface using your default web browser.
+
+### Running locally on macOS
+
+#### For Apple Silicon (Apple M1, etc.) users
+
+1. Download the `voice-changer-macos-arm64-cpu.tar.gz` file.
+
+1. Double-click the file. The voice changer will unpack and the `dist` folder will appear.
+
+#### For Intel users
+
+> **NOTE**: You may get suboptimal performance with old Intel-based machines. Proceed on your own risk.
+
+1. Download the `voice-changer-macos-amd64-cpu.tar.gz` file.
+
+1. Double-click the file. The voice changer will unpack and the `dist` folder will appear.
+
+#### Running the voice changer
+
+1. Open the extracted folder `dist` > `MMVCServerSIO`.
+
+1. Double-click `MMVCServerSIO` to run the voice changer.
 
 ### Running on Colab/Kaggle
 

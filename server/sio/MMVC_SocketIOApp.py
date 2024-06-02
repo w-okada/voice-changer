@@ -5,7 +5,7 @@ from mods.origins import compute_local_origins, normalize_origins
 from typing import Sequence, Optional
 from sio.MMVC_SocketIOServer import MMVC_SocketIOServer
 from voice_changer.VoiceChangerManager import VoiceChangerManager
-from const import getFrontendPath
+from const import FRONTEND_DIR
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
 
@@ -40,39 +40,39 @@ class MMVC_SocketIOApp:
                 other_asgi_app=app_fastapi,
                 static_files={
                     "/assets/icons/github.svg": {
-                        "filename": f"{getFrontendPath()}/assets/icons/github.svg",
+                        "filename": f"{FRONTEND_DIR}/assets/icons/github.svg",
                         "content_type": "image/svg+xml",
                     },
                     "/assets/icons/help-circle.svg": {
-                        "filename": f"{getFrontendPath()}/assets/icons/help-circle.svg",
+                        "filename": f"{FRONTEND_DIR}/assets/icons/help-circle.svg",
                         "content_type": "image/svg+xml",
                     },
                     "/assets/icons/tool.svg": {
-                        "filename": f"{getFrontendPath()}/assets/icons/tool.svg",
+                        "filename": f"{FRONTEND_DIR}/assets/icons/tool.svg",
                         "content_type": "image/svg+xml",
                     },
                     "/assets/icons/folder.svg": {
-                        "filename": f"{getFrontendPath()}/assets/icons/folder.svg",
+                        "filename": f"{FRONTEND_DIR}/assets/icons/folder.svg",
                         "content_type": "image/svg+xml",
                     },
                     "/buymeacoffee.png": {
-                        "filename": f"{getFrontendPath()}/assets/buymeacoffee.png",
+                        "filename": f"{FRONTEND_DIR}/assets/buymeacoffee.png",
                         "content_type": "image/png",
                     },
                     "/ort-wasm-simd.wasm": {
-                        "filename": f"{getFrontendPath()}/ort-wasm-simd.wasm",
+                        "filename": f"{FRONTEND_DIR}/ort-wasm-simd.wasm",
                         "content_type": "application/wasm",
                     },
                     "/assets/beatrice/female-clickable.svg": {
-                        "filename": f"{getFrontendPath()}/assets/beatrice/female-clickable.svg",
+                        "filename": f"{FRONTEND_DIR}/assets/beatrice/female-clickable.svg",
                         "content_type": "image/svg+xml",
                     },
                     "/assets/beatrice/male-clickable.svg": {
-                        "filename": f"{getFrontendPath()}/assets/beatrice/male-clickable.svg",
+                        "filename": f"{FRONTEND_DIR}/assets/beatrice/male-clickable.svg",
                         "content_type": "image/svg+xml",
                     },
-                    "": f"{getFrontendPath()}",
-                    "/": f"{getFrontendPath()}/index.html",
+                    "": FRONTEND_DIR,
+                    "/": f"{FRONTEND_DIR}/index.html",
                 },
             )
 

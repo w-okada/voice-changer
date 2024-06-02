@@ -3,7 +3,6 @@ import asyncio
 
 from downloader.Downloader import download
 from mods.log_control import VoiceChangaerLogger
-from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 from settings import ServerSettings
 from Exceptions import WeightsVerificationException
 from utils.hasher import compute_hash
@@ -11,59 +10,50 @@ from xxhash import xxh128
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
 
-async def downloadWeight(voiceChangerParams: VoiceChangerParams | ServerSettings):
-    content_vec_500_onnx = voiceChangerParams.content_vec_500_onnx
-    # hubert_base = voiceChangerParams.hubert_base
-    # hubert_base_jp = voiceChangerParams.hubert_base_jp
-    # hubert_soft = voiceChangerParams.hubert_soft
-    crepe_onnx_full = voiceChangerParams.crepe_onnx_full
-    crepe_onnx_tiny = voiceChangerParams.crepe_onnx_tiny
-    rmvpe = voiceChangerParams.rmvpe
-    rmvpe_onnx = voiceChangerParams.rmvpe_onnx
-
+async def downloadWeight(params: ServerSettings):
     file_params = [
         # {
         #     "url": "https://huggingface.co/ddPn08/rvc-webui-models/resolve/main/embeddings/hubert_base.pt",
-        #     "saveTo": hubert_base,
+        #     "saveTo": params.hubert_base,
         #     "hash": "3ea71c977bf403eda3fcc73fb1bedc5a",
         # },
         # {
         #     "url": "https://huggingface.co/rinna/japanese-hubert-base/resolve/main/fairseq/model.pt",
-        #     "saveTo": hubert_base_jp,
+        #     "saveTo": params.hubert_base_jp,
         #     "hash": "fed21bfb71a38df821cf9ae43e5da8b3",
         # },
         # {
         #     "url": "https://huggingface.co/wok000/weights/resolve/main/ddsp-svc30/embedder/hubert-soft-0d54a1f4.pt",
-        #     "saveTo": hubert_soft,
+        #     "saveTo": params.hubert_soft,
         #     "hash": "c32e64b2d7e222a1912948a6192636d8",
         # },
         {
             "url": "https://huggingface.co/wok000/weights/resolve/main/crepe/onnx/full.onnx",
-            "saveTo": crepe_onnx_full,
+            "saveTo": params.crepe_onnx_full,
             "hash": "e9bb11eb5d3557805715077b30aefebc",
             "size": 88984790
         },
         {
             "url": "https://huggingface.co/wok000/weights/resolve/main/crepe/onnx/tiny.onnx",
-            "saveTo": crepe_onnx_tiny,
+            "saveTo": params.crepe_onnx_tiny,
             "hash": "b509427f6d223152e57ff2aeb1b48300",
             "size": 1955762
         },
         {
             "url": "https://huggingface.co/wok000/weights_gpl/resolve/main/content-vec/contentvec-f.onnx",
-            "saveTo": content_vec_500_onnx,
+            "saveTo": params.content_vec_500_onnx,
             "hash": "ab288ca5b540a4a15909a40edf875d1e",
             "size": 378550151
         },
         {
             "url": "https://huggingface.co/wok000/weights/resolve/main/rmvpe/rmvpe_20231006.pt",
-            "saveTo": rmvpe,
+            "saveTo": params.rmvpe,
             "hash": "7989809b6b54fb33653818e357bcb643",
             "size": 181184272
         },
         {
             "url": "https://huggingface.co/wok000/weights_gpl/resolve/main/rmvpe/rmvpe_20231006.onnx",
-            "saveTo": rmvpe_onnx,
+            "saveTo": params.rmvpe_onnx,
             "hash": "b6979bf69503f8ec48c135000028a7b0",
             "size": 362003174
         }
