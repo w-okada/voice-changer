@@ -196,6 +196,8 @@ you encounter during usage.
 
 1. [If not installed] Download and install [Python 3.10](https://www.python.org/downloads/release/python-3108/).
 
+1. [If not installed] Download and install git.
+
 1. Open a command line.
 
 1. Verify your Python version by running the following command:
@@ -205,7 +207,11 @@ you encounter during usage.
    Python 3.10.8
    ```
 
+1. Clone the repository.
+
 1. Navigate to the `server` folder.
+
+### Setting up the environment
 
 1. [If not set up] Set up virtual environment with the following command:
 
