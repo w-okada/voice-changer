@@ -9,12 +9,8 @@ from fastapi import UploadFile, Form
 from restapi.mods.FileUploader import upload_file
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 
-from const import MODEL_DIR, UPLOAD_DIR
+from const import UPLOAD_DIR
 from voice_changer.utils.LoadModelParams import LoadModelParamFile, LoadModelParams
-
-
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-os.makedirs(MODEL_DIR, exist_ok=True)
 
 
 class MMVC_Rest_Fileuploader:

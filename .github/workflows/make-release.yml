@@ -62,9 +62,12 @@ jobs:
         - os: windows-latest
           os_suffix: windows-amd64
           backend: dml
-        # - os: macos-latest
-        #   os_suffix: macos-amd64
-        #   backend: cpu
+        - os: macos-13
+          os_suffix: macos-amd64
+          backend: cpu
+        - os: macos-latest
+          os_suffix: macos-arm64
+          backend: cpu
         - os: ubuntu-latest
           os_suffix: linux-amd64
           backend: cpu
@@ -102,7 +105,7 @@ jobs:
         if [ "$RUNNER_OS" = "Windows" ]; then
           7z a -v2000m -tzip ./server/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip ./server/dist > /dev/null 2>&1
         else
-          zip -r -s 2000m ./server/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip ./server/dist > /dev/null 2>&1
+          tar czf - ./server/dist | split -b 2000m - ./server/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.tar.gz.
         fi
     - name: Upload release
       id: upload_release
@@ -115,7 +118,7 @@ jobs:
           const release_id = '${{ needs.create-tag.outputs.release_id }}';
           const files = fs.readdirSync('./server');
           for (const file of files) {
-            if (file.match(/[.](?:z\d+)|(?:zip(?:[.]\d+)?)$/)) {
+            if (file.match(/[.](?:z\d+)|(?:zip(?:[.]\d+)?)|(?:tar[.]gz(?:[.]\w+)?)$/)) {
               console.log('uploadReleaseAsset', file);
               await github.repos.uploadReleaseAsset({
                 owner: context.repo.owner,

@@ -24,9 +24,11 @@ SERVER_DEVICE_SAMPLE_RATES = [16000, 32000, 44100, 48000, 96000, 192000]
 
 tmpdir = tempfile.TemporaryDirectory()
 SSL_KEY_DIR = os.path.join(tmpdir.name, "keys") if hasattr(sys, "_MEIPASS") else "keys"
-MODEL_DIR = os.path.join(tmpdir.name, "logs") if hasattr(sys, "_MEIPASS") else "logs"
 UPLOAD_DIR = os.path.join(tmpdir.name, "upload_dir") if hasattr(sys, "_MEIPASS") else "upload_dir"
-UPLOAD_DIR = os.path.join(tmpdir.name, "upload_dir") if hasattr(sys, "_MEIPASS") else "upload_dir"
+TMP_DIR = os.path.join(tmpdir.name, "tmp_dir") if hasattr(sys, "_MEIPASS") else "tmp_dir"
+
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+os.makedirs(TMP_DIR, exist_ok=True)
 
 STORED_SETTINGS = {
     "enableServerAudio", "serverAudioSampleRate", "serverInputDeviceId", "serverOutputDeviceId", "serverMonitorDeviceId", "serverInputAudioGain", "serverOutputAudioGain",
@@ -49,20 +51,10 @@ NATIVE_CLIENT_FILE_MAC = (
 )
 EDITION_FILE = os.path.join(sys._MEIPASS, "edition.txt") if hasattr(sys, "_MEIPASS") else 'editions/edition.txt'
 
+ROOT_PATH = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else '.'
 MODEL_DIR_STATIC = os.path.join(sys._MEIPASS, "model_dir_static") if hasattr(sys, "_MEIPASS") else "model_dir_static"
 
-
-HUBERT_ONNX_MODEL_PATH = os.path.join(sys._MEIPASS, "model_hubert/hubert_simple.onnx") if hasattr(sys, "_MEIPASS") else "model_hubert/hubert_simple.onnx"  # type: ignore
-
-
-TMP_DIR = os.path.join(tmpdir.name, "tmp_dir") if hasattr(sys, "_MEIPASS") else "tmp_dir"
-os.makedirs(TMP_DIR, exist_ok=True)
-
-
-def getFrontendPath():
-    frontend_path = os.path.join(sys._MEIPASS, "dist") if hasattr(sys, "_MEIPASS") else "../client/demo/dist"
-    return frontend_path
-
+FRONTEND_DIR = os.path.join(sys._MEIPASS, "dist") if hasattr(sys, "_MEIPASS") else "../client/demo/dist"
 
 EmbedderType: TypeAlias = Literal["hubert_base", "contentvec", "hubert-base-japanese"]
 
