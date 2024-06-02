@@ -2,19 +2,12 @@ name: Make release
 
 on:
   workflow_dispatch: # allows manual triggering
-    inputs:
-      create_release:
-        description: 'Create new release'
-        required: true
-        type: boolean
 
 env:
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
 jobs:
   create-tag:
-    # if: ${{ github.event.inputs.create_release == 'true' }}
-
     runs-on: ubuntu-latest
 
     outputs:
