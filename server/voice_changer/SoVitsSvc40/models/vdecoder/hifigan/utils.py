@@ -3,20 +3,6 @@ import os
 import torch
 from torch.nn.utils import weight_norm
 
-# matplotlib.use("Agg")
-import matplotlib.pylab as plt
-
-
-def plot_spectrogram(spectrogram):
-    fig, ax = plt.subplots(figsize=(10, 2))
-    im = ax.imshow(spectrogram, aspect="auto", origin="lower", interpolation="none")
-    plt.colorbar(im, ax=ax)
-
-    fig.canvas.draw()
-    plt.close()
-
-    return fig
-
 
 def init_weights(m, mean=0.0, std=0.01):
     classname = m.__class__.__name__

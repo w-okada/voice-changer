@@ -1,5 +1,3 @@
-import gin
-
 import numpy as np
 import torch
 import torch.nn as nn
@@ -35,13 +33,13 @@ class Unit2Control(nn.Module):
         self.n_spk = n_spk
         if n_spk is not None and n_spk > 1:
             self.spk_embed = nn.Embedding(n_spk, 256)
-            
+
         # conv in stack
         self.stack = nn.Sequential(
                 nn.Conv1d(input_channel, 256, 3, 1, 1),
                 nn.GroupNorm(4, 256),
                 nn.LeakyReLU(),
-                nn.Conv1d(256, 256, 3, 1, 1)) 
+                nn.Conv1d(256, 256, 3, 1, 1))
 
         # transformer
         self.decoder = PCmer(
@@ -60,11 +58,11 @@ class Unit2Control(nn.Module):
             nn.Linear(256, self.n_out))
 
     def forward(self, units, f0, phase, volume, spk_id = None, spk_mix_dict = None):
-        
+
         '''
-        input: 
+        input:
             B x n_frames x n_unit
-        return: 
+        return:
             dict of B x n_frames x feat
         '''
 
@@ -81,6 +79,5 @@ class Unit2Control(nn.Module):
         x = self.norm(x)
         e = self.dense_out(x)
         controls = split_to_dict(e, self.output_splits)
-    
-        return controls 
 
+        return controls
