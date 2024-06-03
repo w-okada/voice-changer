@@ -121,8 +121,9 @@ jobs:
         script: |
           const path = require('path');
           const fs = require('fs');
+          const root = './server/artifacts';
           const release_id = '${{ needs.create-tag.outputs.release_id }}';
-          const files = fs.readdirSync('./server/artifacts');
+          const files = fs.readdirSync(root);
           for (const file of files) {
             console.log('uploadReleaseAsset', file);
             await github.repos.uploadReleaseAsset({
@@ -130,6 +131,6 @@ jobs:
               repo: context.repo.repo,
               release_id: release_id,
               name: file,
-              data: await fs.readFileSync(`./server/${file}`)
+              data: await fs.readFileSync(path.join(root, file))
             });
           }
