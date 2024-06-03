@@ -108,9 +108,9 @@ jobs:
         COUNT=$(ls -1q ./server/artifacts/ | wc -l | sed -r 's/[[:space:]]+//g')
         if [ $COUNT = 1 ]; then
           if [ "$RUNNER_OS" = "Windows" ]; then
-            mv ./server/artifacts/${{ matrix.os_suffix }}-${{ matrix.backend }}.zip.001 ./server/artifacts/${{ matrix.os_suffix }}-${{ matrix.backend }}.zip
+            mv ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip.001 ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip
           else
-            mv ./server/artifacts/${{ matrix.os_suffix }}-${{ matrix.backend }}.tar.gz.aa ./server/artifacts/${{ matrix.os_suffix }}-${{ matrix.backend }}.tar.gz
+            mv ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.tar.gz.aa ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.tar.gz
           fi
         fi
     - name: Upload release
