@@ -104,6 +104,7 @@ jobs:
     - name: Rename single asset
       shell: bash
       run: |
+        ls -al ./server/artifacts/
         COUNT=$(ls -1q ./server/artifacts/ | wc -l | sed -r 's/[[:space:]]+//g')
         if [ $COUNT = 1 ]; then
           if [ "$RUNNER_OS" = "Windows" ]; then
