@@ -112,7 +112,7 @@ A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX
 
 #### Running the voice changer
 
-1. Open the extracted folder (`voice-changer-windows-amd64-dml` or `voice-changer-windows-amd64-cuda`) > `dist` > `MMVCServerSIO`.
+1. Open the extracted folder (`voice-changer-windows-amd64-dml` or `voice-changer-windows-amd64-cuda`) > `MMVCServerSIO`.
 
 1. Run `MMVCServerSIO.exe`.
 
@@ -138,7 +138,7 @@ Once the download is finished, the voice changer will open the user interface us
 
 #### Running the voice changer
 
-1. Open the extracted folder `dist` > `MMVCServerSIO`.
+1. Open the extracted `MMVCServerSIO` folder.
 
 1. Double-click `MMVCServerSIO` to run the voice changer.
 
