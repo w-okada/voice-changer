@@ -1,9 +1,17 @@
 {
-    "files.associations": {
-      "*.css": "postcss"
-    },
-    "workbench.colorCustomizations": {
-      "tab.activeBackground": "#65952acc"
-    }
-  }
-  
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "[markdown]": {
+    "editor.wordWrap": "off"
+  },
+  "flake8.args": ["--max-line-length=1024", "--ignore=E402,E203,E722"],
+  "workbench.colorCustomizations": {
+    "tab.activeBackground": "#65952acc"
+  },
+  "black-formatter.args": ["--line-length", "550"],
+  "python.testing.pytestArgs": ["tests"],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+  "mypy-type-checker.args": ["--config-file=mypy.ini"]
+}
