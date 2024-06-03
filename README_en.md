@@ -8,7 +8,7 @@
   - By providing REST API, it has become easier for third parties to develop clients.
   - The edition system has been revamped.
     - The Standard Edition (win) runs on onnx models by default, regardless of the presence of a GPU. Please convert torch models to onnx models before use. If you have a GPU, hardware acceleration is only effective with onnx models.
-    - The Nvidia cuda Edition (win) enables hardware acceleration for torch models as well. Additionally, onnx models might perform slightly better compared to the Standard Edition.
+    - CUDA Edition (Windows) enables hardware acceleration for the torch model if you have an Nvidia GPU. Additionally, ONNX models may also see a slight performance improvement compared to the Standard Edition.
     - The mac Edition is aimed at users with Macs equipped with Apple Silicon.
     - Users with Linux and Python knowledge can clone the repository and run it.
   - Currently, only the Standard Edition is available in the alpha version.
