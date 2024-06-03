@@ -3,6 +3,7 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## What's New!
+- VCClientは version.2として開発が進められています.  [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
 - v.1.5.3.18a
   - Bugfix: FCPE
 

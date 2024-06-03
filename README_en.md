@@ -3,6 +3,7 @@
 [Japanese](/README_ja.md) [Korean](/README_ko.md)
 
 ## What's New!
+- VCClient has rebooted as the second version. see [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
 - v.1.5.3.18a
   - Bugfix: FCPE
 
