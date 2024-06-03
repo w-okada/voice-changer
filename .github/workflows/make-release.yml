@@ -95,10 +95,25 @@ jobs:
     - name: Pack artifact
       shell: bash
       run: |
+        mkdir ./server/artifacts
         if [ "$RUNNER_OS" = "Windows" ]; then
-          7z a -v2000m -tzip ./server/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip ./server/dist > /dev/null 2>&1
+          7z a -v2000m -tzip ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip ./server/dist/* > /dev/null 2>&1
         else
-          tar czf - ./server/dist | split -b 2000m - ./server/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.tar.gz.
+          cd ./server/dist
+          tar czf - ./* | split -b 2000m - ../artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.tar.gz.
+          cd -
+        fi
+    - name: Rename single asset
+      shell: bash
+      run: |
+        ls -al ./server/artifacts/
+        COUNT=$(ls -1q ./server/artifacts/ | wc -l | sed -r 's/[[:space:]]+//g')
+        if [ $COUNT = 1 ]; then
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            mv ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip.001 ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip
+          else
+            mv ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.tar.gz.aa ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.tar.gz
+          fi
         fi
     - name: Upload release
       id: upload_release
@@ -108,17 +123,16 @@ jobs:
         script: |
           const path = require('path');
           const fs = require('fs');
+          const root = './server/artifacts';
           const release_id = '${{ needs.create-tag.outputs.release_id }}';
-          const files = fs.readdirSync('./server');
+          const files = fs.readdirSync(root);
           for (const file of files) {
-            if (file.match(/[.](?:z\d+)|(?:zip(?:[.]\d+)?)|(?:tar[.]gz(?:[.]\w+)?)$/)) {
-              console.log('uploadReleaseAsset', file);
-              await github.repos.uploadReleaseAsset({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                release_id: release_id,
-                name: file,
-                data: await fs.readFileSync(`./server/${file}`)
-              });
-            }
+            console.log('uploadReleaseAsset', file);
+            await github.repos.uploadReleaseAsset({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: release_id,
+              name: file,
+              data: await fs.readFileSync(path.join(root, file))
+            });
           }
