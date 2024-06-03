@@ -8,9 +8,6 @@ torchaudio
 torch-directml
 faiss-cpu
 
-tensorboard
-tensorboardx
-
 onnxscript
 onnxsim
 onnxruntime-directml

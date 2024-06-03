@@ -11,11 +11,8 @@ python-socketio
 fastapi
 python-multipart
 scipy
-matplotlib
 librosa
-gin
 einops
-websockets
 sounddevice
 python-dotenv
 pydantic-settings

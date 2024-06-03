@@ -1,7 +1,6 @@
 import os
 import glob
 import re
-import sys
 import argparse
 import logging
 import json
@@ -12,8 +11,6 @@ import functools
 import numpy as np
 from scipy.io.wavfile import read
 import torch
-
-MATPLOTLIB_FLAG = False
 
 # logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logger = logging
@@ -92,30 +89,6 @@ def compute_f0_uv_torchcrepe(wav_numpy, p_len=None, sampling_rate=44100, hop_len
     F0Creper = CrepePitchExtractor(hop_length=hop_length, f0_min=f0_min, f0_max=f0_max, device=device)
     f0, uv = F0Creper(x[None, :].float(), sampling_rate, pad_to=p_len)
     return f0, uv
-
-
-def plot_data_to_numpy(x, y):
-    global MATPLOTLIB_FLAG
-    if not MATPLOTLIB_FLAG:
-        import matplotlib
-
-        matplotlib.use("Agg")
-        MATPLOTLIB_FLAG = True
-        mpl_logger = logging.getLogger("matplotlib")
-        mpl_logger.setLevel(logging.WARNING)
-    import matplotlib.pylab as plt
-    import numpy as np
-
-    fig, ax = plt.subplots(figsize=(10, 2))
-    plt.plot(x)
-    plt.plot(y)
-    plt.tight_layout()
-
-    fig.canvas.draw()
-    data = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep="")
-    data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
-    plt.close()
-    return data
 
 
 def interpolate_f0(f0):
@@ -311,61 +284,6 @@ def latest_checkpoint_path(dir_path, regex="G_*.pth"):
     x = f_list[-1]
     print(x)
     return x
-
-
-def plot_spectrogram_to_numpy(spectrogram):
-    global MATPLOTLIB_FLAG
-    if not MATPLOTLIB_FLAG:
-        import matplotlib
-
-        matplotlib.use("Agg")
-        MATPLOTLIB_FLAG = True
-        mpl_logger = logging.getLogger("matplotlib")
-        mpl_logger.setLevel(logging.WARNING)
-    import matplotlib.pylab as plt
-    import numpy as np
-
-    fig, ax = plt.subplots(figsize=(10, 2))
-    im = ax.imshow(spectrogram, aspect="auto", origin="lower", interpolation="none")
-    plt.colorbar(im, ax=ax)
-    plt.xlabel("Frames")
-    plt.ylabel("Channels")
-    plt.tight_layout()
-
-    fig.canvas.draw()
-    data = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep="")
-    data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
-    plt.close()
-    return data
-
-
-def plot_alignment_to_numpy(alignment, info=None):
-    global MATPLOTLIB_FLAG
-    if not MATPLOTLIB_FLAG:
-        import matplotlib
-
-        matplotlib.use("Agg")
-        MATPLOTLIB_FLAG = True
-        mpl_logger = logging.getLogger("matplotlib")
-        mpl_logger.setLevel(logging.WARNING)
-    import matplotlib.pylab as plt
-    import numpy as np
-
-    fig, ax = plt.subplots(figsize=(6, 4))
-    im = ax.imshow(alignment.transpose(), aspect="auto", origin="lower", interpolation="none")
-    fig.colorbar(im, ax=ax)
-    xlabel = "Decoder timestep"
-    if info is not None:
-        xlabel += "\n\n" + info
-    plt.xlabel(xlabel)
-    plt.ylabel("Encoder timestep")
-    plt.tight_layout()
-
-    fig.canvas.draw()
-    data = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep="")
-    data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
-    plt.close()
-    return data
 
 
 def load_wav_to_torch(full_path):

@@ -10,9 +10,6 @@ torchaudio
 faiss-cpu; sys_platform!='linux'
 faiss-gpu; sys_platform=='linux'
 
-tensorboard
-tensorboardx
-
 onnxscript
 onnxsim
 onnxruntime-gpu
