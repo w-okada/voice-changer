@@ -100,7 +100,7 @@ jobs:
           7z a -v2000m -tzip ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip ./server/dist/* > /dev/null 2>&1
         else
           cd ./server/dist
-          tar czf - ./* | split -b 2000m - ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.tar.gz.
+          tar czf - ./* | split -b 2000m - ../artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.tar.gz.
           cd -
         fi
     - name: Rename single asset
