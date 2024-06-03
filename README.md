@@ -3,7 +3,16 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## What's New!
-- VCClient is rebooted as version 2 !!!
+- VCClientがセカンドバージョンとしてリブートしました。
+  - 大幅なソフトウェア構造変更により拡張容易性を高めました。
+  - REST APIを提供することでサードパーティによるクライアント開発を容易化しました。
+  - エディション体系を刷新しました。
+    - スタンダードエディション(win)はgpuの有無にかかわらず、onnxモデルでの実行を基本としてます。torchモデルはonnxモデルに変換してから使用してください。gpuをお持ちの方はonnxモデルでのみハードウェアアクセラレーションが有効となります。
+    - Nvidiaのcudaエディション(win)は、torchモデルもハードウェアアクセラレーションが有効になります。また、onnxモデルもスタンダードエディションと比較してわずかながら性能が高くなる可能性があります。
+    - macエディションはApple Silicon搭載のMacユーザ向けです。
+    - linuxユーザやpythonの知識がある方はリポジトリをcloneして実行することもできます。
+  - 現在のalpha versionではスタンダードエディションのみの提供となっています。
+  
 
 # VC Client とは
 
@@ -16,9 +25,25 @@
 
 ![image](https://user-images.githubusercontent.com/48346627/206640768-53f6052d-0a96-403b-a06c-6714a0b7471d.png)
 
-3. 複数のプラットフォームに対応しています。
+1. 複数のプラットフォームに対応しています。
 
 - Windows, Mac(M1), Linux, Google Colab (MMVC のみ)
+
+1. REST APIを提供しています。
+
+- curlなどのOSに組み込まれているHTTPクライアントを使って操作ができます。
+- これにより、次のようなことが簡単に実現できます。
+  - ユーザが.bat等でREST APIをたたく処理をショートカットとして登録する。
+  - リモートから操作する簡易クライアントを作成する。
+  - など。
+
+# ダウンロード
+[Hugging Face](https://huggingface.co/wok000/vcclient000/tree/main)からダウンロードしてください。
+
+# マニュアル
+
+[マニュアル](docs/01_basic_v2.0.z.md)
+
 
 # トラブルシュート
 

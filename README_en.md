@@ -3,7 +3,15 @@
 [Japanese](/README.md) [Korean](/README_ko.md)
 
 ## What's New!
-- VCClient is rebooted as version 2 !!!
+- VCClient has rebooted as the second version.
+  - Significant software structural changes have enhanced extensibility.
+  - By providing REST API, it has become easier for third parties to develop clients.
+  - The edition system has been revamped.
+    - The Standard Edition (win) runs on onnx models by default, regardless of the presence of a GPU. Please convert torch models to onnx models before use. If you have a GPU, hardware acceleration is only effective with onnx models.
+    - The Nvidia cuda Edition (win) enables hardware acceleration for torch models as well. Additionally, onnx models might perform slightly better compared to the Standard Edition.
+    - The mac Edition is aimed at users with Macs equipped with Apple Silicon.
+    - Users with Linux and Python knowledge can clone the repository and run it.
+  - Currently, only the Standard Edition is available in the alpha version.
 
 # What is VC Client
 
@@ -17,9 +25,23 @@
 
 ![image](https://user-images.githubusercontent.com/48346627/206640768-53f6052d-0a96-403b-a06c-6714a0b7471d.png)
 
-3. Cross-platform compatibility
+1. Cross-platform compatibility
    Supports Windows, Mac (including Apple Silicon M1), Linux, and Google Colaboratory.
 
+1. We provide a REST API.
+
+- You can operate it using HTTP clients that are built into the OS, such as curl.
+- This allows you to easily achieve the following:
+  - Users can register processes that call the REST API in shortcuts, such as in .bat files.
+  - Create simple clients to operate remotely.
+  - And more.
+
+# Download
+Please download it from [Hugging Face](https://huggingface.co/wok000/vcclient000/tree/main).
+
+# Manual
+
+[Manual](docs/01_basic_v2.0.z.md)
 
 # Software Signing
 

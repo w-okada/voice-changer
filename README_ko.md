@@ -1,11 +1,18 @@
 ## VC Client
 
-
 [English](/README_en.md) [Japanese](/README.md)
 
 ## What's New!
-- VCClient is rebooted as version 2 !!!
-
+- VCClient가 세컨드 버전으로 리부트되었습니다.
+  - 대대적인 소프트웨어 구조 변경으로 확장 용이성을 높였습니다.
+  - REST API를 제공하여 서드파티 클라이언트 개발을 용이하게 하였습니다.
+  - 에디션 체계를 새롭게 구성하였습니다.
+    - 스탠다드 에디션(win)은 GPU의 유무에 관계없이 onnx 모델로 실행하는 것을 기본으로 합니다. torch 모델은 onnx 모델로 변환한 후 사용하십시오. GPU를 보유한 경우 onnx 모델에서만 하드웨어 가속이 활성화됩니다.
+    - Nvidia의 cuda 에디션(win)은 torch 모델에서도 하드웨어 가속이 활성화됩니다. 또한, onnx 모델도 스탠다드 에디션과 비교할 때 성능이 약간 향상될 가능성이 있습니다.
+    - mac 에디션은 Apple Silicon을 탑재한 Mac 사용자용입니다.
+    - 리눅스 사용자 및 파이썬 지식이 있는 분은 리포지토리를 클론하여 실행할 수도 있습니다.
+  - 현재의 알파 버전에서는 스탠다드 에디션만 제공하고 있습니다.
+  
 # VC Client란
                                                                                                                                                      
 1. 각종 음성 변환 AI(VC, Voice Conversion)를 활용해 실시간 음성 변환을 하기 위한 클라이언트 소프트웨어입니다. 지원하는 음성 변환 AI는 다음과 같습니다.
@@ -17,9 +24,25 @@
 
 ![image](https://user-images.githubusercontent.com/48346627/206640768-53f6052d-0a96-403b-a06c-6714a0b7471d.png)
 
-3. 여러 플랫폼을 지원합니다.
+1. 여러 플랫폼을 지원합니다.
 
 - Windows, Mac(M1), Linux, Google Colab (MMVC만 지원)
+
+1. REST API를 제공합니다.
+
+- curl과 같은 OS에 내장된 HTTP 클라이언트를 사용하여 조작할 수 있습니다.
+- 이를 통해 다음과 같은 것을 쉽게 실현할 수 있습니다.
+  - 사용자가 .bat 등의 스크립트 파일로 REST API를 호출하는 처리를 바로가기로 등록한다.
+  - 원격에서 조작할 수 있는 간이 클라이언트를 작성한다.
+  - 등등.
+
+# 다운로드
+[Hugging Face](https://huggingface.co/wok000/vcclient000/tree/main)에서 다운로드하세요.
+
+# 매뉴얼
+
+[매뉴얼](docs/01_basic_v2.0.z.md)
+
 
 # 문제 해결법
 
