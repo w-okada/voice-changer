@@ -6,8 +6,6 @@ import socket
 import sys
 
 import ffmpeg
-import matplotlib
-import matplotlib.pylab as plt
 import numpy as np
 import torch
 from scipy.io.wavfile import read
@@ -16,12 +14,6 @@ from torch.nn import functional as F
 from modules.shared import ROOT_DIR
 
 from .config import TrainConfig
-
-matplotlib.use("Agg")
-logging.getLogger("matplotlib").setLevel(logging.WARNING)
-
-# logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-logger = logging
 
 
 class AWP:
@@ -230,41 +222,6 @@ def latest_checkpoint_path(dir_path, regex="G_*.pth"):
     filelist.sort(key=lambda f: int("".join(filter(str.isdigit, f))))
     filepath = filelist[-1]
     return filepath
-
-
-def plot_spectrogram_to_numpy(spectrogram):
-    fig, ax = plt.subplots(figsize=(10, 2))
-    im = ax.imshow(spectrogram, aspect="auto", origin="lower", interpolation="none")
-    plt.colorbar(im, ax=ax)
-    plt.xlabel("Frames")
-    plt.ylabel("Channels")
-    plt.tight_layout()
-
-    fig.canvas.draw()
-    data = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep="")
-    data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
-    plt.close()
-    return data
-
-
-def plot_alignment_to_numpy(alignment, info=None):
-    fig, ax = plt.subplots(figsize=(6, 4))
-    im = ax.imshow(
-        alignment.transpose(), aspect="auto", origin="lower", interpolation="none"
-    )
-    fig.colorbar(im, ax=ax)
-    xlabel = "Decoder timestep"
-    if info is not None:
-        xlabel += "\n\n" + info
-    plt.xlabel(xlabel)
-    plt.ylabel("Encoder timestep")
-    plt.tight_layout()
-
-    fig.canvas.draw()
-    data = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep="")
-    data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
-    plt.close()
-    return data
 
 
 def load_wav_to_torch(full_path):
