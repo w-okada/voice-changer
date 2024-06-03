@@ -100,7 +100,7 @@ A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX
 
 #### For AMD/Intel/CPU users
 
-1. Download the `voice-changer-windows-amd64-dml.zip.001` ZIP file.
+1. Download the `voice-changer-windows-amd64-dml.zip` ZIP file.
 
 1. Right-click the ZIP file. In the opened action menu select **7-Zip** > **Extract to "voice-changer-windows-amd64-dml\\"**.
 
