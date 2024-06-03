@@ -97,9 +97,9 @@ jobs:
       run: |
         mkdir ./server/artifacts
         if [ "$RUNNER_OS" = "Windows" ]; then
-          7z a -v2000m -tzip ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip ./server/dist > /dev/null 2>&1
+          7z a -v2000m -tzip ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip ./server/dist/* > /dev/null 2>&1
         else
-          tar czf - ./server/dist | split -b 2000m - ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.tar.gz.
+          tar czf - ./server/dist/* | split -b 2000m - ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.tar.gz.
         fi
     - name: Rename single asset
       shell: bash
