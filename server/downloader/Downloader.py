@@ -72,7 +72,7 @@ async def download(params: dict):
         res = await s.get(url, headers={ 'Range': f'bytes={offset}-' }, allow_redirects=True)
     else:
         # Reset hasher to avoid potential mixing with discarded data
-        hasher = xxh128()
+        hasher.reset()
         res = await s.get(url, allow_redirects=True)
     res.raise_for_status()
     content_length = int(res.headers.get("content-length"))
