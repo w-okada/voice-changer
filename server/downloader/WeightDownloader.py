@@ -1,16 +1,13 @@
-import os
 import asyncio
 
 from downloader.Downloader import download
 from mods.log_control import VoiceChangaerLogger
 from settings import ServerSettings
-from Exceptions import WeightsVerificationException
-from utils.hasher import compute_hash
-from xxhash import xxh128
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
 
 async def downloadWeight(params: ServerSettings):
+    logger.info('[Voice Changer] Loading weights.')
     file_params = [
         # {
         #     "url": "https://huggingface.co/ddPn08/rvc-webui-models/resolve/main/embeddings/hubert_base.pt",
@@ -31,52 +28,37 @@ async def downloadWeight(params: ServerSettings):
             "url": "https://huggingface.co/wok000/weights/resolve/main/crepe/onnx/full.onnx",
             "saveTo": params.crepe_onnx_full,
             "hash": "e9bb11eb5d3557805715077b30aefebc",
-            "size": 88984790
         },
         {
             "url": "https://huggingface.co/wok000/weights/resolve/main/crepe/onnx/tiny.onnx",
             "saveTo": params.crepe_onnx_tiny,
             "hash": "b509427f6d223152e57ff2aeb1b48300",
-            "size": 1955762
         },
         {
             "url": "https://huggingface.co/wok000/weights_gpl/resolve/main/content-vec/contentvec-f.onnx",
             "saveTo": params.content_vec_500_onnx,
             "hash": "ab288ca5b540a4a15909a40edf875d1e",
-            "size": 378550151
         },
         {
             "url": "https://huggingface.co/wok000/weights/resolve/main/rmvpe/rmvpe_20231006.pt",
             "saveTo": params.rmvpe,
             "hash": "7989809b6b54fb33653818e357bcb643",
-            "size": 181184272
         },
         {
             "url": "https://huggingface.co/wok000/weights_gpl/resolve/main/rmvpe/rmvpe_20231006.onnx",
             "saveTo": params.rmvpe_onnx,
             "hash": "b6979bf69503f8ec48c135000028a7b0",
-            "size": 362003174
         }
     ]
 
     files_to_download = []
     pos = 0
     for param in file_params:
-        saveTo = param['saveTo']
-        try:
-            offset = os.stat(saveTo).st_size
-            # Check whether the offset is greater than expected file size just
-            # to avoid potentially starting a download on incorrect offset
-            if offset >= param['size']:
-                continue
-        except:
-            offset = None
         files_to_download.append({
             "url": param["url"],
-            "saveTo": saveTo,
-            "hash": param["hash"],
+            "saveTo": param['saveTo'],
+            "hash": param['hash'],
             "position": pos,
-            "offset": offset
         })
         pos += 1
 
@@ -85,22 +67,4 @@ async def downloadWeight(params: ServerSettings):
         tasks.append(asyncio.ensure_future(download(file)))
     await asyncio.gather(*tasks)
 
-    # ファイルサイズをログに書き込む。（デバッグ用）
-    logger.info('[Voice Changer] Verifying files...')
-    fail = False
-    for param in file_params:
-        file_path = param['saveTo']
-        if not os.path.exists(file_path):
-            fail = True
-            continue
-
-        hash = param["hash"]
-        with open(file_path, 'rb') as f:
-            received_hash = compute_hash(f, xxh128())
-        if received_hash != hash:
-            logger.error(f'Corrupted file {file_path}: calculated hash {received_hash}, expected hash {hash}')
-            fail = True
-        logger.debug(f"weight file [{file_path}]: {os.path.getsize(file_path)}")
-    if fail:
-        raise WeightsVerificationException()
-    logger.info('[Voice Changer] Files were verified successfully!')
+    logger.info('[Voice Changer] All weights are loaded!')

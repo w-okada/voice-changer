@@ -10,17 +10,16 @@ from data.ModelSlot import DiffusionSVCModelSlot, ModelSlot, RVCModelSlot
 from mods.log_control import VoiceChangaerLogger
 from voice_changer.ModelSlotManager import ModelSlotManager
 from voice_changer.RVC.RVCModelSlotGenerator import RVCModelSlotGenerator
-from downloader.Downloader import download, download_no_tqdm
+from downloader.Downloader import download
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
 async def downloadInitialSamples(mode: RVCSampleMode, model_dir: str):
     sampleJsonUrls, sampleModels = getSampleJsonAndModelIds(mode)
-    sampleJsons = await _downloadSampleJsons(sampleJsonUrls)
-    if os.path.exists(model_dir):
-        logger.info("[Voice Changer] model_dir is already exists. skip download samples.")
+    if not sampleModels:
         return
+    sampleJsons = await _downloadSampleJsons(sampleJsonUrls)
     samples = _generateSampleList(sampleJsons)
     slotIndex = list(range(len(sampleModels)))
     await _downloadSamples(samples, sampleModels, model_dir, slotIndex)
@@ -30,7 +29,7 @@ async def downloadSample(mode: RVCSampleMode, modelId: str, model_dir: str, slot
     sampleJsonUrls, _sampleModels = getSampleJsonAndModelIds(mode)
     sampleJsons = _generateSampleJsons(sampleJsonUrls)
     samples = _generateSampleList(sampleJsons)
-    await _downloadSamples(samples, [(modelId, params)], model_dir, [slotIndex], withoutTqdm=True)
+    await _downloadSamples(samples, [(modelId, params)], model_dir, [slotIndex])
 
 
 def getSampleInfos(mode: RVCSampleMode):
@@ -43,10 +42,12 @@ def getSampleInfos(mode: RVCSampleMode):
 async def _downloadSampleJsons(sampleJsonUrls: list[str]):
     sampleJsons: list[str] = []
     tasks: list[asyncio.Task] = []
+    pos = 0
     for url in sampleJsonUrls:
         filename = os.path.basename(url)
-        tasks.append(asyncio.ensure_future(download_no_tqdm({"url": url, "saveTo": filename, "position": 0})))
+        tasks.append(asyncio.ensure_future(download({"url": url, "saveTo": filename, "position": pos})))
         sampleJsons.append(filename)
+        pos += 1
     await asyncio.gather(*tasks)
     return sampleJsons
 
@@ -71,7 +72,7 @@ def _generateSampleList(sampleJsons: list[str]):
     return samples
 
 
-async def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str, Any]], model_dir: str, slotIndex: list[int], withoutTqdm=False):
+async def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str, Any]], model_dir: str, slotIndex: list[int]):
     downloadParams = []
     line_num = 0
     modelSlotManager = ModelSlotManager.get_instance(model_dir)
@@ -204,12 +205,8 @@ async def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tup
     # ダウンロード
     logger.info("[Voice Changer] Downloading model files...")
     tasks: list[asyncio.Task] = []
-    if withoutTqdm:
-        for file in downloadParams:
-            tasks.append(asyncio.ensure_future(download_no_tqdm(file)))
-    else:
-        for file in downloadParams:
-            tasks.append(asyncio.ensure_future(download(file)))
+    for file in downloadParams:
+        tasks.append(asyncio.ensure_future(download(file)))
     await asyncio.gather(*tasks)
 
     # メタデータ作成

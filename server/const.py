@@ -19,6 +19,7 @@ VoiceChangerType: TypeAlias = Literal[
 StaticSlot: TypeAlias = Literal["Beatrice-JVS",]
 
 STORED_SETTING_FILE = "stored_setting.json"
+ASSETS_FILE = 'assets.json'
 
 SERVER_DEVICE_SAMPLE_RATES = [16000, 32000, 44100, 48000, 96000, 192000]
 
