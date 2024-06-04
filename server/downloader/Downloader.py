@@ -68,11 +68,12 @@ async def download(params: dict):
     # If file is incomplete and web-server supports byte ranges - resume the download
     # In case file size somehow exceeds reported content-length - redownload the file completely
     resume_download = offset is not None and accept_ranges is not None and accept_ranges == 'bytes' and offset < content_length
-    res = await s.get(
-        url,
-        headers={ 'Range': f'bytes={offset}-' } if resume_download else None,
-        allow_redirects=True
-    )
+    if resume_download:
+        res = await s.get(url, headers={ 'Range': f'bytes={offset}-' }, allow_redirects=True)
+    else:
+        # Reset hasher to avoid potential mixing with discarded data
+        hasher = xxh128()
+        res = await s.get(url, allow_redirects=True)
     res.raise_for_status()
     content_length = int(res.headers.get("content-length"))
     progress_bar = tqdm(
@@ -84,7 +85,7 @@ async def download(params: dict):
         position=position,
     )
 
-    # with tqdm
+    # Append to file if resume, overwrite otherwise
     with progress_bar, open(saveTo, "ab" if resume_download else "wb") as f:
         async for chunk in res.content.iter_chunked(8192):
             progress_bar.update(len(chunk))
@@ -98,6 +99,7 @@ async def download(params: dict):
         raise DownloadVerificationException(saveTo, hash, expected_hash)
 
     write_file_entry(saveTo, hash)
+    logger.info(f'[Voice Changer] Downloaded {saveTo}.')
 
 def write_file_entry(saveTo: str, hash: str):
     global lock, files
