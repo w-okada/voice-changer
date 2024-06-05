@@ -150,18 +150,16 @@ Refer to corresponding [Colab](https://github.com/deiteris/voice-changer/blob/ma
 
 > **NOTE**: When any issue with the voice changer occurs, check the command line window (the one that opens during the start) for errors.
 
-### Weight failed to pass verification check
+### Exceptions.WeightDownloadException: 'Failed to download weight.'
 
-Either the download was incomplete during the first-time start or your files were corrupted. The error will show which files are affected above:
+Either the remote files have changed or your files were corrupted. The error will show which files are affected above the error:
 
 ```
-Corrupted file pretrain/crepe_onnx_full.onnx: calculated hash 67f6432087eec1887bfcfc6e4045dcae, expected hash e9bb11eb5d3557805715077b30aefebc
-Corrupted file pretrain/content_vec_500.onnx: calculated hash ef1f3a8da54c6c7d1ebc708b5824e155, expected hash ab288ca5b540a4a15909a40edf875d1e
-Corrupted file pretrain/rmvpe.pt: calculated hash a014255b0460e3cc20c576c01d5583ff, expected hash 7989809b6b54fb33653818e357bcb643
-Corrupted file pretrain/rmvpe.onnx: calculated hash 9737c9c9b5ce93bd797a643613ac87e1, expected hash b6979bf69503f8ec48c135000028a7b0
+[Voice Changer] 'pretrain/content_vec_500.onnx failed to pass hash verification check. Got 1931e237626b80d65ae44cbacd4a5197, expected ab288ca5b540a4a15909a40edf875d1e'
+[Voice Changer] 'pretrain/rmvpe.onnx failed to pass hash verification check. Got 65030149d579a65f15aa7e85769c32f1, expected b6979bf69503f8ec48c135000028a7b0'
 ```
 
-Delete the mentioned files and restart the voice changer. Deleted files will be re-downloaded.
+Find and delete the mentioned files from the voice changer folder and restart the voice changer. Deleted files will be re-downloaded.
 
 ### Audio devices are not displayed
 

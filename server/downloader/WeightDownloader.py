@@ -3,6 +3,7 @@ import asyncio
 from downloader.Downloader import download
 from mods.log_control import VoiceChangaerLogger
 from settings import ServerSettings
+from Exceptions import WeightDownloadException
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
 
@@ -65,6 +66,12 @@ async def downloadWeight(params: ServerSettings):
     tasks: list[asyncio.Task] = []
     for file in files_to_download:
         tasks.append(asyncio.ensure_future(download(file)))
-    await asyncio.gather(*tasks)
+    fail = False
+    for res in await asyncio.gather(*tasks, return_exceptions=True):
+        if isinstance(res, Exception):
+            fail = True
+            logger.error(f'[Voice Changer] {res}')
+    if fail:
+        raise WeightDownloadException()
 
     logger.info('[Voice Changer] All weights are loaded!')
