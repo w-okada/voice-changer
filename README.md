@@ -3,7 +3,19 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## What's New!
-- VCClientがセカンドバージョンとしてリブートしました。
+
+- v.2.0.6-alpha
+  - 新規
+    - M1系 Macに対応しました。
+      - M1 MBA(monterey), M2 Pro MBP(venture)での動作実績あります。
+      - sonomaでのレポートお待ちしております。
+  - bugfix:
+    - beatriceのスピーカー選択でpitchが元に戻ってしまうバグに対応。
+  - その他：
+    - 不具合解析用の情報取得強化
+
+- v.2.0.5-alpha
+  - VCClientがセカンドバージョンとしてリブートしました。
   - 大幅なソフトウェア構造変更により拡張容易性を高めました。
   - REST APIを提供することでサードパーティによるクライアント開発を容易化しました。
   - エディション体系を刷新しました。

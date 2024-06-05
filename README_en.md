@@ -3,15 +3,26 @@
 [Japanese](/README.md) [Korean](/README_ko.md)
 
 ## What's New!
-- VCClient has rebooted as the second version.
-  - Significant software structural changes have enhanced extensibility.
-  - By providing REST API, it has become easier for third parties to develop clients.
-  - The edition system has been revamped.
-    - The Standard Edition (win) runs on onnx models by default, regardless of the presence of a GPU. Please convert torch models to onnx models before use. If you have a GPU, hardware acceleration is only effective with onnx models.
-    - CUDA Edition (Windows) enables hardware acceleration for the torch model if you have an Nvidia GPU. Additionally, ONNX models may also see a slight performance improvement compared to the Standard Edition.
-    - The mac Edition is aimed at users with Macs equipped with Apple Silicon.
-    - Users with Linux and Python knowledge can clone the repository and run it.
-  - Currently, only the Standard Edition is available in the alpha version.
+- v.2.0.6-alpha
+  - New
+    - Now compatible with M1 series Macs.
+      - Confirmed to work on M1 MBA (Monterey) and M2 Pro MBP (Ventura).
+      - Looking for reports on performance with Sonoma.
+  - Bugfix:
+    - Fixed a bug where the pitch would revert when selecting a speaker in Beatrice.
+  - Others:
+    - Enhanced information gathering for debugging purposes.
+
+- v.2.0.5-alpha
+  - VCClient has rebooted as the second version.
+    - Significant software structural changes have enhanced extensibility.
+    - By providing REST API, it has become easier for third parties to develop clients.
+    - The edition system has been revamped.
+      - The Standard Edition (win) runs on onnx models by default, regardless of the presence of a GPU. Please convert torch models to onnx models before use. If you have a GPU, hardware acceleration is only effective with onnx models.
+      - CUDA Edition (Windows) enables hardware acceleration for the torch model if you have an Nvidia GPU. Additionally, ONNX models may also see a slight performance improvement compared to the Standard Edition.
+      - The mac Edition is aimed at users with Macs equipped with Apple Silicon.
+      - Users with Linux and Python knowledge can clone the repository and run it.
+    - Currently, only the Standard Edition is available in the alpha version.
 
 # What is VC Client
 
