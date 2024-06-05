@@ -42,12 +42,10 @@ def getSampleInfos(mode: RVCSampleMode):
 async def _downloadSampleJsons(sampleJsonUrls: list[str]):
     sampleJsons: list[str] = []
     tasks: list[asyncio.Task] = []
-    pos = 0
     for url in sampleJsonUrls:
         filename = os.path.basename(url)
-        tasks.append(asyncio.ensure_future(download({"url": url, "saveTo": filename, "position": pos})))
+        tasks.append(asyncio.ensure_future(download({"url": url, "saveTo": filename})))
         sampleJsons.append(filename)
-        pos += 1
     await asyncio.gather(*tasks)
     return sampleJsons
 
@@ -74,7 +72,6 @@ def _generateSampleList(sampleJsons: list[str]):
 
 async def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tuple[str, Any]], model_dir: str, slotIndex: list[int]):
     downloadParams = []
-    line_num = 0
     modelSlotManager = ModelSlotManager.get_instance(model_dir)
 
     for i, initSampleId in enumerate(sampleModelIds):
@@ -107,11 +104,9 @@ async def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tup
                 {
                     "url": sample.modelUrl,
                     "saveTo": modelFilePath,
-                    "position": line_num,
                 }
             )
             slotInfo.modelFile = os.path.basename(sample.modelUrl)
-            line_num += 1
 
             if targetSampleParams["useIndex"] is True and hasattr(sample, "indexUrl") and sample.indexUrl != "":
                 indexPath = os.path.join(
@@ -122,11 +117,9 @@ async def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tup
                     {
                         "url": sample.indexUrl,
                         "saveTo": indexPath,
-                        "position": line_num,
                     }
                 )
                 slotInfo.indexFile = os.path.basename(sample.indexUrl)
-                line_num += 1
 
             if hasattr(sample, "icon") and sample.icon != "":
                 iconPath = os.path.join(
@@ -137,11 +130,9 @@ async def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tup
                     {
                         "url": sample.icon,
                         "saveTo": iconPath,
-                        "position": line_num,
                     }
                 )
                 slotInfo.iconFile = os.path.basename(sample.icon)
-                line_num += 1
 
             slotInfo.sampleId = sample.id
             slotInfo.credit = sample.credit
@@ -167,11 +158,9 @@ async def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tup
                 {
                     "url": sample.modelUrl,
                     "saveTo": modelFilePath,
-                    "position": line_num,
                 }
             )
             slotInfo.modelFile = os.path.basename(sample.modelUrl)
-            line_num += 1
 
             if hasattr(sample, "icon") and sample.icon != "":
                 iconPath = os.path.join(
@@ -182,11 +171,9 @@ async def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tup
                     {
                         "url": sample.icon,
                         "saveTo": iconPath,
-                        "position": line_num,
                     }
                 )
                 slotInfo.iconFile = os.path.basename(sample.icon)
-                line_num += 1
 
             slotInfo.sampleId = sample.id
             slotInfo.credit = sample.credit

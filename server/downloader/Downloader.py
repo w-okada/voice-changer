@@ -12,6 +12,7 @@ from Exceptions import DownloadVerificationException
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
 
+position = 0
 lock = Lock()
 
 if os.path.exists(ASSETS_FILE):
@@ -22,11 +23,11 @@ else:
 
 
 async def download(params: dict):
+    global position
     s = await HttpClient.get_client()
 
     url = params["url"]
     saveTo = params["saveTo"]
-    position = params["position"]
 
     dirname = os.path.dirname(saveTo)
     if dirname:
@@ -77,6 +78,7 @@ async def download(params: dict):
         hasher.reset()
         res = await s.get(url, allow_redirects=True)
     res.raise_for_status()
+    position += 1
     content_length = int(res.headers.get("content-length"))
     progress_bar = tqdm(
         total=content_length,
@@ -94,6 +96,7 @@ async def download(params: dict):
             f.write(chunk)
             # Reusing the same hasher instance defined above
             hasher.update(chunk)
+    position -= 1
 
     # Get final hash (local chunks + remote chunks)
     hash = hasher.hexdigest()

@@ -53,15 +53,12 @@ async def downloadWeight(params: ServerSettings):
     ]
 
     files_to_download = []
-    pos = 0
     for param in file_params:
         files_to_download.append({
             "url": param["url"],
             "saveTo": param['saveTo'],
             "hash": param['hash'],
-            "position": pos,
         })
-        pos += 1
 
     tasks: list[asyncio.Task] = []
     for file in files_to_download:
