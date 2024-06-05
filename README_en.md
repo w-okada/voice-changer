@@ -4,6 +4,7 @@
 
 ## What's New!
 - VCClient has rebooted as the second version. see [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
+  - The Mac(Apple silicon) version has also been released.
 - v.1.5.3.18a
   - Bugfix: FCPE
 

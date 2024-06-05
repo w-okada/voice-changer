@@ -4,6 +4,8 @@
 
 ## 새로운 기능!
 - VCClient는 version.2로 개발이 진행 중입니다. [여기를 참조하십시오](https://github.com/w-okada/voice-changer/tree/v.2)
+  - Mac 버전도 출시했습니다.
+  - 
 - v.1.5.3.18a
   - Bugfix: FCPE
 
