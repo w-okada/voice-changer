@@ -117,7 +117,7 @@ jobs:
         fi
     - name: Upload release
       id: upload_release
-      uses: actions/github-script@v3
+      uses: actions/github-script@v7
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
@@ -128,7 +128,7 @@ jobs:
           const files = fs.readdirSync(root);
           for (const file of files) {
             console.log('uploadReleaseAsset', file);
-            await github.repos.uploadReleaseAsset({
+            await github.rest.repos.uploadReleaseAsset({
               owner: context.repo.owner,
               repo: context.repo.repo,
               release_id: release_id,
