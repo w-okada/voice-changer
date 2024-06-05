@@ -1,6 +1,6 @@
 from io import FileIO
 
-BUF_SIZE = 65536
+BUF_SIZE = 1024 * 1024 * 4 # 4MB
 MEMORY_VIEW = memoryview(bytearray(BUF_SIZE))
 
 def compute_hash(f: FileIO, hasher) -> str:
