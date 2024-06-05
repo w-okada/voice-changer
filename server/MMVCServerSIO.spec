@@ -1,5 +1,4 @@
 # -*- mode: python ; coding: utf-8 -*-
-# from PyInstaller.utils.hooks import collect_all
 from PyInstaller.utils.hooks import collect_data_files
 import sys
 import os.path
@@ -36,11 +35,11 @@ a = Analysis(
     binaries=binaries,
     datas=datas,
     hiddenimports=hiddenimports,
-    hookspath=[],
+    hookspath=['./pyinstaller-hooks'],
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
-    noarchive=True,
+    noarchive=False,
 )
 pyz = PYZ(a.pure)
 

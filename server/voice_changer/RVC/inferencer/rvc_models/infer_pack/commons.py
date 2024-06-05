@@ -104,7 +104,7 @@ def subsequent_mask(length):
     return mask
 
 
-# @torch.jit.script
+@torch.jit.script
 def fused_add_tanh_sigmoid_multiply(input_a, input_b, n_channels):
     n_channels_int = n_channels[0]
     in_act = input_a + input_b
