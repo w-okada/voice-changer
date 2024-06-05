@@ -70,6 +70,10 @@ A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX
 
 * Slightly degraded performance (up to 25% reduction) can be observed with multi-GPU setups.
 
+### All versions
+
+* On first startup, voice may not change or errors may occur until Chunk and Extra settings are changed. Workaround is to change Chunk and Extra.
+
 ## How to use
 
 ### Running locally on Windows
