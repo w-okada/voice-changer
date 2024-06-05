@@ -52,24 +52,32 @@ jobs:
         - os: windows-latest
           os_suffix: windows-amd64
           backend: cuda
+          python-version: '3.11'
         - os: windows-latest
           os_suffix: windows-amd64
           backend: dml
+          python-version: '3.11'
         - os: macos-13
           os_suffix: macos-amd64
           backend: cpu
+          python-version: '3.11'
         - os: macos-latest
           os_suffix: macos-arm64
           backend: cpu
+          python-version: '3.11'
         - os: ubuntu-latest
           os_suffix: linux-amd64
           backend: cpu
+          python-version: '3.11'
         - os: ubuntu-latest
           os_suffix: linux-amd64
           backend: cuda
+          # Linux CUDA depends on faiss-gpu-cp310
+          python-version: '3.10'
         # - os: ubuntu-latest
         #   os_suffix: linux-amd64
         #   backend: rocm
+        #   python-version: '3.10'
     runs-on: ${{ matrix.os }}
     env:
       BACKEND: ${{ matrix.backend }}
@@ -81,7 +89,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
+        python-version: ${{ matrix.python-version }}
         # architecture: x64
         # cache: pip
     - name: Installing build dependencies
