@@ -89,7 +89,7 @@ async def download(params: dict):
 
     # Append to file if resume, overwrite otherwise
     with progress_bar, open(saveTo, "ab" if resume_download else "wb") as f:
-        async for chunk in res.content.iter_chunked(8192):
+        async for chunk in res.content.iter_chunked(1024 * 1024): # 1MB
             progress_bar.update(len(chunk))
             f.write(chunk)
             # Reusing the same hasher instance defined above
