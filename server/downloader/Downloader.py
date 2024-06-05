@@ -61,6 +61,8 @@ async def download(params: dict):
     res.raise_for_status()
     content_length = int(res.headers.get("content-length"))
     if offset is not None and offset == content_length:
+        if expected_hash is not None and hash != expected_hash:
+            raise DownloadVerificationException(saveTo, hash, expected_hash)
         # Hash will not be written here if file is absent or incomplete
         write_file_entry(saveTo, hash)
         return
