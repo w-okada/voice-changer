@@ -70,10 +70,6 @@ A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX
 
 * Slightly degraded performance (up to 25% reduction) can be observed with multi-GPU setups.
 
-### All versions
-
-* Export to ONNX does not work.
-
 ## How to use
 
 ### Running locally on Windows
