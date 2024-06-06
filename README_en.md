@@ -3,6 +3,14 @@
 [Japanese](/README.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.13-alpha
+  - Added support for onnxruntime-gpu. Release of the CUDA edition.
+  - Bugfix:
+    - Addressed issues with onnxcrepe
+    - Fixed ID selection issue in Beatrice v2 API
+  - Others:
+    - Enhanced logger
+
 - v.2.0.6-alpha
   - New
     - Now compatible with M1 series Macs.
@@ -14,15 +22,16 @@
     - Enhanced information gathering for debugging purposes.
 
 - v.2.0.5-alpha
-  - VCClient has rebooted as the second version.
-    - Significant software structural changes have enhanced extensibility.
-    - By providing REST API, it has become easier for third parties to develop clients.
-    - The edition system has been revamped.
-      - The Standard Edition (win) runs on onnx models by default, regardless of the presence of a GPU. Please convert torch models to onnx models before use. If you have a GPU, hardware acceleration is only effective with onnx models.
-      - CUDA Edition (Windows) enables hardware acceleration for the torch model if you have an Nvidia GPU. Additionally, ONNX models may also see a slight performance improvement compared to the Standard Edition.
-      - The mac Edition is aimed at users with Macs equipped with Apple Silicon.
-      - Users with Linux and Python knowledge can clone the repository and run it.
-    - Currently, only the Standard Edition is available in the alpha version.
+  - VCClient has been rebooted as a second version.
+  - Major software structure changes have been made to improve extensibility.
+  - Providing REST API to facilitate client development by third parties.
+  - Edition system has been completely revamped.
+    - The Standard Edition (win) runs on ONNX models by default regardless of the presence of a GPU. Please convert Torch models to ONNX models before use. Hardware acceleration is only effective with ONNX models for users with a GPU.
+    - The CUDA Edition (win) is optimized specifically for Nvidia GPUs. It offers further speed enhancements compared to the Standard Edition. Hardware acceleration is only effective with ONNX models.
+    - Torch models can also be hardware accelerated using PyTorch models.
+    - The Mac Edition is for Mac users with Apple Silicon.
+    - Linux users or those with knowledge of Python can clone the repository and run it.
+  - Currently, only the Standard Edition is available in the Alpha version.
 
 # What is VC Client
 
