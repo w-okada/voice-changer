@@ -14,12 +14,13 @@
 
 ## edition
 
-| edition   | os  | 内容                                                                                   |
-| --------- | --- | -------------------------------------------------------------------------------------- |
-| win_std   | win | 一般的なwinユーザ向け。AMD, NvidiaのGPU所有者。CPUのみのユーザ                         |
-| win_cuda  | win | NvidiaのGPU所有者向け。cudaのセットアップが可能なユーザ                                |
-| win_torch | win | pytorchのモデルを使用する場合。NvidiaのGPU所有者向け。cudaのセットアップが可能なユーザ |
-| mac       | mac | AppleSilicon(M1等)ユーザ向け。                                                         |
+| edition             | os  | 内容                                                                                   |
+| ------------------- | --- | -------------------------------------------------------------------------------------- |
+| win_std             | win | 一般的なwinユーザ向け。AMD, NvidiaのGPU所有者。CPUのみのユーザ                         |
+| win_cuda            | win | NvidiaのGPU所有者向け。cudaのセットアップが可能なユーザ                                |
+| win_std_torch_dml   | win | pytorchのモデルを使用する場合。AMDのGPU所有者向け。                                    |
+| win_cuda_torch_cuda | win | pytorchのモデルを使用する場合。NvidiaのGPU所有者向け。cudaのセットアップが可能なユーザ |
+| mac                 | mac | AppleSilicon(M1等)ユーザ向け。                                                         |
 
 ## サポート Voice Changer Type
 | Voice Chanager Type     | サポートエディション   |                                                                       |
@@ -47,10 +48,12 @@ vcclient_<edition>_<version>.zip
 
 ## 操作
 ### 起動方法
-| 起動ファイル    | サポートエディション | 説明                                           |
-| --------------- | -------------------- | ---------------------------------------------- |
-| start_http.bat  | win_std, win_cuda    | 一般的な起動方法                               |
-| start_https.bat | win_std, win_cuda    | リモートからブラウザアクセスする場合の起動方法 |
+| 起動ファイル        | サポートエディション | 説明                                           |
+| ------------------- | -------------------- | ---------------------------------------------- |
+| start_http.bat      | win_*                | 一般的な起動方法                               |
+| start_https.bat     | win_*                | リモートからブラウザアクセスする場合の起動方法 |
+| start_http.command  | mac                  | 一般的な起動方法                               |
+| start_https.command | mac                  | リモートからブラウザアクセスする場合の起動方法 |
 
 初回起動時のみ、必要なデータのダウンロードが行われます。しばらくお待ちください。
 

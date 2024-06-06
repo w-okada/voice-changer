@@ -3,6 +3,11 @@
 [English](/README_en.md) [Japanese](/README.md)
 
 ## What's New!
+- v.2.0.16-alpha
+  - torch-dml 실험적 버전을 지원. 에디션에 대한 설명은 [여기](docs/01_basic_v2.0.z.md)를 참조.
+  - 버그 수정:
+    - rvc 파일 업로드 시 pth와 index 파일을 동시에 업로드할 수 없는 문제를 해결.
+  
 - v.2.0.13-alpha
   - onnxruntime-gpu 지원 추가. CUDA 에디션 릴리스.
   - 버그 수정:
