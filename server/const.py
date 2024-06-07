@@ -32,6 +32,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(TMP_DIR, exist_ok=True)
 
 STORED_SETTINGS = {
+    "version",
     "enableServerAudio", "serverAudioSampleRate", "serverInputDeviceId", "serverOutputDeviceId", "serverMonitorDeviceId", "serverInputAudioGain", "serverOutputAudioGain",
     "crossFadeOverlapSize", "protect",
     "modelSlotIndex", "serverReadChunkSize", "extraConvertSize", "gpu",
