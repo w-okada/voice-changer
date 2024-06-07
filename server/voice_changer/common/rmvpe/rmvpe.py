@@ -357,7 +357,8 @@ class RMVPE:
         with torch.no_grad():
             n_frames = mel.shape[-1]
             n_pad = 32 * ((n_frames - 1) // 32 + 1) - n_frames
-            mel = F.pad(mel, (0, n_pad), mode="constant")
+            if n_pad > 0:
+                mel = F.pad(mel, (0, n_pad), mode="reflect")
             hidden = self.model(mel)
             return hidden[:, :n_frames]
 
