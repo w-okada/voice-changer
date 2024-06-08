@@ -8,7 +8,7 @@ import { isDesktopApp } from "../../../const";
 export type DeviceAreaProps = {};
 
 export const DeviceArea = (_props: DeviceAreaProps) => {
-    const { setting, serverSetting, audioContext, setAudioOutputElementId, setAudioMonitorElementId, initializedRef, setVoiceChangerClientSetting, startOutputRecording, stopOutputRecording, webEdition } = useAppState();
+    const { setting, serverSetting, audioContext, setAudioOutputElementId, setAudioMonitorElementId, initializedRef, setVoiceChangerClientSetting, startOutputRecording, stopOutputRecording } = useAppState();
     const { isConverting, audioInputForGUI, inputAudioDeviceInfo, setAudioInputForGUI, fileInputEchoback, setFileInputEchoback, setAudioOutputForGUI, setAudioMonitorForGUI, audioOutputForGUI, audioMonitorForGUI, outputAudioDeviceInfo, shareScreenEnabled, setShareScreenEnabled, reloadDeviceInfo } = useGuiState();
     const [inputHostApi, setInputHostApi] = useState<string>("ALL");
     const [outputHostApi, setOutputHostApi] = useState<string>("ALL");
@@ -21,20 +21,6 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
 
     // (1) Audio Mode
     const deviceModeRow = useMemo(() => {
-        if (webEdition) {
-            return (
-                <div className="config-sub-area-control">
-                    <div className="config-sub-area-control-title">AUDIO:</div>
-                    <div className="config-sub-area-control-field">
-                        <div className="config-sub-area-buttons">
-                            <div onClick={reloadDeviceInfo} className="config-sub-area-button">
-                                reload
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
         const enableServerAudio = serverSetting.serverSetting.enableServerAudio;
         const clientChecked = enableServerAudio == 1 ? false : true;
         const serverChecked = enableServerAudio == 1 ? true : false;

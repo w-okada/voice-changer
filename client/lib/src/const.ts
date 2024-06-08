@@ -5,7 +5,6 @@
 
 export const VoiceChangerType = {
     RVC: "RVC",
-    WebModel: "WebModel",
 } as const;
 export type VoiceChangerType = (typeof VoiceChangerType)[keyof typeof VoiceChangerType];
 
@@ -297,8 +296,7 @@ export type WorkletSetting = {
 ///////////////////////
 export const Protocol = {
     sio: "sio",
-    rest: "rest",
-    internal: "internal",
+    rest: "rest"
 } as const;
 export type Protocol = (typeof Protocol)[keyof typeof Protocol];
 

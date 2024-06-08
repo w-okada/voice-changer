@@ -13,7 +13,7 @@ const SortTypes = {
 export type SortTypes = (typeof SortTypes)[keyof typeof SortTypes];
 
 export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
-    const { serverSetting, getInfo, webEdition } = useAppState();
+    const { serverSetting, getInfo } = useAppState();
     const guiState = useGuiState();
     const messageBuilderState = useMessageBuilder();
     const [sortType, setSortType] = useState<SortTypes>("slot");
@@ -114,10 +114,6 @@ export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
             </div>
         );
     }, [modelTiles, sortType]);
-
-    if (webEdition) {
-        return <></>;
-    }
 
     return modelSlotArea;
 };

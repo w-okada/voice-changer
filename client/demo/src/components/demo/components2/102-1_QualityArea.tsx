@@ -8,7 +8,7 @@ export type QualityAreaProps = {
 };
 
 export const QualityArea = (props: QualityAreaProps) => {
-    const { setVoiceChangerClientSetting, serverSetting, setting, webEdition } = useAppState();
+    const { setVoiceChangerClientSetting, serverSetting, setting } = useAppState();
     const { appGuiSettingState } = useAppRoot();
     const edition = appGuiSettingState.edition;
 
@@ -47,9 +47,7 @@ export const QualityArea = (props: QualityAreaProps) => {
         };
         const f0DetOptions = generateF0DetOptions();
 
-        const f0Det = webEdition ? (
-            <></>
-        ) : (
+        const f0Det = (
             <div className="config-sub-area-control">
                 <div className="config-sub-area-control-title">F0 Det.:</div>
                 <div className="config-sub-area-control-field">
@@ -66,9 +64,7 @@ export const QualityArea = (props: QualityAreaProps) => {
             </div>
         );
 
-        const threshold = webEdition ? (
-            <></>
-        ) : (
+        const threshold = (
             <div className="config-sub-area-control">
                 <div className="config-sub-area-control-title">S.Thresh.:</div>
                 <div className="config-sub-area-control-field">

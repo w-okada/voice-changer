@@ -20,10 +20,6 @@ export type VoiceChangerWorkletListener = {
   ) => void;
 };
 
-export type InternalCallback = {
-  processAudio: (data: ArrayBuffer) => Promise<Uint8Array>;
-};
-
 export class VoiceChangerWorkletNode extends AudioWorkletNode {
   private listener: VoiceChangerWorkletListener;
 
@@ -45,9 +41,6 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
   private stopPromiseResolve:
     | ((value: void | PromiseLike<void>) => void)
     | null = null;
-
-  // InternalCallback
-  private internalCallback: InternalCallback | null = null;
 
   constructor(context: AudioContext, listener: VoiceChangerWorkletListener) {
     super(context, "voice-changer-worklet-processor");
@@ -81,10 +74,6 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
     if (recreateSocketIoRequired) {
       this.createSocketIO();
     }
-  };
-
-  setInternalAudioProcessCallback = (internalCallback: InternalCallback) => {
-    this.internalCallback = internalCallback;
   };
 
   getSettings = (): WorkletNodeSetting => {
@@ -195,16 +184,10 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
       // console.log("receive input data", inputData);
 
       // Float to Int16 (internalの場合はfloatのまま行く。)
-      if (this.setting.protocol != "internal") {
-        const offset = inputData.length * this.chunkCounter;
-        for (let i = 0; i < inputData.length; i++) {
-          let s = Math.max(-1, Math.min(1, inputData[i]));
-          this.requestChunks[offset + i] = s < 0 ? s * 0x8000 : s * 0x7fff;
-        }
-      } else {
-        // internal
-        // console.log("inputData.buffer", inputData.buffer);
-        // this.requestChunks.push(inputData.buffer);
+      const offset = inputData.length * this.chunkCounter;
+      for (let i = 0; i < inputData.length; i++) {
+        let s = Math.max(-1, Math.min(1, inputData[i]));
+        this.requestChunks[offset + i] = s < 0 ? s * 0x8000 : s * 0x7fff;
       }
 
       //// リクエストバッファの中身が、リクエスト送信数と違う場合は処理終了。
@@ -251,33 +234,6 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
         }
       }
       this.listener.notifyResponseTime(Date.now() - timestamp, perf);
-    } else if (this.setting.protocol == "internal") {
-      if (!this.internalCallback) {
-        this.listener.notifyException(
-          VOICE_CHANGER_CLIENT_EXCEPTION.ERR_INTERNAL_AUDIO_PROCESS_CALLBACK_IS_NOT_INITIALIZED,
-          `[AudioWorkletNode] internal audio process callback is not initialized`
-        );
-        return;
-      }
-      // const res = await this.internalCallback.processAudio(newBuffer);
-      // if (res.length < 128 * 2) {
-      //     return;
-      // }
-      // if (this.outputNode != null) {
-      //     this.outputNode.postReceivedVoice(res.buffer);
-      // } else {
-      //     this.postReceivedVoice(res.buffer);
-      // }
-      // this.internalCallback.processAudio(newBuffer).then((res) => {
-      //   if (res.length < 128 * 2) {
-      //     return;
-      //   }
-      //   if (this.outputNode != null) {
-      //     this.outputNode.postReceivedVoice(res.buffer);
-      //   } else {
-      //     this.postReceivedVoice(res.buffer);
-      //   }
-      // });
     } else {
       throw "unknown protocol";
     }
