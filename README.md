@@ -22,8 +22,6 @@ And this one demonstrates how the voice changer works and performs with Nvidia G
 
 ## Supported operated systems
 
-> **NOTE**: macOS builds are not included yet. But you can run from source.
-
 * Windows 10 or later.
 * Linux.
 * macOS 12 Monterey or later. With Apple Silicon or Intel CPU.
@@ -121,6 +119,8 @@ When running the voice changer for the first time, it will start downloading nec
 Once the download is finished, the voice changer will open the user interface using your default web browser.
 
 ### Running locally on macOS
+
+> **NOTE**: macOS support is experimental and not confirmed to be fully working.
 
 #### For Apple Silicon (Apple M1, etc.) users
 
