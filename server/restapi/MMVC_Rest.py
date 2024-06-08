@@ -52,23 +52,6 @@ class MMVC_Rest:
                 port=port
             )
 
-            app_fastapi.mount(
-                "/front",
-                StaticFiles(directory=FRONTEND_DIR, html=True),
-                name="static",
-            )
-
-            app_fastapi.mount(
-                "/trainer",
-                StaticFiles(directory=FRONTEND_DIR, html=True),
-                name="static",
-            )
-
-            app_fastapi.mount(
-                "/recorder",
-                StaticFiles(directory=FRONTEND_DIR, html=True),
-                name="static",
-            )
             app_fastapi.mount("/tmp", StaticFiles(directory=TMP_DIR), name="static")
             app_fastapi.mount("/upload_dir", StaticFiles(directory=UPLOAD_DIR), name="static")
 
