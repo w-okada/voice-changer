@@ -12,5 +12,6 @@ onnxscript
 onnxsim
 onnxruntime-directml
 torchcrepe
+torchfcpe
 pyworld
 safetensors
