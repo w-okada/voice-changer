@@ -7,16 +7,16 @@ from voice_changer.RVC.pitchExtractor.CrepePitchExtractor import CrepePitchExtra
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 from voice_changer.RVC.pitchExtractor.RMVPEOnnxPitchExtractor import RMVPEOnnxPitchExtractor
 from voice_changer.RVC.pitchExtractor.RMVPEPitchExtractor import RMVPEPitchExtractor
-from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
+from settings import ServerSettings
 
 
 class PitchExtractorManager(Protocol):
     currentPitchExtractor: PitchExtractor | None = None
-    params: VoiceChangerParams
+    params: ServerSettings
     gpu: int = -1
 
     @classmethod
-    def initialize(cls, params: VoiceChangerParams):
+    def initialize(cls, params: ServerSettings):
         cls.params = params
 
     @classmethod

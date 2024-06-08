@@ -4,12 +4,12 @@ import torch
 from const import UPLOAD_DIR
 from voice_changer.RVC.modelMerger.MergeModel import merge_model
 from voice_changer.utils.ModelMerger import ModelMerger, ModelMergerRequest
-from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
+from settings import ServerSettings
 
 
 class RVCModelMerger(ModelMerger):
     @classmethod
-    def merge_models(cls, params: VoiceChangerParams, request: ModelMergerRequest, storeSlot: int):
+    def merge_models(cls, params: ServerSettings, request: ModelMergerRequest, storeSlot: int):
         merged = merge_model(params, request)
 
         # いったんは、アップロードフォルダに格納する。（歴史的経緯）

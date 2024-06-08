@@ -1,7 +1,6 @@
 import React from "react";
 import { useGuiState } from "./001_GuiStateProvider";
 import { TextInputDialog } from "./911_TextInputDialog";
-import { ShowLicenseDialog } from "./912_ShowLicenseDialog";
 
 export const Dialogs2 = () => {
     const guiState = useGuiState();
@@ -13,7 +12,6 @@ export const Dialogs2 = () => {
                 {guiState.stateControls.showTextInputCheckbox.trigger}
                 <TextInputDialog></TextInputDialog>
                 {guiState.stateControls.showLicenseCheckbox.trigger}
-                <ShowLicenseDialog />
             </div>
         </div>
     );

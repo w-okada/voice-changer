@@ -12,7 +12,6 @@ fastapi
 python-multipart
 scipy
 librosa
-einops
 sounddevice
 python-dotenv
 pydantic-settings

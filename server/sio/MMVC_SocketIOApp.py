@@ -59,18 +59,6 @@ class MMVC_SocketIOApp:
                         "filename": f"{FRONTEND_DIR}/assets/buymeacoffee.png",
                         "content_type": "image/png",
                     },
-                    "/ort-wasm-simd.wasm": {
-                        "filename": f"{FRONTEND_DIR}/ort-wasm-simd.wasm",
-                        "content_type": "application/wasm",
-                    },
-                    "/assets/beatrice/female-clickable.svg": {
-                        "filename": f"{FRONTEND_DIR}/assets/beatrice/female-clickable.svg",
-                        "content_type": "image/svg+xml",
-                    },
-                    "/assets/beatrice/male-clickable.svg": {
-                        "filename": f"{FRONTEND_DIR}/assets/beatrice/male-clickable.svg",
-                        "content_type": "image/svg+xml",
-                    },
                     "": FRONTEND_DIR,
                     "/": f"{FRONTEND_DIR}/index.html",
                 },

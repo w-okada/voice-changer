@@ -64,67 +64,6 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
                     return x.kind == "rvcModel";
                 });
                 return enough;
-            } else if (setting.voiceChangerType == "MMVCv13") {
-                const enough =
-                    !!setting.files.find((x) => {
-                        return x.kind == "mmvcv13Model";
-                    }) &&
-                    !!setting.files.find((x) => {
-                        return x.kind == "mmvcv13Config";
-                    });
-                return enough;
-            } else if (setting.voiceChangerType == "MMVCv15") {
-                const enough =
-                    !!setting.files.find((x) => {
-                        return x.kind == "mmvcv15Model";
-                    }) &&
-                    !!setting.files.find((x) => {
-                        return x.kind == "mmvcv15Config";
-                    });
-                return enough;
-            } else if (setting.voiceChangerType == "so-vits-svc-40") {
-                const enough =
-                    !!setting.files.find((x) => {
-                        return x.kind == "soVitsSvc40Config";
-                    }) &&
-                    !!setting.files.find((x) => {
-                        return x.kind == "soVitsSvc40Model";
-                    });
-                return enough;
-            } else if (setting.voiceChangerType == "DDSP-SVC") {
-                const enough =
-                    !!setting.files.find((x) => {
-                        return x.kind == "ddspSvcModel";
-                    }) &&
-                    !!setting.files.find((x) => {
-                        return x.kind == "ddspSvcModelConfig";
-                    }) &&
-                    !!setting.files.find((x) => {
-                        return x.kind == "ddspSvcDiffusion";
-                    }) &&
-                    !!setting.files.find((x) => {
-                        return x.kind == "ddspSvcDiffusionConfig";
-                    });
-                return enough;
-            } else if (setting.voiceChangerType == "Diffusion-SVC") {
-                const enough = !!setting.files.find((x) => {
-                    return x.kind == "diffusionSVCModel";
-                });
-                return enough;
-            } else if (setting.voiceChangerType == "Beatrice") {
-                const enough = !!setting.files.find((x) => {
-                    return x.kind == "beatriceModel";
-                });
-                return enough;
-            } else if (setting.voiceChangerType == "LLVC") {
-                const enough =
-                    !!setting.files.find((x) => {
-                        return x.kind == "llvcModel";
-                    }) &&
-                    !!setting.files.find((x) => {
-                        return x.kind == "llvcConfig";
-                    });
-                return enough;
             }
             return false;
         };
@@ -166,29 +105,6 @@ export const FileUploaderScreen = (props: FileUploaderScreenProps) => {
             if (vcType == "RVC") {
                 rows.push(generateFileRow(uploadSetting!, "Model", "rvcModel", ["pth", "onnx", 'safetensors']));
                 rows.push(generateFileRow(uploadSetting!, "Index", "rvcIndex", ["index", "bin"]));
-            } else if (vcType == "MMVCv13") {
-                rows.push(generateFileRow(uploadSetting!, "Config", "mmvcv13Config", ["json"]));
-                rows.push(generateFileRow(uploadSetting!, "Model", "mmvcv13Model", ["pth", "onnx"]));
-            } else if (vcType == "MMVCv15") {
-                rows.push(generateFileRow(uploadSetting!, "Config", "mmvcv15Config", ["json"]));
-                rows.push(generateFileRow(uploadSetting!, "Corres", "mmvcv15Correspondence", ["txt"]));
-                rows.push(generateFileRow(uploadSetting!, "Model", "mmvcv15Model", ["pth", "onnx"]));
-            } else if (vcType == "so-vits-svc-40") {
-                rows.push(generateFileRow(uploadSetting!, "Config", "soVitsSvc40Config", ["json"]));
-                rows.push(generateFileRow(uploadSetting!, "Model", "soVitsSvc40Model", ["pth"]));
-                rows.push(generateFileRow(uploadSetting!, "Cluster", "soVitsSvc40Cluster", ["pth", "pt"]));
-            } else if (vcType == "DDSP-SVC") {
-                rows.push(generateFileRow(uploadSetting!, "Config", "ddspSvcModelConfig", ["yaml"], "model/"));
-                rows.push(generateFileRow(uploadSetting!, "Model", "ddspSvcModel", ["pth", "pt"], "model/"));
-                rows.push(generateFileRow(uploadSetting!, "Config(diff)", "ddspSvcDiffusionConfig", ["yaml"], "diff/"));
-                rows.push(generateFileRow(uploadSetting!, "Model(diff)", "ddspSvcDiffusion", ["pth", "pt"], "diff/"));
-            } else if (vcType == "Diffusion-SVC") {
-                rows.push(generateFileRow(uploadSetting!, "Model(combo)", "diffusionSVCModel", ["ptc"]));
-            } else if (vcType == "Beatrice") {
-                rows.push(generateFileRow(uploadSetting!, "Beatrice", "beatriceModel", ["bin"]));
-            } else if (vcType == "LLVC") {
-                rows.push(generateFileRow(uploadSetting!, "Model", "llvcModel", ["pth"]));
-                rows.push(generateFileRow(uploadSetting!, "Config", "llvcConfig", ["json"]));
             }
             return rows;
         };

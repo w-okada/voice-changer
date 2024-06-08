@@ -20,11 +20,6 @@ async def downloadWeight(params: ServerSettings):
         #     "saveTo": params.hubert_base_jp,
         #     "hash": "fed21bfb71a38df821cf9ae43e5da8b3",
         # },
-        # {
-        #     "url": "https://huggingface.co/wok000/weights/resolve/main/ddsp-svc30/embedder/hubert-soft-0d54a1f4.pt",
-        #     "saveTo": params.hubert_soft,
-        #     "hash": "c32e64b2d7e222a1912948a6192636d8",
-        # },
         {
             "url": "https://huggingface.co/wok000/weights/resolve/main/crepe/onnx/full.onnx",
             "saveTo": params.crepe_onnx_full,

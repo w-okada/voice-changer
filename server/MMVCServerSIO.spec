@@ -11,7 +11,7 @@ backend = 'cpu' if 'BACKEND' not in os.environ else os.environ['BACKEND']
 python_folder = next(folder for folder in site.getsitepackages() if 'site-packages' in folder).replace('\\', '/')
 logging.info(python_folder)
 
-datas = [('../client/demo/dist', './dist'), ('./model_dir_static', './model_dir_static')]
+datas = [('../client/demo/dist', './dist')]
 if backend == 'dml':
     datas += [('./editions/dml/edition.txt', '.')]
 else:

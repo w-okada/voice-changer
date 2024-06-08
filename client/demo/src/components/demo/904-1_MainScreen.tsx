@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useGuiState } from "./001_GuiStateProvider";
 import { useAppState } from "../../001_provider/001_AppStateProvider";
-import { DDSPSVCModelSlot, DiffusionSVCModelSlot, MMVCv13ModelSlot, MMVCv15ModelSlot, RVCModelSlot, SoVitsSvc40ModelSlot, fileSelector } from "@dannadori/voice-changer-client-js";
+import { RVCModelSlot, fileSelector } from "@dannadori/voice-changer-client-js";
 import { useMessageBuilder } from "../../hooks/useMessageBuilder";
 import { ModelSlotManagerDialogScreen } from "./904_ModelSlotManagerDialog";
 import { checkExtention, trimfileName } from "../../utils/utils";
@@ -191,43 +191,6 @@ export const MainScreen = (props: MainScreenProps) => {
                 fileRows.push(generateFileRow("model", slotInfo.modelFile));
                 fileRows.push(generateFileRow("index", slotInfo.indexFile));
                 infoRow = generateInfoRow(`${slotInfo.f0 ? "f0" : "nof0"}, ${slotInfo.samplingRate}, ${slotInfo.embChannels}, ${slotInfo.modelType}, ${slotInfo.defaultTune}, ${slotInfo.defaultIndexRatio}, ${slotInfo.defaultProtect}`);
-            } else if (x.voiceChangerType == "MMVCv13") {
-                const slotInfo = x as MMVCv13ModelSlot;
-                iconArea = generateIconArea(index, slotInfo.iconFile, true);
-                nameRow = generateNameRow(index, slotInfo.name, slotInfo.termsOfUseUrl);
-                fileRows.push(generateFileRow("config", slotInfo.configFile));
-                fileRows.push(generateFileRow("model", slotInfo.modelFile));
-                infoRow = generateInfoRow(``);
-            } else if (x.voiceChangerType == "MMVCv15") {
-                const slotInfo = x as MMVCv15ModelSlot;
-                iconArea = generateIconArea(index, slotInfo.iconFile, true);
-                nameRow = generateNameRow(index, slotInfo.name, slotInfo.termsOfUseUrl);
-                fileRows.push(generateFileRow("config", slotInfo.configFile));
-                fileRows.push(generateFileRow("model", slotInfo.modelFile));
-                infoRow = generateInfoRow(`f0factor:${slotInfo.f0Factor}`);
-            } else if (x.voiceChangerType == "so-vits-svc-40") {
-                const slotInfo = x as SoVitsSvc40ModelSlot;
-                iconArea = generateIconArea(index, slotInfo.iconFile, true);
-                nameRow = generateNameRow(index, slotInfo.name, slotInfo.termsOfUseUrl);
-                fileRows.push(generateFileRow("config", slotInfo.configFile));
-                fileRows.push(generateFileRow("model", slotInfo.modelFile));
-                fileRows.push(generateFileRow("cluster", slotInfo.clusterFile));
-                infoRow = generateInfoRow(`tune:${slotInfo.defaultTune},cluster:${slotInfo.defaultClusterInferRatio},noise:${slotInfo.noiseScale}`);
-            } else if (x.voiceChangerType == "DDSP-SVC") {
-                const slotInfo = x as DDSPSVCModelSlot;
-                iconArea = generateIconArea(index, slotInfo.iconFile, true);
-                nameRow = generateNameRow(index, slotInfo.name, slotInfo.termsOfUseUrl);
-                fileRows.push(generateFileRow("config", slotInfo.configFile));
-                fileRows.push(generateFileRow("model", slotInfo.modelFile));
-                fileRows.push(generateFileRow("diff conf", slotInfo.diffConfigFile));
-                fileRows.push(generateFileRow("diff model", slotInfo.diffModelFile));
-                infoRow = generateInfoRow(`tune:${slotInfo.defaultTune},acc:${slotInfo.acc},ks:${slotInfo.kstep}, diff:${slotInfo.diffusion},enh:${slotInfo.enhancer}`);
-            } else if (x.voiceChangerType == "Diffusion-SVC") {
-                const slotInfo = x as DiffusionSVCModelSlot;
-                iconArea = generateIconArea(index, slotInfo.iconFile, true);
-                nameRow = generateNameRow(index, slotInfo.name, slotInfo.termsOfUseUrl);
-                fileRows.push(generateFileRow("model", slotInfo.modelFile));
-                infoRow = generateInfoRow(`tune:${slotInfo.defaultTune},mks:${slotInfo.kStepMax},ks:${slotInfo.defaultKstep}, sp:${slotInfo.defaultSpeedup}, l:${slotInfo.nLayers},${slotInfo.nnLayers},`);
             } else {
                 iconArea = generateIconArea(index, null, false);
                 nameRow = generateNameRow(index, "", "");

@@ -41,7 +41,7 @@ export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
                 const tileContainerClass = x.slotIndex == serverSetting.serverSetting.modelSlotIndex ? "model-slot-tile-container-selected" : "model-slot-tile-container";
                 const name = x.name.length > 8 ? x.name.substring(0, 7) + "..." : x.name;
 
-                const modelDir = x.slotIndex == "Beatrice-JVS" ? "model_dir_static" : serverSetting.serverSetting.voiceChangerParams.model_dir;
+                const modelDir = serverSetting.serverSetting.voiceChangerParams.model_dir;
                 const icon = x.iconFile.length > 0 ? modelDir + "/" + x.slotIndex + "/" + x.iconFile.split(/[\/\\]/).pop() : "./assets/icons/human.png";
 
                 const iconElem =

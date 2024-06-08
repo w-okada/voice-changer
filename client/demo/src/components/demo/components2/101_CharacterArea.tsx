@@ -6,10 +6,6 @@ import { useMessageBuilder } from "../../../hooks/useMessageBuilder";
 import { TuningArea } from "./101-1_TuningArea";
 import { IndexArea } from "./101-2_IndexArea";
 import { SpeakerArea } from "./101-3_SpeakerArea";
-import { F0FactorArea } from "./101-4_F0FactorArea";
-import { SoVitsSVC40SettingArea } from "./101-5_so-vits-svc40SettingArea";
-import { DDSPSVC30SettingArea } from "./101-6_ddsp-svc30SettingArea";
-import { DiffusionSVCSettingArea } from "./101-7_diffusion-svcSettingArea";
 import { Portrait } from "./101-0_Portrait";
 import { useAppRoot } from "../../../001_provider/001_AppRootProvider";
 import { WebEditionSettingArea } from "./101-8_web-editionSettingArea";
@@ -22,7 +18,6 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
     const guiState = useGuiState();
     const messageBuilderState = useMessageBuilder();
     const webEdition = appGuiSettingState.edition.indexOf("web") >= 0;
-    const { beatriceJVSSpeakerId } = useGuiState();
     useMemo(() => {
         messageBuilderState.setMessage(__filename, "export_to_onnx", { ja: "onnx出力", en: "export to onnx" });
         messageBuilderState.setMessage(__filename, "save_default", { ja: "設定保存", en: "save setting" });
@@ -35,9 +30,6 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
         }
         if (serverSetting.serverSetting.modelSlotIndex == undefined) {
             return;
-        } else if (serverSetting.serverSetting.modelSlotIndex == "Beatrice-JVS") {
-            const beatriceJVS = serverSetting.serverSetting.modelSlots.find((v) => v.slotIndex == "Beatrice-JVS");
-            return beatriceJVS;
         } else {
             return serverSetting.serverSetting.modelSlots[serverSetting.serverSetting.modelSlotIndex];
         }
@@ -61,12 +53,12 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
                 <div className="character-area-control-title">Name:</div>
                 <div className="character-area-control-field">
                     <div className="character-area-text">
-                        {selected.name} {selected.slotIndex == "Beatrice-JVS" ? `speaker:${beatriceJVSSpeakerId}` : ""}
+                        {selected.name}
                     </div>
                 </div>
             </div>
         );
-    }, [selected, beatriceJVSSpeakerId]);
+    }, [selected]);
 
     const startControl = useMemo(() => {
         const onStartClicked = async () => {
@@ -305,10 +297,6 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
                     <TuningArea />
                     <IndexArea />
                     <SpeakerArea />
-                    <F0FactorArea />
-                    <SoVitsSVC40SettingArea />
-                    <DDSPSVC30SettingArea />
-                    <DiffusionSVCSettingArea />
                     <WebEditionSettingArea />
                     {modelSlotControl}
                 </div>

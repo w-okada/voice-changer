@@ -6,17 +6,8 @@ from typing import Literal, TypeAlias
 
 
 VoiceChangerType: TypeAlias = Literal[
-    "MMVCv13",
-    "MMVCv15",
-    "so-vits-svc-40",
-    "DDSP-SVC",
     "RVC",
-    "Diffusion-SVC",
-    "Beatrice",
-    "LLVC",
 ]
-
-StaticSlot: TypeAlias = Literal["Beatrice-JVS",]
 
 STORED_SETTING_FILE = "stored_setting.json"
 ASSETS_FILE = 'assets.json'
@@ -54,11 +45,10 @@ NATIVE_CLIENT_FILE_MAC = (
 EDITION_FILE = os.path.join(sys._MEIPASS, "edition.txt") if hasattr(sys, "_MEIPASS") else 'editions/edition.txt'
 
 ROOT_PATH = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else '.'
-MODEL_DIR_STATIC = os.path.join(sys._MEIPASS, "model_dir_static") if hasattr(sys, "_MEIPASS") else "model_dir_static"
 
 FRONTEND_DIR = os.path.join(sys._MEIPASS, "dist") if hasattr(sys, "_MEIPASS") else "../client/demo/dist"
 
-EmbedderType: TypeAlias = Literal["hubert_base", "contentvec", "hubert-base-japanese"]
+EmbedderType: TypeAlias = Literal["hubert_base", "contentvec"]
 
 
 class EnumInferenceTypes(Enum):
@@ -71,9 +61,6 @@ class EnumInferenceTypes(Enum):
     pyTorchVoRASbeta = "pyTorchVoRASbeta"
     onnxRVC = "onnxRVC"
     onnxRVCNono = "onnxRVCNono"
-
-
-DiffusionSVCInferenceType: TypeAlias = Literal["combo",]
 
 
 PitchExtractorType: TypeAlias = Literal[

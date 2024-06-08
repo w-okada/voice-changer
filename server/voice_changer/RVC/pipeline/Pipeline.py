@@ -17,7 +17,6 @@ from Exceptions import (
     DeviceCannotSupportHalfPrecisionException,
     DeviceChangingException,
     HalfPrecisionChangingException,
-    NotEnoughDataExtimateF0,
 )
 from mods.log_control import VoiceChangaerLogger
 
@@ -114,19 +113,13 @@ class Pipeline:
         self.pitchExtractor = pitchExtractor
 
     def extractPitch(self, audio: torch.Tensor, pitchf: torch.Tensor, f0_up_key: int) -> tuple[torch.Tensor | None, torch.Tensor | None]:
-        try:
-            return self.pitchExtractor.extract(
-                audio,
-                pitchf,
-                f0_up_key,
-                self.sr,
-                self.window,
-            )
-        except IndexError as e:  # NOQA
-            print(e)
-            import traceback
-            traceback.print_exc()
-            raise NotEnoughDataExtimateF0()
+        return self.pitchExtractor.extract(
+            audio,
+            pitchf,
+            f0_up_key,
+            self.sr,
+            self.window,
+        )
 
     def extractFeatures(self, feats: torch.Tensor, embOutputLayer: int, useFinalProj: bool):
         try:
@@ -246,7 +239,7 @@ class Pipeline:
 
             p_len = torch.as_tensor([audio_feats_len], device=self.device, dtype=torch.int64)
 
-            sid = torch.as_tensor(sid, device=self.device, dtype=torch.int64).unsqueeze(0)
+            sid = torch.as_tensor([sid], device=self.device, dtype=torch.int64)
             t.record("mid-precess")
             # 推論実行
             out_audio = self.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length)

@@ -8,30 +8,8 @@ export const ModelAssetName = {
 export type ModelAssetName = (typeof ModelAssetName)[keyof typeof ModelAssetName];
 
 export const ModelFileKind = {
-    mmvcv13Config: "mmvcv13Config",
-    mmvcv13Model: "mmvcv13Model",
-    mmvcv15Config: "mmvcv15Config",
-    mmvcv15Model: "mmvcv15Model",
-    mmvcv15Correspondence: "mmvcv15Correspondence",
-
-    soVitsSvc40Config: "soVitsSvc40Config",
-    soVitsSvc40Model: "soVitsSvc40Model",
-    soVitsSvc40Cluster: "soVitsSvc40Cluster",
-
     rvcModel: "rvcModel",
     rvcIndex: "rvcIndex",
-
-    ddspSvcModel: "ddspSvcModel",
-    ddspSvcModelConfig: "ddspSvcModelConfig",
-    ddspSvcDiffusion: "ddspSvcDiffusion",
-    ddspSvcDiffusionConfig: "ddspSvcDiffusionConfig",
-
-    diffusionSVCModel: "diffusionSVCModel",
-
-    beatriceModel: "beatriceModel",
-
-    llvcModel: "llvcModel",
-    llvcConfig: "llvcConfig",
 } as const;
 export type ModelFileKind = (typeof ModelFileKind)[keyof typeof ModelFileKind];
 

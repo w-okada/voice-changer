@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useAppState } from "../../001_provider/001_AppStateProvider";
-import { DiffusionSVCSampleModel, ModelUploadSetting, RVCSampleModel, VoiceChangerType } from "@dannadori/voice-changer-client-js";
+import { ModelUploadSetting, RVCSampleModel, VoiceChangerType } from "@dannadori/voice-changer-client-js";
 import { useMessageBuilder } from "../../hooks/useMessageBuilder";
 import { ModelSlotManagerDialogScreen } from "./904_ModelSlotManagerDialog";
 
@@ -85,9 +85,6 @@ export const SampleDownloaderScreen = (props: SampleDownloaderScreenProps) => {
                 if (x.voiceChangerType == "RVC") {
                     const sampleInfo = x as RVCSampleModel;
                     info = `type:${sampleInfo.modelType}, f0:${sampleInfo.f0 ? "f0" : "nof0"}, sr:${sampleInfo.sampleRate}`;
-                } else if (x.voiceChangerType == "Diffusion-SVC") {
-                    const sampleInfo = x as DiffusionSVCSampleModel;
-                    info = `native_l:${sampleInfo.numOfNativeLayers}, diff_l:${sampleInfo.numOfDiffLayers}, max_kstep:${sampleInfo.maxKStep}`;
                 }
                 return (
                     <div key={index} className="model-slot">
@@ -117,8 +114,6 @@ export const SampleDownloaderScreen = (props: SampleDownloaderScreenProps) => {
                                         onDownloadSampleClicked(x.id, x.voiceChangerType, {
                                             useIndex: true,
                                         });
-                                    } else if (x.voiceChangerType == "Diffusion-SVC") {
-                                        onDownloadSampleClicked(x.id, x.voiceChangerType, {});
                                     }
                                 }}
                             >

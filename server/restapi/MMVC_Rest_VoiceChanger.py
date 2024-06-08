@@ -23,11 +23,18 @@ class MMVC_Rest_VoiceChanger:
         self.router = APIRouter()
         self.router.add_api_route("/test", self.test, methods=["POST"])
         self.router.add_api_route("/edition", self.edition, methods=["GET"])
+        self.router.add_api_route("/version", self.version, methods=["GET"])
 
         self.tlock = threading.Lock()
 
+
     def edition(self):
         return PlainTextResponse(self.voiceChangerManager.params.edition)
+
+
+    def version(self):
+        return PlainTextResponse('-.-.-')
+
 
     def test(self, voice: VoiceModel):
         try:
