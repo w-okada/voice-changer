@@ -3,15 +3,15 @@ from torch import device
 from const import EmbedderType
 from voice_changer.RVC.embedder.Embedder import Embedder
 from voice_changer.RVC.embedder.OnnxContentvec import OnnxContentvec
-from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
+from settings import ServerSettings
 
 
 class EmbedderManager:
     currentEmbedder: Embedder | None = None
-    params: VoiceChangerParams
+    params: ServerSettings
 
     @classmethod
-    def initialize(cls, params: VoiceChangerParams):
+    def initialize(cls, params: ServerSettings):
         cls.params = params
 
     @classmethod

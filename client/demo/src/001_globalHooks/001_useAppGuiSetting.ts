@@ -51,9 +51,7 @@ export const useAppGuiSetting = (): AppGuiSettingStateAndMethod => {
 
     useEffect(() => {
         const getVersionInfo = async () => {
-            const res = await fetch(`/assets/gui_settings/version.txt`, {
-                method: "GET",
-            })
+            const res = await fetch('/version')
             const version = await res.text()
             setVersion(version)
         }
@@ -62,9 +60,7 @@ export const useAppGuiSetting = (): AppGuiSettingStateAndMethod => {
 
     useEffect(() => {
         const getVersionInfo = async () => {
-            const res = await fetch(`/edition`, {
-                method: "GET",
-            })
+            const res = await fetch('/edition')
             const edition = await res.text()
             setEdition(edition)
         }

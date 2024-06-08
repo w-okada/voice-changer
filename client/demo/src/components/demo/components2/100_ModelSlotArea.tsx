@@ -13,7 +13,7 @@ const SortTypes = {
 export type SortTypes = (typeof SortTypes)[keyof typeof SortTypes];
 
 export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
-    const { serverSetting, getInfo, webEdition } = useAppState();
+    const { serverSetting, getInfo } = useAppState();
     const guiState = useGuiState();
     const messageBuilderState = useMessageBuilder();
     const [sortType, setSortType] = useState<SortTypes>("slot");
@@ -41,7 +41,7 @@ export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
                 const tileContainerClass = x.slotIndex == serverSetting.serverSetting.modelSlotIndex ? "model-slot-tile-container-selected" : "model-slot-tile-container";
                 const name = x.name.length > 8 ? x.name.substring(0, 7) + "..." : x.name;
 
-                const modelDir = x.slotIndex == "Beatrice-JVS" ? "model_dir_static" : serverSetting.serverSetting.voiceChangerParams.model_dir;
+                const modelDir = serverSetting.serverSetting.voiceChangerParams.model_dir;
                 const icon = x.iconFile.length > 0 ? modelDir + "/" + x.slotIndex + "/" + x.iconFile.split(/[\/\\]/).pop() : "./assets/icons/human.png";
 
                 const iconElem =
@@ -114,10 +114,6 @@ export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
             </div>
         );
     }, [modelTiles, sortType]);
-
-    if (webEdition) {
-        return <></>;
-    }
 
     return modelSlotArea;
 };

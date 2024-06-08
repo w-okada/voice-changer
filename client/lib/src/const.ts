@@ -4,22 +4,9 @@
 // 187.5chunk -> 1sec
 
 export const VoiceChangerType = {
-    MMVCv15: "MMVCv15",
-    MMVCv13: "MMVCv13",
-    "so-vits-svc-40": "so-vits-svc-40",
-    "DDSP-SVC": "DDSP-SVC",
     RVC: "RVC",
-    "Diffusion-SVC": "Diffusion-SVC",
-    Beatrice: "Beatrice",
-    LLVC: "LLVC",
-    WebModel: "WebModel",
 } as const;
 export type VoiceChangerType = (typeof VoiceChangerType)[keyof typeof VoiceChangerType];
-
-export const StaticModel = {
-    BeatriceJVS: "Beatrice-JVS",
-} as const;
-export type StaticModel = (typeof StaticModel)[keyof typeof StaticModel];
 
 ///////////////////////
 // サーバセッティング
@@ -100,11 +87,8 @@ export const ServerSettingKey = {
     serverMonitorAudioGain: "serverMonitorAudioGain",
 
     tran: "tran",
-    noiseScale: "noiseScale",
-    predictF0: "predictF0",
     silentThreshold: "silentThreshold",
     extraConvertSize: "extraConvertSize",
-    clusterInferRatio: "clusterInferRatio",
 
     indexRatio: "indexRatio",
     protect: "protect",
@@ -113,21 +97,7 @@ export const ServerSettingKey = {
     silenceFront: "silenceFront",
     modelSlotIndex: "modelSlotIndex",
 
-    useEnhancer: "useEnhancer",
-    useDiff: "useDiff",
-    // "useDiffDpm": "useDiffDpm",
-    diffMethod: "diffMethod",
-    useDiffSilence: "useDiffSilence",
-    diffAcc: "diffAcc",
-    diffSpkId: "diffSpkId",
-    kStep: "kStep",
-    threshold: "threshold",
-
-    speedUp: "speedUp",
-    skipDiffusion: "skipDiffusion",
-
     inputSampleRate: "inputSampleRate",
-    enableDirectML: "enableDirectML",
 } as const;
 export type ServerSettingKey = (typeof ServerSettingKey)[keyof typeof ServerSettingKey];
 
@@ -159,39 +129,22 @@ export type VoiceChangerServerSetting = {
     serverOutputAudioGain: number;
     serverMonitorAudioGain: number;
 
-    tran: number; // so-vits-svc
-    noiseScale: number; // so-vits-svc
-    predictF0: number; // so-vits-svc
-    silentThreshold: number; // so-vits-svc
-    extraConvertSize: number; // so-vits-svc
-    clusterInferRatio: number; // so-vits-svc
+    tran: number;
+    silentThreshold: number;
+    extraConvertSize: number;
 
     indexRatio: number; // RVC
     protect: number; // RVC
     rvcQuality: number; // 0:low, 1:high
     silenceFront: number; // 0:off, 1:on
     modelSamplingRate: ModelSamplingRate; // 32000,40000,48000
-    modelSlotIndex: number | StaticModel;
-
-    useEnhancer: number; // DDSP-SVC
-    useDiff: number; // DDSP-SVC
-    // useDiffDpm: number// DDSP-SVC
-    diffMethod: DiffMethod; // DDSP-SVC
-    useDiffSilence: number; // DDSP-SVC
-    diffAcc: number; // DDSP-SVC
-    diffSpkId: number; // DDSP-SVC
-    kStep: number; // DDSP-SVC
-    threshold: number; // DDSP-SVC
-
-    speedUp: number; // Diffusion-SVC
-    skipDiffusion: number; // Diffusion-SVC 0:off, 1:on
+    modelSlotIndex: number;
 
     inputSampleRate: InputSampleRate;
-    enableDirectML: number;
 };
 
 type ModelSlot = {
-    slotIndex: number | StaticModel;
+    slotIndex: number;
     voiceChangerType: VoiceChangerType;
     name: string;
     description: string;
@@ -215,86 +168,6 @@ export type RVCModelSlot = ModelSlot & {
     deprecated: boolean;
 };
 
-export type MMVCv13ModelSlot = ModelSlot & {
-    modelFile: string;
-    configFile: string;
-    srcId: number;
-    dstId: number;
-
-    samplingRate: number;
-    speakers: { [key: number]: string };
-};
-
-export type MMVCv15ModelSlot = ModelSlot & {
-    modelFile: string;
-    configFile: string;
-    srcId: number;
-    dstId: number;
-    f0Factor: number;
-    samplingRate: number;
-    f0: { [key: number]: number };
-};
-
-export type SoVitsSvc40ModelSlot = ModelSlot & {
-    modelFile: string;
-    configFile: string;
-    clusterFile: string;
-    dstId: number;
-
-    samplingRate: number;
-
-    defaultTune: number;
-    defaultClusterInferRatio: number;
-    noiseScale: number;
-    speakers: { [key: number]: string };
-};
-
-export type DDSPSVCModelSlot = ModelSlot & {
-    modelFile: string;
-    configFile: string;
-    diffModelFile: string;
-    diffConfigFile: string;
-    dstId: number;
-
-    samplingRate: number;
-
-    defaultTune: number;
-    enhancer: boolean;
-    diffusion: boolean;
-    acc: number;
-    kstep: number;
-    speakers: { [key: number]: string };
-};
-
-export type DiffusionSVCModelSlot = ModelSlot & {
-    modelFile: string;
-    dstId: number;
-
-    samplingRate: number;
-
-    defaultTune: number;
-    defaultKstep: number;
-    defaultSpeedup: number;
-    kStepMax: number;
-    nLayers: number;
-    nnLayers: number;
-    speakers: { [key: number]: string };
-};
-
-export type BeatriceModelSlot = ModelSlot & {
-    modelFile: string;
-    dstId: number;
-
-    speakers: { [key: number]: string };
-};
-
-export type LLVCModelSlot = ModelSlot & {
-    modelFile: string;
-    configFile: string;
-
-    speakers: { [key: number]: string };
-};
-
 export type WebModelSlot = ModelSlot & {
     modelFile: string;
     defaultTune: number;
@@ -303,7 +176,7 @@ export type WebModelSlot = ModelSlot & {
     samplingRate: number;
 };
 
-export type ModelSlotUnion = RVCModelSlot | MMVCv13ModelSlot | MMVCv15ModelSlot | SoVitsSvc40ModelSlot | DDSPSVCModelSlot | DiffusionSVCModelSlot | BeatriceModelSlot | LLVCModelSlot | WebModelSlot;
+export type ModelSlotUnion = RVCModelSlot | WebModelSlot;
 
 type ServerAudioDevice = {
     kind: "audioinput" | "audiooutput";
@@ -318,7 +191,7 @@ export type ServerInfo = VoiceChangerServerSetting & {
     modelSlots: ModelSlotUnion[];
     serverAudioInputDevices: ServerAudioDevice[];
     serverAudioOutputDevices: ServerAudioDevice[];
-    sampleModels: (RVCSampleModel | DiffusionSVCSampleModel)[];
+    sampleModels: RVCSampleModel[];
     gpus: {
         id: number;
         name: string;
@@ -349,12 +222,6 @@ export type SampleModel = {
 export type RVCSampleModel = SampleModel & {
     indexUrl: string;
     featureUrl: string;
-};
-
-export type DiffusionSVCSampleModel = SampleModel & {
-    numOfDiffLayers: number;
-    numOfNativeLayers: number;
-    maxKStep: number;
 };
 
 export const DefaultServerSetting: ServerInfo = {
@@ -391,11 +258,8 @@ export const DefaultServerSetting: ServerInfo = {
     f0Detector: F0Detector.rmvpe_onnx,
 
     tran: 0,
-    noiseScale: 0,
-    predictF0: 0,
     silentThreshold: 0,
     extraConvertSize: 0,
-    clusterInferRatio: 0,
 
     indexRatio: 0,
     protect: 0.5,
@@ -406,19 +270,6 @@ export const DefaultServerSetting: ServerInfo = {
     sampleModels: [],
     gpus: [],
 
-    useEnhancer: 0,
-    useDiff: 1,
-    diffMethod: "dpm-solver",
-    useDiffSilence: 0,
-    diffAcc: 20,
-    diffSpkId: 1,
-    kStep: 120,
-    threshold: -45,
-
-    speedUp: 10,
-    skipDiffusion: 1,
-
-    enableDirectML: 0,
     //
     status: "ok",
     modelSlots: [],
@@ -445,8 +296,7 @@ export type WorkletSetting = {
 ///////////////////////
 export const Protocol = {
     sio: "sio",
-    rest: "rest",
-    internal: "internal",
+    rest: "rest"
 } as const;
 export type Protocol = (typeof Protocol)[keyof typeof Protocol];
 

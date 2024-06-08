@@ -1,14 +1,3 @@
-"""
-■ VoiceChangerV2
-- VoiceChangerとの差分
-・リサンプル処理の無駄を省くため、VoiceChangerModelにリサンプル処理を移譲
-・前処理、メイン処理の分割を廃止(VoiceChangeModelでの無駄な型変換などを回避するため)
-
-- 適用VoiceChangerModel
-・DiffusionSVC
-・RVC
-"""
-
 from typing import Any, Union
 
 from const import TMP_DIR
@@ -18,8 +7,6 @@ import os
 import numpy as np
 from dataclasses import dataclass, asdict, field
 from mods.log_control import VoiceChangaerLogger
-
-# from voice_changer.Beatrice.Beatrice import Beatrice
 
 from voice_changer.IORecorder import IORecorder
 
@@ -31,12 +18,10 @@ from Exceptions import (
     DeviceChangingException,
     HalfPrecisionChangingException,
     NoModeLoadedException,
-    NotEnoughDataExtimateF0,
-    ONNXInputArgumentException,
     PipelineNotInitializedException,
     VoiceChangerIsNotSelectedException,
 )
-from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
+from settings import ServerSettings
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 
 STREAM_INPUT_FILE = os.path.join(TMP_DIR, "in.wav")
@@ -79,7 +64,7 @@ class VoiceChangerV2Settings:
 
 
 class VoiceChangerV2(VoiceChangerIF):
-    def __init__(self, params: VoiceChangerParams):
+    def __init__(self, params: ServerSettings):
         # 初期化
         self.settings = VoiceChangerV2Settings()
 
@@ -93,7 +78,7 @@ class VoiceChangerV2(VoiceChangerIF):
         self.voiceChangerModel: VoiceChangerModel | None = None
         self.params = params
         self.device_manager = DeviceManager.get_instance()
-        self.noCrossFade = False
+        self.noCrossFade = False # TODO: For the future, if other voice changing algos won't require crossfade
         self.sola_buffer: torch.Tensor | None = None
         self.ioRecorder: IORecorder | None = None
 
@@ -107,11 +92,6 @@ class VoiceChangerV2(VoiceChangerIF):
         self.voiceChangerModel.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
         self.voiceChangerModel.realloc(self.block_frame, self.extra_frame, self.crossfade_frame, self.sola_search_frame)
         self._generate_strength()
-        # if model.voiceChangerType == "Beatrice" or model.voiceChangerType == "LLVC":
-        if model.voiceChangerType == "Beatrice":
-            self.noCrossFade = True
-        else:
-            self.noCrossFade = False
 
     def setInputSampleRate(self, sr: int):
         self.settings.inputSampleRate = sr
@@ -287,14 +267,8 @@ class VoiceChangerV2(VoiceChangerIF):
         except NoModeLoadedException as e:
             logger.warn(f"[Voice Changer] [Exception], {e}")
             return np.zeros(self.block_frame, dtype=np.float32), [0, 0, 0]
-        except ONNXInputArgumentException as e:
-            logger.warn(f"[Voice Changer] [Exception] onnx are waiting valid input., {e}")
-            return np.zeros(self.block_frame, dtype=np.float32), [0, 0, 0]
         except HalfPrecisionChangingException:
             logger.warn("[Voice Changer] Switching model configuration....")
-            return np.zeros(self.block_frame, dtype=np.float32), [0, 0, 0]
-        except NotEnoughDataExtimateF0:
-            logger.warn("[Voice Changer] warming up... waiting more data.")
             return np.zeros(self.block_frame, dtype=np.float32), [0, 0, 0]
         except DeviceChangingException as e:
             logger.warn(f"[Voice Changer] embedder: {e}")

@@ -5,10 +5,10 @@
 This is a fork of [w-okada voice changer](https://github.com/w-okada/voice-changer) that performs real-time voice conversion
 using various voice conversion algorithms.
 
-> **NOTE**: Currently, this version is only guaranteed to work with Retrieval-based Voice Conversion (RVC).
-> Other voice conversion algorithms are not guaranteed to work.
+> **NOTE**: This version works only with Retrieval-based Voice Conversion (RVC).
 
-The fork mostly preserves the same user interface and user experience, gradually improving the existing features and performance.
+The fork aims to improve the overall performance for any backend, and at the same time introducing new features and improving
+user experience.
 
 The following videos demonstrate how the voice changer works and performs with AMD graphics cards (including integrated GPU!):
 

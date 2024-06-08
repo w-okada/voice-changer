@@ -6,23 +6,14 @@ import { useMessageBuilder } from "../../../hooks/useMessageBuilder";
 import { TuningArea } from "./101-1_TuningArea";
 import { IndexArea } from "./101-2_IndexArea";
 import { SpeakerArea } from "./101-3_SpeakerArea";
-import { F0FactorArea } from "./101-4_F0FactorArea";
-import { SoVitsSVC40SettingArea } from "./101-5_so-vits-svc40SettingArea";
-import { DDSPSVC30SettingArea } from "./101-6_ddsp-svc30SettingArea";
-import { DiffusionSVCSettingArea } from "./101-7_diffusion-svcSettingArea";
 import { Portrait } from "./101-0_Portrait";
-import { useAppRoot } from "../../../001_provider/001_AppRootProvider";
-import { WebEditionSettingArea } from "./101-8_web-editionSettingArea";
 
 export type CharacterAreaProps = {};
 
 export const CharacterArea = (_props: CharacterAreaProps) => {
-    const { appGuiSettingState } = useAppRoot();
-    const { serverSetting, initializedRef, setting, setVoiceChangerClientSetting, start, stop, webInfoState } = useAppState();
+    const { serverSetting, initializedRef, setting, setVoiceChangerClientSetting, start, stop } = useAppState();
     const guiState = useGuiState();
     const messageBuilderState = useMessageBuilder();
-    const webEdition = appGuiSettingState.edition.indexOf("web") >= 0;
-    const { beatriceJVSSpeakerId } = useGuiState();
     useMemo(() => {
         messageBuilderState.setMessage(__filename, "export_to_onnx", { ja: "onnx出力", en: "export to onnx" });
         messageBuilderState.setMessage(__filename, "save_default", { ja: "設定保存", en: "save setting" });
@@ -30,18 +21,12 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
     }, []);
 
     const selected = useMemo(() => {
-        if (webEdition) {
-            return webInfoState.webModelslot;
-        }
         if (serverSetting.serverSetting.modelSlotIndex == undefined) {
             return;
-        } else if (serverSetting.serverSetting.modelSlotIndex == "Beatrice-JVS") {
-            const beatriceJVS = serverSetting.serverSetting.modelSlots.find((v) => v.slotIndex == "Beatrice-JVS");
-            return beatriceJVS;
         } else {
             return serverSetting.serverSetting.modelSlots[serverSetting.serverSetting.modelSlotIndex];
         }
-    }, [serverSetting.serverSetting.modelSlotIndex, serverSetting.serverSetting.modelSlots, webEdition]);
+    }, [serverSetting.serverSetting.modelSlotIndex, serverSetting.serverSetting.modelSlots]);
 
     const [startWithAudioContextCreate, setStartWithAudioContextCreate] = useState<boolean>(false);
     useEffect(() => {
@@ -61,12 +46,12 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
                 <div className="character-area-control-title">Name:</div>
                 <div className="character-area-control-field">
                     <div className="character-area-text">
-                        {selected.name} {selected.slotIndex == "Beatrice-JVS" ? `speaker:${beatriceJVSSpeakerId}` : ""}
+                        {selected.name}
                     </div>
                 </div>
             </div>
         );
-    }, [selected, beatriceJVSSpeakerId]);
+    }, [selected]);
 
     const startControl = useMemo(() => {
         const onStartClicked = async () => {
@@ -118,66 +103,23 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
         const stopClassName = guiState.isConverting ? "character-area-control-button-stanby" : "character-area-control-button-active";
         const passThruClassName = serverSetting.serverSetting.passThrough == false ? "character-area-control-passthru-button-stanby" : "character-area-control-passthru-button-active blinking";
 
-        if (webEdition && webInfoState.webModelLoadingState != "ready") {
-            if (webInfoState.webModelLoadingState == "none" || webInfoState.webModelLoadingState == "loading") {
-                return (
-                    <div className="character-area-control">
-                        <div className="character-area-control-title">wait...</div>
-                        <div className="character-area-control-field">
-                            <div className="character-area-text blink">{webInfoState.webModelLoadingState}..</div>
-                            <div className="character-area-text">
-                                pre:{Math.floor(webInfoState.progressLoadPreprocess * 100)}%, model: {Math.floor(webInfoState.progressLoadVCModel * 100)}%
-                            </div>
-                        </div>
+        return (
+            <div className="character-area-control">
+                <div className="character-area-control-buttons">
+                    <div onClick={onStartClicked} className={startClassName}>
+                        start
                     </div>
-                );
-            } else if (webInfoState.webModelLoadingState == "warmup") {
-                return (
-                    <div className="character-area-control">
-                        <div className="character-area-control-title">wait...</div>
-                        <div className="character-area-control-field">
-                            <div className="character-area-text blink">{webInfoState.webModelLoadingState}..</div>
-                            <div className="character-area-text">warm up:{Math.floor(webInfoState.progressWarmup * 100)}%</div>
-                        </div>
+                    <div onClick={onStopClicked} className={stopClassName}>
+                        stop
                     </div>
-                );
-            } else {
-                throw new Error("invalid webModelLoadingState");
-            }
-        } else {
-            if (webEdition) {
-                return (
-                    <div className="character-area-control">
-                        <div className="character-area-control-buttons">
-                            <div onClick={onStartClicked} className={startClassName}>
-                                start
-                            </div>
-                            <div onClick={onStopClicked} className={stopClassName}>
-                                stop
-                            </div>
-                        </div>
-                    </div>
-                );
-            } else {
-                return (
-                    <div className="character-area-control">
-                        <div className="character-area-control-buttons">
-                            <div onClick={onStartClicked} className={startClassName}>
-                                start
-                            </div>
-                            <div onClick={onStopClicked} className={stopClassName}>
-                                stop
-                            </div>
 
-                            <div onClick={onPassThroughClicked} className={passThruClassName}>
-                                passthru
-                            </div>
-                        </div>
+                    <div onClick={onPassThroughClicked} className={passThruClassName}>
+                        passthru
                     </div>
-                );
-            }
-        }
-    }, [guiState.isConverting, start, stop, serverSetting.serverSetting, serverSetting.updateServerSettings, webInfoState.progressLoadPreprocess, webInfoState.progressLoadVCModel, webInfoState.progressWarmup, webInfoState.webModelLoadingState]);
+                </div>
+            </div>
+        );
+    }, [guiState.isConverting, start, stop, serverSetting.serverSetting, serverSetting.updateServerSettings]);
 
     const gainControl = useMemo(() => {
         const currentInputGain = serverSetting.serverSetting.enableServerAudio == 0 ? setting.voiceChangerClientSetting.inputGain : serverSetting.serverSetting.serverInputAudioGain;
@@ -246,9 +188,6 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
         if (!selected) {
             return <></>;
         }
-        if (webEdition) {
-            return <></>;
-        }
         const onUpdateDefaultClicked = async () => {
             await serverSetting.updateModelDefault();
         };
@@ -305,11 +244,6 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
                     <TuningArea />
                     <IndexArea />
                     <SpeakerArea />
-                    <F0FactorArea />
-                    <SoVitsSVC40SettingArea />
-                    <DDSPSVC30SettingArea />
-                    <DiffusionSVCSettingArea />
-                    <WebEditionSettingArea />
                     {modelSlotControl}
                 </div>
             </div>

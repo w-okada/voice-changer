@@ -6,14 +6,11 @@ import { AUDIO_ELEMENT_FOR_SAMPLING_INPUT, AUDIO_ELEMENT_FOR_SAMPLING_OUTPUT } f
 export type RecorderAreaProps = {};
 
 export const RecorderArea = (_props: RecorderAreaProps) => {
-    const { serverSetting, webEdition } = useAppState();
+    const { serverSetting } = useAppState();
     const { audioOutputForAnalyzer, setAudioOutputForAnalyzer, outputAudioDeviceInfo } = useGuiState();
     const [serverIORecording, setServerIORecording] = useState<boolean>(false);
 
     const serverIORecorderRow = useMemo(() => {
-        if (webEdition) {
-            return <> </>;
-        }
         const onServerIORecordStartClicked = async () => {
             setServerIORecording(true);
             await serverSetting.updateServerSettings({ ...serverSetting.serverSetting, recordIO: 1 });

@@ -14,7 +14,5 @@ onnxscript
 onnxsim
 onnxruntime-gpu
 torchcrepe
-local_attention
 pyworld
-transformers
 safetensors

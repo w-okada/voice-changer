@@ -12,7 +12,7 @@ from voice_changer.utils.VoiceChangerModel import (
     AudioInOutFloat,
     VoiceChangerModel,
 )
-from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
+from settings import ServerSettings
 from voice_changer.RVC.onnxExporter.export2onnx import export2onnx
 from voice_changer.RVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
 from voice_changer.RVC.pipeline.PipelineGenerator import createPipeline
@@ -31,7 +31,7 @@ logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
 class RVCr2(VoiceChangerModel):
-    def __init__(self, params: VoiceChangerParams, slotInfo: RVCModelSlot):
+    def __init__(self, params: ServerSettings, slotInfo: RVCModelSlot):
         logger.info("[Voice Changer] [RVCr2] Creating instance ")
         self.voiceChangerType = "RVC"
 

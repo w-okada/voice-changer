@@ -6,7 +6,6 @@ import { ServerSettingState, useServerSetting } from "./useServerSetting";
 import { useWorkletNodeSetting } from "./useWorkletNodeSetting";
 import { useWorkletSetting } from "./useWorkletSetting";
 import { ClientSetting, DefaultClientSettng, VoiceChangerClientSetting, WorkletNodeSetting, WorkletSetting } from "../const";
-import { InternalCallback } from "../client/VoiceChangerWorkletNode";
 
 export type UseClientProps = {
     audioContext: AudioContext | null;
@@ -26,7 +25,6 @@ export type ClientState = {
     startOutputRecording: () => void;
     stopOutputRecording: () => Promise<Float32Array>;
     trancateBuffer: () => Promise<void>;
-    setInternalAudioProcessCallback: (internalCallback: InternalCallback) => Promise<void>;
 
     setWorkletSetting: (_workletSetting: WorkletSetting) => void;
     // workletSetting: WorkletSetting
@@ -270,7 +268,6 @@ export const useClient = (props: UseClientProps): ClientState => {
         startOutputRecording: workletNodeSetting.startOutputRecording,
         stopOutputRecording: workletNodeSetting.stopOutputRecording,
         trancateBuffer: workletNodeSetting.trancateBuffer,
-        setInternalAudioProcessCallback: workletNodeSetting.setInternalAudioProcessCallback,
 
         setWorkletSetting,
         // workletSetting: workletSettingIF.setting,

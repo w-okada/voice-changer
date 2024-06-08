@@ -8,7 +8,7 @@ from mods.log_control import VoiceChangaerLogger
 from voice_changer.RVC.RVCSettings import RVCSettings
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 from voice_changer.utils.VoiceChangerModel import AudioInOut, PitchfInOut, FeatureInOut, VoiceChangerModel
-from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
+from settings import ServerSettings
 from voice_changer.RVC.onnxExporter.export2onnx import export2onnx
 from voice_changer.RVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
 from voice_changer.RVC.pipeline.PipelineGenerator import createPipeline
@@ -21,7 +21,7 @@ logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
 class RVC(VoiceChangerModel):
-    def __init__(self, params: VoiceChangerParams, slotInfo: RVCModelSlot):
+    def __init__(self, params: ServerSettings, slotInfo: RVCModelSlot):
         logger.info("[Voice Changer] [RVC] Creating instance ")
         self.deviceManager = DeviceManager.get_instance()
         EmbedderManager.initialize(params)

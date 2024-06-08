@@ -7,7 +7,7 @@ export type ConvertProps = {
 };
 
 export const ConvertArea = (props: ConvertProps) => {
-    const { setting, serverSetting, setWorkletNodeSetting, trancateBuffer, webEdition } = useAppState();
+    const { setting, serverSetting, setWorkletNodeSetting, trancateBuffer } = useAppState();
     const { appGuiSettingState } = useAppRoot();
     const edition = appGuiSettingState.edition;
 
@@ -26,9 +26,7 @@ export const ConvertArea = (props: ConvertProps) => {
 
         const gpusEntry = serverSetting.serverSetting.gpus;
 
-        const gpuSelect = webEdition ? (
-                <></>
-            ) : (
+        const gpuSelect = (
                 <div className="config-sub-area-control">
                     <div className="config-sub-area-control-title">GPU:</div>
                     <div className="config-sub-area-control-field">
@@ -52,9 +50,7 @@ export const ConvertArea = (props: ConvertProps) => {
                 </div>
             );
 
-        const extraArea = webEdition ? (
-            <></>
-        ) : (
+        const extraArea = (
             <div className="config-sub-area-control">
                 <div className="config-sub-area-control-title">EXTRA:</div>
                 <div className="config-sub-area-control-field">

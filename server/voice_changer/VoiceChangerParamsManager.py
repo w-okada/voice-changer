@@ -1,4 +1,4 @@
-from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
+from settings import ServerSettings
 
 
 class VoiceChangerParamsManager:
@@ -13,7 +13,7 @@ class VoiceChangerParamsManager:
             cls._instance = cls()
         return cls._instance
 
-    def setParams(self, params: VoiceChangerParams):
+    def setParams(self, params: ServerSettings):
         self.params = params
 
     def getParams(self):

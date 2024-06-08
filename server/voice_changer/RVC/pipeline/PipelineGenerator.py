@@ -12,10 +12,10 @@ from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 from voice_changer.RVC.inferencer.InferencerManager import InferencerManager
 from voice_changer.RVC.pipeline.Pipeline import Pipeline
 from voice_changer.RVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
-from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
+from settings import ServerSettings
 
 
-def createPipeline(params: VoiceChangerParams, modelSlot: RVCModelSlot, gpu: int, f0Detector: str):
+def createPipeline(params: ServerSettings, modelSlot: RVCModelSlot, gpu: int, f0Detector: str):
     dev = DeviceManager.get_instance().getDevice(gpu)
     half = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
 

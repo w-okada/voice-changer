@@ -1,4 +1,4 @@
-import { VoiceChangerWorkletNode, VoiceChangerWorkletListener, InternalCallback } from "./client/VoiceChangerWorkletNode";
+import { VoiceChangerWorkletNode, VoiceChangerWorkletListener } from "./client/VoiceChangerWorkletNode";
 // @ts-ignore
 import workerjs from "raw-loader!../worklet/dist/index.js";
 import { VoiceFocusDeviceTransformer, VoiceFocusTransformDevice } from "amazon-chime-sdk-js";
@@ -59,7 +59,7 @@ export class VoiceChangerClient {
 
             // const ctx44k = new AudioContext({ sampleRate: 44100 }) // これでもプチプチが残る
             const ctx44k = new AudioContext({ sampleRate: 48000 }); // 結局これが一番まし。
-            // const ctx44k = new AudioContext({ sampleRate: 16000 }); // LLVCテスト⇒16K出力でプチプチなしで行ける。
+            // const ctx44k = new AudioContext({ sampleRate: 16000 });
             console.log("audio out:", ctx44k);
             try {
                 this.vcOutNode = new VoiceChangerWorkletNode(ctx44k, voiceChangerWorkletListener); // vc node
@@ -343,9 +343,6 @@ export class VoiceChangerClient {
     updateWorkletNodeSetting = (setting: WorkletNodeSetting) => {
         this.vcInNode.updateSetting(setting);
         this.vcOutNode.updateSetting(setting);
-    };
-    setInternalAudioProcessCallback = (internalCallback: InternalCallback) => {
-        this.vcInNode.setInternalAudioProcessCallback(internalCallback);
     };
 
     /////////////////////////////////////////////////////

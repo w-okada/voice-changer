@@ -9,9 +9,6 @@ export const IndexArea = (_props: IndexAreaProps) => {
     const selected = useMemo(() => {
         if (serverSetting.serverSetting.modelSlotIndex == undefined) {
             return;
-        } else if (serverSetting.serverSetting.modelSlotIndex == "Beatrice-JVS") {
-            const beatriceJVS = serverSetting.serverSetting.modelSlots.find((v) => v.slotIndex == "Beatrice-JVS");
-            return beatriceJVS;
         } else {
             return serverSetting.serverSetting.modelSlots[serverSetting.serverSetting.modelSlotIndex];
         }

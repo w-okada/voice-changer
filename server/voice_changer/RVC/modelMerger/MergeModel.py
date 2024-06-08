@@ -5,10 +5,10 @@ import torch
 from voice_changer.ModelSlotManager import ModelSlotManager
 
 from voice_changer.utils.ModelMerger import ModelMergerRequest
-from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
+from settings import ServerSettings
 
 
-def merge_model(params: VoiceChangerParams, request: ModelMergerRequest):
+def merge_model(params: ServerSettings, request: ModelMergerRequest):
     def extract(ckpt: Dict[str, Any]):
         a = ckpt["model"]
         opt: Dict[str, Any] = OrderedDict()

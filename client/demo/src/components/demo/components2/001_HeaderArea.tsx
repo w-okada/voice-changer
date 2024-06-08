@@ -13,7 +13,7 @@ export type HeaderAreaProps = {
 export const HeaderArea = (props: HeaderAreaProps) => {
     const { appGuiSettingState } = useAppRoot();
     const messageBuilderState = useMessageBuilder();
-    const { clearSetting, webInfoState } = useAppState();
+    const { clearSetting } = useAppState();
 
     const { removeItem, removeDB } = useIndexedDB({ clientType: null });
 
