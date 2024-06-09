@@ -44,6 +44,11 @@ async def downloadWeight(params: ServerSettings):
             "url": "https://huggingface.co/wok000/weights_gpl/resolve/main/rmvpe/rmvpe_20231006.onnx",
             "saveTo": params.rmvpe_onnx,
             "hash": "b6979bf69503f8ec48c135000028a7b0",
+        },
+        {
+            "url": "https://github.com/CNChTu/FCPE/raw/5d6e9ece99e2ee9748b3c8abd614a8ec5a1522b1/torchfcpe/assets/fcpe_c_v001.pt",
+            "saveTo": params.fcpe,
+            "hash": "933f1b588409b3945389381a2ab98014",
         }
     ]
 
