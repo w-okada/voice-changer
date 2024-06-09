@@ -1,3 +1,5 @@
+from typing import List
+
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
@@ -53,15 +55,12 @@ class ConvBlockRes(nn.Module):
         )
         if in_channels != out_channels:
             self.shortcut = nn.Conv2d(in_channels, out_channels, (1, 1))
-            self.is_shortcut = True
-        else:
-            self.is_shortcut = False
 
-    def forward(self, x):
-        if self.is_shortcut:
-            return self.conv(x) + self.shortcut(x)
-        else:
+    def forward(self, x: torch.Tensor):
+        if not hasattr(self, "shortcut"):
             return self.conv(x) + x
+        else:
+            return self.conv(x) + self.shortcut(x)
 
 
 class Encoder(nn.Module):
@@ -93,12 +92,12 @@ class Encoder(nn.Module):
         self.out_size = in_size
         self.out_channel = out_channels
 
-    def forward(self, x):
-        concat_tensors = []
+    def forward(self, x: torch.Tensor):
+        concat_tensors: List[torch.Tensor] = []
         x = self.bn(x)
-        for i in range(self.n_encoders):
-            _, x = self.layers[i](x)
-            concat_tensors.append(_)
+        for i, layer in enumerate(self.layers):
+            t, x = layer(x)
+            concat_tensors.append(t)
         return x, concat_tensors
 
 
@@ -117,8 +116,8 @@ class ResEncoderBlock(nn.Module):
             self.pool = nn.AvgPool2d(kernel_size=kernel_size)
 
     def forward(self, x):
-        for i in range(self.n_blocks):
-            x = self.conv[i](x)
+        for i, conv in enumerate(self.conv):
+            x = conv(x)
         if self.kernel_size is not None:
             return x, self.pool(x)
         else:
@@ -139,8 +138,8 @@ class Intermediate(nn.Module):  #
             )
 
     def forward(self, x):
-        for i in range(self.n_inters):
-            x = self.layers[i](x)
+        for i, layer in enumerate(self.layers):
+            x = layer(x)
         return x
 
 
@@ -170,8 +169,8 @@ class ResDecoderBlock(nn.Module):
     def forward(self, x, concat_tensor):
         x = self.conv1(x)
         x = torch.cat((x, concat_tensor), dim=1)
-        for i in range(self.n_blocks):
-            x = self.conv2[i](x)
+        for i, conv2 in enumerate(self.conv2):
+            x = conv2(x)
         return x
 
 
@@ -187,9 +186,9 @@ class Decoder(nn.Module):
             )
             in_channels = out_channels
 
-    def forward(self, x, concat_tensors):
-        for i in range(self.n_decoders):
-            x = self.layers[i](x, concat_tensors[-1 - i])
+    def forward(self, x: torch.Tensor, concat_tensors: List[torch.Tensor]):
+        for i, layer in enumerate(self.layers):
+            x = layer(x, concat_tensors[-1 - i])
         return x
 
 
@@ -217,7 +216,7 @@ class DeepUnet(nn.Module):
             self.encoder.out_channel, en_de_layers, kernel_size, n_blocks
         )
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         x, concat_tensors = self.encoder(x)
         x = self.intermediate(x)
         x = self.decoder(x, concat_tensors)
@@ -252,10 +251,10 @@ class E2E(nn.Module):
                 nn.Dropout(0.25),
                 nn.Sigmoid(),
             )
-        # else:
-        #     self.fc = nn.Sequential(
-        #         nn.Linear(3 * N_MELS, N_CLASS), nn.Dropout(0.25), nn.Sigmoid()
-        #     )
+        else:
+            self.fc = nn.Sequential(
+                nn.Linear(3 * nn.N_MELS, nn.N_CLASS), nn.Dropout(0.25), nn.Sigmoid()
+            )
 
     def forward(self, mel):
         mel = mel.transpose(-1, -2).unsqueeze(1)
@@ -267,6 +266,7 @@ class E2E(nn.Module):
 class MelSpectrogram(torch.nn.Module):
     def __init__(
         self,
+        is_half,
         n_mel_channels,
         sampling_rate,
         win_length,
@@ -287,7 +287,7 @@ class MelSpectrogram(torch.nn.Module):
             fmax=mel_fmax,
             htk=True,
         )
-        mel_basis = torch.from_numpy(mel_basis)
+        mel_basis = torch.from_numpy(mel_basis).float()
         self.register_buffer("mel_basis", mel_basis)
         self.n_fft = win_length if n_fft is None else n_fft
         self.hop_length = hop_length
@@ -295,6 +295,7 @@ class MelSpectrogram(torch.nn.Module):
         self.sampling_rate = sampling_rate
         self.n_mel_channels = n_mel_channels
         self.clamp = clamp
+        self.is_half = is_half
 
     def forward(self, audio, keyshift=0, speed=1, center=True):
         factor = 2 ** (keyshift / 12)
@@ -322,10 +323,9 @@ class MelSpectrogram(torch.nn.Module):
             if resize < size:
                 magnitude = F.pad(magnitude, (0, 0, 0, size - resize))
             magnitude = magnitude[:, :size, :] * self.win_length / win_length_new
-        if self.mel_basis.device != magnitude.device:
-            logger.warn(f"[RMVPE] Device is not same. mel_basis:{self.mel_basis.device}, magnitude:{magnitude.device}")
-            self.mel_basis.to(magnitude.device)
         mel_output = torch.matmul(self.mel_basis, magnitude)
+        if self.is_half:
+            mel_output = mel_output.half()
         log_mel_spec = torch.log(torch.clamp(mel_output, min=self.clamp))
         return log_mel_spec
 
@@ -348,7 +348,7 @@ class RMVPE:
 
         self.device = device
         self.mel_extractor = MelSpectrogram(
-            128, 16000, 1024, 160, None, 30, 8000
+            is_half, 128, 16000, 1024, 160, None, 30, 8000
         ).to(device)
         cents_mapping = 20 * torch.arange(360, device=device) + 1997.3794084376191
         self.cents_mapping = F.pad(cents_mapping, (4, 4))
