@@ -1,3 +1,4 @@
+.env
 tmp_dir
 dummy
 node_modules
