@@ -52,8 +52,8 @@ vcclient_<edition>_<version>.zip
 | ------------------- | -------------------- | ---------------------------------------------- |
 | start_http.bat      | win_*                | 一般的な起動方法                               |
 | start_https.bat     | win_*                | リモートからブラウザアクセスする場合の起動方法 |
-| start_http.command  | mac                  | 一般的な起動方法                               |
-| start_https.command | mac                  | リモートからブラウザアクセスする場合の起動方法 |
+| start_http.command  | mac_*                | 一般的な起動方法                               |
+| start_https.command | mac_*                | リモートからブラウザアクセスする場合の起動方法 |
 
 初回起動時のみ、必要なデータのダウンロードが行われます。しばらくお待ちください。
 
