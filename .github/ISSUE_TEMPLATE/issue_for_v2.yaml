@@ -1,6 +1,6 @@
-name: Issue or Bug Report for v.1.x.x.x
+name: Issue or Bug Report for v.2.x.x
 description: Please provide as much detail as possible to convey the history of your problem.
-title: "[ISSUE]: "
+title: "[ISSUE for v2]: "
 body:
   - type: markdown
     attributes:
@@ -10,7 +10,7 @@ body:
     attributes:
       label: Voice Changer Version
       description: Downloaded File Name (.zip)
-      placeholder: MMVCServerSIO_xxx_yyyy-zzzz_v.x.x.x.x.zip
+      placeholder: vcclient_win_std_x.y.x.zip, vcclient_win_cuda_torch_cuda_x.y.x.zip, or so
     validations:
       required: true
   - type: input
@@ -33,10 +33,10 @@ body:
     attributes:
       label: Read carefully and check the options
       options:
-        - label: I've tried to Clear Settings
-        - label: Sample/Default Models are working
+        - label: If you use win_cuda_torch_cuda edition, setup cuda? [see here](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements)
+        - label: If you use win_cuda edition, setup cuda and cudnn? [see here](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements)
+        - label: If you use mac edition, client is not launched automatically. Use chrome to open application.?
         - label: I've tried to change the Chunk Size
-        - label: GUI was successfully launched
         - label: I've read the [tutorial](https://github.com/w-okada/voice-changer/blob/master/tutorials/tutorial_rvc_en_latest.md)
         - label: I've tried to extract to another folder (or re-extract) the .zip file
   - type: input
