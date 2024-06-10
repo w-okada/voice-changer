@@ -3,6 +3,11 @@
 [Japanese](/README.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.20-alpha
+  - Support for torch-cuda. See the edition description [here](docs/01_basic_v2.0.z.md).
+  - Bugfix:
+    - Unified file encoding to UTF-8
+    - 
 - v.2.0.16-alpha
   - Added support for experimental version of torch-dml. For a description of the edition, refer to [here](docs/01_basic_v2.0.z.md).
   - Bugfix:

@@ -17,7 +17,7 @@
 | edition             | os  | 内容                                                                                   |
 | ------------------- | --- | -------------------------------------------------------------------------------------- |
 | win_std             | win | 一般的なwinユーザ向け。AMD, NvidiaのGPU所有者。CPUのみのユーザ                         |
-| win_cuda            | win | NvidiaのGPU所有者向け。cudaのセットアップが可能なユーザ                                |
+| win_cuda            | win | NvidiaのGPU所有者向け。cuda, cudnnのセットアップが可能なユーザ                         |
 | win_std_torch_dml   | win | pytorchのモデルを使用する場合。AMDのGPU所有者向け。                                    |
 | win_cuda_torch_cuda | win | pytorchのモデルを使用する場合。NvidiaのGPU所有者向け。cudaのセットアップが可能なユーザ |
 | mac                 | mac | AppleSilicon(M1等)ユーザ向け。                                                         |
