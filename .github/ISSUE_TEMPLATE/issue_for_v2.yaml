@@ -28,6 +28,13 @@ body:
       description: If you have no gpu, please input none.
     validations:
       required: true
+  - type: input
+    id: CUDA
+    attributes:
+      label: CUDA Version
+      description: If you have nvidia gpu, please input version of cuda. Otherwise, please input none.
+    validations:
+      required: true
   - type: checkboxes
     id: checks
     attributes:
