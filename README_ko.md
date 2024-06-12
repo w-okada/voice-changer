@@ -3,6 +3,18 @@
 [English](/README_en.md) [Japanese](/README.md)
 
 ## What's New!
+- v.2.0.23-alpha
+  - 에디션 재정리
+    - win_std: 일반적인 윈도우 사용자 대상. DirectML을 통한 하드웨어 가속이 ONNX 모델과 torch 모델 모두에서 가능합니다.
+    - win_cuda: Nvidia GPU 소유자 대상. CUDA를 통한 하드웨어 가속이 ONNX 모델과 torch 모델 모두에서 가능합니다. CUDA 12.4 이상 필요.
+    - mac: AppleSilicon(M1 등) 사용자 대상.
+  - 기능
+    - 클라이언트 모드에서 동작 시 출력 버퍼를 조정하는 기능 추가
+  - 버그 수정:
+    - RVC의 torch 모델을 onnx 모델로 내보낼 때 index와 icon을 유지하는 문제 수정
+  - 기타:
+    - 로거 강화
+
 - v.2.0.20-alpha
   - Support for torch-cuda. See the edition description [here](docs/01_basic_v2.0.z.md).
   - Bugfix:

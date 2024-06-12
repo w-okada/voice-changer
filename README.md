@@ -3,6 +3,18 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.23-alpha
+  - エディションを再整理
+    - win_std:  一般的なwinユーザ向け。onnxモデル, torchモデルともに、DirectMLによりGPUのハードウェアアクセラレーションが可能です。
+    - win_cuda:NvidiaのGPU所有者向け。onnxモデル, torchモデルともに、cudaによりNvidiaのGPUのハードウェアアクセラレーションが可能です。要cuda12.4~。
+    - mac: AppleSilicon(M1等)ユーザ向け。            
+  - feature
+    - クライアントモードでの動作時のアウトプットバッファの調整機能を追加
+  - bugfix:
+    - RVCのtorchモデルをonnxモデルにエクスポートする際にindex, iconを引き継ぐように修正
+  - その他：
+    - loggerの強化
+
 - v.2.0.20-alpha
   - torch-cudaに対応。エディションの説明は[こちら](docs/01_basic_v2.0.z.md)。
   - bugfix:

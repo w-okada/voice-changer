@@ -3,6 +3,18 @@
 [Japanese](/README.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.23-alpha
+  - Reorganizing Editions
+    - win_std: For typical Windows users. Hardware acceleration via DirectML is available for both ONNX and torch models.
+    - win_cuda: For Nvidia GPU owners. Hardware acceleration via CUDA is available for both ONNX and torch models. Requires CUDA 12.4 or later.
+    - mac: For Apple Silicon (e.g., M1) users.
+  - feature
+    - Added the capability to adjust the output buffer when operating in client mode
+  - bugfix:
+    - Fixed the issue of retaining index and icon when exporting RVC's torch model to onnx model
+  - Other:
+    - Enhanced logger
+
 - v.2.0.20-alpha
   - Support for torch-cuda. See the edition description [here](docs/01_basic_v2.0.z.md).
   - Bugfix:
