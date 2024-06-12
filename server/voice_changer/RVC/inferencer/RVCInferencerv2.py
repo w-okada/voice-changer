@@ -16,7 +16,7 @@ class RVCInferencerv2(Inferencer):
         self.set_props(EnumInferenceTypes.pyTorchRVCv2, file)
 
         # Keep torch.load for backward compatibility, but discourage the use of this loading method
-        if '.safetensors' in file:
+        if file.endswith('.safetensors'):
             with safe_open(file, 'pt', device=str(dev) if dev.type == 'cuda' else 'cpu') as cpt:
                 config = json.loads(cpt.metadata()['config'])
                 model = SynthesizerTrnMs768NSFsid(*config, is_half=is_half).to(dev)

@@ -42,7 +42,7 @@ def _export2onnx(input_model: str, output_model_simple: str, metadata: dict):
     if dev.type == 'privateuseone':
         dev = torch.device('cpu')
     is_half = False
-    is_safetensors = '.safetensors' in input_model
+    is_safetensors = input_model.endswith('.safetensors')
 
     if is_safetensors:
         cpt = safetensors.safe_open(input_model, 'pt', device=str(dev))

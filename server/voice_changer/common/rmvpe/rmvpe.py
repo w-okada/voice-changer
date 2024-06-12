@@ -336,7 +336,7 @@ class RMVPE:
             device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
         model = E2E(4, 1, (2, 2))
-        if '.safetensors' in model_path:
+        if model_path.endswith('.safetensors'):
             with safe_open(model_path, 'pt', device=str(device) if device.type == 'cuda' else 'cpu') as cpt:
                 load_model(model, cpt, strict=False)
         else:
