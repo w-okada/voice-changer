@@ -11,22 +11,24 @@ from voice_changer.common.SafetensorsUtils import load_model
 class RVCInferencerv2(Inferencer):
     def loadModel(self, file: str, gpu: int):
         dev = DeviceManager.get_instance().getDevice(gpu)
-        # isHalf = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
-        isHalf = False
+        isHalf = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
         self.setProps(EnumInferenceTypes.pyTorchRVCv2, file, isHalf, gpu)
 
         # Keep torch.load for backward compatibility, but discourage the use of this loading method
         if '.safetensors' in file:
             with safe_open(file, 'pt', device=str(dev) if dev.type == 'cuda' else 'cpu') as cpt:
                 config = json.loads(cpt.metadata()['config'])
-                model = SynthesizerTrnMs768NSFsid(*config, is_half=False).to(dev)
+                model = SynthesizerTrnMs768NSFsid(*config, is_half=isHalf).to(dev)
                 load_model(model, cpt, strict=False)
         else:
             cpt = torch.load(file, map_location=dev if dev.type == 'cuda' else 'cpu')
-            model = SynthesizerTrnMs768NSFsid(*cpt["config"], is_half=False).to(dev)
+            model = SynthesizerTrnMs768NSFsid(*cpt["config"], is_half=isHalf).to(dev)
             model.load_state_dict(cpt["weight"], strict=False)
 
         model.eval().remove_weight_norm()
+
+        if isHalf:
+            model = model.half()
 
         self.model = model
         return self

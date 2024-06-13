@@ -78,6 +78,7 @@ class DeviceManager(object):
         self.forceTensor = forceTensor
 
     def halfPrecisionAvailable(self, id: int):
+        return True
         if self.gpu_num == 0:
             return False
         if id < 0:

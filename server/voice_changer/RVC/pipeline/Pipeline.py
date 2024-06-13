@@ -29,12 +29,12 @@ from voice_changer.utils.Timer import Timer2
 logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
-def make_onnx_upscaler(device: torch.device, dim_size: int):
+def make_onnx_upscaler(device: torch.device, dim_size: int, isHalf: bool):
     # Inputs
-    input = make_tensor_value_info('in', TensorProto.FLOAT, [1, dim_size, None])
+    input = make_tensor_value_info('in', TensorProto.FLOAT16 if isHalf else TensorProto.FLOAT, [1, dim_size, None])
     scales = make_tensor_value_info('scales', TensorProto.FLOAT, [None])
     # Outputs
-    output = make_tensor_value_info('out', TensorProto.FLOAT, [1, dim_size, None])
+    output = make_tensor_value_info('out', TensorProto.FLOAT16 if isHalf else TensorProto.FLOAT, [1, dim_size, None])
 
     resize_node = make_node(
         "Resize",
@@ -94,7 +94,7 @@ class Pipeline:
         self.use_f0 = use_f0
         # self.feature = feature
 
-        self.onnx_upscaler = make_onnx_upscaler(device, embChannels) if device.type == 'privateuseone' else None
+        self.onnx_upscaler = make_onnx_upscaler(device, embChannels, isHalf) if device.type == 'privateuseone' else None
 
         self.targetSR = targetSR
         self.device = device
@@ -164,7 +164,7 @@ class Pipeline:
     def _upscale(self, feats: torch.Tensor) -> torch.Tensor:
         if self.onnx_upscaler is not None:
             feats = self.onnx_upscaler.run(['out'], { 'in': feats.permute(0, 2, 1).detach().cpu().numpy(), 'scales': np.array([2], dtype=np.float32) })
-            return torch.as_tensor(feats[0], dtype=torch.float32, device=self.device).permute(0, 2, 1).contiguous()
+            return torch.as_tensor(feats[0], dtype=torch.float16 if self.isHalf else torch.float32, device=self.device).permute(0, 2, 1).contiguous()
         return F.interpolate(feats.permute(0, 2, 1), scale_factor=2, mode='nearest').permute(0, 2, 1).contiguous()
 
     def exec(
@@ -220,6 +220,9 @@ class Pipeline:
 
                 # Recover silent front
                 feats[0][skip_offset :] = index_audio * index_rate + feats[0][skip_offset :] * (1 - index_rate)
+
+            if self.isHalf:
+                feats = feats.to(torch.float16)
 
             feats = self._upscale(feats)[:, :audio_feats_len, :]
             if self.use_f0:
