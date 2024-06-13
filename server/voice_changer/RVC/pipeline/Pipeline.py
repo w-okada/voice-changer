@@ -115,8 +115,7 @@ class Pipeline:
 
     def extractPitch(self, audio: torch.Tensor, pitchf: torch.Tensor, f0_up_key: int) -> tuple[torch.Tensor | None, torch.Tensor | None]:
         return self.pitchExtractor.extract(
-            # FIXME: Explicit conversion to FP32 is done for all extractors in FP16 mode
-            audio.to(torch.float32),
+            audio,
             pitchf,
             f0_up_key,
             self.sr,

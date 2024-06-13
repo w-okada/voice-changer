@@ -29,7 +29,8 @@ class CrepeOnnxPitchExtractor(PitchExtractor):
         self.f0_mel_max = 1127 * np.log(1 + self.f0_max / 700)
 
     def extract(self, audio: torch.Tensor | np.ndarray[Any, np.float32], pitchf: torch.Tensor | np.ndarray[Any, np.float32], f0_up_key: int, sr: int, window: int):
-        audio_num = audio.detach().cpu().numpy()
+        # NOTE: Crepe ONNX model is FP32. Conversion was not tested so keeping input in FP32.
+        audio_num = audio.to(torch.float32).detach().cpu().numpy()
         onnx_f0, onnx_pd = onnxcrepe.predict(
             self.onnx_session,
             audio_num,

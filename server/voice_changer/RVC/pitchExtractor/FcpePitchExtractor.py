@@ -19,6 +19,7 @@ class FcpePitchExtractor(PitchExtractor):
         device = DeviceManager.get_instance().getDevice(gpu)
 
         model = torchfcpe.spawn_infer_model_from_pt(file, device, bundled_model=True)
+        # NOTE: FCPE currently cannot be converted to FP16 because MEL extractor expects FP32 input.
         self.fcpe = model
 
     def extract(self, audio: torch.Tensor, pitchf: torch.Tensor, f0_up_key: int, sr: int, window: int) -> tuple[torch.Tensor, torch.Tensor]:

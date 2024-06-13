@@ -17,11 +17,8 @@ class RMVPEPitchExtractor(PitchExtractor):
         self.f0_mel_min = 1127 * np.log(1 + self.f0_min / 700)
         self.f0_mel_max = 1127 * np.log(1 + self.f0_max / 700)
 
-        # self.uv_interp = True
-        # self.input_sr = -1
         self.device = DeviceManager.get_instance().getDevice(gpu)
-        # isHalf = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
-        isHalf = False
+        isHalf = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
         self.rmvpe = RMVPE(model_path=file, is_half=isHalf, device=self.device)
 
     def extract(self, audio: torch.Tensor, pitchf: torch.Tensor, f0_up_key: int, sr: int, window: int) -> tuple[torch.Tensor, torch.Tensor]:

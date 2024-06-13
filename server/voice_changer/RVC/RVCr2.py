@@ -178,7 +178,7 @@ class RVCr2(VoiceChangerModel):
         # Additional +1 is to compensate for pitch extraction algorithm
         # that can output additional feature.
         # FIXME: Pitch extractors currently work only in FP32 mode
-        self.pitchf_buffer = torch.zeros(self.convert_feature_size_16k + 1, dtype=torch.float32, device=self.device_manager.device)
+        self.pitchf_buffer = torch.zeros(self.convert_feature_size_16k + 1, dtype=self.dtype, device=self.device_manager.device)
         print('Allocated audio buffer:', self.audio_buffer.shape[0])
         print('Allocated pitchf buffer:', self.pitchf_buffer.shape[0])
 
