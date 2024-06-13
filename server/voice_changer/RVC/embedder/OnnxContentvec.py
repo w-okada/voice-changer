@@ -1,5 +1,6 @@
 import torch
 import onnx
+import os
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.embedder.Embedder import Embedder
 import onnxruntime
@@ -17,9 +18,16 @@ class OnnxContentvec(Embedder):
             onnxProviderOptions,
         ) = DeviceManager.get_instance().getOnnxExecutionProvider(gpu)
 
-        model = onnx.load(file)
         if self.isHalf:
-            model: onnx.ModelProto = float16.convert_float_to_float16(model)
+            fname, _ = os.path.splitext(os.path.basename(file))
+            fp16_fpath = os.path.join(os.path.dirname(file), f'{fname}.fp16.onnx')
+            if not os.path.exists(fp16_fpath):
+                model: onnx.ModelProto = float16.convert_float_to_float16(onnx.load(file))
+                onnx.save(model, fp16_fpath)
+            else:
+                model = onnx.load(fp16_fpath)
+        else:
+            model = onnx.load(file)
 
         so = onnxruntime.SessionOptions()
         # so.log_severity_level = 3
