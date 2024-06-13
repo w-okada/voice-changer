@@ -62,6 +62,8 @@ class RVCr2(VoiceChangerModel):
         self.input_sample_rate = 44100
         self.outputSampleRate = 44100
 
+        self.is_half = False
+
         self.initialize()
 
     def initialize(self):
@@ -78,6 +80,9 @@ class RVCr2(VoiceChangerModel):
             )
             return
 
+        self.is_half = self.device_manager.halfPrecisionAvailable(self.settings.gpu)
+        self.dtype = torch.float16 if self.is_half else torch.float32
+
         # その他の設定
         self.settings.tran = self.slotInfo.defaultTune
         self.settings.indexRatio = self.slotInfo.defaultIndexRatio
@@ -87,7 +92,7 @@ class RVCr2(VoiceChangerModel):
         self.resampler_in = tat.Resample(
             orig_freq=self.input_sample_rate,
             new_freq=self.sr,
-            dtype=torch.float32
+            dtype=self.dtype
         ).to(self.device_manager.device)
 
         self.resampler_out = tat.Resample(
@@ -104,7 +109,7 @@ class RVCr2(VoiceChangerModel):
             self.resampler_in = tat.Resample(
                 orig_freq=self.input_sample_rate,
                 new_freq=self.sr,
-                dtype=torch.float32
+                dtype=self.dtype
             ).to(self.device_manager.device)
         if self.outputSampleRate != outputSampleRate:
             self.outputSampleRate = outputSampleRate
@@ -169,9 +174,10 @@ class RVCr2(VoiceChangerModel):
         self.crop_start = -(block_frame_16k + crossfade_frame_16k)
         self.crop_end = -crossfade_frame_16k
 
-        self.audio_buffer = torch.zeros(convert_size_16k, dtype=torch.float32, device=self.device_manager.device)
+        self.audio_buffer = torch.zeros(convert_size_16k, dtype=self.dtype, device=self.device_manager.device)
         # Additional +1 is to compensate for pitch extraction algorithm
         # that can output additional feature.
+        # FIXME: Pitch extractors currently work only in FP32 mode
         self.pitchf_buffer = torch.zeros(self.convert_feature_size_16k + 1, dtype=torch.float32, device=self.device_manager.device)
         print('Allocated audio buffer:', self.audio_buffer.shape[0])
         print('Allocated pitchf buffer:', self.pitchf_buffer.shape[0])
@@ -180,9 +186,12 @@ class RVCr2(VoiceChangerModel):
         if self.pipeline is None:
             raise PipelineNotInitializedException()
 
-        audio_in_16k = self.resampler_in(
-            torch.as_tensor(audio_in, dtype=torch.float32, device=self.device_manager.device)
-        )
+        # Input audio is always float32
+        audio_in_t = torch.as_tensor(audio_in, dtype=torch.float32, device=self.device_manager.device)
+        if self.is_half:
+            audio_in_t = audio_in_t.half()
+
+        audio_in_16k = self.resampler_in(audio_in_t)
 
         self.audio_buffer = circular_write(audio_in_16k, self.audio_buffer)
 
@@ -195,7 +204,7 @@ class RVCr2(VoiceChangerModel):
         if vol < self.settings.silentThreshold:
             if self.slotInfo.f0:
                 self.pitchf_buffer = circular_write(
-                    torch.zeros(self.convert_feature_size_16k, device=self.device_manager.device, dtype=torch.float32),
+                    torch.zeros(self.convert_feature_size_16k, device=self.device_manager.device, dtype=self.dtype),
                     self.pitchf_buffer
                 )
             return None

@@ -99,6 +99,7 @@ class Pipeline:
         self.targetSR = targetSR
         self.device = device
         self.isHalf = isHalf
+        self.dtype = torch.float16 if self.isHalf else torch.float32
 
         self.sr = 16000
         self.window = 160
@@ -114,7 +115,8 @@ class Pipeline:
 
     def extractPitch(self, audio: torch.Tensor, pitchf: torch.Tensor, f0_up_key: int) -> tuple[torch.Tensor | None, torch.Tensor | None]:
         return self.pitchExtractor.extract(
-            audio,
+            # FIXME: Explicit conversion to FP32 is done for all extractors in FP16 mode
+            audio.to(torch.float32),
             pitchf,
             f0_up_key,
             self.sr,
@@ -123,28 +125,17 @@ class Pipeline:
 
     def extractFeatures(self, feats: torch.Tensor, embOutputLayer: int, useFinalProj: bool):
         try:
-            feats = self.embedder.extractFeatures(feats, embOutputLayer, useFinalProj)
-            # if torch.isnan(feats).all():
-            #     raise DeviceCannotSupportHalfPrecisionException()
-            return feats
+            return self.embedder.extractFeatures(feats, embOutputLayer, useFinalProj)
         except RuntimeError as e:
             print("Failed to extract features:", e)
-            if "HALF" in e.__str__().upper():
-                raise HalfPrecisionChangingException()
-            elif "same device" in e.__str__():
-                raise DeviceChangingException()
-            else:
-                raise e
+            raise e
 
     def infer(self, feats: torch.Tensor, p_len: torch.Tensor, pitch: torch.Tensor, pitchf: torch.Tensor, sid: torch.Tensor, skip_head: int | None, return_length: int | None) -> torch.Tensor:
         try:
             return self.inferencer.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length)
         except RuntimeError as e:
             print("Failed to infer:", e)
-            if "HALF" in e.__str__().upper():
-                raise HalfPrecisionChangingException()
-            else:
-                raise e
+            raise e
 
     def _search_index(self, audio: torch.Tensor, top_k: int = 1):
         if top_k == 1:
@@ -164,7 +155,7 @@ class Pipeline:
     def _upscale(self, feats: torch.Tensor) -> torch.Tensor:
         if self.onnx_upscaler is not None:
             feats = self.onnx_upscaler.run(['out'], { 'in': feats.permute(0, 2, 1).detach().cpu().numpy(), 'scales': np.array([2], dtype=np.float32) })
-            return torch.as_tensor(feats[0], dtype=torch.float16 if self.isHalf else torch.float32, device=self.device).permute(0, 2, 1).contiguous()
+            return torch.as_tensor(feats[0], dtype=self.dtype, device=self.device).permute(0, 2, 1).contiguous()
         return F.interpolate(feats.permute(0, 2, 1), scale_factor=2, mode='nearest').permute(0, 2, 1).contiguous()
 
     def exec(
@@ -220,9 +211,6 @@ class Pipeline:
 
                 # Recover silent front
                 feats[0][skip_offset :] = index_audio * index_rate + feats[0][skip_offset :] * (1 - index_rate)
-
-            if self.isHalf:
-                feats = feats.to(torch.float16)
 
             feats = self._upscale(feats)[:, :audio_feats_len, :]
             if self.use_f0:

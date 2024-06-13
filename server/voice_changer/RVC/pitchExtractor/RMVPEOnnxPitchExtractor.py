@@ -32,6 +32,7 @@ class RMVPEOnnxPitchExtractor(PitchExtractor):
         self.onnx_session = onnxruntime.InferenceSession(self.file, sess_options=so, providers=onnxProviders, provider_options=onnxProviderOptions)
 
     def extract(self, audio: torch.Tensor, pitchf: torch.Tensor, f0_up_key: int, sr: int, window: int) -> tuple[torch.Tensor, torch.Tensor]:
+        # NOTE: RMVPE ONNX model produces incorrect results in FP16 mode. Do not try!
         audio = audio.unsqueeze(0)
 
         if audio.device.type == 'cuda':
