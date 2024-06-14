@@ -47,5 +47,5 @@ class RVCInferencerv2(Inferencer):
             raise RuntimeError("[Voice Changer] Pitch or Pitchf is not found.")
 
         res = self.model.infer(feats, pitch_length, pitch, pitchf, sid, skip_head=skip_head, return_length=return_length)
-        res = res[0][0, 0].to(dtype=torch.float32)
+        res = res[0][0, 0].float()
         return torch.clip(res, -1.0, 1.0, out=res)

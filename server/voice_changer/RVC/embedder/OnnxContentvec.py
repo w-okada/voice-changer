@@ -35,7 +35,7 @@ class OnnxContentvec(Embedder):
         self.fp_dtype_t = torch.float16 if self.isHalf else torch.float32
         self.fp_dtype_np = np.float16 if self.isHalf else np.float32
         self.onnx_session = onnxruntime.InferenceSession(model.SerializeToString(), sess_options=so, providers=onnxProviders, provider_options=onnxProviderOptions)
-        super().setProps('hubert_base', file, dev, False)
+        super().setProps('hubert_base', file, dev, self.isHalf)
         return self
 
     def extractFeatures(
