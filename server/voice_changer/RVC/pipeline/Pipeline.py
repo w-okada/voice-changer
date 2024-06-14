@@ -202,11 +202,10 @@ class Pipeline:
                 skip_offset = skip_head // 2
                 index_audio = feats[0][skip_offset :]
 
-                # if self.isHalf:
-                #     index_audio = index_audio.to(dtype=torch.float32, copy=False)
-
                 # TODO: kは調整できるようにする
-                index_audio = self._search_index(index_audio, 8).unsqueeze(0)
+                index_audio = self._search_index(index_audio.float(), 8).unsqueeze(0)
+                if self.isHalf:
+                    index_audio = index_audio.half()
 
                 # Recover silent front
                 feats[0][skip_offset :] = index_audio * index_rate + feats[0][skip_offset :] * (1 - index_rate)
