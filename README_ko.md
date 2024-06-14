@@ -3,6 +3,12 @@
 [English](/README_en.md) [Japanese](/README.md)
 
 ## What's New!
+- v.2.0.24-alpha
+  - 버그 수정:
+    - 모드 전환 시 소리가 나지 않는 문제를 해결
+  - 기타:
+    - 로거 강화
+    - 에러 화면 강화
 - v.2.0.23-alpha
   - 에디션 재정리
     - win_std: 일반적인 윈도우 사용자 대상. DirectML을 통한 하드웨어 가속이 ONNX 모델과 torch 모델 모두에서 가능합니다.

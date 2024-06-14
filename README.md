@@ -3,6 +3,13 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.24-alpha
+  - bugfix:
+    - モード切替をしたときに音が出なくなる問題を対策
+  - その他：
+    - loggerの強化
+    - エラー画面の強化
+
 - v.2.0.23-alpha
   - エディションを再整理
     - win_std:  一般的なwinユーザ向け。onnxモデル, torchモデルともに、DirectMLによりGPUのハードウェアアクセラレーションが可能です。

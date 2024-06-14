@@ -3,6 +3,12 @@
 [Japanese](/README.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.24-alpha
+  - Bugfix:
+    - Addressed the issue where sound stops when switching modes
+  - Others:
+    - Enhanced logger
+    - Improved error screen
 - v.2.0.23-alpha
   - Reorganizing Editions
     - win_std: For typical Windows users. Hardware acceleration via DirectML is available for both ONNX and torch models.
