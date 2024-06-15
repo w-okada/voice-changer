@@ -1,5 +1,3 @@
-from torch import device
-
 from const import EmbedderType
 from voice_changer.RVC.embedder.Embedder import Embedder
 from voice_changer.RVC.embedder.OnnxContentvec import OnnxContentvec
@@ -7,7 +5,7 @@ from settings import ServerSettings
 
 
 class EmbedderManager:
-    currentEmbedder: Embedder | None = None
+    embedder: Embedder | None = None
     params: ServerSettings
 
     @classmethod
@@ -15,27 +13,18 @@ class EmbedderManager:
         cls.params = params
 
     @classmethod
-    def getEmbedder(
-        cls, embederType: EmbedderType, isHalf: bool, dev: device
-    ) -> Embedder:
-        if cls.currentEmbedder is None:
-            print("[Voice Changer] generate new embedder. (no embedder)")
-            cls.currentEmbedder = cls.loadEmbedder(embederType, isHalf, dev)
-        elif cls.currentEmbedder.matchCondition(embederType) is False:
-            print("[Voice Changer] generate new embedder. (not match)")
-            cls.currentEmbedder = cls.loadEmbedder(embederType, isHalf, dev)
-        elif cls.currentEmbedder.dev != dev:
-            print(f"[Voice Changer] generate new embedder. (moving to {dev})")
-            cls.currentEmbedder = cls.loadEmbedder(embederType, isHalf, dev)
-        else:
+    def get_embedder(cls, embedder_type: EmbedderType, force_reload: bool = False) -> Embedder:
+        if cls.embedder is not None \
+            and cls.embedder.matchCondition(embedder_type) \
+            and not force_reload:
             print('[Voice Changer] Reusing embedder.')
-        return cls.currentEmbedder
+            return cls.embedder
+        cls.embedder = cls.load_embedder(embedder_type)
+        return cls.embedder
 
     @classmethod
-    def loadEmbedder(
-        cls, embederType: EmbedderType, isHalf: bool, dev: device
-    ) -> Embedder:
-        if embederType not in ["hubert_base", "contentvec"]:
-            raise RuntimeError(f'Unsupported embedder type: {embederType}')
+    def load_embedder(cls, embedder_type: EmbedderType) -> Embedder:
+        if embedder_type not in ["hubert_base", "contentvec"]:
+            raise RuntimeError(f'Unsupported embedder type: {embedder_type}')
         file = cls.params.content_vec_500_onnx
-        return OnnxContentvec().loadModel(file, dev)
+        return OnnxContentvec().load_model(file)

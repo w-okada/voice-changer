@@ -7,20 +7,20 @@ from .rvc_models.infer_pack.models import SynthesizerTrnMs256NSFsid
 
 
 class RVCInferencer(Inferencer):
-    def loadModel(self, file: str, gpu: int):
-        self.setProps(EnumInferenceTypes.pyTorchRVC, file, True, gpu)
+    def load_model(self, file: str):
+        self.set_props(EnumInferenceTypes.pyTorchRVC, file)
 
-        dev = DeviceManager.get_instance().getDevice(gpu)
-        isHalf = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
+        device_manager = DeviceManager.get_instance()
+        is_half = device_manager.use_fp16()
 
         cpt = torch.load(file, map_location="cpu")
-        model = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=isHalf)
+        model = SynthesizerTrnMs256NSFsid(*cpt["config"], is_half=is_half)
 
         model.eval()
         model.load_state_dict(cpt["weight"], strict=False)
 
-        model = model.to(dev)
-        if isHalf:
+        model = model.to(device_manager.device)
+        if is_half:
             model = model.half()
 
         self.model = model
@@ -36,6 +36,5 @@ class RVCInferencer(Inferencer):
         convert_length: int | None,
     ) -> torch.Tensor:
         res = self.model.infer(feats, pitch_length, pitch, pitchf, sid, convert_length=convert_length)
-        res = res[0][0, 0].to(dtype=torch.float32)
-        res = torch.clip(res, -1.0, 1.0)
-        return res
+        res = res[0][0, 0].float()
+        return torch.clip(res, -1.0, 1.0)

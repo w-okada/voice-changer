@@ -16,8 +16,8 @@ FeatureInOut: TypeAlias = np.ndarray[Any, np.dtype[np.int16]]
 class VoiceChangerModel(Protocol):
     voiceChangerType: VoiceChangerType = "RVC"
 
-    # loadModel: Callable[..., dict[str, Any]]
-    def loadModel(self, params: LoadModelParams):
+    # load_model: Callable[..., dict[str, Any]]
+    def load_model(self, params: LoadModelParams):
         ...
 
     def get_processing_sampling_rate(self) -> int:

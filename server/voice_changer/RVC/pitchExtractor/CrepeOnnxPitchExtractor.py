@@ -11,13 +11,13 @@ from voice_changer.RVC.pitchExtractor import onnxcrepe
 
 class CrepeOnnxPitchExtractor(PitchExtractor):
 
-    def __init__(self, pitchExtractorType: PitchExtractorType, file: str, gpu: int):
-        self.pitchExtractorType = pitchExtractorType
+    def __init__(self, type: PitchExtractorType, file: str):
+        self.type = type
         super().__init__()
         (
             onnxProviders,
             onnxProviderOptions,
-        ) = DeviceManager.get_instance().getOnnxExecutionProvider(gpu)
+        ) = DeviceManager.get_instance().get_onnx_execution_provider()
 
         self.onnx_session = onnxruntime.InferenceSession(
             file, providers=onnxProviders, provider_options=onnxProviderOptions
@@ -29,7 +29,8 @@ class CrepeOnnxPitchExtractor(PitchExtractor):
         self.f0_mel_max = 1127 * np.log(1 + self.f0_max / 700)
 
     def extract(self, audio: torch.Tensor | np.ndarray[Any, np.float32], pitchf: torch.Tensor | np.ndarray[Any, np.float32], f0_up_key: int, sr: int, window: int):
-        audio_num = audio.detach().cpu().numpy()
+        # NOTE: Crepe ONNX model is FP32. Conversion was not tested so keeping input in FP32.
+        audio_num = audio.float().detach().cpu().numpy()
         onnx_f0, onnx_pd = onnxcrepe.predict(
             self.onnx_session,
             audio_num,

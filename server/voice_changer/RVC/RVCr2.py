@@ -22,7 +22,6 @@ from voice_changer.RVC.pipeline.Pipeline import Pipeline
 from torchaudio import transforms as tat
 
 from Exceptions import (
-    DeviceCannotSupportHalfPrecisionException,
     PipelineCreateException,
     PipelineNotInitializedException,
 )
@@ -62,21 +61,27 @@ class RVCr2(VoiceChangerModel):
         self.input_sample_rate = 44100
         self.outputSampleRate = 44100
 
+        self.is_half = False
+
         self.initialize()
 
-    def initialize(self):
+    def initialize(self, force_reload: bool = False):
         logger.info("[Voice Changer] [RVCr2] Initializing... ")
+
+        self.is_half = self.device_manager.use_fp16()
 
         # pipelineの生成
         try:
             self.pipeline = createPipeline(
-                self.params, self.slotInfo, self.settings.gpu, self.settings.f0Detector
+                self.params, self.slotInfo, self.settings.f0Detector, force_reload
             )
         except PipelineCreateException as e:  # NOQA
             logger.error(
                 "[Voice Changer] pipeline create failed. check your model is valid."
             )
             return
+
+        self.dtype = torch.float16 if self.is_half else torch.float32
 
         # その他の設定
         self.settings.tran = self.slotInfo.defaultTune
@@ -87,7 +92,7 @@ class RVCr2(VoiceChangerModel):
         self.resampler_in = tat.Resample(
             orig_freq=self.input_sample_rate,
             new_freq=self.sr,
-            dtype=torch.float32
+            dtype=self.dtype
         ).to(self.device_manager.device)
 
         self.resampler_out = tat.Resample(
@@ -96,15 +101,13 @@ class RVCr2(VoiceChangerModel):
             dtype=torch.float32
         ).to(self.device_manager.device)
 
-        logger.info(f"[Voice Changer] [RVCr2] Initializing on {self.device_manager.device}... done")
-
     def setSamplingRate(self, input_sample_rate, outputSampleRate):
         if self.input_sample_rate != input_sample_rate:
             self.input_sample_rate = input_sample_rate
             self.resampler_in = tat.Resample(
                 orig_freq=self.input_sample_rate,
                 new_freq=self.sr,
-                dtype=torch.float32
+                dtype=self.dtype
             ).to(self.device_manager.device)
         if self.outputSampleRate != outputSampleRate:
             self.outputSampleRate = outputSampleRate
@@ -119,9 +122,8 @@ class RVCr2(VoiceChangerModel):
 
         if key in self.settings.intData:
             setattr(self.settings, key, int(val))
-            if key == "gpu":
-                self.device_manager.setForceTensor(False)
-                self.initialize()
+            if key in {"gpu", "forceFp32"}:
+                self.initialize(True)
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
         elif key in self.settings.strData:
@@ -169,20 +171,23 @@ class RVCr2(VoiceChangerModel):
         self.crop_start = -(block_frame_16k + crossfade_frame_16k)
         self.crop_end = -crossfade_frame_16k
 
-        self.audio_buffer = torch.zeros(convert_size_16k, dtype=torch.float32, device=self.device_manager.device)
+        self.audio_buffer = torch.zeros(convert_size_16k, dtype=self.dtype, device=self.device_manager.device)
         # Additional +1 is to compensate for pitch extraction algorithm
         # that can output additional feature.
-        self.pitchf_buffer = torch.zeros(self.convert_feature_size_16k + 1, dtype=torch.float32, device=self.device_manager.device)
-        print('Allocated audio buffer:', self.audio_buffer.shape[0])
-        print('Allocated pitchf buffer:', self.pitchf_buffer.shape[0])
+        self.pitchf_buffer = torch.zeros(self.convert_feature_size_16k + 1, dtype=self.dtype, device=self.device_manager.device)
+        print('[Voice Changer] Allocated audio buffer:', self.audio_buffer.shape[0])
+        print('[Voice Changer] Allocated pitchf buffer:', self.pitchf_buffer.shape[0])
 
     def inference(self, audio_in: AudioInOutFloat):
         if self.pipeline is None:
             raise PipelineNotInitializedException()
 
-        audio_in_16k = self.resampler_in(
-            torch.as_tensor(audio_in, dtype=torch.float32, device=self.device_manager.device)
-        )
+        # Input audio is always float32
+        audio_in_t = torch.as_tensor(audio_in, dtype=torch.float32, device=self.device_manager.device)
+        if self.is_half:
+            audio_in_t = audio_in_t.half()
+
+        audio_in_16k = self.resampler_in(audio_in_t)
 
         self.audio_buffer = circular_write(audio_in_16k, self.audio_buffer)
 
@@ -195,34 +200,25 @@ class RVCr2(VoiceChangerModel):
         if vol < self.settings.silentThreshold:
             if self.slotInfo.f0:
                 self.pitchf_buffer = circular_write(
-                    torch.zeros(self.convert_feature_size_16k, device=self.device_manager.device, dtype=torch.float32),
+                    torch.zeros(self.convert_feature_size_16k, device=self.device_manager.device, dtype=self.dtype),
                     self.pitchf_buffer
                 )
             return None
 
-        try:
-            audio_model = self.pipeline.exec(
-                self.settings.dstId,
-                self.audio_buffer,
-                self.pitchf_buffer,
-                self.settings.tran,
-                self.settings.indexRatio,
-                self.convert_feature_size_16k,
-                self.silence_front,
-                self.slotInfo.embOutputLayer,
-                self.slotInfo.useFinalProj,
-                self.settings.protect,
-                self.skip_head,
-                self.return_length,
-            )
-        except DeviceCannotSupportHalfPrecisionException as e:  # NOQA
-            logger.warn(
-                "[Device Manager] Device cannot support half precision. Fallback to float...."
-            )
-            self.device_manager.setForceTensor(True)
-            self.initialize()
-            # raise e
-            return None
+        audio_model = self.pipeline.exec(
+            self.settings.dstId,
+            self.audio_buffer,
+            self.pitchf_buffer,
+            self.settings.tran,
+            self.settings.indexRatio,
+            self.convert_feature_size_16k,
+            self.silence_front,
+            self.slotInfo.embOutputLayer,
+            self.slotInfo.useFinalProj,
+            self.settings.protect,
+            self.skip_head,
+            self.return_length,
+        )
 
         # FIXME: Why the heck does it require another sqrt to amplify the volume?
         audio_out: torch.Tensor = self.resampler_out(audio_model * torch.sqrt(vol_t))
@@ -259,10 +255,7 @@ class RVCr2(VoiceChangerModel):
             del self.pipeline
             self.pipeline = None
 
-        torch.cuda.empty_cache()
-        self.initialize()
-
-        output_file_simple = export2onnx(self.settings.gpu, modelSlot)
+        output_file_simple = export2onnx(modelSlot)
 
         return {
             "status": "ok",

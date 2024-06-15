@@ -6,9 +6,9 @@ from voice_changer.RVC.inferencer.OnnxRVCInferencer import OnnxRVCInferencer
 
 
 class OnnxRVCInferencerNono(OnnxRVCInferencer):
-    def loadModel(self, file: str, gpu: int, inferencerTypeVersion: str | None = None):
-        super().loadModel(file, gpu, inferencerTypeVersion)
-        self.setProps(EnumInferenceTypes.onnxRVCNono, file, self.isHalf, gpu)
+    def load_model(self, file: str, inferencerTypeVersion: str | None = None):
+        super().load_model(file, inferencerTypeVersion)
+        self.set_props(EnumInferenceTypes.onnxRVCNono, file)
         return self
 
     def infer(
@@ -24,11 +24,7 @@ class OnnxRVCInferencerNono(OnnxRVCInferencer):
         if feats.device.type == 'cuda':
             binding = self.model.io_binding()
 
-            if self.input_feats_half:
-                feats = feats.to(torch.float16)
-                binding.bind_input('feats', device_type='cuda', device_id=feats.device.index, element_type=np.float16, shape=tuple(feats.shape), buffer_ptr=feats.data_ptr())
-            else:
-                binding.bind_input('feats', device_type='cuda', device_id=feats.device.index, element_type=np.float32, shape=tuple(feats.shape), buffer_ptr=feats.data_ptr())
+            binding.bind_input('feats', device_type='cuda', device_id=feats.device.index, element_type=self.fp_dtype_np, shape=tuple(feats.shape), buffer_ptr=feats.float().data_ptr())
             binding.bind_input('p_len', device_type='cuda', device_id=feats.device.index, element_type=np.int64, shape=tuple(pitch_length.shape), buffer_ptr=pitch_length.data_ptr())
             binding.bind_input('sid', device_type='cuda', device_id=feats.device.index, element_type=np.int64, shape=tuple(sid.shape), buffer_ptr=sid.data_ptr())
             binding.bind_cpu_input('skip_head', np.array(skip_head, dtype=np.int64))
@@ -42,7 +38,7 @@ class OnnxRVCInferencerNono(OnnxRVCInferencer):
             output = self.model.run(
                 ["audio"],
                 {
-                    "feats": feats.detach().cpu().numpy().astype(np.float16 if self.input_feats_half else np.float32, copy=False),
+                    "feats": feats.float().detach().cpu().numpy(),
                     "p_len": pitch_length.detach().cpu().numpy(),
                     "sid": sid.detach().cpu().numpy(),
                     "skip_head": np.array(skip_head, dtype=np.int64)
@@ -50,7 +46,9 @@ class OnnxRVCInferencerNono(OnnxRVCInferencer):
             )
         # self.model.end_profiling()
 
-        res = torch.as_tensor(output[0], dtype=torch.float32, device=sid.device)
+        res = torch.as_tensor(output[0], dtype=self.fp_dtype_t, device=feats.device)
+        if self.isHalf:
+            res = res.float()
 
         if self.inferencerTypeVersion == "v2.1" or self.inferencerTypeVersion == "v2.2" or self.inferencerTypeVersion == "v1.1":
             return res

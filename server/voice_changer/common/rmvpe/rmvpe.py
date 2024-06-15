@@ -344,6 +344,8 @@ class RMVPE:
             model.load_state_dict(cpt, strict=False)
         model.eval().to(device)
 
+        if is_half:
+            model = model.half()
         self.model = model
 
         self.device = device

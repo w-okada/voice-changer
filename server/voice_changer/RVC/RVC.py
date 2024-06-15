@@ -60,7 +60,6 @@ class RVC(VoiceChangerModel):
         if key in self.settings.intData:
             setattr(self.settings, key, int(val))
             if key == "gpu":
-                self.deviceManager.setForceTensor(False)
                 self.initialize()
         elif key in self.settings.floatData:
             setattr(self.settings, key, float(val))
@@ -162,30 +161,24 @@ class RVC(VoiceChangerModel):
         embOutputLayer = self.slotInfo.embOutputLayer
         useFinalProj = self.slotInfo.useFinalProj
 
-        try:
-            audio_out, self.pitchf_buffer, self.feature_buffer = self.pipeline.exec(
-                sid,
-                audio,
-                pitchf,
-                feature,
-                f0_up_key,
-                index_rate,
-                self.slotInfo.f0,
-                self.settings.extraConvertSize / self.slotInfo.samplingRate if self.settings.silenceFront else 0.,  # extaraDataSizeの秒数。RVCのモデルのサンプリングレートで処理(★１)。
-                embOutputLayer,
-                useFinalProj,
-                repeat,
-                protect,
-                outSize
-            )
-            result = audio_out.detach().cpu().numpy() * np.sqrt(vol)
+        audio_out, self.pitchf_buffer, self.feature_buffer = self.pipeline.exec(
+            sid,
+            audio,
+            pitchf,
+            feature,
+            f0_up_key,
+            index_rate,
+            self.slotInfo.f0,
+            self.settings.extraConvertSize / self.slotInfo.samplingRate if self.settings.silenceFront else 0.,  # extaraDataSizeの秒数。RVCのモデルのサンプリングレートで処理(★１)。
+            embOutputLayer,
+            useFinalProj,
+            repeat,
+            protect,
+            outSize
+        )
+        result = audio_out.detach().cpu().numpy() * np.sqrt(vol)
 
-            return result
-        except DeviceCannotSupportHalfPrecisionException as e:  # NOQA
-            logger.warn("[Device Manager] Device cannot support half precision. Fallback to float....")
-            self.deviceManager.setForceTensor(True)
-            self.initialize()
-            # raise e
+        return result
 
         return
 

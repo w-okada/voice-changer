@@ -7,20 +7,21 @@ from voice_changer.RVC.inferencer.rvc_models.infer_pack.models_onnx import Synth
 
 
 class WebUIInferencerNono(Inferencer):
-    def loadModel(self, file: str, gpu: int):
-        self.setProps(EnumInferenceTypes.pyTorchWebUINono, file, True, gpu)
+    def load_model(self, file: str):
+        self.set_props(EnumInferenceTypes.pyTorchWebUINono, file)
 
-        dev = DeviceManager.get_instance().getDevice(gpu)
-        isHalf = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
+        device_manager = DeviceManager.get_instance()
+        dev = device_manager.device
+        is_half = device_manager.use_fp16()
 
         cpt = torch.load(file, map_location="cpu")
-        model = SynthesizerTrnMsNSFsidM_nono(**cpt["params"], is_half=isHalf)
+        model = SynthesizerTrnMsNSFsidM_nono(**cpt["params"], is_half=is_half)
 
         model.eval()
         model.load_state_dict(cpt["weight"], strict=False)
 
         model = model.to(dev)
-        if isHalf:
+        if is_half:
             model = model.half()
 
         self.model = model
@@ -37,6 +38,5 @@ class WebUIInferencerNono(Inferencer):
         return_length: torch.Tensor | None,
     ) -> torch.Tensor:
         res = self.model.infer(feats, pitch_length, sid, skip_head=skip_head)
-        res = res[0][0, 0].to(dtype=torch.float32)
-        res = torch.clip(res, -1.0, 1.0)
-        return res
+        res = res[0][0, 0].float()
+        return torch.clip(res, -1.0, 1.0)

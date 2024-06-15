@@ -8,11 +8,11 @@ from .voras_beta.models import Synthesizer
 
 
 class VoRASInferencer(Inferencer):
-    def loadModel(self, file: str, gpu: device):
-        super().setProps(EnumInferenceTypes.pyTorchVoRASbeta, file, False, gpu)
+    def load_model(self, file: str):
+        super().set_props(EnumInferenceTypes.pyTorchVoRASbeta, file)
 
-        dev = DeviceManager.get_instance().getDevice(gpu)
-        self.isHalf = False  # DeviceManager.get_instance().halfPrecisionAvailable(gpu)
+        dev = DeviceManager.get_instance().device
+        self.isHalf = False  # DeviceManager.get_instance().is_fp16_available(gpu)
 
         cpt = torch.load(file, map_location="cpu")
         model = Synthesizer(**cpt["params"])

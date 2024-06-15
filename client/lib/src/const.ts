@@ -95,6 +95,7 @@ export const ServerSettingKey = {
     indexRatio: "indexRatio",
     protect: "protect",
     rvcQuality: "rvcQuality",
+    forceFp32: "forceFp32",
     modelSamplingRate: "modelSamplingRate",
     silenceFront: "silenceFront",
     modelSlotIndex: "modelSlotIndex",
@@ -139,6 +140,7 @@ export type VoiceChangerServerSetting = {
     protect: number; // RVC
     rvcQuality: number; // 0:low, 1:high
     silenceFront: number; // 0:off, 1:on
+    forceFp32: number; // 0:off, 1:on
     modelSamplingRate: ModelSamplingRate; // 32000,40000,48000
     modelSlotIndex: number;
 
@@ -268,6 +270,7 @@ export const DefaultServerSetting: ServerInfo = {
     rvcQuality: 0,
     modelSamplingRate: 48000,
     silenceFront: 1,
+    forceFp32: 0,
     modelSlotIndex: 0,
     sampleModels: [],
     gpus: [],

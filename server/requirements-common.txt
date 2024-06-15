@@ -17,3 +17,4 @@ python-dotenv
 pydantic-settings
 xxhash
 aiohttp
+onnxconverter-common

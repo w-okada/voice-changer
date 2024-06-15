@@ -9,20 +9,16 @@ import torch
 
 class RMVPEPitchExtractor(PitchExtractor):
 
-    def __init__(self, file: str, gpu: int):
+    def __init__(self, file: str):
         super().__init__()
-        self.pitchExtractorType: PitchExtractorType = "rmvpe"
+        self.type: PitchExtractorType = "rmvpe"
         self.f0_min = 50
         self.f0_max = 1100
         self.f0_mel_min = 1127 * np.log(1 + self.f0_min / 700)
         self.f0_mel_max = 1127 * np.log(1 + self.f0_max / 700)
 
-        # self.uv_interp = True
-        # self.input_sr = -1
-        self.device = DeviceManager.get_instance().getDevice(gpu)
-        # isHalf = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
-        isHalf = False
-        self.rmvpe = RMVPE(model_path=file, is_half=isHalf, device=self.device)
+        device_manager = DeviceManager.get_instance()
+        self.rmvpe = RMVPE(model_path=file, is_half=device_manager.use_fp16(), device=device_manager.device)
 
     def extract(self, audio: torch.Tensor, pitchf: torch.Tensor, f0_up_key: int, sr: int, window: int) -> tuple[torch.Tensor, torch.Tensor]:
         f0: torch.Tensor = self.rmvpe.infer_from_audio_t(audio, threshold=0.03)

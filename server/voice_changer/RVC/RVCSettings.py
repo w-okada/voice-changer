@@ -14,6 +14,7 @@ class RVCSettings:
     protect: float = 0.5
     rvcQuality: int = 0
     silenceFront: int = 1  # 0:off, 1:on
+    forceFp32: int = 0 # 0:off, 1:on
     modelSamplingRate: int = 48000
 
     speakers: dict[str, int] = field(default_factory=lambda: {})
@@ -21,6 +22,7 @@ class RVCSettings:
     # ↓mutableな物だけ列挙
     intData = [
         "gpu",
+        "forceFp32",
         "dstId",
         "tran",
         "extraConvertSize",

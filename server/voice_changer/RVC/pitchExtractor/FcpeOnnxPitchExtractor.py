@@ -9,9 +9,9 @@ from voice_changer.common.TorchUtils import circular_write
 
 class FcpeOnnxPitchExtractor(PitchExtractor):
 
-    def __init__(self, file: str, gpu: int):
+    def __init__(self, file: str):
         super().__init__()
-        self.pitchExtractorType: PitchExtractorType = "fcpe_onnx"
+        self.type: PitchExtractorType = "fcpe_onnx"
         self.f0_min = 50
         self.f0_max = 1100
         self.f0_mel_min = 1127 * np.log(1 + self.f0_min / 700)
@@ -20,7 +20,7 @@ class FcpeOnnxPitchExtractor(PitchExtractor):
         (
             onnxProviders,
             onnxProviderOptions,
-        ) = DeviceManager.get_instance().getOnnxExecutionProvider(gpu)
+        ) = DeviceManager.get_instance().get_onnx_execution_provider()
 
         so = onnxruntime.SessionOptions()
         # so.log_severity_level = 3

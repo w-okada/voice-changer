@@ -12,7 +12,7 @@ from ..inferencer.rvc_models.infer_pack.models_onnx import SynthesizerTrnMsNSFsi
 from settings import ServerSettings
 from io import BytesIO
 
-def export2onnx(gpu: int, modelSlot: RVCModelSlot):
+def export2onnx(modelSlot: RVCModelSlot):
     model_dir = ServerSettings().model_dir
     modelFile = os.path.join(model_dir, str(modelSlot.slotIndex), os.path.basename(modelSlot.modelFile))
 
@@ -31,16 +31,17 @@ def export2onnx(gpu: int, modelSlot: RVCModelSlot):
     }
 
     print("[Voice Changer] Exporting onnx...")
-    _export2onnx(modelFile, output_path_simple, gpu, metadata)
+    _export2onnx(modelFile, output_path_simple, metadata)
 
     return output_file_simple
 
 
-def _export2onnx(input_model: str, output_model_simple: str, gpu: int, metadata: dict):
-    dev = DeviceManager.get_instance().getDevice(gpu)
+def _export2onnx(input_model: str, output_model_simple: str, metadata: dict):
+    device_manager = DeviceManager.get_instance()
+    dev = device_manager.device
     if dev.type == 'privateuseone':
         dev = torch.device('cpu')
-    is_half = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
+    is_half = False
     is_safetensors = '.safetensors' in input_model
 
     if is_safetensors:
@@ -57,10 +58,7 @@ def _export2onnx(input_model: str, output_model_simple: str, gpu: int, metadata:
             'params': cpt['params']
         }
 
-    if is_half:
-        print(f'[Voice Changer] Exporting to float16 on GPU')
-    else:
-        print(f'[Voice Changer] Exporting to float32 on CPU')
+    print(f'[Voice Changer] Exporting to ONNX on {dev}')
 
     # EnumInferenceTypesのままだとシリアライズできないのでテキスト化
     if metadata["modelType"] == EnumInferenceTypes.pyTorchRVC.value:
@@ -89,15 +87,10 @@ def _export2onnx(input_model: str, output_model_simple: str, gpu: int, metadata:
         load_model(net_g_onnx, cpt, strict=False)
     else:
         net_g_onnx.load_state_dict(cpt["weight"], strict=False)
-    if is_half:
-        net_g_onnx = net_g_onnx.half()
 
     featsLength = 64
 
-    if is_half:
-        feats = torch.zeros((1, featsLength, metadata["embChannels"]), dtype=torch.float16, device=dev)
-    else:
-        feats = torch.zeros((1, featsLength, metadata["embChannels"]), dtype=torch.float32, device=dev)
+    feats = torch.zeros((1, featsLength, metadata["embChannels"]), dtype=torch.float32, device=dev)
     p_len = torch.tensor([featsLength], dtype=torch.int64, device=dev)
     sid = torch.tensor([0], dtype=torch.int64, device=dev)
     skip_head = torch.tensor(32, dtype=torch.int64, device=dev)
