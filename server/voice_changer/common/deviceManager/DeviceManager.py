@@ -44,11 +44,11 @@ class DeviceManager(object):
         elif self.cuda_enabled:
             torch.cuda.empty_cache()
 
-        device, presentation = self._get_device(id)
+        device, metadata = self._get_device(id)
         self.device = device
-        self.device_presentation = presentation
+        self.device_metadata = metadata
         self.fp16_available = self.is_fp16_available()
-        print(f'[Voice Changer] Switched to {presentation["name"]} ({device}). FP16 support: {self.fp16_available}')
+        print(f'[Voice Changer] Switched to {metadata["name"]} ({device}). FP16 support: {self.fp16_available}')
 
     def use_fp16(self):
         return self.fp16_available and not self.force_fp32
@@ -123,7 +123,7 @@ class DeviceManager(object):
         # TODO: Need information and filtering for Radeon and Intel GPUs
         # All Radeon GPUs starting from GCN 1 (Radeon HD 7000 series and later) reportedly have 2:1 FP16 performance
         # Intel UHD Graphics 600 and later reportedly have 2:1 FP16 performance
-        ignored_gpu = re.search(r'(GTX|RTX|TESLA|QUADRO) (V100|[789]\d{2}|1[06]\d{2}|P40|TITAN)', self.device_presentation['name'].upper())
+        ignored_gpu = re.search(r'(GTX|RTX|TESLA|QUADRO) (V100|[789]\d{2}|1[06]\d{2}|P40|TITAN)', self.device_metadata['name'].upper())
         if ignored_gpu is not None:
             return False
 
