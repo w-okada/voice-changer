@@ -94,10 +94,10 @@ class MMVC_Rest_Fileuploader:
             import traceback
             traceback.print_exc()
 
-    def post_merge_models(self, request: str = Form(...)):
+    async def post_merge_models(self, request: str = Form(...)):
         try:
             print(request)
-            info = self.voiceChangerManager.merge_models(request)
+            info = await self.voiceChangerManager.merge_models(request)
             json_compatible_item_data = jsonable_encoder(info)
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:
