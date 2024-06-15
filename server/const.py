@@ -91,13 +91,11 @@ def getSampleJsonAndModelIds(mode: RVCSampleMode):
     if mode == "production":
         return [
             "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0004_t.json",
-            "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0004_o.json",
-            "https://huggingface.co/wok000/vcclient_model/raw/main/samples_0004_d.json",
         ], [
-            ("Tsukuyomi-chan_o", {"useIndex": False}),
-            ("Amitaro_o", {"useIndex": False}),
-            ("KikotoMahiro_o", {"useIndex": False}),
-            ("TokinaShigure_o", {"useIndex": False}),
+            ("Tsukuyomi-chan_t", {"useIndex": False}),
+            ("Amitaro_t", {"useIndex": False}),
+            ("KikotoMahiro_t", {"useIndex": False}),
+            ("TokinaShigure_t", {"useIndex": False}),
         ]
     elif mode == "testAll":
         return [
@@ -192,6 +190,4 @@ def getSampleJsonAndModelIds(mode: RVCSampleMode):
     else:
         return [], []
 
-
-RVC_MODEL_DIRNAME = "rvc"
 MAX_SLOT_NUM = 500
