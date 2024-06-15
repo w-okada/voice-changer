@@ -84,9 +84,10 @@
 
 - チュートリアルは[こちら](tutorials/tutorial_rvc_ja_latest.md)をご覧ください。([ネットワークのトラブルシュート](https://github.com/w-okada/voice-changer/blob/master/tutorials/trouble_shoot_communication_ja.md))
 
-- [Google Colaboratory](https://github.com/w-okada/voice-changer/blob/master/Realtime_Voice_Changer_on_Colab.ipynb) で簡単にお試しいただけるようになりました。左上の Open in Colab のボタンから起動できます。
+- Google Colaboratory <a target="_blank" href="https://colab.research.google.com/github/w-okada/voice-changer/blob/master/Hina_Modified_Realtime_Voice_Changer_on_Colab.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a> (Click Open In Colab) で簡単にお試しいただけるようになりました。左上の Open in Colab のボタンから起動できます。
 
-<img src="https://github.com/w-okada/voice-changer/assets/48346627/3f092e2d-6834-42f6-bbfd-7d389111604e" width="400" height="150">
 
 - Windows 版と Mac 版を提供しています。
 
