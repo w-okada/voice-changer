@@ -315,7 +315,7 @@ class RMVPEModule(torch.nn.Module):
         self.idx = torch.arange(360)[None, None, :]
         self.idx_cents = self.idx * 20 + 1997.3794084376191
 
-    def forward(self, mel: torch.Tensor, threshold: int) -> torch.Tensor:
+    def forward(self, mel: torch.Tensor, threshold: float) -> torch.Tensor:
         hidden = self.mel2hidden(mel)
         return self.decode(hidden, threshold)
 
@@ -325,7 +325,7 @@ class RMVPEModule(torch.nn.Module):
         hidden = self.e2e(mel)
         return hidden[:, :n_frames]
 
-    def decode(self, hidden: torch.Tensor, threshold: int) -> torch.Tensor:
+    def decode(self, hidden: torch.Tensor, threshold: float) -> torch.Tensor:
         center = torch.argmax(hidden, dim=2, keepdim=True)  # [B, T, 1]
         start = torch.clip(center - 4, min=0)  # [B, T, 1]
         end = torch.clip(center + 5, max=360)  # [B, T, 1]
@@ -366,7 +366,7 @@ if __name__ == '__main__':
     mel_sample = mel_extractor(audio_sample)
     threshold_sample = torch.tensor(0.03, dtype=torch.float32, device=dev)
 
-    cpt = torch.load(r'rmvpe.pt', map_location='cpu')
+    cpt = torch.load(r'C:\Sources\voice-changer\server\pretrain\rmvpe.pt', map_location='cpu')
     rmvpe = RMVPEModule(cpt).eval().to(dev)
     rmvpe_onnx = convert(
         rmvpe,
