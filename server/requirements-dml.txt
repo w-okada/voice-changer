@@ -3,7 +3,7 @@
 # # wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh
 # # bash Anaconda3-2022.10-Linux-x86_64.sh
 
-torch==2.2.1 # torch-directml is built up to 2.2.1
+torch==2.3.1 # torch-directml-0.2.2.dev240614 supports up to to 2.3.1
 torchaudio
 torch-directml
 faiss-cpu
