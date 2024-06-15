@@ -49,7 +49,7 @@ export type UseServerSettingProps = {
 export type ServerSettingState = {
     serverSetting: ServerInfo;
     updateServerSettings: (setting: ServerInfo) => Promise<void>;
-    reloadServerInfo: () => Promise<void>;
+    reloadServerInfo: () => Promise<any>;
 
     uploadModel: (setting: ModelUploadSetting) => Promise<void>;
     uploadProgress: number;
@@ -166,6 +166,7 @@ export const useServerSetting = (props: UseServerSettingProps): ServerSettingSta
             if (!props.voiceChangerClient) return;
             const res = await props.voiceChangerClient.getServerSettings();
             setServerSetting(res);
+            return res;
         };
     }, [props.voiceChangerClient]);
 

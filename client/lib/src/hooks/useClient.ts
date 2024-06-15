@@ -223,8 +223,10 @@ export const useClient = (props: UseClientProps): ClientState => {
     const getInfo = useMemo(() => {
         return async () => {
             await initializedPromise;
+            // FIXME: Hacky way to bring client chunk size in sync with server.
             await voiceChangerClientSetting.reloadClientSetting(); // 実質的な処理の意味はない
-            await serverSetting.reloadServerInfo();
+            const server = await serverSetting.reloadServerInfo();
+            setWorkletNodeSetting({ ...setting.workletNodeSetting, inputChunkNum: server.serverReadChunkSize });
         };
     }, [voiceChangerClientSetting.reloadClientSetting, serverSetting.reloadServerInfo]);
 
