@@ -62,7 +62,7 @@ export const useClientSetting = (props: UseClientSettingProps): ClientSettingSta
     const reloadClientSetting = useMemo(() => {
         return async () => {
             if (!props.voiceChangerClient) return;
-            await props.voiceChangerClient.getClientSettings();
+            props.voiceChangerClient.getClientSettings();
         };
     }, [props.voiceChangerClient]);
 
