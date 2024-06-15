@@ -10,18 +10,18 @@ from onnxconverter_common import float16
 
 
 class OnnxRVCInferencer(Inferencer):
-    def loadModel(self, file: str, gpu: int, inferencerTypeVersion: str | None = None):
+    def load_model(self, file: str, inferencerTypeVersion: str | None = None):
         self.inferencerTypeVersion = inferencerTypeVersion
         (
             onnxProviders,
             onnxProviderOptions,
-        ) = DeviceManager.get_instance().getOnnxExecutionProvider(gpu)
+        ) = DeviceManager.get_instance().get_onnx_execution_provider()
         # FIXME: Temporarily disable conversion to FP16 since the forward pass contains the ops that are not converted correctly.
         # Note that float model inputs are explicitly converted to FP32!
-        # self.isHalf = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
+        # self.isHalf = DeviceManager.get_instance().is_fp16_available(gpu)
         self.isHalf = False
 
-        self.setProps(EnumInferenceTypes.onnxRVC, file, self.isHalf, gpu)
+        self.set_props(EnumInferenceTypes.onnxRVC, file)
 
         if self.isHalf:
             fname, _ = os.path.splitext(os.path.basename(file))
@@ -86,7 +86,7 @@ class OnnxRVCInferencer(Inferencer):
             )
         # self.model.end_profiling()
 
-        res = torch.as_tensor(output[0], dtype=self.fp_dtype_t, device=sid.device)
+        res = torch.as_tensor(output[0], dtype=self.fp_dtype_t, device=feats.device)
         if self.isHalf:
             res = res.float()
 

@@ -26,7 +26,7 @@ STORED_SETTINGS = {
     "version",
     "enableServerAudio", "serverAudioSampleRate", "serverInputDeviceId", "serverOutputDeviceId", "serverMonitorDeviceId", "serverInputAudioGain", "serverOutputAudioGain",
     "crossFadeOverlapSize", "protect",
-    "modelSlotIndex", "serverReadChunkSize", "extraConvertSize", "gpu",
+    "modelSlotIndex", "serverReadChunkSize", "extraConvertSize", "gpu", "forceFp32",
     "f0Detector", "rvcQuality", "silenceFront", "silentThreshold",
 }
 

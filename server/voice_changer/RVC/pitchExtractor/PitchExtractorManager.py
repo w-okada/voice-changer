@@ -10,64 +10,57 @@ from voice_changer.RVC.pitchExtractor.RMVPEPitchExtractor import RMVPEPitchExtra
 from voice_changer.RVC.pitchExtractor.FcpePitchExtractor import FcpePitchExtractor
 from voice_changer.RVC.pitchExtractor.FcpeOnnxPitchExtractor import FcpeOnnxPitchExtractor
 from settings import ServerSettings
+import torch
 
 
 class PitchExtractorManager(Protocol):
-    currentPitchExtractor: PitchExtractor | None = None
+    pitch_extractor: PitchExtractor | None = None
     params: ServerSettings
-    gpu: int = -1
 
     @classmethod
     def initialize(cls, params: ServerSettings):
         cls.params = params
 
     @classmethod
-    def getPitchExtractor(
-        cls, pitchExtractorType: PitchExtractorType, gpu: int
-    ) -> PitchExtractor:
-        cls.currentPitchExtractor = cls.loadPitchExtractor(pitchExtractorType, gpu)
-        return cls.currentPitchExtractor
+    def getPitchExtractor(cls, pitch_extractor: PitchExtractorType, force_reload: bool) -> PitchExtractor:
+        cls.pitch_extractor = cls.loadPitchExtractor(pitch_extractor, force_reload)
+        return cls.pitch_extractor
 
     @classmethod
-    def loadPitchExtractor(
-        cls, pitchExtractorType: PitchExtractorType, gpu: int
-    ) -> PitchExtractor:
-        if cls.currentPitchExtractor is not None \
-            and pitchExtractorType == cls.currentPitchExtractor.pitchExtractorType and gpu == cls.gpu:
+    def loadPitchExtractor(cls, pitch_extractor: PitchExtractorType, force_reload: bool) -> PitchExtractor:
+        if cls.pitch_extractor is not None \
+            and pitch_extractor == cls.pitch_extractor.type \
+            and not force_reload:
             print('[Voice Changer] Reusing pitch extractor.')
-            return cls.currentPitchExtractor
+            return cls.pitch_extractor
 
-        cls.gpu = gpu
-        print(f'[Voice Changer] Loading pitch extractor {pitchExtractorType}')
+        print(f'[Voice Changer] Loading pitch extractor {pitch_extractor}')
         try:
-            if pitchExtractorType == "harvest":
+            if pitch_extractor == "harvest":
                 return HarvestPitchExtractor()
-            elif pitchExtractorType == "dio":
+            elif pitch_extractor == "dio":
                 return DioPitchExtractor()
-            elif pitchExtractorType == "crepe_tiny":
-                return CrepePitchExtractor(gpu, 'tiny')
-            elif pitchExtractorType == "crepe_full":
-                return CrepePitchExtractor(gpu, 'full')
-            elif pitchExtractorType == "crepe_tiny_onnx":
-                return CrepeOnnxPitchExtractor(pitchExtractorType, cls.params.crepe_onnx_tiny, gpu)
-            elif pitchExtractorType == "crepe_full_onnx":
-                return CrepeOnnxPitchExtractor(pitchExtractorType, cls.params.crepe_onnx_full, gpu)
-            elif pitchExtractorType == "rmvpe":
-                return RMVPEPitchExtractor(cls.params.rmvpe, gpu)
-            elif pitchExtractorType == "rmvpe_onnx":
-                return RMVPEOnnxPitchExtractor(cls.params.rmvpe_onnx, gpu)
-            elif pitchExtractorType == "fcpe":
-                return FcpePitchExtractor(cls.params.fcpe, gpu)
+            elif pitch_extractor in {"crepe_tiny", "crepe_full"}:
+                return CrepePitchExtractor(pitch_extractor)
+            elif pitch_extractor == "crepe_tiny_onnx":
+                return CrepeOnnxPitchExtractor(pitch_extractor, cls.params.crepe_onnx_tiny)
+            elif pitch_extractor == "crepe_full_onnx":
+                return CrepeOnnxPitchExtractor(pitch_extractor, cls.params.crepe_onnx_full)
+            elif pitch_extractor == "rmvpe":
+                return RMVPEPitchExtractor(cls.params.rmvpe)
+            elif pitch_extractor == "rmvpe_onnx":
+                return RMVPEOnnxPitchExtractor(cls.params.rmvpe_onnx)
+            elif pitch_extractor == "fcpe":
+                return FcpePitchExtractor(cls.params.fcpe)
             # TODO: Not implemented yet
-            # elif pitchExtractorType == "fcpe_onnx":
-            #     return FcpeOnnxPitchExtractor(cls.params.fcpe_onnx, gpu)
+            # elif pitch_extractor == "fcpe_onnx":
+            #     return FcpeOnnxPitchExtractor(cls.params.fcpe_onnx)
             else:
-                # return hubert as default
-                print(f"[Voice Changer] PitchExctractor not found {pitchExtractorType}. Fallback to rmvpe_onnx")
-                return RMVPEOnnxPitchExtractor(cls.params.rmvpe_onnx, gpu)
+                print(f"[Voice Changer] PitchExctractor not found {pitch_extractor}. Fallback to rmvpe_onnx")
+                return RMVPEOnnxPitchExtractor(cls.params.rmvpe_onnx)
         except RuntimeError as e:
             import traceback
             print(traceback.format_exc())
             print(e)
-            print(f'[Voice Changer] Failed to load {pitchExtractorType}. Fallback to rmvpe_onnx.')
-            return RMVPEOnnxPitchExtractor(cls.params.rmvpe_onnx, gpu)
+            print(f'[Voice Changer] Failed to load {pitch_extractor}. Fallback to rmvpe_onnx.')
+            return RMVPEOnnxPitchExtractor(cls.params.rmvpe_onnx)

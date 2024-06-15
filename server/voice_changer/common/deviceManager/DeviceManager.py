@@ -1,114 +1,135 @@
 import torch
 import onnxruntime
+import re
+from typing import TypedDict, Literal
 
 try:
     import torch_directml
 except ImportError:
     import voice_changer.common.deviceManager.DummyDML as torch_directml
 
+class DevicePresentation(TypedDict):
+    id: int
+    name: str
+    backend: Literal['cpu', 'cuda', 'directml', 'mps']
+
 class DeviceManager(object):
     _instance = None
-    forceTensor: bool = False
 
     @classmethod
     def get_instance(cls):
+        # TODO: Dictionary of device manager and client sessions (?)
         if cls._instance is None:
             cls._instance = cls()
         return cls._instance
 
     def __init__(self):
         self.device = torch.device('cpu')
-        self.gpu_num = torch.cuda.device_count()
+        self.cuda_enabled = torch.cuda.is_available()
         self.mps_enabled: bool = (
             getattr(torch.backends, "mps", None) is not None
             and torch.backends.mps.is_available()
         )
         self.dml_enabled: bool = torch_directml.is_available()
+        self.fp16_available = False
+        self.force_fp32 = False
+        print('[Voice Changer] Initialized DeviceManager. Available backends:')
+        print(f'[Voice Changer] * DirectML: {self.dml_enabled}, device count: {torch_directml.device_count()}')
+        print(f'[Voice Changer] * CUDA: {self.cuda_enabled}, device count: {torch.cuda.device_count()}')
+        print(f'[Voice Changer] * MPS: {self.mps_enabled}')
 
-    def setDevice(self, id: int):
-        self.device = self.getDevice(id)
+    def set_device(self, id: int):
+        if self.mps_enabled:
+            torch.mps.empty_cache()
+        elif self.cuda_enabled:
+            torch.cuda.empty_cache()
 
-    def getDevice(self, id: int):
-        if id == -1:
-            return torch.device("cpu")
+        device, presentation = self._get_device(id)
+        self.device = device
+        self.device_presentation = presentation
+        self.fp16_available = self.is_fp16_available()
+        print(f'[Voice Changer] Switched to {presentation["name"]} ({device}). FP16 support: {self.fp16_available}')
 
-        if self.gpu_num > 0 and id < self.gpu_num:
-            return torch.device("cuda", index=id)
+    def use_fp16(self):
+        return self.fp16_available and not self.force_fp32
+
+    # TODO: This function should also accept backend type
+    def _get_device(self, dev_id: int) -> tuple[torch.device, DevicePresentation]:
+        if dev_id == -1:
+            return (torch.device("cpu"), { "id": -1, "name": "CPU", 'backend': 'cpu' })
+
+        if self.cuda_enabled:
+            name = torch.cuda.get_device_name(dev_id)
+            memory = torch.cuda.get_device_properties(dev_id).total_memory
+            return (torch.device("cuda", index=dev_id), {"id": dev_id, "name": f"{dev_id}: {name} (CUDA)", "memory": memory, 'backend': 'cuda'})
         elif self.mps_enabled:
-            return torch.device("mps")
+            return (torch.device("mps"), { "id": -1, "name": "CPU (MPS)", 'backend': 'mps' })
         elif self.dml_enabled:
-            return torch.device(torch_directml.device(id))
-        else:
-            print("[Voice Changer] Device detection error, fallback to cpu")
-            return torch.device("cpu")
+            name = torch_directml.device_name(dev_id)
+            return (torch.device(torch_directml.device(dev_id)), {"id": dev_id, "name": f"{dev_id}: {name} (DirectML)", "memory": 0, 'backend': 'directml'})
+        raise Exception(f'Failed to find device with index {dev_id}')
 
     @staticmethod
-    def listDevices():
+    def list_devices():
         devCount = torch.cuda.device_count()
-        gpus = [{ "id": -1, "name": "CPU" }]
+        devices = [{ "id": -1, "name": "CPU", 'backend': 'cpu' }]
         for id in range(devCount):
             name = torch.cuda.get_device_name(id)
             memory = torch.cuda.get_device_properties(id).total_memory
-            gpu = {"id": id, "name": f"{id}: {name} (CUDA) ", "memory": memory}
-            gpus.append(gpu)
+            device = {"id": id, "name": f"{id}: {name} (CUDA)", "memory": memory, 'backend': 'cuda'}
+            devices.append(device)
         devCount = torch_directml.device_count()
         for id in range(devCount):
             name = torch_directml.device_name(id)
-            gpu = {"id": id, "name": f"{id}: {name} (DirectML) ", "memory": 0}
-            gpus.append(gpu)
-        return gpus
+            device = {"id": id, "name": f"{id}: {name} (DirectML)", "memory": 0, 'backend': 'directml'}
+            devices.append(device)
+        return devices
 
-    def getOnnxExecutionProvider(self, gpu: int):
+    def get_onnx_execution_provider(self):
         cpu_settings = {
             "intra_op_num_threads": 8,
             "execution_mode": onnxruntime.ExecutionMode.ORT_PARALLEL,
             "inter_op_num_threads": 8,
         }
         availableProviders = onnxruntime.get_available_providers()
-        if gpu >= 0 and "ROCMExecutionProvider" in availableProviders and self.gpu_num > 0:
-            return ["ROCMExecutionProvider", "CPUExecutionProvider"], [{"device_id": gpu}, cpu_settings]
-        elif gpu >= 0 and "CUDAExecutionProvider" in availableProviders and self.gpu_num > 0:
-            return ["CUDAExecutionProvider", "CPUExecutionProvider"], [{"device_id": gpu}, cpu_settings]
-        elif gpu >= 0 and "DmlExecutionProvider" in availableProviders:
-            return ["DmlExecutionProvider", "CPUExecutionProvider"], [{"device_id": gpu}, cpu_settings]
+        if self.device.type == 'cuda' and "ROCMExecutionProvider" in availableProviders:
+            return ["ROCMExecutionProvider", "CPUExecutionProvider"], [{"device_id": self.device.index}, cpu_settings]
+        elif self.device.type == 'cuda' and "CUDAExecutionProvider" in availableProviders:
+            return ["CUDAExecutionProvider", "CPUExecutionProvider"], [{"device_id": self.device.index}, cpu_settings]
+        elif self.device.type == 'privateuseone' and "DmlExecutionProvider" in availableProviders:
+            return ["DmlExecutionProvider", "CPUExecutionProvider"], [{"device_id": self.device.index}, cpu_settings]
         else:
             return ["CPUExecutionProvider"], [cpu_settings]
 
-    def setForceTensor(self, forceTensor: bool):
-        self.forceTensor = forceTensor
+    def set_force_fp32(self, force_fp32: bool):
+        if self.mps_enabled:
+            torch.mps.empty_cache()
+        elif self.cuda_enabled:
+            torch.cuda.empty_cache()
+        self.force_fp32 = force_fp32
 
-    def halfPrecisionAvailable(self, id: int):
-        return True
-        if self.gpu_num == 0:
-            return False
-        if id < 0:
-            return False
-        if self.forceTensor:
+    def is_int8_avalable(self):
+        if self.device.type == 'cpu':
+            return True
+        # TODO: Need information on INT8 support on GPUs.
+        return False
+
+    def is_fp16_available(self):
+        # TODO: Maybe need to add bfloat16 support?
+        # FP16 is not supported on CPU
+        if self.device.type == 'cpu':
             return False
 
-        try:
-            gpuName = torch.cuda.get_device_name(id).upper()
-            if (
-                ("16" in gpuName and "V100" not in gpuName)
-                or "P40" in gpuName.upper()
-                or "1070" in gpuName
-                or "1080" in gpuName
-            ):
+        # TODO: Need information and filtering for Radeon and Intel GPUs
+        # All Radeon GPUs starting from GCN 1 (Radeon HD 7000 series and later) reportedly have 2:1 FP16 performance
+        # Intel UHD Graphics 600 and later reportedly have 2:1 FP16 performance
+        ignored_gpu = re.search(r'(GTX|RTX|TESLA|QUADRO) (V100|[789]\d{2}|1[06]\d{2}|P40|TITAN)', self.device_presentation['name'].upper())
+        if ignored_gpu is not None:
+            return False
+
+        if self.device == 'cuda':
+            major, _ = torch.cuda.get_device_capability(self.device)
+            if major < 7:  # コンピューティング機能が7以上の場合half precisionが使えるとされている（が例外がある？T500とか）
                 return False
-        except Exception as e:
-            print(e)
-            return False
-
-        cap = torch.cuda.get_device_capability(id)
-        if cap[0] < 7:  # コンピューティング機能が7以上の場合half precisionが使えるとされている（が例外がある？T500とか）
-            return False
 
         return True
-
-    def getDeviceMemory(self, id: int):
-        try:
-            return torch.cuda.get_device_properties(id).total_memory
-        except Exception as e:
-            # except:
-            print(e)
-            return 0

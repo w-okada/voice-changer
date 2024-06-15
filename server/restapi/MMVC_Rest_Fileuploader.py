@@ -76,7 +76,7 @@ class MMVC_Rest_Fileuploader:
             loadModelparams.files = [LoadModelParamFile(**x) for x in paramDict["files"]]
             # print("paramDict", loadModelparams)
 
-            info = await self.voiceChangerManager.loadModel(loadModelparams)
+            info = await self.voiceChangerManager.load_model(loadModelparams)
             json_compatible_item_data = jsonable_encoder(info)
             return JSONResponse(content=json_compatible_item_data)
         except Exception as e:

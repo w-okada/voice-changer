@@ -115,7 +115,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             json.dump(self.stored_setting, open(STORED_SETTING_FILE, "w"))
 
     def _get_gpuInfos(self):
-        return DeviceManager.listDevices()
+        return DeviceManager.list_devices()
 
     @classmethod
     def get_instance(cls, params: ServerSettings):
@@ -123,7 +123,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             cls._instance = cls(params)
         return cls._instance
 
-    async def loadModel(self, params: LoadModelParams):
+    async def load_model(self, params: LoadModelParams):
         if params.isSampleMode:
             # サンプルダウンロード
             logger.info(f"[Voice Changer] sample download...., {params}")
@@ -159,7 +159,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         if params.voiceChangerType == "RVC":
             from voice_changer.RVC.RVCModelSlotGenerator import RVCModelSlotGenerator  # 起動時にインポートするとパラメータが取れない。
 
-            slotInfo = RVCModelSlotGenerator.loadModel(params)
+            slotInfo = RVCModelSlotGenerator.load_model(params)
             self.modelSlotManager.save_model_slot(params.slot, slotInfo)
 
         logger.info(f"params, {params}")
@@ -227,10 +227,6 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             if key == "modelSlotIndex":
                 logger.info(f"[Voice Changer] model slot is changed {self.settings.modelSlotIndex} -> {newVal}")
                 self.generateVoiceChanger(newVal)
-            elif key == 'gpu':
-                device_manager = DeviceManager.get_instance()
-                device_manager.setDevice(newVal)
-
             setattr(self.settings, key, newVal)
 
         self.serverDevice.update_settings(key, val)
@@ -262,7 +258,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         if req.voiceChangerType == "RVC":
             merged = RVCModelMerger.merge_models(self.params, req, slot)
             loadParam = LoadModelParams(voiceChangerType="RVC", slot=slot, isSampleMode=False, sampleId="", files=[LoadModelParamFile(name=os.path.basename(merged), kind="rvcModel", dir="")], params={})
-            self.loadModel(loadParam)
+            self.load_model(loadParam)
         return self.get_info()
 
     def setEmitTo(self, emitTo: Callable[[Any], None]):

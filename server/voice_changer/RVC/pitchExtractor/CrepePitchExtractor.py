@@ -10,11 +10,12 @@ from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 
 class CrepePitchExtractor(PitchExtractor):
 
-    def __init__(self, gpu: int, model_size: str):
+    def __init__(self, type: PitchExtractorType):
         super().__init__()
-        self.pitchExtractorType: PitchExtractorType = f"crepe_{model_size}"
-        self.model_size = model_size
-        self.device = DeviceManager.get_instance().getDevice(gpu)
+        type, size = type.split('_')
+        self.type: PitchExtractorType = type
+        self.model_size = size
+        self.device = DeviceManager.get_instance().device
         self.f0_min = 50
         self.f0_max = 1100
         self.f0_mel_min = 1127 * np.log(1 + self.f0_min / 700)

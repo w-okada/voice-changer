@@ -11,13 +11,13 @@ from voice_changer.RVC.pitchExtractor import onnxcrepe
 
 class CrepeOnnxPitchExtractor(PitchExtractor):
 
-    def __init__(self, pitchExtractorType: PitchExtractorType, file: str, gpu: int):
-        self.pitchExtractorType = pitchExtractorType
+    def __init__(self, type: PitchExtractorType, file: str):
+        self.type = type
         super().__init__()
         (
             onnxProviders,
             onnxProviderOptions,
-        ) = DeviceManager.get_instance().getOnnxExecutionProvider(gpu)
+        ) = DeviceManager.get_instance().get_onnx_execution_provider()
 
         self.onnx_session = onnxruntime.InferenceSession(
             file, providers=onnxProviders, provider_options=onnxProviderOptions

@@ -9,7 +9,7 @@ class DioPitchExtractor(PitchExtractor):
 
     def __init__(self):
         super().__init__()
-        self.pitchExtractorType: PitchExtractorType = "dio"
+        self.type: PitchExtractorType = "dio"
 
     def extract(self, audio, pitchf, f0_up_key, sr, window):
         audio = audio.detach().cpu().numpy()

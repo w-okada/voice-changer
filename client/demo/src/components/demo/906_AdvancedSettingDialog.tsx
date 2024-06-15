@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useGuiState } from "./001_GuiStateProvider";
 import { useAppState } from "../../001_provider/001_AppStateProvider";
-import { CrossFadeOverlapSize, Protocol } from "@dannadori/voice-changer-client-js";
+import { Protocol } from "@dannadori/voice-changer-client-js";
 
 export const AdvancedSettingDialog = () => {
     const guiState = useGuiState();
@@ -93,6 +93,29 @@ export const AdvancedSettingDialog = () => {
             </div>
         );
 
+        const onForceFp32ModeChanged = (val: number) => {
+            serverSetting.updateServerSettings({
+                ...serverSetting.serverSetting,
+                forceFp32: val,
+            });
+        };
+        const forceFp32ModeRow = (
+            <div className="advanced-setting-container-row">
+                <div className="advanced-setting-container-row-title">Force FP32 mode</div>
+                <div className="advanced-setting-container-row-field">
+                    <select
+                        value={serverSetting.serverSetting.forceFp32}
+                        onChange={(e) => {
+                            onForceFp32ModeChanged(Number(e.target.value));
+                        }}
+                    >
+                        <option value="0">off</option>
+                        <option value="1">on</option>
+                    </select>
+                </div>
+            </div>
+        );
+
         const protectRow = (
             <div className="advanced-setting-container-row">
                 <div className="advanced-setting-container-row-title">Protect</div>
@@ -158,6 +181,7 @@ export const AdvancedSettingDialog = () => {
                 {protocolRow}
                 {crossfaceRow}
                 {silenceFrontRow}
+                {forceFp32ModeRow}
                 {protectRow}
                 {rvcQualityRow}
                 {skipPassThroughConfirmationRow}

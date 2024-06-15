@@ -9,14 +9,14 @@ from voice_changer.common.TorchUtils import circular_write
 
 class FcpePitchExtractor(PitchExtractor):
 
-    def __init__(self, file: str, gpu: int):
+    def __init__(self, file: str):
         super().__init__()
-        self.pitchExtractorType: PitchExtractorType = "fcpe"
+        self.type: PitchExtractorType = "fcpe"
         self.f0_min = 50
         self.f0_max = 1100
         self.f0_mel_min = 1127 * np.log(1 + self.f0_min / 700)
         self.f0_mel_max = 1127 * np.log(1 + self.f0_max / 700)
-        device = DeviceManager.get_instance().getDevice(gpu)
+        device = DeviceManager.get_instance().device
 
         model = torchfcpe.spawn_infer_model_from_pt(file, device, bundled_model=True)
         # NOTE: FCPE currently cannot be converted to FP16 because MEL extractor expects FP32 input.

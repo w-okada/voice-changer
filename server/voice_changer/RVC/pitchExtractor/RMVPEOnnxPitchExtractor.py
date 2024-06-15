@@ -9,10 +9,10 @@ import torch
 
 class RMVPEOnnxPitchExtractor(PitchExtractor):
 
-    def __init__(self, file: str, gpu: int):
+    def __init__(self, file: str):
         super().__init__()
         self.file = file
-        self.pitchExtractorType: PitchExtractorType = "rmvpe_onnx"
+        self.type: PitchExtractorType = "rmvpe_onnx"
         self.f0_min = 50
         self.f0_max = 1100
         self.f0_mel_min = 1127 * np.log(1 + self.f0_min / 700)
@@ -21,10 +21,9 @@ class RMVPEOnnxPitchExtractor(PitchExtractor):
         (
             onnxProviders,
             onnxProviderOptions,
-        ) = DeviceManager.get_instance().getOnnxExecutionProvider(gpu)
+        ) = DeviceManager.get_instance().get_onnx_execution_provider()
 
-        self.device = DeviceManager.get_instance().getDevice(gpu)
-        self.threshold = torch.tensor((0.3,), dtype=torch.float32, device=self.device)
+        self.threshold = np.array([0.3], dtype=np.float32)
 
         so = onnxruntime.SessionOptions()
         # so.log_severity_level = 3
@@ -38,10 +37,10 @@ class RMVPEOnnxPitchExtractor(PitchExtractor):
         if audio.device.type == 'cuda':
             binding = self.onnx_session.io_binding()
 
-            binding.bind_input('waveform', device_type='cuda', device_id=self.device.index, element_type=np.float32, shape=tuple(audio.shape), buffer_ptr=audio.data_ptr())
-            binding.bind_input('threshold', device_type='cuda', device_id=self.device.index, element_type=np.float32, shape=tuple(self.threshold.shape), buffer_ptr=self.threshold.data_ptr())
+            binding.bind_input('waveform', device_type='cuda', device_id=audio.device.index, element_type=np.float32, shape=tuple(audio.shape), buffer_ptr=audio.data_ptr())
+            binding.bind_cpu_input('threshold', self.threshold)
 
-            binding.bind_output('pitchf', device_type='cuda', device_id=self.device.index)
+            binding.bind_output('pitchf', device_type='cuda', device_id=audio.device.index)
 
             self.onnx_session.run_with_iobinding(binding)
 
@@ -51,7 +50,7 @@ class RMVPEOnnxPitchExtractor(PitchExtractor):
                 ["pitchf"],
                 {
                     "waveform": audio.detach().cpu().numpy(),
-                    "threshold": self.threshold.detach().cpu().numpy(),
+                    "threshold": self.threshold,
                 },
             )
         # self.onnx_session.end_profiling()

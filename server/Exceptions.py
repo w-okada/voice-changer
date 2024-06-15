@@ -16,11 +16,6 @@ class DeviceChangingException(Exception):
         return repr("Device changing...")
 
 
-class DeviceCannotSupportHalfPrecisionException(Exception):
-    def __str__(self):
-        return repr("Device cannot support half precision.")
-
-
 class VoiceChangerIsNotSelectedException(Exception):
     def __str__(self):
         return repr("Voice Changer is not selected.")

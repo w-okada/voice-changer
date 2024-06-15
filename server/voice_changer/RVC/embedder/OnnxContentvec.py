@@ -10,13 +10,13 @@ from onnxconverter_common import float16
 
 class OnnxContentvec(Embedder):
 
-    def loadModel(self, file: str, dev: torch.device) -> Embedder:
-        gpu = dev.index if dev.index is not None else -1
-        self.isHalf = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
+    def load_model(self, file: str) -> Embedder:
+        device_manager = DeviceManager.get_instance()
+        self.isHalf = device_manager.use_fp16()
         (
             onnxProviders,
             onnxProviderOptions,
-        ) = DeviceManager.get_instance().getOnnxExecutionProvider(gpu)
+        ) = device_manager.get_onnx_execution_provider()
 
         if self.isHalf:
             fname, _ = os.path.splitext(os.path.basename(file))
@@ -35,10 +35,10 @@ class OnnxContentvec(Embedder):
         self.fp_dtype_t = torch.float16 if self.isHalf else torch.float32
         self.fp_dtype_np = np.float16 if self.isHalf else np.float32
         self.onnx_session = onnxruntime.InferenceSession(model.SerializeToString(), sess_options=so, providers=onnxProviders, provider_options=onnxProviderOptions)
-        super().setProps('hubert_base', file, dev, self.isHalf)
+        super().set_props('hubert_base', file)
         return self
 
-    def extractFeatures(
+    def extract_features(
         self, feats: torch.Tensor, embOutputLayer=9, useFinalProj=True
     ) -> torch.Tensor:
         if feats.device.type == 'cuda':

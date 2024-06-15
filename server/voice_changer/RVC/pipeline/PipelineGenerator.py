@@ -15,14 +15,11 @@ from voice_changer.RVC.pitchExtractor.PitchExtractorManager import PitchExtracto
 from settings import ServerSettings
 
 
-def createPipeline(params: ServerSettings, modelSlot: RVCModelSlot, gpu: int, f0Detector: str):
-    dev = DeviceManager.get_instance().getDevice(gpu)
-    half = DeviceManager.get_instance().halfPrecisionAvailable(gpu)
-
+def createPipeline(params: ServerSettings, modelSlot: RVCModelSlot, f0Detector: str, force_reload: bool):
     # Inferencer 生成
     try:
         modelPath = os.path.join(params.model_dir, str(modelSlot.slotIndex), os.path.basename(modelSlot.modelFile))
-        inferencer = InferencerManager.getInferencer(modelSlot.modelType, modelPath, gpu, modelSlot.version)
+        inferencer = InferencerManager.getInferencer(modelSlot.modelType, modelPath, modelSlot.version)
     except Exception as e:
         print("[Voice Changer] exception! loading inferencer", e)
         traceback.print_exc()
@@ -30,23 +27,18 @@ def createPipeline(params: ServerSettings, modelSlot: RVCModelSlot, gpu: int, f0
 
     # Embedder 生成
     try:
-        embedder = EmbedderManager.getEmbedder(
-            modelSlot.embedder,
-            # emmbedderFilename,
-            half,
-            dev,
-        )
+        embedder = EmbedderManager.get_embedder(modelSlot.embedder, force_reload)
     except Exception as e:
-        print("[Voice Changer] exception! loading embedder", e, dev)
+        print("[Voice Changer] exception! loading embedder", e)
         traceback.print_exc()
         raise PipelineCreateException("[Voice Changer] exception! loading embedder")
 
     # pitchExtractor
-    pitchExtractor = PitchExtractorManager.getPitchExtractor(f0Detector, gpu)
+    pitchExtractor = PitchExtractorManager.getPitchExtractor(f0Detector, force_reload)
 
     # index, feature
     indexPath = os.path.join(params.model_dir, str(modelSlot.slotIndex), os.path.basename(modelSlot.indexFile))
-    index, index_reconstruct = _loadIndex(indexPath, dev)
+    index, index_reconstruct = _loadIndex(indexPath)
 
     pipeline = Pipeline(
         embedder,
@@ -57,14 +49,13 @@ def createPipeline(params: ServerSettings, modelSlot: RVCModelSlot, gpu: int, f0
         modelSlot.f0,
         modelSlot.samplingRate,
         modelSlot.embChannels,
-        dev,
-        half,
     )
 
     return pipeline
 
 
-def _loadIndex(indexPath: str, dev: torch.device) -> tuple[faiss.Index | None, torch.Tensor | None]:
+def _loadIndex(indexPath: str) -> tuple[faiss.Index | None, torch.Tensor | None]:
+    dev = DeviceManager.get_instance().device
     # Indexのロード
     print("[Voice Changer] Loading index...")
     # ファイル指定があってもファイルがない場合はNone

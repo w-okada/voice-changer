@@ -14,7 +14,7 @@ from settings import ServerSettings
 
 class RVCModelSlotGenerator(ModelSlotGenerator):
     @classmethod
-    def loadModel(cls, props: LoadModelParams):
+    def load_model(cls, props: LoadModelParams):
         model_dir = ServerSettings().model_dir
 
         slotInfo: RVCModelSlot = RVCModelSlot()

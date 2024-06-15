@@ -13,11 +13,6 @@ import torch
 import torch.nn.functional as F
 import onnxruntime
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
-from Exceptions import (
-    DeviceCannotSupportHalfPrecisionException,
-    DeviceChangingException,
-    HalfPrecisionChangingException,
-)
 from mods.log_control import VoiceChangaerLogger
 
 from voice_changer.RVC.embedder.Embedder import Embedder
@@ -28,31 +23,6 @@ from voice_changer.utils.Timer import Timer2
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
 
-
-def make_onnx_upscaler(device: torch.device, dim_size: int, isHalf: bool):
-    # Inputs
-    input = make_tensor_value_info('in', TensorProto.FLOAT16 if isHalf else TensorProto.FLOAT, [1, dim_size, None])
-    scales = make_tensor_value_info('scales', TensorProto.FLOAT, [None])
-    # Outputs
-    output = make_tensor_value_info('out', TensorProto.FLOAT16 if isHalf else TensorProto.FLOAT, [1, dim_size, None])
-
-    resize_node = make_node(
-        "Resize",
-        inputs=["in", "", "scales"],
-        outputs=["out"],
-        mode="nearest",
-        axes=[2]
-    )
-
-    graph = make_graph([resize_node], 'upscaler', [input, scales], [output])
-
-    onnx_model = make_model(graph)
-
-    (
-        providers,
-        provider_options,
-    ) = DeviceManager.get_instance().getOnnxExecutionProvider(device.index)
-    return onnxruntime.InferenceSession(onnx_model.SerializeToString(), providers=providers, provider_options=provider_options)
 
 class Pipeline:
     embedder: Embedder
@@ -77,8 +47,6 @@ class Pipeline:
         use_f0: bool,
         targetSR: int,
         embChannels: int,
-        device: torch.device,
-        isHalf: bool,
     ):
         self.embedder = embedder
         self.inferencer = inferencer
@@ -92,23 +60,50 @@ class Pipeline:
         self.use_index = index is not None and self.index_reconstruct is not None
         self.use_gpu_index = sys.platform == 'linux' and device.type == 'cuda'
         self.use_f0 = use_f0
-        # self.feature = feature
 
-        self.onnx_upscaler = make_onnx_upscaler(device, embChannels, isHalf) if device.type == 'privateuseone' else None
+        self.device_manager = DeviceManager.get_instance()
+        self.device = self.device_manager.device
+        self.is_half = self.device_manager.use_fp16()
+
+        self.onnx_upscaler = self.make_onnx_upscaler(embChannels) if self.device.type == 'privateuseone' else None
 
         self.targetSR = targetSR
-        self.device = device
-        self.isHalf = isHalf
-        self.dtype = torch.float16 if self.isHalf else torch.float32
+
+        self.dtype = torch.float16 if self.is_half else torch.float32
 
         self.sr = 16000
         self.window = 160
 
+    def make_onnx_upscaler(self, dim_size: int):
+        # Inputs
+        input = make_tensor_value_info('in', TensorProto.FLOAT16 if self.is_half else TensorProto.FLOAT, [1, dim_size, None])
+        scales = make_tensor_value_info('scales', TensorProto.FLOAT, [None])
+        # Outputs
+        output = make_tensor_value_info('out', TensorProto.FLOAT16 if self.is_half else TensorProto.FLOAT, [1, dim_size, None])
+
+        resize_node = make_node(
+            "Resize",
+            inputs=["in", "", "scales"],
+            outputs=["out"],
+            mode="nearest",
+            axes=[2]
+        )
+
+        graph = make_graph([resize_node], 'upscaler', [input, scales], [output])
+
+        onnx_model = make_model(graph)
+
+        (
+            providers,
+            provider_options,
+        ) = self.device_manager.get_onnx_execution_provider()
+        return onnxruntime.InferenceSession(onnx_model.SerializeToString(), providers=providers, provider_options=provider_options)
+
     def getPipelineInfo(self):
         inferencerInfo = self.inferencer.getInferencerInfo() if self.inferencer else {}
-        embedderInfo = self.embedder.getEmbedderInfo()
+        embedderInfo = self.embedder.get_embedder_info()
         pitchExtractorInfo = self.pitchExtractor.getPitchExtractorInfo()
-        return {"inferencer": inferencerInfo, "embedder": embedderInfo, "pitchExtractor": pitchExtractorInfo, "isHalf": self.isHalf}
+        return {"inferencer": inferencerInfo, "embedder": embedderInfo, "pitchExtractor": pitchExtractorInfo}
 
     def setPitchExtractor(self, pitchExtractor: PitchExtractor):
         self.pitchExtractor = pitchExtractor
@@ -122,9 +117,9 @@ class Pipeline:
             self.window,
         )
 
-    def extractFeatures(self, feats: torch.Tensor, embOutputLayer: int, useFinalProj: bool):
+    def extract_features(self, feats: torch.Tensor, embOutputLayer: int, useFinalProj: bool):
         try:
-            return self.embedder.extractFeatures(feats, embOutputLayer, useFinalProj)
+            return self.embedder.extract_features(feats, embOutputLayer, useFinalProj)
         except RuntimeError as e:
             print("Failed to extract features:", e)
             raise e
@@ -182,13 +177,13 @@ class Pipeline:
             t.record("pre-process")
 
             # ピッチ検出
-            # with autocast(enabled=self.isHalf):
+            # with autocast(enabled=self.is_half):
             pitch, pitchf = self.extractPitch(audio[silence_front:], pitchf, f0_up_key) if self.use_f0 else (None, None)
             t.record("extract-pitch")
 
             # embedding
-            # with autocast(enabled=self.isHalf):
-            feats = self.extractFeatures(audio.view(1, -1), embOutputLayer, useFinalProj)
+            # with autocast(enabled=self.is_half):
+            feats = self.extract_features(audio.view(1, -1), embOutputLayer, useFinalProj)
             feats = torch.cat((feats, feats[:, -1:, :]), 1)
             t.record("extract-feats")
 
@@ -204,7 +199,7 @@ class Pipeline:
 
                 # TODO: kは調整できるようにする
                 index_audio = self._search_index(index_audio.float(), 8).unsqueeze(0)
-                if self.isHalf:
+                if self.is_half:
                     index_audio = index_audio.half()
 
                 # Recover silent front

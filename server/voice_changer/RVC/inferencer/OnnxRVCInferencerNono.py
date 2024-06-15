@@ -6,9 +6,9 @@ from voice_changer.RVC.inferencer.OnnxRVCInferencer import OnnxRVCInferencer
 
 
 class OnnxRVCInferencerNono(OnnxRVCInferencer):
-    def loadModel(self, file: str, gpu: int, inferencerTypeVersion: str | None = None):
-        super().loadModel(file, gpu, inferencerTypeVersion)
-        self.setProps(EnumInferenceTypes.onnxRVCNono, file, self.isHalf, gpu)
+    def load_model(self, file: str, inferencerTypeVersion: str | None = None):
+        super().load_model(file, inferencerTypeVersion)
+        self.set_props(EnumInferenceTypes.onnxRVCNono, file)
         return self
 
     def infer(
@@ -46,7 +46,7 @@ class OnnxRVCInferencerNono(OnnxRVCInferencer):
             )
         # self.model.end_profiling()
 
-        res = torch.as_tensor(output[0], dtype=self.fp_dtype_t, device=sid.device)
+        res = torch.as_tensor(output[0], dtype=self.fp_dtype_t, device=feats.device)
         if self.isHalf:
             res = res.float()
 

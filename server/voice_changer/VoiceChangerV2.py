@@ -14,7 +14,6 @@ from voice_changer.utils.Timer import Timer2
 from voice_changer.utils.VoiceChangerIF import VoiceChangerIF
 from voice_changer.utils.VoiceChangerModel import AudioInOutFloat, VoiceChangerModel
 from Exceptions import (
-    DeviceCannotSupportHalfPrecisionException,
     DeviceChangingException,
     HalfPrecisionChangingException,
     NoModeLoadedException,
@@ -38,6 +37,7 @@ class VoiceChangerV2Settings:
     serverReadChunkSize: int = 192
     extraConvertSize: float = 0.5
     gpu: int = -1
+    forceFp32: int = 0 # 0:off, 1:on
 
     recordIO: int = 0  # 0:off, 1:on
 
@@ -50,7 +50,8 @@ class VoiceChangerV2Settings:
             "outputSampleRate",
             "recordIO",
             "serverReadChunkSize",
-            "gpu"
+            "gpu",
+            "forceFp32",
         ]
     )
     strData: list[str] = field(default_factory=lambda: [])
@@ -132,7 +133,10 @@ class VoiceChangerV2(VoiceChangerIF):
             setattr(self.settings, key, val)
             if key == "serverReadChunkSize":
                 self.block_frame = self.settings.serverReadChunkSize * 128
+            elif key == 'forceFp32':
+                self.device_manager.set_force_fp32(val)
             elif key == 'gpu':
+                self.device_manager.set_device(val)
                 # When changing GPU, need to re-allocate fade-in/fade-out buffers on different device
                 self._generate_strength()
             elif key == "recordIO" and val == 1:
@@ -167,10 +171,9 @@ class VoiceChangerV2(VoiceChangerIF):
                 self._generate_strength()
 
         if self.voiceChangerModel is not None:
-            if key in {'gpu', 'serverReadChunkSize', 'extraConvertSize', 'crossFadeOverlapSize', 'rvcQuality', 'silenceFront'}:
+            self.voiceChangerModel.update_settings(key, val)
+            if key in {'gpu', 'serverReadChunkSize', 'extraConvertSize', 'crossFadeOverlapSize', 'rvcQuality', 'silenceFront', 'forceFp32'}:
                 self.voiceChangerModel.realloc(self.block_frame, self.extra_frame, self.crossfade_frame, self.sola_search_frame)
-
-        self.voiceChangerModel.update_settings(key, val)
 
         return self.get_info()
 
@@ -193,7 +196,7 @@ class VoiceChangerV2(VoiceChangerIF):
 
         # ひとつ前の結果とサイズが変わるため、記録は消去する。
         self.sola_buffer = torch.zeros(self.crossfade_frame, device=self.device_manager.device, dtype=torch.float32)
-        logger.info(f'Allocated sola buffer size: {self.sola_buffer.shape}')
+        logger.info(f'[Voice Changer] Allocated sola buffer size: {self.sola_buffer.shape}')
 
     def get_processing_sampling_rate(self):
         if self.voiceChangerModel is None:
@@ -275,9 +278,6 @@ class VoiceChangerV2(VoiceChangerIF):
             return np.zeros(self.block_frame, dtype=np.float32), [0, 0, 0]
         except VoiceChangerIsNotSelectedException:
             logger.warn("[Voice Changer] Voice Changer is not selected. Wait a bit and if there is no improvement, please re-select vc.")
-            return np.zeros(self.block_frame, dtype=np.float32), [0, 0, 0]
-        except DeviceCannotSupportHalfPrecisionException:
-            # RVC.pyでfallback処理をするので、ここはダミーデータ返すだけ。
             return np.zeros(self.block_frame, dtype=np.float32), [0, 0, 0]
         except PipelineNotInitializedException:
             logger.warn("[Voice Changer] Pipeline is not initialized.")
