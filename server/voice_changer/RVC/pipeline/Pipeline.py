@@ -55,15 +55,15 @@ class Pipeline:
         logger.info("GENERATE EMBEDDER" + str(self.embedder))
         logger.info("GENERATE PITCH EXTRACTOR" + str(self.pitchExtractor))
 
-        self.index = index
-        self.index_reconstruct: torch.Tensor | None = index_reconstruct
-        self.use_index = index is not None and self.index_reconstruct is not None
-        self.use_gpu_index = sys.platform == 'linux' and device.type == 'cuda'
-        self.use_f0 = use_f0
-
         self.device_manager = DeviceManager.get_instance()
         self.device = self.device_manager.device
         self.is_half = self.device_manager.use_fp16()
+
+        self.index = index
+        self.index_reconstruct: torch.Tensor | None = index_reconstruct
+        self.use_index = index is not None and self.index_reconstruct is not None
+        self.use_gpu_index = sys.platform == 'linux' and self.device.type == 'cuda'
+        self.use_f0 = use_f0
 
         self.onnx_upscaler = self.make_onnx_upscaler(embChannels) if self.device.type == 'privateuseone' else None
 
