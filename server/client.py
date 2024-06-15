@@ -2,7 +2,7 @@ import asyncio
 import traceback
 
 from main import setupArgParser, main
-from distutils.util import strtobool
+from utils.strtobool import strtobool
 from mods.log_control import VoiceChangaerLogger
 
 VoiceChangaerLogger.get_instance().initialize(initialize=True)
