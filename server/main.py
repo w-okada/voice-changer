@@ -7,7 +7,7 @@ import threading
 import socket
 import time
 from dotenv import set_key
-from distutils.util import strtobool
+from utils.strtobool import strtobool
 from datetime import datetime
 import platform
 import os
