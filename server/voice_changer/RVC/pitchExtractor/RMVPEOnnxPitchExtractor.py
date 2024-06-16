@@ -42,7 +42,7 @@ class RMVPEOnnxPitchExtractor(PitchExtractor):
         self.fp_dtype_t = torch.float16 if self.is_half else torch.float32
         self.fp_dtype_np = np.float16 if self.is_half else np.float32
 
-        self.threshold = np.array(0.3, dtype=self.fp_dtype_np)
+        self.threshold = np.array(0.05, dtype=self.fp_dtype_np)
 
         so = onnxruntime.SessionOptions()
         # so.log_severity_level = 3

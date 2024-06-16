@@ -364,20 +364,20 @@ class RMVPE:
             hidden = self.model(mel)
             return hidden[:, :n_frames]
 
-    def decode(self, hidden: torch.Tensor, threshold=0.03):
+    def decode(self, hidden: torch.Tensor, threshold: float):
         cents_pred = self.to_local_average_cents(hidden, threshold=threshold)
         f0 = 10 * (2 ** (cents_pred / 1200))
         f0[f0 == 10] = 0
         # f0 = np.array([10 * (2 ** (cent_pred / 1200)) if cent_pred else 0 for cent_pred in cents_pred])
         return f0
 
-    def infer_from_audio_t(self, audio: torch.Tensor, threshold=0.03) -> torch.Tensor:
+    def infer_from_audio_t(self, audio: torch.Tensor, threshold: float = 0.05) -> torch.Tensor:
         mel: torch.Tensor = self.mel_extractor(audio.unsqueeze(0), center=True)
         hidden = self.mel2hidden(mel).squeeze(0)
         f0 = self.decode(hidden, threshold=threshold)
         return f0
 
-    def to_local_average_cents(self, hidden: torch.Tensor, threshold=0.05):
+    def to_local_average_cents(self, hidden: torch.Tensor, threshold: float):
         # t0 = ttime()
         starts = torch.argmax(hidden, dim=1)  # 帧长#index
         hidden = F.pad(hidden, (8, 0))  # 帧长,368
