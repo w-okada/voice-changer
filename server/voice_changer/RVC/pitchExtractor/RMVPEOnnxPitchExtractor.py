@@ -1,14 +1,12 @@
 import numpy as np
 from const import PitchExtractorType
+from voice_changer.common.OnnxLoader import load_onnx_model
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from voice_changer.common.MelExtractor import MelSpectrogram
 from voice_changer.common.TorchUtils import circular_write
 import onnxruntime
 import torch
-from onnxconverter_common import float16
-import onnx
-import os
 
 class RMVPEOnnxPitchExtractor(PitchExtractor):
 
@@ -28,16 +26,7 @@ class RMVPEOnnxPitchExtractor(PitchExtractor):
             onnxProviderOptions,
         ) = device_manager.get_onnx_execution_provider()
 
-        if self.is_half:
-            fname, _ = os.path.splitext(os.path.basename(file))
-            fp16_fpath = os.path.join(os.path.dirname(file), f'{fname}.fp16.onnx')
-            if not os.path.exists(fp16_fpath):
-                model: onnx.ModelProto = float16.convert_float_to_float16(onnx.load(file))
-                onnx.save(model, fp16_fpath)
-            else:
-                model = onnx.load(fp16_fpath)
-        else:
-            model = onnx.load(file)
+        model = load_onnx_model(file, self.is_half)
 
         self.fp_dtype_t = torch.float16 if self.is_half else torch.float32
         self.fp_dtype_np = np.float16 if self.is_half else np.float32
