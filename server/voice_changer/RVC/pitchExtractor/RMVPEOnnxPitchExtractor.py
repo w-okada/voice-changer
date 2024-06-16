@@ -76,7 +76,7 @@ class RMVPEOnnxPitchExtractor(PitchExtractor):
                 ["pitchf"],
                 {
                     "mel": mel.detach().cpu().numpy(),
-                    "threshold": self.threshold
+                    "threshold": self.threshold,
                 },
             )
         # self.onnx_session.end_profiling()
