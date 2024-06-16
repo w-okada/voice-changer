@@ -10,7 +10,6 @@ from voice_changer.RVC.pitchExtractor.RMVPEPitchExtractor import RMVPEPitchExtra
 from voice_changer.RVC.pitchExtractor.FcpePitchExtractor import FcpePitchExtractor
 from voice_changer.RVC.pitchExtractor.FcpeOnnxPitchExtractor import FcpeOnnxPitchExtractor
 from settings import ServerSettings
-import torch
 
 
 class PitchExtractorManager(Protocol):
@@ -52,9 +51,8 @@ class PitchExtractorManager(Protocol):
                 return RMVPEOnnxPitchExtractor(cls.params.rmvpe_onnx)
             elif pitch_extractor == "fcpe":
                 return FcpePitchExtractor(cls.params.fcpe)
-            # TODO: Not implemented yet
-            # elif pitch_extractor == "fcpe_onnx":
-            #     return FcpeOnnxPitchExtractor(cls.params.fcpe_onnx)
+            elif pitch_extractor == "fcpe_onnx":
+                return FcpeOnnxPitchExtractor(cls.params.fcpe_onnx)
             else:
                 print(f"[Voice Changer] PitchExctractor not found {pitch_extractor}. Fallback to rmvpe_onnx")
                 return RMVPEOnnxPitchExtractor(cls.params.rmvpe_onnx)

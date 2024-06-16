@@ -6,6 +6,8 @@ from const import PitchExtractorType
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 from voice_changer.common.TorchUtils import circular_write
+from voice_changer.common.FCPE import spawn_infer_model_from_pt
+# from voice_changer.common.MelExtractor import MelSpectrogram
 
 class FcpePitchExtractor(PitchExtractor):
 
@@ -16,20 +18,22 @@ class FcpePitchExtractor(PitchExtractor):
         self.f0_max = 1100
         self.f0_mel_min = 1127 * np.log(1 + self.f0_min / 700)
         self.f0_mel_max = 1127 * np.log(1 + self.f0_max / 700)
-        device = DeviceManager.get_instance().device
+        device_manager = DeviceManager.get_instance()
+        self.is_half = device_manager.use_fp16()
 
-        model = torchfcpe.spawn_infer_model_from_pt(file, device, bundled_model=True)
-        # NOTE: FCPE currently cannot be converted to FP16 because MEL extractor expects FP32 input.
+        model, wav2mel = spawn_infer_model_from_pt(file, self.is_half, device_manager.device, bundled_model=True)
+        self.mel_extractor = wav2mel
         self.fcpe = model
 
     def extract(self, audio: torch.Tensor, pitchf: torch.Tensor, f0_up_key: int, sr: int, window: int) -> tuple[torch.Tensor, torch.Tensor]:
-        f0: torch.Tensor = self.fcpe.infer(
-            audio.unsqueeze(0),
-            sr=sr,
+        mel: torch.Tensor = self.mel_extractor(audio.unsqueeze(0).float(), sr)
+        if self.is_half:
+            mel = mel.half()
+
+        f0: torch.Tensor = self.fcpe(
+            mel,
             decoder_mode="local_argmax",
             threshold=0.006,
-            f0_min=self.f0_min,
-            f0_max=self.f0_max,
         )
         f0 = f0.squeeze()
 
