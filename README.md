@@ -42,6 +42,8 @@ Recommended requirement: Intel Core i5-10400F or AMD Ryzen 5 1600X.
 
 ### For GPU voice conversion
 
+Minimum VRAM required: 2GB (in FP32 mode), ~1GB (in FP16 mode, if supported).
+
 Minimum requirement:
 
 * An integrated graphics card: AMD Radeon Vega 7 (with AMD Ryzen 5 5600G) or later.
