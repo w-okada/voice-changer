@@ -7,7 +7,7 @@ from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 from voice_changer.common.TorchUtils import circular_write
 from voice_changer.common.FCPE import spawn_infer_model_from_pt
-# from voice_changer.common.MelExtractor import MelSpectrogram
+from voice_changer.common.MelExtractorFcpe import Wav2MelModule
 
 class FcpePitchExtractor(PitchExtractor):
 
@@ -21,14 +21,22 @@ class FcpePitchExtractor(PitchExtractor):
         device_manager = DeviceManager.get_instance()
         self.is_half = device_manager.use_fp16()
 
-        model, wav2mel = spawn_infer_model_from_pt(file, self.is_half, device_manager.device, bundled_model=True)
-        self.mel_extractor = wav2mel
+        model = spawn_infer_model_from_pt(file, self.is_half, device_manager.device, bundled_model=True)
+        self.mel_extractor = Wav2MelModule(
+            sr=16000,
+            n_mels=128,
+            n_fft=1024,
+            win_size=1024,
+            hop_length=160,
+            fmin=0,
+            fmax=8000,
+            clip_val=1e-05,
+            is_half=self.is_half
+        ).to(device_manager.device)
         self.fcpe = model
 
     def extract(self, audio: torch.Tensor, pitchf: torch.Tensor, f0_up_key: int, sr: int, window: int) -> tuple[torch.Tensor, torch.Tensor]:
-        mel: torch.Tensor = self.mel_extractor(audio.unsqueeze(0).float(), sr)
-        if self.is_half:
-            mel = mel.half()
+        mel: torch.Tensor = self.mel_extractor(audio.unsqueeze(0).float())
 
         f0: torch.Tensor = self.fcpe(
             mel,

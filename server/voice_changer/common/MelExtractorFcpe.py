@@ -33,6 +33,7 @@ class Wav2MelModule(torch.nn.Module):
         fmax: float = None,
         clip_val: float = 1e-5,
         mel_type="default",
+        is_half: bool = False,
     ):
         super().__init__()
         # catch None
@@ -40,24 +41,15 @@ class Wav2MelModule(torch.nn.Module):
             fmin = 0
         if fmax is None:
             fmax = sr / 2
-        # self.device = device
-        self.register_buffer(
-            'tensor_device_marker',
-            torch.tensor(1.0).float(),
-            persistent=False
-        )
         self.hop_size = hop_length
         if mel_type == "default":
             self.mel_extractor = MelModule(sr, n_mels, n_fft, win_size, hop_length, fmin, fmax, clip_val,
-                                           out_stft=False)
+                                           out_stft=False, is_half=is_half)
         elif mel_type == "stft":
-            self.mel_extractor = MelModule(sr, n_mels, n_fft, win_size, hop_length, fmin, fmax, clip_val,
-                                           out_stft=True)
+            self.mel_extractor = MelModule(is_half, sr, n_mels, n_fft, win_size, hop_length, fmin, fmax, clip_val,
+                                           out_stft=True, is_half=is_half)
         self.mel_type = mel_type
 
-    def device(self):
-        """Get device"""
-        return self.tensor_device_marker.device
 
     @torch.no_grad()
     def __call__(self,
@@ -100,7 +92,8 @@ class MelModule(torch.nn.Module):
         clip_val (float, optional): Clipping value. Defaults to 1e-5.
     """
 
-    def __init__(self,
+    def __init__(
+        self,
         sr: int,
         n_mels: int,
         n_fft: int,
@@ -110,6 +103,7 @@ class MelModule(torch.nn.Module):
         fmax: float = None,
         clip_val: float = 1e-5,
         out_stft: bool = False,
+        is_half: bool = False,
     ):
         super().__init__()
         if fmin is None:
@@ -124,6 +118,7 @@ class MelModule(torch.nn.Module):
         self.fmin = fmin
         self.fmax = fmax
         self.clip_val = clip_val
+        self.is_half = is_half
         # self.mel_basis = {}
         self.register_buffer(
             'mel_basis',
@@ -174,6 +169,8 @@ class MelModule(torch.nn.Module):
         spec = self.stft.transform(y)
 
         spec = torch.matmul(self.mel_basis, spec)
+        if self.is_half:
+            spec = spec.half()
         spec = dynamic_range_compression_torch(spec, clip_val=self.clip_val)
         spec = spec.transpose(-1, -2)
         return spec  # (B, T, n_mels)
