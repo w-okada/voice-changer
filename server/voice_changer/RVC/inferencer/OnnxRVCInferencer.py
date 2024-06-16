@@ -1,13 +1,10 @@
 import torch
 import onnxruntime
 from const import EnumInferenceTypes
+from voice_changer.common.OnnxLoader import load_onnx_model
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
 import numpy as np
-import os
-import onnx
-from onnxconverter_common import float16
-
 
 class OnnxRVCInferencer(Inferencer):
     def load_model(self, file: str, inferencerTypeVersion: str | None = None):
@@ -18,24 +15,15 @@ class OnnxRVCInferencer(Inferencer):
         ) = DeviceManager.get_instance().get_onnx_execution_provider()
         # FIXME: Temporarily disable conversion to FP16 since the forward pass contains the ops that are not converted correctly.
         # Note that float model inputs are explicitly converted to FP32!
-        # self.isHalf = DeviceManager.get_instance().is_fp16_available(gpu)
-        self.isHalf = False
+        # self.is_half = DeviceManager.get_instance().is_fp16_available(gpu)
+        self.is_half = False
 
         self.set_props(EnumInferenceTypes.onnxRVC, file)
 
-        if self.isHalf:
-            fname, _ = os.path.splitext(os.path.basename(file))
-            fp16_fpath = os.path.join(os.path.dirname(file), f'{fname}.fp16.onnx')
-            if not os.path.exists(fp16_fpath):
-                model: onnx.ModelProto = float16.convert_float_to_float16(onnx.load(file))
-                onnx.save(model, fp16_fpath)
-            else:
-                model = onnx.load(fp16_fpath)
-        else:
-            model = onnx.load(file)
+        model = load_onnx_model(file, self.is_half)
 
-        self.fp_dtype_t = torch.float16 if self.isHalf else torch.float32
-        self.fp_dtype_np = np.float16 if self.isHalf else np.float32
+        self.fp_dtype_t = torch.float16 if self.is_half else torch.float32
+        self.fp_dtype_np = np.float16 if self.is_half else np.float32
 
         so = onnxruntime.SessionOptions()
         # so.log_severity_level = 3
@@ -87,7 +75,7 @@ class OnnxRVCInferencer(Inferencer):
         # self.model.end_profiling()
 
         res = torch.as_tensor(output[0], dtype=self.fp_dtype_t, device=feats.device)
-        if self.isHalf:
+        if self.is_half:
             res = res.float()
 
         if self.inferencerTypeVersion == "v2.1" or self.inferencerTypeVersion == "v2.2" or self.inferencerTypeVersion == "v1.1":
