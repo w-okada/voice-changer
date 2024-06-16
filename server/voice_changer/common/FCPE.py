@@ -38,7 +38,7 @@ class InferCFNaiveMelPE(torch.nn.Module):
         return self.model.infer(mel, decoder=decoder_mode, threshold=threshold)  # (B, T, 1)
 
 
-def spawn_infer_model_from_pt(pt_path: str, is_half: bool = False, device: torch.device = torch.device('cpu'), bundled_model: bool = False) -> tuple[InferCFNaiveMelPE, Wav2MelModule]:
+def spawn_infer_model_from_pt(pt_path: str, is_half: bool = False, device: torch.device = torch.device('cpu'), bundled_model: bool = False) -> InferCFNaiveMelPE:
     """
     Spawn infer model from pt file
     Args:
@@ -60,6 +60,4 @@ def spawn_infer_model_from_pt(pt_path: str, is_half: bool = False, device: torch
     else:
         raise ValueError(f'  [ERROR] args.model.type is {args.model.type}, but only support CFNaiveMelPE')
 
-    wav2mel = spawn_wav2mel(args, device)
-
-    return infer_model, wav2mel
+    return infer_model

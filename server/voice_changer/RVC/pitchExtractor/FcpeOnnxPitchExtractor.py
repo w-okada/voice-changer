@@ -47,6 +47,7 @@ class FcpeOnnxPitchExtractor(PitchExtractor):
             fmin=0,
             fmax=8000,
             clip_val=1e-05,
+            is_half=self.is_half
         ).to(device_manager.device)
         self.onnx_session = onnxruntime.InferenceSession(model.SerializeToString(), sess_options=so, providers=onnxProviders, provider_options=onnxProviderOptions)
 
