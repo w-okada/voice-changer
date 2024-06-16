@@ -18,7 +18,7 @@ class ServerSettings(BaseSettings):
     rmvpe: str = 'pretrain/rmvpe.pt'
     rmvpe_onnx: str = 'pretrain/rmvpe.onnx'
     fcpe: str = 'pretrain/fcpe.pt'
-    # fcpe_onnx: str = 'pretrain/fcpe.onnx'
+    fcpe_onnx: str = 'pretrain/fcpe.onnx'
     host: str = '127.0.0.1'
     port: int = 18888
     allowed_origins: Literal['*'] | list[str] = []

@@ -1,31 +1,86 @@
 import numpy as np
-import torch
 import onnxruntime
-
+import torch
 from const import PitchExtractorType
-from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
+from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from voice_changer.common.TorchUtils import circular_write
+from voice_changer.common.OnnxLoader import load_onnx_model
+from voice_changer.common.MelExtractorFcpe import Wav2MelModule
 
 class FcpeOnnxPitchExtractor(PitchExtractor):
 
     def __init__(self, file: str):
         super().__init__()
+        self.file = file
         self.type: PitchExtractorType = "fcpe_onnx"
         self.f0_min = 50
         self.f0_max = 1100
         self.f0_mel_min = 1127 * np.log(1 + self.f0_min / 700)
         self.f0_mel_max = 1127 * np.log(1 + self.f0_max / 700)
 
+        device_manager = DeviceManager.get_instance()
+        # NOTE: FCPE doesn't seem to be behave correctly in FP16 mode.
+        # self.is_half = device_manager.use_fp16()
+        self.is_half = False
         (
             onnxProviders,
             onnxProviderOptions,
-        ) = DeviceManager.get_instance().get_onnx_execution_provider()
+        ) = device_manager.get_onnx_execution_provider()
+
+        model = load_onnx_model(file, self.is_half)
+
+        self.fp_dtype_t = torch.float16 if self.is_half else torch.float32
+        self.fp_dtype_np = np.float16 if self.is_half else np.float32
+
+        self.threshold = np.array(0.006, dtype=self.fp_dtype_np)
 
         so = onnxruntime.SessionOptions()
         # so.log_severity_level = 3
         # so.enable_profiling = True
-        self.onnx_session = onnxruntime.InferenceSession(file, sess_options=so, providers=onnxProviders, provider_options=onnxProviderOptions)
+        self.mel_extractor = Wav2MelModule(
+            sr=16000,
+            n_mels=128,
+            n_fft=1024,
+            win_size=1024,
+            hop_length=160,
+            fmin=0,
+            fmax=8000,
+            clip_val=1e-05,
+        ).to(device_manager.device)
+        self.onnx_session = onnxruntime.InferenceSession(model.SerializeToString(), sess_options=so, providers=onnxProviders, provider_options=onnxProviderOptions)
 
     def extract(self, audio: torch.Tensor, pitchf: torch.Tensor, f0_up_key: int, sr: int, window: int) -> tuple[torch.Tensor, torch.Tensor]:
-        raise NotImplemented()
+        mel = self.mel_extractor(audio.unsqueeze(0).float())
+
+        if audio.device.type == 'cuda':
+            binding = self.onnx_session.io_binding()
+
+            binding.bind_input('mel', device_type='cuda', device_id=audio.device.index, element_type=self.fp_dtype_np, shape=tuple(mel.shape), buffer_ptr=mel.contiguous().data_ptr())
+            binding.bind_cpu_input('threshold', self.threshold)
+
+            binding.bind_output('pitchf', device_type='cuda', device_id=audio.device.index)
+
+            self.onnx_session.run_with_iobinding(binding)
+
+            output = [output.numpy() for output in binding.get_outputs()]
+        else:
+            output: list[np.ndarray] = self.onnx_session.run(
+                ["pitchf"],
+                {
+                    "mel": mel.detach().cpu().numpy(),
+                    "threshold": self.threshold,
+                },
+            )
+        # self.onnx_session.end_profiling()
+
+        f0 = torch.as_tensor(output[0], dtype=self.fp_dtype_t, device=audio.device).squeeze()
+
+        f0 *= 2 ** (f0_up_key / 12)
+        circular_write(f0, pitchf)
+        f0_mel = 1127.0 * torch.log(1.0 + pitchf / 700.0)
+        f0_mel[f0_mel > 0] = (f0_mel[f0_mel > 0] - self.f0_mel_min) * 254 / (self.f0_mel_max - self.f0_mel_min) + 1
+        f0_mel[f0_mel <= 1] = 1
+        f0_mel[f0_mel > 255] = 255
+        f0_coarse = torch.round(f0_mel, out=f0_mel).to(dtype=torch.int64)
+        return f0_coarse.unsqueeze(0), pitchf.unsqueeze(0)

@@ -49,7 +49,12 @@ async def downloadWeight(params: ServerSettings):
             "url": "https://github.com/CNChTu/FCPE/raw/819765c8db719c457f53aaee3238879ab98ed0cd/torchfcpe/assets/fcpe_c_v001.pt",
             "saveTo": params.fcpe,
             "hash": "933f1b588409b3945389381a2ab98014",
-        }
+        },
+        {
+            "url": "https://huggingface.co/deiteris/weights/resolve/main/fcpe.onnx",
+            "saveTo": params.fcpe_onnx,
+            "hash": "6a7b11db05def00053102920d039760f",
+        },
     ]
 
     files_to_download = []
