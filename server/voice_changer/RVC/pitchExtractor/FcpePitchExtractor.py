@@ -19,7 +19,9 @@ class FcpePitchExtractor(PitchExtractor):
         self.f0_mel_min = 1127 * np.log(1 + self.f0_min / 700)
         self.f0_mel_max = 1127 * np.log(1 + self.f0_max / 700)
         device_manager = DeviceManager.get_instance()
-        self.is_half = device_manager.use_fp16()
+        # self.is_half = device_manager.use_fp16()
+        # NOTE: FCPE doesn't seem to be behave correctly in FP16 mode.
+        self.is_half = False
 
         model = spawn_infer_model_from_pt(file, self.is_half, device_manager.device, bundled_model=True)
         self.mel_extractor = Wav2MelModule(
