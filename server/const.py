@@ -64,8 +64,6 @@ class EnumInferenceTypes(Enum):
 
 
 PitchExtractorType: TypeAlias = Literal[
-    "dio",
-    "harvest",
     "crepe_full",
     "crepe_tiny",
     "crepe_full_onnx",

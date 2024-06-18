@@ -15,5 +15,4 @@ onnxsim
 onnxruntime-gpu
 torchcrepe
 torchfcpe
-pyworld
 safetensors
