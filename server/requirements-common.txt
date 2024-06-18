@@ -18,3 +18,4 @@ pydantic-settings
 xxhash
 aiohttp
 onnxconverter-common
+certifi
