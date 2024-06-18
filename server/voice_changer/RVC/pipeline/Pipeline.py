@@ -15,11 +15,13 @@ import onnxruntime
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from mods.log_control import VoiceChangaerLogger
 
+from voice_changer.common.TorchUtils import circular_write
 from voice_changer.RVC.embedder.Embedder import Embedder
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
 
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 from voice_changer.utils.Timer import Timer2
+from const import F0_MEL_MIN, F0_MEL_MAX
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
 
@@ -108,14 +110,23 @@ class Pipeline:
     def setPitchExtractor(self, pitchExtractor: PitchExtractor):
         self.pitchExtractor = pitchExtractor
 
-    def extractPitch(self, audio: torch.Tensor, pitchf: torch.Tensor, f0_up_key: int) -> tuple[torch.Tensor | None, torch.Tensor | None]:
-        return self.pitchExtractor.extract(
+    def extractPitch(self, audio: torch.Tensor, pitchf: torch.Tensor | None, f0_up_key: int) -> tuple[torch.Tensor, torch.Tensor]:
+        f0 = self.pitchExtractor.extract(
             audio,
-            pitchf,
-            f0_up_key,
             self.sr,
             self.window,
         )
+        f0 *= 2 ** (f0_up_key / 12)
+        if pitchf is not None:
+            circular_write(f0, pitchf)
+        else:
+            pitchf = f0
+        f0_mel = 1127.0 * torch.log(1.0 + pitchf / 700.0)
+        f0_mel[f0_mel > 0] = (f0_mel[f0_mel > 0] - F0_MEL_MIN) * 254 / (F0_MEL_MAX - F0_MEL_MIN) + 1
+        f0_mel[f0_mel <= 1] = 1
+        f0_mel[f0_mel > 255] = 255
+        f0_coarse = torch.round(f0_mel, out=f0_mel).long()
+        return f0_coarse.unsqueeze(0), pitchf.unsqueeze(0)
 
     def extract_features(self, feats: torch.Tensor, embOutputLayer: int, useFinalProj: bool):
         try:
@@ -156,33 +167,27 @@ class Pipeline:
         self,
         sid: int,
         audio: torch.Tensor,  # torch.tensor [n]
-        pitchf: torch.Tensor,  # torch.tensor [m]
+        pitchf: torch.Tensor | None,  # torch.tensor [m]
         f0_up_key: int,
         index_rate: float,
         audio_feats_len: int,
         silence_front: int,
         embOutputLayer: int,
         useFinalProj: bool,
+        skip_head: int,
         protect: float = 0.5,
-        skip_head: int | None = None,
         return_length: int | None = None,
-    ) -> tuple[torch.Tensor, torch.Tensor | None, torch.Tensor]:
+    ) -> torch.Tensor:
         with Timer2("Pipeline-Exec", False) as t:  # NOQA
             # 16000のサンプリングレートで入ってきている。以降この世界は16000で処理。
-
-            # tensor型調整
-            # if audio.dim() == 2:  # double channels
-            #     audio = audio.mean(-1)
             assert audio.dim() == 1, audio.dim()
             t.record("pre-process")
 
             # ピッチ検出
-            # with autocast(enabled=self.is_half):
             pitch, pitchf = self.extractPitch(audio[silence_front:], pitchf, f0_up_key) if self.use_f0 else (None, None)
             t.record("extract-pitch")
 
             # embedding
-            # with autocast(enabled=self.is_half):
             feats = self.extract_features(audio.view(1, -1), embOutputLayer, useFinalProj)
             feats = torch.cat((feats, feats[:, -1:, :]), 1)
             t.record("extract-feats")
@@ -221,18 +226,12 @@ class Pipeline:
                     pitchff = pitchff.unsqueeze(-1)
                     feats = feats * pitchff + feats_orig * (1 - pitchff)
 
-            p_len = torch.as_tensor([audio_feats_len], device=self.device, dtype=torch.int64)
+            p_len = torch.tensor([audio_feats_len], device=self.device, dtype=torch.int64)
 
-            sid = torch.as_tensor([sid], device=self.device, dtype=torch.int64)
+            sid = torch.tensor([sid], device=self.device, dtype=torch.int64)
             t.record("mid-precess")
             # 推論実行
             out_audio = self.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length)
             t.record("infer")
-
-            # del p_len, pitch, pitchf, feats, sid
-            # torch.cuda.empty_cache()
-
-            t.record("post-process")
-            # torch.cuda.empty_cache()
         # print("EXEC AVERAGE:", t.avrSecs)
         return out_audio

@@ -61,10 +61,6 @@ export const ModelSlotArea = (_props: ModelSlotAreaProps) => {
                 const clickAction = async () => {
                     // @ts-ignore
                     await serverSetting.updateServerSettings({ ...serverSetting.serverSetting, modelSlotIndex: x.slotIndex });
-                    setTimeout(() => {
-                        // quick hack
-                        getInfo();
-                    }, 1000 * 2);
                 };
 
                 return (

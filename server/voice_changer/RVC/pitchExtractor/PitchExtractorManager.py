@@ -1,8 +1,6 @@
 from typing import Protocol
 from const import PitchExtractorType
 from voice_changer.RVC.pitchExtractor.CrepeOnnxPitchExtractor import CrepeOnnxPitchExtractor
-from voice_changer.RVC.pitchExtractor.DioPitchExtractor import DioPitchExtractor
-from voice_changer.RVC.pitchExtractor.HarvestPitchExtractor import HarvestPitchExtractor
 from voice_changer.RVC.pitchExtractor.CrepePitchExtractor import CrepePitchExtractor
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 from voice_changer.RVC.pitchExtractor.RMVPEOnnxPitchExtractor import RMVPEOnnxPitchExtractor
@@ -35,11 +33,7 @@ class PitchExtractorManager(Protocol):
 
         print(f'[Voice Changer] Loading pitch extractor {pitch_extractor}')
         try:
-            if pitch_extractor == "harvest":
-                return HarvestPitchExtractor()
-            elif pitch_extractor == "dio":
-                return DioPitchExtractor()
-            elif pitch_extractor in {"crepe_tiny", "crepe_full"}:
+            if pitch_extractor in {"crepe_tiny", "crepe_full"}:
                 return CrepePitchExtractor(pitch_extractor)
             elif pitch_extractor == "crepe_tiny_onnx":
                 return CrepeOnnxPitchExtractor(pitch_extractor, cls.params.crepe_onnx_tiny)

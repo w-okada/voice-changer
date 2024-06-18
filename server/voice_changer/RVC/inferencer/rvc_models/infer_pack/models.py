@@ -38,6 +38,7 @@ class TextEncoder256(nn.Module):
         self.kernel_size = kernel_size
         self.p_dropout = float(p_dropout)
         self.emb_phone = nn.Linear(256, hidden_channels)
+        self.sqrt_hidden_channels = math.sqrt(self.hidden_channels)
         self.lrelu = nn.LeakyReLU(0.1, inplace=True)
         if f0 == True:
             self.emb_pitch = nn.Embedding(256, hidden_channels)  # pitch 256
@@ -58,7 +59,7 @@ class TextEncoder256(nn.Module):
             x = self.emb_phone(phone)
         else:
             x = self.emb_phone(phone) + self.emb_pitch(pitch)
-        x = x * math.sqrt(self.hidden_channels)  # [b, t, h]
+        x = x * self.sqrt_hidden_channels  # [b, t, h]
         x = self.lrelu(x)
         x = torch.transpose(x, 1, -1)  # [b, h, t]
         x_mask = torch.unsqueeze(commons.sequence_mask(lengths, x.size(2)), 1).to(
@@ -86,6 +87,7 @@ class TextEncoder768(nn.Module):
         super(TextEncoder768, self).__init__()
         self.out_channels = out_channels
         self.hidden_channels = hidden_channels
+        self.sqrt_hidden_channels = math.sqrt(self.hidden_channels)
         self.filter_channels = filter_channels
         self.n_heads = n_heads
         self.n_layers = n_layers
@@ -110,7 +112,7 @@ class TextEncoder768(nn.Module):
             x = self.emb_phone(phone)
         else:
             x = self.emb_phone(phone) + self.emb_pitch(pitch)
-        x = x * math.sqrt(self.hidden_channels)  # [b, t, h]
+        x = x * self.sqrt_hidden_channels  # [b, t, h]
         x = self.lrelu(x)
         x = torch.transpose(x, 1, -1)  # [b, h, t]
         x_mask = torch.unsqueeze(commons.sequence_mask(lengths, x.size(2)), 1).to(
@@ -511,8 +513,9 @@ class GeneratorNSF(torch.nn.Module):
         super(GeneratorNSF, self).__init__()
         self.num_kernels = len(resblock_kernel_sizes)
         self.num_upsamples = len(upsample_rates)
+        self.upp = math.prod(upsample_rates)
 
-        self.f0_upsamp = torch.nn.Upsample(scale_factor=math.prod(upsample_rates))
+        self.f0_upsamp = torch.nn.Upsample(scale_factor=self.upp)
         self.m_source = SourceModuleHnNSF(
             sampling_rate=sr, harmonic_num=0, is_half=is_half
         )
@@ -563,8 +566,6 @@ class GeneratorNSF(torch.nn.Module):
 
         if gin_channels != 0:
             self.cond = nn.Conv1d(gin_channels, upsample_initial_channel, 1)
-
-        self.upp = math.prod(upsample_rates)
 
         self.lrelu_slope = modules.LRELU_SLOPE
 

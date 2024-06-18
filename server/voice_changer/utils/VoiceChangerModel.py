@@ -26,6 +26,9 @@ class VoiceChangerModel(Protocol):
     def get_info(self) -> dict[str, Any]:
         ...
 
+    def convert(self, data: torch.Tensor, sample_rate: int) -> torch.Tensor:
+        ...
+
     def inference(self, data: tuple[Any, ...]) -> torch.Tensor:
         ...
 

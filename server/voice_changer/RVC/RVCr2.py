@@ -178,6 +178,47 @@ class RVCr2(VoiceChangerModel):
         print('[Voice Changer] Allocated audio buffer:', self.audio_buffer.shape[0])
         print('[Voice Changer] Allocated pitchf buffer:', self.pitchf_buffer.shape[0])
 
+    def convert(self, audio_in: AudioInOutFloat, sample_rate: int) -> torch.Tensor:
+        if self.pipeline is None:
+            raise PipelineNotInitializedException()
+
+        # Input audio is always float32
+        audio_in_t = torch.as_tensor(audio_in, dtype=torch.float32, device=self.device_manager.device)
+        if self.is_half:
+            audio_in_t = audio_in_t.half()
+
+        convert_feature_size_16k = audio_in_t.shape[0] // self.window
+
+        audio_in_16k = tat.Resample(
+            orig_freq=sample_rate,
+            new_freq=self.sr,
+            dtype=self.dtype
+        ).to(self.device_manager.device)(audio_in_t)
+
+        vol_t = torch.sqrt(
+            torch.square(audio_in_16k).mean()
+        )
+
+        audio_model = self.pipeline.exec(
+            self.settings.dstId,
+            audio_in_16k,
+            None,
+            self.settings.tran,
+            self.settings.indexRatio,
+            convert_feature_size_16k,
+            0,
+            self.slotInfo.embOutputLayer,
+            self.slotInfo.useFinalProj,
+            0,
+            self.settings.protect,
+        )
+
+        # TODO: Need to handle resampling for individual files
+        # FIXME: Why the heck does it require another sqrt to amplify the volume?
+        audio_out: torch.Tensor = self.resampler_out(audio_model * torch.sqrt(vol_t))
+
+        return audio_out
+
     def inference(self, audio_in: AudioInOutFloat):
         if self.pipeline is None:
             raise PipelineNotInitializedException()
@@ -215,8 +256,8 @@ class RVCr2(VoiceChangerModel):
             self.silence_front,
             self.slotInfo.embOutputLayer,
             self.slotInfo.useFinalProj,
-            self.settings.protect,
             self.skip_head,
+            self.settings.protect,
             self.return_length,
         )
 
