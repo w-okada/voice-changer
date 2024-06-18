@@ -15,11 +15,13 @@ import onnxruntime
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from mods.log_control import VoiceChangaerLogger
 
+from voice_changer.common.TorchUtils import circular_write
 from voice_changer.RVC.embedder.Embedder import Embedder
 from voice_changer.RVC.inferencer.Inferencer import Inferencer
 
 from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 from voice_changer.utils.Timer import Timer2
+from const import F0_MEL_MIN, F0_MEL_MAX
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
 
@@ -108,14 +110,23 @@ class Pipeline:
     def setPitchExtractor(self, pitchExtractor: PitchExtractor):
         self.pitchExtractor = pitchExtractor
 
-    def extractPitch(self, audio: torch.Tensor, pitchf: torch.Tensor, f0_up_key: int) -> tuple[torch.Tensor | None, torch.Tensor | None]:
-        return self.pitchExtractor.extract(
+    def extractPitch(self, audio: torch.Tensor, pitchf: torch.Tensor | None, f0_up_key: int) -> tuple[torch.Tensor, torch.Tensor]:
+        f0 = self.pitchExtractor.extract(
             audio,
-            pitchf,
-            f0_up_key,
             self.sr,
             self.window,
         )
+        f0 *= 2 ** (f0_up_key / 12)
+        if pitchf is not None:
+            circular_write(f0, pitchf)
+        else:
+            pitchf = f0
+        f0_mel = 1127.0 * torch.log(1.0 + pitchf / 700.0)
+        f0_mel[f0_mel > 0] = (f0_mel[f0_mel > 0] - F0_MEL_MIN) * 254 / (F0_MEL_MAX - F0_MEL_MIN) + 1
+        f0_mel[f0_mel <= 1] = 1
+        f0_mel[f0_mel > 255] = 255
+        f0_coarse = torch.round(f0_mel, out=f0_mel).long()
+        return f0_coarse.unsqueeze(0), pitchf.unsqueeze(0)
 
     def extract_features(self, feats: torch.Tensor, embOutputLayer: int, useFinalProj: bool):
         try:
@@ -156,17 +167,17 @@ class Pipeline:
         self,
         sid: int,
         audio: torch.Tensor,  # torch.tensor [n]
-        pitchf: torch.Tensor,  # torch.tensor [m]
+        pitchf: torch.Tensor | None,  # torch.tensor [m]
         f0_up_key: int,
         index_rate: float,
         audio_feats_len: int,
         silence_front: int,
         embOutputLayer: int,
         useFinalProj: bool,
+        skip_head: int,
         protect: float = 0.5,
-        skip_head: int | None = None,
         return_length: int | None = None,
-    ) -> tuple[torch.Tensor, torch.Tensor | None, torch.Tensor]:
+    ) -> torch.Tensor:
         with Timer2("Pipeline-Exec", False) as t:  # NOQA
             # 16000のサンプリングレートで入ってきている。以降この世界は16000で処理。
 

@@ -3,6 +3,7 @@ import os
 import sys
 import tempfile
 from typing import Literal, TypeAlias
+import numpy as np
 
 
 VoiceChangerType: TypeAlias = Literal[
@@ -62,6 +63,10 @@ class EnumInferenceTypes(Enum):
     onnxRVC = "onnxRVC"
     onnxRVCNono = "onnxRVCNono"
 
+F0_MIN = 50
+F0_MAX = 1100
+F0_MEL_MIN = 1127 * np.log(1 + F0_MIN / 700)
+F0_MEL_MAX = 1127 * np.log(1 + F0_MAX / 700)
 
 PitchExtractorType: TypeAlias = Literal[
     "crepe_full",

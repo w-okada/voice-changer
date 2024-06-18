@@ -215,8 +215,8 @@ class RVCr2(VoiceChangerModel):
             self.silence_front,
             self.slotInfo.embOutputLayer,
             self.slotInfo.useFinalProj,
-            self.settings.protect,
             self.skip_head,
+            self.settings.protect,
             self.return_length,
         )
 
