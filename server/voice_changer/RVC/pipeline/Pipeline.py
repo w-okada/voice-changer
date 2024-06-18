@@ -180,20 +180,14 @@ class Pipeline:
     ) -> torch.Tensor:
         with Timer2("Pipeline-Exec", False) as t:  # NOQA
             # 16000のサンプリングレートで入ってきている。以降この世界は16000で処理。
-
-            # tensor型調整
-            # if audio.dim() == 2:  # double channels
-            #     audio = audio.mean(-1)
             assert audio.dim() == 1, audio.dim()
             t.record("pre-process")
 
             # ピッチ検出
-            # with autocast(enabled=self.is_half):
             pitch, pitchf = self.extractPitch(audio[silence_front:], pitchf, f0_up_key) if self.use_f0 else (None, None)
             t.record("extract-pitch")
 
             # embedding
-            # with autocast(enabled=self.is_half):
             feats = self.extract_features(audio.view(1, -1), embOutputLayer, useFinalProj)
             feats = torch.cat((feats, feats[:, -1:, :]), 1)
             t.record("extract-feats")
@@ -239,11 +233,5 @@ class Pipeline:
             # 推論実行
             out_audio = self.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length)
             t.record("infer")
-
-            # del p_len, pitch, pitchf, feats, sid
-            # torch.cuda.empty_cache()
-
-            t.record("post-process")
-            # torch.cuda.empty_cache()
         # print("EXEC AVERAGE:", t.avrSecs)
         return out_audio
