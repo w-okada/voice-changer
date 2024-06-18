@@ -226,9 +226,9 @@ class Pipeline:
                     pitchff = pitchff.unsqueeze(-1)
                     feats = feats * pitchff + feats_orig * (1 - pitchff)
 
-            p_len = torch.as_tensor([audio_feats_len], device=self.device, dtype=torch.int64)
+            p_len = torch.tensor([audio_feats_len], device=self.device, dtype=torch.int64)
 
-            sid = torch.as_tensor([sid], device=self.device, dtype=torch.int64)
+            sid = torch.tensor([sid], device=self.device, dtype=torch.int64)
             t.record("mid-precess")
             # 推論実行
             out_audio = self.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length)
