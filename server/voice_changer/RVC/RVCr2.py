@@ -43,9 +43,8 @@ class RVCr2(VoiceChangerModel):
 
         self.pipeline: Pipeline | None = None
 
-        self.audio_buffer: torch.Tensor | None = None
+        self.convert_buffer: torch.Tensor | None = None
         self.pitchf_buffer: torch.Tensor | None = None
-        self.prev_vol = 0.0
         self.return_length = 0
         self.skip_head = 0
         self.silence_front = 0.0
@@ -168,14 +167,17 @@ class RVCr2(VoiceChangerModel):
         self.return_length = self.convert_feature_size_16k if not self.settings.rvcQuality else None
         self.silence_front = extra_frame_16k - (self.window * 5) if self.settings.silenceFront else 0
 
-        self.crop_start = -(block_frame_16k + crossfade_frame_16k)
-        self.crop_end = -crossfade_frame_16k
+        # Audio buffer to measure volume between chunks
+        audio_buffer_size = block_frame_16k + crossfade_frame_16k
+        self.audio_buffer = torch.zeros(audio_buffer_size, dtype=self.dtype, device=self.device_manager.device)
 
-        self.audio_buffer = torch.zeros(convert_size_16k, dtype=self.dtype, device=self.device_manager.device)
+        # Audio buffer for conversion without silence
+        self.convert_buffer = torch.zeros(convert_size_16k, dtype=self.dtype, device=self.device_manager.device)
         # Additional +1 is to compensate for pitch extraction algorithm
         # that can output additional feature.
         self.pitchf_buffer = torch.zeros(self.convert_feature_size_16k + 1, dtype=self.dtype, device=self.device_manager.device)
         print('[Voice Changer] Allocated audio buffer:', self.audio_buffer.shape[0])
+        print('[Voice Changer] Allocated convert buffer:', self.convert_buffer.shape[0])
         print('[Voice Changer] Allocated pitchf buffer:', self.pitchf_buffer.shape[0])
 
     def convert(self, audio_in: AudioInOutFloat, sample_rate: int) -> torch.Tensor:
@@ -230,25 +232,21 @@ class RVCr2(VoiceChangerModel):
 
         audio_in_16k = self.resampler_in(audio_in_t)
 
-        self.audio_buffer = circular_write(audio_in_16k, self.audio_buffer)
+        circular_write(audio_in_16k, self.audio_buffer)
 
         vol_t = torch.sqrt(
-            torch.square(self.audio_buffer[self.crop_start:self.crop_end]).mean()
+            torch.square(self.audio_buffer).mean()
         )
         vol = max(vol_t.item(), 0)
-        self.prev_vol = vol
 
         if vol < self.settings.silentThreshold:
-            if self.slotInfo.f0:
-                self.pitchf_buffer = circular_write(
-                    torch.zeros(self.convert_feature_size_16k, device=self.device_manager.device, dtype=self.dtype),
-                    self.pitchf_buffer
-                )
             return None
+
+        circular_write(audio_in_16k, self.convert_buffer)
 
         audio_model = self.pipeline.exec(
             self.settings.dstId,
-            self.audio_buffer,
+            self.convert_buffer,
             self.pitchf_buffer,
             self.settings.tran,
             self.settings.indexRatio,
