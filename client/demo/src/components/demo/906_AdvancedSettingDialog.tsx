@@ -138,28 +138,6 @@ export const AdvancedSettingDialog = () => {
             </div>
         );
 
-        const onRVCQualityChanged = (val: number) => {
-            serverSetting.updateServerSettings({
-                ...serverSetting.serverSetting,
-                rvcQuality: val,
-            });
-        };
-        const rvcQualityRow = (
-            <div className="advanced-setting-container-row">
-                <div className="advanced-setting-container-row-title">RVC Quality</div>
-                <div className="advanced-setting-container-row-field">
-                    <select
-                        value={serverSetting.serverSetting.rvcQuality}
-                        onChange={(e) => {
-                            onRVCQualityChanged(Number(e.target.value));
-                        }}
-                    >
-                        <option value="0">low</option>
-                        <option value="1">high</option>
-                    </select>
-                </div>
-            </div>
-        );
         const skipPassThroughConfirmationRow = (
             <div className="advanced-setting-container-row">
                 <div className="advanced-setting-container-row-title-long">Skip Pass through confirmation</div>
@@ -183,7 +161,6 @@ export const AdvancedSettingDialog = () => {
                 {silenceFrontRow}
                 {forceFp32ModeRow}
                 {protectRow}
-                {rvcQualityRow}
                 {skipPassThroughConfirmationRow}
             </div>
         );

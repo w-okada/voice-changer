@@ -57,7 +57,6 @@ class TextEncoder(nn.Module):
         phone: torch.Tensor,
         pitch: torch.Tensor,
         lengths: torch.Tensor,
-        skip_head: Optional[torch.Tensor] = None,
     ):
         if pitch is None:
             x = self.emb_phone(phone)
@@ -693,9 +692,9 @@ class SynthesizerTrnMsNSFsidM(nn.Module):
         g = self.emb_g(sid).unsqueeze(0).transpose(1, 2)
         m_p, logs_p, x_mask = self.enc_p(phone, pitch, phone_lengths)
         z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p)) * x_mask
-        z_p = z_p[:, :, skip_head: -1]
-        x_mask = x_mask[:, :, skip_head: -1]
-        nsff0 = nsff0[:, skip_head: -1]
+        z_p = z_p[:, :, skip_head:]
+        x_mask = x_mask[:, :, skip_head:]
+        nsff0 = nsff0[:, skip_head:]
         z = self.flow(z_p, x_mask, g=g, reverse=True)
         o = self.dec(z * x_mask, nsff0, g=g)
         o = torch.clip(o[0, 0], -1.0, 1.0)

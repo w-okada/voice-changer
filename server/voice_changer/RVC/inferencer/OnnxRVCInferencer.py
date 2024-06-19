@@ -39,8 +39,7 @@ class OnnxRVCInferencer(Inferencer):
         pitch: torch.Tensor,
         pitchf: torch.Tensor,
         sid: torch.Tensor,
-        skip_head: torch.Tensor | None,
-        return_length: torch.Tensor | None,
+        skip_head: int | None,
     ) -> torch.Tensor:
         if pitch is None or pitchf is None:
             raise RuntimeError("[Voice Changer] Pitch or Pitchf is not found.")

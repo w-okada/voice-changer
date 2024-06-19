@@ -18,8 +18,7 @@ class OnnxRVCInferencerNono(OnnxRVCInferencer):
         pitch: torch.Tensor | None,
         pitchf: torch.Tensor | None,
         sid: torch.Tensor,
-        skip_head: torch.Tensor | None,
-        return_length: torch.Tensor | None,
+        skip_head: int | None,
     ) -> torch.Tensor:
         if feats.device.type == 'cuda':
             binding = self.model.io_binding()

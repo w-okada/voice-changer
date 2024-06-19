@@ -22,7 +22,6 @@ class Inferencer(Protocol):
         pitchf: torch.Tensor | None,
         sid: torch.Tensor,
         skip_head: int | None,
-        return_length: int | None,
     ) -> torch.Tensor:
         ...
 

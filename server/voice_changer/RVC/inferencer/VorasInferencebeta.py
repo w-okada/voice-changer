@@ -35,6 +35,6 @@ class VoRASInferencer(Inferencer):
         pitch: torch.Tensor,
         pitchf: torch.Tensor,
         sid: torch.Tensor,
-        convert_length: int | None,
+        skip_head: int | None,
     ) -> torch.Tensor:
         return self.model.infer(feats, pitch_length, pitch, pitchf, sid)
