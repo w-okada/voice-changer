@@ -135,9 +135,9 @@ class Pipeline:
             print("Failed to extract features:", e)
             raise e
 
-    def infer(self, feats: torch.Tensor, p_len: torch.Tensor, pitch: torch.Tensor, pitchf: torch.Tensor, sid: torch.Tensor, skip_head: int | None, return_length: int | None) -> torch.Tensor:
+    def infer(self, feats: torch.Tensor, p_len: torch.Tensor, pitch: torch.Tensor, pitchf: torch.Tensor, sid: torch.Tensor, skip_head: int | None) -> torch.Tensor:
         try:
-            return self.inferencer.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length)
+            return self.inferencer.infer(feats, p_len, pitch, pitchf, sid, skip_head)
         except RuntimeError as e:
             print("Failed to infer:", e)
             raise e
@@ -176,7 +176,6 @@ class Pipeline:
         useFinalProj: bool,
         skip_head: int,
         protect: float = 0.5,
-        return_length: int | None = None,
     ) -> torch.Tensor:
         with Timer2("Pipeline-Exec", False) as t:  # NOQA
             # 16000のサンプリングレートで入ってきている。以降この世界は16000で処理。
@@ -231,7 +230,7 @@ class Pipeline:
             sid = torch.tensor([sid], device=self.device, dtype=torch.int64)
             t.record("mid-precess")
             # 推論実行
-            out_audio = self.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length)
+            out_audio = self.infer(feats, p_len, pitch, pitchf, sid, skip_head)
             t.record("infer")
         # print("EXEC AVERAGE:", t.avrSecs)
         return out_audio

@@ -152,7 +152,7 @@ class RVC(VoiceChangerModel):
             device = torch.device("cpu")
         audio = torch.as_tensor(audio, device=device, dtype=torch.float32)
         audio = torchaudio.functional.resample(audio, self.slotInfo.samplingRate, 16000, rolloff=0.99)
-        repeat = 1 if self.settings.rvcQuality else 0
+        repeat = 0
         sid = self.settings.dstId
         f0_up_key = self.settings.tran
         index_rate = self.settings.indexRatio

@@ -28,7 +28,7 @@ STORED_SETTINGS = {
     "enableServerAudio", "serverAudioSampleRate", "serverInputDeviceId", "serverOutputDeviceId", "serverMonitorDeviceId", "serverInputAudioGain", "serverOutputAudioGain",
     "crossFadeOverlapSize", "protect",
     "modelSlotIndex", "serverReadChunkSize", "extraConvertSize", "gpu", "forceFp32",
-    "f0Detector", "rvcQuality", "silenceFront", "silentThreshold",
+    "f0Detector", "silenceFront", "silentThreshold",
 }
 
 NATIVE_CLIENT_FILE_WIN = os.path.join(sys._MEIPASS, "voice-changer-native-client.exe") if hasattr(sys, "_MEIPASS") else "voice-changer-native-client"  # type: ignore

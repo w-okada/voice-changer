@@ -164,7 +164,6 @@ class RVCr2(VoiceChangerModel):
         self.convert_feature_size_16k = convert_size_16k // self.window
 
         self.skip_head = extra_frame_16k // self.window
-        self.return_length = self.convert_feature_size_16k if not self.settings.rvcQuality else None
         self.silence_front = extra_frame_16k - (self.window * 5) if self.settings.silenceFront else 0
 
         # Audio buffer to measure volume between chunks
@@ -256,7 +255,6 @@ class RVCr2(VoiceChangerModel):
             self.slotInfo.useFinalProj,
             self.skip_head,
             self.settings.protect,
-            self.return_length,
         )
 
         # FIXME: Why the heck does it require another sqrt to amplify the volume?

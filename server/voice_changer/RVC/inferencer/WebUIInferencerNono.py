@@ -34,8 +34,7 @@ class WebUIInferencerNono(Inferencer):
         pitch: torch.Tensor | None,
         pitchf: torch.Tensor | None,
         sid: torch.Tensor,
-        skip_head: torch.Tensor | None,
-        return_length: torch.Tensor | None,
+        skip_head: int | None,
     ) -> torch.Tensor:
         res = self.model.infer(feats, pitch_length, sid, skip_head=skip_head)
         res = res[0][0, 0].float()

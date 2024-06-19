@@ -12,7 +12,6 @@ class RVCSettings:
 
     indexRatio: float = 0
     protect: float = 0.5
-    rvcQuality: int = 0
     silenceFront: int = 1  # 0:off, 1:on
     forceFp32: int = 0 # 0:off, 1:on
     modelSamplingRate: int = 48000
@@ -26,7 +25,6 @@ class RVCSettings:
         "dstId",
         "tran",
         "extraConvertSize",
-        "rvcQuality",
         "silenceFront",
     ]
     floatData = ["silentThreshold", "indexRatio", "protect"]
