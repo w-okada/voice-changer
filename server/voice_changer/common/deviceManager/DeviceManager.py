@@ -123,8 +123,13 @@ class DeviceManager(object):
         # TODO: Need information and filtering for Radeon and Intel GPUs
         # All Radeon GPUs starting from GCN 1 (Radeon HD 7000 series and later) reportedly have 2:1 FP16 performance
         # Intel UHD Graphics 600 and later reportedly have 2:1 FP16 performance
-        ignored_gpu = re.search(r'(GTX|RTX|TESLA|QUADRO) (V100|[789]\d{2}|1[06]\d{2}|P40|TITAN)', self.device_metadata['name'].upper())
-        if ignored_gpu is not None:
+        ignored_nvidia_gpu = re.search(r'(GTX|RTX|TESLA|QUADRO) (V100|[789]\d{2}|1[06]\d{2}|P40|TITAN)', self.device_metadata['name'].upper())
+        if ignored_nvidia_gpu is not None:
+            return False
+        # FIXME: Apparently FP16 does not work well for Intel in DirectML backend.
+        # Causes problems with Intel UHD on 10th Gen Intel CPU.
+        ignored_intel_gpu = 'INTEL' in self.device_metadata['name'].upper()
+        if ignored_intel_gpu:
             return False
 
         if self.device == 'cuda':
