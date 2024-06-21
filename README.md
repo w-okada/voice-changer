@@ -142,7 +142,7 @@ Once the download is finished, the voice changer will open the user interface us
 
 #### Removing Apple quarantine attribute
 
-> NOTE: Currently, this step is mandatory. This may be improved in the future.
+> **NOTE**: Currently, this step is mandatory. This may be improved in the future.
 
 1. Open Terminal.
 
