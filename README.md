@@ -130,7 +130,7 @@ Once the download is finished, the voice changer will open the user interface us
 
 1. Download the `voice-changer-macos-arm64-cpu.tar.gz` file.
 
-1. Double-click the file. The voice changer will unpack and the `dist` folder will appear.
+1. Double-click the file. The voice changer will unpack and the `MMVCServerSIO` folder will appear.
 
 #### For Intel users
 
@@ -138,7 +138,7 @@ Once the download is finished, the voice changer will open the user interface us
 
 1. Download the `voice-changer-macos-amd64-cpu.tar.gz` file.
 
-1. Double-click the file. The voice changer will unpack and the `dist` folder will appear.
+1. Double-click the file. The voice changer will unpack and the `MMVCServerSIO` folder will appear.
 
 #### Removing Apple quarantine attribute
 
