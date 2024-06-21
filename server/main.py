@@ -1,3 +1,7 @@
+import multiprocessing as mp
+# NOTE: This is required to avoid recursive process call bug for macOS
+mp.freeze_support()
+
 import sys
 import uvicorn
 import asyncio
@@ -15,14 +19,14 @@ import argparse
 from downloader.WeightDownloader import downloadWeight
 from downloader.SampleDownloader import downloadInitialSamples
 from mods.ssl import create_self_signed_cert
-from const import SSL_KEY_DIR
+from const import SSL_KEY_DIR, DOTENV_FILE
 from webbrowser import open_new_tab
-from settings import ServerSettings
+from settings import ServerSettings, resolve_paths
 from mods.log_control import VoiceChangaerLogger
 
 VoiceChangaerLogger.get_instance().initialize(initialize=True)
 logger = VoiceChangaerLogger.get_instance().getLogger()
-settings = ServerSettings()
+settings = resolve_paths(ServerSettings())
 
 def setupArgParser():
     parser = argparse.ArgumentParser()
@@ -95,9 +99,9 @@ async def runServer(host: str, port: int, launch_browser: bool = False, logLevel
 async def main(args):
     logger.debug(args)
 
-    if not os.path.exists('.env'):
+    if not os.path.exists(DOTENV_FILE):
         for key, value in settings.model_dump().items():
-            set_key('.env', key.upper(), str(value))
+            set_key(DOTENV_FILE, key.upper(), str(value))
 
     printMessage(f"PYTHON: {sys.version}", level=2)
     # printMessage("Voice Changerを起動しています。", level=2)

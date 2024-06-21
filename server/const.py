@@ -10,8 +10,12 @@ VoiceChangerType: TypeAlias = Literal[
     "RVC",
 ]
 
-STORED_SETTING_FILE = "stored_setting.json"
-ASSETS_FILE = 'assets.json'
+ROOT_PATH = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else './'
+
+LOG_FILE = os.path.join(ROOT_PATH, 'vcclient.log')
+DOTENV_FILE = os.path.join(ROOT_PATH, '.env')
+STORED_SETTING_FILE = os.path.join(ROOT_PATH, 'stored_setting.json')
+ASSETS_FILE = os.path.join(ROOT_PATH, 'assets.json')
 
 SERVER_DEVICE_SAMPLE_RATES = [16000, 32000, 44100, 48000, 96000, 192000]
 
@@ -31,21 +35,7 @@ STORED_SETTINGS = {
     "f0Detector", "silenceFront", "silentThreshold",
 }
 
-NATIVE_CLIENT_FILE_WIN = os.path.join(sys._MEIPASS, "voice-changer-native-client.exe") if hasattr(sys, "_MEIPASS") else "voice-changer-native-client"  # type: ignore
-NATIVE_CLIENT_FILE_MAC = (
-    os.path.join(
-        sys._MEIPASS,  # type: ignore
-        "voice-changer-native-client.app",
-        "Contents",
-        "MacOS",
-        "voice-changer-native-client",
-    )
-    if hasattr(sys, "_MEIPASS")
-    else "voice-changer-native-client"
-)
 EDITION_FILE = os.path.join(sys._MEIPASS, "edition.txt") if hasattr(sys, "_MEIPASS") else 'editions/edition.txt'
-
-ROOT_PATH = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else '.'
 
 FRONTEND_DIR = os.path.join(sys._MEIPASS, "dist") if hasattr(sys, "_MEIPASS") else "../client/demo/dist"
 
