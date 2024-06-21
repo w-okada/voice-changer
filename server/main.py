@@ -21,12 +21,12 @@ from downloader.SampleDownloader import downloadInitialSamples
 from mods.ssl import create_self_signed_cert
 from const import SSL_KEY_DIR
 from webbrowser import open_new_tab
-from settings import ServerSettings
+from settings import ServerSettings, resolve_paths
 from mods.log_control import VoiceChangaerLogger
 
 VoiceChangaerLogger.get_instance().initialize(initialize=True)
 logger = VoiceChangaerLogger.get_instance().getLogger()
-settings = ServerSettings()
+settings = resolve_paths(ServerSettings())
 
 def setupArgParser():
     parser = argparse.ArgumentParser()

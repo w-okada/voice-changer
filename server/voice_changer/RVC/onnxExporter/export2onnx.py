@@ -9,11 +9,11 @@ from data.ModelSlot import RVCModelSlot
 from voice_changer.common.SafetensorsUtils import load_model
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from ..inferencer.rvc_models.infer_pack.models_onnx import SynthesizerTrnMsNSFsidM  # type: ignore
-from settings import ServerSettings
+from settings import ServerSettings, resolve_paths
 from io import BytesIO
 
 def export2onnx(modelSlot: RVCModelSlot):
-    model_dir = ServerSettings().model_dir
+    model_dir = resolve_paths(ServerSettings()).model_dir
     modelFile = os.path.join(model_dir, str(modelSlot.slotIndex), os.path.basename(modelSlot.modelFile))
 
     output_file_simple = os.path.splitext(os.path.basename(modelFile))[0] + "_simple.onnx"
