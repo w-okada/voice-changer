@@ -1,3 +1,7 @@
+import multiprocessing as mp
+# NOTE: This is required to avoid recursive process call bug for macOS
+mp.freeze_support()
+
 import sys
 import uvicorn
 import asyncio
