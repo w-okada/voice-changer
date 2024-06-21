@@ -1,6 +1,7 @@
 import logging
 import traceback
-
+import sys
+from const import LOG_FILE
 
 class UvicornSuppressFilter(logging.Filter):
     def filter(self, record):
@@ -79,11 +80,11 @@ class VoiceChangaerLogger:
     def initialize(self, initialize: bool):
         if not self.logger.handlers:
             if initialize:
-                # file_handler = logging.FileHandler("vcclient.log", encoding="utf-8", mode="w")
-                file_handler = DebugFileHandler("vcclient.log", encoding="utf-8", mode="w")
+                # file_handler = logging.FileHandler(LOG_FILE, encoding="utf-8", mode="w")
+                file_handler = DebugFileHandler(LOG_FILE, encoding="utf-8", mode="w")
             else:
-                # file_handler = logging.FileHandler("vcclient.log", encoding="utf-8")
-                file_handler = DebugFileHandler("vcclient.log", encoding="utf-8")
+                # file_handler = logging.FileHandler(LOG_FILE, encoding="utf-8")
+                file_handler = DebugFileHandler(LOG_FILE, encoding="utf-8")
             file_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(process)d - %(message)s")
             file_handler.setFormatter(file_formatter)
             file_handler.setLevel(logging.DEBUG)

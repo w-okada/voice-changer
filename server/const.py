@@ -12,6 +12,7 @@ VoiceChangerType: TypeAlias = Literal[
 
 ROOT_PATH = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else './'
 
+LOG_FILE = os.path.join(ROOT_PATH, 'vcclient.log')
 DOTENV_FILE = os.path.join(ROOT_PATH, '.env')
 STORED_SETTING_FILE = os.path.join(ROOT_PATH, 'stored_setting.json')
 ASSETS_FILE = os.path.join(ROOT_PATH, 'assets.json')
