@@ -2,10 +2,10 @@ import os
 
 from typing import Literal
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from const import EDITION_FILE, RVCSampleMode, ROOT_PATH
+from const import EDITION_FILE, RVCSampleMode, ROOT_PATH, DOTENV_FILE
 
 class ServerSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8', protected_namespaces=('model_config',))
+    model_config = SettingsConfigDict(env_file=DOTENV_FILE, env_file_encoding='utf-8', protected_namespaces=('model_config',))
 
     model_dir: str = 'model_dir'
     content_vec_500: str = 'pretrain/checkpoint_best_legacy_500.pt'

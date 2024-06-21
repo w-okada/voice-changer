@@ -10,8 +10,9 @@ VoiceChangerType: TypeAlias = Literal[
     "RVC",
 ]
 
-ROOT_PATH = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else '.'
+ROOT_PATH = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else './'
 
+DOTENV_FILE = os.path.join(ROOT_PATH, '.env')
 STORED_SETTING_FILE = os.path.join(ROOT_PATH, 'stored_setting.json')
 ASSETS_FILE = os.path.join(ROOT_PATH, 'assets.json')
 
