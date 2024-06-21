@@ -140,6 +140,24 @@ Once the download is finished, the voice changer will open the user interface us
 
 1. Double-click the file. The voice changer will unpack and the `dist` folder will appear.
 
+#### Removing Apple quarantine attribute
+
+> NOTE: Currently, this step is mandatory. This may be improved in the future.
+
+1. Open Terminal.
+
+1. Run the following command:
+
+   ```
+   xattr -dr com.apple.quarantine <Path to extracted MMVCServerSIO folder>
+   ```
+
+   For example, if you extracted the voice changer to your desktop, the command may look as follows:
+
+   ```
+   xattr -dr com.apple.quarantine ~/Desktop/MMVCServerSIO
+   ```
+
 #### Running the voice changer
 
 1. Open the extracted `MMVCServerSIO` folder.
