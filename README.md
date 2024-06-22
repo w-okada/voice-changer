@@ -64,7 +64,7 @@ A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX
 * When changing **Chunk**, **Extra** or **Crossfade size** settings, you must switch device to CPU then back to your GPU.
   Otherwise, performance issues can be observed.
 
-* Only `rmvpe_onnx`, `crepe_tiny_onnx` and `crepe_full_onnx` are available in the list of **F0 Det.**.
+* Only `rmvpe_onnx`, `fcpe_onnx`, `crepe_tiny_onnx` and `crepe_full_onnx` are available in the list of **F0 Det.**.
 
 * When using a laptop with integrated GPU and dedicated GPU, severely degraded performance (up to 50% reduction) can be observed when running the voice changer on built-in display.
 
