@@ -36,7 +36,6 @@ class CrepeOnnxPitchExtractor(PitchExtractor):
             precision=10.0,
             fmin=F0_MIN,
             fmax=F0_MAX,
-            batch_size=256,
             return_periodicity=True,
             decoder=onnxcrepe.decode.weighted_argmax,
         )
