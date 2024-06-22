@@ -27,7 +27,6 @@ class CrepePitchExtractor(PitchExtractor):
             fmin=F0_MIN,
             fmax=F0_MAX,
             model=self.model_size,
-            batch_size=256,
             decoder=torchcrepe.decode.weighted_argmax,
             device=self.device,
             return_periodicity=True,
