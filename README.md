@@ -134,7 +134,7 @@ Once the download is finished, the voice changer will open the user interface us
 
 #### For Intel users
 
-> **NOTE**: You may get suboptimal performance with old Intel-based machines. Proceed on your own risk.
+> **NOTE**: The voice changer would work best if your Intel-based machine has AMD graphics. If your machine has only Intel integrated graphics, only CPU will be utilized.
 
 1. Download the `voice-changer-macos-amd64-cpu.tar.gz` file.
 
