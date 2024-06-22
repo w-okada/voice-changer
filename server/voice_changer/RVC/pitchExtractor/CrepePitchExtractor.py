@@ -21,7 +21,7 @@ class CrepePitchExtractor(PitchExtractor):
         window: int,
     ) -> torch.Tensor:
         f0, pd = torchcrepe.predict(
-            audio.unsqueeze(0),
+            audio.unsqueeze(0).float(),
             sr,
             hop_length=window,
             fmin=F0_MIN,
