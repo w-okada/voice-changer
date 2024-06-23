@@ -80,6 +80,15 @@ RVCSampleMode: TypeAlias = Literal[
     "",
 ]
 
+def get_edition():
+    if not os.path.exists(EDITION_FILE):
+        return '-'
+    return open(EDITION_FILE, 'r').read()
+
+def get_version():
+    if not os.path.exists(VERSION_FILE):
+        return 'Development'
+    return open(VERSION_FILE, 'r').read()
 
 def getSampleJsonAndModelIds(mode: RVCSampleMode):
     if mode == "production":

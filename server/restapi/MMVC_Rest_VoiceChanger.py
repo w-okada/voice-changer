@@ -6,7 +6,7 @@ import os
 from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, PlainTextResponse
-from const import EDITION_FILE, VERSION_FILE
+from const import get_edition, get_version
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 from pydantic import BaseModel
 import threading
@@ -29,15 +29,11 @@ class MMVC_Rest_VoiceChanger:
 
 
     def edition(self):
-        if not os.path.exists(EDITION_FILE):
-            return PlainTextResponse('-')
-        return PlainTextResponse(open(EDITION_FILE, 'r').read())
+        return PlainTextResponse(get_edition)
 
 
     def version(self):
-        if not os.path.exists(VERSION_FILE):
-            return PlainTextResponse('Development')
-        return PlainTextResponse(open(VERSION_FILE, 'r').read())
+        return PlainTextResponse(get_version)
 
 
     def test(self, voice: VoiceModel):

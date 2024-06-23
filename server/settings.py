@@ -1,6 +1,6 @@
 from typing import Literal
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from const import EDITION_FILE, RVCSampleMode, DOTENV_FILE
+from const import get_edition, RVCSampleMode, DOTENV_FILE
 
 class ServerSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=DOTENV_FILE, env_file_encoding='utf-8', protected_namespaces=('model_config',))
@@ -22,4 +22,4 @@ class ServerSettings(BaseSettings):
     host: str = '127.0.0.1'
     port: int = 18888
     allowed_origins: Literal['*'] | list[str] = []
-    edition: str = open(EDITION_FILE, 'r').read()
+    edition: str = get_edition()
