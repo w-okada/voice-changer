@@ -63,7 +63,7 @@ class DeviceManager(object):
             memory = torch.cuda.get_device_properties(dev_id).total_memory
             return (torch.device("cuda", index=dev_id), {"id": dev_id, "name": f"{dev_id}: {name} (CUDA)", "memory": memory, 'backend': 'cuda'})
         elif self.mps_enabled:
-            return (torch.device("mps"), { "id": -1, "name": "CPU (MPS)", 'backend': 'mps' })
+            return (torch.device("mps"), { "id": -1, "name": "MPS", 'backend': 'mps' })
         elif self.dml_enabled:
             name = torch_directml.device_name(dev_id)
             return (torch.device(torch_directml.device(dev_id)), {"id": dev_id, "name": f"{dev_id}: {name} (DirectML)", "memory": 0, 'backend': 'directml'})
@@ -72,7 +72,10 @@ class DeviceManager(object):
     @staticmethod
     def list_devices():
         devCount = torch.cuda.device_count()
-        devices = [{ "id": -1, "name": "CPU", 'backend': 'cpu' }]
+        if getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available():
+            devices = [{ "id": -1, "name": "MPS", 'backend': 'mps' }]
+        else:
+            devices = [{ "id": -1, "name": "CPU", 'backend': 'cpu' }]
         for id in range(devCount):
             name = torch.cuda.get_device_name(id)
             memory = torch.cuda.get_device_properties(id).total_memory
