@@ -3,6 +3,7 @@
 [English](/README_en.md) [Japanese](/README.md)
 
 ## What's New!
+- v.2.0.24-alpha Colab 버전 릴리스. ⇒ [여기](./w_okada's_Voice_Changer_version_2_x.ipynb)
 - v.2.0.24-alpha
   - 버그 수정:
     - 모드 전환 시 소리가 나지 않는 문제를 해결

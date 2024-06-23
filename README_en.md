@@ -3,6 +3,7 @@
 [Japanese](/README.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.24-alpha Colab version released. ⇒ [Here](./w_okada's_Voice_Changer_version_2_x.ipynb)
 - v.2.0.24-alpha
   - Bugfix:
     - Addressed the issue where sound stops when switching modes

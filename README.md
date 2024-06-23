@@ -3,6 +3,7 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.24-alpha Colab版 リリース。⇒[こちら](./w_okada's_Voice_Changer_version_2_x.ipynb)
 - v.2.0.24-alpha
   - bugfix:
     - モード切替をしたときに音が出なくなる問題を対策
