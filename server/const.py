@@ -10,7 +10,7 @@ VoiceChangerType: TypeAlias = Literal[
     "RVC",
 ]
 
-ROOT_PATH = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else './'
+ROOT_PATH = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(os.path.realpath(sys.argv[0]))
 
 LOG_FILE = os.path.join(ROOT_PATH, 'vcclient.log')
 DOTENV_FILE = os.path.join(ROOT_PATH, '.env')
