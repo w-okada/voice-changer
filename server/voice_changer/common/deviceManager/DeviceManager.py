@@ -56,14 +56,15 @@ class DeviceManager(object):
     # TODO: This function should also accept backend type
     def _get_device(self, dev_id: int) -> tuple[torch.device, DevicePresentation]:
         if dev_id == -1:
-            return (torch.device("cpu"), { "id": -1, "name": "CPU", 'backend': 'cpu' })
+            if self.mps_enabled:
+                return (torch.device('mps'), { "id": -1, "name": "MPS", 'backend': 'mps' })
+            else:
+                return (torch.device("cpu"), { "id": -1, "name": "CPU", 'backend': 'cpu' })
 
         if self.cuda_enabled:
             name = torch.cuda.get_device_name(dev_id)
             memory = torch.cuda.get_device_properties(dev_id).total_memory
             return (torch.device("cuda", index=dev_id), {"id": dev_id, "name": f"{dev_id}: {name} (CUDA)", "memory": memory, 'backend': 'cuda'})
-        elif self.mps_enabled:
-            return (torch.device("mps"), { "id": -1, "name": "MPS", 'backend': 'mps' })
         elif self.dml_enabled:
             name = torch_directml.device_name(dev_id)
             return (torch.device(torch_directml.device(dev_id)), {"id": dev_id, "name": f"{dev_id}: {name} (DirectML)", "memory": 0, 'backend': 'directml'})
