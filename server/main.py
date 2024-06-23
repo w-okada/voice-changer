@@ -1,6 +1,10 @@
+import os
 import multiprocessing as mp
 # NOTE: This is required to avoid recursive process call bug for macOS
 mp.freeze_support()
+from const import SSL_KEY_DIR, DOTENV_FILE, ROOT_PATH
+# NOTE: This is required to fix current working directory on macOS
+os.chdir(ROOT_PATH)
 
 import sys
 import uvicorn
@@ -14,19 +18,17 @@ from dotenv import set_key
 from utils.strtobool import strtobool
 from datetime import datetime
 import platform
-import os
 import argparse
 from downloader.WeightDownloader import downloadWeight
 from downloader.SampleDownloader import downloadInitialSamples
 from mods.ssl import create_self_signed_cert
-from const import SSL_KEY_DIR, DOTENV_FILE
 from webbrowser import open_new_tab
-from settings import ServerSettings, resolve_paths
+from settings import ServerSettings
 from mods.log_control import VoiceChangaerLogger
 
 VoiceChangaerLogger.get_instance().initialize(initialize=True)
 logger = VoiceChangaerLogger.get_instance().getLogger()
-settings = resolve_paths(ServerSettings())
+settings = ServerSettings()
 
 def setupArgParser():
     parser = argparse.ArgumentParser()
