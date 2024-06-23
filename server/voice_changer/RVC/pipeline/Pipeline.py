@@ -110,7 +110,7 @@ class Pipeline:
     def setPitchExtractor(self, pitchExtractor: PitchExtractor):
         self.pitchExtractor = pitchExtractor
 
-    def extractPitch(self, audio: torch.Tensor, pitchf: torch.Tensor | None, f0_up_key: int, formant_shift: float, return_length: int) -> tuple[torch.Tensor, torch.Tensor, int]:
+    def extractPitch(self, audio: torch.Tensor, pitch: torch.Tensor | None, pitchf: torch.Tensor | None, f0_up_key: int, formant_shift: float, return_length: int) -> tuple[torch.Tensor, torch.Tensor, int]:
         f0 = self.pitchExtractor.extract(
             audio,
             self.sr,
@@ -118,20 +118,23 @@ class Pipeline:
         )
         f0 *= 2 ** ((f0_up_key - formant_shift) / 12)
 
-        if pitchf is not None:
-            circular_write(f0, pitchf)
-        else:
-            pitchf = f0
-        f0_mel = 1127.0 * torch.log(1.0 + pitchf / 700.0)
+        f0_mel = 1127.0 * torch.log(1.0 + f0 / 700.0)
         f0_mel[f0_mel > 0] = (f0_mel[f0_mel > 0] - F0_MEL_MIN) * 254 / (F0_MEL_MAX - F0_MEL_MIN) + 1
         f0_mel[f0_mel <= 1] = 1
         f0_mel[f0_mel > 255] = 255
         f0_coarse = torch.round(f0_mel, out=f0_mel).long()
 
+        if pitch is not None and pitchf is not None:
+            circular_write(f0_coarse, pitch)
+            circular_write(f0, pitchf)
+        else:
+            pitch = f0_coarse
+            pitchf = f0
+
         formant_factor = 2 ** (formant_shift / 12)
         formant_length = int(np.ceil(return_length * formant_factor))
 
-        return f0_coarse.unsqueeze(0), pitchf.unsqueeze(0) * (formant_length / return_length), formant_length
+        return pitch.unsqueeze(0), pitchf.unsqueeze(0) * (formant_length / return_length), formant_length
 
     def extract_features(self, feats: torch.Tensor, embOutputLayer: int, useFinalProj: bool):
         try:
@@ -172,6 +175,7 @@ class Pipeline:
         self,
         sid: int,
         audio: torch.Tensor,  # torch.tensor [n]
+        pitch: torch.Tensor | None,  # torch.tensor [m]
         pitchf: torch.Tensor | None,  # torch.tensor [m]
         f0_up_key: int,
         formant_shift: float,
@@ -190,7 +194,7 @@ class Pipeline:
             t.record("pre-process")
 
             # ピッチ検出
-            pitch, pitchf, formant_length = self.extractPitch(audio[silence_front:], pitchf, f0_up_key, formant_shift, audio_feats_len - skip_head) if self.use_f0 else (None, None, None)
+            pitch, pitchf, formant_length = self.extractPitch(audio[silence_front:], pitch, pitchf, f0_up_key, formant_shift, audio_feats_len - skip_head) if self.use_f0 else (None, None, None)
             t.record("extract-pitch")
 
             # embedding
