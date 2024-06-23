@@ -84,7 +84,7 @@ It can be used in two main ways, in order of difficulty:
 
 - Please see [here](tutorials/tutorial_rvc_en_latest.md) for the tutorial. ([trouble shoot](https://github.com/w-okada/voice-changer/blob/master/tutorials/trouble_shoot_communication_ja.md))
 
-- It's now easy to try it out on [Google Colaboratory](https://github.com/w-okada/voice-changer/blob/master/Realtime_Voice_Changer_on_Colab.ipynb) (requires a ngrok account). You can launch it from the 'Open in Colab' button in the top left corner.
+- It's now easy to try it out on [Google Colaboratory](https://github.com/w-okada/voice-changer/tree/v.2/w_okada's_Voice_Changer_version_2_x.ipynb) (requires a ngrok account). You can launch it from the 'Open in Colab' button in the top left corner.
 
 <img src="https://github.com/w-okada/voice-changer/assets/48346627/3f092e2d-6834-42f6-bbfd-7d389111604e" width="400" height="150">
 

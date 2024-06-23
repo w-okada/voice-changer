@@ -87,7 +87,7 @@
 
 - 튜토리얼은 [이곳](tutorials/tutorial_rvc_ko_latest.md)을 확인하세요。([네트워크 문제 해결법](https://github.com/w-okada/voice-changer/blob/master/tutorials/trouble_shoot_communication_ko.md))
 
-- [Google Colaboratory](https://github.com/w-okada/voice-changer/blob/master/Realtime_Voice_Changer_on_Colab.ipynb) で簡単にお試しいただけるようになりました。左上の Open in Colab のボタンから起動できます。
+- [Google Colaboratory](https://github.com/w-okada/voice-changer/tree/v.2/w_okada's_Voice_Changer_version_2_x.ipynb) で簡単にお試しいただけるようになりました。左上の Open in Colab のボタンから起動できます。
 
 <img src="https://github.com/w-okada/voice-changer/assets/48346627/3f092e2d-6834-42f6-bbfd-7d389111604e" width="400" height="150">
 
