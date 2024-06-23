@@ -1,12 +1,12 @@
 import base64
-import struct
 import numpy as np
 import traceback
+import os
 
 from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, PlainTextResponse
-
+from const import EDITION_FILE, VERSION_FILE
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 from pydantic import BaseModel
 import threading
@@ -29,11 +29,15 @@ class MMVC_Rest_VoiceChanger:
 
 
     def edition(self):
-        return PlainTextResponse(self.voiceChangerManager.params.edition)
+        if not os.path.exists(EDITION_FILE):
+            return PlainTextResponse('-')
+        return PlainTextResponse(open(EDITION_FILE, 'r').read())
 
 
     def version(self):
-        return PlainTextResponse('-.-.-')
+        if not os.path.exists(VERSION_FILE):
+            return PlainTextResponse('Development')
+        return PlainTextResponse(open(VERSION_FILE, 'r').read())
 
 
     def test(self, voice: VoiceModel):

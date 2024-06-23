@@ -86,7 +86,7 @@ export const StartingNoticeDialog = () => {
         const content = (
             <div className="body-row">
                 {donationMessage}
-                {edition.indexOf("onnxdirectML-cuda") >= 0 ? directMLMessage : <></>}
+                {edition.indexOf("DirectML") >= 0 ? directMLMessage : <></>}
                 {clickToStartMessage}
             </div>
         );
