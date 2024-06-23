@@ -3,8 +3,11 @@
 [Japanese](/README_ja.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.24-alpha Colab version released. ⇒ [Here](https://github.com/w-okada/voice-changer/tree/v.2/w_okada's_Voice_Changer_version_2_x.ipynb)
+
 - VCClient has rebooted as the second version. see [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
   - The Mac(Apple silicon) version has also been released.
+
 - v.1.5.3.18a
   - Bugfix: FCPE
 
