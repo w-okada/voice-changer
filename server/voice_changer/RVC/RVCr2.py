@@ -164,6 +164,7 @@ class RVCr2(VoiceChangerModel):
         self.convert_feature_size_16k = convert_size_16k // self.window
 
         self.skip_head = extra_frame_16k // self.window
+        self.return_length = self.convert_feature_size_16k - self.skip_head
         self.silence_front = extra_frame_16k - (self.window * 5) if self.settings.silenceFront else 0
 
         # Audio buffer to measure volume between chunks
@@ -205,12 +206,14 @@ class RVCr2(VoiceChangerModel):
             audio_in_16k,
             None,
             self.settings.tran,
+            self.settings.formantShift,
             self.settings.indexRatio,
             convert_feature_size_16k,
             0,
             self.slotInfo.embOutputLayer,
             self.slotInfo.useFinalProj,
             0,
+            convert_feature_size_16k,
             self.settings.protect,
         )
 
@@ -248,12 +251,14 @@ class RVCr2(VoiceChangerModel):
             self.convert_buffer,
             self.pitchf_buffer,
             self.settings.tran,
+            self.settings.formantShift,
             self.settings.indexRatio,
             self.convert_feature_size_16k,
             self.silence_front,
             self.slotInfo.embOutputLayer,
             self.slotInfo.useFinalProj,
             self.skip_head,
+            self.return_length,
             self.settings.protect,
         )
 

@@ -57,6 +57,7 @@ class TextEncoder(nn.Module):
         phone: torch.Tensor,
         pitch: torch.Tensor,
         lengths: torch.Tensor,
+        skip_head: Optional[int] = None,
     ):
         if pitch is None:
             x = self.emb_phone(phone)
@@ -69,6 +70,8 @@ class TextEncoder(nn.Module):
             x.dtype
         )
         x = self.encoder(x * x_mask, x_mask)
+        x = x[:, :, skip_head:]
+        x_mask = x_mask[:, :, skip_head:]
         stats = self.proj(x) * x_mask
         m, logs = torch.split(stats, self.out_channels, dim=1)
         return m, logs, x_mask
@@ -244,7 +247,14 @@ class Generator(torch.nn.Module):
         if gin_channels != 0:
             self.cond = nn.Conv1d(gin_channels, upsample_initial_channel, 1)
 
-    def forward(self, x: torch.Tensor, g: Optional[torch.Tensor] = None):
+    def forward(
+        self,
+        x: torch.Tensor,
+        g: Optional[torch.Tensor] = None,
+        n_res: Optional[int] = None,
+    ):
+        if n_res is not None and n_res != x.shape[-1]:
+            x = F.interpolate(x, size=n_res, mode="linear")
         x = self.conv_pre(x)
         if g is not None:
             x = x + self.cond(g)
@@ -523,9 +533,20 @@ class GeneratorNSF(torch.nn.Module):
 
         self.lrelu_slope = modules.LRELU_SLOPE
 
-    def forward(self, x, f0, g: Optional[torch.Tensor] = None):
+    def forward(
+        self,
+        x,
+        f0,
+        g: Optional[torch.Tensor] = None,
+        n_res: Optional[int] = None,
+    ):
         har_source, noi_source, uv = self.m_source(f0, self.upp)
         har_source = har_source.transpose(1, 2)
+        if n_res is not None:
+            if (n := n_res * self.upp) != har_source.shape[-1]:
+                har_source = F.interpolate(har_source, size=n, mode="linear")
+            if n_res != x.shape[-1]:
+                x = F.interpolate(x, size=n_res, mode="linear")
         x = self.conv_pre(x)
         if g is not None:
             x = x + self.cond(g)
@@ -688,15 +709,17 @@ class SynthesizerTrnMsNSFsidM(nn.Module):
     #         self.speaker_map[i] = self.emb_g(torch.LongTensor([[i]]))
     #     self.speaker_map = self.speaker_map.unsqueeze(0)
 
-    def forward(self, phone, phone_lengths, pitch, nsff0, sid, skip_head):
+    def forward(self, phone, phone_lengths, pitch, nsff0, sid, skip_head, return_length, formant_length):
         g = self.emb_g(sid).unsqueeze(0).transpose(1, 2)
-        m_p, logs_p, x_mask = self.enc_p(phone, pitch, phone_lengths)
-        z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p)) * x_mask
-        z_p = z_p[:, :, skip_head:]
-        x_mask = x_mask[:, :, skip_head:]
-        nsff0 = nsff0[:, skip_head:]
+        flow_head = max(skip_head - 24, 0)
+        dec_head = skip_head - flow_head
+        m_p, logs_p, x_mask = self.enc_p(phone, pitch, phone_lengths, flow_head)
+        z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p) * 0.66666) * x_mask
         z = self.flow(z_p, x_mask, g=g, reverse=True)
-        o = self.dec(z * x_mask, nsff0, g=g)
+        z = z[:, :, dec_head : dec_head + return_length]
+        x_mask = x_mask[:, :, dec_head : dec_head + return_length]
+        nsff0 = nsff0[:, skip_head : skip_head + return_length]
+        o = self.dec(z * x_mask, nsff0, g=g, n_res=formant_length)
         o = torch.clip(o[0, 0], -1.0, 1.0)
         return o
 
@@ -799,14 +822,16 @@ class SynthesizerTrnMsNSFsidM_nono(nn.Module):
     #         self.speaker_map[i] = self.emb_g(torch.LongTensor([[i]]))
     #     self.speaker_map = self.speaker_map.unsqueeze(0)
 
-    def forward(self, phone, phone_lengths, sid, skip_head):
+    def forward(self, phone, phone_lengths, sid, skip_head, return_length, formant_length):
         g = self.emb_g(sid).unsqueeze(0).transpose(1, 2)
-        m_p, logs_p, x_mask = self.enc_p(phone, phone_lengths)
-        z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p)) * x_mask
-        z_p = z_p[:, :, skip_head:]
-        x_mask = x_mask[:, :, skip_head:]
+        flow_head = max(skip_head - 24, 0)
+        dec_head = skip_head - flow_head
+        m_p, logs_p, x_mask = self.enc_p(phone, None, phone_lengths, flow_head)
+        z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p) * 0.66666) * x_mask
         z = self.flow(z_p, x_mask, g=g, reverse=True)
-        o = self.dec(z * x_mask, g=g)
+        z = z[:, :, dec_head : dec_head + return_length]
+        x_mask = x_mask[:, :, dec_head : dec_head + return_length]
+        o = self.dec(z * x_mask, g=g, n_res=formant_length)
         o = torch.clip(o[0, 0], -1.0, 1.0)
         return o
 

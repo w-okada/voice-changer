@@ -89,6 +89,7 @@ export const ServerSettingKey = {
     serverMonitorAudioGain: "serverMonitorAudioGain",
 
     tran: "tran",
+    formantShift: "formantShift",
     silentThreshold: "silentThreshold",
     extraConvertSize: "extraConvertSize",
 
@@ -132,6 +133,7 @@ export type VoiceChangerServerSetting = {
     serverMonitorAudioGain: number;
 
     tran: number;
+    formantShift: number;
     silentThreshold: number;
     extraConvertSize: number;
 
@@ -162,6 +164,7 @@ export type RVCModelSlot = ModelSlot & {
     defaultIndexRatio: number;
     defaultProtect: number;
     defaultTune: number;
+    defaultFormantShift: number;
     modelType: RVCModelType;
 
     embChannels: number;
@@ -170,15 +173,7 @@ export type RVCModelSlot = ModelSlot & {
     deprecated: boolean;
 };
 
-export type WebModelSlot = ModelSlot & {
-    modelFile: string;
-    defaultTune: number;
-    modelType: RVCModelType;
-    f0: boolean;
-    samplingRate: number;
-};
-
-export type ModelSlotUnion = RVCModelSlot | WebModelSlot;
+export type ModelSlotUnion = RVCModelSlot;
 
 type ServerAudioDevice = {
     kind: "audioinput" | "audiooutput";
@@ -260,6 +255,7 @@ export const DefaultServerSetting: ServerInfo = {
     f0Detector: F0Detector.rmvpe_onnx,
 
     tran: 0,
+    formantShift: 0,
     silentThreshold: 0,
     extraConvertSize: 0,
 

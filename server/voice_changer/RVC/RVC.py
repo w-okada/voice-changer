@@ -51,6 +51,7 @@ class RVC(VoiceChangerModel):
 
         # その他の設定
         self.settings.tran = self.slotInfo.defaultTune
+        self.settings.formantShift = self.slotInfo.defaultFormantShift
         self.settings.indexRatio = self.slotInfo.defaultIndexRatio
         self.settings.protect = self.slotInfo.defaultProtect
         logger.info("[Voice Changer] [RVC] Initializing... done")

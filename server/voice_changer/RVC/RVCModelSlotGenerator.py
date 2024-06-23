@@ -24,6 +24,7 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
             elif file.kind == "rvcIndex":
                 slotInfo.indexFile = file.name
         slotInfo.defaultTune = 0
+        slotInfo.defaultFormantShift = 0
         slotInfo.defaultIndexRatio = 0
         slotInfo.defaultProtect = 0.5
         slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")

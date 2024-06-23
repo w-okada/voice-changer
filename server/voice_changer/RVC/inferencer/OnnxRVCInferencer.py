@@ -39,10 +39,11 @@ class OnnxRVCInferencer(Inferencer):
         pitch: torch.Tensor,
         pitchf: torch.Tensor,
         sid: torch.Tensor,
-        skip_head: int | None,
+        skip_head: int,
+        return_length: int,
+        formant_length: int,
     ) -> torch.Tensor:
-        if pitch is None or pitchf is None:
-            raise RuntimeError("[Voice Changer] Pitch or Pitchf is not found.")
+        assert pitch is not None or pitchf is not None, "Pitch or Pitchf is not found."
 
         if feats.device.type == 'cuda':
             binding = self.model.io_binding()
@@ -53,6 +54,8 @@ class OnnxRVCInferencer(Inferencer):
             binding.bind_input('pitchf', device_type='cuda', device_id=feats.device.index, element_type=self.fp_dtype_np, shape=tuple(pitchf.shape), buffer_ptr=pitchf.float().data_ptr())
             binding.bind_input('sid', device_type='cuda', device_id=feats.device.index, element_type=np.int64, shape=tuple(sid.shape), buffer_ptr=sid.data_ptr())
             binding.bind_cpu_input('skip_head', np.array(skip_head, dtype=np.int64))
+            binding.bind_cpu_input('return_length', np.array(return_length, dtype=np.int64))
+            binding.bind_cpu_input('formant_length', np.array(formant_length, dtype=np.int64))
 
             binding.bind_output('audio', device_type='cuda', device_id=feats.device.index)
 
@@ -68,7 +71,9 @@ class OnnxRVCInferencer(Inferencer):
                     "pitch": pitch.detach().cpu().numpy(),
                     "pitchf": pitchf.float().detach().cpu().numpy(),
                     "sid": sid.detach().cpu().numpy(),
-                    "skip_head": np.array(skip_head, dtype=np.int64)
+                    "skip_head": np.array(skip_head, dtype=np.int64),
+                    "return_length": np.array(return_length, dtype=np.int64),
+                    "formant_length": np.array(formant_length, dtype=np.int64),
                 },
             )
         # self.model.end_profiling()

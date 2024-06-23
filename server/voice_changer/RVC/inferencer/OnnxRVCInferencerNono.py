@@ -18,7 +18,9 @@ class OnnxRVCInferencerNono(OnnxRVCInferencer):
         pitch: torch.Tensor | None,
         pitchf: torch.Tensor | None,
         sid: torch.Tensor,
-        skip_head: int | None,
+        skip_head: int,
+        return_length: int,
+        formant_length: int,
     ) -> torch.Tensor:
         if feats.device.type == 'cuda':
             binding = self.model.io_binding()
@@ -27,6 +29,8 @@ class OnnxRVCInferencerNono(OnnxRVCInferencer):
             binding.bind_input('p_len', device_type='cuda', device_id=feats.device.index, element_type=np.int64, shape=tuple(pitch_length.shape), buffer_ptr=pitch_length.data_ptr())
             binding.bind_input('sid', device_type='cuda', device_id=feats.device.index, element_type=np.int64, shape=tuple(sid.shape), buffer_ptr=sid.data_ptr())
             binding.bind_cpu_input('skip_head', np.array(skip_head, dtype=np.int64))
+            binding.bind_cpu_input('return_length', np.array(return_length, dtype=np.int64))
+            binding.bind_cpu_input('formant_length', np.array(formant_length, dtype=np.int64))
 
             binding.bind_output('audio', device_type='cuda', device_id=feats.device.index)
 
@@ -40,7 +44,9 @@ class OnnxRVCInferencerNono(OnnxRVCInferencer):
                     "feats": feats.float().detach().cpu().numpy(),
                     "p_len": pitch_length.detach().cpu().numpy(),
                     "sid": sid.detach().cpu().numpy(),
-                    "skip_head": np.array(skip_head, dtype=np.int64)
+                    "skip_head": np.array(skip_head, dtype=np.int64),
+                    "return_length": np.array(return_length, dtype=np.int64),
+                    "formant_length": np.array(formant_length, dtype=np.int64),
                 },
             )
         # self.model.end_profiling()
