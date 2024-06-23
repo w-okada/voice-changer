@@ -64,7 +64,7 @@ class Pipeline:
         self.index = index
         self.index_reconstruct: torch.Tensor | None = index_reconstruct
         self.use_index = index is not None and self.index_reconstruct is not None
-        self.use_gpu_index = sys.platform == 'linux' and self.device.type == 'cuda'
+        self.use_gpu_index = sys.platform == 'linux' and '+cu' in torch.__version__ and self.device.type == 'cuda'
         self.use_f0 = use_f0
 
         self.onnx_upscaler = self.make_onnx_upscaler(embChannels) if self.device.type == 'privateuseone' else None

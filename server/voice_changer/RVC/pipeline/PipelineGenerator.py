@@ -72,7 +72,7 @@ def _loadIndex(indexPath: str) -> tuple[faiss.Index | None, torch.Tensor | None]
         # BUG: faiss-gpu does not support reconstruct on GPU indices
         # https://github.com/facebookresearch/faiss/issues/2181
         index_reconstruct = index.reconstruct_n(0, index.ntotal).to(dev)
-        if sys.platform == 'linux' and dev.type == 'cuda':
+        if sys.platform == 'linux' and '+cu' in torch.__version__ and dev.type == 'cuda':
             index: faiss.GpuIndexIVFFlat = faiss.index_cpu_to_gpus_list(index, gpus=[dev.index])
     except: # NOQA
         print("[Voice Changer] Load index failed. Use no index.")
