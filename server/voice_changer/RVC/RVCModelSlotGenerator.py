@@ -10,12 +10,12 @@ from data.ModelSlot import RVCModelSlot
 from voice_changer.common.SafetensorsUtils import convert_single
 from voice_changer.utils.LoadModelParams import LoadModelParams
 from voice_changer.utils.ModelSlotGenerator import ModelSlotGenerator
-from settings import ServerSettings, resolve_paths
+from settings import ServerSettings
 
 class RVCModelSlotGenerator(ModelSlotGenerator):
     @classmethod
     def load_model(cls, props: LoadModelParams):
-        model_dir = resolve_paths(ServerSettings()).model_dir
+        model_dir = ServerSettings().model_dir
 
         slotInfo: RVCModelSlot = RVCModelSlot()
         for file in props.files:
