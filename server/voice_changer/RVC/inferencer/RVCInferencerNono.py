@@ -33,8 +33,17 @@ class RVCInferencerNono(Inferencer):
         pitch: torch.Tensor | None,
         pitchf: torch.Tensor | None,
         sid: torch.Tensor,
-        skip_head: int | None,
+        skip_head: int,
+        return_length: int,
+        formant_length: int,
     ) -> torch.Tensor:
-        res = self.model.infer(feats, pitch_length, sid, skip_head=skip_head)
+        res = self.model.infer(
+            feats,
+            pitch_length,
+            sid,
+            skip_head=skip_head,
+            return_length=return_length,
+            formant_length=formant_length
+        )
         res = res[0][0, 0].float()
         return torch.clip(res, -1.0, 1.0)

@@ -110,23 +110,31 @@ class Pipeline:
     def setPitchExtractor(self, pitchExtractor: PitchExtractor):
         self.pitchExtractor = pitchExtractor
 
-    def extractPitch(self, audio: torch.Tensor, pitchf: torch.Tensor | None, f0_up_key: int) -> tuple[torch.Tensor, torch.Tensor]:
+    def extractPitch(self, audio: torch.Tensor, pitch: torch.Tensor | None, pitchf: torch.Tensor | None, f0_up_key: int, formant_shift: float, return_length: int) -> tuple[torch.Tensor, torch.Tensor, int]:
         f0 = self.pitchExtractor.extract(
             audio,
             self.sr,
             self.window,
         )
-        f0 *= 2 ** (f0_up_key / 12)
-        if pitchf is not None:
-            circular_write(f0, pitchf)
-        else:
-            pitchf = f0
-        f0_mel = 1127.0 * torch.log(1.0 + pitchf / 700.0)
+        f0 *= 2 ** ((f0_up_key - formant_shift) / 12)
+
+        f0_mel = 1127.0 * torch.log(1.0 + f0 / 700.0)
         f0_mel[f0_mel > 0] = (f0_mel[f0_mel > 0] - F0_MEL_MIN) * 254 / (F0_MEL_MAX - F0_MEL_MIN) + 1
         f0_mel[f0_mel <= 1] = 1
         f0_mel[f0_mel > 255] = 255
         f0_coarse = torch.round(f0_mel, out=f0_mel).long()
-        return f0_coarse.unsqueeze(0), pitchf.unsqueeze(0)
+
+        if pitch is not None and pitchf is not None:
+            circular_write(f0_coarse, pitch)
+            circular_write(f0, pitchf)
+        else:
+            pitch = f0_coarse
+            pitchf = f0
+
+        formant_factor = 2 ** (formant_shift / 12)
+        formant_length = int(np.ceil(return_length * formant_factor))
+
+        return pitch.unsqueeze(0), pitchf.unsqueeze(0) * (formant_length / return_length), formant_length
 
     def extract_features(self, feats: torch.Tensor, embOutputLayer: int, useFinalProj: bool):
         try:
@@ -135,9 +143,9 @@ class Pipeline:
             print("Failed to extract features:", e)
             raise e
 
-    def infer(self, feats: torch.Tensor, p_len: torch.Tensor, pitch: torch.Tensor, pitchf: torch.Tensor, sid: torch.Tensor, skip_head: int | None) -> torch.Tensor:
+    def infer(self, feats: torch.Tensor, p_len: torch.Tensor, pitch: torch.Tensor, pitchf: torch.Tensor, sid: torch.Tensor, skip_head: int | None, return_length: int | None, formant_length: int | None) -> torch.Tensor:
         try:
-            return self.inferencer.infer(feats, p_len, pitch, pitchf, sid, skip_head)
+            return self.inferencer.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length, formant_length)
         except RuntimeError as e:
             print("Failed to infer:", e)
             raise e
@@ -167,14 +175,17 @@ class Pipeline:
         self,
         sid: int,
         audio: torch.Tensor,  # torch.tensor [n]
+        pitch: torch.Tensor | None,  # torch.tensor [m]
         pitchf: torch.Tensor | None,  # torch.tensor [m]
         f0_up_key: int,
+        formant_shift: float,
         index_rate: float,
         audio_feats_len: int,
         silence_front: int,
         embOutputLayer: int,
         useFinalProj: bool,
         skip_head: int,
+        return_length: int,
         protect: float = 0.5,
     ) -> torch.Tensor:
         with Timer2("Pipeline-Exec", False) as t:  # NOQA
@@ -183,7 +194,7 @@ class Pipeline:
             t.record("pre-process")
 
             # ピッチ検出
-            pitch, pitchf = self.extractPitch(audio[silence_front:], pitchf, f0_up_key) if self.use_f0 else (None, None)
+            pitch, pitchf, formant_length = self.extractPitch(audio[silence_front:], pitch, pitchf, f0_up_key, formant_shift, audio_feats_len - skip_head) if self.use_f0 else (None, None, None)
             t.record("extract-pitch")
 
             # embedding
@@ -230,7 +241,7 @@ class Pipeline:
             sid = torch.tensor([sid], device=self.device, dtype=torch.int64)
             t.record("mid-precess")
             # 推論実行
-            out_audio = self.infer(feats, p_len, pitch, pitchf, sid, skip_head)
+            out_audio = self.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length, formant_length)
             t.record("infer")
         # print("EXEC AVERAGE:", t.avrSecs)
         return out_audio

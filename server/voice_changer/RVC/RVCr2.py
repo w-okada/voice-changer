@@ -44,6 +44,7 @@ class RVCr2(VoiceChangerModel):
         self.pipeline: Pipeline | None = None
 
         self.convert_buffer: torch.Tensor | None = None
+        self.pitch_buffer: torch.Tensor | None = None
         self.pitchf_buffer: torch.Tensor | None = None
         self.return_length = 0
         self.skip_head = 0
@@ -164,6 +165,7 @@ class RVCr2(VoiceChangerModel):
         self.convert_feature_size_16k = convert_size_16k // self.window
 
         self.skip_head = extra_frame_16k // self.window
+        self.return_length = self.convert_feature_size_16k - self.skip_head
         self.silence_front = extra_frame_16k - (self.window * 5) if self.settings.silenceFront else 0
 
         # Audio buffer to measure volume between chunks
@@ -174,6 +176,7 @@ class RVCr2(VoiceChangerModel):
         self.convert_buffer = torch.zeros(convert_size_16k, dtype=self.dtype, device=self.device_manager.device)
         # Additional +1 is to compensate for pitch extraction algorithm
         # that can output additional feature.
+        self.pitch_buffer = torch.zeros(self.convert_feature_size_16k + 1, dtype=torch.int64, device=self.device_manager.device)
         self.pitchf_buffer = torch.zeros(self.convert_feature_size_16k + 1, dtype=self.dtype, device=self.device_manager.device)
         print('[Voice Changer] Allocated audio buffer:', self.audio_buffer.shape[0])
         print('[Voice Changer] Allocated convert buffer:', self.convert_buffer.shape[0])
@@ -204,13 +207,16 @@ class RVCr2(VoiceChangerModel):
             self.settings.dstId,
             audio_in_16k,
             None,
+            None,
             self.settings.tran,
+            self.settings.formantShift,
             self.settings.indexRatio,
             convert_feature_size_16k,
             0,
             self.slotInfo.embOutputLayer,
             self.slotInfo.useFinalProj,
             0,
+            convert_feature_size_16k,
             self.settings.protect,
         )
 
@@ -246,14 +252,17 @@ class RVCr2(VoiceChangerModel):
         audio_model = self.pipeline.exec(
             self.settings.dstId,
             self.convert_buffer,
+            self.pitch_buffer,
             self.pitchf_buffer,
             self.settings.tran,
+            self.settings.formantShift,
             self.settings.indexRatio,
             self.convert_feature_size_16k,
             self.silence_front,
             self.slotInfo.embOutputLayer,
             self.slotInfo.useFinalProj,
             self.skip_head,
+            self.return_length,
             self.settings.protect,
         )
 

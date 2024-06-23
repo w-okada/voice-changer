@@ -94,11 +94,13 @@ def _export2onnx(input_model: str, output_model_simple: str, metadata: dict):
     p_len = torch.tensor([featsLength], dtype=torch.int64, device=dev)
     sid = torch.tensor([0], dtype=torch.int64, device=dev)
     skip_head = torch.tensor(32, dtype=torch.int64, device=dev)
+    return_length = torch.tensor(32, dtype=torch.int64, device=dev)
+    formant_length = torch.tensor(25, dtype=torch.int64, device=dev)
 
     if metadata["f0"]:
         pitch = torch.zeros((1, featsLength), dtype=torch.int64, device=dev)
         pitchf = torch.zeros((1, featsLength), dtype=torch.float32, device=dev)
-        input_names = ["feats", "p_len", "pitch", "pitchf", "sid", "skip_head"]
+        input_names = ["feats", "p_len", "pitch", "pitchf", "sid", "skip_head", "return_length", "formant_length"]
         inputs = (
             feats,
             p_len,
@@ -106,15 +108,19 @@ def _export2onnx(input_model: str, output_model_simple: str, metadata: dict):
             pitchf,
             sid,
             skip_head,
+            return_length,
+            formant_length,
         )
 
     else:
-        input_names = ["feats", "p_len", "sid", "skip_head"]
+        input_names = ["feats", "p_len", "sid", "skip_head", "return_length", "formant_length"]
         inputs = (
             feats,
             p_len,
             sid,
             skip_head,
+            return_length,
+            formant_length,
         )
 
     output_names = [

@@ -190,7 +190,7 @@ export const MainScreen = (props: MainScreenProps) => {
                 nameRow = generateNameRow(index, slotInfo.name, slotInfo.termsOfUseUrl);
                 fileRows.push(generateFileRow("model", slotInfo.modelFile));
                 fileRows.push(generateFileRow("index", slotInfo.indexFile));
-                infoRow = generateInfoRow(`${slotInfo.f0 ? "f0" : "nof0"}, ${slotInfo.samplingRate}, ${slotInfo.embChannels}, ${slotInfo.modelType}, ${slotInfo.defaultTune}, ${slotInfo.defaultIndexRatio}, ${slotInfo.defaultProtect}`);
+                infoRow = generateInfoRow(`${slotInfo.f0 ? "f0" : "nof0"}, ${slotInfo.samplingRate}, ${slotInfo.embChannels}, ${slotInfo.modelType}, ${slotInfo.defaultTune}, ${slotInfo.defaultFormantShift}, ${slotInfo.defaultIndexRatio}, ${slotInfo.defaultProtect}`);
             } else {
                 iconArea = generateIconArea(index, null, false);
                 nameRow = generateNameRow(index, "", "");
