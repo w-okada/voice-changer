@@ -39,17 +39,26 @@ jobs:
           backend: cuda
           # Linux CUDA depends on faiss-gpu-cp310
           python-version: '3.10'
-        # - os: ubuntu-latest
-        #   os_suffix: linux-amd64
-        #   backend: rocm
-        #   python-version: '3.10'
+        - os: ubuntu-latest
+          os_suffix: linux-amd64
+          backend: rocm
+          # onnxruntime-rocm supports only cp310
+          python-version: '3.10'
     runs-on: ${{ matrix.os }}
     env:
       BACKEND: ${{ matrix.backend }}
     steps:
-    - name: Clean runner
-      shell: bash
-      run: rm -rf "$AGENT_TOOLSDIRECTORY"
+    - name: Maximize build space
+      if: matrix.os == 'ubuntu-latest'
+      uses: AdityaGarg8/remove-unwanted-software@v3
+      with:
+        remove-swapfile: 'true'
+        remove-codeql: 'true'
+        # remove-docker-images: 'true'
+        remove-android: 'true'
+        remove-dotnet: 'true'
+        # remove-large-packages: 'true'
+        remove-haskell: 'true'
     - uses: actions/checkout@v4
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -58,9 +67,9 @@ jobs:
         # architecture: x64
         # cache: pip
     - name: Installing build dependencies
-      run: python -m pip install --upgrade pip wheel setuptools pyinstaller
+      run: python -m pip install --no-cache-dir --upgrade pip wheel setuptools pyinstaller
     - name: Installing project dependencies
-      run: python -m pip install -r requirements-common.txt -r requirements-${{ matrix.backend }}.txt
+      run: python -m pip install --no-cache-dir -r requirements-common.txt -r requirements-${{ matrix.backend }}.txt
       working-directory: ./server
     - name: Building executable
       run: pyinstaller --clean -y --dist ./dist --workpath /tmp MMVCServerSIO.spec
