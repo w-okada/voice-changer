@@ -32,9 +32,11 @@ STORED_SETTINGS = {
     "f0Detector", "silenceFront", "silentThreshold",
 }
 
-EDITION_FILE = os.path.join(sys._MEIPASS, "edition.txt") if hasattr(sys, "_MEIPASS") else 'editions/edition.txt'
+EDITION_FILE = os.path.join(sys._MEIPASS, "edition.txt") if hasattr(sys, "_MEIPASS") else 'edition.txt'
 
 FRONTEND_DIR = os.path.join(sys._MEIPASS, "dist") if hasattr(sys, "_MEIPASS") else "../client/demo/dist"
+
+VERSION_FILE = os.path.join(sys._MEIPASS, "version.txt") if hasattr(sys, "_MEIPASS") else 'version.txt'
 
 EmbedderType: TypeAlias = Literal["hubert_base", "contentvec"]
 
@@ -78,6 +80,15 @@ RVCSampleMode: TypeAlias = Literal[
     "",
 ]
 
+def get_edition():
+    if not os.path.exists(EDITION_FILE):
+        return '-'
+    return open(EDITION_FILE, 'r').read()
+
+def get_version():
+    if not os.path.exists(VERSION_FILE):
+        return 'Development'
+    return open(VERSION_FILE, 'r').read()
 
 def getSampleJsonAndModelIds(mode: RVCSampleMode):
     if mode == "production":

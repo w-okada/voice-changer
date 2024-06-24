@@ -7,15 +7,25 @@ import logging
 
 sys.setrecursionlimit(sys.getrecursionlimit() * 5)
 
-backend = 'cpu' if 'BACKEND' not in os.environ else os.environ['BACKEND']
+backend = os.environ.get('BACKEND', 'cpu')
 python_folder = next(folder for folder in site.getsitepackages() if 'site-packages' in folder).replace('\\', '/')
 logging.info(python_folder)
 
-datas = [('../client/demo/dist', './dist')]
-if backend == 'dml':
-    datas += [('./editions/dml/edition.txt', '.')]
-else:
-    datas += [('./editions/edition.txt', '.')]
+with open('edition.txt', 'w') as f:
+    if backend == 'cpu':
+      f.write('CPU')
+    elif backend == 'dml':
+      f.write('DirectML')
+    elif backend == 'cuda':
+      f.write('NVIDIA-CUDA')
+    elif backend == 'rocm':
+      f.write('AMD-ROCm')
+
+if 'BUILD_NAME' in os.environ:
+  with open('version.txt', 'w') as f:
+      f.write(os.environ['BUILD_NAME'])
+
+datas = [('../client/demo/dist', './dist'), ('./edition.txt', '.'), ('./version.txt', '.')]
 
 if sys.platform == 'win32':
     binaries = [(python_folder + '/onnxruntime/capi/*.dll', 'onnxruntime/capi')]

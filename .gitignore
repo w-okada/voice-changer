@@ -1,4 +1,6 @@
 .env
+version.txt
+edition.txt
 tmp_dir
 dummy
 node_modules

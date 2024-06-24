@@ -2,7 +2,7 @@ import os
 import multiprocessing as mp
 # NOTE: This is required to avoid recursive process call bug for macOS
 mp.freeze_support()
-from const import SSL_KEY_DIR, DOTENV_FILE, ROOT_PATH, UPLOAD_DIR, TMP_DIR
+from const import SSL_KEY_DIR, DOTENV_FILE, ROOT_PATH, UPLOAD_DIR, TMP_DIR, get_version, get_edition
 # NOTE: This is required to fix current working directory on macOS
 os.chdir(ROOT_PATH)
 
@@ -105,7 +105,8 @@ async def main(args):
         for key, value in settings.model_dump().items():
             set_key(DOTENV_FILE, key.upper(), str(value))
 
-    printMessage(f"PYTHON: {sys.version}", level=2)
+    printMessage(f"Python: {sys.version}", level=2)
+    printMessage(f"Voice changer version: {get_version()} {get_edition()}", level=2)
     # printMessage("Voice Changerを起動しています。", level=2)
     printMessage("Activating the Voice Changer.", level=2)
     # ダウンロード(Weight)
