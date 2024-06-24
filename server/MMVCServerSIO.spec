@@ -20,12 +20,15 @@ with open('edition.txt', 'w') as f:
       f.write('NVIDIA-CUDA')
     elif backend == 'rocm':
       f.write('AMD-ROCm')
+    else:
+      f.write('-')
+
+datas = [('../client/demo/dist', './dist'), ('./edition.txt', '.')]
 
 if 'BUILD_NAME' in os.environ:
   with open('version.txt', 'w') as f:
       f.write(os.environ['BUILD_NAME'])
-
-datas = [('../client/demo/dist', './dist'), ('./edition.txt', '.'), ('./version.txt', '.')]
+  datas += [('./version.txt', '.')]
 
 if sys.platform == 'win32':
     binaries = [(python_folder + '/onnxruntime/capi/*.dll', 'onnxruntime/capi')]
