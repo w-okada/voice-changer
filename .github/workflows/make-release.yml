@@ -12,6 +12,7 @@ jobs:
 
     outputs:
       release_id: ${{ steps.create_release.outputs.id }}
+      name: ${{ steps.tag.outputs.name }}
 
     steps:
     - name: Clone
@@ -81,6 +82,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       BACKEND: ${{ matrix.backend }}
+      BUILD_NAME: ${{ needs.create-tag.outputs.name }}
     steps:
     - name: Clean runner
       shell: bash

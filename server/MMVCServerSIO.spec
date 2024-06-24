@@ -22,8 +22,8 @@ with open('edition.txt', 'w') as f:
       f.write('AMD-ROCm')
 
 with open('version.txt', 'w') as f:
-    build_number = os.popen("git rev-list --count HEAD").read().strip()
-    f.write(f'b{build_number}')
+    build_number = os.environ.get('BUILD_NUMBER', 'Development')
+    f.write(build_number)
 
 datas = [('../client/demo/dist', './dist'), ('./edition.txt', '.'), ('./version.txt', '.')]
 

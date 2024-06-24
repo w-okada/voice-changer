@@ -29,11 +29,11 @@ class MMVC_Rest_VoiceChanger:
 
 
     def edition(self):
-        return PlainTextResponse(get_edition)
+        return PlainTextResponse(get_edition())
 
 
     def version(self):
-        return PlainTextResponse(get_version)
+        return PlainTextResponse(get_version())
 
 
     def test(self, voice: VoiceModel):
