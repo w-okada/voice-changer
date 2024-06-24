@@ -7,7 +7,7 @@ import logging
 
 sys.setrecursionlimit(sys.getrecursionlimit() * 5)
 
-backend = 'cpu' if 'BACKEND' not in os.environ else os.environ['BACKEND']
+backend = os.environ.get('BACKEND', 'cpu')
 python_folder = next(folder for folder in site.getsitepackages() if 'site-packages' in folder).replace('\\', '/')
 logging.info(python_folder)
 
@@ -22,7 +22,7 @@ with open('edition.txt', 'w') as f:
       f.write('AMD-ROCm')
 
 with open('version.txt', 'w') as f:
-    build_number = os.environ.get('BUILD_NUMBER', 'Development')
+    build_number = os.environ.get('BUILD_NAME', 'Development')
     f.write(build_number)
 
 datas = [('../client/demo/dist', './dist'), ('./edition.txt', '.'), ('./version.txt', '.')]
