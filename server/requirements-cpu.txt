@@ -6,7 +6,8 @@
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch
 torchaudio
-faiss-cpu
+faiss-cpu; sys_platform!='darwin'
+faiss-cpu==1.8.0; sys_platform=='darwin' # No wheels available for mac yet
 
 onnxscript
 onnxsim
