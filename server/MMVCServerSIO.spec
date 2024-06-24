@@ -21,9 +21,9 @@ with open('edition.txt', 'w') as f:
     elif backend == 'rocm':
       f.write('AMD-ROCm')
 
-with open('version.txt', 'w') as f:
-    build_number = os.environ.get('BUILD_NAME', 'Development')
-    f.write(build_number)
+if 'BUILD_NAME' in os.environ:
+  with open('version.txt', 'w') as f:
+      f.write(os.environ['BUILD_NAME'])
 
 datas = [('../client/demo/dist', './dist'), ('./edition.txt', '.'), ('./version.txt', '.')]
 
