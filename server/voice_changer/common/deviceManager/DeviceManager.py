@@ -102,8 +102,8 @@ class DeviceManager(object):
             return ["CUDAExecutionProvider", "CPUExecutionProvider"], [{"device_id": self.device.index}, cpu_settings]
         elif self.device.type == 'privateuseone' and "DmlExecutionProvider" in availableProviders:
             return ["DmlExecutionProvider", "CPUExecutionProvider"], [{"device_id": self.device.index}, cpu_settings]
-        elif 'CoreMLExecutionProvider' in availableProviders:
-            return ["CoreMLExecutionProvider", "CPUExecutionProvider"], [{}, cpu_settings]
+        # elif 'CoreMLExecutionProvider' in availableProviders:
+        #     return ["CoreMLExecutionProvider", "CPUExecutionProvider"], [{}, cpu_settings]
         else:
             return ["CPUExecutionProvider"], [cpu_settings]
 
