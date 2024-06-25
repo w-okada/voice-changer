@@ -12,13 +12,13 @@ user experience.
 
 The following videos demonstrate how the voice changer works and performs with AMD graphics cards (including integrated GPU!):
 
-[Amd iGPU.webm](https://github.com/deiteris/voice-changer/assets/6103913/af72e31a-cf66-447b-87c9-43f13355402f)
+[Amd iGPU.webm](https://github.com/deiteris/voice-changer/assets/6103913/67354d4e-51aa-425c-bd23-d33ad2baf824)
 
-[Amd Dgpu Rx6600m.webm](https://github.com/deiteris/voice-changer/assets/6103913/bc5180b8-3f67-478b-9ea8-c8ae5e59a4c2)
+[Amd Dgpu Rx6600m.webm](https://github.com/deiteris/voice-changer/assets/6103913/c9f060c1-b243-4c1f-846a-6e129b3fbabc)
 
 And this one demonstrates how the voice changer works and performs with Nvidia GeForce GTX 1650 laptop:
 
-[Nvidia Dgpu Gtx1650.webm](https://github.com/deiteris/voice-changer/assets/6103913/cb5b0a5b-a96c-460e-9f57-f82bed84559e)
+[Nvidia Dgpu Gtx 1650.webm](https://github.com/deiteris/voice-changer/assets/6103913/3985e6f3-c22d-4899-ad93-057c599b8b53)
 
 ## Supported operated systems
 
