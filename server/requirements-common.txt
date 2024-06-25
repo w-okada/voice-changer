@@ -10,7 +10,7 @@ soxr
 python-socketio
 fastapi
 python-multipart
-scipy
+scipy==1.13.1 # frozen build for macOS seems to have problems with >1.14: "ModuleNotFoundError: No module named 'scipy._lib.array_api_compat.numpy.fft'"
 librosa
 sounddevice
 python-dotenv
