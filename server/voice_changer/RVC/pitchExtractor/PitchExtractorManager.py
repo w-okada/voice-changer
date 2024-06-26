@@ -33,8 +33,10 @@ class PitchExtractorManager(Protocol):
 
         print(f'[Voice Changer] Loading pitch extractor {pitch_extractor}')
         try:
-            if pitch_extractor in {"crepe_tiny", "crepe_full"}:
-                return CrepePitchExtractor(pitch_extractor)
+            if pitch_extractor == 'crepe_tiny':
+                return CrepePitchExtractor(pitch_extractor, cls.params.crepe_tiny)
+            elif pitch_extractor == 'crepe_full':
+                return CrepePitchExtractor(pitch_extractor, cls.params.crepe_full)
             elif pitch_extractor == "crepe_tiny_onnx":
                 return CrepeOnnxPitchExtractor(pitch_extractor, cls.params.crepe_onnx_tiny)
             elif pitch_extractor == "crepe_full_onnx":

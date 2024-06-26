@@ -31,6 +31,16 @@ async def downloadWeight(params: ServerSettings):
             "hash": "b509427f6d223152e57ff2aeb1b48300",
         },
         {
+            "url": "https://github.com/maxrmorrison/torchcrepe/raw/master/torchcrepe/assets/full.pth",
+            "saveTo": params.crepe_full,
+            "hash": "2ab425d128692f27ad5b765f13752333",
+        },
+        {
+            "url": "https://github.com/maxrmorrison/torchcrepe/raw/master/torchcrepe/assets/tiny.pth",
+            "saveTo": params.crepe_tiny,
+            "hash": "eec11d7661587b6b90da7823cf409340",
+        },
+        {
             "url": "https://huggingface.co/wok000/weights_gpl/resolve/main/content-vec/contentvec-f.onnx",
             "saveTo": params.content_vec_500_onnx,
             "hash": "ab288ca5b540a4a15909a40edf875d1e",
