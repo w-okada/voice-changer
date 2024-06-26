@@ -76,7 +76,11 @@ def merge_model(params: ServerSettings, request: ModelMergerRequest):
     merged["version"] = state_dict["version"] if "version" in state_dict else None
     merged["sr"] = state_dict["sr"]
     merged["f0"] = int(state_dict["f0"])
-    merged["info"] = state_dict["info"]
+    try:
+        # Some forks do not include info apparently (?)
+        merged["info"] = state_dict["info"]
+    except:
+        pass
     merged["embedder_name"] = state_dict["embedder_name"] if "embedder_name" in state_dict else None
     merged["embedder_output_layer"] = state_dict["embedder_output_layer"] if "embedder_output_layer" in state_dict else None
     print("write metadata done.")
