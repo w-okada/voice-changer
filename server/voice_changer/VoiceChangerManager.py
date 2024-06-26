@@ -254,7 +254,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         req = json.loads(request)
         req = ModelMergerRequest(**req)
         req.files = [MergeElement(**f) for f in req.files]
-        # Slots are range is 0-499
+        # Slots range is 0-499
         slot = len(self.modelSlotManager.getAllSlotInfo()) - 1
         if req.voiceChangerType == "RVC":
             merged = RVCModelMerger.merge_models(self.params, req, slot)
