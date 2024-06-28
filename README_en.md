@@ -3,6 +3,17 @@
 [Japanese](/README.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.27-alpha
+  - Feature
+    - Support for Beatrice v2 alpha2: formant changes, improved quality
+  - Logging enhancement
+    - Added download button
+  - Improvements
+    - Prevent double-clicking on upload
+    - Display during upload
+    - Fixed typo: paththrough -> passthrough
+  - Bug fixes
+    - Added handling for when undefined is returned in the performance monitor
 - v.2.0.24-alpha Colab version released. ⇒ [Here](./w_okada's_Voice_Changer_version_2_x.ipynb)
 - v.2.0.24-alpha
   - Bugfix:

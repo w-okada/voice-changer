@@ -3,6 +3,18 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.27-alpha
+  - Feature
+    - Beatrice v2 alpha2対応：formant変更、品質向上
+  - ログ強化
+    - ダウンロードボタン追加
+  - 改善
+    - アップロードの２度押し回避
+    - アップロード中の表示
+    - paththrough -> passthrough
+  - バグフィックス
+    - performance monitorにundefinedが返ってきたときの対応追加
+
 - v.2.0.24-alpha Colab版 リリース。⇒[こちら](./w_okada's_Voice_Changer_version_2_x.ipynb)
 - v.2.0.24-alpha
   - bugfix:
