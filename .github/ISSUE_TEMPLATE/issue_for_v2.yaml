@@ -50,7 +50,7 @@ body:
   - type: dropdown
     id: sample-model-work
     attributes:
-      label: What browsers are you seeing the problem on?
+      label: Does pre-installed model work?
       options:
         - Firefox
         - Chrome
