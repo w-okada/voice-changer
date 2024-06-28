@@ -54,7 +54,7 @@ body:
       options:
         - Firefox
         - Chrome
-        - SafariaYES
+        - "YES"
 
   - type: input
     id: vc-type
