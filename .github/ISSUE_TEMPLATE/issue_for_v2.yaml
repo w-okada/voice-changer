@@ -54,7 +54,7 @@ body:
       options:
         - "No"
         - "YES"
-      value: "No"
+      default: 0
   - type: input
     id: vc-type
     attributes:
