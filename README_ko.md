@@ -3,6 +3,7 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## 새로운 기능!
+- v.2.0.27-alpha -> [여기를 참조하십시오](https://github.com/w-okada/voice-changer/tree/v.2)
 - v.2.0.24-alpha Colab 버전 릴리스. ⇒ [여기](https://github.com/w-okada/voice-changer/tree/v.2/w_okada's_Voice_Changer_version_2_x.ipynb)
 
 - VCClient는 version.2로 개발이 진행 중입니다. [여기를 참조하십시오](https://github.com/w-okada/voice-changer/tree/v.2)
