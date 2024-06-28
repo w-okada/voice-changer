@@ -44,8 +44,20 @@ body:
         - label: If you use win_cuda edition, setup cuda and cudnn? [see here](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements)
         - label: If you use mac edition, client is not launched automatically. Use chrome to open application.?
         - label: I've tried to change the Chunk Size
+        - label: I've tried to set the Index to zero
         - label: I've read the [tutorial](https://github.com/w-okada/voice-changer/blob/master/tutorials/tutorial_rvc_en_latest.md)
         - label: I've tried to extract to another folder (or re-extract) the .zip file
+
+  - type: select
+    id: sample-model-work
+    attributes:
+      label: Does pre-installed model work?
+      description:
+      options:
+        - YES
+        - NO
+    validations:
+      required: true
   - type: input
     id: vc-type
     attributes:
