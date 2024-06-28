@@ -52,10 +52,8 @@ body:
     attributes:
       label: Does pre-installed model work?
       options:
-        - Firefox
-        - Chrome
-        - Safari
-        - Microsoft Edge
+        - YES
+        - NO
 
   - type: input
     id: vc-type
