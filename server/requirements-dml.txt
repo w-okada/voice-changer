@@ -10,7 +10,7 @@ faiss-cpu
 
 onnxscript
 onnxsim
-onnxruntime-directml
+onnxruntime-directml==1.18.0
 torchcrepe
 torchfcpe
 safetensors

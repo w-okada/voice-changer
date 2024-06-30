@@ -11,7 +11,7 @@ faiss-cpu==1.8.0; sys_platform=='darwin' # No wheels available for mac yet
 
 onnxscript
 onnxsim
-onnxruntime
+onnxruntime==1.18.0
 torchcrepe
 torchfcpe
 safetensors
