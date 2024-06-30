@@ -3,7 +3,7 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## 새로운 기능!
-- v.2.0.30-alpha Colab 버전 출시. ⇒ [여기](./w_okada's_Voice_Changer_version_2_x.ipynb)
+- v.2.0.32-alpha Colab 버전 출시. ⇒ [여기](./w_okada's_Voice_Changer_version_2_x.ipynb)
   - ngrok 없이도 사용 가능합니다. ngrok 계정이 없어도 이용할 수 있습니다.
 - v.2.0.27-alpha -> [여기를 참조하십시오](https://github.com/w-okada/voice-changer/tree/v.2)
 - v.2.0.24-alpha Colab 버전 릴리스. ⇒ [여기](https://github.com/w-okada/voice-changer/tree/v.2/w_okada's_Voice_Changer_version_2_x.ipynb)
