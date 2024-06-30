@@ -52,31 +52,44 @@ jobs:
         include:
         - os: windows-latest
           os_suffix: windows-amd64
+          reqs: cuda
           backend: cuda
           python-version: '3.11'
         - os: windows-latest
           os_suffix: windows-amd64
+          reqs: dml
           backend: dml
           python-version: '3.11'
         - os: macos-13
           os_suffix: macos-amd64
+          reqs: cpu
           backend: cpu
           python-version: '3.11'
         - os: macos-latest
           os_suffix: macos-arm64
+          reqs: cpu
           backend: cpu
           python-version: '3.11'
         - os: ubuntu-20.04
           os_suffix: linux-amd64
+          reqs: cpu
           backend: cpu
           python-version: '3.11'
         - os: ubuntu-20.04
           os_suffix: linux-amd64
+          reqs: cuda-cu118
           backend: cuda
           # Linux CUDA depends on faiss-gpu-cp310
           python-version: '3.10'
         - os: ubuntu-20.04
           os_suffix: linux-amd64
+          reqs: cuda
+          backend: cuda
+          # Linux CUDA depends on faiss-gpu-cp310
+          python-version: '3.10'
+        - os: ubuntu-20.04
+          os_suffix: linux-amd64
+          reqs: rocm
           backend: rocm
           # onnxruntime-rocm supports only cp310
           python-version: '3.10'
@@ -106,7 +119,7 @@ jobs:
     - name: Installing build dependencies
       run: python -m pip install --no-cache-dir --upgrade pip wheel setuptools pyinstaller
     - name: Installing project dependencies
-      run: python -m pip install --no-cache-dir -r requirements-common.txt -r requirements-${{ matrix.backend }}.txt
+      run: python -m pip install --no-cache-dir -r requirements-common.txt -r requirements-${{ matrix.reqs }}.txt
       working-directory: ./server
     - name: Building executable
       run: pyinstaller --clean -y --dist ./dist --workpath /tmp MMVCServerSIO.spec
@@ -116,10 +129,10 @@ jobs:
       run: |
         mkdir ./server/artifacts
         if [ "$RUNNER_OS" = "Windows" ]; then
-          7z a -v2000m -tzip ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip ./server/dist/* > /dev/null 2>&1
+          7z a -v2000m -tzip ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.reqs }}.zip ./server/dist/* > /dev/null 2>&1
         else
           cd ./server/dist
-          tar czf - ./* | split -b 2000m - ../artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.tar.gz.
+          tar czf - ./* | split -b 2000m - ../artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.reqs }}.tar.gz.
           cd -
         fi
     - name: Rename single asset
@@ -129,9 +142,9 @@ jobs:
         COUNT=$(ls -1q ./server/artifacts/ | wc -l | sed -r 's/[[:space:]]+//g')
         if [ $COUNT = 1 ]; then
           if [ "$RUNNER_OS" = "Windows" ]; then
-            mv ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip.001 ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.zip
+            mv ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.reqs }}.zip.001 ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.reqs }}.zip
           else
-            mv ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.tar.gz.aa ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.tar.gz
+            mv ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.reqs }}.tar.gz.aa ./server/artifacts/voice-changer-${{ matrix.os_suffix }}-${{ matrix.reqs }}.tar.gz
           fi
         fi
     - name: Upload release

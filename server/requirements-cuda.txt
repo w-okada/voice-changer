@@ -12,7 +12,7 @@ faiss-gpu; sys_platform=='linux'
 
 onnxscript
 onnxsim
-onnxruntime-gpu==1.18.0 # 1.18.0 is built against CuDNN 8.x which is required by Kaggle and possibly by other systems/libs
+onnxruntime-gpu
 torchcrepe
 torchfcpe
 safetensors

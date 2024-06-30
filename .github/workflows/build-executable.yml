@@ -16,31 +16,44 @@ jobs:
         include:
         - os: windows-latest
           os_suffix: windows-amd64
+          reqs: cuda
           backend: cuda
           python-version: '3.11'
         - os: windows-latest
           os_suffix: windows-amd64
+          reqs: dml
           backend: dml
           python-version: '3.11'
         - os: macos-13
           os_suffix: macos-amd64
+          reqs: cpu
           backend: cpu
           python-version: '3.11'
         - os: macos-latest
           os_suffix: macos-arm64
+          reqs: cpu
           backend: cpu
           python-version: '3.11'
         - os: ubuntu-20.04
           os_suffix: linux-amd64
+          reqs: cpu
           backend: cpu
           python-version: '3.11'
         - os: ubuntu-20.04
           os_suffix: linux-amd64
+          reqs: cuda-cu118
           backend: cuda
           # Linux CUDA depends on faiss-gpu-cp310
           python-version: '3.10'
         - os: ubuntu-20.04
           os_suffix: linux-amd64
+          reqs: cuda
+          backend: cuda
+          # Linux CUDA depends on faiss-gpu-cp310
+          python-version: '3.10'
+        - os: ubuntu-20.04
+          os_suffix: linux-amd64
+          reqs: rocm
           backend: rocm
           # onnxruntime-rocm supports only cp310
           python-version: '3.10'
@@ -69,7 +82,7 @@ jobs:
     - name: Installing build dependencies
       run: python -m pip install --no-cache-dir --upgrade pip wheel setuptools pyinstaller
     - name: Installing project dependencies
-      run: python -m pip install --no-cache-dir -r requirements-common.txt -r requirements-${{ matrix.backend }}.txt
+      run: python -m pip install --no-cache-dir -r requirements-common.txt -r requirements-${{ matrix.reqs }}.txt
       working-directory: ./server
     - name: Building executable
       run: pyinstaller --clean -y --dist ./dist --workpath /tmp MMVCServerSIO.spec
@@ -79,12 +92,12 @@ jobs:
       run: |
         if [ "$RUNNER_OS" != "Windows" ]; then
           mkdir ./server/.tarballs
-          tar cf ./server/.tarballs/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.tar ./server/dist
+          tar cf ./server/.tarballs/voice-changer-${{ matrix.os_suffix }}-${{ matrix.reqs }}.tar ./server/dist
           rm -rf ./server/dist/*
-          mv ./server/.tarballs/voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}.tar ./server/dist/
+          mv ./server/.tarballs/voice-changer-${{ matrix.os_suffix }}-${{ matrix.reqs }}.tar ./server/dist/
         fi
     - name: Uploading artifact
       uses: actions/upload-artifact@v4
       with:
-        name: voice-changer-${{ matrix.os_suffix }}-${{ matrix.backend }}
+        name: voice-changer-${{ matrix.os_suffix }}-${{ matrix.reqs }}
         path: ./server/dist
