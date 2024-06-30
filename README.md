@@ -70,6 +70,8 @@ A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX
 
 * Slightly degraded performance (up to 25% reduction) can be observed with multi-GPU setups.
 
+* AMD Radeon RX 7000 series may be unable to achieve low latency (below 256ms).
+
 ### All versions
 
 * On first startup, voice may not change or errors may occur until Chunk and Extra settings are changed. Workaround is to change Chunk and Extra.
