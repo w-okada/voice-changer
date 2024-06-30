@@ -77,12 +77,6 @@ jobs:
           python-version: '3.11'
         - os: ubuntu-20.04
           os_suffix: linux-amd64
-          reqs: cuda-cu118
-          backend: cuda
-          # Linux CUDA depends on faiss-gpu-cp310
-          python-version: '3.10'
-        - os: ubuntu-20.04
-          os_suffix: linux-amd64
           reqs: cuda
           backend: cuda
           # Linux CUDA depends on faiss-gpu-cp310

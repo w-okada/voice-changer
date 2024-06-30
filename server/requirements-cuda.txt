@@ -3,8 +3,8 @@
 # # wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh
 # # bash Anaconda3-2022.10-Linux-x86_64.sh
 
---extra-index-url https://download.pytorch.org/whl/cu121
---extra-index-url https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/
+# PyPI onnxruntime-gpu is compiled with CUDA 11.x
+--extra-index-url https://download.pytorch.org/whl/cu118
 torch
 torchaudio
 faiss-cpu; sys_platform!='linux'
