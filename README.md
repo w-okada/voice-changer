@@ -3,6 +3,8 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.30-alpha Colab版 リリース。⇒[こちら](./w_okada's_Voice_Changer_version_2_x.ipynb)
+  - ngrokフリーになりました。ngrokのアカウントなしで利用可能です。
 - v.2.0.27-alpha
   - Feature
     - Beatrice v2 alpha2対応：formant変更、品質向上

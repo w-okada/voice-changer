@@ -3,6 +3,8 @@
 [Japanese](/README.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.30-alpha Colab version released. ⇒ [Here](./w_okada's_Voice_Changer_version_2_x.ipynb)
+  - ngrok is no longer needed. You can use it without a ngrok account.
 - v.2.0.27-alpha
   - Feature
     - Support for Beatrice v2 alpha2: formant changes, improved quality
