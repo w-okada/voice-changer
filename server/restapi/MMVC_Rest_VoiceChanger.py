@@ -39,12 +39,17 @@ class MMVC_Rest_VoiceChanger:
             #         struct.unpack("<%sh" % (len(wav) // struct.calcsize("<h")), wav)
             #     )
 
-            unpackedData = np.array(struct.unpack("<%sh" % (len(wav) // struct.calcsize("<h")), wav)).astype(np.int16)
+            # unpackedData = np.array(struct.unpack("<%sh" % (len(wav) // struct.calcsize("<h")), wav)).astype(np.int16)
+            unpackedData = np.array(
+                struct.unpack("<%sf" % (len(wav) // struct.calcsize("<f")), wav)
+            ).astype(np.float32)
             # print(f"[REST] unpackedDataType {unpackedData.dtype}")
 
             self.tlock.acquire()
             changedVoice = self.voiceChangerManager.changeVoice(unpackedData)
             self.tlock.release()
+
+            print("", changedVoice[0].dtype)
 
             changedVoiceBase64 = base64.b64encode(changedVoice[0]).decode("utf-8")
             data = {"timestamp": timestamp, "changedVoiceBase64": changedVoiceBase64}

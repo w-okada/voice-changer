@@ -41,32 +41,122 @@ logger.debug(f"---------------- Booting PHASE :{__name__} -----------------")
 
 def setupArgParser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--logLevel", type=str, default="error", help="Log level info|critical|error. (default: error)")
+    parser.add_argument(
+        "--logLevel",
+        type=str,
+        default="error",
+        help="Log level info|critical|error. (default: error)",
+    )
     parser.add_argument("-p", type=int, default=18888, help="port")
     parser.add_argument("--https", type=strtobool, default=False, help="use https")
-    parser.add_argument("--test_connect", type=str, default="8.8.8.8", help="test connect to detect ip in https mode. default 8.8.8.8")
-    parser.add_argument("--httpsKey", type=str, default="ssl.key", help="path for the key of https")
-    parser.add_argument("--httpsCert", type=str, default="ssl.cert", help="path for the cert of https")
-    parser.add_argument("--httpsSelfSigned", type=strtobool, default=True, help="generate self-signed certificate")
+    parser.add_argument(
+        "--test_connect",
+        type=str,
+        default="8.8.8.8",
+        help="test connect to detect ip in https mode. default 8.8.8.8",
+    )
+    parser.add_argument(
+        "--httpsKey", type=str, default="ssl.key", help="path for the key of https"
+    )
+    parser.add_argument(
+        "--httpsCert", type=str, default="ssl.cert", help="path for the cert of https"
+    )
+    parser.add_argument(
+        "--httpsSelfSigned",
+        type=strtobool,
+        default=True,
+        help="generate self-signed certificate",
+    )
 
-    parser.add_argument("--model_dir", type=str, default="model_dir", help="path to model files")
-    parser.add_argument("--sample_mode", type=str, default="production", help="rvc_sample_mode")
+    parser.add_argument(
+        "--model_dir", type=str, default="model_dir", help="path to model files"
+    )
+    parser.add_argument(
+        "--sample_mode", type=str, default="production", help="rvc_sample_mode"
+    )
 
-    parser.add_argument("--content_vec_500", type=str, default="pretrain/checkpoint_best_legacy_500.pt", help="path to content_vec_500 model(pytorch)")
-    parser.add_argument("--content_vec_500_onnx", type=str, default="pretrain/content_vec_500.onnx", help="path to content_vec_500 model(onnx)")
-    parser.add_argument("--content_vec_500_onnx_on", type=strtobool, default=True, help="use or not onnx for  content_vec_500")
-    parser.add_argument("--hubert_base", type=str, default="pretrain/hubert_base.pt", help="path to hubert_base model(pytorch)")
-    parser.add_argument("--hubert_base_jp", type=str, default="pretrain/rinna_hubert_base_jp.pt", help="path to hubert_base_jp model(pytorch)")
-    parser.add_argument("--hubert_soft", type=str, default="pretrain/hubert/hubert-soft-0d54a1f4.pt", help="path to hubert_soft model(pytorch)")
-    parser.add_argument("--whisper_tiny", type=str, default="pretrain/whisper_tiny.pt", help="path to hubert_soft model(pytorch)")
-    parser.add_argument("--nsf_hifigan", type=str, default="pretrain/nsf_hifigan/model", help="path to nsf_hifigan model(pytorch)")
-    parser.add_argument("--crepe_onnx_full", type=str, default="pretrain/crepe_onnx_full.onnx", help="path to crepe_onnx_full")
-    parser.add_argument("--crepe_onnx_tiny", type=str, default="pretrain/crepe_onnx_tiny.onnx", help="path to crepe_onnx_tiny")
-    parser.add_argument("--rmvpe", type=str, default="pretrain/rmvpe.pt", help="path to rmvpe")
-    parser.add_argument("--rmvpe_onnx", type=str, default="pretrain/rmvpe.onnx", help="path to rmvpe onnx")
+    parser.add_argument(
+        "--content_vec_500",
+        type=str,
+        default="pretrain/checkpoint_best_legacy_500.pt",
+        help="path to content_vec_500 model(pytorch)",
+    )
+    parser.add_argument(
+        "--content_vec_500_onnx",
+        type=str,
+        default="pretrain/content_vec_500.onnx",
+        help="path to content_vec_500 model(onnx)",
+    )
+    parser.add_argument(
+        "--content_vec_500_onnx_on",
+        type=strtobool,
+        default=True,
+        help="use or not onnx for  content_vec_500",
+    )
+    parser.add_argument(
+        "--hubert_base",
+        type=str,
+        default="pretrain/hubert_base.pt",
+        help="path to hubert_base model(pytorch)",
+    )
+    parser.add_argument(
+        "--hubert_base_jp",
+        type=str,
+        default="pretrain/rinna_hubert_base_jp.pt",
+        help="path to hubert_base_jp model(pytorch)",
+    )
+    parser.add_argument(
+        "--hubert_soft",
+        type=str,
+        default="pretrain/hubert/hubert-soft-0d54a1f4.pt",
+        help="path to hubert_soft model(pytorch)",
+    )
+    parser.add_argument(
+        "--whisper_tiny",
+        type=str,
+        default="pretrain/whisper_tiny.pt",
+        help="path to hubert_soft model(pytorch)",
+    )
+    parser.add_argument(
+        "--nsf_hifigan",
+        type=str,
+        default="pretrain/nsf_hifigan/model",
+        help="path to nsf_hifigan model(pytorch)",
+    )
+    parser.add_argument(
+        "--crepe_onnx_full",
+        type=str,
+        default="pretrain/crepe_onnx_full.onnx",
+        help="path to crepe_onnx_full",
+    )
+    parser.add_argument(
+        "--crepe_onnx_tiny",
+        type=str,
+        default="pretrain/crepe_onnx_tiny.onnx",
+        help="path to crepe_onnx_tiny",
+    )
+    parser.add_argument(
+        "--rmvpe", type=str, default="pretrain/rmvpe.pt", help="path to rmvpe"
+    )
+    parser.add_argument(
+        "--rmvpe_onnx",
+        type=str,
+        default="pretrain/rmvpe.onnx",
+        help="path to rmvpe onnx",
+    )
 
-    parser.add_argument("--host", type=str, default='127.0.0.1', help="IP address of the network interface to listen for HTTP connections. Specify 0.0.0.0 to listen on all interfaces.")
-    parser.add_argument("--allowed-origins", action='append', default=[], help="List of URLs to allow connection from, i.e. https://example.com. Allows http(s)://127.0.0.1:{port} and http(s)://localhost:{port} by default.")
+    parser.add_argument(
+        "--host",
+        type=str,
+        default="127.0.0.1",
+        help="IP address of the network interface to listen for HTTP connections. Specify 0.0.0.0 to listen on all interfaces.",
+    )
+    parser.add_argument(
+        "--allowed-origins",
+        action="append",
+        default=[],
+        help="List of URLs to allow connection from, i.e. https://example.com. Allows http(s)://127.0.0.1:{port} and http(s)://localhost:{port} by default.",
+    )
 
     return parser
 
@@ -121,7 +211,11 @@ HOST = args.host
 PORT = args.p
 
 
-def localServer(logLevel: str = "critical", key_path: str | None = None, cert_path: str | None = None):
+def localServer(
+    logLevel: str = "critical",
+    key_path: str | None = None,
+    cert_path: str | None = None,
+):
     try:
         uvicorn.run(
             f"{os.path.basename(__file__)[:-3]}:app_socketio",
@@ -140,13 +234,18 @@ if __name__ == "MMVCServerSIO":
     mp.freeze_support()
 
     voiceChangerManager = VoiceChangerManager.get_instance(voiceChangerParams)
-    app_fastapi = MMVC_Rest.get_instance(voiceChangerManager, voiceChangerParams, args.allowed_origins, PORT)
-    app_socketio = MMVC_SocketIOApp.get_instance(app_fastapi, voiceChangerManager, args.allowed_origins, PORT)
+    app_fastapi = MMVC_Rest.get_instance(
+        voiceChangerManager, voiceChangerParams, args.allowed_origins, PORT
+    )
+    app_socketio = MMVC_SocketIOApp.get_instance(
+        app_fastapi, voiceChangerManager, args.allowed_origins, PORT
+    )
 
 
 if __name__ == "__mp_main__":
     # printMessage("サーバプロセスを起動しています。", level=2)
     printMessage("The server process is starting up.", level=2)
+
 
 if __name__ == "__main__":
     mp.freeze_support()
@@ -202,7 +301,9 @@ if __name__ == "__main__":
         )
         key_path = os.path.join(SSL_KEY_DIR, keyname)
         cert_path = os.path.join(SSL_KEY_DIR, certname)
-        printMessage(f"protocol: HTTPS(self-signed), key:{key_path}, cert:{cert_path}", level=1)
+        printMessage(
+            f"protocol: HTTPS(self-signed), key:{key_path}, cert:{cert_path}", level=1
+        )
 
     elif args.https and args.httpsSelfSigned == 0:
         # HTTPS
@@ -223,8 +324,13 @@ if __name__ == "__main__":
         printMessage("http://<IP>:<PORT>/", level=1)
 
     # printMessage("多くの場合は次のいずれかのURLにアクセスすると起動します。", level=2)
-    printMessage("In many cases, it will launch when you access any of the following URLs.", level=2)
-    if "EX_PORT" in locals() and "EX_IP" in locals():  # シェルスクリプト経由起動(docker)
+    printMessage(
+        "In many cases, it will launch when you access any of the following URLs.",
+        level=2,
+    )
+    if (
+        "EX_PORT" in locals() and "EX_IP" in locals()
+    ):  # シェルスクリプト経由起動(docker)
         if args.https == 1:
             printMessage(f"https://localhost:{EX_PORT}/", level=1)
             for ip in EX_IP.strip().split(" "):
@@ -254,12 +360,26 @@ if __name__ == "__main__":
         p.start()
         try:
             if sys.platform.startswith("win"):
-                process = subprocess.Popen([NATIVE_CLIENT_FILE_WIN, "--disable-gpu", "-u", f"http://localhost:{PORT}/"])
+                process = subprocess.Popen(
+                    [
+                        NATIVE_CLIENT_FILE_WIN,
+                        "--disable-gpu",
+                        "-u",
+                        f"http://localhost:{PORT}/",
+                    ]
+                )
                 return_code = process.wait()
                 logger.info("client closed.")
                 p.terminate()
             elif sys.platform.startswith("darwin"):
-                process = subprocess.Popen([NATIVE_CLIENT_FILE_MAC, "--disable-gpu", "-u", f"http://localhost:{PORT}/"])
+                process = subprocess.Popen(
+                    [
+                        NATIVE_CLIENT_FILE_MAC,
+                        "--disable-gpu",
+                        "-u",
+                        f"http://localhost:{PORT}/",
+                    ]
+                )
                 return_code = process.wait()
                 logger.info("client closed.")
                 p.terminate()

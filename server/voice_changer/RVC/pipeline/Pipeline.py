@@ -55,7 +55,9 @@ class Pipeline(object):
         logger.info("GENERATE PITCH EXTRACTOR" + str(self.pitchExtractor))
 
         self.index = index
-        self.big_npy = index.reconstruct_n(0, index.ntotal) if index is not None else None
+        self.big_npy = (
+            index.reconstruct_n(0, index.ntotal) if index is not None else None
+        )
         # self.feature = feature
 
         self.targetSR = targetSR
@@ -69,7 +71,12 @@ class Pipeline(object):
         inferencerInfo = self.inferencer.getInferencerInfo() if self.inferencer else {}
         embedderInfo = self.embedder.getEmbedderInfo()
         pitchExtractorInfo = self.pitchExtractor.getPitchExtractorInfo()
-        return {"inferencer": inferencerInfo, "embedder": embedderInfo, "pitchExtractor": pitchExtractorInfo, "isHalf": self.isHalf}
+        return {
+            "inferencer": inferencerInfo,
+            "embedder": embedderInfo,
+            "pitchExtractor": pitchExtractorInfo,
+            "isHalf": self.isHalf,
+        }
 
     def setPitchExtractor(self, pitchExtractor: PitchExtractor):
         self.pitchExtractor = pitchExtractor
@@ -88,13 +95,16 @@ class Pipeline(object):
                 # pitch = pitch[:p_len]
                 # pitchf = pitchf[:p_len]
                 pitch = torch.tensor(pitch, device=self.device).unsqueeze(0).long()
-                pitchf = torch.tensor(pitchf, device=self.device, dtype=torch.float).unsqueeze(0)
+                pitchf = torch.tensor(
+                    pitchf, device=self.device, dtype=torch.float
+                ).unsqueeze(0)
             else:
                 pitch = None
                 pitchf = None
         except IndexError as e:  # NOQA
             print(e)
             import traceback
+
             traceback.print_exc()
             raise NotEnoughDataExtimateF0()
         return pitch, pitchf
@@ -102,7 +112,9 @@ class Pipeline(object):
     def extractFeatures(self, feats, embOutputLayer, useFinalProj):
         with autocast(enabled=self.isHalf):
             try:
-                feats = self.embedder.extractFeatures(feats, embOutputLayer, useFinalProj)
+                feats = self.embedder.extractFeatures(
+                    feats, embOutputLayer, useFinalProj
+                )
                 if torch.isnan(feats).all():
                     raise DeviceCannotSupportHalfPrecisionException()
                 return feats
@@ -113,13 +125,16 @@ class Pipeline(object):
                     raise DeviceChangingException()
                 else:
                     raise e
-                
+
     def infer(self, feats, p_len, pitch, pitchf, sid, out_size):
         try:
             with torch.no_grad():
                 with autocast(enabled=self.isHalf):
-                    audio1 = self.inferencer.infer(feats,  p_len, pitch, pitchf, sid, out_size)                    
-                    audio1 = (audio1 * 32767.5).data.to(dtype=torch.int16)
+                    audio1 = self.inferencer.infer(
+                        feats, p_len, pitch, pitchf, sid, out_size
+                    )
+                    # audio1 = (audio1 * 32767.5).data.to(dtype=torch.int16)
+                    audio1 = (audio1).data
             return audio1
         except RuntimeError as e:
             if "HALF" in e.__str__().upper():
@@ -149,16 +164,24 @@ class Pipeline(object):
 
         with Timer2("Pipeline-Exec", False) as t:  # NOQA
             # 16000のサンプリングレートで入ってきている。以降この世界は16000で処理。
-            search_index = self.index is not None and self.big_npy is not None and index_rate != 0
+            search_index = (
+                self.index is not None and self.big_npy is not None and index_rate != 0
+            )
             # self.t_pad = self.sr * repeat  # 1秒
             # self.t_pad_tgt = self.targetSR * repeat  # 1秒　出力時のトリミング(モデルのサンプリングで出力される)
             audio = audio.unsqueeze(0)
 
-            quality_padding_sec = (repeat * (audio.shape[1] - 1)) / self.sr  # padding(reflect)のサイズは元のサイズより小さい必要がある。
+            quality_padding_sec = (
+                repeat * (audio.shape[1] - 1)
+            ) / self.sr  # padding(reflect)のサイズは元のサイズより小さい必要がある。
 
             self.t_pad = round(self.sr * quality_padding_sec)  # 前後に音声を追加
-            self.t_pad_tgt = round(self.targetSR * quality_padding_sec)  # 前後に音声を追加　出力時のトリミング(モデルのサンプリングで出力される)
-            audio_pad = F.pad(audio, (self.t_pad, self.t_pad), mode="reflect").squeeze(0)
+            self.t_pad_tgt = round(
+                self.targetSR * quality_padding_sec
+            )  # 前後に音声を追加　出力時のトリミング(モデルのサンプリングで出力される)
+            audio_pad = F.pad(audio, (self.t_pad, self.t_pad), mode="reflect").squeeze(
+                0
+            )
             p_len = audio_pad.shape[0] // self.window
             sid = torch.tensor(sid, device=self.device).unsqueeze(0).long()
 
@@ -176,7 +199,9 @@ class Pipeline(object):
 
             t.record("pre-process")
             # ピッチ検出
-            pitch, pitchf = self.extractPitch(audio_pad, if_f0, pitchf, f0_up_key, silence_front)
+            pitch, pitchf = self.extractPitch(
+                audio_pad, if_f0, pitchf, f0_up_key, silence_front
+            )
             t.record("extract-pitch")
 
             # embedding
@@ -203,12 +228,25 @@ class Pipeline(object):
                     score, ix = self.index.search(npy, k=8)
                     weight = np.square(1 / score)
                     weight /= weight.sum(axis=1, keepdims=True)
-                    npy = np.sum(self.big_npy[ix] * np.expand_dims(weight, axis=2), axis=1)
+                    npy = np.sum(
+                        self.big_npy[ix] * np.expand_dims(weight, axis=2), axis=1
+                    )
 
                 # recover silient font
-                npy = np.concatenate([np.zeros([npyOffset, npy.shape[1]], dtype=np.float32), feature[:npyOffset:2].astype("float32"), npy])[-feats.shape[1]:]
-                feats = torch.from_numpy(npy).unsqueeze(0).to(self.device) * index_rate + (1 - index_rate) * feats
-            feats = F.interpolate(feats.permute(0, 2, 1), scale_factor=2).permute(0, 2, 1)
+                npy = np.concatenate(
+                    [
+                        np.zeros([npyOffset, npy.shape[1]], dtype=np.float32),
+                        feature[:npyOffset:2].astype("float32"),
+                        npy,
+                    ]
+                )[-feats.shape[1] :]
+                feats = (
+                    torch.from_numpy(npy).unsqueeze(0).to(self.device) * index_rate
+                    + (1 - index_rate) * feats
+                )
+            feats = F.interpolate(feats.permute(0, 2, 1), scale_factor=2).permute(
+                0, 2, 1
+            )
             if protect < 0.5 and search_index:
                 feats0 = feats.clone()
 
@@ -280,4 +318,4 @@ class Pipeline(object):
         del self.embedder
         del self.inferencer
         del self.pitchExtractor
-        print('Pipeline has been deleted')
+        print("Pipeline has been deleted")
