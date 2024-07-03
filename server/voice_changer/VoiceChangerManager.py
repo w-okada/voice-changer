@@ -247,7 +247,8 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             return self.voiceChanger.on_request(receivedData)
 
     def export2onnx(self):
-        return self.voiceChanger.export2onnx()
+        with torch.no_grad():
+            return self.voiceChanger.export2onnx()
 
     async def merge_models(self, request: str):
         # self.voiceChanger.merge_models(request)

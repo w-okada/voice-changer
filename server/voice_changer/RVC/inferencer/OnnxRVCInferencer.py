@@ -9,14 +9,12 @@ import numpy as np
 class OnnxRVCInferencer(Inferencer):
     def load_model(self, file: str, inferencerTypeVersion: str | None = None):
         self.inferencerTypeVersion = inferencerTypeVersion
+        device_manager = DeviceManager.get_instance()
         (
             onnxProviders,
             onnxProviderOptions,
         ) = DeviceManager.get_instance().get_onnx_execution_provider()
-        # FIXME: Temporarily disable conversion to FP16 since the forward pass contains the ops that are not converted correctly.
-        # Note that float model inputs are explicitly converted to FP32!
-        # self.is_half = DeviceManager.get_instance().is_fp16_available(gpu)
-        self.is_half = False
+        self.is_half = device_manager.use_fp16()
 
         self.set_props(EnumInferenceTypes.onnxRVC, file)
 
@@ -48,10 +46,10 @@ class OnnxRVCInferencer(Inferencer):
         if feats.device.type == 'cuda':
             binding = self.model.io_binding()
 
-            binding.bind_input('feats', device_type='cuda', device_id=feats.device.index, element_type=self.fp_dtype_np, shape=tuple(feats.shape), buffer_ptr=feats.float().data_ptr())
+            binding.bind_input('feats', device_type='cuda', device_id=feats.device.index, element_type=self.fp_dtype_np, shape=tuple(feats.shape), buffer_ptr=feats.data_ptr())
             binding.bind_input('p_len', device_type='cuda', device_id=feats.device.index, element_type=np.int64, shape=tuple(pitch_length.shape), buffer_ptr=pitch_length.data_ptr())
             binding.bind_input('pitch', device_type='cuda', device_id=feats.device.index, element_type=np.int64, shape=tuple(pitch.shape), buffer_ptr=pitch.data_ptr())
-            binding.bind_input('pitchf', device_type='cuda', device_id=feats.device.index, element_type=self.fp_dtype_np, shape=tuple(pitchf.shape), buffer_ptr=pitchf.float().data_ptr())
+            binding.bind_input('pitchf', device_type='cuda', device_id=feats.device.index, element_type=self.fp_dtype_np, shape=tuple(pitchf.shape), buffer_ptr=pitchf.data_ptr())
             binding.bind_input('sid', device_type='cuda', device_id=feats.device.index, element_type=np.int64, shape=tuple(sid.shape), buffer_ptr=sid.data_ptr())
             binding.bind_cpu_input('skip_head', np.array(skip_head, dtype=np.int64))
             binding.bind_cpu_input('return_length', np.array(return_length, dtype=np.int64))
@@ -66,10 +64,10 @@ class OnnxRVCInferencer(Inferencer):
             output = self.model.run(
                 ["audio"],
                 {
-                    "feats": feats.float().detach().cpu().numpy(),
+                    "feats": feats.detach().cpu().numpy(),
                     "p_len": pitch_length.detach().cpu().numpy(),
                     "pitch": pitch.detach().cpu().numpy(),
-                    "pitchf": pitchf.float().detach().cpu().numpy(),
+                    "pitchf": pitchf.detach().cpu().numpy(),
                     "sid": sid.detach().cpu().numpy(),
                     "skip_head": np.array(skip_head, dtype=np.int64),
                     "return_length": np.array(return_length, dtype=np.int64),

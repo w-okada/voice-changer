@@ -2,6 +2,7 @@ import os
 from const import ROOT_PATH
 # NOTE: This is required to fix current working directory on macOS
 os.chdir(ROOT_PATH)
+os.environ['PYTORCH_ENABLE_MPS_FALLBACK'] = '1'
 
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 from sio.MMVC_SocketIOApp import MMVC_SocketIOApp
