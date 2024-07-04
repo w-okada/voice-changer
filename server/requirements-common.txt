@@ -6,7 +6,6 @@
 uvicorn
 pyOpenSSL
 numpy<2 # Not all modules have migrated to NumPy 2 yet. Using latest NumPy 1 version
-soxr
 python-socketio
 fastapi
 python-multipart
