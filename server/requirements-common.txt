@@ -9,7 +9,7 @@ numpy<2 # Not all modules have migrated to NumPy 2 yet. Using latest NumPy 1 ver
 python-socketio
 fastapi
 python-multipart
-scipy==1.13.1 # frozen build for macOS seems to have problems with >1.14: "ModuleNotFoundError: No module named 'scipy._lib.array_api_compat.numpy.fft'"
+scipy
 librosa
 sounddevice
 python-dotenv
