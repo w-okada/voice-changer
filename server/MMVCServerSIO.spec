@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-from PyInstaller.utils.hooks import collect_data_files
+from PyInstaller.utils.hooks import collect_data_files, collect_all, collect_dynamic_libs
 import sys
 import os.path
 import site
@@ -8,8 +8,6 @@ import logging
 sys.setrecursionlimit(sys.getrecursionlimit() * 5)
 
 backend = os.environ.get('BACKEND', 'cpu')
-python_folder = next(folder for folder in site.getsitepackages() if 'site-packages' in folder).replace('\\', '/')
-logging.info(python_folder)
 
 with open('edition.txt', 'w') as f:
     if backend == 'cpu':
@@ -30,17 +28,13 @@ if 'BUILD_NAME' in os.environ:
       f.write(os.environ['BUILD_NAME'])
   datas += [('./version.txt', '.')]
 
-if sys.platform == 'win32':
-    binaries = [(python_folder + '/onnxruntime/capi/*.dll', 'onnxruntime/capi')]
-    if backend == 'dml':
-        binaries += [(python_folder + '/torch_directml/DirectML.dll', 'torch_directml')]
-else:
-    binaries = [(python_folder + '/onnxruntime/capi/*.so', 'onnxruntime/capi')]
-
+binaries = []
+if backend == 'dml':
+  binaries += collect_dynamic_libs('torch_directml')
 hiddenimports = ['app']
 datas += collect_data_files('onnxscript', include_py_files=True)
-# tmp_ret = collect_all('fairseq')
-# datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+tmp_ret = collect_all('onnxruntime')
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 
 a = Analysis(
     ['client.py'],
