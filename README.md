@@ -3,6 +3,10 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.36-alpha
+  - バグフィックス
+    - RVCの音が割れる問題の対策
+    - vcclient v1で作成したDDPN版RVCのonnxの読み込み失敗の対策
 - v.2.0.32-alpha Colab版 リリース。⇒[こちら](./w_okada's_Voice_Changer_version_2_x.ipynb)
   - ngrokフリーになりました。ngrokのアカウントなしで利用可能です。
 - v.2.0.27-alpha
