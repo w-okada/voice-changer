@@ -11,6 +11,7 @@ except ImportError:
 class DevicePresentation(TypedDict):
     id: int
     name: str
+    memory: int
     backend: Literal['cpu', 'cuda', 'directml', 'mps']
 
 class DeviceManager(object):
@@ -71,7 +72,7 @@ class DeviceManager(object):
         raise Exception(f'Failed to find device with index {dev_id}')
 
     @staticmethod
-    def list_devices():
+    def list_devices() -> list[DevicePresentation]:
         devCount = torch.cuda.device_count()
         if getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available():
             devices = [{ "id": -1, "name": "MPS", 'backend': 'mps' }]

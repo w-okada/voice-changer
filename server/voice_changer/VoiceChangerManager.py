@@ -20,18 +20,9 @@ from dataclasses import dataclass, asdict, field
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 
 # import threading
-from typing import Callable
-from typing import Any
-import re
+from typing import Callable, Any
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
-
-
-@dataclass()
-class GPUInfo:
-    id: int
-    name: str
-    memory: int
 
 
 @dataclass()
@@ -81,7 +72,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
 
         self.modelSlotManager = ModelSlotManager.get_instance(self.params.model_dir)
         # スタティックな情報を収集
-        self.gpus: list[GPUInfo] = self._get_gpuInfos()
+        self.devices = self._get_devices()
 
         self.serverDevice = ServerDevice(self)
 
@@ -114,7 +105,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             self.stored_setting[key] = val
             json.dump(self.stored_setting, open(STORED_SETTING_FILE, "w"))
 
-    def _get_gpuInfos(self):
+    def _get_devices(self):
         return DeviceManager.list_devices()
 
     @classmethod
@@ -166,7 +157,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
 
     def get_info(self):
         data = asdict(self.settings)
-        data["gpus"] = self.gpus
+        data["gpus"] = self.devices
         data["modelSlots"] = self.modelSlotManager.getAllSlotInfo(reload=True)
         data["sampleModels"] = getSampleInfos(self.params.sample_mode)
         data["python"] = sys.version
