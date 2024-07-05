@@ -1,4 +1,4 @@
-import soxr
+import librosa
 import numpy as np
 
 from voice_changer.RVC.pitchExtractor import onnxcrepe
@@ -134,7 +134,7 @@ def preprocess(audio: np.ndarray,
     """
     # Resample
     if sample_rate != SAMPLE_RATE:
-        audio = soxr.resample(audio, sample_rate, SAMPLE_RATE)
+        audio = librosa.resample(audio, orig_sr=sample_rate, target_sr=SAMPLE_RATE)
 
     # Default hop length of 10 ms
     hop_length = SAMPLE_RATE / 100 if precision is None else SAMPLE_RATE * precision / 1000
@@ -253,4 +253,4 @@ def periodicity(probabilities: np.ndarray, bins: np.ndarray):
 
 def resample(audio: np.ndarray, sample_rate: int):
     """Resample audio"""
-    return soxr.resample(audio, sample_rate, onnxcrepe.SAMPLE_RATE)
+    return librosa.resample(audio, orig_sr=sample_rate, target_sr=onnxcrepe.SAMPLE_RATE)

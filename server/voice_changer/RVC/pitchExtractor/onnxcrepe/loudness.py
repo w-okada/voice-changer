@@ -1,6 +1,5 @@
 import warnings
 
-import soxr
 import librosa
 import numpy as np
 from voice_changer.RVC.pitchExtractor import onnxcrepe
@@ -34,7 +33,7 @@ def a_weighted(audio, sample_rate, hop_length=None, pad=True):
 
     # Resample
     if sample_rate != onnxcrepe.SAMPLE_RATE:
-        audio = soxr.resample(audio, sample_rate, onnxcrepe.SAMPLE_RATE)
+        audio = librosa.resample(audio, orig_sr=sample_rate, target_sr=onnxcrepe.SAMPLE_RATE)
         hop_length = int(hop_length * onnxcrepe.SAMPLE_RATE / sample_rate)
 
     # Cache weights

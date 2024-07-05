@@ -6,7 +6,7 @@
 torch==2.3.1 # torch-directml-0.2.2.dev240614 supports up to to 2.3.1
 torchaudio
 torch-directml
-faiss-cpu
+faiss-cpu==1.8.0
 
 onnxscript
 onnxsim

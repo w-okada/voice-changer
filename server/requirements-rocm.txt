@@ -6,7 +6,7 @@
 --extra-index-url https://download.pytorch.org/whl/rocm6.0
 torch
 torchaudio
-faiss-cpu
+faiss-cpu==1.8.0
 
 onnxscript
 onnxsim

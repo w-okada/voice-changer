@@ -7,7 +7,7 @@
 --extra-index-url https://download.pytorch.org/whl/cu118
 torch
 torchaudio
-faiss-cpu; sys_platform!='linux'
+faiss-cpu==1.8.0; sys_platform!='linux'
 faiss-gpu; sys_platform=='linux'
 
 onnxscript

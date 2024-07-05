@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-from PyInstaller.utils.hooks import collect_data_files, collect_all, collect_dynamic_libs
+from PyInstaller.utils.hooks import collect_data_files, collect_all, collect_dynamic_libs, collect_submodules
 import sys
 import os.path
 import site
@@ -27,14 +27,16 @@ if 'BUILD_NAME' in os.environ:
   with open('version.txt', 'w') as f:
       f.write(os.environ['BUILD_NAME'])
   datas += [('./version.txt', '.')]
+datas += collect_data_files('onnxscript', include_py_files=True)
 
 binaries = []
 if backend == 'dml':
   binaries += collect_dynamic_libs('torch_directml')
+binaries += collect_dynamic_libs('onnxruntime')
+
 hiddenimports = ['app']
-datas += collect_data_files('onnxscript', include_py_files=True)
-tmp_ret = collect_all('onnxruntime')
-datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+hiddenimports += collect_submodules('scipy') # Fix "ModuleNotFoundError: No module named 'scipy._lib.*'"
+hiddenimports += collect_submodules('onnxruntime') # Fix "ModuleNotFoundError: No module named 'onnxruntime.transformers.*'"
 
 a = Analysis(
     ['client.py'],
