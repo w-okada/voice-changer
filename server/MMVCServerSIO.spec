@@ -32,11 +32,12 @@ datas += collect_data_files('onnxscript', include_py_files=True)
 binaries = []
 if backend == 'dml':
   binaries += collect_dynamic_libs('torch_directml')
-binaries += collect_dynamic_libs('onnxruntime')
 
 hiddenimports = ['app']
 hiddenimports += collect_submodules('scipy') # Fix "ModuleNotFoundError: No module named 'scipy._lib.*'"
-hiddenimports += collect_submodules('onnxruntime') # Fix "ModuleNotFoundError: No module named 'onnxruntime.transformers.*'"
+
+tmp_ret = collect_all('onnxruntime') # Fix "ModuleNotFoundError: No module named 'onnxruntime.transformers.*'"
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 
 a = Analysis(
     ['client.py'],

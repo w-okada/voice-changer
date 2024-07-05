@@ -3,7 +3,6 @@ from onnxsim import simplify
 import onnx
 import torch
 from io import BytesIO
-from onnxconverter_common import float16
 import torch
 from torchfcpe.models_infer import spawn_model, spawn_wav2mel
 from torchfcpe.tools import DotDict
@@ -62,7 +61,7 @@ def spawn_infer_model_from_pt(pt_path: str, is_half: bool = False, device: torch
     return infer_model, args
 
 
-def convert(pt_model: torch.nn.Module, input_names: list[str], inputs: tuple[torch.Tensor], output_names: list[str], dynamic_axes: dict, convert_to_fp16: bool) -> onnx.ModelProto:
+def convert(pt_model: torch.nn.Module, input_names: list[str], inputs: tuple[torch.Tensor], output_names: list[str], dynamic_axes: dict) -> onnx.ModelProto:
     with BytesIO() as io:
         torch.onnx.export(
             pt_model,
@@ -75,8 +74,6 @@ def convert(pt_model: torch.nn.Module, input_names: list[str], inputs: tuple[tor
             output_names=output_names,
         )
         model, _ = simplify(onnx.load_model_from_string(io.getvalue()))
-    if convert_to_fp16:
-        model: onnx.ModelProto = float16.convert_float_to_float16(model)
     return model
 
 if __name__ == '__main__':
@@ -102,7 +99,6 @@ if __name__ == '__main__':
             'pitchf': {
                 1: 'n_samples',
             }
-        },
-        False
+        }
     )
     onnx.save(fcpe_onnx, 'fcpe.onnx')

@@ -9,7 +9,6 @@ import torch.nn.functional as F
 import torch
 from librosa.filters import mel
 from io import BytesIO
-from onnxconverter_common import float16
 
 class BiGRU(nn.Module):
     def __init__(self, input_features, hidden_features, num_layers):
@@ -350,8 +349,6 @@ def convert(pt_model: torch.nn.Module, input_names: list[str], inputs: tuple[tor
             output_names=output_names,
         )
         model, _ = simplify(onnx.load_model_from_string(io.getvalue()))
-    if convert_to_fp16:
-        model: onnx.ModelProto = float16.convert_float_to_float16(model)
     return model
 
 if __name__ == '__main__':
@@ -380,7 +377,6 @@ if __name__ == '__main__':
             'pitchf': {
                 1: 'n_samples',
             }
-        },
-        False
+        }
     )
     onnx.save(rmvpe_onnx, 'rmvpe.onnx')

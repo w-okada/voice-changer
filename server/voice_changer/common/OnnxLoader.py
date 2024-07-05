@@ -4,7 +4,6 @@ from xxhash import xxh128
 from utils.hasher import compute_hash
 
 from onnx import ModelProto
-from onnx.shape_inference import infer_shapes
 from onnxruntime.transformers.float16 import convert_float_to_float16
 from onnxruntime.transformers.fusion_utils import FusionUtils
 from onnxruntime.transformers.onnx_model import OnnxModel
@@ -46,7 +45,6 @@ def load_cached_fp16_model(fpath: str) -> ModelProto:
 
 
 def convert_fp16(model: ModelProto) -> ModelProto:
-    model = infer_shapes(model)
     model_fp16 = convert_float_to_float16(model)
     wrapped_fp16_model = OnnxModel(model_fp16)
     fusion_utils = FusionUtils(wrapped_fp16_model)
