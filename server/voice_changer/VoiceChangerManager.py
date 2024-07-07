@@ -145,13 +145,6 @@ class VoiceChangerManager(ServerDeviceCallbacks):
 
         return data
 
-    def get_performance(self):
-        if self.voiceChanger is not None:
-            info = self.voiceChanger.get_performance()
-            return info
-        else:
-            return {"status": "ERROR", "msg": "no model loaded"}
-
     def initialize(self, val: int):
         slotInfo = self.modelSlotManager.get_slot_info(val)
         if slotInfo is None:

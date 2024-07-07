@@ -11,9 +11,6 @@ class VoiceChangerIF(Protocol):
     def get_info(self) -> dict[str, Any]:
         ...
 
-    def get_performance(self) -> list[int]:
-        ...
-
     def set_model(model: VoiceChangerModel) -> None:
         ...
 
