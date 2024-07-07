@@ -53,7 +53,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         self.modelSlotManager = ModelSlotManager.get_instance(self.params.model_dir)
         # スタティックな情報を収集
 
-        self.settings = VoiceChangerSettings().get_instance()
+        self.settings = VoiceChangerSettings()
         try:
             with open(STORED_SETTING_FILE, "r", encoding="utf-8") as f:
                 settings = json.load(f)
@@ -160,7 +160,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
 
         if self.voiceChangerModel is not None and slotInfo.voiceChangerType == self.voiceChangerModel.voiceChangerType:
             self.voiceChangerModel.set_slot_info(slotInfo)
-            self.voiceChanger.setModel(self.voiceChangerModel)
+            self.voiceChanger.set_model(self.voiceChangerModel)
             self.voiceChangerModel.initialize()
             return
 
@@ -170,11 +170,12 @@ class VoiceChangerManager(ServerDeviceCallbacks):
 
             self.voiceChangerModel = RVCr2(self.params, slotInfo, self.settings)
             self.voiceChanger = VoiceChangerV2(self.params, self.settings)
-            self.voiceChanger.setModel(self.voiceChangerModel)
+            self.voiceChanger.set_model(self.voiceChangerModel)
         else:
             logger.info(f"[Voice Changer] unknown voice changer model: {slotInfo.voiceChangerType}")
 
     def update_settings(self, key: str, val: Any):
+        print("[Voice Changer] update configuration:", key, val)
         error, old_value = self.settings.set_property(key, val)
         if error:
             return self.get_info()

@@ -12,13 +12,6 @@ class SetPropertyResult(NamedTuple):
     old_value: str | int | float | bool | None
 
 class VoiceChangerSettings:
-    _instance: 'VoiceChangerSettings' = None
-
-    @classmethod
-    def get_instance(cls) -> 'VoiceChangerSettings':
-        if cls._instance is None:
-            cls._instance = cls()
-        return cls._instance
 
     @classmethod
     def to_dict(cls) -> dict:

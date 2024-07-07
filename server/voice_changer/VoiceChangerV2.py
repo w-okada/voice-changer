@@ -33,8 +33,6 @@ class VoiceChangerV2(VoiceChangerIF):
         self.extra_frame = int(self.settings.extraConvertSize * self.settings.inputSampleRate)
         self.sola_search_frame = int(0.012 * self.settings.inputSampleRate)
 
-        self.processing_sampling_rate = 0
-
         self.voiceChangerModel: VoiceChangerModel | None = None
         self.params = params
         self.device_manager = DeviceManager.get_instance()
@@ -45,26 +43,22 @@ class VoiceChangerV2(VoiceChangerIF):
         np.set_printoptions(threshold=10000)
 
 
-    def setModel(self, model: VoiceChangerModel):
+    def set_model(self, model: VoiceChangerModel):
         self.voiceChangerModel = model
-        self.processing_sampling_rate = self.voiceChangerModel.get_processing_sampling_rate()
         self.voiceChangerModel.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
         self.voiceChangerModel.realloc(self.block_frame, self.extra_frame, self.crossfade_frame, self.sola_search_frame)
         self._generate_strength()
 
-    def setInputSampleRate(self, sr: int):
-        self.settings.inputSampleRate = sr
-
-        self.extra_frame = int(self.settings.extraConvertSize * sr)
-        self.crossfade_frame = int(self.settings.crossFadeOverlapSize * sr)
-        self.sola_search_frame = int(0.012 * sr)
+    def set_input_sample_rate(self):
+        self.extra_frame = int(self.settings.extraConvertSize * self.settings.inputSampleRate)
+        self.crossfade_frame = int(self.settings.crossFadeOverlapSize * self.settings.inputSampleRate)
+        self.sola_search_frame = int(0.012 * self.settings.inputSampleRate)
         self._generate_strength()
 
         self.voiceChangerModel.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
         self.voiceChangerModel.realloc(self.block_frame, self.extra_frame, self.crossfade_frame, self.sola_search_frame)
 
-    def setOutputSampleRate(self, sr: int):
-        self.settings.outputSampleRate = sr
+    def set_output_sample_rate(self):
         self.voiceChangerModel.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
 
     def get_info(self):
@@ -94,8 +88,10 @@ class VoiceChangerV2(VoiceChangerIF):
                 print(f"-------------------------- - - - {self.settings.inputSampleRate}, {self.settings.outputSampleRate}")
             else:
                 self.ioRecorder.close()
-        elif key in {"inputSampleRate", "outputSampleRate"}:
-            self.voiceChangerModel.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
+        elif key == "inputSampleRate":
+            self.set_input_sample_rate()
+        elif key == "outputSampleRate":
+            self.set_output_sample_rate()
         elif key == 'extraConvertSize':
             self.extra_frame = int(val * self.settings.inputSampleRate)
         elif key == 'crossFadeOverlapSize':

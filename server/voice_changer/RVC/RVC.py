@@ -50,10 +50,12 @@ class RVC(VoiceChangerModel):
             return
 
         # その他の設定
-        self.settings.tran = self.slotInfo.defaultTune
-        self.settings.formantShift = self.slotInfo.defaultFormantShift
-        self.settings.indexRatio = self.slotInfo.defaultIndexRatio
-        self.settings.protect = self.slotInfo.defaultProtect
+        self.settings.set_properties({
+            'tran': self.slotInfo.defaultTune,
+            'formantShift': self.slotInfo.defaultFormantShift,
+            'indexRatio': self.slotInfo.defaultIndexRatio,
+            'protect': self.slotInfo.defaultProtect
+        })
         logger.info("[Voice Changer] [RVC] Initializing... done")
 
     def update_settings(self, key: str, val, old_val):
