@@ -75,14 +75,11 @@ class ServerDevice:
     def _processData(self, indata: np.ndarray):
         indata = indata * self.settings.serverInputAudioGain
         unpackedData = librosa.to_mono(indata.T)
-        out_wav, times = self.serverDeviceCallbacks.on_request(unpackedData)
-        return out_wav, times
+        return self.serverDeviceCallbacks.on_request(unpackedData)
 
     def _processDataWithTime(self, indata: np.ndarray):
-        with Timer2("all_inference_time", False) as t:
-            out_wav, times = self._processData(indata)
-        all_inference_time = t.secs
-        self.performance = [all_inference_time] + times
+        out_wav, perf = self._processData(indata)
+        self.performance = [0] + perf
         self.serverDeviceCallbacks.emitTo(self.performance)
         self.performance = [round(x * 1000) for x in self.performance]
         return out_wav

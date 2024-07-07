@@ -12,8 +12,7 @@ class MMVC_Namespace(socketio.AsyncNamespace):
 
     async def emitTo(self, data):
         timestamp = 0
-        audio1 = np.zeros(1, dtype=np.float32)
-        bin = struct.pack("<%sf" % len(audio1), *audio1)
+        bin = np.zeros(1, dtype=np.float32).tobytes()
         perf = data
 
         await self.emit("response", [timestamp, bin, perf], to=self.sid)
