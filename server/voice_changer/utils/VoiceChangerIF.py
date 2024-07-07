@@ -17,7 +17,7 @@ class VoiceChangerIF(Protocol):
     def setModel(model: VoiceChangerModel) -> None:
         ...
 
-    def update_settings(self, key: str, val: int | float | str) -> bool:
+    def update_settings(self, key: str, val: Any, old_val: Any):
         ...
 
     def on_request(receivedData: AudioInOut) -> tuple[AudioInOut, list[int | float]]:

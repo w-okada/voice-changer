@@ -6,7 +6,6 @@ import torch
 from data.ModelSlot import RVCModelSlot
 from mods.log_control import VoiceChangaerLogger
 
-from voice_changer.RVC.RVCSettings import RVCSettings
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 from voice_changer.utils.VoiceChangerModel import (
     AudioInOutFloat,
@@ -20,7 +19,7 @@ from voice_changer.common.TorchUtils import circular_write
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.pipeline.Pipeline import Pipeline
 from torchaudio import transforms as tat
-
+from voice_changer.VoiceChangerSettings import VoiceChangerSettings
 from Exceptions import (
     PipelineCreateException,
     PipelineNotInitializedException,
@@ -30,16 +29,15 @@ logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
 class RVCr2(VoiceChangerModel):
-    def __init__(self, params: ServerSettings, slotInfo: RVCModelSlot):
-        logger.info("[Voice Changer] [RVCr2] Creating instance ")
+    def __init__(self, params: ServerSettings, slotInfo: RVCModelSlot, settings: VoiceChangerSettings):
+        logger.info("[Voice Changer] [RVCr2] Creating instance")
         self.voiceChangerType = "RVC"
 
         self.device_manager = DeviceManager.get_instance()
         EmbedderManager.initialize(params)
         PitchExtractorManager.initialize(params)
-        self.settings = RVCSettings()
+        self.settings = settings
         self.params = params
-        # self.pitchExtractor = PitchExtractorManager.getPitchExtractor(self.settings.f0Detector, self.settings.gpu)
 
         self.pipeline: Pipeline | None = None
 
@@ -117,31 +115,22 @@ class RVCr2(VoiceChangerModel):
                 dtype=torch.float32
             ).to(self.device_manager.device)
 
-    def update_settings(self, key: str, val: int | float | str):
+    def update_settings(self, key: str, val, old_val):
         logger.info(f"[Voice Changer] [RVCr2]: update_settings {key}:{val}")
 
-        if key in self.settings.intData:
-            setattr(self.settings, key, int(val))
-            if key in {"gpu", "forceFp32"}:
-                self.initialize(True)
-        elif key in self.settings.floatData:
-            setattr(self.settings, key, float(val))
-        elif key in self.settings.strData:
-            setattr(self.settings, key, str(val))
-            if key == "f0Detector" and self.pipeline is not None:
-                pitchExtractor = PitchExtractorManager.getPitchExtractor(
-                    self.settings.f0Detector, self.settings.gpu
-                )
-                self.pipeline.setPitchExtractor(pitchExtractor)
-        else:
-            return False
-        return True
+        if key in {"gpu", "forceFp32"}:
+            self.initialize(True)
+        elif key == "f0Detector" and self.pipeline is not None:
+            pitchExtractor = PitchExtractorManager.getPitchExtractor(
+                self.settings.f0Detector, self.settings.gpu
+            )
+            self.pipeline.setPitchExtractor(pitchExtractor)
 
     def set_slot_info(self, slotInfo: RVCModelSlot):
         self.slotInfo = slotInfo
 
     def get_info(self):
-        data = asdict(self.settings)
+        data = {}
         if self.pipeline is not None:
             pipelineInfo = self.pipeline.getPipelineInfo()
             data["pipelineInfo"] = pipelineInfo

@@ -6,16 +6,6 @@ class NoModeLoadedException(Exception):
         return repr(f"No model for {self.framework} loaded. Please confirm the model uploaded.")
 
 
-class HalfPrecisionChangingException(Exception):
-    def __str__(self):
-        return repr("HalfPrecision related exception.")
-
-
-class DeviceChangingException(Exception):
-    def __str__(self):
-        return repr("Device changing...")
-
-
 class VoiceChangerIsNotSelectedException(Exception):
     def __str__(self):
         return repr("Voice Changer is not selected.")

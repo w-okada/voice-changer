@@ -355,14 +355,14 @@ class RMVPE:
         cents_mapping = 20 * torch.arange(360, device=device) + 1997.3794084376191
         self.cents_mapping = F.pad(cents_mapping, (4, 4))
 
+    @torch.no_grad()
     def mel2hidden(self, mel: torch.Tensor) -> torch.Tensor:
-        with torch.no_grad():
-            n_frames = mel.shape[-1]
-            n_pad = 32 * ((n_frames - 1) // 32 + 1) - n_frames
-            if n_pad > 0:
-                mel = F.pad(mel, (0, n_pad), mode="reflect")
-            hidden = self.model(mel)
-            return hidden[:, :n_frames]
+        n_frames = mel.shape[-1]
+        n_pad = 32 * ((n_frames - 1) // 32 + 1) - n_frames
+        if n_pad > 0:
+            mel = F.pad(mel, (0, n_pad), mode="reflect")
+        hidden = self.model(mel)
+        return hidden[:, :n_frames]
 
     def decode(self, hidden: torch.Tensor, threshold: float):
         cents_pred = self.to_local_average_cents(hidden, threshold=threshold)

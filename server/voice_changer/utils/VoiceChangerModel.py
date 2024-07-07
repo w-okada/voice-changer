@@ -41,7 +41,7 @@ class VoiceChangerModel(Protocol):
     ) -> tuple[Any, ...]:
         ...
 
-    def update_settings(self, key: str, val: int | float | str) -> bool:
+    def update_settings(self, key: str, val: Any, old_val: Any):
         ...
 
     def setSamplingRate(self, inputSampleRate: int, outputSampleRate: int):
