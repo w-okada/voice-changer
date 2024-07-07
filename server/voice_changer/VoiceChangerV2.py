@@ -140,7 +140,8 @@ class VoiceChangerV2(VoiceChangerIF):
             audio = self.voiceChangerModel.inference(audio_in)
 
             if audio is None:
-                return np.zeros(1, dtype=np.float32), [0, 0, 0]
+                # In case there's an actual silence - send full block with zeros
+                return np.zeros(block_size, dtype=np.float32), [0, 0, 0]
 
             # SOLA algorithm from https://github.com/yxlllc/DDSP-SVC, https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI
             conv_input = audio[
