@@ -1,7 +1,6 @@
 """
 VoiceChangerV2向け
 """
-from dataclasses import asdict
 import torch
 from data.ModelSlot import RVCModelSlot
 from mods.log_control import VoiceChangaerLogger
