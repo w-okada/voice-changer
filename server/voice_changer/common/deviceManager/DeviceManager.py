@@ -2,15 +2,24 @@ import torch
 import onnxruntime
 import re
 from typing import TypedDict, Literal
+from enum import IntFlag
 
 try:
     import torch_directml
 except ImportError:
     import voice_changer.common.deviceManager.DummyDML as torch_directml
 
+class CoreMLFlag(IntFlag):
+    USE_CPU_ONLY = 0x001
+    ENABLE_ON_SUBGRAPH = 0x002
+    ONLY_ENABLE_DEVICE_WITH_ANE = 0x004
+    ONLY_ALLOW_STATIC_INPUT_SHAPES = 0x008
+    CREATE_MLPROGRAM = 0x010
+
 class DevicePresentation(TypedDict):
     id: int
     name: str
+    memory: int
     backend: Literal['cpu', 'cuda', 'directml', 'mps']
 
 class DeviceManager(object):
@@ -37,6 +46,10 @@ class DeviceManager(object):
         print(f'[Voice Changer] * DirectML: {self.dml_enabled}, device count: {torch_directml.device_count()}')
         print(f'[Voice Changer] * CUDA: {self.cuda_enabled}, device count: {torch.cuda.device_count()}')
         print(f'[Voice Changer] * MPS: {self.mps_enabled}')
+
+    def initialize(self, device_id: int, force_fp32: bool):
+        self.set_device(device_id)
+        self.set_force_fp32(force_fp32)
 
     def set_device(self, id: int):
         if self.mps_enabled:
@@ -71,7 +84,7 @@ class DeviceManager(object):
         raise Exception(f'Failed to find device with index {dev_id}')
 
     @staticmethod
-    def list_devices():
+    def list_devices() -> list[DevicePresentation]:
         devCount = torch.cuda.device_count()
         if getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available():
             devices = [{ "id": -1, "name": "MPS", 'backend': 'mps' }]
@@ -102,8 +115,9 @@ class DeviceManager(object):
             return ["CUDAExecutionProvider", "CPUExecutionProvider"], [{"device_id": self.device.index}, cpu_settings]
         elif self.device.type == 'privateuseone' and "DmlExecutionProvider" in availableProviders:
             return ["DmlExecutionProvider", "CPUExecutionProvider"], [{"device_id": self.device.index}, cpu_settings]
-        # elif 'CoreMLExecutionProvider' in availableProviders:
-        #     return ["CoreMLExecutionProvider", "CPUExecutionProvider"], [{}, cpu_settings]
+        elif 'CoreMLExecutionProvider' in availableProviders:
+            coreml_flags = CoreMLFlag.ONLY_ENABLE_DEVICE_WITH_ANE
+            return ["CoreMLExecutionProvider", "CPUExecutionProvider"], [{'coreml_flags': coreml_flags}, cpu_settings]
         else:
             return ["CPUExecutionProvider"], [cpu_settings]
 

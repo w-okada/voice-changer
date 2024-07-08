@@ -4,48 +4,29 @@ import sys
 import shutil
 import threading
 import numpy as np
-import torch
 from downloader.SampleDownloader import downloadSample, getSampleInfos
 from mods.log_control import VoiceChangaerLogger
 from voice_changer.Local.ServerDevice import ServerDevice, ServerDeviceCallbacks
 from voice_changer.ModelSlotManager import ModelSlotManager
 from voice_changer.RVC.RVCModelMerger import RVCModelMerger
-from const import STORED_SETTING_FILE, STORED_SETTINGS, UPLOAD_DIR
+from const import STORED_SETTING_FILE, UPLOAD_DIR
+from voice_changer.VoiceChangerSettings import VoiceChangerSettings
 from voice_changer.VoiceChangerV2 import VoiceChangerV2
 from voice_changer.utils.LoadModelParams import LoadModelParamFile, LoadModelParams
 from voice_changer.utils.ModelMerger import MergeElement, ModelMergerRequest
 from voice_changer.utils.VoiceChangerModel import AudioInOut
 from settings import ServerSettings
-from dataclasses import dataclass, asdict, field
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
+from Exceptions import (
+    NoModeLoadedException,
+    PipelineNotInitializedException,
+    VoiceChangerIsNotSelectedException,
+)
 
 # import threading
-from typing import Callable
-from typing import Any
-import re
+from typing import Callable, Any
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
-
-
-@dataclass()
-class GPUInfo:
-    id: int
-    name: str
-    memory: int
-
-
-@dataclass()
-class VoiceChangerManagerSettings:
-    modelSlotIndex: int = -1
-    passThrough: bool = False  # 0: off, 1: on
-    # ↓mutableな物だけ列挙
-    boolData: list[str] = field(default_factory=lambda: ["passThrough"])
-    intData: list[str] = field(
-        default_factory=lambda: [
-            "modelSlotIndex",
-            "gpu"
-        ]
-    )
 
 
 class VoiceChangerManager(ServerDeviceCallbacks):
@@ -60,15 +41,6 @@ class VoiceChangerManager(ServerDeviceCallbacks):
     def emitTo(self, performance: list[float]):
         self.emitToFunc(performance)
 
-    def get_processing_sampling_rate(self):
-        return self.voiceChanger.get_processing_sampling_rate()
-
-    def setInputSamplingRate(self, sr: int):
-        self.voiceChanger.setInputSampleRate(sr)
-
-    def setOutputSamplingRate(self, sr: int):
-        self.voiceChanger.setOutputSampleRate(sr)
-
     ############################
     # VoiceChangerManager
     ############################
@@ -77,45 +49,35 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         self.params = params
         self.voiceChanger: VoiceChangerV2 = None
         self.voiceChangerModel = None
-        self.settings: VoiceChangerManagerSettings = VoiceChangerManagerSettings()
 
         self.modelSlotManager = ModelSlotManager.get_instance(self.params.model_dir)
         # スタティックな情報を収集
-        self.gpus: list[GPUInfo] = self._get_gpuInfos()
 
-        self.serverDevice = ServerDevice(self)
+        self.settings = VoiceChangerSettings()
+        try:
+            with open(STORED_SETTING_FILE, "r", encoding="utf-8") as f:
+                settings = json.load(f)
+            self.settings.set_properties(settings)
+        except:
+            pass
+
+        self.device_manager = DeviceManager.get_instance()
+        self.devices = self.device_manager.list_devices()
+        self.device_manager.initialize(self.settings.gpu, self.settings.forceFp32)
+
+        self.serverDevice = ServerDevice(self, self.settings)
 
         thread = threading.Thread(target=self.serverDevice.start, args=())
         thread.start()
 
-        # 設定保存用情報
-        self.current_model_index = -1
-        self.stored_setting: dict[str, str | int | float] = {}
-        if os.path.exists(STORED_SETTING_FILE):
-            self.stored_setting = json.load(open(STORED_SETTING_FILE, "r", encoding="utf-8"))
-        if 'version' not in self.stored_setting:
-            if 'crossFadeOverlapSize' in self.stored_setting:
-                self.update_settings('crossFadeOverlapSize', "0.10")
-            if 'extraConvertSize' in self.stored_setting:
-                self.update_settings('extraConvertSize', "0.5")
-            self.update_settings("version", 1)
-        if "modelSlotIndex" in self.stored_setting:
-            self.update_settings("modelSlotIndex", self.stored_setting["modelSlotIndex"])
-        # キャッシュ設定の反映
-        for k, v in self.stored_setting.items():
-            if k != "modelSlotIndex":
-                self.update_settings(k, v)
-        if "gpu" not in self.stored_setting:
-            self.update_settings("gpu", -1)
         logger.info("[Voice Changer] VoiceChangerManager initializing... done.")
 
-    def store_setting(self, key: str, val: str | int | float):
-        if key in STORED_SETTINGS:
-            self.stored_setting[key] = val
-            json.dump(self.stored_setting, open(STORED_SETTING_FILE, "w"))
+        # Initialize the voice changer
+        self.initialize(self.settings.modelSlotIndex)
 
-    def _get_gpuInfos(self):
-        return DeviceManager.list_devices()
+    def store_setting(self):
+        with open(STORED_SETTING_FILE, "w") as f:
+            json.dump(self.settings.to_dict_stateless(), f)
 
     @classmethod
     def get_instance(cls, params: ServerSettings):
@@ -165,8 +127,8 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         logger.info(f"params, {params}")
 
     def get_info(self):
-        data = asdict(self.settings)
-        data["gpus"] = self.gpus
+        data = self.settings.to_dict()
+        data["gpus"] = self.devices
         data["modelSlots"] = self.modelSlotManager.getAllSlotInfo(reload=True)
         data["sampleModels"] = getSampleInfos(self.params.sample_mode)
         data["python"] = sys.version
@@ -183,18 +145,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
 
         return data
 
-    def get_performance(self):
-        if self.voiceChanger is not None:
-            info = self.voiceChanger.get_performance()
-            return info
-        else:
-            return {"status": "ERROR", "msg": "no model loaded"}
-
-    def generateVoiceChanger(self, val: int):
-        if self.current_model_index == val:
-            return
-
-        self.current_model_index = val
+    def initialize(self, val: int):
         slotInfo = self.modelSlotManager.get_slot_info(val)
         if slotInfo is None:
             logger.info(f"[Voice Changer] model slot is not found {val}")
@@ -202,7 +153,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
 
         if self.voiceChangerModel is not None and slotInfo.voiceChangerType == self.voiceChangerModel.voiceChangerType:
             self.voiceChangerModel.set_slot_info(slotInfo)
-            self.voiceChanger.setModel(self.voiceChangerModel)
+            self.voiceChanger.set_model(self.voiceChangerModel)
             self.voiceChangerModel.initialize()
             return
 
@@ -210,28 +161,49 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             logger.info("................RVC")
             from voice_changer.RVC.RVCr2 import RVCr2
 
-            self.voiceChangerModel = RVCr2(self.params, slotInfo)
-            self.voiceChanger = VoiceChangerV2(self.params)
-            self.voiceChanger.setModel(self.voiceChangerModel)
+            self.voiceChangerModel = RVCr2(self.params, slotInfo, self.settings)
+            self.voiceChanger = VoiceChangerV2(self.params, self.settings)
+            self.voiceChanger.set_model(self.voiceChangerModel)
         else:
             logger.info(f"[Voice Changer] unknown voice changer model: {slotInfo.voiceChangerType}")
 
-    def update_settings(self, key: str, val: str | int | float | bool):
-        self.store_setting(key, val)
+    def update_settings(self, key: str, val: Any):
+        print("[Voice Changer] update configuration:", key, val)
+        error, old_value = self.settings.set_property(key, val)
+        if error:
+            return self.get_info()
+        # TODO: This is required to get type-casted setting. But maybe this should be done prior to setting.
+        val = self.settings.get_property(key)
+        if old_value == val:
+            return self.get_info()
+        # TODO: Storing settings on each change is suboptimal. Maybe timed autosave?
+        self.store_setting()
 
-        if key in self.settings.boolData:
-            newVal = val == 'true'
-            setattr(self.settings, key, newVal)
-        elif key in self.settings.intData:
-            newVal = int(val)
-            if key == "modelSlotIndex":
-                logger.info(f"[Voice Changer] model slot is changed {self.settings.modelSlotIndex} -> {newVal}")
-                self.generateVoiceChanger(newVal)
-            setattr(self.settings, key, newVal)
+        if key == "modelSlotIndex":
+            logger.info(f"[Voice Changer] Model slot is changed {old_value} -> {val}")
+            self.initialize(val)
+        elif key == 'gpu':
+            self.device_manager.set_device(val)
+        elif key == 'forceFp32':
+            self.device_manager.set_force_fp32(val)
+        # FIXME: This is a very counter-intuitive handling of audio modes...
+        # Map "serverAudioSampleRate" to "inputSampleRate" and "outputSampleRate"
+        # since server audio can have its sample rate configured.
+        # Revert change in case we switched back to client audio mode.
+        elif key == 'enableServerAudio':
+            if val:
+                self.update_settings('inputSampleRate', self.settings.serverAudioSampleRate)
+                self.update_settings('outputSampleRate', self.settings.serverAudioSampleRate)
+            else:
+                self.update_settings('inputSampleRate', 48000)
+                self.update_settings('outputSampleRate', 48000)
+        elif key == 'serverAudioSampleRate':
+            self.update_settings('inputSampleRate', self.settings.serverAudioSampleRate)
+            self.update_settings('outputSampleRate', self.settings.serverAudioSampleRate)
 
-        self.serverDevice.update_settings(key, val)
+        self.serverDevice.update_settings(key, val, old_value)
         if self.voiceChanger is not None:
-            self.voiceChanger.update_settings(key, val)
+            self.voiceChanger.update_settings(key, val, old_value)
 
         return self.get_info()
 
@@ -243,12 +215,24 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             logger.info("Voice Change is not loaded. Did you load a correct model?")
             return np.zeros(1, dtype=np.float32), [0, 0, 0]
 
-        with torch.no_grad():
+        try:
             return self.voiceChanger.on_request(receivedData)
+        except NoModeLoadedException as e:
+            logger.warn(f"[Voice Changer] [Exception], {e}")
+            return np.zeros(1, dtype=np.float32), [0, 0, 0]
+        except VoiceChangerIsNotSelectedException:
+            logger.warn("[Voice Changer] Voice Changer is not selected. Wait a bit and if there is no improvement, please re-select vc.")
+            return np.zeros(1, dtype=np.float32), [0, 0, 0]
+        except PipelineNotInitializedException:
+            logger.warn("[Voice Changer] Pipeline is not initialized.")
+            return np.zeros(1, dtype=np.float32), [0, 0, 0]
+        except Exception as e:
+            logger.warn(f"[Voice Changer] VC PROCESSING EXCEPTION!!! {e}")
+            logger.exception(e)
+            return np.zeros(1, dtype=np.float32), [0, 0, 0]
 
     def export2onnx(self):
-        with torch.no_grad():
-            return self.voiceChanger.export2onnx()
+        return self.voiceChanger.export2onnx()
 
     async def merge_models(self, request: str):
         # self.voiceChanger.merge_models(request)

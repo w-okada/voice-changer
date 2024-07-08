@@ -11,13 +11,10 @@ class VoiceChangerIF(Protocol):
     def get_info(self) -> dict[str, Any]:
         ...
 
-    def get_performance(self) -> list[int]:
+    def set_model(model: VoiceChangerModel) -> None:
         ...
 
-    def setModel(model: VoiceChangerModel) -> None:
-        ...
-
-    def update_settings(self, key: str, val: int | float | str) -> bool:
+    def update_settings(self, key: str, val: Any, old_val: Any):
         ...
 
     def on_request(receivedData: AudioInOut) -> tuple[AudioInOut, list[int | float]]:
@@ -26,8 +23,8 @@ class VoiceChangerIF(Protocol):
     def export2onnx() -> Any:
         ...
 
-    def setInputSampleRate(self, sr: int):
+    def set_input_sample_rate(self):
         ...
 
-    def setOutputSampleRate(self, sr: int):
+    def set_output_sample_rate(self):
         ...

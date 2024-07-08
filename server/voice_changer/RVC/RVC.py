@@ -5,7 +5,7 @@ import torchaudio
 from data.ModelSlot import RVCModelSlot
 from mods.log_control import VoiceChangaerLogger
 
-from voice_changer.RVC.RVCSettings import RVCSettings
+from voice_changer.VoiceChangerSettings import VoiceChangerSettings
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 from voice_changer.utils.VoiceChangerModel import AudioInOut, PitchfInOut, FeatureInOut, VoiceChangerModel
 from settings import ServerSettings
@@ -15,18 +15,18 @@ from voice_changer.RVC.pipeline.PipelineGenerator import createPipeline
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from voice_changer.RVC.pipeline.Pipeline import Pipeline
 
-from Exceptions import DeviceCannotSupportHalfPrecisionException, PipelineCreateException, PipelineNotInitializedException
+from Exceptions import PipelineCreateException, PipelineNotInitializedException
 
 logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
 class RVC(VoiceChangerModel):
-    def __init__(self, params: ServerSettings, slotInfo: RVCModelSlot):
+    def __init__(self, params: ServerSettings, slotInfo: RVCModelSlot, settings: VoiceChangerSettings):
         logger.info("[Voice Changer] [RVC] Creating instance ")
         self.deviceManager = DeviceManager.get_instance()
         EmbedderManager.initialize(params)
         PitchExtractorManager.initialize(params)
-        self.settings = RVCSettings()
+        self.settings = settings
         self.params = params
         # self.pitchExtractor = PitchExtractorManager.getPitchExtractor(self.settings.f0Detector, self.settings.gpu)
 
@@ -50,13 +50,15 @@ class RVC(VoiceChangerModel):
             return
 
         # その他の設定
-        self.settings.tran = self.slotInfo.defaultTune
-        self.settings.formantShift = self.slotInfo.defaultFormantShift
-        self.settings.indexRatio = self.slotInfo.defaultIndexRatio
-        self.settings.protect = self.slotInfo.defaultProtect
+        self.settings.set_properties({
+            'tran': self.slotInfo.defaultTune,
+            'formantShift': self.slotInfo.defaultFormantShift,
+            'indexRatio': self.slotInfo.defaultIndexRatio,
+            'protect': self.slotInfo.defaultProtect
+        })
         logger.info("[Voice Changer] [RVC] Initializing... done")
 
-    def update_settings(self, key: str, val: int | float | str):
+    def update_settings(self, key: str, val, old_val):
         logger.info(f"[Voice Changer][RVC]: update_settings {key}:{val}")
         if key in self.settings.intData:
             setattr(self.settings, key, int(val))
@@ -74,7 +76,7 @@ class RVC(VoiceChangerModel):
         return True
 
     def get_info(self):
-        data = asdict(self.settings)
+        data = {}
         if self.pipeline is not None:
             pipelineInfo = self.pipeline.getPipelineInfo()
             data["pipelineInfo"] = pipelineInfo

@@ -18,7 +18,6 @@ class MMVC_Rest_Fileuploader:
         self.voiceChangerManager = voiceChangerManager
         self.router = APIRouter()
         self.router.add_api_route("/info", self.get_info, methods=["GET"])
-        self.router.add_api_route("/performance", self.get_performance, methods=["GET"])
         self.router.add_api_route("/upload_file", self.post_upload_file, methods=["POST"])
         self.router.add_api_route("/update_settings", self.post_update_settings, methods=["POST"])
         self.router.add_api_route("/load_model", self.post_load_model, methods=["POST"])
@@ -44,17 +43,8 @@ class MMVC_Rest_Fileuploader:
         except Exception as e:
             print("[Voice Changer] get_info ex:", e)
 
-    def get_performance(self):
-        try:
-            info = self.voiceChangerManager.get_performance()
-            json_compatible_item_data = jsonable_encoder(info)
-            return JSONResponse(content=json_compatible_item_data)
-        except Exception as e:
-            print("[Voice Changer] get_performance ex:", e)
-
     def post_update_settings(self, key: str = Form(...), val: Union[int, str, float] = Form(...)):
         try:
-            print("[Voice Changer] update configuration:", key, val)
             info = self.voiceChangerManager.update_settings(key, val)
             json_compatible_item_data = jsonable_encoder(info)
             return JSONResponse(content=json_compatible_item_data)
