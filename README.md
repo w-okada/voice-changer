@@ -82,7 +82,7 @@ A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX
 
 #### Before you start
 
-1. [If not installed] Download and install [7-Zip](https://www.7-zip.org/).
+1. [If not installed] Download and install [7-Zip](https://www.7-zip.org/) or [WinRAR](https://www.win-rar.com/download.html).
 
 1. [If not installed] Download and install [VAC Lite by Muzychenko](https://software.muzychenko.net/freeware/vac470lite.zip).
 
@@ -115,6 +115,13 @@ A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX
 1. Download the `voice-changer-windows-amd64-cuda.zip.001` and `voice-changer-windows-amd64-cuda.zip.002` ZIP files and place them in the same folder.
 
 1. Right-click the `voice-changer-windows-amd64-cuda.zip.001` ZIP file. In the opened action menu select **7-Zip** > **Extract to "voice-changer-windows-amd64-cuda\\"**. This will unpack **both** files, no need to unpack them separately.
+
+The following examples demonstrate the unpacking process:
+
+* 7-Zip.
+  ![unzip_cuda](https://github.com/deiteris/voice-changer/assets/6103913/f33ebb39-b527-462e-bd0c-6007d26aba35)
+* WinRAR.
+  ![unzip_cuda_winrar](https://github.com/deiteris/voice-changer/assets/6103913/1f8d63db-01b6-427f-9ee9-c674a61d0ecf)
 
 #### Running the voice changer
 
