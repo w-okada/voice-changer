@@ -14,7 +14,7 @@ The following videos demonstrate how the voice changer works and performs with A
 
 [Amd iGPU.webm](https://github.com/deiteris/voice-changer/assets/6103913/67354d4e-51aa-425c-bd23-d33ad2baf824)
 
-[Amd Dgpu Rx6600m.webm](https://github.com/deiteris/voice-changer/assets/6103913/c9f060c1-b243-4c1f-846a-6e129b3fbabc)
+[Amd Dgpu Rx6600m.webm](https://github.com/deiteris/voice-changer/assets/6103913/b932296c-36e4-4150-9306-e80b5c7e4afb)
 
 And this one demonstrates how the voice changer works and performs with Nvidia GeForce GTX 1650 laptop:
 
