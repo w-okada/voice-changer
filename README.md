@@ -47,7 +47,7 @@ Minimum VRAM required: 2GB (in FP32 mode), ~1GB (in FP16 mode, if supported).
 Minimum requirement:
 
 * An integrated graphics card: AMD Radeon Vega 7 (with AMD Ryzen 5 5600G) or later.
-* A dedicated graphics card: Nvidia GeForce GTX 900 Series or later or AMD Radeon RX 500 series or later.
+* A dedicated graphics card: Nvidia GeForce GTX 900 Series or later or AMD Radeon RX 400 series or later.
 
 Recommended requirement:
 
