@@ -13,34 +13,32 @@ class SetPropertyResult(NamedTuple):
 
 class VoiceChangerSettings:
 
-    @classmethod
-    def to_dict(cls) -> dict:
-        return cls._get_properties(cls)
+    def to_dict(self) -> dict:
+        return self.get_properties()
 
     # TODO: This is a temporary kostyl.
     # Stateful keys must not be part of the settings. Need to rework audio handling logic
-    @classmethod
-    def to_dict_stateless(cls) -> dict:
-        data = cls.to_dict()
+    def to_dict_stateless(self) -> dict:
+        data = self.to_dict()
         for key in STATEFUL_KEYS:
             del data[key]
         return data
 
-    def _get_properties(cls) -> dict:
+    def get_properties(self) -> dict:
         return {
-            key: value.fget(cls)
-            for key, value in cls.__dict__.items()
+            key: value.fget(self)
+            for key, value in self.__class__.__dict__.items()
             if isinstance(value, property)
         }
 
-    @classmethod
-    def set_properties(cls, data: dict) -> list[SetPropertyResult]:
+    def set_properties(self, data: dict) -> list[SetPropertyResult]:
         return [
-            cls._set_property(cls, key, value)
+            self.set_property(key, value)
             for key, value in data.items()
         ]
 
-    def _set_property(cls, key, value) -> SetPropertyResult:
+    def set_property(self, key, value) -> SetPropertyResult:
+        cls = self.__class__
         if key in IGNORED_KEYS:
             return SetPropertyResult(error=False, old_value=None)
         if key not in cls.__dict__:
@@ -52,13 +50,9 @@ class VoiceChangerSettings:
         if p.fset is None:
             print(f'[VoiceChangerSettings] Failed to set setting: {key} is immutable.')
             return SetPropertyResult(error=True, old_value=None)
-        old_value = p.fget(cls)
-        p.fset(cls, value)
+        old_value = p.fget(self)
+        p.fset(self, value)
         return SetPropertyResult(error=False, old_value=old_value)
-
-    @classmethod
-    def set_property(cls, key, value) -> SetPropertyResult:
-        return cls._set_property(cls, key, value)
 
     def get_property(self, key):
         return getattr(self, key)
