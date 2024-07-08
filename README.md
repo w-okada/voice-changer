@@ -102,13 +102,15 @@ A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX
 
 #### For AMD/Intel/CPU users
 
+> NOTE: For AMD users, the recommended driver version is `24.6.1` or later.
+
 1. Download the `voice-changer-windows-amd64-dml.zip` ZIP file.
 
 1. Right-click the ZIP file. In the opened action menu select **7-Zip** > **Extract to "voice-changer-windows-amd64-dml\\"**.
 
 #### For Nvidia users
 
-1. Make sure your Nvidia driver version is `>=528.33`. [Click here](https://www.nvidia.com/en-gb/drivers/drivers-faq) to learn how to check your driver version.
+1. Make sure your Nvidia driver version is `528.33` or later. [Click here](https://www.nvidia.com/en-gb/drivers/drivers-faq) to learn how to check your driver version.
 
 1. Download the `voice-changer-windows-amd64-cuda.zip.001` and `voice-changer-windows-amd64-cuda.zip.002` ZIP files and place them in the same folder.
 
