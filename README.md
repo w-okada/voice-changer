@@ -72,9 +72,9 @@ A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX
 
 * AMD Radeon RX 7000 series may be unable to achieve low latency (below 256ms).
 
-### All versions
+### Nvidia version
 
-* On first startup, voice may not change or errors may occur until Chunk and Extra settings are changed. Workaround is to change Chunk and Extra.
+* When starting voice conversion for the first time, it may take up to 5-7 seconds to start outputting the converted voice.
 
 ## How to use
 
