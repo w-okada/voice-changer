@@ -76,6 +76,10 @@ A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX
 
 * When starting voice conversion for the first time, it may take up to 5-7 seconds to start outputting the converted voice.
 
+### All versions
+
+* AMD CPU users may experience low performance when using index. The workaround is to set index to 0.
+
 ## How to use
 
 ### Running locally on Windows
