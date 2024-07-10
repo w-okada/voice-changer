@@ -53,6 +53,8 @@ Recommended requirement:
 
 A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX 6000 series or later.
 
+> **NOTE**: Nvidia GPUs prior to GTX 900 Series will not work with CUDA version. However, they may be used with DirectML version. Performance outside the minimum and recommended requirements is not guaranteed.
+
 ## Known issues
 
 ### General
@@ -78,7 +80,7 @@ A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX
 
 ### All versions
 
-* AMD CPU users may experience low performance when using index. The workaround is to set index to 0.
+* Bad voice quality may be observed when changing Chunk with voice conversion started. The workaround is to stop and start conversion again.
 
 ## How to use
 
