@@ -3,6 +3,12 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.40-alpha
+  - 改善
+    - 音量対応
+    - ASIO対応
+    - webフォルダ公開
+      - `web_front\assets\i18n\<lang>\translation.json`を作成し、`web_front\assets\gui_settings\GUI.json`の`lang`に追加すれば言語対応を拡張できます。
 - v.2.0.36-alpha
   - バグフィックス
     - RVCの音が割れる問題の対策

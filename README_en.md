@@ -3,6 +3,12 @@
 [Japanese](/README.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.40-alpha
+  - Improvements
+    - Volume support
+    - ASIO support
+    - Web folder publishing
+      - You can extend language support by creating `web_front\assets\i18n\<lang>\translation.json` and adding it to `lang` in `web_front\assets\gui_settings\GUI.json`.
 - v.2.0.36-alpha
   - Bug Fixes
     - Countermeasure for sound clipping issue in RVC

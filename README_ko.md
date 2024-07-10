@@ -3,6 +3,12 @@
 [English](/README_en.md) [Japanese](/README.md)
 
 ## What's New!
+- v.2.0.40-alpha
+  - 개선 사항
+    - 볼륨 지원
+    - ASIO 지원
+    - 웹 폴더 공개
+      - `web_front\assets\i18n\<lang>\translation.json` 파일을 생성하고 `web_front\assets\gui_settings\GUI.json`의 `lang`에 추가하면 언어 지원을 확장할 수 있습니다.
 - v.2.0.36-alpha
   - 버그 수정
     - RVC의 음이 왜곡되는 문제 대책
