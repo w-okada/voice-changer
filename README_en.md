@@ -3,6 +3,13 @@
 [Japanese](/README_ja.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.40-alpha
+  - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
+  - Improvements
+    - Volume support
+    - ASIO support
+    - Web folder publishing
+      - You can extend language support by creating `web_front\assets\i18n\<lang>\translation.json` and adding it to `lang` in `web_front\assets\gui_settings\GUI.json`.
 - v.2.0.32-alpha Colab version released. ⇒ [Here](./w_okada's_Voice_Changer_version_2_x.ipynb)
   - ngrok is no longer needed. You can use it without a ngrok account.
 - v.2.0.27-alpha -> [HERE](https://github.com/w-okada/voice-changer/tree/v.2)

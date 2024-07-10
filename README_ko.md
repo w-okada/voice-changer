@@ -3,6 +3,13 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## 새로운 기능!
+- v.2.0.40-alpha
+  - [여기를 참조하십시오](https://github.com/w-okada/voice-changer/tree/v.2)
+  - 개선 사항
+    - 볼륨 지원
+    - ASIO 지원
+    - 웹 폴더 공개
+      - `web_front\assets\i18n\<lang>\translation.json` 파일을 생성하고 `web_front\assets\gui_settings\GUI.json`의 `lang`에 추가하면 언어 지원을 확장할 수 있습니다.
 - v.2.0.32-alpha Colab 버전 출시. ⇒ [여기](./w_okada's_Voice_Changer_version_2_x.ipynb)
   - ngrok 없이도 사용 가능합니다. ngrok 계정이 없어도 이용할 수 있습니다.
 - v.2.0.27-alpha -> [여기를 참조하십시오](https://github.com/w-okada/voice-changer/tree/v.2)

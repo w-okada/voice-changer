@@ -3,6 +3,13 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.40-alpha
+  - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
+  - 改善
+    - 音量対応
+    - ASIO対応
+    - webフォルダ公開
+      - `web_front\assets\i18n\<lang>\translation.json`を作成し、`web_front\assets\gui_settings\GUI.json`の`lang`に追加すれば言語対応を拡張できます。
 - v.2.0.32-alpha Colab版 リリース。⇒[こちら](https://github.com/w-okada/voice-changer/tree/v.2/w_okada's_Voice_Changer_version_2_x.ipynb)
   - ngrokフリーになりました。ngrokのアカウントなしで利用可能です。
 - v.2.0.27-alpha -> [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
