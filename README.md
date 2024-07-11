@@ -141,7 +141,7 @@ Once the download is finished, the voice changer will open the user interface us
 
 ### Running locally on macOS
 
-> **NOTE**: macOS support is experimental and not confirmed to be fully working.
+> **NOTE**: macOS support is experimental.
 
 #### For Apple Silicon (Apple M1, etc.) users
 
