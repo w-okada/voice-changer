@@ -212,6 +212,8 @@ Find and delete the mentioned files from the voice changer folder and restart th
 
 1. Make sure your input device is not muted. Check the microphone volume in the system settings or hardware switch on your headset (usually a button, if present).
 
+1. If nothing helped, check the command line that opens when your start the app. In case there are any error messages containing `Exception` or `error`, report an issue and provide full text from the command line.
+
 ### Hearing non-converted voice
 
 In the voice changer, make sure **passthru** is not on (indicated by blinking red color). Click it to switch it off (indicated by solid green color).
@@ -220,7 +222,7 @@ In the voice changer, make sure **passthru** is not on (indicated by blinking re
 
 1. Make sure you are using **VAC by Muzychenko** (indicated by the **Line 1** audio device name).
 
-1. Make sure the **perf** time is smaller than **buf**. Increase **Chunk** or reduce **Extra** and **Crossfade size**.
+1. Make sure the **perf** time is smaller than **Chunk**. Increase **Chunk** or reduce **Extra** and **Crossfade size**.
 
 ## Contribution
 
