@@ -28,7 +28,7 @@ And this one demonstrates how the voice changer works and performs with Nvidia G
 
 ## System requirements
 
-> **NOTE**: Minimum requirement means that you will be able to run **ONLY** the voice changer. Voice conversion and gaming at the same time will not provide satisfying experience.
+> **NOTE**: Minimum requirement means that you will be able to run **ONLY** the voice changer. Voice conversion and gaming at the same time will not provide satisfying experience with minimum requirements in most cases.
 
 RAM: at least 6GB.
 
@@ -53,7 +53,7 @@ Recommended requirement:
 
 A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX 6000 series or later.
 
-> **NOTE**: Nvidia GPUs prior to GTX 900 Series will not work with CUDA version. However, they may be used with DirectML version. Performance outside the minimum and recommended requirements is not guaranteed.
+> **NOTE**: Nvidia GPUs prior to GTX 900 Series will not work with CUDA version. However, they may be used with DirectML version.
 
 ## Known issues
 
