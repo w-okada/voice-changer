@@ -39,7 +39,8 @@ def export2onnx(modelSlot: RVCModelSlot):
 def _export2onnx(input_model: str, output_model_simple: str, metadata: dict):
     device_manager = DeviceManager.get_instance()
     dev = device_manager.device
-    if dev.type == 'privateuseone':
+    # DirectML and MPS fail to export due to different incompatibilities. And export is in FP32 anyway.
+    if dev.type != 'cuda':
         dev = torch.device('cpu')
     is_half = False
     is_safetensors = input_model.endswith('.safetensors')
