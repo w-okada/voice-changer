@@ -156,7 +156,7 @@ export class ServerRestClient {
             const res = (await (await fetch(request)).json()) as ServerInfo;
             resolve(res);
         });
-        return await info;
+        return info;
     };
 
     uploadAssets = async (params: string) => {
@@ -172,7 +172,7 @@ export class ServerRestClient {
             const res = (await (await fetch(request)).json()) as ServerInfo;
             resolve(res);
         });
-        return await info;
+        return info;
     };
 
     getModelType = async () => {
@@ -184,7 +184,7 @@ export class ServerRestClient {
             const res = (await (await fetch(request)).json()) as ServerInfo;
             resolve(res);
         });
-        return await info;
+        return info;
     };
 
     export2onnx = async () => {
@@ -196,7 +196,7 @@ export class ServerRestClient {
             const res = (await (await fetch(request)).json()) as OnnxExporterInfo;
             resolve(res);
         });
-        return await info;
+        return info;
     };
 
     mergeModel = async (req: MergeModelRequest) => {
@@ -213,7 +213,7 @@ export class ServerRestClient {
             console.log("RESPONSE", res);
             resolve(res);
         });
-        return await info;
+        return info;
     };
 
     updateModelDefault = async () => {
@@ -226,7 +226,7 @@ export class ServerRestClient {
             console.log("RESPONSE", res);
             resolve(res);
         });
-        return await info;
+        return info;
     };
 
     updateModelInfo = async (slot: number, key: string, val: string) => {
@@ -245,7 +245,7 @@ export class ServerRestClient {
             console.log("RESPONSE", res);
             resolve(res);
         });
-        return await info;
+        return info;
     };
 
     // VoiceChangerWorkletNodeから呼び出される
@@ -267,7 +267,6 @@ export class ServerRestClient {
             body: JSON.stringify(obj),
         });
 
-        const { changedVoiceBase64, perf } = await res.json();
-        return { changedVoiceBuffer: Buffer.from(changedVoiceBase64, "base64").buffer, perf };
+        return res.json();
     };
 }

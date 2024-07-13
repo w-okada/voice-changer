@@ -49,8 +49,8 @@ export type ClientState = {
     setAudioOutputElementId: (elemId: string) => void;
     setAudioMonitorElementId: (elemId: string) => void;
 
-    ioErrorCount: number;
-    resetIoErrorCount: () => void;
+    errorMessage: string;
+    resetErrorMessage: () => void;
 };
 
 export type PerformanceData = {
@@ -91,7 +91,7 @@ export const useClient = (props: UseClientProps): ClientState => {
     const [bufferingTime, setBufferingTime] = useState<number>(0);
     const [performance, setPerformance] = useState<PerformanceData>(InitialPerformanceData);
     const [volume, setVolume] = useState<number>(0);
-    const [ioErrorCount, setIoErrorCount] = useState<number>(0);
+    const [errorMessage, setErrorMessage] = useState<string>("");
 
     //// Server Audio Deviceを使うとき、モニタリングデータはpolling
     const updatePerformance = useMemo(() => {
@@ -117,11 +117,8 @@ export const useClient = (props: UseClientProps): ClientState => {
         };
     }, [voiceChangerClientRef.current]);
 
-    // (1-4) エラーステータス
-    const ioErrorCountRef = useRef<number>(0);
-    const resetIoErrorCount = () => {
-        ioErrorCountRef.current = 0;
-        setIoErrorCount(ioErrorCountRef.current);
+    const resetErrorMessage = () => {
+        setErrorMessage("");
     };
 
     // 設定データ管理
@@ -146,7 +143,7 @@ export const useClient = (props: UseClientProps): ClientState => {
             const _setting = (await getItem("clientSetting")) as ClientSetting;
             if (_setting) {
                 setSetting(_setting);
-                serverSetting.reloadServerInfo();
+                await serverSetting.reloadServerInfo();
             }
         };
         loadCache();
@@ -169,12 +166,11 @@ export const useClient = (props: UseClientProps): ClientState => {
                     const postprocessTime = perf ? Math.ceil(perf[2] * 1000) : 0;
                     setPerformance({ responseTime, preprocessTime, mainprocessTime, postprocessTime });
                 },
-                notifyException: (mes: string) => {
-                    if (mes.length > 0) {
-                        console.log(`error:${mes}`);
-                        ioErrorCountRef.current += 1;
-                        setIoErrorCount(ioErrorCountRef.current);
-                    }
+                notifyException: (_: string, mes: string) => {
+                    // TODO: Refactor
+                    // const serverError = `Error code: ${code}\n\n${mes}`
+                    // console.error(serverError);
+                    setErrorMessage(mes);
                 },
                 notifyVolume: (vol: number) => {
                     setVolume(vol);
@@ -223,10 +219,9 @@ export const useClient = (props: UseClientProps): ClientState => {
     const getInfo = useMemo(() => {
         return async () => {
             await initializedPromise;
-            // FIXME: Hacky way to bring client chunk size in sync with server.
             await voiceChangerClientSetting.reloadClientSetting(); // 実質的な処理の意味はない
             const server = await serverSetting.reloadServerInfo();
-            setWorkletNodeSetting({ ...setting.workletNodeSetting, inputChunkNum: server.serverReadChunkSize });
+            setting.workletNodeSetting.inputChunkNum = server.serverReadChunkSize;
         };
     }, [voiceChangerClientSetting.reloadClientSetting, serverSetting.reloadServerInfo]);
 
@@ -292,7 +287,7 @@ export const useClient = (props: UseClientProps): ClientState => {
         setAudioOutputElementId,
         setAudioMonitorElementId,
 
-        ioErrorCount,
-        resetIoErrorCount,
+        errorMessage,
+        resetErrorMessage,
     };
 };

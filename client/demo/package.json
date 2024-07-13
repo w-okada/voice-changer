@@ -61,19 +61,15 @@
         "webpack-dev-server": "^4.15.1"
     },
     "dependencies": {
-        "@alexanderolsen/libsamplerate-js": "^2.1.0",
         "@dannadori/voice-changer-client-js": "^1.0.180",
-        "@dannadori/voice-changer-js": "^1.0.2",
         "@dannadori/worker-manager": "^1.0.20",
         "@fortawesome/fontawesome-svg-core": "^6.5.1",
         "@fortawesome/free-brands-svg-icons": "^6.5.1",
         "@fortawesome/free-regular-svg-icons": "^6.5.1",
         "@fortawesome/free-solid-svg-icons": "^6.5.1",
         "@fortawesome/react-fontawesome": "^0.2.0",
-        "@tensorflow/tfjs": "^4.14.0",
-        "onnxruntime-web": "^1.16.3",
-        "protobufjs": "^7.2.5",
         "react": "^18.2.0",
-        "react-dom": "^18.2.0"
+        "react-dom": "^18.2.0",
+        "react-toastify": "^10.0.5"
     }
 }

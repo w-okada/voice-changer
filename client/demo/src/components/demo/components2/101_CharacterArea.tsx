@@ -8,6 +8,7 @@ import { IndexArea } from "./101-2_IndexArea";
 import { SpeakerArea } from "./101-3_SpeakerArea";
 // import { FormantShiftArea } from "./101-4_FormantShiftArea";
 import { Portrait } from "./101-0_Portrait";
+import { toast } from "react-toastify";
 
 export type CharacterAreaProps = {};
 
@@ -57,9 +58,20 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
     const startControl = useMemo(() => {
         const onStartClicked = async () => {
             if (serverSetting.serverSetting.modelSlotIndex === -1) {
+                toast.warn('Select a voice model first.')
                 return
             }
             if (serverSetting.serverSetting.enableServerAudio == 0) {
+                if (!setting.voiceChangerClientSetting.audioInput || setting.voiceChangerClientSetting.audioInput == 'none') {
+                    toast.warn('Select an audio input device.')
+                    return
+                }
+                // TODO: Refactor
+                if (guiState.audioOutputForGUI == 'none') {
+                    toast.warn('Select an audio output device.')
+                    return
+                }
+
                 if (!initializedRef.current) {
                     while (true) {
                         await new Promise<void>((resolve) => {
@@ -75,6 +87,14 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
                     await start();
                 }
             } else {
+                if (serverSetting.serverSetting.serverInputDeviceId == -1) {
+                    toast.warn('Select an audio input device.')
+                    return
+                }
+                if (serverSetting.serverSetting.serverOutputDeviceId == -1) {
+                    toast.warn('Select an audio output device.')
+                    return
+                }
                 serverSetting.updateServerSettings({ ...serverSetting.serverSetting, serverAudioStated: 1 });
                 guiState.setIsConverting(true);
             }

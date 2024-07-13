@@ -43,15 +43,27 @@ class MMVC_Rest_VoiceChanger:
             unpackedData = np.frombuffer(data, dtype=np.int16).astype(np.float32) / 32768
 
             self.tlock.acquire()
-            out_audio, perf = self.voiceChangerManager.changeVoice(unpackedData)
+            out_audio, perf, err = self.voiceChangerManager.changeVoice(unpackedData)
             self.tlock.release()
             out_audio = (out_audio * 32767).astype(np.int16).tobytes()
 
-            return JSONResponse(content=jsonable_encoder({
-                "timestamp": voice.timestamp,
-                "changedVoiceBase64": base64.b64encode(out_audio).decode("utf-8"),
-                "perf": perf
-            }))
+            if err is not None:
+                error_code, error_message = err
+                return JSONResponse(content=jsonable_encoder({
+                    "error": True,
+                    "timestamp": voice.timestamp,
+                    "details": {
+                        "code": error_code,
+                        "message": error_message,
+                    },
+                }))
+            else:
+                return JSONResponse(content=jsonable_encoder({
+                    "error": False,
+                    "timestamp": voice.timestamp,
+                    "changedVoiceBase64": base64.b64encode(out_audio).decode("utf-8"),
+                    "perf": perf,
+                }))
 
         except Exception as e:
             print("REQUEST PROCESSING!!!! EXCEPTION!!!", e)

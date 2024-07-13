@@ -49,3 +49,9 @@ class VoiceChangerModel(Protocol):
 
     def realloc(self, block_frame: int, extra_frame: int, crossfade_frame: int, sola_search_frame: int):
         ...
+
+    def export2onnx() -> Any:
+        ...
+
+    def merge_models(request: str) -> Any:
+        ...

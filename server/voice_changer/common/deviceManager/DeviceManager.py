@@ -151,7 +151,6 @@ class DeviceManager(object):
 
         # FIXME: Apparently FP16 does not work well for Intel iGPUs in DirectML backend.
         # Causes problems with Intel UHD on 10th Gen Intel CPU.
-        # TODO: To confirm if works well on Arc GPUs
         ignored_intel_gpu = 'INTEL' in device_name_uppercase and 'ARC' not in device_name_uppercase
         if ignored_intel_gpu:
             return False
