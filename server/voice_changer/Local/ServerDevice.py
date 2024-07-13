@@ -19,7 +19,7 @@ class ServerDeviceCallbacks(Protocol):
     def on_request(self, unpackedData: AudioInOut) -> tuple[AudioInOut, list[Union[int, float]]]:
         ...
 
-    def emitTo(self, performance: list[float]):
+    def emitTo(self, performance: list[float], err: tuple[str, str] | None):
         ...
 
 
@@ -62,9 +62,9 @@ class ServerDevice:
         return self.serverDeviceCallbacks.on_request(unpackedData)
 
     def _processDataWithTime(self, indata: np.ndarray):
-        out_wav, perf = self._processData(indata)
+        out_wav, perf, err = self._processData(indata)
         self.performance = [0] + perf
-        self.serverDeviceCallbacks.emitTo(self.performance)
+        self.serverDeviceCallbacks.emitTo(self.performance, err)
         self.performance = [round(x * 1000) for x in self.performance]
         return out_wav
 

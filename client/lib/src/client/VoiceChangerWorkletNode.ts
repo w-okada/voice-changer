@@ -1,4 +1,4 @@
-import { VoiceChangerWorkletProcessorRequest } from "../@types/voice-changer-worklet-processor";
+import { VoiceChangerWorkletProcessorRequest } from "../../worklet/src/voice-changer-worklet-processor";
 import {
   DefaultClientSettng,
   //DownSamplingMode,
@@ -109,6 +109,15 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
         console.log("message:", response);
       });
 
+      this.socket.on("error", (_: any) => {
+        // const [error_code, error_message] = response;
+        // this.listener.notifyException(error_code, error_message);
+        this.listener.notifyException(
+          "ERR_GENERIC_VOICE_CHANGER_EXCEPTION",
+          "An error occurred during voice conversion. Check command line window for more details."
+        )
+      });
+
       this.socket.on("response", (response: any[]) => {
         const cur = Date.now();
         const responseTime = cur - response[0];
@@ -127,7 +136,7 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
         if (result.byteLength < 128 * 2) {
           this.listener.notifyException(
             VOICE_CHANGER_CLIENT_EXCEPTION.ERR_SIO_INVALID_RESPONSE,
-            `[SIO] recevied data is too short ${result.byteLength}`
+            `[SIO] Received data is too short ${result.byteLength}`
           );
         } else {
           if (this.outputNode != null) {
@@ -158,9 +167,6 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
     const req: VoiceChangerWorkletProcessorRequest = {
       requestType: "voice",
       voice: f32Data,
-      numTrancateTreshold: 0,
-      volTrancateThreshold: 0,
-      volTrancateLength: 0,
     };
     this.port.postMessage(req, [f32Data.buffer]);
   };
@@ -220,11 +226,21 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
       this.socket.emit("request_message", [timestamp, newBuffer]);
     } else if (this.setting.protocol === "rest") {
       const restClient = new ServerRestClient(this.setting.serverUrl);
-      const { changedVoiceBuffer, perf } = await restClient.postVoice(timestamp, newBuffer);
+      const data = await restClient.postVoice(timestamp, newBuffer);
+      if (data.error) {
+        // const { code, message } = data.details
+        this.listener.notifyException(
+          "ERR_GENERIC_VOICE_CHANGER_EXCEPTION",
+          "An error occurred during voice conversion. Check command line window for more details."
+        )
+        return;
+      }
+      const changedVoiceBuffer = Buffer.from(data.changedVoiceBase64, "base64").buffer
+
       if (changedVoiceBuffer.byteLength < 128 * 2) {
         this.listener.notifyException(
           VOICE_CHANGER_CLIENT_EXCEPTION.ERR_SIO_INVALID_RESPONSE,
-          `[REST] recevied data is too short ${changedVoiceBuffer.byteLength}`
+          `[REST] Received data is too short ${changedVoiceBuffer.byteLength}`
         );
       } else {
         if (this.outputNode != null) {
@@ -233,20 +249,17 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
           this.postReceivedVoice(changedVoiceBuffer);
         }
       }
-      this.listener.notifyResponseTime(Date.now() - timestamp, perf);
+      this.listener.notifyResponseTime(Date.now() - timestamp, data.perf);
     } else {
       throw "unknown protocol";
     }
   };
 
   // Worklet操作
-  configure = (setting: WorkletSetting) => {
+  configure = (_: WorkletSetting) => {
     const req: VoiceChangerWorkletProcessorRequest = {
       requestType: "config",
       voice: new Float32Array(1),
-      numTrancateTreshold: setting.numTrancateTreshold,
-      volTrancateThreshold: setting.volTrancateThreshold,
-      volTrancateLength: setting.volTrancateLength,
     };
     this.port.postMessage(req);
   };
@@ -261,9 +274,6 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
     const req: VoiceChangerWorkletProcessorRequest = {
       requestType: "start",
       voice: new Float32Array(1),
-      numTrancateTreshold: 0,
-      volTrancateThreshold: 0,
-      volTrancateLength: 0,
     };
     this.port.postMessage(req);
     await p;
@@ -275,9 +285,6 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
     const req: VoiceChangerWorkletProcessorRequest = {
       requestType: "stop",
       voice: new Float32Array(1),
-      numTrancateTreshold: 0,
-      volTrancateThreshold: 0,
-      volTrancateLength: 0,
     };
     this.port.postMessage(req);
     await p;
@@ -286,9 +293,6 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
     const req: VoiceChangerWorkletProcessorRequest = {
       requestType: "trancateBuffer",
       voice: new Float32Array(1),
-      numTrancateTreshold: 0,
-      volTrancateThreshold: 0,
-      volTrancateLength: 0,
     };
     this.port.postMessage(req);
   };

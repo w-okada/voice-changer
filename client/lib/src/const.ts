@@ -285,9 +285,6 @@ export const DefaultServerSetting: ServerInfo = {
 ///////////////////////
 
 export type WorkletSetting = {
-    numTrancateTreshold: number;
-    volTrancateThreshold: number;
-    volTrancateLength: number;
 };
 ///////////////////////
 // Worklet Nodeセッティング
@@ -351,10 +348,6 @@ export type ClientSetting = {
 };
 export const DefaultClientSettng: ClientSetting = {
     workletSetting: {
-        // numTrancateTreshold: 512 * 2,
-        numTrancateTreshold: 100,
-        volTrancateThreshold: 0.0005,
-        volTrancateLength: 32,
     },
     workletNodeSetting: {
         serverUrl: "",
@@ -385,6 +378,7 @@ export const VOICE_CHANGER_CLIENT_EXCEPTION = {
     ERR_REST_INVALID_RESPONSE: "ERR_REST_INVALID_RESPONSE",
     ERR_MIC_STREAM_NOT_INITIALIZED: "ERR_MIC_STREAM_NOT_INITIALIZED",
     ERR_INTERNAL_AUDIO_PROCESS_CALLBACK_IS_NOT_INITIALIZED: "ERR_INTERNAL_AUDIO_PROCESS_CALLBACK_IS_NOT_INITIALIZED",
+    ERR_GENERIC_VOICE_CHANGER_EXCEPTION: "ERR_GENERIC_VOICE_CHANGER_EXCEPTION",
 } as const;
 export type VOICE_CHANGER_CLIENT_EXCEPTION = (typeof VOICE_CHANGER_CLIENT_EXCEPTION)[keyof typeof VOICE_CHANGER_CLIENT_EXCEPTION];
 

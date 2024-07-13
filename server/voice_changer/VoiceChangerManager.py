@@ -22,6 +22,7 @@ from Exceptions import (
     PipelineNotInitializedException,
     VoiceChangerIsNotSelectedException,
 )
+from traceback import format_exc
 
 # import threading
 from typing import Callable, Any
@@ -38,8 +39,8 @@ class VoiceChangerManager(ServerDeviceCallbacks):
     def on_request(self, unpackedData: AudioInOut):
         return self.changeVoice(unpackedData)
 
-    def emitTo(self, performance: list[float]):
-        self.emitToFunc(performance)
+    def emitTo(self, performance: list[float], err):
+        self.emitToFunc(performance, err)
 
     ############################
     # VoiceChangerManager
@@ -207,29 +208,30 @@ class VoiceChangerManager(ServerDeviceCallbacks):
 
         return self.get_info()
 
-    def changeVoice(self, receivedData: AudioInOut):
+    def changeVoice(self, receivedData: AudioInOut) -> tuple[AudioInOut, tuple, tuple | None]:
         if self.settings.passThrough:  # パススルー
-            return receivedData, [0, 0, 0]
+            return receivedData, [0, 0, 0], None
 
         if self.voiceChanger is None:
             logger.info("Voice Change is not loaded. Did you load a correct model?")
-            return np.zeros(1, dtype=np.float32), [0, 0, 0]
+            return np.zeros(1, dtype=np.float32), [0, 0, 0], ('NoVoiceChangerLoaded', "Voice Change is not loaded. Did you load a correct model?")
 
         try:
-            return self.voiceChanger.on_request(receivedData)
-        except NoModeLoadedException as e:
+            audio, perf = self.voiceChanger.on_request(receivedData)
+            return audio, perf, None
+        except NoModeLoadedException:
             logger.warn(f"[Voice Changer] [Exception], {e}")
-            return np.zeros(1, dtype=np.float32), [0, 0, 0]
+            return np.zeros(1, dtype=np.float32), [0, 0, 0], ('NoModeLoadedException', format_exc())
         except VoiceChangerIsNotSelectedException:
             logger.warn("[Voice Changer] Voice Changer is not selected. Wait a bit and if there is no improvement, please re-select vc.")
-            return np.zeros(1, dtype=np.float32), [0, 0, 0]
+            return np.zeros(1, dtype=np.float32), [0, 0, 0], ('VoiceChangerIsNotSelectedException', format_exc())
         except PipelineNotInitializedException:
             logger.warn("[Voice Changer] Pipeline is not initialized.")
-            return np.zeros(1, dtype=np.float32), [0, 0, 0]
+            return np.zeros(1, dtype=np.float32), [0, 0, 0], ('PipelineNotInitializedException', format_exc())
         except Exception as e:
             logger.warn(f"[Voice Changer] VC PROCESSING EXCEPTION!!! {e}")
             logger.exception(e)
-            return np.zeros(1, dtype=np.float32), [0, 0, 0]
+            return np.zeros(1, dtype=np.float32), [0, 0, 0], ('Exception', format_exc())
 
     def export2onnx(self):
         return self.voiceChanger.export2onnx()

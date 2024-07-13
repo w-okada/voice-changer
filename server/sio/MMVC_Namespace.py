@@ -1,4 +1,3 @@
-import struct
 from datetime import datetime
 import numpy as np
 import socketio
@@ -10,15 +9,20 @@ import asyncio
 class MMVC_Namespace(socketio.AsyncNamespace):
     sid: int = 0
 
-    async def emitTo(self, data):
+    async def emitTo(self, data, err):
         timestamp = 0
         bin = np.zeros(1, dtype=np.float32).tobytes()
         perf = data
 
-        await self.emit("response", [timestamp, bin, perf], to=self.sid)
+        if err is not None:
+            error_code, error_message = err
+            await self.emit("error", [error_code, error_message], to=self.sid)
+        else:
+            # TODO: Switch to binary messages to reduce serialization overhead?
+            await self.emit("response", [timestamp, bin, perf], to=self.sid)
 
-    def emit_coroutine(self, data):
-        asyncio.run(self.emitTo(data))
+    def emit_coroutine(self, data, err):
+        asyncio.run(self.emitTo(data, err))
 
     def __init__(self, namespace: str, voiceChangerManager: VoiceChangerManager):
         super().__init__(namespace)
@@ -43,9 +47,14 @@ class MMVC_Namespace(socketio.AsyncNamespace):
         # Receive and send int16 instead of float32 to reduce bandwidth requirement over websocket
         input_audio = np.frombuffer(data, dtype=np.int16).astype(np.float32) / 32768
 
-        out_audio, perf = self.voiceChangerManager.changeVoice(input_audio)
+        out_audio, perf, err = self.voiceChangerManager.changeVoice(input_audio)
         out_audio = (out_audio * 32767).astype(np.int16).tobytes()
-        await self.emit("response", [timestamp, out_audio, perf], to=sid)
+        if err is not None:
+            error_code, error_message = err
+            await self.emit("error", [error_code, error_message], to=sid)
+        else:
+            # TODO: Switch to binary messages to reduce serialization overhead?
+            await self.emit("response", [timestamp, out_audio, perf], to=sid)
 
     def on_disconnect(self, sid):
         # print('[{}] disconnect'.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
