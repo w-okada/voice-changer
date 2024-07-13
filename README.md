@@ -212,6 +212,8 @@ Find and delete the mentioned files from the voice changer folder and restart th
 
 1. Make sure your input device is not muted. Check the microphone volume in the system settings or hardware switch on your headset (usually a button, if present).
 
+1. Try switching input device to **none**, then back to your microphone.
+
 1. If nothing helped, check the command line that opens when your start the app. In case there are any error messages containing `Exception` or `error`, report an issue and provide full text from the command line.
 
 ### Hearing non-converted voice
