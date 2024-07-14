@@ -105,15 +105,13 @@ export const DeviceArea = (_props: DeviceAreaProps) => {
                         value={audioInputForGUI}
                         onChange={async (e) => {
                             setAudioInputForGUI(e.target.value);
-                            if (e.target.value != "file" && e.target.value != "screen") {
-                                try {
-                                    await setVoiceChangerClientSetting({ ...setting.voiceChangerClientSetting, audioInput: e.target.value });
-                                } catch (e) {
-                                    alert(e);
-                                    console.error(e);
-                                    setAudioInputForGUI("none");
-                                    await setVoiceChangerClientSetting({ ...setting.voiceChangerClientSetting, audioInput: null });
-                                }
+                            try {
+                                await setVoiceChangerClientSetting({ ...setting.voiceChangerClientSetting, audioInput: e.target.value });
+                            } catch (e) {
+                                alert(e);
+                                console.error(e);
+                                setAudioInputForGUI("none");
+                                await setVoiceChangerClientSetting({ ...setting.voiceChangerClientSetting, audioInput: null });
                             }
                         }}
                     >
