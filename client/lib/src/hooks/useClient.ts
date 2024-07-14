@@ -139,14 +139,19 @@ export const useClient = (props: UseClientProps): ClientState => {
         if (!voiceChangerClient) {
             return;
         }
-        const loadCache = async () => {
+        const loadSettings = async () => {
+            const server = await serverSetting.reloadServerInfo();
             const _setting = (await getItem("clientSetting")) as ClientSetting;
             if (_setting) {
+                // Modify cached settings with the server's setting
+                _setting.workletNodeSetting.inputChunkNum = server.serverReadChunkSize
                 setSetting(_setting);
-                await serverSetting.reloadServerInfo();
+            } else {
+                // Modify default settings with the server's setting
+                setSetting({ ...setting, workletNodeSetting: { ...setting.workletNodeSetting, inputChunkNum: server.serverReadChunkSize } });
             }
         };
-        loadCache();
+        loadSettings();
     }, [voiceChangerClient]);
 
     // (2-1) クライアント初期化処理
@@ -220,10 +225,9 @@ export const useClient = (props: UseClientProps): ClientState => {
         return async () => {
             await initializedPromise;
             await voiceChangerClientSetting.reloadClientSetting(); // 実質的な処理の意味はない
-            const server = await serverSetting.reloadServerInfo();
-            setting.workletNodeSetting.inputChunkNum = server.serverReadChunkSize;
+            // await serverSetting.reloadServerInfo();
         };
-    }, [voiceChangerClientSetting.reloadClientSetting, serverSetting.reloadServerInfo]);
+    }, [voiceChangerClientSetting.reloadClientSetting]);
 
     const clearSetting = async () => {
         await removeItem("clientSetting");

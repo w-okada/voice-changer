@@ -140,7 +140,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
                 </div>
             </div>
         );
-    }, [guiState.isConverting, guiState.audioOutputForGUI, start, stop, serverSetting.serverSetting, serverSetting.updateServerSettings]);
+    }, [guiState.isConverting, setting.voiceChangerClientSetting.audioInput, guiState.audioOutputForGUI, start, stop, serverSetting.serverSetting, serverSetting.updateServerSettings]);
 
     const gainControl = useMemo(() => {
         const currentInputGain = serverSetting.serverSetting.enableServerAudio == 0 ? setting.voiceChangerClientSetting.inputGain : serverSetting.serverSetting.serverInputAudioGain;
