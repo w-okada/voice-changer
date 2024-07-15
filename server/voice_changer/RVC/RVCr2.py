@@ -115,7 +115,7 @@ class RVCr2(VoiceChangerModel):
             self.resampler_out = tat.Resample(
                 orig_freq=self.slotInfo.samplingRate,
                 new_freq=self.outputSampleRate,
-                dtype=torch.float32
+                dtype=self.dtype
             ).to(self.device_manager.device)
 
     def update_settings(self, key: str, val, old_val):
@@ -261,7 +261,7 @@ class RVCr2(VoiceChangerModel):
         # FIXME: Why the heck does it require another sqrt to amplify the volume?
         audio_out: torch.Tensor = self.resampler_out(audio_model * torch.sqrt(vol_t))
 
-        return audio_out
+        return audio_out.float()
 
     def __del__(self):
         del self.pipeline

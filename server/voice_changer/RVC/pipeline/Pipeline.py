@@ -255,7 +255,7 @@ class Pipeline:
                     self.resamplers[scaled_window] = tat.Resample(
                         orig_freq=scaled_window,
                         new_freq=self.model_window,
-                        dtype=torch.float32,
+                        dtype=self.dtype,
                     ).to(self.device)
                 out_audio = self.resamplers[scaled_window](
                     out_audio[: return_length * scaled_window]

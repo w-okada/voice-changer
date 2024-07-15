@@ -45,5 +45,5 @@ class RVCInferencerNono(Inferencer):
             return_length=return_length,
             formant_length=formant_length
         )
-        res = res[0][0, 0].float()
+        res = res[0][0, 0]
         return torch.clip(res, -1.0, 1.0)

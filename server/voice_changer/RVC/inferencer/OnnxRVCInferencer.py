@@ -77,8 +77,6 @@ class OnnxRVCInferencer(Inferencer):
         # self.model.end_profiling()
 
         res = torch.as_tensor(output[0], dtype=self.fp_dtype_t, device=feats.device)
-        if self.is_half:
-            res = res.float()
 
         if self.inferencerTypeVersion == "v2.1" or self.inferencerTypeVersion == "v2.2" or self.inferencerTypeVersion == "v1.1":
             return res
