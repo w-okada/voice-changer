@@ -315,4 +315,8 @@ class RVCr2(VoiceChangerModel):
                 "key": "defaultProtect",
                 "val": self.settings.protect,
             },
+            {
+                "key": "defaultFormantShift",
+                "val": self.settings.formantShift,
+            },
         ]
