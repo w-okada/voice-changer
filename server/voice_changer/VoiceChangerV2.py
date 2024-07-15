@@ -31,7 +31,7 @@ class VoiceChangerV2(VoiceChangerIF):
         self.block_frame = self.settings.serverReadChunkSize * 128
         self.crossfade_frame = int(self.settings.crossFadeOverlapSize * self.settings.inputSampleRate)
         self.extra_frame = int(self.settings.extraConvertSize * self.settings.inputSampleRate)
-        self.sola_search_frame = int(0.012 * self.settings.inputSampleRate)
+        self.sola_search_frame = self.settings.inputSampleRate // 100
 
         self.voiceChangerModel: VoiceChangerModel | None = None
         self.params = params
@@ -52,7 +52,7 @@ class VoiceChangerV2(VoiceChangerIF):
     def set_input_sample_rate(self):
         self.extra_frame = int(self.settings.extraConvertSize * self.settings.inputSampleRate)
         self.crossfade_frame = int(self.settings.crossFadeOverlapSize * self.settings.inputSampleRate)
-        self.sola_search_frame = int(0.012 * self.settings.inputSampleRate)
+        self.sola_search_frame = self.settings.inputSampleRate // 100
         self._generate_strength()
 
         self.voiceChangerModel.setSamplingRate(self.settings.inputSampleRate, self.settings.outputSampleRate)
@@ -163,15 +163,7 @@ class VoiceChangerV2(VoiceChangerIF):
                 self.sola_buffer * self.fade_out_window
             )
 
-            end = block_size + self.crossfade_frame
-            if audio.shape[0] >= end:
-                self.sola_buffer[:] = audio[block_size : end]
-            else:
-                # No idea why but either new RVC code seems to produce smaller audio
-                # or SOLA offset calculation is a bit off. This fixes audio "popping" when fading chunks.
-                offset = end - audio.shape[0]
-                self.sola_buffer[-offset :] = torch.zeros(offset, device=self.device_manager.device, dtype=torch.float32)
-                self.sola_buffer[: -offset] = audio[block_size :]
+            self.sola_buffer[:] = audio[block_size : block_size + self.crossfade_frame]
 
             result: np.ndarray = audio[: block_size].detach().cpu().numpy()
 
