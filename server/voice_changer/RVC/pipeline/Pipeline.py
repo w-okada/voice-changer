@@ -12,6 +12,7 @@ import sys
 import torch
 import torch.nn.functional as F
 import onnxruntime
+from torchaudio import transforms as tat
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from mods.log_control import VoiceChangaerLogger
 
@@ -35,7 +36,7 @@ class Pipeline:
     index_reconstruct: torch.Tensor | None
     # feature: Any | None
 
-    targetSR: int
+    model_sr: int
     device: torch.device
     isHalf: bool
 
@@ -47,7 +48,7 @@ class Pipeline:
         index: IndexIVFFlat | None,
         index_reconstruct: torch.Tensor | None,
         use_f0: bool,
-        targetSR: int,
+        model_sr: int,
         embChannels: int,
     ):
         self.embedder = embedder
@@ -69,12 +70,15 @@ class Pipeline:
 
         self.onnx_upscaler = self.make_onnx_upscaler(embChannels) if self.device.type == 'privateuseone' else None
 
-        self.targetSR = targetSR
+        self.model_sr = model_sr
+        self.model_window = model_sr // 100
 
         self.dtype = torch.float16 if self.is_half else torch.float32
 
         self.sr = 16000
         self.window = 160
+
+        self.resamplers = {}
 
     def make_onnx_upscaler(self, dim_size: int):
         # Inputs
@@ -110,7 +114,7 @@ class Pipeline:
     def setPitchExtractor(self, pitchExtractor: PitchExtractor):
         self.pitchExtractor = pitchExtractor
 
-    def extractPitch(self, audio: torch.Tensor, pitch: torch.Tensor | None, pitchf: torch.Tensor | None, f0_up_key: int, formant_shift: float, return_length: int) -> tuple[torch.Tensor, torch.Tensor, int]:
+    def extractPitch(self, audio: torch.Tensor, pitch: torch.Tensor | None, pitchf: torch.Tensor | None, f0_up_key: int, formant_shift: float) -> tuple[torch.Tensor, torch.Tensor]:
         f0 = self.pitchExtractor.extract(
             audio,
             self.sr,
@@ -131,10 +135,7 @@ class Pipeline:
             pitch = f0_coarse
             pitchf = f0
 
-        formant_factor = 2 ** (formant_shift / 12)
-        formant_length = int(np.ceil(return_length * formant_factor))
-
-        return pitch.unsqueeze(0), pitchf.unsqueeze(0) * (formant_length / return_length), formant_length
+        return pitch.unsqueeze(0), pitchf.unsqueeze(0)
 
     def extract_features(self, feats: torch.Tensor, embOutputLayer: int, useFinalProj: bool):
         try:
@@ -194,7 +195,7 @@ class Pipeline:
             t.record("pre-process")
 
             # ピッチ検出
-            pitch, pitchf, formant_length = self.extractPitch(audio[silence_front:], pitch, pitchf, f0_up_key, formant_shift, audio_feats_len - skip_head) if self.use_f0 else (None, None, None)
+            pitch, pitchf = self.extractPitch(audio[silence_front:], pitch, pitchf, f0_up_key, formant_shift) if self.use_f0 else (None, None)
             t.record("extract-pitch")
 
             # embedding
@@ -222,8 +223,11 @@ class Pipeline:
 
             feats = self._upscale(feats)[:, :audio_feats_len, :]
             if self.use_f0:
+                formant_factor = 2 ** (formant_shift / 12)
+                formant_length = int(np.ceil(return_length * formant_factor))
+
                 pitch = pitch[:, -audio_feats_len:]
-                pitchf = pitchf[:, -audio_feats_len:]
+                pitchf = pitchf[:, -audio_feats_len:] * (formant_length / return_length)
                 # pitchの推定が上手くいかない(pitchf=0)場合、検索前の特徴を混ぜる
                 # pitchffの作り方の疑問はあるが、本家通りなので、このまま使うことにする。
                 # https://github.com/w-okada/voice-changer/pull/276#issuecomment-1571336929
@@ -235,6 +239,9 @@ class Pipeline:
                     pitchff[pitchf < 1] = protect
                     pitchff = pitchff.unsqueeze(-1)
                     feats = feats * pitchff + feats_orig * (1 - pitchff)
+            else:
+                formant_factor = 0
+                formant_length = return_length
 
             p_len = torch.tensor([audio_feats_len], device=self.device, dtype=torch.int64)
 
@@ -243,5 +250,18 @@ class Pipeline:
             # 推論実行
             out_audio = self.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length, formant_length)
             t.record("infer")
+
+            # Formant shift sample rate adjustment
+            scaled_window = int(np.floor(formant_factor * self.model_window))
+            if scaled_window != self.model_window:
+                if scaled_window not in self.resamplers:
+                    self.resamplers[scaled_window] = tat.Resample(
+                        orig_freq=scaled_window,
+                        new_freq=self.model_window,
+                        dtype=torch.float32,
+                    ).to(self.device)
+                out_audio = self.resamplers[scaled_window](
+                    out_audio[: return_length * scaled_window]
+                )
         # print("EXEC AVERAGE:", t.avrSecs)
         return out_audio

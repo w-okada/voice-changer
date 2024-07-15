@@ -6,7 +6,7 @@ import { useMessageBuilder } from "../../../hooks/useMessageBuilder";
 import { TuningArea } from "./101-1_TuningArea";
 import { IndexArea } from "./101-2_IndexArea";
 import { SpeakerArea } from "./101-3_SpeakerArea";
-// import { FormantShiftArea } from "./101-4_FormantShiftArea";
+import { FormantShiftArea } from "./101-4_FormantShiftArea";
 import { Portrait } from "./101-0_Portrait";
 import { toast } from "react-toastify";
 
@@ -263,6 +263,7 @@ export const CharacterArea = (_props: CharacterAreaProps) => {
                     {startControl}
                     {gainControl}
                     <TuningArea />
+                    <FormantShiftArea />
                     <IndexArea />
                     <SpeakerArea />
                     {modelSlotControl}
