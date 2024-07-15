@@ -192,6 +192,9 @@ class Pipeline:
         with Timer2("Pipeline-Exec", False) as t:  # NOQA
             # 16000のサンプリングレートで入ってきている。以降この世界は16000で処理。
             assert audio.dim() == 1, audio.dim()
+
+            formant_factor = 2 ** (formant_shift / 12)
+            formant_length = int(np.ceil(return_length * formant_factor))
             t.record("pre-process")
 
             # ピッチ検出
@@ -223,9 +226,6 @@ class Pipeline:
 
             feats = self._upscale(feats)[:, :audio_feats_len, :]
             if self.use_f0:
-                formant_factor = 2 ** (formant_shift / 12)
-                formant_length = int(np.ceil(return_length * formant_factor))
-
                 pitch = pitch[:, -audio_feats_len:]
                 pitchf = pitchf[:, -audio_feats_len:] * (formant_length / return_length)
                 # pitchの推定が上手くいかない(pitchf=0)場合、検索前の特徴を混ぜる
@@ -239,9 +239,6 @@ class Pipeline:
                     pitchff[pitchf < 1] = protect
                     pitchff = pitchff.unsqueeze(-1)
                     feats = feats * pitchff + feats_orig * (1 - pitchff)
-            else:
-                formant_factor = 0
-                formant_length = return_length
 
             p_len = torch.tensor([audio_feats_len], device=self.device, dtype=torch.int64)
 
