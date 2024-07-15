@@ -99,7 +99,7 @@ class RVCr2(VoiceChangerModel):
         self.resampler_out = tat.Resample(
             orig_freq=self.slotInfo.samplingRate,
             new_freq=self.outputSampleRate,
-            dtype=torch.float32
+            dtype=self.dtype
         ).to(self.device_manager.device)
 
     def setSamplingRate(self, input_sample_rate, outputSampleRate):
