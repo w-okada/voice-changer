@@ -72,7 +72,7 @@ class ServerDevice:
         try:
             out_wav = self._processDataWithTime(indata)
             outputChannels = outdata.shape[1]
-            outdata[:] = (np.repeat(out_wav, outputChannels).reshape(-1, outputChannels) * self.settings.serverMonitorAudioGain)
+            outdata[:] = (np.repeat(out_wav, outputChannels).reshape(-1, outputChannels) * self.settings.serverOutputAudioGain)
         except Exception as e:
             print("[Voice Changer] ex:", e)
 
@@ -81,7 +81,7 @@ class ServerDevice:
             out_wav = self._processDataWithTime(indata)
             self.monQueue.put(out_wav)
             outputChannels = outdata.shape[1]
-            outdata[:] = (np.repeat(out_wav, outputChannels).reshape(-1, outputChannels) * self.settings.serverMonitorAudioGain)
+            outdata[:] = (np.repeat(out_wav, outputChannels).reshape(-1, outputChannels) * self.settings.serverOutputAudioGain)
         except Exception as e:
             print("[Voice Changer] ex:", e)
 
