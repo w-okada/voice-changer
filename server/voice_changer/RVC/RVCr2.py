@@ -93,7 +93,7 @@ class RVCr2(VoiceChangerModel):
         self.resampler_in = tat.Resample(
             orig_freq=self.input_sample_rate,
             new_freq=self.sr,
-            dtype=self.dtype
+            dtype=torch.float32
         ).to(self.device_manager.device)
 
         self.resampler_out = tat.Resample(
@@ -108,7 +108,7 @@ class RVCr2(VoiceChangerModel):
             self.resampler_in = tat.Resample(
                 orig_freq=self.input_sample_rate,
                 new_freq=self.sr,
-                dtype=self.dtype
+                dtype=torch.float32
             ).to(self.device_manager.device)
         if self.outputSampleRate != outputSampleRate:
             self.outputSampleRate = outputSampleRate
@@ -224,10 +224,9 @@ class RVCr2(VoiceChangerModel):
 
         # Input audio is always float32
         audio_in_t = torch.as_tensor(audio_in, dtype=torch.float32, device=self.device_manager.device)
-        if self.is_half:
-            audio_in_t = audio_in_t.half()
-
         audio_in_16k = self.resampler_in(audio_in_t)
+        if self.is_half:
+            audio_in_16k = audio_in_16k.half()
 
         circular_write(audio_in_16k, self.audio_buffer)
 
