@@ -245,7 +245,7 @@ class Pipeline:
             sid = torch.tensor([sid], device=self.device, dtype=torch.int64)
             t.record("mid-precess")
             # 推論実行
-            out_audio = self.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length, formant_length)
+            out_audio = self.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length, formant_length).float()
             t.record("infer")
 
             # Formant shift sample rate adjustment
@@ -255,7 +255,7 @@ class Pipeline:
                     self.resamplers[scaled_window] = tat.Resample(
                         orig_freq=scaled_window,
                         new_freq=self.model_window,
-                        dtype=self.dtype,
+                        dtype=torch.float32,
                     ).to(self.device)
                 out_audio = self.resamplers[scaled_window](
                     out_audio[: return_length * scaled_window]
