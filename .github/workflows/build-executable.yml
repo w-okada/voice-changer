@@ -74,7 +74,7 @@ jobs:
         # architecture: x64
         # cache: pip
     - name: Installing build dependencies
-      run: python -m pip install --no-cache-dir --upgrade pip wheel setuptools pyinstaller
+      run: python -m pip install --no-cache-dir --upgrade pip wheel setuptools pyinstaller msvc-runtime
     - name: Installing project dependencies
       run: python -m pip install --no-cache-dir -r requirements-common.txt -r requirements-${{ matrix.reqs }}.txt
       working-directory: ./server
