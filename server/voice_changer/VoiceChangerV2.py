@@ -273,7 +273,6 @@ class VoiceChangerV2(VoiceChangerIF):
                         crossfade_frame=crossfade_frame,
                         sola_search_frame=sola_search_frame,
                     )
-                    print("output audio dtype", audio.dtype)
                     t.record("inference")
 
                     if hasattr(self, "sola_buffer") is True:

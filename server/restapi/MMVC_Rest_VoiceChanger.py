@@ -49,7 +49,7 @@ class MMVC_Rest_VoiceChanger:
             changedVoice = self.voiceChangerManager.changeVoice(unpackedData)
             self.tlock.release()
 
-            print("", changedVoice[0].dtype)
+            # print("", changedVoice[0].dtype)
 
             changedVoiceBase64 = base64.b64encode(changedVoice[0]).decode("utf-8")
             data = {"timestamp": timestamp, "changedVoiceBase64": changedVoiceBase64}
