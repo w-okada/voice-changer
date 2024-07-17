@@ -3,6 +3,8 @@
 # # wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh
 # # bash Anaconda3-2022.10-Linux-x86_64.sh
 
+# At least 14.38 is required by onnxruntime
+msvc-runtime>=14.38; sys_platform=='win32'
 uvicorn
 pyOpenSSL
 numpy<2 # Not all modules have migrated to NumPy 2 yet. Using latest NumPy 1 version
