@@ -226,6 +226,20 @@ In the voice changer, make sure **passthru** is not on (indicated by blinking re
 
 1. Make sure you are using **VAC by Muzychenko** (indicated by the **Line 1** audio device name).
 
+1. In Windows **Sound Control Panel**, make sure that the sample rate of your microphone matches the sample rate of the virtual cable.
+
+   The following example shows the configuration of the virtual cable and the microphone:
+
+   ![image](https://github.com/user-attachments/assets/bd19dcbe-87a8-4e0a-9d3d-baf8015c546c)
+
+   ![image](https://github.com/user-attachments/assets/0e7ae533-3ba5-4308-895e-54254c2a67e0)
+
+1. If nothing helped, in **Task Manager** > **Details**, try setting the priority for the `audiodg.exe` process to **High**.
+
+### Audio is stuttery
+
+1. If you changed chunk when voice conversion was on, click **Stop** then **Start** again.
+
 1. Make sure the **perf** time is smaller than **Chunk**. Increase **Chunk** or reduce **Extra** and **Crossfade size**.
 
 ## Contribution
