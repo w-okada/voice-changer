@@ -12,7 +12,7 @@ faiss-gpu; sys_platform=='linux'
 
 onnxscript
 onnxsim
-onnxruntime-gpu==1.18.0
+onnxruntime-gpu
 torchcrepe
 torchfcpe
 safetensors
