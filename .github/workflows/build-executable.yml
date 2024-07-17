@@ -75,7 +75,7 @@ jobs:
         # cache: pip
     - name: Install MSVC package
       if: runner.os == 'Windows'
-      run: python -m pip install --co-cache-dir --upgrade msvc-runtime
+      run: python -m pip install --no-cache-dir --upgrade msvc-runtime
     - name: Installing build dependencies
       run: python -m pip install --no-cache-dir --upgrade pip wheel setuptools pyinstaller
     - name: Installing project dependencies
