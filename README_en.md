@@ -3,6 +3,15 @@
 [Japanese](/README_ja.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v2.0.42-alpha
+  - Feature
+    - Upload of Beatrice v2 custom model
+  - Improvement
+    - Improved RVC sound quality
+    - Enhanced RVC conversion speed
+  - Bugfix
+    - Pass-through
+    - Audio device reload
 - v.2.0.40-alpha
   - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
   - Improvements

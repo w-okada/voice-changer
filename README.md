@@ -3,6 +3,15 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.42-alpha
+  - Feature
+    - Beatrice v2 カスタムモデルのアップロード
+  - Improvement
+    - RVC音質向上
+    - RVC変換速度向上
+  - Bugfix
+    - パススルー
+    - オーディオデバイスリロード
 - v.2.0.40-alpha
   - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
   - 改善
