@@ -3,6 +3,10 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## 새로운 기능!
+- v2.0.44-alpha
+  - [여기를 참조하십시오](https://github.com/w-okada/voice-changer/tree/v.2)
+  - bugfix
+    - 모델 삭제 후 불안정한 동작 개선
 - v2.0.42-alpha
   - [여기를 참조하십시오](https://github.com/w-okada/voice-changer/tree/v.2)
   - 기능

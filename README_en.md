@@ -3,6 +3,10 @@
 [Japanese](/README_ja.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v2.0.44-alpha
+  - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
+  - bugfix
+    - Improvements for Unstable Behavior After Model Deletion
 - v2.0.42-alpha
   - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
   - Feature
