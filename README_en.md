@@ -3,6 +3,9 @@
 [Japanese](/README.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.44-alpha
+  - bugfix
+    - Improvements for Unstable Behavior After Model Deletion
 - v2.0.42-alpha
   - Feature
     - Upload of Beatrice v2 custom model

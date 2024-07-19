@@ -3,6 +3,9 @@
 [English](/README_en.md) [Japanese](/README.md)
 
 ## What's New!
+- v.2.0.44-alpha
+  - bugfix
+    - 모델 삭제 후 불안정한 동작 개선
 - v2.0.42-alpha
   - 기능
     - Beatrice v2 커스텀 모델 업로드
