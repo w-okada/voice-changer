@@ -3,6 +3,15 @@
 [English](/README_en.md) [Japanese](/README.md)
 
 ## What's New!
+- v2.0.42-alpha
+  - 기능
+    - Beatrice v2 커스텀 모델 업로드
+  - 개선
+    - RVC 음질 향상
+    - RVC 변환 속도 향상
+  - 버그 수정
+    - 패스스루
+    - 오디오 장치 다시 로드
 - v.2.0.40-alpha
   - 개선 사항
     - 볼륨 지원
