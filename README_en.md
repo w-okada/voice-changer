@@ -4,6 +4,7 @@
 
 ## What's New!
 - v2.0.42-alpha
+  - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
   - Feature
     - Upload of Beatrice v2 custom model
   - Improvement
