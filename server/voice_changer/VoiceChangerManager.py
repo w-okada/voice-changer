@@ -22,9 +22,11 @@ from Exceptions import (
     VoiceChangerIsNotSelectedException,
 )
 from traceback import format_exc
-
 # import threading
 from typing import Callable, Any
+
+from voice_changer.RVC.RVCr2 import RVCr2
+from voice_changer.RVC.RVCModelSlotGenerator import RVCModelSlotGenerator  # 起動時にインポートするとパラメータが取れない。
 
 logger = logging.getLogger(__name__)
 
@@ -119,8 +121,6 @@ class VoiceChangerManager(ServerDeviceCallbacks):
 
         # メタデータ作成(各VCで定義)
         if params.voiceChangerType == "RVC":
-            from voice_changer.RVC.RVCModelSlotGenerator import RVCModelSlotGenerator  # 起動時にインポートするとパラメータが取れない。
-
             slotInfo = RVCModelSlotGenerator.load_model(params)
             self.modelSlotManager.save_model_slot(params.slot, slotInfo)
 
@@ -159,7 +159,6 @@ class VoiceChangerManager(ServerDeviceCallbacks):
 
         if slotInfo.voiceChangerType == "RVC":
             logger.info("Loading RVC...")
-            from voice_changer.RVC.RVCr2 import RVCr2
 
             self.voiceChangerModel = RVCr2(self.params, slotInfo, self.settings)
             self.voiceChanger = VoiceChangerV2(self.params, self.settings)
