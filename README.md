@@ -3,6 +3,10 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v2.0.45-alpha
+  - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
+  - bugfix
+    - 音量調整
 - v2.0.44-alpha
   - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
   - bugfix
