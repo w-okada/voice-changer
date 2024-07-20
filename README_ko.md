@@ -3,6 +3,9 @@
 [English](/README_en.md) [Japanese](/README.md)
 
 ## What's New!
+- v.2.0.45-alpha
+  - bugfix
+    - 음량 조절
 - v.2.0.44-alpha
   - bugfix
     - 모델 삭제 후 불안정한 동작 개선

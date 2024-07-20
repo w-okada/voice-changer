@@ -3,6 +3,9 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## What's New!
+- v.2.0.45-alpha
+  - bugfix
+    - 音量調整
 - v.2.0.44-alpha
   - bugfix
     - モデル削除後の不安定動作の改善
