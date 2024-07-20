@@ -1,19 +1,13 @@
-import base64
 import numpy as np
+import msgpack
 
-from fastapi import APIRouter
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi import APIRouter, Request
+from fastapi.responses import Response, PlainTextResponse
 from const import get_edition, get_version
 from voice_changer.VoiceChangerManager import VoiceChangerManager
-from pydantic import BaseModel
 
 import logging
 logger = logging.getLogger(__name__)
-
-class VoiceModel(BaseModel):
-    timestamp: int
-    buffer: str
 
 
 class MMVC_Rest_VoiceChanger:
@@ -33,40 +27,50 @@ class MMVC_Rest_VoiceChanger:
         return PlainTextResponse(get_version())
 
 
-    def test(self, voice: VoiceModel):
+    async def test(self, req: Request):
         try:
-            data = base64.b64decode(voice.buffer)
+            data = await req.body()
+            timestamp, voice = msgpack.unpackb(data)
 
-            unpackedData = np.frombuffer(data, dtype=np.int16).astype(np.float32) / 32768
+            unpackedData = np.frombuffer(voice, dtype=np.int16).astype(np.float32) / 32768
 
             out_audio, perf, err = self.voiceChangerManager.changeVoice(unpackedData)
             out_audio = (out_audio * 32767).astype(np.int16).tobytes()
 
             if err is not None:
                 error_code, error_message = err
-                return JSONResponse(content=jsonable_encoder({
-                    "error": True,
-                    "timestamp": voice.timestamp,
-                    "details": {
-                        "code": error_code,
-                        "message": error_message,
-                    },
-                }))
-            else:
-                return JSONResponse(content=jsonable_encoder({
+                return Response(
+                    content=msgpack.packb({
+                        "error": True,
+                        "timestamp": timestamp,
+                        "details": {
+                            "code": error_code,
+                            "message": error_message,
+                        },
+                    }),
+                    headers={'Content-Type': 'application/octet-stream'},
+                )
+
+            return Response(
+                content=msgpack.packb({
                     "error": False,
-                    "timestamp": voice.timestamp,
-                    "changedVoiceBase64": base64.b64encode(out_audio).decode("utf-8"),
+                    "timestamp": timestamp,
+                    "audio": out_audio,
                     "perf": perf,
-                }))
+                }),
+                headers={'Content-Type': 'application/octet-stream'},
+            )
 
         except Exception as e:
             logger.exception(e)
-            return JSONResponse(content=jsonable_encoder({
-                "error": True,
-                "timestamp": 0,
-                "details": {
-                    "code": "GENERIC_REST_SERVER_ERROR",
-                    "message": "Check command line for more details.",
-                },
-            }))
+            return Response(
+                content=msgpack.packb({
+                    "error": True,
+                    "timestamp": 0,
+                    "details": {
+                        "code": "GENERIC_REST_SERVER_ERROR",
+                        "message": "Check command line for more details.",
+                    },
+                }),
+                headers={'Content-Type': 'application/octet-stream'},
+            )
