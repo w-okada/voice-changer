@@ -39,8 +39,6 @@ class VoiceChangerV2(VoiceChangerIF):
         self.sola_buffer: torch.Tensor | None = None
         self.ioRecorder: IORecorder | None = None
 
-        logger.info(f"VoiceChangerV2 Initialized")
-
 
     def set_model(self, model: VoiceChangerModel):
         self.voiceChangerModel = model
