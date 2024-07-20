@@ -25,6 +25,8 @@ class EmbedderManager:
 
     @classmethod
     def load_embedder(cls, embedder_type: EmbedderType) -> Embedder:
+        logger.info(f'Loading embedder {embedder_type}')
+
         if embedder_type not in ["hubert_base", "contentvec"]:
             raise RuntimeError(f'Unsupported embedder type: {embedder_type}')
         file = cls.params.content_vec_500_onnx
