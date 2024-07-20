@@ -40,7 +40,6 @@ class VoiceChangerV2(VoiceChangerIF):
         self.ioRecorder: IORecorder | None = None
 
         logger.info(f"VoiceChangerV2 Initialized")
-        np.set_printoptions(threshold=10000)
 
 
     def set_model(self, model: VoiceChangerModel):
