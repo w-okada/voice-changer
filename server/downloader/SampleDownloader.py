@@ -1,18 +1,17 @@
 import json
 import os
-import sys
 import asyncio
 from typing import Any, Tuple
 
 from const import RVCSampleMode, getSampleJsonAndModelIds
 from data.ModelSample import ModelSamples, generateModelSample
 from data.ModelSlot import ModelSlot, RVCModelSlot
-from mods.log_control import VoiceChangaerLogger
+import logging
 from voice_changer.ModelSlotManager import ModelSlotManager
 from voice_changer.RVC.RVCModelSlotGenerator import RVCModelSlotGenerator
 from downloader.Downloader import download
 
-logger = VoiceChangaerLogger.get_instance().getLogger()
+logger = logging.getLogger(__name__)
 
 
 async def downloadInitialSamples(mode: RVCSampleMode, model_dir: str):
@@ -86,7 +85,7 @@ async def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tup
                 match = True
                 break
         if match is False:
-            logger.warn(f"[Voice Changer] initiail sample not found. {targetSampleId}")
+            logger.warn(f"Initial sample not found: {targetSampleId}")
             continue
 
         # 検出されたら、、、
@@ -145,17 +144,17 @@ async def _downloadSamples(samples: list[ModelSamples], sampleModelIds: list[Tup
             slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
             modelSlotManager.save_model_slot(targetSlotIndex, slotInfo)
         else:
-            logger.warn(f"[Voice Changer] {sample.voiceChangerType} is not supported.")
+            logger.warn(f"{sample.voiceChangerType} is not supported.")
 
     # ダウンロード
-    logger.info("[Voice Changer] Downloading model files...")
+    logger.info("Downloading model files...")
     tasks: list[asyncio.Task] = []
     for file in downloadParams:
         tasks.append(asyncio.ensure_future(download(file)))
     await asyncio.gather(*tasks)
 
     # メタデータ作成
-    logger.info("[Voice Changer] Generating metadata...")
+    logger.info("Generating metadata...")
     for targetSlotIndex in slotIndex:
         slotInfo = modelSlotManager.get_slot_info(targetSlotIndex)
         modelPath = os.path.join(model_dir, str(slotInfo.slotIndex), os.path.basename(slotInfo.modelFile))

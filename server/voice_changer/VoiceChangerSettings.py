@@ -1,6 +1,9 @@
 # from const import PitchExtractorType
 from typing import NamedTuple
 
+import logging
+logger = logging.getLogger(__name__)
+
 IGNORED_KEYS = { 'version' }
 STATEFUL_KEYS = [ 'serverAudioStated', 'passThrough', 'recordIO' ]
 
@@ -42,13 +45,13 @@ class VoiceChangerSettings:
         if key in IGNORED_KEYS:
             return SetPropertyResult(error=False, old_value=None)
         if key not in cls.__dict__:
-            print(f'[VoiceChangerSettings] Failed to set setting: {key} does not exist')
+            logger.error(f'Failed to set setting: {key} does not exist')
             return SetPropertyResult(error=True, old_value=None)
         p = cls.__dict__[key]
         if not isinstance(p, property):
             return SetPropertyResult(error=True, old_value=None)
         if p.fset is None:
-            print(f'[VoiceChangerSettings] Failed to set setting: {key} is immutable.')
+            logger.error(f'Failed to set setting: {key} is immutable.')
             return SetPropertyResult(error=True, old_value=None)
         old_value = p.fget(self)
         p.fset(self, value)

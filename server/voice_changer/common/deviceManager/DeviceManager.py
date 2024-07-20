@@ -3,11 +3,15 @@ import onnxruntime
 import re
 from typing import TypedDict, Literal
 from enum import IntFlag
+from threading import Lock
 
 try:
     import torch_directml
 except ImportError:
     import voice_changer.common.deviceManager.DummyDML as torch_directml
+
+import logging
+logger = logging.getLogger(__name__)
 
 class CoreMLFlag(IntFlag):
     USE_CPU_ONLY = 0x001
@@ -42,10 +46,11 @@ class DeviceManager(object):
         self.dml_enabled: bool = torch_directml.is_available()
         self.fp16_available = False
         self.force_fp32 = False
-        print('[Voice Changer] Initialized DeviceManager. Available backends:')
-        print(f'[Voice Changer] * DirectML: {self.dml_enabled}, device count: {torch_directml.device_count()}')
-        print(f'[Voice Changer] * CUDA: {self.cuda_enabled}, device count: {torch.cuda.device_count()}')
-        print(f'[Voice Changer] * MPS: {self.mps_enabled}')
+        self.lock = Lock()
+        logger.info('Initialized DeviceManager. Backend statuses:')
+        logger.info(f'* DirectML: {self.dml_enabled}, device count: {torch_directml.device_count()}')
+        logger.info(f'* CUDA: {self.cuda_enabled}, device count: {torch.cuda.device_count()}')
+        logger.info(f'* MPS: {self.mps_enabled}')
 
     def initialize(self, device_id: int, force_fp32: bool):
         self.set_device(device_id)
@@ -61,7 +66,7 @@ class DeviceManager(object):
         self.device = device
         self.device_metadata = metadata
         self.fp16_available = self.is_fp16_available()
-        print(f'[Voice Changer] Switched to {metadata["name"]} ({device}). FP16 support: {self.fp16_available}')
+        logger.info(f'Switched to {metadata["name"]} ({device}). FP16 support: {self.fp16_available}')
 
     def use_fp16(self):
         return self.fp16_available and not self.force_fp32

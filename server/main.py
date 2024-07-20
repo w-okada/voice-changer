@@ -2,65 +2,47 @@ import os
 import multiprocessing as mp
 # NOTE: This is required to avoid recursive process call bug for macOS
 mp.freeze_support()
-from const import SSL_KEY_DIR, DOTENV_FILE, ROOT_PATH, UPLOAD_DIR, TMP_DIR, get_version, get_edition
+from const import SSL_KEY_DIR, ROOT_PATH, UPLOAD_DIR, TMP_DIR, LOG_FILE, get_version, get_edition
 # NOTE: This is required to fix current working directory on macOS
 os.chdir(ROOT_PATH)
 
 import sys
 import uvicorn
 import asyncio
-import traceback
 
 import threading
 import socket
 import time
-from dotenv import set_key
+import logging
 from utils.strtobool import strtobool
 from datetime import datetime
-import platform
 import argparse
 from downloader.WeightDownloader import downloadWeight
 from downloader.SampleDownloader import downloadInitialSamples
 from mods.ssl import create_self_signed_cert
 from webbrowser import open_new_tab
 from settings import ServerSettings
-from mods.log_control import VoiceChangaerLogger
 
-VoiceChangaerLogger.get_instance().initialize(initialize=True)
-logger = VoiceChangaerLogger.get_instance().getLogger()
+stream_handler = logging.StreamHandler()
+stream_handler.setLevel(logging.INFO)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)-15s %(levelname)-8s [%(module)s] %(message)s",
+    handlers=[logging.FileHandler(LOG_FILE), stream_handler]
+)
+logger = logging.getLogger(__name__)
 settings = ServerSettings()
 
 def setupArgParser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--logLevel", type=str, default="error", help="Log level info|critical|error. (default: error)")
+    parser.add_argument("--log-level", type=str, default="error", help="Log level info|critical|error.")
     parser.add_argument("--https", type=strtobool, default=False, help="use https")
-    parser.add_argument("--httpsKey", type=str, default="ssl.key", help="path for the key of https")
-    parser.add_argument("--httpsCert", type=str, default="ssl.cert", help="path for the cert of https")
-    parser.add_argument("--httpsSelfSigned", type=strtobool, default=True, help="generate self-signed certificate")
+    parser.add_argument("--https-key", type=str, default="ssl.key", help="path for the key of https")
+    parser.add_argument("--https-cert", type=str, default="ssl.cert", help="path for the cert of https")
+    parser.add_argument("--https-self-signed", type=strtobool, default=True, help="generate self-signed certificate")
 
     return parser
-
-def printMessage(message, level=0):
-    pf = platform.system()
-    if pf == "Windows":
-        if level == 0:
-            message = f"{message}"
-        elif level == 1:
-            message = f"    {message}"
-        elif level == 2:
-            message = f"    {message}"
-        else:
-            message = f"    {message}"
-    else:
-        if level == 0:
-            message = f"\033[17m{message}\033[0m"
-        elif level == 1:
-            message = f"\033[34m    {message}\033[0m"
-        elif level == 2:
-            message = f"\033[32m    {message}\033[0m"
-        else:
-            message = f"\033[47m    {message}\033[0m"
-    logger.info(message)
 
 def check_port(port) -> int:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
@@ -73,13 +55,13 @@ def wait_for_server(proto: str, launch_browser: bool):
             result = sock.connect_ex(('127.0.0.1', settings.port))
         if result == 0:
             break
-    print('-' * 8)
-    print(f"The server is listening on {proto}://{settings.host}:{settings.port}/")
-    print('-' * 8)
+    logger.info('-' * 8)
+    logger.info(f"The server is listening on {proto}://{settings.host}:{settings.port}/")
+    logger.info('-' * 8)
     if launch_browser:
         open_new_tab(f'{proto}://127.0.0.1:{settings.port}')
 
-async def runServer(host: str, port: int, launch_browser: bool = False, logLevel: str = 'critical', key_path: str | None = None, cert_path: str | None = None):
+async def runServer(host: str, port: int, launch_browser: bool = False, log_level: str = 'error', key_path: str | None = None, cert_path: str | None = None):
     check_port(port)
 
     config = uvicorn.Config(
@@ -89,7 +71,7 @@ async def runServer(host: str, port: int, launch_browser: bool = False, logLevel
         reload=False,
         ssl_keyfile=key_path,
         ssl_certfile=cert_path,
-        log_level=logLevel
+        log_level=log_level
     )
     server = uvicorn.Server(config)
 
@@ -101,14 +83,8 @@ async def runServer(host: str, port: int, launch_browser: bool = False, logLevel
 async def main(args):
     logger.debug(args)
 
-    if not os.path.exists(DOTENV_FILE):
-        for key, value in settings.model_dump().items():
-            set_key(DOTENV_FILE, key.upper(), str(value))
-
-    printMessage(f"Python: {sys.version}", level=2)
-    printMessage(f"Voice changer version: {get_version()} {get_edition()}", level=2)
-    # printMessage("Voice Changerを起動しています。", level=2)
-    printMessage("Activating the Voice Changer.", level=2)
+    logger.info(f"Python: {sys.version}")
+    logger.info(f"Voice changer version: {get_version()} {get_edition()}")
     # ダウンロード(Weight)
 
     await downloadWeight(settings)
@@ -116,8 +92,8 @@ async def main(args):
     try:
         await downloadInitialSamples(settings.sample_mode, settings.model_dir)
     except Exception as e:
-        print(traceback.format_exc())
-        printMessage(f"Failed to download samples. Reason: {e}", level=2)
+        logger.error(f"Failed to download samples.")
+        logger.exception(e)
 
     # FIXME: Need to refactor samples download logic
     os.makedirs(settings.model_dir, exist_ok=True)
@@ -125,7 +101,7 @@ async def main(args):
     os.makedirs(TMP_DIR, exist_ok=True)
 
     # HTTPS key/cert作成
-    if args.https and args.httpsSelfSigned:
+    if args.https and args.https_self_signed:
         # HTTPS(おれおれ証明書生成)
         os.makedirs(SSL_KEY_DIR, exist_ok=True)
         key_base_name = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}"
@@ -145,24 +121,23 @@ async def main(args):
         )
         key_path = os.path.join(SSL_KEY_DIR, keyname)
         cert_path = os.path.join(SSL_KEY_DIR, certname)
-        printMessage(f"protocol: HTTPS(self-signed), key:{key_path}, cert:{cert_path}", level=1)
+        logger.info(f"protocol: HTTPS(self-signed), key:{key_path}, cert:{cert_path}")
 
-    elif args.https and not args.httpsSelfSigned:
+    elif args.https and not args.https_self_signed:
         # HTTPS
-        key_path = args.httpsKey
-        cert_path = args.httpsCert
-        printMessage(f"protocol: HTTPS, key:{key_path}, cert:{cert_path}", level=1)
+        key_path = args.https_key
+        cert_path = args.https_cert
+        logger.info(f"protocol: HTTPS, key:{key_path}, cert:{cert_path}")
     else:
         # HTTP
-        printMessage("protocol: HTTP", level=1)
-    printMessage("-- ---- -- ", level=1)
+        logger.info("protocol: HTTP")
 
     # サーバ起動
     if args.https:
         # HTTPS サーバ起動
-        await runServer(settings.host, settings.port, args.launch_browser, args.logLevel, key_path, cert_path)
+        await runServer(settings.host, settings.port, args.launch_browser, args.log_level, key_path, cert_path)
     else:
-        await runServer(settings.host, settings.port, args.launch_browser, args.logLevel)
+        await runServer(settings.host, settings.port, args.launch_browser, args.log_level)
 
 
 if __name__ == "__main__":
@@ -170,10 +145,8 @@ if __name__ == "__main__":
     args, _ = parser.parse_known_args()
     args.launch_browser = False
 
-    printMessage(f"Booting PHASE :{__name__}", level=2)
-
     try:
         asyncio.run(main(args))
     except Exception as e:
-        print(traceback.format_exc())
+        logger.exception(e)
         input('Press Enter to continue...')

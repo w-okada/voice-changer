@@ -1,12 +1,10 @@
 import asyncio
-import traceback
 
 from main import setupArgParser, main
 from utils.strtobool import strtobool
-from mods.log_control import VoiceChangaerLogger
 
-VoiceChangaerLogger.get_instance().initialize(initialize=True)
-logger = VoiceChangaerLogger.get_instance().getLogger()
+import logging
+logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     parser = setupArgParser()
@@ -16,5 +14,5 @@ if __name__ == "__main__":
     try:
         asyncio.run(main(args))
     except Exception as e:
-        print(traceback.format_exc())
+        logger.exception(e)
         input('Press Enter to continue...')

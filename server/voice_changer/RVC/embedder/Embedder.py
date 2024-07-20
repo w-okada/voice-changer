@@ -5,7 +5,8 @@ from torch import device
 
 from const import EmbedderType
 from voice_changer.RVC.embedder.EmbedderProtocol import EmbedderProtocol
-
+import logging
+logger = logging.getLogger(__name__)
 
 class Embedder(EmbedderProtocol):
     def __init__(self):
@@ -38,12 +39,4 @@ class Embedder(EmbedderProtocol):
         self.file = file
 
     def matchCondition(self, embedderType: EmbedderType) -> bool:
-        # Check Type
-        if self.embedderType != embedderType:
-            print(
-                "[Voice Changer] embeder type is not match",
-                self.embedderType,
-                embedderType,
-            )
-            return False
-        return True
+        return self.embedderType == embedderType

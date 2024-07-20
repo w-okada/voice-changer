@@ -1,7 +1,5 @@
 import base64
 import numpy as np
-import traceback
-import os
 
 from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
@@ -9,8 +7,9 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 from const import get_edition, get_version
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 from pydantic import BaseModel
-import threading
 
+import logging
+logger = logging.getLogger(__name__)
 
 class VoiceModel(BaseModel):
     timestamp: int
@@ -24,8 +23,6 @@ class MMVC_Rest_VoiceChanger:
         self.router.add_api_route("/test", self.test, methods=["POST"])
         self.router.add_api_route("/edition", self.edition, methods=["GET"])
         self.router.add_api_route("/version", self.version, methods=["GET"])
-
-        self.tlock = threading.Lock()
 
 
     def edition(self):
@@ -42,9 +39,7 @@ class MMVC_Rest_VoiceChanger:
 
             unpackedData = np.frombuffer(data, dtype=np.int16).astype(np.float32) / 32768
 
-            self.tlock.acquire()
             out_audio, perf, err = self.voiceChangerManager.changeVoice(unpackedData)
-            self.tlock.release()
             out_audio = (out_audio * 32767).astype(np.int16).tobytes()
 
             if err is not None:
@@ -66,7 +61,12 @@ class MMVC_Rest_VoiceChanger:
                 }))
 
         except Exception as e:
-            print("REQUEST PROCESSING!!!! EXCEPTION!!!", e)
-            print(traceback.format_exc())
-            self.tlock.release()
-            return str(e)
+            logger.exception(e)
+            return JSONResponse(content=jsonable_encoder({
+                "error": True,
+                "timestamp": 0,
+                "details": {
+                    "code": "GENERIC_REST_SERVER_ERROR",
+                    "message": "Check command line for more details.",
+                },
+            }))

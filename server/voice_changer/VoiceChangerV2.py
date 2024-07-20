@@ -5,7 +5,7 @@ from torch.functional import F
 import torch
 import os
 import numpy as np
-from mods.log_control import VoiceChangaerLogger
+import logging
 
 from voice_changer.IORecorder import IORecorder
 from voice_changer.VoiceChangerSettings import VoiceChangerSettings
@@ -20,7 +20,7 @@ from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 
 STREAM_INPUT_FILE = os.path.join(TMP_DIR, "in.wav")
 STREAM_OUTPUT_FILE = os.path.join(TMP_DIR, "out.wav")
-logger = VoiceChangaerLogger.get_instance().getLogger()
+logger = logging.getLogger(__name__)
 
 
 class VoiceChangerV2(VoiceChangerIF):
@@ -38,9 +38,6 @@ class VoiceChangerV2(VoiceChangerIF):
         self.device_manager = DeviceManager.get_instance()
         self.sola_buffer: torch.Tensor | None = None
         self.ioRecorder: IORecorder | None = None
-
-        logger.info(f"VoiceChangerV2 Initialized")
-        np.set_printoptions(threshold=10000)
 
 
     def set_model(self, model: VoiceChangerModel):
@@ -68,7 +65,7 @@ class VoiceChangerV2(VoiceChangerIF):
 
     def update_settings(self, key: str, val: Any, old_val: Any):
         if self.voiceChangerModel is None:
-            logger.warn("[Voice Changer] Voice Changer is not selected.")
+            logger.warn("Voice Changer model is not selected.")
             return
 
         if key == "serverReadChunkSize":
@@ -85,7 +82,7 @@ class VoiceChangerV2(VoiceChangerIF):
                     self.settings.outputSampleRate,
                     # 16000,
                 )
-                print(f"-------------------------- - - - {self.settings.inputSampleRate}, {self.settings.outputSampleRate}")
+                logger.info(f"-------------------------- - - - {self.settings.inputSampleRate}, {self.settings.outputSampleRate}")
             else:
                 self.ioRecorder.close()
         elif key == "inputSampleRate":
@@ -122,7 +119,7 @@ class VoiceChangerV2(VoiceChangerIF):
 
         # ひとつ前の結果とサイズが変わるため、記録は消去する。
         self.sola_buffer = torch.zeros(self.crossfade_frame, device=self.device_manager.device, dtype=torch.float32)
-        logger.info(f'[Voice Changer] Allocated sola buffer size: {self.sola_buffer.shape}')
+        logger.info(f'Allocated SOLA buffer size: {self.crossfade_frame}')
 
     def get_processing_sampling_rate(self):
         if self.voiceChangerModel is None:
@@ -179,12 +176,3 @@ class VoiceChangerV2(VoiceChangerIF):
     @torch.no_grad()
     def export2onnx(self):
         return self.voiceChangerModel.export2onnx()
-
-        ##############
-
-    def merge_models(self, request: str):
-        if self.voiceChangerModel is None:
-            logger.info("[Voice Changer] Voice Changer is not selected.")
-            return
-        self.voiceChangerModel.merge_models(request)
-        return self.get_info()

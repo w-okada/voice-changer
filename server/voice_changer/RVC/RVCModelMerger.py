@@ -5,7 +5,8 @@ from const import UPLOAD_DIR
 from voice_changer.RVC.modelMerger.MergeModel import merge_model
 from voice_changer.utils.ModelMerger import ModelMerger, ModelMergerRequest
 from settings import ServerSettings
-
+import logging
+logger = logging.getLogger(__name__)
 
 class RVCModelMerger(ModelMerger):
     @classmethod
@@ -15,7 +16,7 @@ class RVCModelMerger(ModelMerger):
         # いったんは、アップロードフォルダに格納する。（歴史的経緯）
         # 後続のloadmodelを呼び出すことで永続化モデルフォルダに移動させられる。
         storeDir = os.path.join(UPLOAD_DIR)
-        print("[Voice Changer] store merged model to:", storeDir)
+        logger.info(f"store merged model to: {storeDir}")
         os.makedirs(storeDir, exist_ok=True)
         storeFile = os.path.join(storeDir, "merged.pth")
         torch.save(merged, storeFile)

@@ -2,7 +2,7 @@ import numpy as np
 from const import SERVER_DEVICE_SAMPLE_RATES
 
 from queue import Queue
-from mods.log_control import VoiceChangaerLogger
+import logging
 from voice_changer.VoiceChangerSettings import VoiceChangerSettings
 from voice_changer.Local.AudioDeviceList import checkSamplingRate, list_audio_device
 import time
@@ -13,7 +13,7 @@ from voice_changer.utils.VoiceChangerModel import AudioInOut
 from typing import Protocol
 from typing import Union
 
-logger = VoiceChangaerLogger.get_instance().getLogger()
+logger = logging.getLogger(__name__)
 
 class ServerDeviceCallbacks(Protocol):
     def on_request(self, unpackedData: AudioInOut) -> tuple[AudioInOut, list[Union[int, float]]]:
@@ -74,7 +74,7 @@ class ServerDevice:
             outputChannels = outdata.shape[1]
             outdata[:] = (np.repeat(out_wav, outputChannels).reshape(-1, outputChannels) * self.settings.serverOutputAudioGain)
         except Exception as e:
-            print("[Voice Changer] ex:", e)
+            logger.exception(e)
 
     def audio_stream_callback_mon_queue(self, indata: np.ndarray, outdata: np.ndarray, frames, times, status):
         try:
@@ -83,7 +83,7 @@ class ServerDevice:
             outputChannels = outdata.shape[1]
             outdata[:] = (np.repeat(out_wav, outputChannels).reshape(-1, outputChannels) * self.settings.serverOutputAudioGain)
         except Exception as e:
-            print("[Voice Changer] ex:", e)
+            logger.exception(e)
 
     def audio_monitor_callback(self, outdata: np.ndarray, frames, times, status):
         try:
@@ -93,9 +93,7 @@ class ServerDevice:
             outputChannels = outdata.shape[1]
             outdata[:] = (np.repeat(mon_wav, outputChannels).reshape(-1, outputChannels) * self.settings.serverMonitorAudioGain)
         except Exception as e:
-            print("[Voice Changer][ServerDevice][audioMonitor_callback]  ex:", e)
-            # import traceback
-            # traceback.print_exc()
+            logger.exception(e)
 
     ###########################################
     # Main Loop Section
@@ -106,9 +104,6 @@ class ServerDevice:
         ):
             while self.stream_loop:
                 time.sleep(2)
-                print(f"[Voice Changer] server audio performance {self.performance}")
-                print(f"                input  : id:{self.settings.serverInputDeviceId}, sr:{self.settings.serverInputAudioSampleRate}, ch:{inputMaxChannel}")
-                print(f"                output : id:{self.settings.serverOutputDeviceId}, sr:{self.settings.serverOutputAudioSampleRate}, ch:{outputMaxChannel}")
 
     def run_with_monitor(self, block_frame: int, inputMaxChannel: int, outputMaxChannel: int, monitorMaxChannel: int, inputExtraSetting, outputExtraSetting, monitorExtraSetting):
         with (
@@ -117,10 +112,6 @@ class ServerDevice:
         ):
             while self.stream_loop:
                 time.sleep(2)
-                print(f"[Voice Changer] server audio performance {self.performance}")
-                print(f"                input  : id:{self.settings.serverInputDeviceId}, sr:{self.settings.serverInputAudioSampleRate}, ch:{inputMaxChannel}")
-                print(f"                output : id:{self.settings.serverOutputDeviceId}, sr:{self.settings.serverOutputAudioSampleRate}, ch:{outputMaxChannel}")
-                print(f"                monitor: id:{self.settings.serverMonitorDeviceId}, sr:{self.settings.serverMonitorAudioSampleRate}, ch:{monitorMaxChannel}")
 
     ###########################################
     # Start Section
@@ -151,14 +142,14 @@ class ServerDevice:
             if serverMonitorAudioDevice and "WASAPI" in serverMonitorAudioDevice.hostAPI:
                 monitorExtraSetting = sd.WasapiSettings(exclusive=bool(self.settings.exclusiveMode))
 
-            print("Devices:")
-            print("  [Input]:", serverInputAudioDevice, inputExtraSetting)
-            print("  [Output]:", serverOutputAudioDevice, outputExtraSetting)
-            print("  [Monitor]:", serverMonitorAudioDevice, monitorExtraSetting)
+            logger.info("Devices:")
+            logger.info(f"  [Input]: {serverInputAudioDevice} {inputExtraSetting}")
+            logger.info(f"  [Output]: {serverOutputAudioDevice}, {outputExtraSetting}")
+            logger.info(f"  [Monitor]: {serverMonitorAudioDevice}, {monitorExtraSetting}")
 
             # Deviceがなかったらいったんスリープ
             if serverInputAudioDevice is None or serverOutputAudioDevice is None:
-                print("serverInputAudioDevice or serverOutputAudioDevice is None")
+                logger.error("serverInputAudioDevice or serverOutputAudioDevice is None")
                 time.sleep(2)
                 continue
 
@@ -173,15 +164,15 @@ class ServerDevice:
             outputAudioSampleRateAvailable = checkSamplingRate(self.settings.serverOutputDeviceId, self.settings.serverOutputAudioSampleRate, "output")
             monitorAudioSampleRateAvailable = checkSamplingRate(self.settings.serverMonitorDeviceId, self.settings.serverMonitorAudioSampleRate, "output") if serverMonitorAudioDevice else True
 
-            print("Sample Rate:")
-            print(f"  [Input]: {self.settings.serverInputAudioSampleRate} -> {inputAudioSampleRateAvailable}")
-            print(f"  [Output]: {self.settings.serverOutputAudioSampleRate} -> {outputAudioSampleRateAvailable}")
+            logger.info("Sample Rate:")
+            logger.info(f"  [Input]: {self.settings.serverInputAudioSampleRate} -> {inputAudioSampleRateAvailable}")
+            logger.info(f"  [Output]: {self.settings.serverOutputAudioSampleRate} -> {outputAudioSampleRateAvailable}")
             if serverMonitorAudioDevice is not None:
-                print(f"  [Monitor]: {self.settings.serverMonitorAudioSampleRate} -> {monitorAudioSampleRateAvailable}")
+                logger.info(f"  [Monitor]: {self.settings.serverMonitorAudioSampleRate} -> {monitorAudioSampleRateAvailable}")
 
             if not inputAudioSampleRateAvailable or not outputAudioSampleRateAvailable or not monitorAudioSampleRateAvailable:
-                print("Sample Rate is not supported by device:")
-                print("Checking Available Sample Rate:")
+                logger.error("Sample Rate is not supported by device:")
+                logger.info("Checking Available Sample Rate:")
                 availableInputSampleRate = []
                 availableOutputSampleRate = []
                 availableMonitorSampleRate = []
@@ -193,20 +184,17 @@ class ServerDevice:
                     if serverMonitorAudioDevice is not None:
                         if checkSamplingRate(self.settings.serverMonitorDeviceId, sr, "output"):
                             availableMonitorSampleRate.append(sr)
-                print("Available Sample Rate:")
-                print(f"  [Input]: {availableInputSampleRate}")
-                print(f"  [Output]: {availableOutputSampleRate}")
+                logger.info("Available Sample Rate:")
+                logger.info(f"  [Input]: {availableInputSampleRate}")
+                logger.info(f"  [Output]: {availableOutputSampleRate}")
                 if serverMonitorAudioDevice is not None:
-                    print(f"  [Monitor]: {availableMonitorSampleRate}")
-
-                print("continue... ")
+                    logger.info(f"  [Monitor]: {availableMonitorSampleRate}")
                 time.sleep(2)
                 continue
 
-            # Blockサイズを計算
+            # FIXME: In UI, block size is calculated based on 48kHz so we convert from 48kHz to input device sample rate.
             block_frame = int((self.settings.serverReadChunkSize * 128 / 48000) * self.settings.serverInputAudioSampleRate)
 
-            # main loop
             try:
                 self.stream_loop = True
                 if serverMonitorAudioDevice is None:
@@ -214,10 +202,7 @@ class ServerDevice:
                 else:
                     self.run_with_monitor(block_frame, serverInputAudioDevice.maxInputChannels, serverOutputAudioDevice.maxOutputChannels, serverMonitorAudioDevice.maxOutputChannels, inputExtraSetting, outputExtraSetting, monitorExtraSetting)
             except Exception as e:
-                print("[Voice Changer] processing, ex:", e)
-                import traceback
-
-                traceback.print_exc()
+                logger.exception(e)
                 time.sleep(2)
 
     ###########################################
@@ -230,7 +215,7 @@ class ServerDevice:
             self.serverAudioInputDevices = audioinput
             self.serverAudioOutputDevices = audiooutput
         except Exception as e:
-            print(e)
+            logger.exception(e)
 
         data["serverAudioInputDevices"] = self.serverAudioInputDevices
         data["serverAudioOutputDevices"] = self.serverAudioOutputDevices

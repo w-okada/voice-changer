@@ -52,6 +52,3 @@ class VoiceChangerModel(Protocol):
 
     def export2onnx() -> Any:
         ...
-
-    def merge_models(request: str) -> Any:
-        ...

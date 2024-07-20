@@ -14,7 +14,7 @@ import torch.nn.functional as F
 import onnxruntime
 from torchaudio import transforms as tat
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
-from mods.log_control import VoiceChangaerLogger
+import logging
 
 from voice_changer.common.TorchUtils import circular_write
 from voice_changer.RVC.embedder.Embedder import Embedder
@@ -24,7 +24,7 @@ from voice_changer.RVC.pitchExtractor.PitchExtractor import PitchExtractor
 from voice_changer.utils.Timer import Timer2
 from const import F0_MEL_MIN, F0_MEL_MAX
 
-logger = VoiceChangaerLogger.get_instance().getLogger()
+logger = logging.getLogger(__name__)
 
 
 class Pipeline:
@@ -114,7 +114,7 @@ class Pipeline:
     def setPitchExtractor(self, pitchExtractor: PitchExtractor):
         self.pitchExtractor = pitchExtractor
 
-    def extractPitch(self, audio: torch.Tensor, pitch: torch.Tensor | None, pitchf: torch.Tensor | None, f0_up_key: int, formant_shift: float) -> tuple[torch.Tensor, torch.Tensor]:
+    def extract_pitch(self, audio: torch.Tensor, pitch: torch.Tensor | None, pitchf: torch.Tensor | None, f0_up_key: int, formant_shift: float) -> tuple[torch.Tensor, torch.Tensor]:
         f0 = self.pitchExtractor.extract(
             audio,
             self.sr,
@@ -136,20 +136,6 @@ class Pipeline:
             pitchf = f0
 
         return pitch.unsqueeze(0), pitchf.unsqueeze(0)
-
-    def extract_features(self, feats: torch.Tensor, embOutputLayer: int, useFinalProj: bool):
-        try:
-            return self.embedder.extract_features(feats, embOutputLayer, useFinalProj)
-        except RuntimeError as e:
-            print("Failed to extract features:", e)
-            raise e
-
-    def infer(self, feats: torch.Tensor, p_len: torch.Tensor, pitch: torch.Tensor, pitchf: torch.Tensor, sid: torch.Tensor, skip_head: int | None, return_length: int | None, formant_length: int | None) -> torch.Tensor:
-        try:
-            return self.inferencer.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length, formant_length)
-        except RuntimeError as e:
-            print("Failed to infer:", e)
-            raise e
 
     def _search_index(self, audio: torch.Tensor, top_k: int = 1):
         if top_k == 1:
@@ -198,11 +184,11 @@ class Pipeline:
             t.record("pre-process")
 
             # ピッチ検出
-            pitch, pitchf = self.extractPitch(audio[silence_front:], pitch, pitchf, f0_up_key, formant_shift) if self.use_f0 else (None, None)
+            pitch, pitchf = self.extract_pitch(audio[silence_front:], pitch, pitchf, f0_up_key, formant_shift) if self.use_f0 else (None, None)
             t.record("extract-pitch")
 
             # embedding
-            feats = self.extract_features(audio.view(1, -1), embOutputLayer, useFinalProj)
+            feats = self.embedder.extract_features(audio.view(1, -1), embOutputLayer, useFinalProj)
             feats = torch.cat((feats, feats[:, -1:, :]), 1)
             t.record("extract-feats")
 
@@ -245,7 +231,7 @@ class Pipeline:
             sid = torch.tensor([sid], device=self.device, dtype=torch.int64)
             t.record("mid-precess")
             # 推論実行
-            out_audio = self.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length, formant_length).float()
+            out_audio = self.inferencer.infer(feats, p_len, pitch, pitchf, sid, skip_head, return_length, formant_length).float()
             t.record("infer")
 
             # Formant shift sample rate adjustment
@@ -260,5 +246,4 @@ class Pipeline:
                 out_audio = self.resamplers[scaled_window](
                     out_audio[: return_length * scaled_window]
                 )
-        # print("EXEC AVERAGE:", t.avrSecs)
         return out_audio

@@ -8,6 +8,8 @@ from onnxruntime.transformers.float16 import convert_float_to_float16
 from onnxruntime.transformers.fusion_utils import FusionUtils
 from onnxruntime.transformers.onnx_model import OnnxModel
 
+import logging
+logger = logging.getLogger(__name__)
 
 def load_onnx_model(fpath: str, is_half: bool) -> ModelProto:
     if is_half:
@@ -25,20 +27,24 @@ def load_cached_fp16_model(fpath: str) -> ModelProto:
     fname, _ = os.path.splitext(os.path.basename(fpath))
     fp16_fpath = os.path.join(os.path.dirname(fpath), f'{fname}.fp16.onnx')
     if original_hash is None:
+        logger.info('Converting model to FP16...')
         model = convert_fp16(onnx.load(fpath))
         onnx.save(model, fp16_fpath)
         with open(fpath, 'rb') as f:
             computed_hash = compute_hash(f, xxh128())
         with open(hashfile, 'w', encoding='utf-8') as f:
             f.write(computed_hash)
+        logger.info('Done!')
     else:
         with open(fpath, 'rb') as f:
             computed_hash = compute_hash(f, xxh128())
         if computed_hash != original_hash:
+            logger.info('Original model has changed. Regenerating FP16 model...')
             model = convert_fp16(onnx.load(fpath))
             onnx.save(model, fp16_fpath)
             with open(hashfile, 'w', encoding='utf-8') as f:
                 f.write(computed_hash)
+            logger.info('Done!')
         else:
             model = onnx.load(fp16_fpath)
     return model

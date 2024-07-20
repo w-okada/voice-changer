@@ -4,13 +4,13 @@ import json
 from downloader.HttpClient import HttpClient
 from tqdm import tqdm
 from threading import Lock
-from mods.log_control import VoiceChangaerLogger
 from xxhash import xxh128
 from utils.hasher import compute_hash
 from const import ASSETS_FILE
 from Exceptions import DownloadVerificationException
 
-logger = VoiceChangaerLogger.get_instance().getLogger()
+import logging
+logger = logging.getLogger(__name__)
 
 lock = Lock()
 
@@ -44,13 +44,13 @@ async def download(params: dict):
         # If hash was provided with the file - verify against provided hash
         if expected_hash is not None:
             if hash == expected_hash:
-                logger.info(f'[Voice Changer] Verified {saveTo}')
+                logger.info(f'Verified {saveTo}')
                 return
         # If hash was not provided - verify against local cache
         elif saveTo in files:
             fhash = files[saveTo]
             if hash == fhash:
-                logger.info(f'[Voice Changer] Verified {saveTo}')
+                logger.info(f'Verified {saveTo}')
                 return
     else:
         hash = None

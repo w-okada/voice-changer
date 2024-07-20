@@ -11,6 +11,8 @@ from voice_changer.common.SafetensorsUtils import convert_single
 from voice_changer.utils.LoadModelParams import LoadModelParams
 from voice_changer.utils.ModelSlotGenerator import ModelSlotGenerator
 from settings import ServerSettings
+import logging
+logger = logging.getLogger(__name__)
 
 class RVCModelSlotGenerator(ModelSlotGenerator):
     @classmethod
@@ -29,7 +31,7 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
         slotInfo.defaultProtect = 0.5
         slotInfo.isONNX = slotInfo.modelFile.endswith(".onnx")
         slotInfo.name = os.path.splitext(os.path.basename(slotInfo.modelFile))[0]
-        print("RVC:: slotInfo.modelFile", slotInfo.modelFile)
+        logger.info(f"RVC:: slotInfo.modelFile {slotInfo.modelFile}")
 
         # slotInfo.iconFile = "/assets/icons/noimage.png"
 
@@ -59,27 +61,7 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
         slot = RVCModelSlot(**asdict(slot))
         slot.f0 = True if cpt["f0"] == 1 else False
 
-        if version == "voras_beta":
-            slot.f0 = True if cpt["f0"] == 1 else False
-            slot.modelType = EnumInferenceTypes.pyTorchVoRASbeta.value
-            slot.embChannels = 768
-            slot.embOutputLayer = cpt["embedder_output_layer"] if "embedder_output_layer" in cpt else 9
-            slot.useFinalProj = False
-
-            slot.embedder = cpt["embedder_name"]
-            if slot.embedder.endswith("768"):
-                slot.embedder = slot.embedder[:-3]
-
-            # if slot.embedder == "hubert":
-            #     slot.embedder = "hubert"
-            # elif slot.embedder == "contentvec":
-            #     slot.embedder = "contentvec"
-            # elif slot.embedder == "hubert_jp":
-            #     slot.embedder = "hubert_jp"
-            else:
-                raise RuntimeError("[Voice Changer][setInfoByPytorch] unknown embedder")
-
-        elif config_len == 18:
+        if config_len == 18:
             # Original RVC
             if version == "v1":
                 slot.modelType = EnumInferenceTypes.pyTorchRVC.value if slot.f0 else EnumInferenceTypes.pyTorchRVCNono.value
@@ -87,14 +69,14 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
                 slot.embOutputLayer = 9
                 slot.useFinalProj = True
                 slot.embedder = "hubert_base"
-                print("[Voice Changer] Official Model(pyTorch) : v1")
+                logger.info("Official Model(pyTorch) : v1")
             else:
                 slot.modelType = EnumInferenceTypes.pyTorchRVCv2.value if slot.f0 else EnumInferenceTypes.pyTorchRVCv2Nono.value
                 slot.embChannels = 768
                 slot.embOutputLayer = 12
                 slot.useFinalProj = False
                 slot.embedder = "hubert_base"
-                print("[Voice Changer] Official Model(pyTorch) : v2")
+                logger.info("Official Model(pyTorch) : v2")
 
         else:
             # DDPN RVC
@@ -109,11 +91,11 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
 
             # DDPNモデルの情報を表示
             if slot.embChannels == 256 and slot.embOutputLayer == 9 and slot.useFinalProj:
-                print("[Voice Changer] DDPN Model(pyTorch) : Official v1 like")
+                logger.info("DDPN Model(pyTorch) : Official v1 like")
             elif slot.embChannels == 768 and slot.embOutputLayer == 12 and slot.useFinalProj is False:
-                print("[Voice Changer] DDPN Model(pyTorch): Official v2 like")
+                logger.info("DDPN Model(pyTorch): Official v2 like")
             else:
-                print(f"[Voice Changer] DDPN Model(pyTorch): ch:{slot.embChannels}, L:{slot.embOutputLayer}, FP:{slot.useFinalProj}")
+                logger.info(f"DDPN Model(pyTorch): ch:{slot.embChannels}, L:{slot.embOutputLayer}, FP:{slot.useFinalProj}")
 
             slot.embedder = cpt["embedder_name"]
             if slot.embedder.endswith("768"):
@@ -150,11 +132,11 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
 
             # ONNXモデルの情報を表示
             if slot.embChannels == 256 and slot.embOutputLayer == 9 and slot.useFinalProj:
-                print("[Voice Changer] ONNX Model: Official v1 like")
+                logger.info("ONNX Model: Official v1 like")
             elif slot.embChannels == 768 and slot.embOutputLayer == 12 and slot.useFinalProj is False:
-                print("[Voice Changer] ONNX Model: Official v2 like")
+                logger.info("ONNX Model: Official v2 like")
             else:
-                print(f"[Voice Changer] ONNX Model: ch:{slot.embChannels}, L:{slot.embOutputLayer}, FP:{slot.useFinalProj}")
+                logger.info(f"ONNX Model: ch:{slot.embChannels}, L:{slot.embOutputLayer}, FP:{slot.useFinalProj}")
 
             if "embedder" not in metadata:
                 slot.embedder = "hubert_base"
@@ -185,10 +167,10 @@ class RVCModelSlotGenerator(ModelSlotGenerator):
             slot.samplingRate = 48000
             slot.deprecated = True
 
-            print("[Voice Changer] setInfoByONNX", e)
-            print("[Voice Changer] ############## !!!! CAUTION !!!! ####################")
-            print("[Voice Changer] This onnxfie is depricated. Please regenerate onnxfile.")
-            print("[Voice Changer] ############## !!!! CAUTION !!!! ####################")
+            logger.error("setInfoByONNX", e)
+            logger.error("############## !!!! CAUTION !!!! ####################")
+            logger.error("This onnxfie is deprecated. Please regenerate onnxfile.")
+            logger.error("############## !!!! CAUTION !!!! ####################")
 
         del tmp_onnx_session
         return slot

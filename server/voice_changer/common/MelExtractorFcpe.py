@@ -2,6 +2,9 @@ import torch
 from .STFT import STFT
 from librosa.filters import mel
 
+import logging
+logger = logging.getLogger(__name__)
+
 # This module is used by FCPE
 # Modules are copied from torchfcpe and modified
 def dynamic_range_compression_torch(x, C=1, clip_val=1e-5):
@@ -153,9 +156,9 @@ class MelModule(torch.nn.Module):
         y = y.squeeze(-1)
 
         if torch.min(y) < -1.:
-            print('[error with torchfcpe.mel_extractor.MelModule]min value is ', torch.min(y))
+            logger.error(f'min value is {torch.min(y)}')
         if torch.max(y) > 1.:
-            print('[error with torchfcpe.mel_extractor.MelModule]max value is ', torch.max(y))
+            logger.error(f'max value is {torch.max(y)}')
 
         pad_left = (self.win_size - self.hop_length) // 2
         pad_right = max((self.win_size - self.hop_length + 1) // 2, self.win_size - y.size(-1) - pad_left)
