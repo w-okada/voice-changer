@@ -2,7 +2,7 @@ import os
 import multiprocessing as mp
 # NOTE: This is required to avoid recursive process call bug for macOS
 mp.freeze_support()
-from const import SSL_KEY_DIR, DOTENV_FILE, ROOT_PATH, UPLOAD_DIR, TMP_DIR, LOG_FILE, get_version, get_edition
+from const import SSL_KEY_DIR, ROOT_PATH, UPLOAD_DIR, TMP_DIR, LOG_FILE, get_version, get_edition
 # NOTE: This is required to fix current working directory on macOS
 os.chdir(ROOT_PATH)
 
@@ -14,7 +14,6 @@ import threading
 import socket
 import time
 import logging
-from dotenv import set_key
 from utils.strtobool import strtobool
 from datetime import datetime
 import argparse
