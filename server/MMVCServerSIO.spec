@@ -3,7 +3,6 @@ from PyInstaller.utils.hooks import collect_data_files, collect_all, collect_dyn
 import sys
 import os.path
 import site
-import logging
 
 sys.setrecursionlimit(sys.getrecursionlimit() * 5)
 

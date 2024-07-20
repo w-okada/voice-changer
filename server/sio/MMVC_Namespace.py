@@ -5,6 +5,8 @@ from voice_changer.VoiceChangerManager import VoiceChangerManager
 
 import asyncio
 
+import logging
+logger = logging.getLogger(__name__)
 
 class MMVC_Namespace(socketio.AsyncNamespace):
     sid: int = 0
@@ -38,8 +40,7 @@ class MMVC_Namespace(socketio.AsyncNamespace):
 
     def on_connect(self, sid, environ):
         self.sid = sid
-        print("[{}] connet sid : {}".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), sid))
-        pass
+        logger.info(f"Connected SID: {sid}")
 
     async def on_request_message(self, sid, msg):
         self.sid = sid
@@ -57,5 +58,4 @@ class MMVC_Namespace(socketio.AsyncNamespace):
             await self.emit("response", [timestamp, out_audio, perf], to=sid)
 
     def on_disconnect(self, sid):
-        # print('[{}] disconnect'.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
-        pass
+        logger.info(f"Disconnected SID: {sid}")

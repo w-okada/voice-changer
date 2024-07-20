@@ -8,9 +8,6 @@ from safetensors import safe_open
 from voice_changer.common.SafetensorsUtils import load_model
 from librosa.filters import mel
 
-from mods.log_control import VoiceChangaerLogger
-
-logger = VoiceChangaerLogger.get_instance().getLogger()
 
 
 class BiGRU(nn.Module):

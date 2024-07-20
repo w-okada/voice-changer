@@ -11,6 +11,8 @@ from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from ..inferencer.rvc_models.infer_pack.models_onnx import SynthesizerTrnMsNSFsidM  # type: ignore
 from settings import ServerSettings
 from io import BytesIO
+import logging
+logger = logging.getLogger(__name__)
 
 def export2onnx(modelSlot: RVCModelSlot):
     model_dir = ServerSettings().model_dir
@@ -30,7 +32,7 @@ def export2onnx(modelSlot: RVCModelSlot):
         "useFinalProj": modelSlot.useFinalProj,
     }
 
-    print("[Voice Changer] Exporting onnx...")
+    logger.info("Exporting onnx...")
     _export2onnx(modelFile, output_path_simple, metadata)
 
     return output_file_simple
@@ -59,7 +61,7 @@ def _export2onnx(input_model: str, output_model_simple: str, metadata: dict):
             'params': cpt['params']
         }
 
-    print(f'[Voice Changer] Exporting to ONNX on {dev}')
+    logger.info(f'Exporting to ONNX on {dev}')
 
     # EnumInferenceTypesのままだとシリアライズできないのでテキスト化
     if metadata["modelType"] == EnumInferenceTypes.pyTorchRVC.value:
@@ -76,11 +78,7 @@ def _export2onnx(input_model: str, output_model_simple: str, metadata: dict):
     elif metadata["modelType"] == EnumInferenceTypes.pyTorchRVCv2Nono.value:
         net_g_onnx = SynthesizerTrnMsNSFsidM(*data["config"], 768, is_half=is_half)
     else:
-        print(
-            "unknwon::::: ",
-            metadata["modelType"],
-            EnumInferenceTypes.pyTorchRVCv2.value,
-        )
+        logger.error(f"Unknown model type: {metadata['modelType']}")
         return
 
     net_g_onnx.eval().to(dev)

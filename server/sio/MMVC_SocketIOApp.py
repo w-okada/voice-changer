@@ -1,5 +1,5 @@
 import socketio
-from mods.log_control import VoiceChangaerLogger
+import logging
 from mods.origins import compute_local_origins, normalize_origins
 
 from typing import Sequence, Optional
@@ -7,7 +7,7 @@ from sio.MMVC_SocketIOServer import MMVC_SocketIOServer
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 from const import FRONTEND_DIR
 
-logger = VoiceChangaerLogger.get_instance().getLogger()
+logger = logging.getLogger(__name__)
 
 
 class MMVC_SocketIOApp:
@@ -22,7 +22,7 @@ class MMVC_SocketIOApp:
         port: Optional[int] = None,
     ):
         if cls._instance is None:
-            logger.info("[Voice Changer] MMVC_SocketIOApp initializing...")
+            logger.info("Initializing...")
 
             allowed_origins: set[str] = set()
             if '*' in allowedOrigins:
@@ -65,7 +65,7 @@ class MMVC_SocketIOApp:
             )
 
             cls._instance = app_socketio
-            logger.info("[Voice Changer] MMVC_SocketIOApp initializing... done.")
+            logger.info("Initialized.")
             return cls._instance
 
         return cls._instance

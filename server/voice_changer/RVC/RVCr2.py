@@ -3,7 +3,7 @@ VoiceChangerV2向け
 """
 import torch
 from data.ModelSlot import RVCModelSlot
-from mods.log_control import VoiceChangaerLogger
+import logging
 
 from voice_changer.RVC.embedder.EmbedderManager import EmbedderManager
 from voice_changer.utils.VoiceChangerModel import (
@@ -20,16 +20,14 @@ from voice_changer.RVC.pipeline.Pipeline import Pipeline
 from torchaudio import transforms as tat
 from voice_changer.VoiceChangerSettings import VoiceChangerSettings
 from Exceptions import (
-    PipelineCreateException,
     PipelineNotInitializedException,
 )
 
-logger = VoiceChangaerLogger.get_instance().getLogger()
+logger = logging.getLogger(__name__)
 
 
 class RVCr2(VoiceChangerModel):
     def __init__(self, params: ServerSettings, slotInfo: RVCModelSlot, settings: VoiceChangerSettings):
-        logger.info("[Voice Changer] [RVCr2] Creating instance")
         self.voiceChangerType = "RVC"
 
         self.device_manager = DeviceManager.get_instance()
@@ -63,7 +61,7 @@ class RVCr2(VoiceChangerModel):
         self.initialize()
 
     def initialize(self, force_reload: bool = False):
-        logger.info("[Voice Changer] [RVCr2] Initializing... ")
+        logger.info("Initializing...")
 
         self.is_half = self.device_manager.use_fp16()
 
@@ -72,10 +70,9 @@ class RVCr2(VoiceChangerModel):
             self.pipeline = createPipeline(
                 self.params, self.slotInfo, self.settings.f0Detector, force_reload
             )
-        except PipelineCreateException as e:  # NOQA
-            logger.error(
-                "[Voice Changer] pipeline create failed. check your model is valid."
-            )
+        except Exception as e:  # NOQA
+            logger.error("Failed to create pipeline.")
+            logger.exception(e)
             return
 
         self.dtype = torch.float16 if self.is_half else torch.float32
@@ -102,6 +99,8 @@ class RVCr2(VoiceChangerModel):
             dtype=torch.float32
         ).to(self.device_manager.device)
 
+        logger.info("Initialized.")
+
     def setSamplingRate(self, input_sample_rate, outputSampleRate):
         if self.input_sample_rate != input_sample_rate:
             self.input_sample_rate = input_sample_rate
@@ -119,8 +118,6 @@ class RVCr2(VoiceChangerModel):
             ).to(self.device_manager.device)
 
     def update_settings(self, key: str, val, old_val):
-        logger.info(f"[Voice Changer] [RVCr2]: update_settings {key}:{val}")
-
         if key in {"gpu", "forceFp32"}:
             self.initialize(True)
         elif key == "f0Detector" and self.pipeline is not None:
@@ -170,9 +167,9 @@ class RVCr2(VoiceChangerModel):
         # that can output additional feature.
         self.pitch_buffer = torch.zeros(self.convert_feature_size_16k + 1, dtype=torch.int64, device=self.device_manager.device)
         self.pitchf_buffer = torch.zeros(self.convert_feature_size_16k + 1, dtype=self.dtype, device=self.device_manager.device)
-        print('[Voice Changer] Allocated audio buffer:', self.audio_buffer.shape[0])
-        print('[Voice Changer] Allocated convert buffer:', self.convert_buffer.shape[0])
-        print('[Voice Changer] Allocated pitchf buffer:', self.pitchf_buffer.shape[0])
+        logger.info(f'Allocated audio buffer size: {audio_buffer_size}')
+        logger.info(f'Allocated convert buffer size: {convert_size_16k}')
+        logger.info(f'Allocated pitchf buffer size: {self.convert_feature_size_16k + 1}')
 
     def convert(self, audio_in: AudioInOutFloat, sample_rate: int) -> torch.Tensor:
         if self.pipeline is None:
@@ -265,27 +262,11 @@ class RVCr2(VoiceChangerModel):
     def __del__(self):
         del self.pipeline
 
-        # print("---------- REMOVING ---------------")
-
-        # remove_path = os.path.join("RVC")
-        # sys.path = [x for x in sys.path if x.endswith(remove_path) is False]
-
-        # for key in list(sys.modules):
-        #     val = sys.modules.get(key)
-        #     try:
-        #         file_path = val.__file__
-        #         if file_path.find("RVC" + os.path.sep) >= 0:
-        #             # print("remove", key, file_path)
-        #             sys.modules.pop(key)
-        #     except Exception:  # type:ignore
-        #         # print(e)
-        #         pass
-
     def export2onnx(self):
         modelSlot = self.slotInfo
 
         if modelSlot.isONNX:
-            logger.warn("[Voice Changer] export2onnx, No pyTorch filepath.")
+            logger.error("Model is already in ONNX format.")
             return {"status": "ng", "path": ""}
 
         if self.pipeline is not None:

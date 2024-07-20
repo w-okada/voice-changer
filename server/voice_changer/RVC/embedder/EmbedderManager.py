@@ -2,7 +2,8 @@ from const import EmbedderType
 from voice_changer.RVC.embedder.Embedder import Embedder
 from voice_changer.RVC.embedder.OnnxContentvec import OnnxContentvec
 from settings import ServerSettings
-
+import logging
+logger = logging.getLogger(__name__)
 
 class EmbedderManager:
     embedder: Embedder | None = None
@@ -17,7 +18,7 @@ class EmbedderManager:
         if cls.embedder is not None \
             and cls.embedder.matchCondition(embedder_type) \
             and not force_reload:
-            print('[Voice Changer] Reusing embedder.')
+            logger.info('Reusing embedder.')
             return cls.embedder
         cls.embedder = cls.load_embedder(embedder_type)
         return cls.embedder

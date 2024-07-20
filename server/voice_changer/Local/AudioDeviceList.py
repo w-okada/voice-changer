@@ -4,11 +4,11 @@ from dataclasses import dataclass, field
 import numpy as np
 
 from const import ServerAudioDeviceType
-from mods.log_control import VoiceChangaerLogger
+import logging
 
 # from const import SERVER_DEVICE_SAMPLE_RATES
 
-logger = VoiceChangaerLogger.get_instance().getLogger()
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -39,7 +39,7 @@ def checkSamplingRate(deviceId: int, desiredSamplingRate: int, type: ServerAudio
                 pass
             return True
         except Exception as e:  # NOQA
-            print("[checkSamplingRate]", e)
+            logger.warn(f"[checkSamplingRate] {e}")
             return False
     else:
         try:
@@ -52,7 +52,7 @@ def checkSamplingRate(deviceId: int, desiredSamplingRate: int, type: ServerAudio
                 pass
             return True
         except Exception as e:  # NOQA
-            print("[checkSamplingRate]", e)
+            logger.warn(f"[checkSamplingRate] {e}")
             return False
 
 
@@ -60,17 +60,12 @@ def list_audio_device():
     try:
         audioDeviceList = sd.query_devices()
     except Exception as e:
-        logger.error("[Voice Changer] ex:query_devices")
         logger.exception(e)
         raise e
 
     inputAudioDeviceList = [d for d in audioDeviceList if d["max_input_channels"] > 0]
     outputAudioDeviceList = [d for d in audioDeviceList if d["max_output_channels"] > 0]
     hostapis = sd.query_hostapis()
-
-    # print("input:", inputAudioDeviceList)
-    # print("output:", outputDeviceList)
-    # print("hostapis", hostapis)
 
     serverAudioInputDevices: list[ServerAudioDevice] = []
     serverAudioOutputDevices: list[ServerAudioDevice] = []
@@ -96,21 +91,5 @@ def list_audio_device():
             default_samplerate=d["default_samplerate"],
         )
         serverAudioOutputDevices.append(serverOutputAudioDevice)
-
-    # print("check sample rate1")
-    # for d in serverAudioInputDevices:
-    #     print("check sample rate1-1")
-    #     for sr in SERVER_DEVICE_SAMPLE_RATES:
-    #         print("check sample rate1-2")
-    #         if checkSamplingRate(d.index, sr, "input"):
-    #             d.available_samplerates.append(sr)
-    # print("check sample rate2")
-    # for d in serverAudioOutputDevices:
-    #     print("check sample rate2-1")
-    #     for sr in SERVER_DEVICE_SAMPLE_RATES:
-    #         print("check sample rate2-2")
-    #         if checkSamplingRate(d.index, sr, "output"):
-    #             d.available_samplerates.append(sr)
-    # print("check sample rate3")
 
     return serverAudioInputDevices, serverAudioOutputDevices

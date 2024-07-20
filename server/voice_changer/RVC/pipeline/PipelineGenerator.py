@@ -1,10 +1,8 @@
 import os
 import sys
-import traceback
 import faiss
 import faiss.contrib.torch_utils
 import torch
-from Exceptions import PipelineCreateException
 from data.ModelSlot import RVCModelSlot
 
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
@@ -14,24 +12,16 @@ from voice_changer.RVC.pipeline.Pipeline import Pipeline
 from voice_changer.RVC.pitchExtractor.PitchExtractorManager import PitchExtractorManager
 from settings import ServerSettings
 
+import logging
+logger = logging.getLogger(__name__)
 
 def createPipeline(params: ServerSettings, modelSlot: RVCModelSlot, f0Detector: str, force_reload: bool):
     # Inferencer 生成
-    try:
-        modelPath = os.path.join(params.model_dir, str(modelSlot.slotIndex), os.path.basename(modelSlot.modelFile))
-        inferencer = InferencerManager.getInferencer(modelSlot.modelType, modelPath, modelSlot.version)
-    except Exception as e:
-        print("[Voice Changer] exception! loading inferencer", e)
-        traceback.print_exc()
-        raise PipelineCreateException("[Voice Changer] exception! loading inferencer")
+    modelPath = os.path.join(params.model_dir, str(modelSlot.slotIndex), os.path.basename(modelSlot.modelFile))
+    inferencer = InferencerManager.getInferencer(modelSlot.modelType, modelPath, modelSlot.version)
 
     # Embedder 生成
-    try:
-        embedder = EmbedderManager.get_embedder(modelSlot.embedder, force_reload)
-    except Exception as e:
-        print("[Voice Changer] exception! loading embedder", e)
-        traceback.print_exc()
-        raise PipelineCreateException("[Voice Changer] exception! loading embedder")
+    embedder = EmbedderManager.get_embedder(modelSlot.embedder, force_reload)
 
     # pitchExtractor
     pitchExtractor = PitchExtractorManager.getPitchExtractor(f0Detector, force_reload)
@@ -57,26 +47,26 @@ def createPipeline(params: ServerSettings, modelSlot: RVCModelSlot, f0Detector: 
 def _loadIndex(indexPath: str) -> tuple[faiss.Index | None, torch.Tensor | None]:
     dev = DeviceManager.get_instance().device
     # Indexのロード
-    print("[Voice Changer] Loading index...")
+    logger.info("Loading index...")
     # ファイル指定があってもファイルがない場合はNone
     if os.path.exists(indexPath) is not True or os.path.isfile(indexPath) is not True:
-        print("[Voice Changer] Index file is not found")
+        logger.warn("Index file not found. Index will not be used.")
         return (None, None)
 
+    logger.info(f"Try loading \"{indexPath}\"...")
     try:
-        print("Try loading...", indexPath)
         index: faiss.IndexIVFFlat = faiss.read_index(indexPath)
         if not index.is_trained:
-            print("[Voice Changer] Invalid index. You MUST use added_xxxx.index, not trained_xxxx.index. Index will not be used.")
+            logger.error("Invalid index. You MUST use added_xxxx.index, not trained_xxxx.index. Index will not be used.")
             return (None, None)
         # BUG: faiss-gpu does not support reconstruct on GPU indices
         # https://github.com/facebookresearch/faiss/issues/2181
         index_reconstruct = index.reconstruct_n(0, index.ntotal).to(dev)
         if sys.platform == 'linux' and '+cu' in torch.__version__ and dev.type == 'cuda':
             index: faiss.GpuIndexIVFFlat = faiss.index_cpu_to_gpus_list(index, gpus=[dev.index])
-    except: # NOQA
-        print("[Voice Changer] Load index failed. Use no index.")
-        traceback.print_exc()
+    except Exception as e: # NOQA
+        logger.error("Load index failed. Index will not be used.")
+        logger.exception(e)
         return (None, None)
 
     return index, index_reconstruct

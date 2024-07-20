@@ -37,12 +37,6 @@ class InferencerManager:
             return RVCInferencerNono().load_model(file)
         elif inferencerType == EnumInferenceTypes.pyTorchRVCv2:
             return RVCInferencerv2().load_model(file)
-        elif inferencerType is EnumInferenceTypes.pyTorchVoRASbeta:
-            if sys.platform.startswith("darwin") is False:
-                from voice_changer.RVC.inferencer.VorasInferencebeta import VoRASInferencer
-                return VoRASInferencer().load_model(file)
-            else:
-                raise RuntimeError("[Voice Changer] VoRAS is not supported on macOS")
         elif inferencerType is EnumInferenceTypes.pyTorchRVCv2Nono:
             return RVCInferencerv2Nono().load_model(file)
         elif inferencerType is EnumInferenceTypes.pyTorchWebUI:
@@ -54,4 +48,4 @@ class InferencerManager:
         elif inferencerType is EnumInferenceTypes.onnxRVCNono:
             return OnnxRVCInferencerNono().load_model(file, inferencerTypeVersion)
         else:
-            raise RuntimeError("[Voice Changer] Inferencer not found", inferencerType)
+            raise RuntimeError("Inferencer not found", inferencerType)

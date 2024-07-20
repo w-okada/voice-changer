@@ -5,7 +5,7 @@ import shutil
 import threading
 import numpy as np
 from downloader.SampleDownloader import downloadSample, getSampleInfos
-from mods.log_control import VoiceChangaerLogger
+import logging
 from voice_changer.Local.ServerDevice import ServerDevice, ServerDeviceCallbacks
 from voice_changer.ModelSlotManager import ModelSlotManager
 from voice_changer.RVC.RVCModelMerger import RVCModelMerger
@@ -18,7 +18,6 @@ from voice_changer.utils.VoiceChangerModel import AudioInOut
 from settings import ServerSettings
 from voice_changer.common.deviceManager.DeviceManager import DeviceManager
 from Exceptions import (
-    NoModeLoadedException,
     PipelineNotInitializedException,
     VoiceChangerIsNotSelectedException,
 )
@@ -27,7 +26,7 @@ from traceback import format_exc
 # import threading
 from typing import Callable, Any
 
-logger = VoiceChangaerLogger.get_instance().getLogger()
+logger = logging.getLogger(__name__)
 
 
 class VoiceChangerManager(ServerDeviceCallbacks):
@@ -46,7 +45,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
     # VoiceChangerManager
     ############################
     def __init__(self, params: ServerSettings):
-        logger.info("[Voice Changer] VoiceChangerManager initializing...")
+        logger.info("Initializing...")
         self.params = params
         self.voiceChanger: VoiceChangerV2 = None
         self.voiceChangerModel = None
@@ -71,7 +70,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         thread = threading.Thread(target=self.serverDevice.start, args=())
         thread.start()
 
-        logger.info("[Voice Changer] VoiceChangerManager initializing... done.")
+        logger.info("Initialized.")
 
         # Initialize the voice changer
         self.initialize(self.settings.modelSlotIndex)
@@ -89,7 +88,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
     async def load_model(self, params: LoadModelParams):
         if params.isSampleMode:
             # サンプルダウンロード
-            logger.info(f"[Voice Changer] sample download...., {params}")
+            logger.info(f"Sample download.... {params}")
             await downloadSample(self.params.sample_mode, params.sampleId, self.params.model_dir, params.slot, params.params)
             self.modelSlotManager.getAllSlotInfo(reload=True)
             info = {"status": "OK"}
@@ -114,7 +113,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             )
             dstPath = os.path.join(dstDir, file.name)
             os.makedirs(dstDir, exist_ok=True)
-            logger.info(f"move to {srcPath} -> {dstPath}")
+            logger.info(f"Moving {srcPath} -> {dstPath}")
             shutil.move(srcPath, dstPath)
             file.name = os.path.basename(dstPath)
 
@@ -149,7 +148,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
     def initialize(self, val: int):
         slotInfo = self.modelSlotManager.get_slot_info(val)
         if slotInfo is None:
-            logger.info(f"[Voice Changer] model slot is not found {val}")
+            logger.warn(f"Model slot is not found {val}")
             return
 
         if self.voiceChangerModel is not None and slotInfo.voiceChangerType == self.voiceChangerModel.voiceChangerType:
@@ -159,17 +158,17 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             return
 
         if slotInfo.voiceChangerType == "RVC":
-            logger.info("................RVC")
+            logger.info("Loading RVC...")
             from voice_changer.RVC.RVCr2 import RVCr2
 
             self.voiceChangerModel = RVCr2(self.params, slotInfo, self.settings)
             self.voiceChanger = VoiceChangerV2(self.params, self.settings)
             self.voiceChanger.set_model(self.voiceChangerModel)
         else:
-            logger.info(f"[Voice Changer] unknown voice changer model: {slotInfo.voiceChangerType}")
+            logger.error(f"Unknown voice changer model: {slotInfo.voiceChangerType}")
 
     def update_settings(self, key: str, val: Any):
-        print("[Voice Changer] update configuration:", key, val)
+        logger.info(f"update configuration {key}: {val}")
         error, old_value = self.settings.set_property(key, val)
         if error:
             return self.get_info()
@@ -181,7 +180,7 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         self.store_setting()
 
         if key == "modelSlotIndex":
-            logger.info(f"[Voice Changer] Model slot is changed {old_value} -> {val}")
+            logger.info(f"Model slot is changed {old_value} -> {val}")
             self.initialize(val)
         elif key == 'gpu':
             self.device_manager.set_device(val)
@@ -213,23 +212,20 @@ class VoiceChangerManager(ServerDeviceCallbacks):
             return receivedData, [0, 0, 0], None
 
         if self.voiceChanger is None:
-            logger.info("Voice Change is not loaded. Did you load a correct model?")
+            logger.error("Voice Change is not loaded. Did you load a correct model?")
             return np.zeros(1, dtype=np.float32), [0, 0, 0], ('NoVoiceChangerLoaded', "Voice Change is not loaded. Did you load a correct model?")
 
         try:
-            audio, perf = self.voiceChanger.on_request(receivedData)
+            with self.device_manager.lock:
+                audio, perf = self.voiceChanger.on_request(receivedData)
             return audio, perf, None
-        except NoModeLoadedException:
-            logger.warn(f"[Voice Changer] [Exception], {e}")
-            return np.zeros(1, dtype=np.float32), [0, 0, 0], ('NoModeLoadedException', format_exc())
-        except VoiceChangerIsNotSelectedException:
-            logger.warn("[Voice Changer] Voice Changer is not selected. Wait a bit and if there is no improvement, please re-select vc.")
+        except VoiceChangerIsNotSelectedException as e:
+            logger.exception(e)
             return np.zeros(1, dtype=np.float32), [0, 0, 0], ('VoiceChangerIsNotSelectedException', format_exc())
-        except PipelineNotInitializedException:
-            logger.warn("[Voice Changer] Pipeline is not initialized.")
+        except PipelineNotInitializedException as e:
+            logger.exception(e)
             return np.zeros(1, dtype=np.float32), [0, 0, 0], ('PipelineNotInitializedException', format_exc())
         except Exception as e:
-            logger.warn(f"[Voice Changer] VC PROCESSING EXCEPTION!!! {e}")
             logger.exception(e)
             return np.zeros(1, dtype=np.float32), [0, 0, 0], ('Exception', format_exc())
 

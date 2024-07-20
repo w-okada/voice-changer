@@ -1,14 +1,14 @@
 import asyncio
 
 from downloader.Downloader import download
-from mods.log_control import VoiceChangaerLogger
+import logging
 from settings import ServerSettings
 from Exceptions import WeightDownloadException
 
-logger = VoiceChangaerLogger.get_instance().getLogger()
+logger = logging.getLogger(__name__)
 
 async def downloadWeight(params: ServerSettings):
-    logger.info('[Voice Changer] Loading weights.')
+    logger.info('Loading weights.')
     file_params = [
         # {
         #     "url": "https://huggingface.co/ddPn08/rvc-webui-models/resolve/main/embeddings/hubert_base.pt",
@@ -82,8 +82,8 @@ async def downloadWeight(params: ServerSettings):
     for res in await asyncio.gather(*tasks, return_exceptions=True):
         if isinstance(res, Exception):
             fail = True
-            logger.error(f'[Voice Changer] {res}')
+            logger.exception(res)
     if fail:
         raise WeightDownloadException()
 
-    logger.info('[Voice Changer] All weights are loaded!')
+    logger.info('All weights are loaded!')

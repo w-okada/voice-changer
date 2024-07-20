@@ -5,7 +5,8 @@ from dataclasses import dataclass, asdict, field
 
 import os
 import json
-
+import logging
+logger = logging.getLogger(__name__)
 
 @dataclass
 class ModelSlot:
@@ -76,7 +77,7 @@ def loadAllSlotInfo(model_dir: str):
 
 def saveSlotInfo(model_dir: str, slotIndex: int, slotInfo: ModelSlots):
     slotDir = os.path.join(model_dir, str(slotIndex))
-    print("SlotInfo:::", slotInfo)
+    logger.info(f"SlotInfo::: {slotInfo}")
     slotInfoDict = asdict(slotInfo)
     slotInfo.slotIndex = -1  # スロットインデックスは動的に注入
     json.dump(slotInfoDict, open(os.path.join(slotDir, "params.json"), "w"), indent=4)

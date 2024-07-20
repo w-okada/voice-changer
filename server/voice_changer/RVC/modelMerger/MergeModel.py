@@ -7,6 +7,8 @@ from safetensors import safe_open
 from voice_changer.utils.ModelMerger import ModelMergerRequest
 from settings import ServerSettings
 import json
+import logging
+logger = logging.getLogger(__name__)
 
 def merge_model(params: ServerSettings, request: ModelMergerRequest):
     def extract(ckpt: Dict[str, Any]):
@@ -21,7 +23,7 @@ def merge_model(params: ServerSettings, request: ModelMergerRequest):
         return opt
 
     def load_weight(path: str):
-        print(f"Loading {path}...")
+        logger.info(f"Loading {path}...")
         if path.endswith('.safetensors'):
             with safe_open(path, 'pt', device='cpu') as cpt:
                 state_dict = cpt.metadata()
@@ -38,8 +40,7 @@ def merge_model(params: ServerSettings, request: ModelMergerRequest):
 
     files = request.files
     if len(files) == 0:
-        print("no merge file..............")
-        raise RuntimeError("no merge file..............")
+        raise RuntimeError("No merge file.")
 
     weights = []
     alphas = []
@@ -64,12 +65,12 @@ def merge_model(params: ServerSettings, request: ModelMergerRequest):
 
     merged: Dict[str, Any] = OrderedDict()
     merged["weight"] = {}
-    print("merge start.")
+    logger.info("merge start.")
     for key in weights[0].keys():
         merged["weight"][key] = 0
         for i, weight in enumerate(weights):
             merged["weight"][key] += weight[key] * alphas[i]
-    print("merge done. write metadata.")
+    logger.info("merge done. write metadata.")
 
     merged["config"] = config
     merged["params"] = state_dict["params"] if "params" in state_dict else None
@@ -83,5 +84,5 @@ def merge_model(params: ServerSettings, request: ModelMergerRequest):
         pass
     merged["embedder_name"] = state_dict["embedder_name"] if "embedder_name" in state_dict else None
     merged["embedder_output_layer"] = state_dict["embedder_output_layer"] if "embedder_output_layer" in state_dict else None
-    print("write metadata done.")
+    logger.info("write metadata done.")
     return merged
