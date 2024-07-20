@@ -53,8 +53,8 @@ class RVCr2(VoiceChangerModel):
         self.resampler_in: tat.Resample | None = None
         self.resampler_out: tat.Resample | None = None
 
-        self.input_sample_rate = 44100
-        self.outputSampleRate = 44100
+        self.input_sample_rate = self.settings.inputSampleRate
+        self.output_sample_rate = self.settings.outputSampleRate
 
         self.is_half = False
 
@@ -95,13 +95,13 @@ class RVCr2(VoiceChangerModel):
 
         self.resampler_out = tat.Resample(
             orig_freq=self.slotInfo.samplingRate,
-            new_freq=self.outputSampleRate,
+            new_freq=self.output_sample_rate,
             dtype=torch.float32
         ).to(self.device_manager.device)
 
         logger.info("Initialized.")
 
-    def setSamplingRate(self, input_sample_rate, outputSampleRate):
+    def setSamplingRate(self, input_sample_rate, output_sample_rate):
         if self.input_sample_rate != input_sample_rate:
             self.input_sample_rate = input_sample_rate
             self.resampler_in = tat.Resample(
@@ -109,11 +109,11 @@ class RVCr2(VoiceChangerModel):
                 new_freq=self.sr,
                 dtype=torch.float32
             ).to(self.device_manager.device)
-        if self.outputSampleRate != outputSampleRate:
-            self.outputSampleRate = outputSampleRate
+        if self.output_sample_rate != output_sample_rate:
+            self.output_sample_rate = output_sample_rate
             self.resampler_out = tat.Resample(
                 orig_freq=self.slotInfo.samplingRate,
-                new_freq=self.outputSampleRate,
+                new_freq=self.output_sample_rate,
                 dtype=torch.float32
             ).to(self.device_manager.device)
 
