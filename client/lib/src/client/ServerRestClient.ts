@@ -1,4 +1,6 @@
 import { MergeModelRequest, OnnxExporterInfo, ServerInfo, ServerSettingKey } from "../const";
+//@ts-ignore
+import msgpack from 'notepack.io';
 
 type FileChunk = {
     hash: number;
@@ -253,20 +255,16 @@ export class ServerRestClient {
     postVoice = async (timestamp: number, buffer: ArrayBuffer) => {
         const url = this.serverUrl + "/test";
 
-        const obj = {
-            timestamp,
-            buffer: Buffer.from(buffer).toString("base64"),
-        };
-
-        const res = await fetch(`${url}`, {
+        const res = await fetch(url, {
             method: "POST",
             headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
+                Accept: "application/octet-stream",
+                "Content-Type": "application/octet-stream",
             },
-            body: JSON.stringify(obj),
+            body: msgpack.encode([timestamp, buffer]),
         });
+        const data = await res.arrayBuffer();
 
-        return res.json();
+        return msgpack.decode(data);
     };
 }

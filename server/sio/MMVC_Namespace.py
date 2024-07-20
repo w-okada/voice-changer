@@ -1,4 +1,3 @@
-from datetime import datetime
 import numpy as np
 import socketio
 from voice_changer.VoiceChangerManager import VoiceChangerManager
@@ -38,7 +37,7 @@ class MMVC_Namespace(socketio.AsyncNamespace):
             cls._instance = cls("/test", voiceChangerManager)
         return cls._instance
 
-    def on_connect(self, sid, environ):
+    def on_connect(self, sid, environ, ext):
         self.sid = sid
         logger.info(f"Connected SID: {sid}")
 
@@ -54,7 +53,6 @@ class MMVC_Namespace(socketio.AsyncNamespace):
             error_code, error_message = err
             await self.emit("error", [error_code, error_message], to=sid)
         else:
-            # TODO: Switch to binary messages to reduce serialization overhead?
             await self.emit("response", [timestamp, out_audio, perf], to=sid)
 
     def on_disconnect(self, sid):
