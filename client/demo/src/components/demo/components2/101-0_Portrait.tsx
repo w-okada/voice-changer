@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useAppState } from "../../../001_provider/001_AppStateProvider";
 import { useMessageBuilder } from "../../../hooks/useMessageBuilder";
 export type PortraitProps = {};
@@ -20,20 +20,6 @@ export const Portrait = (_props: PortraitProps) => {
             return serverSetting.serverSetting.modelSlots[serverSetting.serverSetting.modelSlotIndex];
         }
     }, [serverSetting.serverSetting.modelSlotIndex, serverSetting.serverSetting.modelSlots]);
-
-    useEffect(() => {
-        const vol = document.getElementById("status-vol") as HTMLSpanElement;
-        const buf = document.getElementById("status-buf") as HTMLSpanElement;
-        const res = document.getElementById("status-res") as HTMLSpanElement;
-        const perf = document.getElementById("status-perf") as HTMLSpanElement;
-        if (!vol || !buf || !res) {
-            return;
-        }
-        vol.innerText = volume.toFixed(4);
-        buf.innerText = bufferingTime.toString();
-        res.innerText = performance.responseTime.toString();
-        perf.innerText = performance.mainprocessTime.toString() ?? "0";
-    }, [volume, bufferingTime, performance]);
 
     const portrait = useMemo(() => {
         if (!selected) {
@@ -60,23 +46,26 @@ export const Portrait = (_props: PortraitProps) => {
                             <span className="portrait-area-status-vctype">{selected.voiceChangerType}</span>
                         </p>
                         <p>
-                            vol: <span id="status-vol">0</span>
+                            vol: <span id="status-vol">{volume.toFixed(4)}</span>
                         </p>
                         <p>
-                            buf: <span id="status-buf">0</span> ms
+                            buf: <span id="status-buf">{bufferingTime}</span> ms
                         </p>
                         <p>
-                            res: <span id="status-res">0</span> ms
+                            res: <span id="status-res">{performance.responseTime}</span> ms
                         </p>
                         <p>
-                            perf: <span id="status-perf">0</span> ms
+                            perf: <span id="status-perf">{performance.mainprocessTime}</span> ms
                         </p>
                     </div>
                     <div className="portrait-area-terms-of-use">{selectedTermOfUseUrlLink}</div>
                 </div>
             </div>
         );
-    }, [selected]);
+        // FIXME: Volume notifications cause too frequent updates which harm the performance.
+        // This way, volume update depends on bufferingTime and performance that are always reported.
+        // However, this might be a problem if this becomes no longer the case.
+    }, [selected, bufferingTime, performance]);
 
     return portrait;
 };
