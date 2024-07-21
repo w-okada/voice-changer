@@ -5,7 +5,8 @@
 This is a fork of [w-okada voice changer](https://github.com/w-okada/voice-changer) that performs real-time voice conversion
 using various voice conversion algorithms.
 
-> **NOTE**: This version works only with Retrieval-based Voice Conversion (RVC).
+> [!IMPORTANT]
+> This version works only with Retrieval-based Voice Conversion (RVC).
 
 The fork aims to improve the overall performance for any backend, and at the same time introducing new features and improving
 user experience.
@@ -28,7 +29,8 @@ And this one demonstrates how the voice changer works and performs with Nvidia G
 
 ## System requirements
 
-> **NOTE**: Minimum requirement means that you will be able to run **ONLY** the voice changer. Voice conversion and gaming at the same time will not provide satisfying experience with minimum requirements in most cases.
+> [!IMPORTANT]
+> Minimum requirement means that you will be able to run **ONLY** the voice changer. Voice conversion and gaming at the same time will not provide satisfying experience with minimum requirements in most cases.
 
 RAM: at least 6GB.
 
@@ -49,11 +51,12 @@ Minimum requirement:
 * An integrated graphics card: AMD Radeon Vega 7 (with AMD Ryzen 5 5600G) or later.
 * A dedicated graphics card: Nvidia GeForce GTX 900 Series or later or AMD Radeon RX 400 series or later.
 
+> [!NOTE]
+> It is also possible to use Nvidia GeForce GTX 700 series GPUs. However, they can be used only with DirectML version.
+
 Recommended requirement:
 
 A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX 6000 series or later.
-
-> **NOTE**: Nvidia GPUs prior to GTX 900 Series will not work with CUDA version. However, they may be used with DirectML version.
 
 ## Known issues
 
@@ -143,7 +146,8 @@ Once the download is finished, the voice changer will open the user interface us
 
 ### Running locally on macOS
 
-> **NOTE**: macOS support is experimental.
+> [!IMPORTANT]
+> macOS support is experimental.
 
 #### For Apple Silicon (Apple M1, etc.) users
 
@@ -153,7 +157,8 @@ Once the download is finished, the voice changer will open the user interface us
 
 #### For Intel users
 
-> **NOTE**: The voice changer would work best if your Intel-based machine has AMD graphics. If your machine has only Intel integrated graphics, only CPU will be utilized.
+> [!NOTE]
+> The voice changer would work best if your Intel-based machine has AMD graphics. If your machine has only Intel integrated graphics, only CPU will be utilized.
 
 1. Download the `voice-changer-macos-amd64-cpu.tar.gz` file.
 
@@ -161,7 +166,8 @@ Once the download is finished, the voice changer will open the user interface us
 
 #### Removing Apple quarantine attribute
 
-> **NOTE**: Currently, this step is mandatory. This may be improved in the future.
+> [!WARNING]
+> Currently, this step is mandatory. Otherwise, the voice changer will fail to start with an error related to **Python.framework** being damaged. This may be improved in the future.
 
 1. Open Terminal.
 
@@ -189,7 +195,8 @@ Refer to corresponding [Colab](https://github.com/deiteris/voice-changer/blob/ma
 
 ## Troubleshooting
 
-> **NOTE**: When any issue with the voice changer occurs, check the command line window (the one that opens during the start) for errors.
+> [!TIP]
+> When any issue with the voice changer occurs, check the command line window (the one that opens during the start) for errors.
 
 ### Exceptions.WeightDownloadException: 'Failed to download weight.'
 
