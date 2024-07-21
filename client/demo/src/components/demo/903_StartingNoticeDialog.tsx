@@ -10,39 +10,29 @@ export const StartingNoticeDialog = () => {
 
     const messageBuilderState = useMessageBuilder();
     useMemo(() => {
-        messageBuilderState.setMessage(__filename, "support", { ja: "支援", en: "Donation" });
-        messageBuilderState.setMessage(__filename, "support_message_1", { ja: "このソフトウェアを気に入ったら開発者にコーヒーをご馳走してあげよう。黄色いアイコンから。", en: "This software is supported by donations. Thank you for your support!" });
-        messageBuilderState.setMessage(__filename, "support_message_2", { ja: "コーヒーをご馳走する。", en: "I will support a developer by buying coffee." });
-
         messageBuilderState.setMessage(__filename, "directml_1", { ja: "directML版は実験的バージョンです。以下の既知の問題があります。", en: "DirectML version is an experimental version. There are the known issues as follows." });
         messageBuilderState.setMessage(__filename, "directml_2", {
             ja: "(1) 一部の設定変更を行うとgpuを使用していても変換処理が遅くなることが発生します。もしこの現象が発生したらGPUの値を-1にしてから再度0に戻してください。",
             en: "(1) When some settings are changed, conversion process becomes slow even when using GPU. If this occurs, reset the GPU value to -1 and then back to 0.",
         });
-        messageBuilderState.setMessage(__filename, "github", { ja: "github", en: "github" });
-
-        messageBuilderState.setMessage(__filename, "click_to_start", { ja: "スタートボタンを押してください。", en: "Click to start" });
-        messageBuilderState.setMessage(__filename, "start", { ja: "スタート", en: "start" });
     }, []);
 
-    const coffeeLink = useMemo(() => {
-        return isDesktopApp() ? (
-            // @ts-ignore
-            <span
-                className="link"
-                onClick={() => {
-                    // @ts-ignore
-                    window.electronAPI.openBrowser("https://www.buymeacoffee.com/wokad");
-                }}
-            >
-                <img className="donate-img" src="./assets/buymeacoffee.png" /> {messageBuilderState.getMessage(__filename, "support_message_2")}
-            </span>
-        ) : (
-            <a className="link" href="https://www.buymeacoffee.com/wokad" target="_blank" rel="noopener noreferrer">
-                <img className="donate-img" src="./assets/buymeacoffee.png" /> {messageBuilderState.getMessage(__filename, "support_message_2")}
-            </a>
-        );
-    }, []);
+    const githubLink = isDesktopApp() ? (
+        // @ts-ignore
+        <span
+            className="link"
+            onClick={() => {
+                // @ts-ignore
+                window.electronAPI.openBrowser("https://github.com/deiteris/voice-changer");
+            }}
+        >
+            Click here
+        </span>
+    ) : (
+        <a className="link" href="https://github.com/deiteris/voice-changer" target="_blank" rel="noopener noreferrer">
+            Click here
+        </a>
+    )
 
     const dialog = useMemo(() => {
         const closeButtonRow = (
@@ -55,17 +45,17 @@ export const StartingNoticeDialog = () => {
                             guiState.stateControls.showStartingNoticeCheckbox.updateState(false);
                         }}
                     >
-                        {messageBuilderState.getMessage(__filename, "start")}
+                        Start
                     </div>
                 </div>
                 <div className="body-item-text"></div>
             </div>
         );
 
-        const donationMessage = (
+        const welcomeMessage = (
             <div className="dialog-content-part">
-                <div>{messageBuilderState.getMessage(__filename, "support_message_1")}</div>
-                <div>{coffeeLink}</div>
+                <div>Thank you for using the application! If you like the application or encounter any issues, please leave a star or file an issue in the Github repository.</div>
+                <div>{githubLink} to visit the Github repository.</div>
             </div>
         );
 
@@ -78,14 +68,14 @@ export const StartingNoticeDialog = () => {
 
         const clickToStartMessage = (
             <div className="dialog-content-part">
-                <div>{messageBuilderState.getMessage(__filename, "click_to_start")}</div>
+                <div>Click "Start" to start using the application.</div>
             </div>
         );
 
         const edition = appGuiSettingState.edition;
         const content = (
             <div className="body-row">
-                {donationMessage}
+                {welcomeMessage}
                 {edition.indexOf("DirectML") >= 0 ? directMLMessage : <></>}
                 {clickToStartMessage}
             </div>
@@ -93,7 +83,7 @@ export const StartingNoticeDialog = () => {
 
         return (
             <div className="dialog-frame">
-                <div className="dialog-title">Message</div>
+                <div className="dialog-title">Welcome to Realtime Voice Changer!</div>
                 <div className="dialog-content">
                     {content}
                     {closeButtonRow}
