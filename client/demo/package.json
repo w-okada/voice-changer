@@ -13,14 +13,7 @@
         "build:mod": "cd ../lib && npm run build:dev && cd - && cp -r ../lib/dist/* node_modules/@dannadori/voice-changer-client-js/dist/",
         "build:mod_dos": "cd ../lib && npm run build:dev && cd ../demo && npm-run-all build:mod_copy",
         "build:mod_copy": "XCOPY ..\\lib\\dist\\* .\\node_modules\\@dannadori\\voice-changer-client-js\\dist\\* /s /e /h /y",
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "____ comment ____": "ウェブバージョンのスクリプト",
-        "clean:web": "rimraf dist_web/",
-        "webpack:web:prod": "npx webpack --config webpack_web.prod.js && copy .\\public\\info_web .\\dist_web\\info && copy .\\public\\assets\\gui_settings\\edition_web.txt .\\dist_web\\assets\\gui_settings\\edition.txt",
-        "webpack:web:dev": "npx webpack --config webpack_web.dev.js && copy .\\public\\info_web .\\dist_web\\info && copy .\\public\\assets\\gui_settings\\edition_web.txt .\\dist_web\\assets\\gui_settings\\edition.txt",
-        "build:web:prod": "npm-run-all clean:web webpack:web:prod",
-        "build:web:dev": "npm-run-all clean:web webpack:web:dev",
-        "start:web": "webpack-dev-server  --config webpack_web.dev.js"
+        "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [
         "voice conversion"
