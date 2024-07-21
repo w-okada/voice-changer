@@ -49,14 +49,17 @@ Minimum VRAM required: 2GB (in FP32 mode), ~1GB (in FP16 mode, if supported).
 Minimum requirement:
 
 * An integrated graphics card: AMD Radeon Vega 7 (with AMD Ryzen 5 5600G) or later.
-* A dedicated graphics card: Nvidia GeForce GTX 900 Series or later or AMD Radeon RX 400 series or later.
+* A dedicated graphics card: Nvidia GeForce GTX 900 Series or later, or AMD Radeon RX 400 series or later, or Intel Arc A300 series or later.
 
 > [!NOTE]
 > It is also possible to use Nvidia GeForce GTX 700 series GPUs. However, they can be used only with DirectML version.
 
+> [!WARNING]
+> The voice changer does not perform well with integrated Intel GPUs. This is a known issue that may be addressed in the future. You may proceed at your own risk and report issues or successful usage.
+
 Recommended requirement:
 
-A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX 6000 series or later.
+A dedicated graphics card Nvidia GeForce RTX 20 Series or later, or AMD Radeon RX 6000 series or later, or Intel Arc A500 series or later.
 
 ## Known issues
 
