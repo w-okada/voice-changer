@@ -113,7 +113,8 @@ A dedicated graphics card Nvidia GeForce RTX 20 Series or later or AMD Radeon RX
 
 #### For AMD/Intel/CPU users
 
-> NOTE: For AMD users, the recommended driver version is `24.6.1` or later.
+> [!TIP]
+> For AMD users, the recommended driver version is `24.6.1` or later.
 
 1. Download the `voice-changer-windows-amd64-dml.zip` ZIP file.
 
