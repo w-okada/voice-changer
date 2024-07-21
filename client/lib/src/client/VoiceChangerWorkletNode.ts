@@ -9,7 +9,7 @@ import {
 import { io, Socket } from "socket.io-client";
 import { DefaultEventsMap } from "@socket.io/component-emitter";
 import { ServerRestClient } from "./ServerRestClient";
-import msgpackParser from "socket.io-msgpack-parser";
+import * as msgpackrParser from "./sio/msgpackr";
 
 export type VoiceChangerWorkletListener = {
   notifyVolume: (vol: number) => void;
@@ -91,7 +91,7 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
       this.socket.close();
     }
     if (this.setting.protocol === "sio") {
-      this.socket = io(this.setting.serverUrl + "/test", { parser: msgpackParser });
+      this.socket = io(this.setting.serverUrl + "/test", { parser: msgpackrParser });
       this.socket.on("connect_error", (err) => {
         this.listener.notifyException(
           VOICE_CHANGER_CLIENT_EXCEPTION.ERR_SIO_CONNECT_FAILED,
@@ -122,7 +122,7 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
       this.socket.on("response", (response: any[]) => {
         const cur = Date.now();
         const responseTime = cur - response[0];
-        const audio = response[1] as ArrayBuffer;
+        const audio = response[1] as Uint8Array;
         const perf = response[2];
 
         // Quick hack for server device mode
@@ -141,9 +141,9 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
           );
         } else {
           if (this.outputNode != null) {
-            this.outputNode.postReceivedVoice(response[1]);
+            this.outputNode.postReceivedVoice(audio);
           } else {
-            this.postReceivedVoice(response[1]);
+            this.postReceivedVoice(audio);
           }
           this.listener.notifyResponseTime(responseTime, perf);
         }
@@ -151,13 +151,13 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
     }
   };
 
-  postReceivedVoice = (data: ArrayBuffer) => {
-    // Int16 to Float
-    const i16Data = new Int16Array(data);
-    const f32Data = new Float32Array(i16Data.length);
+  postReceivedVoice = (u8data: Uint8Array) => {
+    // Array view is Uint8, but received data is actually Int16.
+    const dataLength = Math.floor(u8data.length / 2)
+    const f32Data = new Float32Array(dataLength);
     // console.log(`[worklet] f32DataLength${f32Data.length} i16DataLength${i16Data.length}`)
-    for (let i = 0; i < i16Data.length; i++) {
-      const x = i16Data[i];
+    for (let i = 0; i < dataLength; i++) {
+      const x = (u8data[i * 2 + 1] << 8) | u8data[i * 2];
       f32Data[i] = x >= 0x8000 ? -(0x10000 - x) / 0x8000 : x / 0x7fff;
     }
 
