@@ -123,7 +123,6 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
         const cur = Date.now();
         const responseTime = cur - response[0];
         const audio = response[1] as Uint8Array;
-        const audioBuffer = audio.buffer.slice(audio.byteOffset, audio.byteLength + audio.byteOffset)
         const perf = response[2];
 
         // Quick hack for server device mode
@@ -135,16 +134,16 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
           return;
         }
 
-        if (audioBuffer.byteLength < 128 * 2) {
+        if (audio.byteLength < 128 * 2) {
           this.listener.notifyException(
             VOICE_CHANGER_CLIENT_EXCEPTION.ERR_SIO_INVALID_RESPONSE,
-            `[SIO] Received data is too short ${audioBuffer.byteLength}`
+            `[SIO] Received data is too short ${audio.byteLength}`
           );
         } else {
           if (this.outputNode != null) {
-            this.outputNode.postReceivedVoice(audioBuffer);
+            this.outputNode.postReceivedVoice(audio);
           } else {
-            this.postReceivedVoice(audioBuffer);
+            this.postReceivedVoice(audio);
           }
           this.listener.notifyResponseTime(responseTime, perf);
         }
@@ -152,13 +151,13 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
     }
   };
 
-  postReceivedVoice = (data: ArrayBuffer) => {
-    // Int16 to Float
-    const i16Data = new Int16Array(data);
-    const f32Data = new Float32Array(i16Data.length);
+  postReceivedVoice = (u8data: Uint8Array) => {
+    // Array view is Uint8, but received data is actually Int16.
+    const dataLength = Math.floor(u8data.length / 2)
+    const f32Data = new Float32Array(dataLength);
     // console.log(`[worklet] f32DataLength${f32Data.length} i16DataLength${i16Data.length}`)
-    for (let i = 0; i < i16Data.length; i++) {
-      const x = i16Data[i];
+    for (let i = 0; i < dataLength; i++) {
+      const x = (u8data[i * 2 + 1] << 8) | u8data[i * 2];
       f32Data[i] = x >= 0x8000 ? -(0x10000 - x) / 0x8000 : x / 0x7fff;
     }
 
@@ -238,18 +237,17 @@ export class VoiceChangerWorkletNode extends AudioWorkletNode {
         return;
       }
       const audio = data.audio
-      const audioBuffer = audio.buffer.slice(audio.byteOffset, audio.byteLength + audio.byteOffset)
 
-      if (audioBuffer.byteLength < 128 * 2) {
+      if (audio.byteLength < 128 * 2) {
         this.listener.notifyException(
           VOICE_CHANGER_CLIENT_EXCEPTION.ERR_SIO_INVALID_RESPONSE,
-          `[REST] Received data is too short ${audioBuffer.byteLength}`
+          `[REST] Received data is too short ${audio.byteLength}`
         );
       } else {
         if (this.outputNode != null) {
-          this.outputNode.postReceivedVoice(audioBuffer);
+          this.outputNode.postReceivedVoice(audio);
         } else {
-          this.postReceivedVoice(audioBuffer);
+          this.postReceivedVoice(audio);
         }
       }
       this.listener.notifyResponseTime(Date.now() - timestamp, data.perf);
