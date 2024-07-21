@@ -1,5 +1,5 @@
 import numpy as np
-import msgpack
+from msgspec import msgpack
 
 from fastapi import APIRouter, Request
 from fastapi.responses import Response, PlainTextResponse
@@ -30,7 +30,7 @@ class MMVC_Rest_VoiceChanger:
     async def test(self, req: Request):
         try:
             data = await req.body()
-            timestamp, voice = msgpack.unpackb(data)
+            timestamp, voice = msgpack.decode(data)
 
             unpackedData = np.frombuffer(voice, dtype=np.int16).astype(np.float32) / 32768
 
@@ -40,7 +40,7 @@ class MMVC_Rest_VoiceChanger:
             if err is not None:
                 error_code, error_message = err
                 return Response(
-                    content=msgpack.packb({
+                    content=msgpack.encode({
                         "error": True,
                         "timestamp": timestamp,
                         "details": {
@@ -52,7 +52,7 @@ class MMVC_Rest_VoiceChanger:
                 )
 
             return Response(
-                content=msgpack.packb({
+                content=msgpack.encode({
                     "error": False,
                     "timestamp": timestamp,
                     "audio": out_audio,
@@ -64,7 +64,7 @@ class MMVC_Rest_VoiceChanger:
         except Exception as e:
             logger.exception(e)
             return Response(
-                content=msgpack.packb({
+                content=msgpack.encode({
                     "error": True,
                     "timestamp": 0,
                     "details": {

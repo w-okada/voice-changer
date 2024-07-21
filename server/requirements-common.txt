@@ -19,4 +19,4 @@ pydantic-settings
 xxhash
 aiohttp
 certifi
-msgpack
+msgspec
