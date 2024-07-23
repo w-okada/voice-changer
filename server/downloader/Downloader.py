@@ -98,7 +98,8 @@ async def download(params: dict):
     if expected_hash is not None and hash != expected_hash:
         raise DownloadVerificationException(saveTo, hash, expected_hash)
 
-    write_file_entry(saveTo, hash)
+    if expected_hash is not None:
+        write_file_entry(saveTo, hash)
 
 def write_file_entry(saveTo: str, hash: str):
     global lock, files
