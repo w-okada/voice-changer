@@ -9,7 +9,6 @@ from voice_changer.common.SafetensorsUtils import load_model
 from librosa.filters import mel
 
 
-
 class BiGRU(nn.Module):
     def __init__(self, input_features, hidden_features, num_layers):
         super(BiGRU, self).__init__()
@@ -328,10 +327,7 @@ class MelSpectrogram(torch.nn.Module):
 
 
 class RMVPE:
-    def __init__(self, model_path: str, is_half: bool, device: torch.device | str = None):
-        if device is None:
-            device = 'cuda' if torch.cuda.is_available() else 'cpu'
-
+    def __init__(self, model_path: str, is_half: bool, device: torch.device):
         model = E2E(4, 1, (2, 2))
         if model_path.endswith('.safetensors'):
             with safe_open(model_path, 'pt', device=str(device) if device.type == 'cuda' else 'cpu') as cpt:
@@ -345,54 +341,32 @@ class RMVPE:
             model = model.half()
         self.model = model
 
-        self.device = device
         self.mel_extractor = MelSpectrogram(
             is_half, 128, 16000, 1024, 160, None, 30, 8000
         ).to(device)
-        cents_mapping = 20 * torch.arange(360, device=device) + 1997.3794084376191
-        self.cents_mapping = F.pad(cents_mapping, (4, 4))
+        self.idx = torch.arange(360, device=device)[None, None, :]
+        self.idx_cents = self.idx * 20 + 1997.3794084376191
 
-    @torch.no_grad()
     def mel2hidden(self, mel: torch.Tensor) -> torch.Tensor:
         n_frames = mel.shape[-1]
-        n_pad = 32 * ((n_frames - 1) // 32 + 1) - n_frames
-        if n_pad > 0:
-            mel = F.pad(mel, (0, n_pad), mode="reflect")
-        hidden = self.model(mel)
-        return hidden[:, :n_frames]
+        mel = F.pad(mel, (0, 32 * ((n_frames - 1) // 32 + 1) - n_frames), mode='reflect')
+        return self.model(mel)[:, :n_frames]
 
     def decode(self, hidden: torch.Tensor, threshold: float):
-        cents_pred = self.to_local_average_cents(hidden, threshold=threshold)
-        f0 = 10 * (2 ** (cents_pred / 1200))
-        f0[f0 == 10] = 0
-        # f0 = np.array([10 * (2 ** (cent_pred / 1200)) if cent_pred else 0 for cent_pred in cents_pred])
-        return f0
+        center = torch.argmax(hidden, dim=2, keepdim=True)  # [B, T, 1]
+        start = torch.clip(center - 4, min=0)  # [B, T, 1]
+        end = torch.clip(center + 5, max=360)  # [B, T, 1]
+        idx_mask = (self.idx >= start) & (self.idx < end)  # [B, T, N]
+        weights = hidden * idx_mask  # [B, T, N]
+        product_sum = torch.sum(weights * self.idx_cents, dim=2)  # [B, T]
+        weight_sum = torch.sum(weights, dim=2)  # [B, T]
+        cents = product_sum / (weight_sum + (weight_sum == 0))  # avoid dividing by zero, [B, T]
+        f0 = 10 * 2 ** (cents / 1200)
+        uv = hidden.max(dim=2)[0] < threshold  # [B, T]
+        return f0 * ~uv
 
+    @torch.no_grad()
     def infer_from_audio_t(self, audio: torch.Tensor, threshold: float = 0.05) -> torch.Tensor:
         mel: torch.Tensor = self.mel_extractor(audio.unsqueeze(0), center=True)
-        hidden = self.mel2hidden(mel).squeeze(0)
-        f0 = self.decode(hidden, threshold=threshold)
-        return f0
-
-    def to_local_average_cents(self, hidden: torch.Tensor, threshold: float):
-        # t0 = ttime()
-        starts = torch.argmax(hidden, dim=1)  # 帧长#index
-        hidden = F.pad(hidden, (8, 0))  # 帧长,368
-        # t1 = ttime()
-        hidden_avgs: list[torch.Tensor] = []
-        cents_mapping_avgs: list[torch.Tensor] = []
-        center = starts + 4
-        ends = center + 5
-        for idx in range(hidden.shape[0]):
-            hidden_avgs.append(hidden[:, starts[idx] : ends[idx]][idx])  # NOQA
-            cents_mapping_avgs.append(self.cents_mapping[starts[idx] : ends[idx]])  # NOQA
-        # t2 = ttime()
-        hidden_avgs = torch.stack(hidden_avgs)  # 帧长，9
-        cents_mapping_avgs = torch.stack(cents_mapping_avgs)  # 帧长，9
-        division = torch.sum(hidden_avgs * cents_mapping_avgs, 1) / torch.sum(hidden_avgs, 1)  # 帧长
-        # t3 = ttime()
-        maxx = torch.max(hidden, dim=1)  # 帧长
-        division[maxx.values <= threshold] = 0
-        # t4 = ttime()
-        # print("decode:%s\t%s\t%s\t%s" % (t1 - t0, t2 - t1, t3 - t2, t4 - t3))
-        return division
+        hidden = self.mel2hidden(mel)
+        return self.decode(hidden, threshold)
