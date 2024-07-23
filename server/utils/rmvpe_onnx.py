@@ -336,7 +336,7 @@ class RMVPEModule(torch.nn.Module):
         cents[cents <= threshold] = 0
         return 10 * 2 ** (cents / 1200)
 
-def convert(pt_model: torch.nn.Module, input_names: list[str], inputs: tuple[torch.Tensor], output_names: list[str], dynamic_axes: dict, convert_to_fp16: bool) -> onnx.ModelProto:
+def convert(pt_model: torch.nn.Module, input_names: list[str], inputs: tuple[torch.Tensor], output_names: list[str], dynamic_axes: dict) -> onnx.ModelProto:
     with BytesIO() as io:
         torch.onnx.export(
             pt_model,
