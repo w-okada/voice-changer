@@ -20,4 +20,4 @@ class RMVPEPitchExtractor(PitchExtractor):
         sr: int,
         window: int,
     ) -> torch.Tensor:
-        return self.rmvpe.infer_from_audio_t(audio)
+        return self.rmvpe.infer_from_audio_t(audio).squeeze()
