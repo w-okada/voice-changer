@@ -333,8 +333,9 @@ class RMVPEModule(torch.nn.Module):
         product_sum = torch.sum(weights * self.idx_cents, dim=2)  # [B, T]
         weight_sum = torch.sum(weights, dim=2)  # [B, T]
         cents = product_sum / (weight_sum + (weight_sum == 0))  # avoid dividing by zero, [B, T]
-        cents[cents <= threshold] = 0
-        return 10 * 2 ** (cents / 1200)
+        f0 = 10 * 2 ** (cents / 1200)
+        uv = hidden.max(dim=2)[0] < threshold  # [B, T]
+        return f0 * ~uv
 
 def convert(pt_model: torch.nn.Module, input_names: list[str], inputs: tuple[torch.Tensor], output_names: list[str], dynamic_axes: dict) -> onnx.ModelProto:
     with BytesIO() as io:
