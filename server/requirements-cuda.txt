@@ -5,7 +5,8 @@
 
 # PyPI onnxruntime-gpu is compiled with CUDA 11.x
 --extra-index-url https://download.pytorch.org/whl/cu118
-torch
+# torch 2.4.0 has problems with Linux builds
+torch==2.3.1
 torchaudio
 faiss-cpu==1.8.0; sys_platform!='linux'
 faiss-gpu; sys_platform=='linux'

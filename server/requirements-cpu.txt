@@ -4,7 +4,8 @@
 # # bash Anaconda3-2022.10-Linux-x86_64.sh
 
 --extra-index-url https://download.pytorch.org/whl/cpu
-torch
+# torch 2.4.0 has problems with Linux builds
+torch==2.3.1
 torchaudio
 faiss-cpu==1.8.0
 
