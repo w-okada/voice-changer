@@ -3,80 +3,21 @@
 [Japanese](/README_ja.md) [Korean](/README_ko.md)
 
 ## What's New!
+- Beatrice V2 Training Code Released!!!
+  - [Training Code Repository](https://huggingface.co/fierce-cats/beatrice-trainer)
+  - [Colab Version](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.47-alpha
+  - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
+  - feature:
+    - Expanded extra frame
+  - bugfix:
+    - Changed the default speaker ID for Beatrice
+    - Fixed errors when model file names are too long
+    - Handled situation when monitor device is set to none.
 - v2.0.45-alpha
   - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
   - bugfix
     - volume control
-- v2.0.44-alpha
-  - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
-  - bugfix
-    - Improvements for Unstable Behavior After Model Deletion
-- v2.0.42-alpha
-  - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
-  - Feature
-    - Upload of Beatrice v2 custom model
-  - Improvement
-    - Improved RVC sound quality
-    - Enhanced RVC conversion speed
-  - Bugfix
-    - Pass-through
-    - Audio device reload
-- v.2.0.40-alpha
-  - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
-  - Improvements
-    - Volume support
-    - ASIO support
-    - Web folder publishing
-      - You can extend language support by creating `web_front\assets\i18n\<lang>\translation.json` and adding it to `lang` in `web_front\assets\gui_settings\GUI.json`.
-- v.2.0.32-alpha Colab version released. ⇒ [Here](./w_okada's_Voice_Changer_version_2_x.ipynb)
-  - ngrok is no longer needed. You can use it without a ngrok account.
-- v.2.0.27-alpha -> [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
-- v.2.0.24-alpha Colab version released. ⇒ [Here](https://github.com/w-okada/voice-changer/tree/v.2/w_okada's_Voice_Changer_version_2_x.ipynb)
-
-- VCClient has rebooted as the second version. see [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
-  - The Mac(Apple silicon) version has also been released.
-
-- v.1.5.3.18a
-  - Bugfix: FCPE
-
-- v.1.5.3.18 (removed.)
-  - New Feature: FCPE
-  - Easy-VC (experimental)
-- v.1.5.3.17b
-  - bugfix:
-    - clear setting
-  - improve
-    - file sanitizer
-  - chage:
-    - default input chunk size: 192.
-      - decided by this chart.(https://rentry.co/VoiceChangerGuide#gpu-chart-for-known-working-chunkextra)
-
-- v.1.5.3.17a
-  - Bug Fixes:
-    - Server mode error
-    - RVC Model merger
-  - Misc
-    - Add RVC Sample Chihaya-Jinja (https://chihaya369.booth.pm/items/4701666)
-
-- v.1.5.3.17
-  - New Features:
-    - Added similarity graph for Beatrice speaker selection 
-  - Bug Fixes:
-    - Fixed crossfade issue with Beatrice speaker
-
-- v.1.5.3.16a
-  - Bug fix:
-    - Lazy load Beatrice.
-
-
-- v.1.5.3.16 (Only for Windows, CPU dependent)
-  - New Feature:
-    - Beatrice is supported(experimental) 
-
-- v.1.5.3.15
-  - Improve:
-    - new rmvpe checkpoint for rvc (torch, onnx)
-    - Mac: upgrade torch version 2.1.0
 
 
 # What is VC Client
@@ -87,7 +28,7 @@
 - [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc)
 - [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI)
 - [DDSP-SVC](https://github.com/yxlllc/DDSP-SVC)
-- [Beatrice JVS Corpus Edition](https://prj-beatrice.com/) * experimental,  (***NOT MIT Licnsence*** see [readme](https://github.com/w-okada/voice-changer/blob/master/server/voice_changer/Beatrice/)) *  Only for Windows, CPU dependent
+- [Beatrice JVS Corpus Edition](https://prj-beatrice.com/) * experimental,  (***NOT MIT License*** see [readme](https://github.com/w-okada/voice-changer/blob/master/server/voice_changer/Beatrice/)) *  Only for Windows, CPU dependent
 
 1. Distribute the load by running Voice Changer on a different PC
    The real-time voice changer of this application works on a server-client configuration. By running the MMVC server on a separate PC, you can run it while minimizing the impact on other resource-intensive processes such as gaming commentary.

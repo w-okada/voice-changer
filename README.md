@@ -3,78 +3,21 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## What's New!
+- Beatrice V2 トレーニングコード公開!!!
+  - [トレーニングコードリポジトリ](https://huggingface.co/fierce-cats/beatrice-trainer)
+  - [コラボ版](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.47-alpha
+  - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
+  - feature:
+    - extra frameを拡大
+  - bugfix:
+    - beatrice のデフォルト話者IDの変更
+    - モデルファイル名が長いときのエラー対策
+    - モニターデバイスをnoneにしたときの対応。
 - v2.0.45-alpha
   - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
   - bugfix
     - 音量調整
-- v2.0.44-alpha
-  - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
-  - bugfix
-    - モデル削除後の不安定動作の改善
-- v.2.0.42-alpha
-  - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
-  - Feature
-    - Beatrice v2 カスタムモデルのアップロード
-  - Improvement
-    - RVC音質向上
-    - RVC変換速度向上
-  - Bugfix
-    - パススルー
-    - オーディオデバイスリロード
-- v.2.0.40-alpha
-  - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
-  - 改善
-    - 音量対応
-    - ASIO対応
-    - webフォルダ公開
-      - `web_front\assets\i18n\<lang>\translation.json`を作成し、`web_front\assets\gui_settings\GUI.json`の`lang`に追加すれば言語対応を拡張できます。
-- v.2.0.32-alpha Colab版 リリース。⇒[こちら](https://github.com/w-okada/voice-changer/tree/v.2/w_okada's_Voice_Changer_version_2_x.ipynb)
-  - ngrokフリーになりました。ngrokのアカウントなしで利用可能です。
-- v.2.0.27-alpha -> [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
-
-- VCClientは version.2として開発が進められています.  [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
-　一応Mac版もリリースしました。
-
-- v.1.5.3.18a
-  - Bugfix: FCPE
-
-- v.1.5.3.18 (removed.)
-  - New Feature: FCPE
-  - Easy-VC (experimental)
-- v.1.5.3.17b
-  - bugfix:
-    - clear setting
-  - improve
-    - file sanitizer
-  - chage:
-    - default input chunk size: 192.
-      - decided by this chart.(https://rentry.co/VoiceChangerGuide#gpu-chart-for-known-working-chunkextra)
-
-- v.1.5.3.17a
-  - Bug Fixes:
-    - Server mode error
-    - RVC Model merger
-  - Misc
-    - Add RVC Sample Chihaya-Jinja (https://chihaya369.booth.pm/items/4701666)
-
-- v.1.5.3.17
-  - New Features:
-    - Added similarity graph for Beatrice speaker selection 
-  - Bug Fixes:
-    - Fixed crossfade issue with Beatrice speaker
-
-- v.1.5.3.16a
-  - Bug fix:
-    - Lazy load Beatrice.
-
-- v.1.5.3.16 (Only for Windows, CPU dependent)
-  - New Feature:
-    - Beatrice is supported(experimental) 
-
-- v.1.5.3.15
-  - Improve:
-    - new rmvpe checkpoint for rvc (torch, onnx)
-    - Mac: upgrade torch version 2.1.0
 
 
 
@@ -88,7 +31,7 @@
   - [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc)
   - [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI)
   - [DDSP-SVC](https://github.com/yxlllc/DDSP-SVC)
-  - [Beatrice JVS Corpus Edition](https://prj-beatrice.com/) * experimental,  (***NOT MIT Licnsence*** see [readme](https://github.com/w-okada/voice-changer/blob/master/server/voice_changer/Beatrice/)) *  Only for Windows, CPU dependent
+  - [Beatrice JVS Corpus Edition](https://prj-beatrice.com/) * experimental,  (***NOT MIT License*** see [readme](https://github.com/w-okada/voice-changer/blob/master/server/voice_changer/Beatrice/)) *  Only for Windows, CPU dependent
 1. 本ソフトウェアは、ネットワークを介した利用も可能であり、ゲームなどの高負荷なアプリケーションと同時に使用する場合などに音声変換処理の負荷を外部にオフロードすることができます。
 
 ![image](https://user-images.githubusercontent.com/48346627/206640768-53f6052d-0a96-403b-a06c-6714a0b7471d.png)
