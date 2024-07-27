@@ -3,102 +3,19 @@
 [Japanese](/README.md) [Korean](/README_ko.md)
 
 ## What's New!
+- Beatrice V2 Training Code Released!!!
+  - [Training Code Repository](https://huggingface.co/fierce-cats/beatrice-trainer)
+  - [Colab Version](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.47-alpha
+  - feature:
+    - Expanded extra frame
+  - bugfix:
+    - Changed the default speaker ID for Beatrice
+    - Fixed errors when model file names are too long
+    - Handled situation when monitor device is set to none.
 - v.2.0.45-alpha
   - bugfix
     - volume control
-- v.2.0.44-alpha
-  - bugfix
-    - Improvements for Unstable Behavior After Model Deletion
-- v2.0.42-alpha
-  - Feature
-    - Upload of Beatrice v2 custom model
-  - Improvement
-    - Improved RVC sound quality
-    - Enhanced RVC conversion speed
-  - Bugfix
-    - Pass-through
-    - Audio device reload
-- v.2.0.40-alpha
-  - Improvements
-    - Volume support
-    - ASIO support
-    - Web folder publishing
-      - You can extend language support by creating `web_front\assets\i18n\<lang>\translation.json` and adding it to `lang` in `web_front\assets\gui_settings\GUI.json`.
-- v.2.0.36-alpha
-  - Bug Fixes
-    - Countermeasure for sound clipping issue in RVC
-    - Countermeasure for failure to load DDPN version of RVC onnx created with vcclient v1
-- v.2.0.32-alpha Colab version released. ⇒ [Here](./w_okada's_Voice_Changer_version_2_x.ipynb)
-  - ngrok is no longer needed. You can use it without a ngrok account.
-- v.2.0.27-alpha
-  - Feature
-    - Support for Beatrice v2 alpha2: formant changes, improved quality
-  - Logging enhancement
-    - Added download button
-  - Improvements
-    - Prevent double-clicking on upload
-    - Display during upload
-    - Fixed typo: paththrough -> passthrough
-  - Bug fixes
-    - Added handling for when undefined is returned in the performance monitor
-- v.2.0.24-alpha Colab version released. ⇒ [Here](./w_okada's_Voice_Changer_version_2_x.ipynb)
-- v.2.0.24-alpha
-  - Bugfix:
-    - Addressed the issue where sound stops when switching modes
-  - Others:
-    - Enhanced logger
-    - Improved error screen
-- v.2.0.23-alpha
-  - Reorganizing Editions
-    - win_std: For typical Windows users. Hardware acceleration via DirectML is available for both ONNX and torch models.
-    - win_cuda: For Nvidia GPU owners. Hardware acceleration via CUDA is available for both ONNX and torch models. Requires CUDA 12.4 or later.
-    - mac: For Apple Silicon (e.g., M1) users.
-  - feature
-    - Added the capability to adjust the output buffer when operating in client mode
-  - bugfix:
-    - Fixed the issue of retaining index and icon when exporting RVC's torch model to onnx model
-  - Other:
-    - Enhanced logger
-
-- v.2.0.20-alpha
-  - Support for torch-cuda. See the edition description [here](docs/01_basic_v2.0.z.md).
-  - Bugfix:
-    - Unified file encoding to UTF-8
-    - 
-- v.2.0.16-alpha
-  - Added support for experimental version of torch-dml. For a description of the edition, refer to [here](docs/01_basic_v2.0.z.md).
-  - Bugfix:
-    - Fixed the issue where both pth and index files could not be uploaded simultaneously during rvc file upload.
-    - 
-- v.2.0.13-alpha
-  - Added support for onnxruntime-gpu. Release of the CUDA edition.
-  - Bugfix:
-    - Addressed issues with onnxcrepe
-    - Fixed ID selection issue in Beatrice v2 API
-  - Others:
-    - Enhanced logger
-
-- v.2.0.6-alpha
-  - New
-    - Now compatible with M1 series Macs.
-      - Confirmed to work on M1 MBA (Monterey) and M2 Pro MBP (Ventura).
-      - Looking for reports on performance with Sonoma.
-  - Bugfix:
-    - Fixed a bug where the pitch would revert when selecting a speaker in Beatrice.
-  - Others:
-    - Enhanced information gathering for debugging purposes.
-
-- v.2.0.5-alpha
-  - VCClient has been rebooted as a second version.
-  - Major software structure changes have been made to improve extensibility.
-  - Providing REST API to facilitate client development by third parties.
-  - Edition system has been completely revamped.
-    - The Standard Edition (win) runs on ONNX models by default regardless of the presence of a GPU. Please convert Torch models to ONNX models before use. Hardware acceleration is only effective with ONNX models for users with a GPU.
-    - The CUDA Edition (win) is optimized specifically for Nvidia GPUs. It offers further speed enhancements compared to the Standard Edition. Hardware acceleration is only effective with ONNX models.
-    - Torch models can also be hardware accelerated using PyTorch models.
-    - The Mac Edition is for Mac users with Apple Silicon.
-    - Linux users or those with knowledge of Python can clone the repository and run it.
-  - Currently, only the Standard Edition is available in the Alpha version.
 
 # What is VC Client
 

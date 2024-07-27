@@ -3,107 +3,16 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## What's New!
-- v.2.0.45-alpha
-  - bugfix
-    - 音量調整
-- v.2.0.44-alpha
-  - bugfix
-    - モデル削除後の不安定動作の改善
-- v.2.0.42-alpha
-  - Feature
-    - Beatrice v2 カスタムモデルのアップロード
-  - Improvement
-    - RVC音質向上
-    - RVC変換速度向上
-  - Bugfix
-    - パススルー
-    - オーディオデバイスリロード
-- v.2.0.40-alpha
-  - 改善
-    - 音量対応
-    - ASIO対応
-    - webフォルダ公開
-      - `web_front\assets\i18n\<lang>\translation.json`を作成し、`web_front\assets\gui_settings\GUI.json`の`lang`に追加すれば言語対応を拡張できます。
-- v.2.0.36-alpha
-  - バグフィックス
-    - RVCの音が割れる問題の対策
-    - vcclient v1で作成したDDPN版RVCのonnxの読み込み失敗の対策
-- v.2.0.32-alpha Colab版 リリース。⇒[こちら](./w_okada's_Voice_Changer_version_2_x.ipynb)
-  - ngrokフリーになりました。ngrokのアカウントなしで利用可能です。
-- v.2.0.27-alpha
-  - Feature
-    - Beatrice v2 alpha2対応：formant変更、品質向上
-  - ログ強化
-    - ダウンロードボタン追加
-  - 改善
-    - アップロードの２度押し回避
-    - アップロード中の表示
-    - paththrough -> passthrough
-  - バグフィックス
-    - performance monitorにundefinedが返ってきたときの対応追加
-
-- v.2.0.24-alpha Colab版 リリース。⇒[こちら](./w_okada's_Voice_Changer_version_2_x.ipynb)
-- v.2.0.24-alpha
+- Beatrice V2 トレーニングコード公開!!!
+  - [トレーニングコードリポジトリ](https://huggingface.co/fierce-cats/beatrice-trainer)
+  - [コラボ版](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.47-alpha
+  - feature:
+    - extra frameを拡大
   - bugfix:
-    - モード切替をしたときに音が出なくなる問題を対策
-  - その他：
-    - loggerの強化
-    - エラー画面の強化
-
-- v.2.0.23-alpha
-  - エディションを再整理
-    - win_std:  一般的なwinユーザ向け。onnxモデル, torchモデルともに、DirectMLによりGPUのハードウェアアクセラレーションが可能です。
-    - win_cuda:NvidiaのGPU所有者向け。onnxモデル, torchモデルともに、cudaによりNvidiaのGPUのハードウェアアクセラレーションが可能です。要cuda12.4~。
-    - mac: AppleSilicon(M1等)ユーザ向け。            
-  - feature
-    - クライアントモードでの動作時のアウトプットバッファの調整機能を追加
-  - bugfix:
-    - RVCのtorchモデルをonnxモデルにエクスポートする際にindex, iconを引き継ぐように修正
-  - その他：
-    - loggerの強化
-
-- v.2.0.20-alpha
-  - torch-cudaに対応。エディションの説明は[こちら](docs/01_basic_v2.0.z.md)。
-  - bugfix:
-    - ファイルエンコーディングをUTF-8に統一
-
-- v.2.0.16-alpha
-  - torch-dmlに対応（実験的なバージョン）。エディションの説明は[こちら](docs/01_basic_v2.0.z.md)。
-  - bugfix:
-    - rvc file uploadの際、pthとindexの両方をアップできない不具合の対策。
-
-- v.2.0.13-alpha
-  - onnxruntime-gpuに対応。cudaエディションのリリース。エディションの説明は[こちら](docs/01_basic_v2.0.z.md)。
-  - bugfix:
-    - onnxcrepeの不具合対策
-    - Beatrice v2 APIのID選択不具合対策
-  - その他：
-    - loggerの強化
-
-
-- v.2.0.6-alpha
-  - 新規
-    - M1系 Macに対応しました。
-      - M1 MBA(monterey), M2 Pro MBP(venture)での動作実績あります。
-      - sonomaでのレポートお待ちしております。
-  - bugfix:
-    - beatriceのスピーカー選択でpitchが元に戻ってしまうバグに対応。
-  - その他：
-    - 不具合解析用の情報取得強化
-
-- v.2.0.5-alpha
-  - VCClientがセカンドバージョンとしてリブートしました。
-  - 大幅なソフトウェア構造変更により拡張容易性を高めました。
-  - REST APIを提供することでサードパーティによるクライアント開発を容易化しました。
-  - エディション体系を刷新しました。
-    - スタンダードエディション(win)はgpuの有無にかかわらず、onnxモデルでの実行を基本としてます。torchモデルはonnxモデルに変換してから使用してください。gpuをお持ちの方はonnxモデルでのみハードウェアアクセラレーションが有効となります。
-    - cudaエディション(win)は、NvidiaのGPUに特化したチューニングがされています。スタンダードエディションと比較してさらなる高速化が可能です。onnxモデルでのみハードウェアアクセラレーションが有効となります。
-    - torchモデルはpytorchのモデルもハードウェアアクセラレートできます。
-    - macエディションはApple Silicon搭載のMacユーザ向けです。
-    - linuxユーザやpythonの知識がある方はリポジトリをcloneして実行することもできます。
-  - 現在のalpha versionではスタンダードエディションのみの提供となっています。
-  
-
+    - beatrice のデフォルト話者IDの変更
+    - モデルファイル名が長いときのエラー対策
+    - モニターデバイスをnoneにしたときの対応。
 # VC Client とは
 
 1. 各種音声変換 AI(VC, Voice Conversion)を用いてリアルタイム音声変換を行うためのクライアントソフトウェアです。サポートしている音声変換 AI は次のものになります。

@@ -3,100 +3,19 @@
 [English](/README_en.md) [Japanese](/README.md)
 
 ## What's New!
+- Beatrice V2 훈련 코드 공개!!!
+  - [훈련 코드 리포지토리](https://huggingface.co/fierce-cats/beatrice-trainer)
+  - [Colab 버전](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.47-alpha
+  - 기능:
+    - 추가 프레임 확장
+  - 버그 수정:
+    - Beatrice의 기본 화자 ID 변경
+    - 모델 파일 이름이 너무 길 때의 오류 수정
+    - 모니터 장치를 none으로 설정했을 때의 처리.
 - v.2.0.45-alpha
   - bugfix
     - 음량 조절
-- v.2.0.44-alpha
-  - bugfix
-    - 모델 삭제 후 불안정한 동작 개선
-- v2.0.42-alpha
-  - 기능
-    - Beatrice v2 커스텀 모델 업로드
-  - 개선
-    - RVC 음질 향상
-    - RVC 변환 속도 향상
-  - 버그 수정
-    - 패스스루
-    - 오디오 장치 다시 로드
-- v.2.0.40-alpha
-  - 개선 사항
-    - 볼륨 지원
-    - ASIO 지원
-    - 웹 폴더 공개
-      - `web_front\assets\i18n\<lang>\translation.json` 파일을 생성하고 `web_front\assets\gui_settings\GUI.json`의 `lang`에 추가하면 언어 지원을 확장할 수 있습니다.
-- v.2.0.36-alpha
-  - 버그 수정
-    - RVC의 음이 왜곡되는 문제 대책
-    - vcclient v1로 생성된 DDPN 버전 RVC onnx 로드 실패 문제 대책
-- v.2.0.32-alpha Colab 버전 출시. ⇒ [여기](./w_okada's_Voice_Changer_version_2_x.ipynb)
-  - ngrok 없이도 사용 가능합니다. ngrok 계정이 없어도 이용할 수 있습니다.
-- v.2.0.27-alpha
-  - 기능
-    - Beatrice v2 alpha2 지원: 포먼트 변경, 품질 향상
-  - 로그 강화
-    - 다운로드 버튼 추가
-  - 개선 사항
-    - 업로드 중 두 번 클릭 방지
-    - 업로드 중 표시
-    - 오타 수정: paththrough -> passthrough
-  - 버그 수정
-    - 성능 모니터에서 undefined가 반환될 때의 처리 추가
-- v.2.0.24-alpha Colab 버전 릴리스. ⇒ [여기](./w_okada's_Voice_Changer_version_2_x.ipynb)
-- v.2.0.24-alpha
-  - 버그 수정:
-    - 모드 전환 시 소리가 나지 않는 문제를 해결
-  - 기타:
-    - 로거 강화
-    - 에러 화면 강화
-- v.2.0.23-alpha
-  - 에디션 재정리
-    - win_std: 일반적인 윈도우 사용자 대상. DirectML을 통한 하드웨어 가속이 ONNX 모델과 torch 모델 모두에서 가능합니다.
-    - win_cuda: Nvidia GPU 소유자 대상. CUDA를 통한 하드웨어 가속이 ONNX 모델과 torch 모델 모두에서 가능합니다. CUDA 12.4 이상 필요.
-    - mac: AppleSilicon(M1 등) 사용자 대상.
-  - 기능
-    - 클라이언트 모드에서 동작 시 출력 버퍼를 조정하는 기능 추가
-  - 버그 수정:
-    - RVC의 torch 모델을 onnx 모델로 내보낼 때 index와 icon을 유지하는 문제 수정
-  - 기타:
-    - 로거 강화
-
-- v.2.0.20-alpha
-  - Support for torch-cuda. See the edition description [here](docs/01_basic_v2.0.z.md).
-  - Bugfix:
-    - Unified file encoding to UTF-8
-- v.2.0.16-alpha
-  - torch-dml 실험적 버전을 지원. 에디션에 대한 설명은 [여기](docs/01_basic_v2.0.z.md)를 참조.
-  - 버그 수정:
-    - rvc 파일 업로드 시 pth와 index 파일을 동시에 업로드할 수 없는 문제를 해결.
-  
-- v.2.0.13-alpha
-  - onnxruntime-gpu 지원 추가. CUDA 에디션 릴리스.
-  - 버그 수정:
-    - onnxcrepe 관련 문제 해결
-    - Beatrice v2 API의 ID 선택 문제 수정
-  - 기타:
-    - 로거 강화
-- v. 2.0.6-alpha
-  - 신규:
-    - M1 계열 Mac에 대응했습니다.
-      - M1 MBA(monterey), M2 Pro MBP(venture)에서의 동작 실적이 있습니다.
-      - sonoma에서의 보고를 기다리고 있습니다.
-  - 버그 수정:
-    - Beatrice의 스피커 선택 시 pitch가 원래대로 돌아가는 버그를 수정했습니다.
-  - 기타:
-    - 오류 분석을 위한 정보 획득 강화
-  
-- v.2.0.5-alpha
-  - VCClient가 두 번째 버전으로 리부트 되었습니다.
-  - 대폭적인 소프트웨어 구조 변경으로 확장 용이성을 높였습니다.
-  - REST API를 제공하여 서드파티에서 클라이언트 개발을 용이하게 했습니다.
-  - 에디션 체계를 새롭게 개편했습니다.
-    - 스탠다드 에디션(win)은 GPU 유무와 상관없이 onnx 모델로 실행되는 것이 기본입니다. torch 모델은 onnx 모델로 변환한 후 사용하십시오. GPU를 소유한 사용자는 onnx 모델에서만 하드웨어 가속이 유효합니다.
-    - cuda 에디션(win)은 Nvidia GPU에 특화된 튜닝이 되어 있습니다. 스탠다드 에디션에 비해 더욱 빠른 속도가 가능합니다. onnx 모델에서만 하드웨어 가속이 유효합니다.
-    - torch 모델은 pytorch 모델도 하드웨어 가속을 지원합니다.
-    - mac 에디션은 Apple Silicon을 탑재한 Mac 사용자들을 위한 것입니다.
-    - linux 사용자나 python에 대한 지식이 있는 분들은 리포지토리를 클론하여 실행할 수도 있습니다.
-  - 현재 Alpha 버전에서는 스탠다드 에디션만 제공됩니다.
   
 # VC Client란
                                                                                                                                                      
