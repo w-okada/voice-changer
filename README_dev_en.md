@@ -1,8 +1,8 @@
-## For Developper
+## For Developer
 
 [Japanese](/README_dev_ja.md)
 
-## Prerequisit
+## Prerequisite
 
 - Linux(ubuntu, debian) or WSL2, (not tested for other linux distributions and Mac)
 - Anaconda
@@ -57,7 +57,7 @@ Access with Browser (currently only chrome is supported), then you can see gui.
 2-1. Trouble shoot
 
 (1) OSError: PortAudio library not found
-If you get the message below, you shold install additional library.
+If you get the message below, you should install additional library.
 
 ```
 OSError: PortAudio library not found
