@@ -6,6 +6,14 @@
 - Beatrice V2 훈련 코드 공개!!!
   - [훈련 코드 리포지토리](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab 버전](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.50-alpha
+  - [여기를 참조하십시오](https://github.com/w-okada/voice-changer/tree/v.2)
+  - 개선사항:
+    - 클라이언트 모드의 성능 개선
+    - Mac 에디션에 네이티브 클라이언트 포함
+  - 버그수정:
+    - BeatriceV2 변환 중 입력 장치를 변경할 때(샘플링 레이트가 다르면 크래시 발생) 예외 처리
+    - 서버 모드에서 클라이언트 모드로 전환 시 음질 손상 문제 해결
 - v.2.0.47-alpha
   - [여기를 참조하십시오](https://github.com/w-okada/voice-changer/tree/v.2)
   - 기능:
@@ -14,21 +22,18 @@
     - Beatrice의 기본 화자 ID 변경
     - 모델 파일 이름이 너무 길 때의 오류 수정
     - 모니터 장치를 none으로 설정했을 때의 처리.
-- v2.0.45-alpha
-  - [여기를 참조하십시오](https://github.com/w-okada/voice-changer/tree/v.2)
-  - bugfix
-    - 음량 조절
 
 # VC Client란
                                                                                                                                                      
 1. 각종 음성 변환 AI(VC, Voice Conversion)를 활용해 실시간 음성 변환을 하기 위한 클라이언트 소프트웨어입니다. 지원하는 음성 변환 AI는 다음과 같습니다.
 
 - 지원하는 음성 변환 AI (지원 VC)
-  - [MMVC](https://github.com/isletennos/MMVC_Trainer)
-  - [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc)
+  - [MMVC](https://github.com/isletennos/MMVC_Trainer) (only v1)
+  - [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc) (only v1)
   - [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI)
-  - [DDSP-SVC](https://github.com/yxlllc/DDSP-SVC)
-  - [Beatrice JVS Corpus Edition](https://prj-beatrice.com/) * experimental,  (***NOT MIT License*** see [readme](https://github.com/w-okada/voice-changer/blob/master/server/voice_changer/Beatrice/)) *  Only for Windows, CPU dependent
+  - [DDSP-SVC](https://github.com/yxlllc/DDSP-SVC) (only v1)
+  - [Beatrice JVS Corpus Edition](https://prj-beatrice.com/) * experimental,  (***NOT MIT License*** see [readme](https://github.com/w-okada/voice-changer/blob/master/server/voice_changer/Beatrice/)) *  Only for Windows, CPU dependent (only v1)
+  - [Beatrice v2](https://prj-beatrice.com/) (only for v2)
   - 
 1. 이 소프트웨어는 네트워크를 통한 사용도 가능하며, 게임 등 부하가 큰 애플리케이션과 동시에 사용할 경우 음성 변화 처리의 부하를 외부로 돌릴 수도 있습니다.
 
@@ -57,8 +62,13 @@
 
 <img src="https://github.com/w-okada/voice-changer/assets/48346627/3f092e2d-6834-42f6-bbfd-7d389111604e" width="400" height="150">
 
-- Windows 버전과 Mac 버전을 제공하고 있습니다.
-
+- Windows 버전과 Mac 버전을 제공하고 있습니다. [Hugging Face](https://huggingface.co/wok000/vcclient000/tree/main)에서 다운로드할 수 있습니다.
+- Windows용 v2
+  - `vcclient_win_std_xxx.zip`를 다운로드하여 사용하세요. GPU를 사용하지 않고도 (어느 정도 고성능의) CPU를 사용한 음성 변환이나, DirectML을 사용해 GPU(AMD, Nvidia)를 활용한 음성 변환이 가능합니다. v2에서는 torch와 onnx 모두를 지원합니다.
+  - Nvidia GPU를 가지고 계신 분들은 `vcclient_win_cuda_xxx.zip`를 사용하시면 더 빠른 음성 변환이 가능합니다.
+- Mac (Apple Silicon)용 v2
+  - `vcclient_mac_xxx.zip`를 다운로드하여 사용하세요.
+- v1
   - Windows와 NVIDIA GPU를 사용하는 분은 ONNX(cpu, cuda), PyTorch(cpu, cuda)를 다운로드하세요.
   - Windows와 AMD/Intel GPU를 사용하는 분은 ONNX(cpu, DirectML), PyTorch(cpu, cuda)를 다운로드하세요 AMD/Intel GPU는 ONNX 모델을 사용할 때만 적용됩니다.
   - 그 외 GPU도 PyTorch, Onnxruntime가 지원할 경우에만 적용됩니다.
@@ -74,26 +84,6 @@
 
 - DDPS-SVC의 encoder는 hubert-soft만 지원합니다.
 
-- 다운로드는 아래에서 하세요.
-
-| Version     | OS  | 프레임워크                            | 링크                                                                | 지원 VC                                                                             | 파일 크기 |
-| ----------- | --- | ------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | --------- |
-| v.1.5.3.18a | mac | ONNX(cpu), PyTorch(cpu,mps)           | N/A                                                                 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                                    | 797MB     |
-|             | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3240MB    |
-|             | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3125MB    |
-| v.1.5.3.17b | mac | ONNX(cpu), PyTorch(cpu,mps)           | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                                    | 797MB     |
-|             | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3240MB    |
-|             | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3125MB    |
-| v.1.5.3.16a | mac | ONNX(cpu), PyTorch(cpu,mps)           | N/A                                                                 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                                    | 797MB     |
-|             | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3240MB    |
-|             | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3125MB    |
-| v.1.5.3.15  | mac | ONNX(cpu), PyTorch(cpu,mps)           | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                                    | 797MB     |
-|             | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC           | 3240MB    |
-|             | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC           | 3125MB    |
-
-(\*1) Google Drive에서 다운로드가 안 되는 분은 [hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)에서 시도해 보세요
-(\*2) 개발자가 AMD 그래픽카드를 갖고 있지 않아서 작동 확인을 할 수 없습니다. onnxruntime-directml를 같이 첨부한 것이 전부입니다.
-(\*3) 압축 해제나 실행 속도가 느릴 경우에는 바이러스 검사가 진행 중일 가능성이 있습니다. 파일과 폴더를 검사 대상 제외를 한 후에 시도해 보세요. (이에 개발자는 책임이 없음)
 
 ## (2) Docker나 Anaconda 등으로 구축된 개발 환경에서 사용
 
@@ -111,17 +101,6 @@ Anaconda 가상 환경에서 실행은 [서버 개발자용 문서](README_dev_k
 
 - [통신편](tutorials/trouble_shoot_communication_ko.md)
 
-# 실시간성(MMVC)
-
-GPU를 사용하면 시간 차가 거의 없이 변환할 수 있습니다.
-
-https://twitter.com/DannadoriYellow/status/1613483372579545088?s=20&t=7CLD79h1F3dfKiTb7M8RUQ
-
-CPU도 최근 제품이라면 어느 정도 빠르게 변환할 수 있습니다.
-
-https://twitter.com/DannadoriYellow/status/1613553862773997569?s=20&t=7CLD79h1F3dfKiTb7M8RUQ
-
-오래된 CPU(i7-4770)면, 1000msec 정도 걸립니다.
 
 # 개발자 서명에 대하여
 

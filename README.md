@@ -6,6 +6,14 @@
 - Beatrice V2 トレーニングコード公開!!!
   - [トレーニングコードリポジトリ](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [コラボ版](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.50-alpha
+  - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
+  - improve:
+    - クライアントモードの性能改善
+    - Macエディションにネイティブクライアント同梱
+  - bugfix:
+    - BeatriceV2変換時の入力デバイス変更時(サンプリングレートが異なると落ちる)の例外対応
+    - サーバモードからクライアントモードへ変更時に音が壊れる対策
 - v.2.0.47-alpha
   - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
   - feature:
@@ -14,31 +22,25 @@
     - beatrice のデフォルト話者IDの変更
     - モデルファイル名が長いときのエラー対策
     - モニターデバイスをnoneにしたときの対応。
-- v2.0.45-alpha
-  - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
-  - bugfix
-    - 音量調整
-
-
-
 
 # VC Client とは
 
 1. 各種音声変換 AI(VC, Voice Conversion)を用いてリアルタイム音声変換を行うためのクライアントソフトウェアです。サポートしている音声変換 AI は次のものになります。
 
 - サポートする音声変換 AI （サポート VC）
-  - [MMVC](https://github.com/isletennos/MMVC_Trainer)
-  - [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc)
+  - [MMVC](https://github.com/isletennos/MMVC_Trainer) (only v1)
+  - [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc)  (only v1)
   - [RVC(Retrieval-based-Voice-Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI)
-  - [DDSP-SVC](https://github.com/yxlllc/DDSP-SVC)
-  - [Beatrice JVS Corpus Edition](https://prj-beatrice.com/) * experimental,  (***NOT MIT License*** see [readme](https://github.com/w-okada/voice-changer/blob/master/server/voice_changer/Beatrice/)) *  Only for Windows, CPU dependent
+  - [DDSP-SVC](https://github.com/yxlllc/DDSP-SVC)  (only v1)
+  - [Beatrice JVS Corpus Edition](https://prj-beatrice.com/) * experimental,  (***NOT MIT License*** see [readme](https://github.com/w-okada/voice-changer/blob/master/server/voice_changer/Beatrice/)) *  Only for Windows, CPU dependent (only for v1)
+  - [Beatrice v2](https://prj-beatrice.com/) (only for v2)
 1. 本ソフトウェアは、ネットワークを介した利用も可能であり、ゲームなどの高負荷なアプリケーションと同時に使用する場合などに音声変換処理の負荷を外部にオフロードすることができます。
 
 ![image](https://user-images.githubusercontent.com/48346627/206640768-53f6052d-0a96-403b-a06c-6714a0b7471d.png)
 
 3. 複数のプラットフォームに対応しています。
 
-- Windows, Mac(M1), Linux, Google Colab (MMVC のみ)
+- Windows, Mac(M1), Linux, Google Colab 
 
 # 使用方法
 
@@ -51,16 +53,19 @@
 
 ## (1) 事前ビルド済みの Binary での利用
 
-- 実行形式のバイナリをダウンロードして実行することができます。
-
 - チュートリアルは[こちら](tutorials/tutorial_rvc_ja_latest.md)をご覧ください。([ネットワークのトラブルシュート](https://github.com/w-okada/voice-changer/blob/master/tutorials/trouble_shoot_communication_ja.md))
 
 - [Google Colaboratory](https://github.com/w-okada/voice-changer/tree/v.2/w_okada's_Voice_Changer_version_2_x.ipynb) で簡単にお試しいただけるようになりました。左上の Open in Colab のボタンから起動できます。
 
 <img src="https://github.com/w-okada/voice-changer/assets/48346627/3f092e2d-6834-42f6-bbfd-7d389111604e" width="400" height="150">
 
-- Windows 版と Mac 版を提供しています。
-
+- Windows 版と Mac 版を提供しています。[Hugging Face](https://huggingface.co/wok000/vcclient000/tree/main)からダウンロードできます。
+- v2 for windows
+  - `vcclient_win_std_xxx.zip`をダウンロードして使用してください。gpuを使用しない(ある程度高性能なCPUでの)音声変換や、directmlを用いてgpu(amd, nvidia)を活用した音声変換が可能です。v2では、torch, onnxいずれも対応可能です。
+  - nvidiaのgpuをお持ちの方は`vcclient_win_cuda_xxx.zip`を使用することでより高速な音声変換ができます。
+- v2 for Mac(apple silicon)
+  - `vcclient_mac_xxx.zip`をダウンロードして使用してください。
+- v1
   - Windows かつ Nvidia の GPU をご使用の方は、ONNX(cpu,cuda), PyTorch(cpu,cuda)をダウンロードしてください。
   - Windows かつ AMD/Intel の GPU をご使用の方は、ONNX(cpu,DirectML), PyTorch(cpu,cuda)をダウンロードしてください。AMD/Intel の GPU は onnx のモデルを使用する場合のみ有効になります。
   - いずれの GPU のサポート状況についても、PyTorch、Onnxruntime がサポートしている場合のみ有効になります。
@@ -77,28 +82,8 @@
 - DDPS-SVC の encoder は hubert-soft のみ対応です。
 
 - ダウンロードはこちらから。
+[hugging face](https://huggingface.co/wok000/vcclient000/tree/main)
 
-| Version     | OS  | フレームワーク                        | link                                                                | サポート VC                                                                         | サイズ |
-| ----------- | --- | ------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------ |
-| v.1.5.3.18a | mac | ONNX(cpu), PyTorch(cpu,mps)           | N/A                                                                 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                                    | 797MB  |
-|             | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3240MB |
-|             | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3125MB |
-| v.1.5.3.17b | mac | ONNX(cpu), PyTorch(cpu,mps)           | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                                    | 797MB  |
-|             | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3240MB |
-|             | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3125MB |
-| v.1.5.3.16a | mac | ONNX(cpu), PyTorch(cpu,mps)           | N/A                                                                 | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                                    | 797MB  |
-|             | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3240MB |
-|             | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC, Beatrice | 3125MB |
-| v.1.5.3.15  | mac | ONNX(cpu), PyTorch(cpu,mps)           | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC                                    | 797MB  |
-|             | win | ONNX(cpu,cuda), PyTorch(cpu,cuda)     | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC           | 3240MB |
-|             | win | ONNX(cpu,DirectML), PyTorch(cpu,cuda) | [hugging face](https://huggingface.co/wok000/vcclient000/tree/main) | MMVC v.1.5.x, MMVC v.1.3.x, so-vits-svc 4.0, RVC, DDSP-SVC, Diffusion-SVC           | 3125MB |
-
-(\*1) Google Drive からダウンロードできない方は[hugging_face](https://huggingface.co/wok000/vcclient000/tree/main)からダウンロードしてみてください
-(\*2) 開発者が AMD のグラフィックボードを持っていないので動作確認していません。onnxruntime-directml を同梱しただけのものです。
-(\*3) 解凍や起動が遅い場合、ウィルス対策ソフトのチェックが走っている可能性があります。ファイルやフォルダを対象外にして実行してみてください。（自己責任です）
-
-
-https://huggingface.co/wok000/vcclient000/resolve/main/MMVCServerSIO_win_onnxgpu-cuda_v.1.5.3.18.zip?download=true
 
 ## (2) Docker や Anaconda など環境構築を行った上での利用
 
@@ -116,17 +101,6 @@ Anaconda の仮想環境上での実行は、[サーバ開発者向けのペー�
 
 - [通信編](tutorials/trouble_shoot_communication_ja.md)
 
-# リアルタイム性（MMVC）
-
-GPU を使用するとほとんどタイムラグなく変換可能です。
-
-https://twitter.com/DannadoriYellow/status/1613483372579545088?s=20&t=7CLD79h1F3dfKiTb7M8RUQ
-
-CPU でも最近のであればそれなりの速度で変換可能。
-
-https://twitter.com/DannadoriYellow/status/1613553862773997569?s=20&t=7CLD79h1F3dfKiTb7M8RUQ
-
-古い CPU( i7-4770)だと、1000msec くらいかかってしまう。
 
 # 開発者の署名について
 
