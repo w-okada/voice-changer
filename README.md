@@ -6,6 +6,13 @@
 - Beatrice V2 トレーニングコード公開!!!
   - [トレーニングコードリポジトリ](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [コラボ版](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.50-alpha
+  - improve:
+    - クライアントモードの性能改善
+    - Macエディションにネイティブクライアント同梱
+  - bugfix:
+    - BeatriceV2変換時の入力デバイス変更時(サンプリングレートが異なると落ちる)の例外対応
+    - サーバモードからクライアントモードへ変更時に音が壊れる対策
 - v.2.0.47-alpha
   - feature:
     - extra frameを拡大

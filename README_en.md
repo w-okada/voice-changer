@@ -6,6 +6,13 @@
 - Beatrice V2 Training Code Released!!!
   - [Training Code Repository](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab Version](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.50-alpha
+  - improve:
+    - Improved performance in client mode
+    - Bundled native client with Mac edition
+  - bugfix:
+    - Fixed exception when changing input device during BeatriceV2 conversion (if the sampling rate is different, it crashes)
+    - Fixed issue where sound gets corrupted when switching from server mode to client mode
 - v.2.0.47-alpha
   - feature:
     - Expanded extra frame

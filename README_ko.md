@@ -6,6 +6,13 @@
 - Beatrice V2 훈련 코드 공개!!!
   - [훈련 코드 리포지토리](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab 버전](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.50-alpha
+  - 개선사항:
+    - 클라이언트 모드의 성능 개선
+    - Mac 에디션에 네이티브 클라이언트 포함
+  - 버그수정:
+    - BeatriceV2 변환 중 입력 장치를 변경할 때(샘플링 레이트가 다르면 크래시 발생) 예외 처리
+    - 서버 모드에서 클라이언트 모드로 전환 시 음질 손상 문제 해결
 - v.2.0.47-alpha
   - 기능:
     - 추가 프레임 확장
@@ -13,9 +20,6 @@
     - Beatrice의 기본 화자 ID 변경
     - 모델 파일 이름이 너무 길 때의 오류 수정
     - 모니터 장치를 none으로 설정했을 때의 처리.
-- v.2.0.45-alpha
-  - bugfix
-    - 음량 조절
   
 # VC Client란
                                                                                                                                                      
