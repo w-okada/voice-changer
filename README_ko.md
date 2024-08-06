@@ -6,6 +6,12 @@
 - Beatrice V2 훈련 코드 공개!!!
   - [훈련 코드 리포지토리](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab 버전](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.55-alpha
+  - 개선:
+    - RVC의 CPU 부하 감소
+    - WebSocket 지원
+  - 변경:
+    - 시작 배치에서 no_cui 옵션 활성화
 - v.2.0.50-alpha
   - 개선사항:
     - 클라이언트 모드의 성능 개선

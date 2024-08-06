@@ -6,6 +6,12 @@
 - Beatrice V2 Training Code Released!!!
   - [Training Code Repository](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab Version](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.55-alpha
+  - improve:
+    - Reduced CPU load of RVC
+    - WebSocket support
+  - change:
+    - Enable no_cui option in startup batch
 - v.2.0.50-alpha
   - improve:
     - Improved performance in client mode
@@ -20,9 +26,6 @@
     - Changed the default speaker ID for Beatrice
     - Fixed errors when model file names are too long
     - Handled situation when monitor device is set to none.
-- v.2.0.45-alpha
-  - bugfix
-    - volume control
 
 # What is VC Client
 
