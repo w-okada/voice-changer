@@ -6,7 +6,15 @@
 - Beatrice V2 Training Code Released!!!
   - [Training Code Repository](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab Version](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.55-alpha
+  - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
+  - improve:
+    - Reduced CPU load of RVC
+    - WebSocket support
+  - change:
+    - Enable no_cui option in startup batch
 - v.2.0.50-alpha
+  - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
   - improve:
     - Improved performance in client mode
     - Bundled native client with Mac edition
