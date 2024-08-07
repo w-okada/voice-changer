@@ -6,26 +6,20 @@
 - Beatrice V2 훈련 코드 공개!!!
   - [훈련 코드 리포지토리](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab 버전](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.58-alpha
+  - 기능:
+    - SIO 브로드캐스팅
+    - ngrok 내장 (실험적)
+  - 향상된 점:
+    - 모바일 폰을 위한 튜닝.
+  - 버그 수정:
+    - macOS에서 CUI 메시지 글자 깨짐 문제
 - v.2.0.55-alpha
   - 개선:
     - RVC의 CPU 부하 감소
     - WebSocket 지원
   - 변경:
     - 시작 배치에서 no_cui 옵션 활성화
-- v.2.0.50-alpha
-  - 개선사항:
-    - 클라이언트 모드의 성능 개선
-    - Mac 에디션에 네이티브 클라이언트 포함
-  - 버그수정:
-    - BeatriceV2 변환 중 입력 장치를 변경할 때(샘플링 레이트가 다르면 크래시 발생) 예외 처리
-    - 서버 모드에서 클라이언트 모드로 전환 시 음질 손상 문제 해결
-- v.2.0.47-alpha
-  - 기능:
-    - 추가 프레임 확장
-  - 버그 수정:
-    - Beatrice의 기본 화자 ID 변경
-    - 모델 파일 이름이 너무 길 때의 오류 수정
-    - 모니터 장치를 none으로 설정했을 때의 처리.
   
 # VC Client란
                                                                                                                                                      

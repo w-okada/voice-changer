@@ -6,26 +6,21 @@
 - Beatrice V2 トレーニングコード公開!!!
   - [トレーニングコードリポジトリ](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [コラボ版](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.58-alpha
+  - feature:
+    - SIO ブロードキャスティング
+    - embed ngrok(experimental)
+  - improve:
+    - for Mobile Phone tuning.
+  - bugfix:
+    - macos CUIメッセージ文字化け
 - v.2.0.55-alpha
   - improve:
     - RVCのCPU負荷を削減
     - WebSocket対応
   - change
     - 起動バッチでno_cuiオプションを有効化
-- v.2.0.50-alpha
-  - improve:
-    - クライアントモードの性能改善
-    - Macエディションにネイティブクライアント同梱
-  - bugfix:
-    - BeatriceV2変換時の入力デバイス変更時(サンプリングレートが異なると落ちる)の例外対応
-    - サーバモードからクライアントモードへ変更時に音が壊れる対策
-- v.2.0.47-alpha
-  - feature:
-    - extra frameを拡大
-  - bugfix:
-    - beatrice のデフォルト話者IDの変更
-    - モデルファイル名が長いときのエラー対策
-    - モニターデバイスをnoneにしたときの対応。
+
 # VC Client とは
 
 1. 各種音声変換 AI(VC, Voice Conversion)を用いてリアルタイム音声変換を行うためのクライアントソフトウェアです。サポートしている音声変換 AI は次のものになります。

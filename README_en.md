@@ -6,26 +6,20 @@
 - Beatrice V2 Training Code Released!!!
   - [Training Code Repository](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab Version](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.58-alpha
+  - feature:
+    - SIO Broadcasting
+    - Embed ngrok (experimental)
+  - improve:
+    - Tuning for mobile phones.
+  - bugfix:
+    - CUI message garbled text on macOS
 - v.2.0.55-alpha
   - improve:
     - Reduced CPU load of RVC
     - WebSocket support
   - change:
     - Enable no_cui option in startup batch
-- v.2.0.50-alpha
-  - improve:
-    - Improved performance in client mode
-    - Bundled native client with Mac edition
-  - bugfix:
-    - Fixed exception when changing input device during BeatriceV2 conversion (if the sampling rate is different, it crashes)
-    - Fixed issue where sound gets corrupted when switching from server mode to client mode
-- v.2.0.47-alpha
-  - feature:
-    - Expanded extra frame
-  - bugfix:
-    - Changed the default speaker ID for Beatrice
-    - Fixed errors when model file names are too long
-    - Handled situation when monitor device is set to none.
 
 # What is VC Client
 
