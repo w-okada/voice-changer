@@ -25,12 +25,15 @@ class MMVC_SocketIOApp:
             logger.info("[Voice Changer] MMVC_SocketIOApp initializing...")
 
             allowed_origins: set[str] = set()
-            local_origins = compute_local_origins(port)
-            allowed_origins.update(local_origins)
-            if allowedOrigins is not None:
-                normalized_origins = normalize_origins(allowedOrigins)
-                allowed_origins.update(normalized_origins)
-            sio = MMVC_SocketIOServer.get_instance(voiceChangerManager, list(allowed_origins))
+            if '*' in allowedOrigins:
+                sio = MMVC_SocketIOServer.get_instance(voiceChangerManager, '*')
+            else:
+                local_origins = compute_local_origins(port)
+                allowed_origins.update(local_origins)
+                if allowedOrigins is not None:
+                    normalized_origins = normalize_origins(allowedOrigins)
+                    allowed_origins.update(normalized_origins)
+                sio = MMVC_SocketIOServer.get_instance(voiceChangerManager, list(allowed_origins))
 
             app_socketio = socketio.ASGIApp(
                 sio,
