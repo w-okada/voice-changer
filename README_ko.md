@@ -3,6 +3,9 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## 새로운 기능!
+- 자매품으로 텍스트 음성 변환 클라이언트를 출시하였습니다.
+  - 간단한 인터페이스로 음성 생성을 즐길 수 있습니다.
+  - 자세한 내용은 [여기](https://github.com/w-okada/ttsclient)를 참조하세요.
 - Beatrice V2 훈련 코드 공개!!!
   - [훈련 코드 리포지토리](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab 버전](https://github.com/w-okada/beatrice-trainer-colab)

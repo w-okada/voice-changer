@@ -3,6 +3,9 @@
 [English](/README_en.md) [Korean](/README_ko.md)
 
 ## What's New!
+- 姉妹品のText To Speechのクライアントをリリースしました。
+  - 簡単なIFで音声生成を楽しむことができます。
+  - 詳細は[こちら](https://github.com/w-okada/ttsclient)。
 - Beatrice V2 トレーニングコード公開!!!
   - [トレーニングコードリポジトリ](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [コラボ版](https://github.com/w-okada/beatrice-trainer-colab)

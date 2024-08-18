@@ -3,6 +3,9 @@
 [Japanese](/README_ja.md) [Korean](/README_ko.md)
 
 ## What's New!
+- We have released a sister product, the Text To Speech client.
+  - You can enjoy voice generation with a simple interface.
+  - For more details, click [here](https://github.com/w-okada/ttsclient).
 - Beatrice V2 Training Code Released!!!
   - [Training Code Repository](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab Version](https://github.com/w-okada/beatrice-trainer-colab)
