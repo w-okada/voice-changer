@@ -9,6 +9,12 @@
 - Beatrice V2 トレーニングコード公開!!!
   - [トレーニングコードリポジトリ](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [コラボ版](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.60-alpha
+  - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
+  - feature:
+    - [darkmode](https://github.com/w-okada/voice-changer/issues/1306)
+    - [re-introduce pytorch rmvpe](https://github.com/w-okada/voice-changer/issues/1319)
+    - [wasapi 排他モード選択](https://github.com/w-okada/voice-changer/issues/1305)
 - v.2.0.58-alpha
   - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
   - feature:
