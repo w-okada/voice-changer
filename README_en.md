@@ -9,8 +9,13 @@
 - Beatrice V2 Training Code Released!!!
   - [Training Code Repository](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab Version](https://github.com/w-okada/beatrice-trainer-colab)
-- v.2.0.60-alpha
+- v.2.0.61-alpha
   - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
+  - feature:
+    - You can now specify the crossfade duration.
+  - bugfix:
+    - Fixed an issue where the non-used elements of a model would still affect performance during model merging by setting their values to zero.
+- v.2.0.60-alpha
   - feature:
     - [darkmode](https://github.com/w-okada/voice-changer/issues/1306)
     - [re-introduce pytorch rmvpe](https://github.com/w-okada/voice-changer/issues/1319)
