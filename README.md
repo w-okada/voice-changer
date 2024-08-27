@@ -6,6 +6,11 @@
 - Beatrice V2 トレーニングコード公開!!!
   - [トレーニングコードリポジトリ](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [コラボ版](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.61-alpha
+  - feature:
+    - クロスフェードの時間を指定できるようになりました。
+  - bugfix:
+    - モデルマージの際に、使用しないモデルの要素を0にしても動くようになりました。
 - v.2.0.58-alpha
   - feature:
     - SIO ブロードキャスティング

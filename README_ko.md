@@ -6,6 +6,11 @@
 - Beatrice V2 훈련 코드 공개!!!
   - [훈련 코드 리포지토리](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab 버전](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.61-alpha
+  - 기능:
+    - 크로스페이드 시간을 지정할 수 있게 되었습니다.
+  - 버그 수정:
+    - 모델 병합 시 사용하지 않는 모델의 요소를 0으로 설정해도 동작하도록 수정되었습니다.
 - v.2.0.58-alpha
   - 기능:
     - SIO 브로드캐스팅

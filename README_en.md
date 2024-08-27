@@ -6,6 +6,11 @@
 - Beatrice V2 Training Code Released!!!
   - [Training Code Repository](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab Version](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.61-alpha
+  - feature:
+    - You can now specify the crossfade duration.
+  - bugfix:
+    - Fixed an issue where the non-used elements of a model would still affect performance during model merging by setting their values to zero.
 - v.2.0.58-alpha
   - feature:
     - SIO Broadcasting
