@@ -12,3 +12,5 @@
 3. コマンドプロンプト（黒い画面）が立ち上がったら、`start_http.bat`と打ち込んでEnterキーを押す。
 
 
+
+https://github.com/user-attachments/assets/31cc0e80-fdab-4765-92f8-5d7343e08985
