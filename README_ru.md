@@ -102,7 +102,7 @@
 
 Для запуска Docker смотрите [start docker](docker_vcclient/README_en.md).
 
-Для запуска на Anaconda venv смотрите [руководство разработчика](README_dev_en.md).
+Для запуска на Anaconda venv смотрите [руководство разработчика](README_dev_ru.md).
 
 Для запуска на Linux с AMD GPU смотрите [руководство](tutorials/tutorial_anaconda_amd_rocm.md).
 
