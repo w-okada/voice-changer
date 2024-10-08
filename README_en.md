@@ -1,6 +1,6 @@
 ## VC Client
 
-[Japanese](/README_ja.md) [Korean](/README_ko.md)
+[Japanese](/README_ja.md) [Korean](/README_ko.md) [Russian](/README_ru.md)
 
 ## What's New!
 - We have released a sister product, the Text To Speech client.

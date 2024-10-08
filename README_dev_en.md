@@ -1,6 +1,6 @@
 ## For Developper
 
-[Japanese](/README_dev_ja.md)
+[Japanese](/README_dev_ja.md) [Russian](/README_dev_ru.md)
 
 ## Prerequisit
 

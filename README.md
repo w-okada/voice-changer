@@ -1,6 +1,6 @@
 ## VC Client
 
-[English](/README_en.md) [Korean](/README_ko.md)
+[English](/README_en.md) [Korean](/README_ko.md) [Russian](/README_ru.md)
 
 ## What's New!
 - 姉妹品のText To Speechのクライアントをリリースしました。
