@@ -9,6 +9,9 @@
 - Beatrice V2 Training Code Released!!!
   - [Training Code Repository](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab Version](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.65-beta
+  - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
+  - new feature: We have supported Beatrice v2 beta.2, enabling even higher quality voice conversion.
 - v.2.0.61-alpha
   - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
   - feature:
@@ -55,7 +58,10 @@
 
 3. Cross-platform compatibility
    Supports Windows, Mac (including Apple Silicon M1), Linux, and Google Colaboratory.
-
+## Related Software
+- [Real-time Voice Changer VCClient](https://github.com/w-okada/voice-changer)
+- [Text-to-Speech Software TTSClient](https://github.com/w-okada/ttsclient)
+- [Real-Time Speech Recognition Software ASRClient](https://github.com/w-okada/asrclient)
 # usage
 
 This is an app for performing voice changes with MMVC and so-vits-svc.

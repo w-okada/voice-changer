@@ -9,6 +9,9 @@
 - Beatrice V2 훈련 코드 공개!!!
   - [훈련 코드 리포지토리](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab 버전](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.65-beta
+  - [여기를 참조하십시오](https://github.com/w-okada/voice-changer/tree/v.2)
+  - new feature: Beatrice v2 beta.2를 지원하여 더 높은 품질의 음성 변환이 가능해졌습니다
 - v.2.0.61-alpha
   - [여기를 참조하십시오](https://github.com/w-okada/voice-changer/tree/v.2)
   - 기능:
@@ -57,7 +60,10 @@
 3. 여러 플랫폼을 지원합니다.
 
 - Windows, Mac(M1), Linux, Google Colab (MMVC만 지원)
-
+## 관련 소프트웨어
+- [실시간 음성 변조기 VCClient](https://github.com/w-okada/voice-changer)
+- [텍스트 읽기 소프트웨어 TTSClient](https://github.com/w-okada/ttsclient)
+- [실시간 음성 인식 소프트웨어 ASRClient](https://github.com/w-okada/asrclient)
 # 사용 방법
 
 크게 두 가지 방법으로 사용할 수 있습니다. 난이도 순서는 다음과 같습니다.

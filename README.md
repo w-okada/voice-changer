@@ -9,6 +9,9 @@
 - Beatrice V2 トレーニングコード公開!!!
   - [トレーニングコードリポジトリ](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [コラボ版](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.65-beta
+  - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
+  - new feature: Beatrice v2 beta.2をサポートしました。さらなる高品質な音声変換が可能になります。  - 
 - v.2.0.61-alpha
   - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
   - feature:
@@ -56,6 +59,10 @@
 3. 複数のプラットフォームに対応しています。
 
 - Windows, Mac(M1), Linux, Google Colab 
+## 関連ソフトウェア
+- [リアルタイムボイスチェンジャ VCClient](https://github.com/w-okada/voice-changer)
+- [読み上げソフトウェア TTSClient](https://github.com/w-okada/ttsclient)
+- [リアルタイム音声認識ソフトウェア ASRClient](https://github.com/w-okada/asrclient)
 
 # 使用方法
 
