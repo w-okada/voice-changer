@@ -6,7 +6,10 @@
 - Beatrice V2 Training Code Released!!!
   - [Training Code Repository](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab Version](https://github.com/w-okada/beatrice-trainer-colab)
-- v.2.0.61-alpha
+- v.2.0.65-beta
+  - new feature: We have supported Beatrice v2 beta.2, enabling even higher quality voice conversion.
+
+- v.2.0.6-alpha
   - feature:
     - You can now specify the crossfade duration.
   - bugfix:
@@ -48,6 +51,11 @@
   - Users can register processes that call the REST API in shortcuts, such as in .bat files.
   - Create simple clients to operate remotely.
   - And more.
+
+## Related Software
+- [Real-time Voice Changer VCClient](https://github.com/w-okada/voice-changer)
+- [Text-to-Speech Software TTSClient](https://github.com/w-okada/ttsclient)
+- [Real-Time Speech Recognition Software ASRClient](https://github.com/w-okada/asrclient)
 
 # Download
 Please download it from [Hugging Face](https://huggingface.co/wok000/vcclient000/tree/main).

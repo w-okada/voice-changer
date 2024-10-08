@@ -6,6 +6,8 @@
 - Beatrice V2 トレーニングコード公開!!!
   - [トレーニングコードリポジトリ](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [コラボ版](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.65-beta
+  - new feature: Beatrice v2 beta.2をサポートしました。さらなる高品質な音声変換が可能になります。
 - v.2.0.61-alpha
   - feature:
     - クロスフェードの時間を指定できるようになりました。
@@ -48,6 +50,11 @@
   - ユーザが.bat等でREST APIをたたく処理をショートカットとして登録する。
   - リモートから操作する簡易クライアントを作成する。
   - など。
+  - 
+## 関連ソフトウェア
+- [リアルタイムボイスチェンジャ VCClient](https://github.com/w-okada/voice-changer)
+- [読み上げソフトウェア TTSClient](https://github.com/w-okada/ttsclient)
+- [リアルタイム音声認識ソフトウェア ASRClient](https://github.com/w-okada/asrclient)
 
 # ダウンロード
 [Hugging Face](https://huggingface.co/wok000/vcclient000/tree/main)からダウンロードしてください。
