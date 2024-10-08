@@ -7,7 +7,7 @@
   - [Training Code Repository](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab Version](https://github.com/w-okada/beatrice-trainer-colab)
 - v.2.0.65-beta
-  - new feature: We have supported Beatrice v2 beta.2, enabling even higher quality voice conversion.
+  - new feature: We have supported Beatrice v2 beta.1, enabling even higher quality voice conversion.
 
 - v.2.0.6-alpha
   - feature:
