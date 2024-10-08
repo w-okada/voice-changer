@@ -11,7 +11,7 @@
   - [Colab Version](https://github.com/w-okada/beatrice-trainer-colab)
 - v.2.0.65-beta
   - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
-  - new feature: We have supported Beatrice v2 beta.2, enabling even higher quality voice conversion.
+  - new feature: We have supported Beatrice v2 beta.1, enabling even higher quality voice conversion.
 - v.2.0.61-alpha
   - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
   - feature:
