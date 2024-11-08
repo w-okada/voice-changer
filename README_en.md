@@ -6,7 +6,10 @@
 - Beatrice V2 Training Code Released!!!
   - [Training Code Repository](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab Version](https://github.com/w-okada/beatrice-trainer-colab)
-- v.2.0.69-beta
+- v.2.0.70-beta (only for m1 mac)
+  - new feature:
+    - The M1 Mac version of VCClient now supports Beatrice v2 beta.1.
+- v.2.0.69-beta (only for win)
   - bugfix:
     - Fixed a bug where the start button would not be displayed in case of some exceptions
     - Adjusted the output buffer for server device mode
