@@ -9,37 +9,17 @@
 - Beatrice V2 トレーニングコード公開!!!
   - [トレーニングコードリポジトリ](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [コラボ版](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.69-beta
+  - bugfix:
+    - 一部の例外発生時にスタートボタンが表示されなくなるバグを修正
+    - サーバデバイスモードの出力バッファを調整
+    - サーバデバイスモード使用中に設定変更を行うとサンプリングレートが変化するバグを修正
+    - 日本語hubert使用時のバグ修正
+  - misc:
+    - サーバデバイスモードのホストAPIフィルタ追加（強調表示）
 - v.2.0.65-beta
   - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
   - new feature: Beatrice v2 beta.1をサポートしました。さらなる高品質な音声変換が可能になります。  - 
-- v.2.0.61-alpha
-  - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
-  - feature:
-    - クロスフェードの時間を指定できるようになりました。
-  - bugfix:
-    - モデルマージの際に、使用しないモデルの要素を0にしても動くようになりました。
-- v.2.0.60-alpha
-  - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
-  - feature:
-    - [darkmode](https://github.com/w-okada/voice-changer/issues/1306)
-    - [re-introduce pytorch rmvpe](https://github.com/w-okada/voice-changer/issues/1319)
-    - [wasapi 排他モード選択](https://github.com/w-okada/voice-changer/issues/1305)
-- v.2.0.58-alpha
-  - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
-  - feature:
-    - SIO ブロードキャスティング
-    - embed ngrok(experimental)
-  - improve:
-    - for Mobile Phone tuning.
-  - bugfix:
-    - macos CUIメッセージ文字化け
-- v.2.0.55-alpha
-  - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
-  - improve:
-    - RVCのCPU負荷を削減
-    - WebSocket対応
-  - change
-    - 起動バッチでno_cuiオプションを有効化
 
 # VC Client とは
 

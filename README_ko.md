@@ -9,37 +9,18 @@
 - Beatrice V2 훈련 코드 공개!!!
   - [훈련 코드 리포지토리](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab 버전](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.69-beta
+  - [여기를 참조하십시오](https://github.com/w-okada/voice-changer/tree/v.2)
+  - 버그 수정:
+    - 일부 예외 발생 시 시작 버튼이 표시되지 않는 버그를 수정
+    - 서버 디바이스 모드의 출력 버퍼 조정
+    - 서버 디바이스 모드 사용 중 설정 변경 시 샘플링 레이트가 변하는 버그 수정
+    - 일본어 hubert 사용 시 버그 수정
+  - 기타:
+    - 서버 디바이스 모드에 호스트 API 필터 추가 (강조 표시)
 - v.2.0.65-beta
   - [여기를 참조하십시오](https://github.com/w-okada/voice-changer/tree/v.2)
   - new feature: Beatrice v2 beta.1를 지원하여 더 높은 품질의 음성 변환이 가능해졌습니다
-- v.2.0.61-alpha
-  - [여기를 참조하십시오](https://github.com/w-okada/voice-changer/tree/v.2)
-  - 기능:
-    - 크로스페이드 시간을 지정할 수 있게 되었습니다.
-  - 버그 수정:
-    - 모델 병합 시 사용하지 않는 모델의 요소를 0으로 설정해도 동작하도록 수정되었습니다.
-- v.2.0.60-alpha
-  - [여기를 참조하십시오](https://github.com/w-okada/voice-changer/tree/v.2)
-  - feature:
-    - [darkmode](https://github.com/w-okada/voice-changer/issues/1306)
-    - [re-introduce pytorch rmvpe](https://github.com/w-okada/voice-changer/issues/1319)
-    - [wasapi 독점 모드 선택됨](https://github.com/w-okada/voice-changer/issues/1305)
-- v.2.0.58-alpha
-  - [여기를 참조하십시오](https://github.com/w-okada/voice-changer/tree/v.2)
-  - 기능:
-    - SIO 브로드캐스팅
-    - ngrok 내장 (실험적)
-  - 향상된 점:
-    - 모바일 폰을 위한 튜닝.
-  - 버그 수정:
-    - macOS에서 CUI 메시지 글자 깨짐 문제
-- v.2.0.55-alpha
-  - [여기를 참조하십시오](https://github.com/w-okada/voice-changer/tree/v.2)
-  - 개선:
-    - RVC의 CPU 부하 감소
-    - WebSocket 지원
-  - 변경:
-    - 시작 배치에서 no_cui 옵션 활성화
 
 # VC Client란
                                                                                                                                                      

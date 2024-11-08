@@ -9,36 +9,18 @@
 - Beatrice V2 Training Code Released!!!
   - [Training Code Repository](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab Version](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.69-beta
+  - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
+  - bugfix:
+    - Fixed a bug where the start button would not be displayed in case of some exceptions
+    - Adjusted the output buffer for server device mode
+    - Fixed a bug where the sampling rate would change when settings were modified while using server device mode
+    - Fixed a bug when using Japanese hubert
+  - misc:
+    - Added host API filter (highlighted) for server device mode
 - v.2.0.65-beta
   - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
   - new feature: We have supported Beatrice v2 beta.1, enabling even higher quality voice conversion.
-- v.2.0.61-alpha
-  - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
-  - feature:
-    - You can now specify the crossfade duration.
-  - bugfix:
-    - Fixed an issue where the non-used elements of a model would still affect performance during model merging by setting their values to zero.
-- v.2.0.60-alpha
-  - feature:
-    - [darkmode](https://github.com/w-okada/voice-changer/issues/1306)
-    - [re-introduce pytorch rmvpe](https://github.com/w-okada/voice-changer/issues/1319)
-    - [wasapi Exclusive Mode Select](https://github.com/w-okada/voice-changer/issues/1305)
-- v.2.0.58-alpha
-  - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
-  - feature:
-    - SIO Broadcasting
-    - Embed ngrok (experimental)
-  - improve:
-    - Tuning for mobile phones.
-  - bugfix:
-    - CUI message garbled text on macOS
-- v.2.0.55-alpha
-  - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
-  - improve:
-    - Reduced CPU load of RVC
-    - WebSocket support
-  - change:
-    - Enable no_cui option in startup batch
 
 # What is VC Client
 

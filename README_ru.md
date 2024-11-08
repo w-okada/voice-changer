@@ -7,37 +7,18 @@
 - Код тренировки Beatrice V2 теперь доступен!
   - [Репозиторий кода тренировки](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Версия для Colab](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.69-beta
+  - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
+  - Исправления ошибок:
+    - Исправлена ошибка, из-за которой кнопка запуска не отображалась в случае некоторых исключений
+    - Настроен выходной буфер для режима серверного устройства
+    - Исправлена ошибка, при которой изменялась частота дискретизации при изменении настроек в режиме серверного устройства
+    - Исправлена ошибка при использовании японского hubert
+  - Прочее:
+    - Добавлен фильтр API хоста (выделено) для режима серверного устройства
 - v.2.0.65-beta
   - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
   - new feature: We have supported Beatrice v2 beta.1, enabling even higher quality voice conversion.
-
-- v.2.0.61-alpha
-  - [ЗДЕСЬ](https://github.com/w-okada/voice-changer/tree/v.2)
-  - Новые функции:
-    - Теперь можно задавать продолжительность перекрёстного затухания.
-  - Исправления:
-    - Исправлена проблема, при которой неиспользуемые элементы модели влияли на производительность при объединении моделей, путём установки их значений в ноль.
-- v.2.0.60-alpha
-  - Новые функции:
-    - [Тёмный режим](https://github.com/w-okada/voice-changer/issues/1306)
-    - [Возвращение PyTorch RMVPE](https://github.com/w-okada/voice-changer/issues/1319)
-    - [Выбор эксклюзивного режима WASAPI](https://github.com/w-okada/voice-changer/issues/1305)
-- v.2.0.58-alpha
-  - [ЗДЕСЬ](https://github.com/w-okada/voice-changer/tree/v.2)
-  - Новые функции:
-    - SIO Broadcasting
-    - Встроенный ngrok (экспериментальный)
-  - Улучшения:
-    - Оптимизация для мобильных телефонов.
-  - Исправления:
-    - Неправильное отображение сообщений CUI на macOS
-- v.2.0.55-alpha
-  - [ЗДЕСЬ](https://github.com/w-okada/voice-changer/tree/v.2)
-  - Улучшения:
-    - Снижение нагрузки на процессор для RVC
-    - Поддержка WebSocket
-  - Изменения:
-    - Включение опции `no_cui` в стартовом батч-файле
 
 # Что такое VC Клиент
 
