@@ -6,6 +6,14 @@
 - Beatrice V2 トレーニングコード公開!!!
   - [トレーニングコードリポジトリ](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [コラボ版](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.69-beta
+  - bugfix:
+    - 一部の例外発生時にスタートボタンが表示されなくなるバグを修正
+    - サーバデバイスモードの出力バッファを調整
+    - サーバデバイスモード使用中に設定変更を行うとサンプリングレートが変化するバグを修正
+    - 日本語hubert使用時のバグ修正
+  - misc:
+    - サーバデバイスモードのホストAPIフィルタ追加（強調表示）
 - v.2.0.65-beta
   - new feature: Beatrice v2 beta.1をサポートしました。さらなる高品質な音声変換が可能になります。
 - v.2.0.61-alpha

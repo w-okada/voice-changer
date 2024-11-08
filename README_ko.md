@@ -6,6 +6,14 @@
 - Beatrice V2 훈련 코드 공개!!!
   - [훈련 코드 리포지토리](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab 버전](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.69-beta
+  - 버그 수정:
+    - 일부 예외 발생 시 시작 버튼이 표시되지 않는 버그를 수정
+    - 서버 디바이스 모드의 출력 버퍼 조정
+    - 서버 디바이스 모드 사용 중 설정 변경 시 샘플링 레이트가 변하는 버그 수정
+    - 일본어 hubert 사용 시 버그 수정
+  - 기타:
+    - 서버 디바이스 모드에 호스트 API 필터 추가 (강조 표시)
 - v.2.0.65-beta
   - new feature: Beatrice v2 beta.1를 지원하여 더 높은 품질의 음성 변환이 가능해졌습니다
 - v.2.0.61-alpha

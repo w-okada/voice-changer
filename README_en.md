@@ -6,6 +6,14 @@
 - Beatrice V2 Training Code Released!!!
   - [Training Code Repository](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab Version](https://github.com/w-okada/beatrice-trainer-colab)
+- v.2.0.69-beta
+  - bugfix:
+    - Fixed a bug where the start button would not be displayed in case of some exceptions
+    - Adjusted the output buffer for server device mode
+    - Fixed a bug where the sampling rate would change when settings were modified while using server device mode
+    - Fixed a bug when using Japanese hubert
+  - misc:
+    - Added host API filter (highlighted) for server device mode
 - v.2.0.65-beta
   - new feature: We have supported Beatrice v2 beta.1, enabling even higher quality voice conversion.
 
