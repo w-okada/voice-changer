@@ -9,7 +9,11 @@
 - Beatrice V2 Training Code Released!!!
   - [Training Code Repository](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Colab Version](https://github.com/w-okada/beatrice-trainer-colab)
-- v.2.0.69-beta
+- v.2.0.70-beta (only for m1 mac)
+  - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
+  - new feature:
+    - The M1 Mac version of VCClient now supports Beatrice v2 beta.1.
+- v.2.0.69-beta (only for win)
   - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
   - bugfix:
     - Fixed a bug where the start button would not be displayed in case of some exceptions

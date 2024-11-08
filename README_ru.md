@@ -7,7 +7,11 @@
 - Код тренировки Beatrice V2 теперь доступен!
   - [Репозиторий кода тренировки](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Версия для Colab](https://github.com/w-okada/beatrice-trainer-colab)
-- v.2.0.69-beta
+- v.2.0.70-beta (only for m1 mac)
+  - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
+  - new feature:
+    -  В версии VCClient для Mac на базе M1 теперь поддерживается Beatrice v2 beta.1.
+- v.2.0.69-beta (only for win)
   - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
   - Исправления ошибок:
     - Исправлена ошибка, из-за которой кнопка запуска не отображалась в случае некоторых исключений

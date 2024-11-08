@@ -9,7 +9,12 @@
 - Beatrice V2 トレーニングコード公開!!!
   - [トレーニングコードリポジトリ](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [コラボ版](https://github.com/w-okada/beatrice-trainer-colab)
-- v.2.0.69-beta
+- v.2.0.70-beta (only for m1 mac)
+  - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
+  - new feature:
+    - M1 Mac版VCClientでもBeatrice v2 beta.2をサポートしました。
+- v.2.0.69-beta (only for win)
+  - [こちらを参照](https://github.com/w-okada/voice-changer/tree/v.2)
   - bugfix:
     - 一部の例外発生時にスタートボタンが表示されなくなるバグを修正
     - サーバデバイスモードの出力バッファを調整
