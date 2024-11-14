@@ -19,7 +19,13 @@ VCClient
 VCClientは、AIを用いてリアルタイム音声変換を行うソフトウェアです。
 
 ## What's New!
-- v.2.0.72-beta
+- v.2.0.73-beta
+  - new feature:
+    - 編集したbeatrice modelのダウンロード
+  - bugfix:
+    - beatrice v2 のpitch, formantが反映されないバグを修正
+    - Applio のembedderを使用しているモデルのONNXができないバグを修正
+- v.2.0.72-beta (バグがあるので非推奨。v.2.0.73で修正済み)
   - new feature
     - Beatriceの編集GUI
     - Beatriceのvoiceごとにpitch, formantを記憶

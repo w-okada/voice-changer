@@ -19,7 +19,13 @@ VCClient ist eine Software, die mithilfe von KI eine Echtzeit-Sprachumwandlung d
 
 ## Was gibt's Neues!
 
-* v.2.0.72-beta
+* v.2.0.73-beta
+  * neues Feature:
+    * Download des bearbeiteten Beatrice-Modells
+  * Fehlerbehebung:
+    * Fehler behoben, bei dem Pitch und Formant von Beatrice v2 nicht reflektiert wurden
+    * Fehler behoben, bei dem das ONNX-Modell mit dem Applio-Embedder nicht erstellt werden konnte
+* v.2.0.72-beta (aufgrund von Fehlern nicht empfohlen, in v.2.0.73 behoben)
   * neues Feature
     * Beatrice Bearbeitungs-GUI
     * Speichert Pitch und Formant für jede Stimme von Beatrice
