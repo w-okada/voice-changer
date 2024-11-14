@@ -19,7 +19,13 @@ VCClient adalah perisian yang menggunakan AI untuk menukar suara secara masa nya
 
 ## Apa yang Baru!
 
-* v.2.0.72-beta
+* v.2.0.73-beta
+  * ciri baru:
+    * Muat turun model beatrice yang telah diedit
+  * pembaikan pepijat:
+    * Memperbaiki pepijat di mana pitch dan formant beatrice v2 tidak diterapkan
+    * Memperbaiki pepijat di mana ONNX tidak dapat dibuat untuk model yang menggunakan embedder Applio
+* v.2.0.72-beta (tidak disyorkan kerana pepijat. Diperbaiki dalam v.2.0.73)
   * ciri baru
     * GUI penyuntingan Beatrice
     * Mengingati pitch dan formant untuk setiap suara Beatrice

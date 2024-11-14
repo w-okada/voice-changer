@@ -19,7 +19,13 @@ VCClient is software that performs real-time voice conversion using AI.
 
 ## What's New!
 
-* v.2.0.72-beta
+* v.2.0.73-beta
+  * new feature:
+    * Download edited Beatrice model
+  * bugfix:
+    * Fixed a bug where pitch and formant of Beatrice v2 were not reflected
+    * Fixed a bug where ONNX could not be created for models using Applio's embedder
+* v.2.0.72-beta (not recommended due to bugs, fixed in v.2.0.73)
   * new feature
     * Beatrice Editing GUI
     * Stores pitch and formant for each Beatrice voice

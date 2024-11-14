@@ -19,7 +19,13 @@ VCClient est un logiciel qui utilise l'IA pour effectuer une conversion vocale e
 
 ## Quoi de neuf !
 
-* v.2.0.72-beta
+* v.2.0.73-beta
+  * nouvelle fonctionnalité :
+    * Téléchargement du modèle Beatrice modifié
+  * correction de bug :
+    * Correction du bug où le pitch et le formant de Beatrice v2 n'étaient pas appliqués
+    * Correction du bug empêchant la création de l'ONNX pour les modèles utilisant l'embedder d'Applio
+* v.2.0.72-beta (non recommandé en raison de bugs, corrigé dans v.2.0.73)
   * nouvelle fonctionnalité
     * GUI d'édition de Beatrice
     * Mémorisation du pitch et du formant pour chaque voix de Beatrice

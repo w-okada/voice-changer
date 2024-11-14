@@ -19,7 +19,13 @@ VCClient는 AI를 사용하여 실시간 음성 변환을 수행하는 소프트
 
 ## What's New!
 
-* v.2.0.72-beta
+* v.2.0.73-beta
+  * new feature:
+    * 편집한 beatrice 모델 다운로드
+  * bugfix:
+    * beatrice v2의 pitch, formant가 반영되지 않는 버그를 수정
+    * Applio의 embedder를 사용하고 있는 모델의 ONNX가 생성되지 않는 버그를 수정
+* v.2.0.72-beta (버그가 있어 비추천. v.2.0.73에서 수정됨)
   * 새로운 기능
     * Beatrice의 편집 GUI
     * Beatrice의 voice마다 pitch, formant를 기억
