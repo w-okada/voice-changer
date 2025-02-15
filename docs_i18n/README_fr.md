@@ -19,29 +19,18 @@ VCClient est un logiciel qui utilise l'IA pour effectuer une conversion vocale e
 
 ## Quoi de neuf !
 
+* v.2.0.76-beta
+  * nouvelle fonctionnalité :
+    * Beatrice : Implémentation de la fusion des locuteurs
+    * Beatrice : Pitch shift automatique
+  * correction de bug :
+    * Correction d'un problème lors de la sélection de l'appareil en mode serveur
 * v.2.0.73-beta
   * nouvelle fonctionnalité :
     * Téléchargement du modèle Beatrice modifié
   * correction de bug :
     * Correction du bug où le pitch et le formant de Beatrice v2 n'étaient pas appliqués
     * Correction du bug empêchant la création de l'ONNX pour les modèles utilisant l'embedder d'Applio
-* v.2.0.72-beta (non recommandé en raison de bugs, corrigé dans v.2.0.73)
-  * nouvelle fonctionnalité
-    * GUI d'édition de Beatrice
-    * Mémorisation du pitch et du formant pour chaque voix de Beatrice
-    * GUI multilingue
-    * Support de l'embedder Applio
-* v.2.0.70-beta (uniquement pour Mac M1)
-  * nouvelle fonctionnalité :
-    * VCClient pour Mac M1 prend désormais en charge Beatrice v2 beta.1.
-* v.2.0.69-beta (uniquement pour Windows)
-  * correction de bug :
-    * Correction d'un bug où le bouton de démarrage ne s'affichait pas lors de certaines exceptions
-    * Ajustement du tampon de sortie en mode appareil serveur
-    * Correction d'un bug où le taux d'échantillonnage changeait lors de la modification des paramètres en mode appareil serveur
-    * Correction de bug lors de l'utilisation de hubert japonais
-  * divers :
-    * Ajout d'un filtre API hôte en mode appareil serveur (mise en évidence)
 
 ## Téléchargement et liens associés
 

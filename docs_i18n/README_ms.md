@@ -19,29 +19,18 @@ VCClient adalah perisian yang menggunakan AI untuk menukar suara secara masa nya
 
 ## Apa yang Baru!
 
+* v.2.0.76-beta
+  * ciri baru:
+    * Beatrice: Pelaksanaan penggabungan pembicara
+    * Beatrice: Auto pitch shift
+  * pembaikan pepijat:
+    * Menangani masalah pemilihan peranti dalam mod pelayan
 * v.2.0.73-beta
   * ciri baru:
     * Muat turun model beatrice yang telah diedit
   * pembaikan pepijat:
     * Memperbaiki pepijat di mana pitch dan formant beatrice v2 tidak diterapkan
     * Memperbaiki pepijat di mana ONNX tidak dapat dibuat untuk model yang menggunakan embedder Applio
-* v.2.0.72-beta (tidak disyorkan kerana pepijat. Diperbaiki dalam v.2.0.73)
-  * ciri baru
-    * GUI penyuntingan Beatrice
-    * Mengingati pitch dan formant untuk setiap suara Beatrice
-    * GUI pelbagai bahasa
-    * Sokongan embedder Applio
-* v.2.0.70-beta (hanya untuk m1 mac)
-  * ciri baru:
-    * VCClient versi M1 Mac kini menyokong Beatrice v2 beta.1.
-* v.2.0.69-beta (hanya untuk win)
-  * pembaikan pepijat:
-    * Memperbaiki pepijat di mana butang mula tidak dipaparkan apabila beberapa pengecualian berlaku
-    * Menyesuaikan penimbal output dalam mod peranti pelayan
-    * Memperbaiki pepijat di mana kadar pensampelan berubah apabila tetapan diubah semasa menggunakan mod peranti pelayan
-    * Memperbaiki pepijat semasa menggunakan hubert Jepun
-  * lain-lain:
-    * Menambah penapis API hos dalam mod peranti pelayan (penekanan)
 
 ## Muat Turun dan Pautan Berkaitan
 

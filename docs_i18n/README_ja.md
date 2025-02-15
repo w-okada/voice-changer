@@ -19,29 +19,18 @@ VCClientは、AIを用いてリアルタイム音声変換を行うソフトウ�
 
 ## What's New!
 
+* v.2.0.76-beta
+  * new feature:
+    * Beatrice: 話者マージの実装
+    * Beatrice: オートピッチシフト
+  * bugfix:
+    * サーバモードのデバイス選択時の不具合対応
 * v.2.0.73-beta
   * new feature:
     * 編集したbeatrice modelのダウンロード
   * bugfix:
     * beatrice v2 のpitch, formantが反映されないバグを修正
     * Applio のembedderを使用しているモデルのONNXができないバグを修正
-* v.2.0.72-beta (バグがあるので非推奨。v.2.0.73で修正済み)
-  * new feature
-    * Beatriceの編集GUI
-    * Beatriceのvoiceごとにpitch, formantを記憶
-    * GUI多言語化
-    * Applioのembedder対応
-* v.2.0.70-beta (only for m1 mac)
-  * new feature:
-    * M1 Mac版VCClientでもBeatrice v2 beta.1をサポートしました。
-* v.2.0.69-beta (only for win)
-  * bugfix:
-    * 一部の例外発生時にスタートボタンが表示されなくなるバグを修正
-    * サーバデバイスモードの出力バッファを調整
-    * サーバデバイスモード使用中に設定変更を行うとサンプリングレートが変化するバグを修正
-    * 日本語hubert使用時のバグ修正
-  * misc:
-    * サーバデバイスモードのホストAPIフィルタ追加（強調表示）
 
 ## ダウンロードと関連リンク
 

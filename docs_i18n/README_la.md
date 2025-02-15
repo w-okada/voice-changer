@@ -19,29 +19,18 @@ VCClient est software quod conversionem vocis in tempore reali per AI facit.
 
 ## Quid Novum!
 
+* v.2.0.76-beta
+  * nova functio:
+    * Beatrice: Implementatio coniunctionis loquentium
+    * Beatrice: Automatica mutatio toni
+  * bugfix:
+    * Solutio problematum in delectu machinae in modo servientis
 * v.2.0.73-beta
   * nova functio:
     * Download model Beatrice editum
   * bugfix:
     * Correctus error ubi pitch et formant Beatrice v2 non reflectuntur
     * Correctus error ubi ONNX non potest fieri pro modelis utentibus embedder Applio
-* v.2.0.72-beta (non commendatur propter bug. Correctum in v.2.0.73)
-  * nova functio
-    * GUI editionis Beatrice
-    * Memoria pitch et formant pro singulis vocibus Beatrice
-    * GUI multilanguage
-    * Embedder Applio compatibilitas
-* v.2.0.70-beta (solum pro m1 mac)
-  * nova functio:
-    * In versione M1 Mac VCClient etiam Beatrice v2 beta.1 sustinetur.
-* v.2.0.69-beta (solum pro win)
-  * bugfix:
-    * Errorem correximus ubi puga initii non apparebat in casu exceptionis.
-    * Buffer outputis in modo machinae servientis adaptavimus.
-    * Errorem correximus ubi mutatio configurationis in modo machinae servientis rate sampling mutabat.
-    * Errorem cum usura Iaponica hubert correximus.
-  * misc:
-    * Filtrum API hospitis in modo machinae servientis additum (emphasis)
 
 ## Download et nexus pertinentes
 
