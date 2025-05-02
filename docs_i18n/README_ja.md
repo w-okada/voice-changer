@@ -18,7 +18,8 @@
 VCClientは、AIを用いてリアルタイム音声変換を行うソフトウェアです。
 
 ## What's New!
-
+* v.2.0.77-beta (only for RTX 5090, experimental)
+  * 関連モジュールを5090対応 (開発者がRTX5090未所持のため、動作未検証)
 * v.2.0.76-beta
   * new feature:
     * Beatrice: 話者マージの実装

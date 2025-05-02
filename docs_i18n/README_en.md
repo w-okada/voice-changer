@@ -19,6 +19,8 @@ VCClient is software that performs real-time voice conversion using AI.
 
 ## What's New!
 
+* v.2.0.77-beta (only for RTX 5090, experimental)
+  * Related modules support for RTX 5090 (not verified as developer does not own RTX 5090)
 * v.2.0.76-beta
   * new feature:
     * Beatrice: Implementation of speaker merge

@@ -17,8 +17,10 @@
 
 VCClient adalah perisian yang menggunakan AI untuk menukar suara secara masa nyata.
 
-## Apa yang Baru!
+## What's New!
 
+* v.2.0.77-beta (hanya untuk RTX 5090, eksperimen)
+  * Sokongan untuk modul berkaitan RTX 5090 (tidak disahkan kerana pembangun tidak memiliki RTX 5090)
 * v.2.0.76-beta
   * ciri baru:
     * Beatrice: Pelaksanaan penggabungan pembicara

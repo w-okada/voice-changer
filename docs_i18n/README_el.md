@@ -17,8 +17,10 @@
 
 Το VCClient είναι λογισμικό που χρησιμοποιεί AI για μετατροπή φωνής σε πραγματικό χρόνο.
 
-## Τι νέο υπάρχει!
+## What's New!
 
+* v.2.0.77-beta (μόνο για RTX 5090, πειραματικό)
+  * Υποστήριξη για σχετικές μονάδες RTX 5090 (δεν επαληθεύτηκε καθώς ο προγραμματιστής δεν διαθέτει RTX 5090)
 * v.2.0.76-beta
   * νέα δυνατότητα:
     * Beatrice: Εφαρμογή συγχώνευσης ομιλητών
@@ -58,12 +60,12 @@
 
 | Μοντέλα AI                                                                                                     | v.2       | v.1                  | Άδεια                                                                                 |
 | ------------------------------------------------------------------------------------------------------------ | --------- | -------------------- | ------------------------------------------------------------------------------------------ |
-| [RVC ](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI/blob/main/docs/jp/README.ja.md) | υποστηρίζεται | υ��οστηρίζεται            | Παρακαλώ ανατρέξτε στο αποθετήριο.                                                             |
+| [RVC ](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI/blob/main/docs/jp/README.ja.md) | υποστηρίζεται | υποστηρίζεται            | Παρακαλώ ανατρέξτε στο αποθετήριο.                                                             |
 | [Beatrice v1](https://prj-beatrice.com/)                                                                     | n/a       | υποστηρίζεται (μόνο win) | [ιδιόκτητο](https://github.com/w-okada/voice-changer/tree/master/server/voice_changer/Beatrice) |
 | [Beatrice v2](https://prj-beatrice.com/)                                                                     | υποστηρίζεται | n/a                  | [ιδιόκτητο](https://huggingface.co/wok000/vcclient_model/blob/main/beatrice_v2_beta/readme.md)  |
 | [MMVC](https://github.com/isletennos/MMVC_Trainer)                                                           | n/a       | υποστηρίζεται            | Παρακαλώ ανατρέξτε στο αποθετήριο.                                                             |
 | [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc)                                               | n/a       | υποστηρίζεται            | Παρακαλώ ανατρέξτε στο αποθετήριο.                                                             |
-| [DDSP-SVC](https://github.com/yxlllc/DDSP-SVC)                                                               | n/a       | υποστηρίζεται            | Παρακαλώ ανατρέξτε στο ��ποθετήριο.                                                             |
+| [DDSP-SVC](https://github.com/yxlllc/DDSP-SVC)                                                               | n/a       | υποστηρίζεται            | Παρακαλώ ανατρέξτε στο αποθετήριο.                                                             |
 
 ## Υποστήριξη τόσο για αυτόνομη όσο και για δικτυακή διαμόρφωση
 
@@ -126,7 +128,7 @@ Windows, Mac(M1), Linux, Google Colab
 ※鑑賞用の作品として配布・販売していただくことは問題ございません。
 ```
 
-* Για το μετατροπέα φωνής σ�� πραγματικό χρόνο Amitaro, ισχύουν οι ακόλουθοι όροι χρήσης του εργαστηρίου φωνητικών υλικών Amitaro. Για λεπτομέρειες,[εδώ](https://amitaro.net/voice/faq/#index_id6)
+* Για το μετατροπέα φωνής σε πραγματικό χρόνο Amitaro, ισχύουν οι ακόλουθοι όροι χρήσης του εργαστηρίου φωνητικών υλικών Amitaro. Για λεπτομέρειες,[εδώ](https://amitaro.net/voice/faq/#index_id6)
 
 ```
 あみたろの声素材やコーパス読み上げ音声を使って音声モデルを作ったり、ボイスチェンジャーや声質変換などを使用して、自分の声をあみたろの声に変換して使うのもOKです。
