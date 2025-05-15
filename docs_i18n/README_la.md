@@ -19,6 +19,10 @@ VCClient est software quod conversionem vocis in tempore reali per AI facit.
 
 ## What's New!
 
+* v.2.0.78-beta
+  * bugfix: error sublationis RVC exemplaris vitata est
+  * Nunc simul cum versione 1.x incipere potes
+  * Auctae sunt chunk magnitudines eligibiles
 * v.2.0.77-beta (solum pro RTX 5090, experimentale)
   * Auxilium pro modulis RTX 5090 relatis (non verificatum quia auctor non habet RTX 5090)
 * v.2.0.76-beta

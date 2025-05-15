@@ -19,6 +19,10 @@ VCClient adalah perisian yang menggunakan AI untuk menukar suara secara masa nya
 
 ## What's New!
 
+* v.2.0.78-beta
+  * pembaikan pepijat: Elakkan ralat muat naik model RVC
+  * Kini boleh dijalankan serentak dengan ver.1.x
+  * Saiz chunk yang boleh dipilih telah ditambah
 * v.2.0.77-beta (hanya untuk RTX 5090, eksperimen)
   * Sokongan untuk modul berkaitan RTX 5090 (tidak disahkan kerana pembangun tidak memiliki RTX 5090)
 * v.2.0.76-beta

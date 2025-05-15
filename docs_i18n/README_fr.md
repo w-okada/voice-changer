@@ -19,6 +19,10 @@ VCClient est un logiciel qui utilise l'IA pour effectuer une conversion vocale e
 
 ## What's New!
 
+* v.2.0.78-beta
+  * correction de bug : évitement de l'erreur de téléchargement du modèle RVC
+  * Il est désormais possible de lancer simultanément avec la version 1.x
+  * Augmentation des tailles de chunk sélectionnables
 * v.2.0.77-beta (uniquement pour RTX 5090, expérimental)
   * Support des modules liés à RTX 5090 (non vérifié car le développeur ne possède pas de RTX 5090)
 * v.2.0.76-beta
