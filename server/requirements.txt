@@ -3,28 +3,29 @@
 # # wget https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh
 # # bash Anaconda3-2022.10-Linux-x86_64.sh
 
-uvicorn==0.21.1
-pyOpenSSL==23.1.1
-numpy==1.23.5
-torch==2.0.1
-torchaudio==2.0.2
-resampy==0.4.2
-python-socketio==5.8.0
-fastapi==0.95.1
-python-multipart==0.0.6
-onnxruntime-gpu==1.13.1
-scipy==1.10.1
-matplotlib==3.7.1
-websockets==11.0.2
-faiss-cpu==1.7.3
-torchcrepe==0.0.18
-librosa==0.9.1
+# fairseq
+git+https://github.com/mallocfree009/fairseq.git@dev_mf1
+
+uvicorn==0.34.2
+pyOpenSSL==25.0.0
+numpy==2.1.2
+resampy==0.4.3
+python-socketio==5.13.0
+fastapi==0.115.12
+python-multipart==0.0.20
+onnxruntime-gpu==1.22.0
+scipy==1.15.3
+matplotlib==3.10.3
+websockets==15.0.1
+faiss-cpu==1.11.0
+torchcrepe==0.0.23
+librosa==0.11.0
 gin==0.1.6
-gin_config==0.5.0
-einops==0.6.0
-local_attention==1.8.5
-websockets==11.0.2
-sounddevice==0.4.6
-dataclasses_json==0.5.7
-onnxsim==0.4.28
-torchfcpe==0.0.3
+gin-config==0.5.0
+einops==0.8.1
+local-attention==1.11.1
+sounddevice==0.5.1
+dataclasses-json==0.6.7
+onnxsim==0.4.36
+torchfcpe==0.0.4
+pyworld==0.3.5
