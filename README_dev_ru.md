@@ -28,9 +28,28 @@ $ git clone https://github.com/w-okada/voice-changer.git
 
 1. Установите необходимые зависимости:
 
+1-1. Для систем без GPU
+
 ```
-$ cd voice-changer/server
-$ pip install -r requirements.txt
+$ python -m pip install -r server/requirements_cpuonly.txt
+```
+
+1-2. Для систем с GPU NVIDIA
+
+Пожалуйста, перепишите часть `cu128` в файле `server/requirements_nvidia.txt` в соответствии с вашей версией CUDA.
+Значение по умолчанию `cu128` предназначено для CUDA 12.8.
+
+```
+--extra-index-url https://download.pytorch.org/whl/cu128
+
+torch==2.7.0+cu128
+torchaudio==2.7.0+cu128
+```
+
+Затем выполните следующую команду:
+
+```
+$ python -m pip install -r server/requirements_nvidia.txt
 ```
 
 2. Запустите сервер
