@@ -17,8 +17,14 @@
 
 VCClient ist eine Software, die mithilfe von KI eine Echtzeit-Sprachumwandlung durchführt.
 
-## Was gibt's Neues!
+## What's New!
 
+* v.2.0.78-beta
+  * Fehlerbehebung: Upload-Fehler für RVC-Modell vermieden
+  * Gleichzeitiger Start mit Version 1.x jetzt möglich
+  * Auswahlbare Chunk-Größen erhöht
+* v.2.0.77-beta (nur für RTX 5090, experimentell)
+  * Unterstützung für RTX 5090 verwandte Module (nicht verifiziert, da Entwickler kein RTX 5090 besitzt)
 * v.2.0.76-beta
   * neues Feature:
     * Beatrice: Implementierung der Sprecherzusammenführung
