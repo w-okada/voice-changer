@@ -38,6 +38,16 @@ VCClient est software quod conversionem vocis in tempore reali per AI facit.
     * Correctus error ubi pitch et formant Beatrice v2 non reflectuntur
     * Correctus error ubi ONNX non potest fieri pro modelis utentibus embedder Applio
 
+## Editiones
+
+VCClient secundum editionem diversa AI exempla sustinet.
+
+| editio | Exempla sustenta |
+| ------ | ----------------- |
+| std    | Beatrice         |
+| cuda   | Beatrice, RVC    |
+| onnx   | Beatrice, RVC    |
+
 ## Download et nexus pertinentes
 
 Versiones pro Windows et M1 Mac possunt ex repositorio hugging face depromi.
@@ -146,3 +156,5 @@ Hoc software non signatur auctore. Monitio ut infra apparebit, sed si iconem cum
 ## Disclaimer
 
 Non tenemur pro ullis damnis directis, indirectis, consequentibus, vel specialibus ex usu vel incapacitate usus huius software.
+
+```

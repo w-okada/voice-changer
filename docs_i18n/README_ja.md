@@ -38,6 +38,16 @@ VCClientは、AIを用いてリアルタイム音声変換を行うソフトウ�
     * beatrice v2 のpitch, formantが反映されないバグを修正
     * Applio のembedderを使用しているモデルのONNXができないバグを修正
 
+## エディション
+
+VCClient はエディションによりサポートする AI モデルが異なります。
+
+| edition | Support Model |
+| ------- | ------------- |
+| std     | Beatrice      |
+| cuda    | Beatrice, RVC |
+| onnx    | Beatrice, RVC |
+
 ## ダウンロードと関連リンク
 
 Windows版、 M1 Mac版はhugging faceのリポジトリからダウンロードできます。
@@ -146,3 +156,5 @@ Windows, Mac(M1), Linux, Google Colab
 ## 免責事項
 
 本ソフトウェアの使用または使用不能により生じたいかなる直接損害・間接損害・波及的損害・結果的損害 または特別損害についても、一切責任を負いません。
+
+```

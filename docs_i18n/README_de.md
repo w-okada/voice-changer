@@ -38,6 +38,16 @@ VCClient ist eine Software, die mithilfe von KI eine Echtzeit-Sprachumwandlung d
     * Fehler behoben, bei dem Pitch und Formant von Beatrice v2 nicht reflektiert wurden
     * Fehler behoben, bei dem das ONNX-Modell mit dem Applio-Embedder nicht erstellt werden konnte
 
+## Editionen
+
+VCClient unterstützt je nach Edition unterschiedliche KI-Modelle.
+
+| Edition | Unterstützte Modelle |
+| ------- | --------------------- |
+| std     | Beatrice             |
+| cuda    | Beatrice, RVC        |
+| onnx    | Beatrice, RVC        |
+
 ## Downloads und verwandte Links
 
 Windows- und M1 Mac-Versionen können aus dem Repository von Hugging Face heruntergeladen werden.
@@ -146,3 +156,5 @@ Diese Software ist nicht vom Entwickler signiert. Es wird eine Warnung wie unten
 ## Haftungsausschluss
 
 Wir übernehmen keine Verantwortung für direkte, indirekte, Folgeschäden, resultierende oder besondere Schäden, die durch die Nutzung oder Unfähigkeit zur Nutzung dieser Software entstehen.
+
+```

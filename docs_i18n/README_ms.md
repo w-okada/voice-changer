@@ -38,6 +38,16 @@ VCClient adalah perisian yang menggunakan AI untuk menukar suara secara masa nya
     * Memperbaiki pepijat di mana pitch dan formant beatrice v2 tidak diterapkan
     * Memperbaiki pepijat di mana ONNX tidak dapat dibuat untuk model yang menggunakan embedder Applio
 
+## Edisi
+
+VCClient menyokong model AI yang berbeza bergantung pada edisi.
+
+| edisi | Model disokong |
+| ----- | --------------- |
+| std   | Beatrice        |
+| cuda  | Beatrice, RVC   |
+| onnx  | Beatrice, RVC   |
+
 ## Muat Turun dan Pautan Berkaitan
 
 Versi Windows dan M1 Mac boleh dimuat turun dari repositori hugging face.
@@ -146,3 +156,5 @@ Perisian ini tidak ditandatangani oleh pembangun. Amaran seperti di bawah akan m
 ## Penafian
 
 Kami tidak bertanggungjawab ke atas sebarang kerosakan langsung, tidak langsung, berbangkit, akibat atau khas yang timbul daripada penggunaan atau ketidakupayaan untuk menggunakan perisian ini.
+
+```

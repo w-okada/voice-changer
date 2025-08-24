@@ -38,6 +38,16 @@ VCClient est un logiciel qui utilise l'IA pour effectuer une conversion vocale e
     * Correction du bug où le pitch et le formant de Beatrice v2 n'étaient pas appliqués
     * Correction du bug empêchant la création de l'ONNX pour les modèles utilisant l'embedder d'Applio
 
+## Éditions
+
+VCClient prend en charge différents modèles d'IA selon l'édition.
+
+| édition | Modèles pris en charge |
+| ------- | ----------------------- |
+| std     | Beatrice               |
+| cuda    | Beatrice, RVC          |
+| onnx    | Beatrice, RVC          |
+
 ## Téléchargement et liens associés
 
 Les versions Windows et Mac M1 peuvent être téléchargées depuis le référentiel hugging face.
@@ -146,3 +156,5 @@ Ce logiciel n'est pas signé par le développeur. Un avertissement s'affiche com
 ## Clause de non-responsabilité
 
 Nous déclinons toute responsabilité pour tout dommage direct, indirect, consécutif, résultant ou spécial causé par l'utilisation ou l'incapacité d'utiliser ce logiciel.
+
+```

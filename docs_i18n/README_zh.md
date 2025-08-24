@@ -38,6 +38,16 @@ VCClient是一款利用AI进行实时语音转换的软件。
     * 修复了beatrice v2的音高和共振峰未反映的错误
     * 修复了使用Applio的embedder的模型无法生成ONNX的错误
 
+## 版本（Edition）
+
+VCClient 的不同版本支持的 AI 模型不同。
+
+| 版本 | 支持的模型 |
+| ---- | ---------- |
+| std  | Beatrice   |
+| cuda | Beatrice, RVC |
+| onnx | Beatrice, RVC |
+
 ## 下载和相关链接
 
 Windows版、M1 Mac版可以从hugging face的仓库下载。
@@ -146,3 +156,5 @@ Windows, Mac(M1), Linux, Google Colab
 ## 免责声明
 
 对于因使用或无法使用本软件而导致的任何直接、间接、衍生、结果性或特殊损害，本软件概不负责。
+
+```
