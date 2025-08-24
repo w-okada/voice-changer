@@ -40,7 +40,7 @@ VCClient ist eine Software, die mithilfe von KI eine Echtzeit-Sprachumwandlung d
 
 ## Editionen
 
-VCClient unterstützt je nach Edition unterschiedliche KI-Modelle.
+Ab v2.2.1 unterstützen die Editionen unterschiedliche KI-Modelle.
 
 | Edition | Unterstützte Modelle |
 | ------- | --------------------- |

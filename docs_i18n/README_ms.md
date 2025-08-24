@@ -40,7 +40,7 @@ VCClient adalah perisian yang menggunakan AI untuk menukar suara secara masa nya
 
 ## Edisi
 
-VCClient menyokong model AI yang berbeza bergantung pada edisi.
+Bermula dari v2.2.1, setiap edisi menyokong model AI yang berbeza.
 
 | edisi | Model disokong |
 | ----- | --------------- |

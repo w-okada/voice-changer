@@ -40,7 +40,7 @@ VCClient is software that performs real-time voice conversion using AI.
 
 ## Editions
 
-VCClient supports different AI models depending on the edition.
+From v2.2.1 onward, editions support different AI models.
 
 | edition | Support Model |
 | ------- | ------------- |

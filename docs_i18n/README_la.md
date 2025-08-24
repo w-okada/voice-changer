@@ -40,7 +40,7 @@ VCClient est software quod conversionem vocis in tempore reali per AI facit.
 
 ## Editiones
 
-VCClient secundum editionem diversa AI exempla sustinet.
+Ab v2.2.1, secundum editionem diversa AI exempla sustinentur.
 
 | editio | Exempla sustenta |
 | ------ | ----------------- |
