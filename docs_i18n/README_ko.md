@@ -19,6 +19,10 @@ VCClient는 AI를 사용하여 실시간 음성 변환을 수행하는 소프트
 
 ## What's New!
 
+* v.2.2.2-beta
+  * 릴리스 에디션: std_win, std_mac, std_lin_aarch64
+  * v.2.2.2-beta부터 에디션별 지원 모델이 달라집니다(아래 참조). 또한 버전별로 출시되는 에디션이 달라질 수 있습니다.
+  * Beatrice v2.0.0-rc0 지원.
 * v.2.0.78-beta
   * 버그 수정: RVC 모델 업로드 오류 회피
   * ver.1.x와 동시에 실행 가능해졌습니다.
@@ -42,11 +46,15 @@ VCClient는 AI를 사용하여 실시간 음성 변환을 수행하는 소프트
 
 v2.2.1 이상에서는 에디션에 따라 지원하는 AI 모델이 달라집니다.
 
-| 에디션 | 지원 모델 |
-| ------ | ---------- |
-| std    | Beatrice   |
-| cuda   | Beatrice, RVC |
-| onnx   | Beatrice, RVC |
+| 에디션 | 플랫폼         | 지원 모델       |     |
+| ------ | -------------- | ---------------- | --- |
+| std    | win            | Beatrice         |     |
+| std    | mac(m1)        | Beatrice         |     |
+| std    | linux(x86-64)  | Beatrice         |     |
+| std    | linux(aarch64) | Beatrice         |     |
+| cuda   | win            | Beatrice, RVC    |     |
+| onnx   | win            | Beatrice, RVC    |     |
+| onnx   | mac(m1)        | Beatrice, RVC    |     |
 
 ## 다운로드 및 관련 링크
 

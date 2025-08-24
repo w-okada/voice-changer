@@ -19,6 +19,10 @@ VCClient adalah perisian yang menggunakan AI untuk menukar suara secara masa nya
 
 ## What's New!
 
+* v.2.2.2-beta
+  * Edisi keluaran: std_win, std_mac, std_lin_aarch64
+  * Bermula dari v.2.2.2-beta, model yang disokong berbeza mengikut edisi (rujuk di bawah). Selain itu, edisi yang dikeluarkan mungkin berbeza mengikut versi.
+  * Menyokong Beatrice v2.0.0-rc0.
 * v.2.0.78-beta
   * pembaikan pepijat: Elakkan ralat muat naik model RVC
   * Kini boleh dijalankan serentak dengan ver.1.x
@@ -42,11 +46,15 @@ VCClient adalah perisian yang menggunakan AI untuk menukar suara secara masa nya
 
 Bermula dari v2.2.1, setiap edisi menyokong model AI yang berbeza.
 
-| edisi | Model disokong |
-| ----- | --------------- |
-| std   | Beatrice        |
-| cuda  | Beatrice, RVC   |
-| onnx  | Beatrice, RVC   |
+| edisi | platform       | Model disokong   |     |
+| ----- | -------------- | ---------------- | --- |
+| std   | win            | Beatrice         |     |
+| std   | mac(m1)        | Beatrice         |     |
+| std   | linux(x86-64)  | Beatrice         |     |
+| std   | linux(aarch64) | Beatrice         |     |
+| cuda  | win            | Beatrice, RVC    |     |
+| onnx  | win            | Beatrice, RVC    |     |
+| onnx  | mac(m1)        | Beatrice, RVC    |     |
 
 ## Muat Turun dan Pautan Berkaitan
 

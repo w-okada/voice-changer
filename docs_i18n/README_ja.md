@@ -18,6 +18,10 @@
 VCClientは、AIを用いてリアルタイム音声変換を行うソフトウェアです。
 
 ## What's New!
+* v.2.2.2-beta
+  * リリースエディション： std_win, std_mac, std_lin_aarch64
+  * v.2.2.2-betaよりエディション毎のサポートモデルが変わります（下記参照）。また、バージョンごとにリリースされるエディションが異なる場合があります。
+  * Beatrice v2.0.0-rc0 をサポート。
 * v.2.0.78-beta
   * bugfix: RVCモデルのアップロードエラーを回避
   * ver.1.x との同時起動ができるようになりました。
@@ -42,11 +46,15 @@ VCClientは、AIを用いてリアルタイム音声変換を行うソフトウ�
 
 v2.2.1以降は、エディションによりサポートする AI モデルが異なります。
 
-| edition | Support Model |
-| ------- | ------------- |
-| std     | Beatrice      |
-| cuda    | Beatrice, RVC |
-| onnx    | Beatrice, RVC |
+| edition | platform       | Support Model |     |
+| ------- | -------------- | ------------- | --- |
+| std     | win            | Beatrice      |     |
+| std     | mac(m1)        | Beatrice      |     |
+| std     | linux(x86-64)  | Beatrice      |     |
+| std     | linux(aarch64) | Beatrice      |     |
+| cuda    | win            | Beatrice, RVC |     |
+| onnx    | win            | Beatrice, RVC |     |
+| onnx    | mac(m1)        | Beatrice, RVC |     |
 
 ## ダウンロードと関連リンク
 
