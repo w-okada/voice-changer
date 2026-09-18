@@ -106,8 +106,6 @@ class MMVCv13(VoiceChangerModel):
             and devNum > 0
         ):
             return ["CUDAExecutionProvider"], [{"device_id": self.settings.gpu}]
-        elif self.settings.gpu >= 0 and "ROCMExecutionProvider" in availableProviders:
-            return ["ROCMExecutionProvider"], [{"device_id": self.settings.gpu}]
         elif self.settings.gpu >= 0 and "DmlExecutionProvider" in availableProviders:
             return ["DmlExecutionProvider"], [{}]
         else:

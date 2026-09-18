@@ -48,8 +48,6 @@ class DeviceManager(object):
                         "inter_op_num_threads": 8,
                     }
                 ]
-        elif gpu >= 0 and "ROCMExecutionProvider" in availableProviders:
-            return ["ROCMExecutionProvider"], [{"device_id": gpu}]
         elif gpu >= 0 and "DmlExecutionProvider" in availableProviders:
             return ["DmlExecutionProvider"], [{"device_id": gpu}]
         else:
