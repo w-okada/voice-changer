@@ -232,6 +232,31 @@ class ServerDevice:
             return False
 
     def runNoMonitorSeparate(self, block_frame: int, inputMaxChannel: int, outputMaxChannel: int, inputExtraSetting, outputExtraSetting):
+        # On Linux with PipeWire's ALSA emulation, opening two separate half-duplex
+        # streams (InputStream + OutputStream) on the same device causes the output
+        # callback to hold the PipeWire graph lock, preventing the input callback from
+        # ever firing. Use a single duplex sd.Stream when input and output share the
+        # same PortAudio device index. See: https://github.com/w-okada/voice-changer/issues/758
+        if self.settings.serverInputDeviceId == self.settings.serverOutputDeviceId:
+            with sd.Stream(
+                callback=self.audio_callback_outQueue,
+                dtype="float32",
+                device=(self.settings.serverInputDeviceId, self.settings.serverOutputDeviceId),
+                blocksize=block_frame,
+                samplerate=self.settings.serverInputAudioSampleRate,
+                channels=(inputMaxChannel, outputMaxChannel),
+                extra_settings=[inputExtraSetting, outputExtraSetting],
+            ):
+                while True:
+                    changed = self.checkSettingChanged()
+                    if changed:
+                        break
+                    time.sleep(2)
+                    print(f"[Voice Changer] server audio performance {self.performance}")
+                    print(f"                status: started:{self.settings.serverAudioStated}, model_sr:{self.currentModelSamplingRate}, chunk:{self.currentInputChunkNum}")
+                    print(f"                input  : id:{self.settings.serverInputDeviceId}, sr:{self.settings.serverInputAudioSampleRate}, ch:{inputMaxChannel}")
+                    print(f"                output : id:{self.settings.serverOutputDeviceId}, sr:{self.settings.serverOutputAudioSampleRate}, ch:{outputMaxChannel}")
+            return
         with sd.InputStream(callback=self.audioInput_callback_outQueue, dtype="float32", device=self.settings.serverInputDeviceId, blocksize=block_frame, samplerate=self.settings.serverInputAudioSampleRate, channels=inputMaxChannel, extra_settings=inputExtraSetting):
             with sd.OutputStream(callback=self.audioOutput_callback, dtype="float32", device=self.settings.serverOutputDeviceId, blocksize=block_frame, samplerate=self.settings.serverOutputAudioSampleRate, channels=outputMaxChannel, extra_settings=outputExtraSetting):
                 while True:
