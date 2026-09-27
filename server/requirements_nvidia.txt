@@ -1,0 +1,12 @@
+# As of 2025/05/17, if you do not install typing-extensions first, 
+# an error will occur when installing torch for NVIDIA.
+typing-extensions==4.13.2
+
+# Please set the URL and package version according to your CUDA version environment. 
+# The one listed here is for CUDA 12.8.
+--extra-index-url https://download.pytorch.org/whl/cu128
+
+torch==2.7.0+cu128
+torchaudio==2.7.0+cu128
+
+-r requirements.txt
