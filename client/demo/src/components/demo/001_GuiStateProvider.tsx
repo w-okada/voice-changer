@@ -306,7 +306,7 @@ export const GuiStateProvider = ({ children }: Props) => {
             // }
 
             document.getElementById("dialog")?.classList.add("dialog-container-show");
-            showStartingNoticeCheckbox.updateState(true);
+            showStartingNoticeCheckbox.updateState(false);
             document.getElementById("dialog2")?.classList.add("dialog-container-show");
         };
         setTimeout(show);
