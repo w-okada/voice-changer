@@ -255,9 +255,7 @@ PyTorch のモデルを ONNX に変換して出力します。ロードされて
 
 onnxgpu 版では使用する GPU を選択することができます。
 
-onnxdirectML 版では GPU の ON/OFF を切り替えることができます。
-
-DirectML Version の場合は次のようなボタンが表示されます。
+onnxdirectML 版では CPU と 4 つの GPU を切り替えることができます：
 
 ![image](https://github.com/w-okada/voice-changer/assets/48346627/5a66f237-e5b5-4819-9409-ff5eebb6e514)
 

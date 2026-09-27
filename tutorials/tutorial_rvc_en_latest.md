@@ -249,11 +249,9 @@ Detail is [here](https://github.com/w-okada/voice-changer/issues/154#issuecommen
 
 #### GPU
 
-You can select the GPU to use in the onnxgpu version.
+In the onnxgpu version, you can select the GPU to use.
 
-In the onnxdirectML version, you can switch the GPU ON/OFF.
-
-On DirectML Version, these buottns is displayed.
+In the onnxdirectML version, you can switch between CPU and 4 GPUs:
 
 ![image](https://github.com/w-okada/voice-changer/assets/48346627/5a66f237-e5b5-4819-9409-ff5eebb6e514)
 
@@ -263,7 +261,7 @@ On DirectML Version, these buottns is displayed.
 - gpu2: use gpu2
 - gpu3: use gpu3
 
-Even if a GPU is not detected, gpu0 - gpu3 will still be displayed. If you specify a GPU that doesn't exist, the CPU will be used instead.[reference](https://github.com/w-okada/voice-changer/issues/410)
+Even if a GPU is not detected, gpu0 - gpu3 will still be displayed. If you specify a GPU that doesn't exist, the CPU will be used instead. [reference](https://github.com/w-okada/voice-changer/issues/410)
 
 #### AUDIO
 
