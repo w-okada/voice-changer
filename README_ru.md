@@ -1,18 +1,18 @@
 [Японский](/README_ja.md) [Корейский](/README_ko.md) [Английский](/README_en.md)
 
 ## Что нового!
-- Мы выпустили продукт-сестру - клиент Text To Speech.
+- Мы выпустили аналог клиента Text To Speech.
   - Вы можете насладиться генерацией голоса через простой интерфейс.
   - Подробнее [здесь](https://github.com/w-okada/ttsclient).
 - Код тренировки Beatrice V2 теперь доступен!
-  - [Репозиторий кода тренировки](https://huggingface.co/fierce-cats/beatrice-trainer)
+  - [Репозиторий кода обучения](https://huggingface.co/fierce-cats/beatrice-trainer)
   - [Версия для Colab](https://github.com/w-okada/beatrice-trainer-colab)
 - v.2.0.70-beta (only for m1 mac)
-  - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
-  - new feature:
-    -  В версии VCClient для Mac на базе M1 теперь поддерживается Beatrice v2 beta.1.
-- v.2.0.69-beta (only for win)
-  - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
+  - [ЗДЕСЬ](https://github.com/w-okada/voice-changer/tree/v.2)
+  - Новые функции:
+    - В версии VCClient для Mac на базе M1 теперь поддерживается Beatrice v2 beta.1.
+- v.2.0.69-beta (только для Windows)
+  - [ЗДЕСЬ](https://github.com/w-okada/voice-changer/tree/v.2)
   - Исправления ошибок:
     - Исправлена ошибка, из-за которой кнопка запуска не отображалась в случае некоторых исключений
     - Настроен выходной буфер для режима серверного устройства
@@ -21,8 +21,8 @@
   - Прочее:
     - Добавлен фильтр API хоста (выделено) для режима серверного устройства
 - v.2.0.65-beta
-  - [HERE](https://github.com/w-okada/voice-changer/tree/v.2)
-  - new feature: We have supported Beatrice v2 beta.1, enabling even higher quality voice conversion.
+  - [ЗДЕСЬ](https://github.com/w-okada/voice-changer/tree/v.2)
+  - Новые функции: теперь поддерживается Beatrice v2 beta.1, обеспечивающая ещё более качественное преобразование голоса.
 
 # Что такое VC Клиент
 
@@ -31,16 +31,16 @@
    - [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc) (только v1)
    - [RVC (Retrieval-based Voice Conversion)](https://github.com/liujing04/Retrieval-based-Voice-Conversion-WebUI)
    - [DDSP-SVC](https://github.com/yxlllc/DDSP-SVC) (только v1)
-   - [Beatrice JVS Corpus Edition](https://prj-beatrice.com/) * экспериментальный * (не по лицензии MIT, см. [readme](https://github.com/w-okada/voice-changer/blob/master/server/voice_changer/Beatrice/)), только для Windows, зависит от процессора (только v1)
-   - [Beatrice v2](https://prj-beatrice.com/) (только v2)
+   - [Beatrice JVS Corpus Edition](https://prj-beatrice.com/) *экспериментальный* (не по лицензии MIT, см. [readme](https://github.com/w-okada/voice-changer/blob/master/server/voice_changer/Beatrice/)), только для Windows, зависит от процессора (только v1).
+   - [Beatrice v2](https://prj-beatrice.com/) (только v2).
 
 2. Распределение нагрузки между разными ПК
-   Реализация преобразования голоса работает по схеме "сервер-клиент". Вы можете запустить сервер MMVC на отдельном ПК для минимизации влияния на другие ресурсоёмкие процессы, такие как стриминг.
+   Реализация преобразования голоса работает по схеме "сервер-клиент". Вы можете запустить сервер MMVC на отдельном ПК для минимизации влияния на другие ресурсоёмкие процессы, такие как стриминг или игры.
 
 ![image](https://user-images.githubusercontent.com/48346627/206640768-53f6052d-0a96-403b-a06c-6714a0b7471d.png)
 
 3. Кроссплатформенная совместимость
-   Поддержка Windows, Mac (включая Apple Silicon M1), Linux и Google Colaboratory.
+   Поддерживаются Windows, Mac (включая Apple Silicon M1), Linux и Google Colaboratory.
 
 # Как использовать
 
@@ -48,26 +48,26 @@
 
 Есть два основных способа использования, в порядке сложности:
 
-- Использование готового исполняемого файла
-- Настройка окружения с Docker или Anaconda
+- Использование готового исполняемого файла.
+- Настройка окружения с Docker или Anaconda.
 
 ## (1) Использование готовых исполняемых файлов
 
-- Вы можете скачать и запустить исполняемые файлы.
+- Вы можете скачать и запустить готовые исполняемые файлы.
 
-- Смотрите [здесь](tutorials/tutorial_rvc_en_latest.md) для получения руководства. ([устранение неполадок](https://github.com/w-okada/voice-changer/blob/master/tutorials/trouble_shoot_communication_ja.md))
+- Смотрите [здесь](tutorials/tutorial_rvc_en_latest.md) для получения руководства ([устранение неполадок](https://github.com/w-okada/voice-changer/blob/master/tutorials/trouble_shoot_communication_ja.md)).
 
-- Теперь попробовать можно на [Google Colaboratory](https://github.com/w-okada/voice-changer/tree/v.2/w_okada's_Voice_Changer_version_2_x.ipynb) (требуется аккаунт ngrok). Вы можете запустить его через кнопку "Открыть в Colab" в верхнем левом углу.
+- Теперь можно попробовать на [Google Colaboratory](https://github.com/w-okada/voice-changer/tree/v.2/w_okada's_Voice_Changer_version_2_x.ipynb) (требуется аккаунт ngrok). Запустите через кнопку "Открыть в Colab" в верхнем левом углу.
 
-<img src="https://github.com/w-okada/voice-changer/assets/48346627/3f092e2d-6834-42f6-bbfd-7d389111604e" width="400" height="150">
+![image](https://github.com/w-okada/voice-changer/assets/48346627/3f092e2d-6834-42f6-bbfd-7d389111604e)
 
-- Мы предлагаем версии для Windows и Mac на [hugging face](https://huggingface.co/wok000/vcclient000/tree/main)
-- v2 для Windows
-  - Пожалуйста, скачайте и используйте `vcclient_win_std_xxx.zip`. Преобразование голоса можно выполнять с использованием мощного процессора без GPU или с использованием DirectML для GPU (AMD, Nvidia). v2 поддерживает как torch, так и onnx.
+- Мы предлагаем версии для Windows и Mac на [Hugging Face](https://huggingface.co/wok000/vcclient000/tree/main).
+- v2 для Windows:
+  - Скачайте и используйте `vcclient_win_std_xxx.zip`. Преобразование голоса можно выполнять с использованием мощного процессора без GPU или с использованием DirectML для GPU (AMD, Nvidia). v2 поддерживает как torch, так и onnx.
   - Если у вас Nvidia GPU, скачайте `vcclient_win_cuda_xxx.zip` для более быстрого преобразования.
-- v2 для Mac (Apple Silicon)
-  - Пожалуйста, скачайте и используйте `vcclient_mac_xxx.zip`.
-- v1
+- v2 для Mac (Apple Silicon):
+  - Скачайте и используйте `vcclient_mac_xxx.zip`.
+- v1:
   - Для Windows с Nvidia GPU скачайте ONNX (cpu, cuda), PyTorch (cpu, cuda).
   - Для Windows с AMD/Intel GPU скачайте ONNX (cpu, DirectML) и PyTorch (cpu, cuda). AMD/Intel GPU поддерживаются только для ONNX моделей.
 
@@ -111,9 +111,9 @@ https://user-images.githubusercontent.com/48346627/212569645-e30b7f4e-079d-4504-
 
 > Это ПО использует голосовые данные бесплатного материала персонажа "Цукуёми-тян", предоставленного CV. Юмесаки Рэй.
 >
-> - Корпус Цукуёми-тян (CV. Юмесаки Рэй)
+> - Tsukuyomi-chan Corpus (CV. Yumesaki Rei)
 >
 > https://tyc.rei-yumesaki.net/material/corpus/
 >
-> Авторское право. Юмесаки Рэй, Все права защищены.
+> Авторское право. Юмесаки Рэй(Yumesaki Rei), Все права защищены.
 
