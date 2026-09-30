@@ -15,12 +15,14 @@ class TrustedOriginMiddleware:
     ) -> None:
         self.allowed_origins: set[str] = set()
 
-        local_origins = compute_local_origins(port)
-        self.allowed_origins.update(local_origins)
+        self.any_origin = '*' in allowed_origins
+        if not self.any_origin:
+            local_origins = compute_local_origins(port)
+            self.allowed_origins.update(local_origins)
 
-        if allowed_origins is not None:
-            normalized_origins = normalize_origins(allowed_origins)
-            self.allowed_origins.update(normalized_origins)
+            if allowed_origins is not None:
+                normalized_origins = normalize_origins(allowed_origins)
+                self.allowed_origins.update(normalized_origins)
 
         self.app = app
 
@@ -35,7 +37,7 @@ class TrustedOriginMiddleware:
         headers = Headers(scope=scope)
         origin = headers.get("origin", "")
         # Origin header is not present for same origin
-        if not origin or origin in self.allowed_origins:
+        if not origin or self.any_origin or origin in self.allowed_origins:
             await self.app(scope, receive, send)
             return
 
