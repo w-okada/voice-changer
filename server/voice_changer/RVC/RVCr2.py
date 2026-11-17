@@ -255,13 +255,14 @@ class RVCr2(VoiceChangerModel):
             )
 
             return result
-        except DeviceCannotSupportHalfPrecisionException as e:  # NOQA
-            logger.warn("[Device Manager] Device cannot support half precision. Fallback to float....")
+        except DeviceCannotSupportHalfPrecisionException:
+            # Pipeline will reinitialize with float precision on the next call.
+            # Raise so the caller (VoiceChangerV2.on_request) can handle the retry
+            # cycle rather than silently returning None, which causes permanent silence.
+            logger.warn("[Device Manager] Device cannot support half precision. Falling back to float.")
             self.deviceManager.setForceTensor(True)
             self.initialize()
-            # raise e
-
-        return
+            raise
 
     def __del__(self):
         del self.pipeline
