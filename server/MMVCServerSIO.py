@@ -68,6 +68,8 @@ def setupArgParser():
     parser.add_argument("--host", type=str, default='127.0.0.1', help="IP address of the network interface to listen for HTTP connections. Specify 0.0.0.0 to listen on all interfaces.")
     parser.add_argument("--allowed-origins", action='append', default=[], help="List of URLs to allow connection from, i.e. https://example.com. Allows http(s)://127.0.0.1:{port} and http(s)://localhost:{port} by default.")
 
+    parser.add_argument("--tts-allowed-origins", action='append', default=[], help="Origins allowed to use ONLY the TTS API (/v1/audio/speech etc.), i.e. chrome-extension://<id> or moz-extension://<uuid>.")
+
     return parser
 
 
@@ -140,7 +142,7 @@ if __name__ == "MMVCServerSIO":
     mp.freeze_support()
 
     voiceChangerManager = VoiceChangerManager.get_instance(voiceChangerParams)
-    app_fastapi = MMVC_Rest.get_instance(voiceChangerManager, voiceChangerParams, args.allowed_origins, PORT)
+    app_fastapi = MMVC_Rest.get_instance(voiceChangerManager, voiceChangerParams, args.allowed_origins, PORT, args.tts_allowed_origins)
     app_socketio = MMVC_SocketIOApp.get_instance(app_fastapi, voiceChangerManager, args.allowed_origins, PORT)
 
 

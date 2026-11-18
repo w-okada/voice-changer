@@ -12,6 +12,7 @@ class TrustedOriginMiddleware:
         app: ASGIApp,
         allowed_origins: Optional[Sequence[str]] = None,
         port: Optional[int] = None,
+        tts_origins: Optional[Sequence[str]] = None,
     ) -> None:
         self.allowed_origins: set[str] = set()
 
@@ -22,7 +23,14 @@ class TrustedOriginMiddleware:
             normalized_origins = normalize_origins(allowed_origins)
             self.allowed_origins.update(normalized_origins)
 
+        # TTS系パス(/v1/*, /audio/*, /models)にだけ許可する追加オリジン (例: chrome-extension://<ID>)
+        self.tts_origins: set[str] = set(normalize_origins(tts_origins)) if tts_origins else set()
+
         self.app = app
+
+    @staticmethod
+    def _is_tts_path(path: str) -> bool:
+        return path == "/models" or path.startswith("/v1/") or path.startswith("/audio/")
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] not in (
@@ -35,7 +43,9 @@ class TrustedOriginMiddleware:
         headers = Headers(scope=scope)
         origin = headers.get("origin", "")
         # Origin header is not present for same origin
-        if not origin or origin in self.allowed_origins:
+        if not origin or origin in self.allowed_origins or (
+            origin in self.tts_origins and self._is_tts_path(scope.get("path", ""))
+        ):
             await self.app(scope, receive, send)
             return
 

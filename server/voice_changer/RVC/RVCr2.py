@@ -263,6 +263,57 @@ class RVCr2(VoiceChangerModel):
 
         return
 
+    def inference_offline(self, pcm: np.ndarray, sample_rate: int):
+        """文全体を1回で変換する(Applio方式)。
+
+        リアルタイム用の内部バッファ / SOLA / クロスフェード / 音量スケール / 無音しきい値は使わず、
+        状態(audio_buffer 等)も書き換えない。pcm は int16 mono。戻り値は (int16 mono, 出力サンプリングレート)。
+        """
+        if self.pipeline is None:
+            raise PipelineNotInitializedException()
+
+        audio16 = resampy.resample(pcm.astype(np.float32) / 32768.0, sample_rate, 16000, filter="kaiser_fast")
+        n = int(audio16.shape[0])
+        if n < 1600:  # 0.1秒未満は特徴抽出できない
+            raise ValueError("audio is too short (min 0.1s)")
+
+        # 前後に最大1秒の reflect padding (Pipeline 側は repeat*(n-1) サンプルを前後に付ける)
+        pad = min(16000, n - 1)
+        repeat = pad / (n - 1)
+
+        device = self.pipeline.device
+        audio = torch.from_numpy(audio16.astype(np.float32)).to(device=device, dtype=torch.float32)
+        pitchf = np.zeros(n // 160 + 1)  # repeat != 0 のとき Pipeline 内で作り直される
+        feature = np.zeros([0, self.slotInfo.embChannels])  # index 検索の silence_front 補完用 (silence_front=0 なので空)
+
+        try:
+            audio_out, _, _ = self.pipeline.exec(
+                self.settings.dstId,
+                audio,
+                pitchf,
+                feature,
+                self.settings.tran,
+                self.settings.indexRatio,
+                1 if self.slotInfo.f0 else 0,
+                0.0,  # silence_front
+                self.slotInfo.embOutputLayer,
+                self.slotInfo.useFinalProj,
+                repeat,
+                self.settings.protect,
+                None,  # out_size
+            )
+        except DeviceCannotSupportHalfPrecisionException:
+            logger.warn("[Device Manager] Device cannot support half precision. Fallback to float....")
+            self.deviceManager.setForceTensor(True)
+            self.initialize()
+            raise RuntimeError("half precision fallback occurred; please retry")
+
+        out = audio_out.detach().cpu().numpy().astype(np.float32) / 32768.0
+        out_sr = int(self.outputSampleRate)
+        if self.slotInfo.samplingRate != out_sr:
+            out = resampy.resample(out, self.slotInfo.samplingRate, out_sr, filter="kaiser_fast")
+        return np.clip(out * 32768.0, -32768, 32767).astype(np.int16), out_sr
+
     def __del__(self):
         del self.pipeline
 

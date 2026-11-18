@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RVC TTS</title>
+<style>
+  :root { color-scheme: dark; --bg:#1b1d23; --card:#262932; --line:#3a3e4a; --fg:#e8e9ee; --mute:#9aa0b0; --acc:#4cc2b0; --err:#ff7b7b; --ok:#7bd88f; }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:20px; background:var(--bg); color:var(--fg); font:15px/1.6 system-ui, "Noto Sans JP", sans-serif; }
+  main { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  h2 { font-size: 15px; margin: 0 0 10px; color: var(--acc); }
+  .sub { color: var(--mute); margin-bottom: 16px; font-size: 13px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin-bottom:14px; }
+  .row { display:flex; align-items:center; gap:10px; margin:8px 0; flex-wrap:wrap; }
+  .row > label { min-width: 96px; color: var(--mute); }
+  select, textarea, input[type=text] { background:#1b1d23; color:var(--fg); border:1px solid var(--line); border-radius:6px; padding:6px 8px; font:inherit; }
+  select { min-width: 220px; }
+  textarea { width:100%; min-height:84px; resize:vertical; }
+  input[type=range] { flex:1; min-width:160px; accent-color: var(--acc); }
+  button { background:var(--acc); color:#08211d; border:0; border-radius:6px; padding:7px 16px; font:inherit; font-weight:600; cursor:pointer; }
+  button.sub2 { background:transparent; color:var(--fg); border:1px solid var(--line); font-weight:400; }
+  button:disabled { opacity:.5; cursor:default; }
+  .chips { display:flex; gap:8px; flex-wrap:wrap; }
+  .chip { padding:2px 10px; border-radius:99px; border:1px solid var(--line); font-size:13px; }
+  .ok { color:var(--ok); } .ng { color:var(--err); }
+  .msg { min-height:1.4em; font-size:13px; color:var(--mute); }
+  .msg.err { color:var(--err); }
+  pre { background:#1b1d23; border:1px solid var(--line); border-radius:6px; padding:8px 10px; overflow:auto; margin:6px 0; font-size:13px; white-space:pre-wrap; word-break:break-all; }
+  audio { width:100%; margin-top:8px; }
+  .note { font-size:12.5px; color:var(--mute); }
+  code { background:#1b1d23; padding:1px 5px; border-radius:4px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>RVC TTS</h1>
+  <div class="sub">Edge-TTS で作った音声を、ロード済みのRVCモデルの声に変換して返します。</div>
+
+  <div class="card">
+    <h2>状態</h2>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="card">
+    <h2>設定</h2>
+    <div class="row"><label for="locale">言語</label><select id="locale"></select></div>
+    <div class="row"><label for="voice">Edge-TTS の声</label><select id="voice"></select></div>
+    <div class="row"><label for="speed">速度</label><input id="speed" type="range" min="0.5" max="2" step="0.05" value="1"><span id="speedVal">1.00</span></div>
+    <div class="row"><label for="rvc">RVC変換</label><label style="min-width:0;color:inherit"><input id="rvc" type="checkbox" checked> 有効 (切ると Edge-TTS の素の声)</label></div>
+    <div class="row"><button id="save">保存</button><span class="msg" id="saveMsg"></span></div>
+  </div>
+
+  <div class="card">
+    <h2>テスト再生</h2>
+    <textarea id="text" maxlength="1000">こんにちは。これはテスト音声です。</textarea>
+    <div class="row"><button id="play">再生</button><span class="msg" id="playMsg"></span></div>
+    <audio id="audio" controls hidden></audio>
+    <div class="note">※ フォームの現在値(声・速度・RVC)で試します。保存は不要です。</div>
+  </div>
+
+  <div class="card">
+    <h2>Read Aloud への設定</h2>
+    <div class="note">拡張機能の「カスタム音声」(OpenAI互換)に次を設定します。</div>
+    <div class="row"><label>URL</label><pre id="url" style="flex:1;margin:0"></pre><button class="sub2" data-copy="url">コピー</button></div>
+    <div class="row" style="align-items:flex-start"><label>Voice list</label><pre id="vlist" style="flex:1;margin:0"></pre><button class="sub2" data-copy="vlist">コピー</button></div>
+    <div class="note">拡張機能から接続するには、voice-changer の起動引数に <code>--tts-allowed-origins chrome-extension://拡張機能ID</code>
+      (Firefoxなら <code>moz-extension://UUID</code>)を追加してください。このページ自体は追加設定なしで使えます。</div>
+  </div>
+</main>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+let allVoices = [];
+
+function setMsg(el, text, isErr) { el.textContent = text; el.className = "msg" + (isErr ? " err" : ""); }
+
+async function api(path, opts) {
+  const res = await fetch(path, opts);
+  let data = null;
+  try { data = await res.json(); } catch (_) { /* 音声などJSONでない応答 */ }
+  if (!res.ok) throw new Error((data && data.error && data.error.message) || ("HTTP " + res.status));
+  return data;
+}
+
+function renderChips(st) {
+  const chips = $("chips");
+  chips.textContent = "";
+  const items = [
+    ["RVCモデル", st.model_ready, st.model_ready ? "ロード済み" : "未ロード(GUIでモデルを選択)"],
+    ["edge-tts", st.edge_tts, st.edge_tts ? "OK" : "未インストール"],
+    ["ffmpeg", st.ffmpeg, st.ffmpeg ? "OK" : "見つかりません"],
+  ];
+  for (const [name, ok, label] of items) {
+    const span = document.createElement("span");
+    span.className = "chip " + (ok ? "ok" : "ng");
+    span.textContent = name + ": " + label;
+    chips.appendChild(span);
+  }
+}
+
+function fillVoices() {
+  const loc = $("locale").value;
+  const cur = $("voice").dataset.want || $("voice").value;
+  $("voice").textContent = "";
+  for (const v of allVoices.filter((v) => v.locale === loc)) {
+    const opt = document.createElement("option");
+    opt.value = v.name;
+    opt.textContent = v.name.replace(/^[a-z]{2,3}-[A-Z]{2,4}-/, "") + (v.gender ? " (" + v.gender + ")" : "");
+    $("voice").appendChild(opt);
+  }
+  if ([...$("voice").options].some((o) => o.value === cur)) $("voice").value = cur;
+  $("voice").dataset.want = "";
+  renderSnippet();
+}
+
+function renderSnippet() {
+  $("url").textContent = location.origin;
+  const entry = { voice: "aniota", langs: [$("locale").value || "ja-JP"], model: "rvc-tts", edge_voice: $("voice").value };
+  $("vlist").textContent = JSON.stringify([entry]);
+}
+
+async function init() {
+  try { renderChips(await api("/tts/api/status")); } catch (e) { setMsg($("saveMsg"), e.message, true); }
+  let settings = { edge_voice: "ja-JP-NanamiNeural", speed: 1.0, rvc: true };
+  try { settings = await api("/tts/api/settings"); } catch (e) { setMsg($("saveMsg"), e.message, true); }
+  $("speed").value = settings.speed; $("speedVal").textContent = Number(settings.speed).toFixed(2);
+  $("rvc").checked = !!settings.rvc;
+  try {
+    const data = await api("/tts/api/voices");
+    allVoices = data.voices;
+    if (data.fallback) setMsg($("saveMsg"), "声の一覧を取得できなかったので、簡易リストを表示しています(オフライン?)", true);
+  } catch (e) { setMsg($("saveMsg"), e.message, true); }
+  const locales = [...new Set(allVoices.map((v) => v.locale))];
+  for (const l of locales) { const o = document.createElement("option"); o.value = l; o.textContent = l; $("locale").appendChild(o); }
+  const cur = allVoices.find((v) => v.name === settings.edge_voice);
+  $("locale").value = cur ? cur.locale : (locales.includes("ja-JP") ? "ja-JP" : locales[0] || "");
+  $("voice").dataset.want = settings.edge_voice;
+  fillVoices();
+}
+
+$("locale").addEventListener("change", fillVoices);
+$("voice").addEventListener("change", renderSnippet);
+$("speed").addEventListener("input", () => { $("speedVal").textContent = Number($("speed").value).toFixed(2); });
+
+$("save").addEventListener("click", async () => {
+  $("save").disabled = true;
+  try {
+    await api("/tts/api/settings", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ edge_voice: $("voice").value, speed: Number($("speed").value), rvc: $("rvc").checked }),
+    });
+    setMsg($("saveMsg"), "保存しました");
+  } catch (e) { setMsg($("saveMsg"), e.message, true); }
+  $("save").disabled = false;
+});
+
+let lastUrl = null;
+$("play").addEventListener("click", async () => {
+  const text = $("text").value.trim();
+  if (!text) { setMsg($("playMsg"), "テキストを入力してください", true); return; }
+  $("play").disabled = true; setMsg($("playMsg"), "生成中…");
+  const t0 = performance.now();
+  try {
+    const res = await fetch("/v1/audio/speech", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ input: text, edge_voice: $("voice").value, speed: Number($("speed").value), rvc: $("rvc").checked, response_format: "mp3" }),
+    });
+    if (!res.ok) {
+      let msg = "HTTP " + res.status;
+      try { msg = (await res.json()).error.message; } catch (_) { /* そのまま */ }
+      throw new Error(msg);
+    }
+    const blob = await res.blob();
+    if (lastUrl) URL.revokeObjectURL(lastUrl);
+    lastUrl = URL.createObjectURL(blob);
+    $("audio").src = lastUrl; $("audio").hidden = false;
+    await $("audio").play().catch(() => {});
+    setMsg($("playMsg"), "完了 (" + ((performance.now() - t0) / 1000).toFixed(1) + " 秒)");
+  } catch (e) { setMsg($("playMsg"), e.message, true); }
+  $("play").disabled = false;
+});
+
+document.querySelectorAll("button[data-copy]").forEach((b) => b.addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText($(b.dataset.copy).textContent); b.textContent = "コピーしました"; }
+  catch (_) { b.textContent = "コピー失敗"; }
+  setTimeout(() => { b.textContent = "コピー"; }, 1500);
+}));
+
+init();
+</script>
+</body>
+</html>

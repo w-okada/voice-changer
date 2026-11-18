@@ -21,6 +21,8 @@ import torch
 
 # import threading
 from typing import Callable
+
+_CONVERT_LOCK = threading.Lock()  # 一括変換(inference_offline)を直列化
 from typing import Any
 import re
 
@@ -370,6 +372,17 @@ class VoiceChangerManager(ServerDeviceCallbacks):
         else:
             logger.info("Voice Change is not loaded. Did you load a correct model?")
             return np.zeros(1).astype(np.int16), []
+
+    def convert_offline(self, pcm, sample_rate: int):
+        """文全体の一括変換 (RVC のみ対応)。リアルタイム用の状態には影響しない。"""
+        vc = getattr(self, "voiceChanger", None)
+        model = getattr(vc, "voiceChanger", None)
+        if model is None:
+            raise RuntimeError("Voice Changer model is not loaded.")
+        if not hasattr(model, "inference_offline"):
+            raise RuntimeError("Offline conversion supports RVC models only.")
+        with _CONVERT_LOCK:
+            return model.inference_offline(pcm, sample_rate)
 
     def export2onnx(self):
         return self.voiceChanger.export2onnx()

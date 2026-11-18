@@ -5,6 +5,7 @@ from restapi.mods.trustedorigin import TrustedOriginMiddleware
 from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.routing import APIRoute
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from typing import Callable, Optional, Sequence, Literal
 from mods.log_control import VoiceChangaerLogger
@@ -13,6 +14,8 @@ from voice_changer.VoiceChangerManager import VoiceChangerManager
 from restapi.MMVC_Rest_Hello import MMVC_Rest_Hello
 from restapi.MMVC_Rest_VoiceChanger import MMVC_Rest_VoiceChanger
 from restapi.MMVC_Rest_Fileuploader import MMVC_Rest_Fileuploader
+from restapi.MMVC_Rest_TTS import MMVC_Rest_TTS
+from mods.origins import normalize_origins
 from const import MODEL_DIR_STATIC, UPLOAD_DIR, getFrontendPath, TMP_DIR
 from voice_changer.utils.VoiceChangerParams import VoiceChangerParams
 
@@ -45,6 +48,7 @@ class MMVC_Rest:
         voiceChangerParams: VoiceChangerParams,
         allowedOrigins: Optional[Sequence[str]] = None,
         port: Optional[int] = None,
+        ttsOrigins: Optional[Sequence[str]] = None,
     ):
         if cls._instance is None:
             logger.info("[Voice Changer] MMVC_Rest initializing...")
@@ -53,8 +57,17 @@ class MMVC_Rest:
             app_fastapi.add_middleware(
                 TrustedOriginMiddleware,
                 allowed_origins=allowedOrigins,
-                port=port
+                port=port,
+                tts_origins=ttsOrigins,
             )
+            if ttsOrigins:
+                # 最後に追加=最外層。プリフライトに答えるのは --tts-allowed-origins で許可したオリジンのみ
+                app_fastapi.add_middleware(
+                    CORSMiddleware,
+                    allow_origins=sorted(normalize_origins(ttsOrigins)),
+                    allow_methods=["GET", "POST", "OPTIONS"],
+                    allow_headers=["Content-Type", "Authorization"],
+                )
 
             app_fastapi.mount(
                 "/front",
@@ -104,6 +117,8 @@ class MMVC_Rest:
             app_fastapi.include_router(restVoiceChanger.router)
             fileUploader = MMVC_Rest_Fileuploader(voiceChangerManager)
             app_fastapi.include_router(fileUploader.router)
+            restTTS = MMVC_Rest_TTS(voiceChangerManager)
+            app_fastapi.include_router(restTTS.router)
 
             cls._instance = app_fastapi
             logger.info("[Voice Changer] MMVC_Rest initializing... done.")

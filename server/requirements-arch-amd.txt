@@ -26,6 +26,7 @@ einops==0.6.0
 local_attention==1.8.5
 
 onnxruntime-rocm
+edge-tts>=7.0.0
 onnxsim==0.4.28
 ml_dtypes
 
