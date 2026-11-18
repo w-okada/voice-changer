@@ -1,5 +1,6 @@
 import socketio
 
+from typing import Literal
 from sio.MMVC_Namespace import MMVC_Namespace
 from voice_changer.VoiceChangerManager import VoiceChangerManager
 
@@ -11,7 +12,7 @@ class MMVC_SocketIOServer:
     def get_instance(
         cls,
         voiceChangerManager: VoiceChangerManager,
-        allowedOrigins: list[str],
+        allowedOrigins: list[str] | Literal['*'],
     ):
         if cls._instance is None:
             sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=allowedOrigins)
